@@ -1,0 +1,267 @@
+// Copyright Midnight Grind. All Rights Reserved.
+//
+// PS1-Style Vertex Effects Shader
+//
+// These functions are designed to be used in Material World Position Offset
+// and Custom UV nodes to achieve the characteristic PS1 vertex wobble and
+// affine texture mapping effects.
+//
+// Usage in Material Editor:
+// 1. Vertex Snap: Use SnapToGrid in World Position Offset node
+// 2. Vertex Jitter: Use AddJitter in World Position Offset node
+// 3. Affine UV: Use AffineTextureMapping in Custom UV node
+
+// ============================================================================
+// VERTEX SNAPPING (PS1 Wobble Effect)
+// ============================================================================
+
+// The PS1 used fixed-point math which caused vertices to "snap" to a grid
+// This creates the characteristic wobbling/warping on polygons
+
+// Snap world position to a grid
+// GridSize: Lower = more wobble. PS1 authentic: ~160.0
+float3 SnapToGrid(float3 WorldPosition, float GridSize)
+{
+    // Snap each component to the nearest grid point
+    return round(WorldPosition / GridSize) * GridSize;
+}
+
+// Snap only in screen space (maintains depth stability)
+float3 SnapToScreenGrid(float3 WorldPosition, float4x4 ViewProjection, float GridSize, float2 ScreenSize)
+{
+    // Transform to clip space
+    float4 ClipPos = mul(float4(WorldPosition, 1.0), ViewProjection);
+
+    // Convert to screen space
+    float2 ScreenPos = (ClipPos.xy / ClipPos.w) * 0.5 + 0.5;
+    ScreenPos *= ScreenSize;
+
+    // Snap to grid
+    ScreenPos = round(ScreenPos / GridSize) * GridSize;
+
+    // Convert back to clip space
+    ScreenPos = (ScreenPos / ScreenSize) * 2.0 - 1.0;
+    ClipPos.xy = ScreenPos * ClipPos.w;
+
+    // Note: Full inverse transform would be needed to get back to world space
+    // This is a simplified version - for best results, do this in the vertex shader
+    return WorldPosition; // Placeholder - actual implementation needs inverse VP
+}
+
+// Snapping with distance-based intensity (less wobble up close)
+float3 SnapToGridWithDistance(float3 WorldPosition, float3 CameraPosition, float GridSize, float MinDistance, float MaxDistance)
+{
+    float Distance = length(WorldPosition - CameraPosition);
+
+    // Calculate snap intensity based on distance
+    float Intensity = saturate((Distance - MinDistance) / (MaxDistance - MinDistance));
+
+    // Snap position
+    float3 SnappedPos = SnapToGrid(WorldPosition, GridSize);
+
+    // Blend between original and snapped based on distance
+    return lerp(WorldPosition, SnappedPos, Intensity);
+}
+
+// ============================================================================
+// VERTEX JITTER (Random per-frame wobble)
+// ============================================================================
+
+// PS1 also had slight per-frame jitter due to floating point precision issues
+
+// Simple pseudo-random based on position and time
+float Random(float2 Seed)
+{
+    return frac(sin(dot(Seed, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+// Add jitter to world position
+// JitterScale: Amount of jitter in world units
+// Time: Game time for animation
+float3 AddJitter(float3 WorldPosition, float JitterScale, float Time)
+{
+    // Generate random offset based on position and time
+    float2 Seed = WorldPosition.xy + Time;
+
+    float JitterX = (Random(Seed) - 0.5) * 2.0 * JitterScale;
+    float JitterY = (Random(Seed + 1.0) - 0.5) * 2.0 * JitterScale;
+    float JitterZ = (Random(Seed + 2.0) - 0.5) * 2.0 * JitterScale;
+
+    return WorldPosition + float3(JitterX, JitterY, JitterZ);
+}
+
+// Jitter that changes per frame (smoother)
+float3 AddFrameJitter(float3 WorldPosition, float JitterScale, float FrameTime)
+{
+    // Frame-based seed (changes each frame)
+    float FrameSeed = floor(FrameTime * 30.0); // 30 fps feel
+
+    float2 Seed = float2(FrameSeed, FrameSeed * 0.7);
+
+    float JitterX = (Random(Seed) - 0.5) * 2.0 * JitterScale;
+    float JitterY = (Random(Seed + float2(1.0, 0.0)) - 0.5) * 2.0 * JitterScale;
+
+    return WorldPosition + float3(JitterX, JitterY, 0.0);
+}
+
+// ============================================================================
+// AFFINE TEXTURE MAPPING (PS1 Texture Warping)
+// ============================================================================
+
+// PS1 didn't have perspective-correct texture mapping
+// This causes textures to "swim" and warp on polygons
+
+// Calculate affine UV (without perspective correction)
+// UV: Original texture coordinates
+// W: The W component from clip space (perspective divide)
+// Intensity: 0 = correct, 1 = fully affine (PS1)
+float2 AffineTextureMapping(float2 UV, float W, float Intensity)
+{
+    // In PS1, UVs were interpolated in screen space, not clip space
+    // This means they weren't divided by W for perspective correction
+
+    // Affine UV = UV * W (undoing the perspective divide)
+    float2 AffineUV = UV * W;
+
+    // Blend between correct and affine
+    return lerp(UV, AffineUV, Intensity);
+}
+
+// Per-vertex affine (interpolate this in vertex shader, sample in pixel)
+// VertexPosition: World position of vertex
+// VertexUV: UV at vertex
+// CameraPosition: Camera world position
+float3 PrepareAffineUV(float2 VertexUV, float Depth)
+{
+    // Store UV * Depth in XY, Depth in Z
+    // In pixel shader: FinalUV = XY / Z
+    return float3(VertexUV * Depth, Depth);
+}
+
+// Reconstruct UV in pixel shader from affine-prepared data
+float2 ReconstructAffineUV(float3 AffineData, float Intensity)
+{
+    // Perspective-correct UV
+    float2 CorrectUV = AffineData.xy / AffineData.z;
+
+    // Affine UV (just use interpolated values directly, which causes warping)
+    float2 AffineUV = AffineData.xy / AffineData.z; // Same for single pixel
+
+    // The actual warping happens during interpolation across the triangle
+    // This simplified version shows the concept
+    return CorrectUV; // In practice, interpolation handles this
+}
+
+// ============================================================================
+// COMBINED VERTEX EFFECT
+// ============================================================================
+
+// Complete PS1-style vertex transformation
+// Use this in World Position Offset
+float3 PS1VertexTransform(
+    float3 WorldPosition,
+    float3 CameraPosition,
+    float GridSize,
+    float JitterScale,
+    float Time,
+    bool EnableSnap,
+    bool EnableJitter)
+{
+    float3 Result = WorldPosition;
+
+    // Apply grid snapping
+    if (EnableSnap && GridSize > 0.0)
+    {
+        // Distance-based snapping (less wobble up close)
+        float Distance = length(WorldPosition - CameraPosition);
+        float SnapIntensity = saturate(Distance / 1000.0); // Full snap at 1000 units
+
+        float3 Snapped = SnapToGrid(WorldPosition, GridSize);
+        Result = lerp(WorldPosition, Snapped, SnapIntensity);
+    }
+
+    // Apply jitter
+    if (EnableJitter && JitterScale > 0.0)
+    {
+        Result = AddJitter(Result, JitterScale, Time);
+    }
+
+    return Result;
+}
+
+// ============================================================================
+// LOW-POLY NORMAL CALCULATION (Flat Shading)
+// ============================================================================
+
+// PS1/PS2 often used flat shading (per-face normals) for performance
+// This can be achieved by using flat interpolation qualifier in shader
+
+// Calculate face normal from world position derivatives
+// Use this in pixel shader for flat shading effect
+float3 CalculateFlatNormal(float3 WorldPosition)
+{
+    float3 dX = ddx(WorldPosition);
+    float3 dY = ddy(WorldPosition);
+    return normalize(cross(dX, dY));
+}
+
+// ============================================================================
+// VERTEX LIGHTING (Per-Vertex instead of Per-Pixel)
+// ============================================================================
+
+// PS1 primarily used per-vertex (Gouraud) lighting
+// Calculate lighting at vertex and interpolate
+
+float3 CalculateVertexLight(
+    float3 VertexPosition,
+    float3 VertexNormal,
+    float3 LightPosition,
+    float3 LightColor,
+    float LightIntensity,
+    float3 AmbientColor)
+{
+    // Direction to light
+    float3 LightDir = normalize(LightPosition - VertexPosition);
+
+    // Simple diffuse
+    float NdotL = max(0.0, dot(VertexNormal, LightDir));
+
+    // Distance attenuation
+    float Distance = length(LightPosition - VertexPosition);
+    float Attenuation = 1.0 / (1.0 + Distance * 0.01);
+
+    // Final vertex color
+    return AmbientColor + LightColor * NdotL * LightIntensity * Attenuation;
+}
+
+// ============================================================================
+// TEXTURE COORDINATE PRECISION (PS1 UV Snapping)
+// ============================================================================
+
+// PS1 had limited UV precision which caused texture coordinates to "snap"
+// This is less common to replicate but adds to authenticity
+
+float2 SnapUV(float2 UV, float Precision)
+{
+    // Precision: Number of UV subdivisions (PS1: ~256)
+    return round(UV * Precision) / Precision;
+}
+
+// ============================================================================
+// DEPTH PRECISION (Z-Fighting Helper)
+// ============================================================================
+
+// PS1 had limited depth buffer precision leading to z-fighting
+// This adds slight depth offset based on polygon ID to reduce fighting
+
+float AdjustDepthPrecision(float Depth, float PolygonID, float PrecisionBits)
+{
+    // Quantize depth to limited precision
+    float MaxValue = pow(2.0, PrecisionBits);
+    float QuantizedDepth = round(Depth * MaxValue) / MaxValue;
+
+    // Add tiny offset based on polygon ID
+    float Offset = (frac(PolygonID * 0.1) - 0.5) * (1.0 / MaxValue);
+
+    return QuantizedDepth + Offset;
+}
