@@ -1,0 +1,282 @@
+# ============================================================================
+# MIDNIGHT GRIND - Unreal Engine 5 .gitignore
+# ============================================================================
+# This file specifies which files and folders should be ignored by Git.
+# Unreal Engine generates many temporary and binary files that should not
+# be committed to version control.
+
+# ============================================================================
+# UNREAL ENGINE - GENERATED FOLDERS
+# ============================================================================
+
+# Build outputs - recompiled each build
+Binaries/
+DerivedDataCache/
+
+# Intermediate build files - regenerated during compile
+Intermediate/
+
+# Saved game data, configs, logs - local to each machine
+Saved/
+
+# Build folder used by some build configurations
+Build/
+
+# ============================================================================
+# UNREAL ENGINE - GENERATED FILES
+# ============================================================================
+
+# Visual Studio files - regenerated from .uproject
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+
+# VS Code workspace (optional - some teams commit this)
+.vscode/
+*.code-workspace
+
+# Rider IDE
+.idea/
+*.sln.DotSettings.user
+
+# ============================================================================
+# COMPILED/BINARY FILES
+# ============================================================================
+
+# Compiled shaders
+*.shaderbin
+*.shaderbytecode
+
+# Cooked content (packaged builds)
+*.pak
+*.ucas
+*.utoc
+
+# Binary asset formats that shouldn't be in source (use .uasset instead)
+*.dll
+*.exe
+*.dylib
+*.so
+*.a
+*.lib
+*.pdb
+
+# ============================================================================
+# UNREAL ENGINE - SPECIFIC EXCLUSIONS
+# ============================================================================
+
+# Hot reload backup files
+*-backup-*
+*-BACKUP-*
+
+# Crash reporter files
+CrashReportClient/
+
+# Plugin intermediate files
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
+
+# Automation tool
+Engine/Programs/AutomationTool/
+
+# ============================================================================
+# ASSET HANDLING
+# ============================================================================
+
+# NOTE: .uasset and .umap files SHOULD be committed
+# They are binary but essential to the project
+# Use Git LFS for these large binary files
+
+# DO NOT ignore these (keep them tracked):
+# *.uasset
+# *.umap
+
+# ============================================================================
+# OPERATING SYSTEM FILES
+# ============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# EDITOR & IDE SPECIFIC
+# ============================================================================
+
+# Visual Studio
+*.VC.db
+*.VC.VC.opendb
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+ipch/
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ============================================================================
+# BUILD TOOLS & AUTOMATION
+# ============================================================================
+
+# npm/Node (if using for tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (if using for tools)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+.env
+
+# ============================================================================
+# DOCUMENTATION BUILD
+# ============================================================================
+
+# Doxygen
+Doxygen/html/
+Doxygen/latex/
+
+# Sphinx
+docs/_build/
+
+# ============================================================================
+# TESTING & COVERAGE
+# ============================================================================
+
+# Test results
+TestResults/
+*.trx
+coverage/
+.coverage
+htmlcov/
+
+# ============================================================================
+# SECRETS & CREDENTIALS
+# ============================================================================
+
+# Never commit these!
+*.pem
+*.key
+*.pfx
+*.p12
+credentials.json
+secrets.json
+.env.local
+.env.*.local
+config/secrets.yml
+
+# Steam/Platform SDK keys
+steam_appid.txt
+SteamSDK/
+
+# ============================================================================
+# LARGE MEDIA (handled by Git LFS)
+# ============================================================================
+
+# These are tracked via Git LFS, not ignored:
+# *.png
+# *.jpg
+# *.jpeg
+# *.tga
+# *.bmp
+# *.psd
+# *.tif
+# *.tiff
+# *.wav
+# *.mp3
+# *.ogg
+# *.fbx
+# *.obj
+# *.blend
+# *.mb
+# *.ma
+
+# But raw uncompressed source files should be ignored:
+*.wav.orig
+*.raw
+*.uncompressed
+
+# ============================================================================
+# SPECIFIC PROJECT EXCLUSIONS
+# ============================================================================
+
+# Local developer overrides
+LocalConfig/
+*.local.ini
+
+# Performance profiling data
+*.ue4stats
+*.ue5stats
+Profiling/
+
+# Memory reports
+MemReports/
+
+# Screen captures (use for debugging, don't commit)
+Screenshots/
+Recordings/
+
+# ============================================================================
+# CI/CD SPECIFIC
+# ============================================================================
+
+# Jenkins
+.jenkins/
+
+# GitHub Actions artifacts
+artifacts/
+
+# Build logs
+*.log
+BuildLogs/

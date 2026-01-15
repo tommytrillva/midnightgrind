@@ -1,0 +1,673 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
+#include "Vehicle/MGVehiclePawn.h"
+#include "Vehicle/MGVehicleMovementComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Components/AudioComponent.h"
+#include "NiagaraComponent.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
+AMGVehiclePawn::AMGVehiclePawn(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMGVehicleMovementComponent>(AWheeledVehiclePawn::VehicleMovementComponentName))
+{
+	// Get our custom movement component
+	MGVehicleMovement = Cast<UMGVehicleMovementComponent>(GetVehicleMovementComponent());
+
+	SetupComponents();
+
+	// Enable tick
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = TG_PostPhysics;
+}
+
+void AMGVehiclePawn::SetupComponents()
+{
+	// Create spring arm for chase camera
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(GetMesh());
+	SpringArm->TargetArmLength = ChaseCameraDistance;
+	SpringArm->SocketOffset = FVector(0.0f, 0.0f, ChaseCameraHeight);
+	SpringArm->bUsePawnControlRotation = false;
+	SpringArm->bInheritPitch = false;
+	SpringArm->bInheritRoll = false;
+	SpringArm->bInheritYaw = true;
+	SpringArm->bEnableCameraLag = true;
+	SpringArm->bEnableCameraRotationLag = true;
+	SpringArm->CameraLagSpeed = CameraLagSpeed;
+	SpringArm->CameraRotationLagSpeed = CameraRotationLagSpeed;
+	SpringArm->CameraLagMaxDistance = 100.0f;
+
+	// Create main chase camera
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm);
+	Camera->FieldOfView = BaseFOV;
+	Camera->bUsePawnControlRotation = false;
+
+	// Create hood camera
+	HoodCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("HoodCamera"));
+	HoodCamera->SetupAttachment(GetMesh());
+	HoodCamera->SetRelativeLocation(FVector(100.0f, 0.0f, 120.0f));
+	HoodCamera->SetRelativeRotation(FRotator(-5.0f, 0.0f, 0.0f));
+	HoodCamera->FieldOfView = 100.0f;
+	HoodCamera->bAutoActivate = false;
+
+	// Create interior camera
+	InteriorCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("InteriorCamera"));
+	InteriorCamera->SetupAttachment(GetMesh());
+	InteriorCamera->SetRelativeLocation(FVector(30.0f, -30.0f, 110.0f));
+	InteriorCamera->SetRelativeRotation(FRotator(-5.0f, 0.0f, 0.0f));
+	InteriorCamera->FieldOfView = 90.0f;
+	InteriorCamera->bAutoActivate = false;
+
+	// Create engine audio component
+	EngineAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineAudio"));
+	EngineAudio->SetupAttachment(GetMesh());
+	EngineAudio->bAutoActivate = false;
+
+	// Create exhaust VFX
+	ExhaustVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ExhaustVFX"));
+	ExhaustVFX->SetupAttachment(GetMesh());
+	ExhaustVFX->SetRelativeLocation(FVector(-200.0f, 0.0f, 30.0f));
+	ExhaustVFX->bAutoActivate = false;
+
+	// Create tire smoke VFX
+	TireSmokeVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TireSmokeVFX"));
+	TireSmokeVFX->SetupAttachment(GetMesh());
+	TireSmokeVFX->bAutoActivate = false;
+
+	// Create nitrous VFX
+	NitrousVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NitrousVFX"));
+	NitrousVFX->SetupAttachment(GetMesh());
+	NitrousVFX->SetRelativeLocation(FVector(-200.0f, 0.0f, 30.0f));
+	NitrousVFX->bAutoActivate = false;
+}
+
+void AMGVehiclePawn::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Store initial transform as checkpoint
+	LastCheckpointTransform = GetActorTransform();
+
+	// Bind to movement component events
+	BindMovementEvents();
+
+	// Activate engine audio
+	if (EngineAudio)
+	{
+		EngineAudio->Activate();
+	}
+
+	// Set initial camera
+	SetCameraMode(EMGCameraMode::Chase);
+}
+
+void AMGVehiclePawn::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Update all systems
+	UpdateRuntimeState(DeltaTime);
+	UpdateCamera(DeltaTime);
+	UpdateAudio(DeltaTime);
+	UpdateVFX(DeltaTime);
+
+	// Update lap timer
+	RuntimeState.CurrentLapTime += DeltaTime;
+	RuntimeState.TotalRaceTime += DeltaTime;
+}
+
+void AMGVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	// Get enhanced input component
+	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (!EnhancedInput)
+	{
+		UE_LOG(LogTemp, Error, TEXT("MGVehiclePawn requires Enhanced Input Component!"));
+		return;
+	}
+
+	// Bind throttle
+	if (ThrottleAction)
+	{
+		EnhancedInput->BindAction(ThrottleAction, ETriggerEvent::Triggered, this, &AMGVehiclePawn::HandleThrottle);
+		EnhancedInput->BindAction(ThrottleAction, ETriggerEvent::Completed, this, &AMGVehiclePawn::HandleThrottleReleased);
+	}
+
+	// Bind brake
+	if (BrakeAction)
+	{
+		EnhancedInput->BindAction(BrakeAction, ETriggerEvent::Triggered, this, &AMGVehiclePawn::HandleBrake);
+		EnhancedInput->BindAction(BrakeAction, ETriggerEvent::Completed, this, &AMGVehiclePawn::HandleBrakeReleased);
+	}
+
+	// Bind steering
+	if (SteeringAction)
+	{
+		EnhancedInput->BindAction(SteeringAction, ETriggerEvent::Triggered, this, &AMGVehiclePawn::HandleSteering);
+		EnhancedInput->BindAction(SteeringAction, ETriggerEvent::Completed, this, &AMGVehiclePawn::HandleSteering);
+	}
+
+	// Bind handbrake
+	if (HandbrakeAction)
+	{
+		EnhancedInput->BindAction(HandbrakeAction, ETriggerEvent::Triggered, this, &AMGVehiclePawn::HandleHandbrake);
+		EnhancedInput->BindAction(HandbrakeAction, ETriggerEvent::Completed, this, &AMGVehiclePawn::HandleHandbrakeReleased);
+	}
+
+	// Bind nitrous
+	if (NitrousAction)
+	{
+		EnhancedInput->BindAction(NitrousAction, ETriggerEvent::Triggered, this, &AMGVehiclePawn::HandleNitrous);
+		EnhancedInput->BindAction(NitrousAction, ETriggerEvent::Completed, this, &AMGVehiclePawn::HandleNitrousReleased);
+	}
+
+	// Bind gear shifts
+	if (ShiftUpAction)
+	{
+		EnhancedInput->BindAction(ShiftUpAction, ETriggerEvent::Started, this, &AMGVehiclePawn::HandleShiftUp);
+	}
+	if (ShiftDownAction)
+	{
+		EnhancedInput->BindAction(ShiftDownAction, ETriggerEvent::Started, this, &AMGVehiclePawn::HandleShiftDown);
+	}
+
+	// Bind camera controls
+	if (CameraCycleAction)
+	{
+		EnhancedInput->BindAction(CameraCycleAction, ETriggerEvent::Started, this, &AMGVehiclePawn::HandleCameraCycle);
+	}
+	if (LookBehindAction)
+	{
+		EnhancedInput->BindAction(LookBehindAction, ETriggerEvent::Triggered, this, &AMGVehiclePawn::HandleLookBehind);
+		EnhancedInput->BindAction(LookBehindAction, ETriggerEvent::Completed, this, &AMGVehiclePawn::HandleLookBehindReleased);
+	}
+
+	// Bind reset
+	if (ResetVehicleAction)
+	{
+		EnhancedInput->BindAction(ResetVehicleAction, ETriggerEvent::Started, this, &AMGVehiclePawn::HandleResetVehicle);
+	}
+
+	// Bind pause
+	if (PauseAction)
+	{
+		EnhancedInput->BindAction(PauseAction, ETriggerEvent::Started, this, &AMGVehiclePawn::HandlePause);
+	}
+}
+
+void AMGVehiclePawn::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Add input mapping context
+	if (APlayerController* PC = Cast<APlayerController>(NewController))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		{
+			if (VehicleMappingContext)
+			{
+				Subsystem->AddMappingContext(VehicleMappingContext, InputPriority);
+			}
+		}
+	}
+}
+
+void AMGVehiclePawn::UnPossessed()
+{
+	// Remove input mapping context
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		{
+			if (VehicleMappingContext)
+			{
+				Subsystem->RemoveMappingContext(VehicleMappingContext);
+			}
+		}
+	}
+
+	Super::UnPossessed();
+}
+
+// ==========================================
+// COMPONENT ACCESS
+// ==========================================
+
+UMGVehicleMovementComponent* AMGVehiclePawn::GetMGVehicleMovement() const
+{
+	return MGVehicleMovement;
+}
+
+void AMGVehiclePawn::LoadVehicleConfiguration(const FMGVehicleData& Configuration)
+{
+	VehicleConfiguration = Configuration;
+
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->ApplyVehicleConfiguration(Configuration);
+	}
+}
+
+// ==========================================
+// CAMERA
+// ==========================================
+
+void AMGVehiclePawn::SetCameraMode(EMGCameraMode NewMode)
+{
+	CurrentCameraMode = NewMode;
+
+	// Deactivate all cameras first
+	if (Camera) Camera->Deactivate();
+	if (HoodCamera) HoodCamera->Deactivate();
+	if (InteriorCamera) InteriorCamera->Deactivate();
+
+	// Activate the selected camera
+	switch (NewMode)
+	{
+	case EMGCameraMode::Chase:
+		if (Camera) Camera->Activate();
+		if (SpringArm)
+		{
+			SpringArm->TargetArmLength = ChaseCameraDistance;
+			SpringArm->SocketOffset = FVector(0.0f, 0.0f, ChaseCameraHeight);
+		}
+		break;
+
+	case EMGCameraMode::Hood:
+		if (HoodCamera) HoodCamera->Activate();
+		break;
+
+	case EMGCameraMode::Bumper:
+		if (Camera) Camera->Activate();
+		if (SpringArm)
+		{
+			SpringArm->TargetArmLength = 0.0f;
+			SpringArm->SocketOffset = FVector(200.0f, 0.0f, 80.0f);
+		}
+		break;
+
+	case EMGCameraMode::Interior:
+		if (InteriorCamera) InteriorCamera->Activate();
+		break;
+
+	case EMGCameraMode::Cinematic:
+		if (Camera) Camera->Activate();
+		if (SpringArm)
+		{
+			SpringArm->TargetArmLength = ChaseCameraDistance * 1.5f;
+			SpringArm->SocketOffset = FVector(0.0f, 200.0f, ChaseCameraHeight * 0.5f);
+		}
+		break;
+	}
+}
+
+void AMGVehiclePawn::CycleCamera()
+{
+	int32 CurrentIndex = static_cast<int32>(CurrentCameraMode);
+	int32 NextIndex = (CurrentIndex + 1) % 5; // 5 camera modes
+	SetCameraMode(static_cast<EMGCameraMode>(NextIndex));
+}
+
+void AMGVehiclePawn::SetLookBehind(bool bLookBehind)
+{
+	bIsLookingBehind = bLookBehind;
+
+	if (SpringArm)
+	{
+		if (bLookBehind)
+		{
+			SpringArm->SetRelativeRotation(FRotator(0.0f, 180.0f, 0.0f));
+		}
+		else
+		{
+			SpringArm->SetRelativeRotation(FRotator::ZeroRotator);
+		}
+	}
+}
+
+// ==========================================
+// RACE STATE
+// ==========================================
+
+void AMGVehiclePawn::SetCurrentLap(int32 Lap)
+{
+	int32 PreviousLap = RuntimeState.CurrentLap;
+	RuntimeState.CurrentLap = Lap;
+
+	if (Lap > PreviousLap && PreviousLap > 0)
+	{
+		// Lap completed
+		if (RuntimeState.CurrentLapTime < RuntimeState.BestLapTime || RuntimeState.BestLapTime <= 0.0f)
+		{
+			RuntimeState.BestLapTime = RuntimeState.CurrentLapTime;
+		}
+
+		OnLapCompleted.Broadcast(PreviousLap);
+		ResetLapTimer();
+	}
+}
+
+void AMGVehiclePawn::SetRacePosition(int32 Position)
+{
+	RuntimeState.RacePosition = Position;
+}
+
+void AMGVehiclePawn::RecordCheckpoint(int32 CheckpointIndex)
+{
+	LastCheckpointTransform = GetActorTransform();
+	OnCheckpointPassed.Broadcast(CheckpointIndex, RuntimeState.CurrentLapTime);
+}
+
+void AMGVehiclePawn::ResetLapTimer()
+{
+	RuntimeState.CurrentLapTime = 0.0f;
+}
+
+void AMGVehiclePawn::RespawnAtCheckpoint()
+{
+	// Stop all momentum
+	if (UPrimitiveComponent* PrimComp = Cast<UPrimitiveComponent>(GetRootComponent()))
+	{
+		PrimComp->SetPhysicsLinearVelocity(FVector::ZeroVector);
+		PrimComp->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+	}
+
+	// Teleport to checkpoint
+	SetActorTransform(LastCheckpointTransform);
+
+	// Broadcast event
+	OnVehicleRespawn.Broadcast();
+}
+
+// ==========================================
+// INPUT HANDLERS
+// ==========================================
+
+void AMGVehiclePawn::HandleThrottle(const FInputActionValue& Value)
+{
+	float ThrottleValue = Value.Get<float>();
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->SetThrottleInput(ThrottleValue);
+	}
+}
+
+void AMGVehiclePawn::HandleThrottleReleased(const FInputActionValue& Value)
+{
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->SetThrottleInput(0.0f);
+	}
+}
+
+void AMGVehiclePawn::HandleBrake(const FInputActionValue& Value)
+{
+	float BrakeValue = Value.Get<float>();
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->SetBrakeInput(BrakeValue);
+	}
+}
+
+void AMGVehiclePawn::HandleBrakeReleased(const FInputActionValue& Value)
+{
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->SetBrakeInput(0.0f);
+	}
+}
+
+void AMGVehiclePawn::HandleSteering(const FInputActionValue& Value)
+{
+	float SteerValue = Value.Get<float>();
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->SetSteeringInput(SteerValue);
+	}
+}
+
+void AMGVehiclePawn::HandleHandbrake(const FInputActionValue& Value)
+{
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->SetHandbrakeInput(true);
+	}
+}
+
+void AMGVehiclePawn::HandleHandbrakeReleased(const FInputActionValue& Value)
+{
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->SetHandbrakeInput(false);
+	}
+}
+
+void AMGVehiclePawn::HandleNitrous(const FInputActionValue& Value)
+{
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->ActivateNitrous();
+	}
+}
+
+void AMGVehiclePawn::HandleNitrousReleased(const FInputActionValue& Value)
+{
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->DeactivateNitrous();
+	}
+}
+
+void AMGVehiclePawn::HandleShiftUp(const FInputActionValue& Value)
+{
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->ShiftUp();
+	}
+}
+
+void AMGVehiclePawn::HandleShiftDown(const FInputActionValue& Value)
+{
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->ShiftDown();
+	}
+}
+
+void AMGVehiclePawn::HandleCameraCycle(const FInputActionValue& Value)
+{
+	CycleCamera();
+}
+
+void AMGVehiclePawn::HandleLookBehind(const FInputActionValue& Value)
+{
+	SetLookBehind(true);
+}
+
+void AMGVehiclePawn::HandleLookBehindReleased(const FInputActionValue& Value)
+{
+	SetLookBehind(false);
+}
+
+void AMGVehiclePawn::HandleResetVehicle(const FInputActionValue& Value)
+{
+	RespawnAtCheckpoint();
+}
+
+void AMGVehiclePawn::HandlePause(const FInputActionValue& Value)
+{
+	// Pause is typically handled by the game mode or player controller
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		PC->SetPause(!UGameplayStatics::IsGamePaused(GetWorld()));
+	}
+}
+
+// ==========================================
+// UPDATE METHODS
+// ==========================================
+
+void AMGVehiclePawn::UpdateRuntimeState(float DeltaTime)
+{
+	if (!MGVehicleMovement)
+	{
+		return;
+	}
+
+	// Get engine state
+	FMGEngineState EngineState = MGVehicleMovement->GetEngineState();
+
+	// Update speed
+	RuntimeState.SpeedMPH = MGVehicleMovement->GetSpeedMPH();
+	RuntimeState.SpeedKPH = MGVehicleMovement->GetSpeedKPH();
+
+	// Update engine
+	RuntimeState.RPM = EngineState.CurrentRPM;
+	RuntimeState.RPMPercent = EngineState.CurrentRPM / 8000.0f; // Normalize to typical redline
+	RuntimeState.CurrentGear = MGVehicleMovement->GetCurrentGear();
+	RuntimeState.bRevLimiter = EngineState.bRevLimiterActive;
+
+	// Update boost/nitrous
+	RuntimeState.BoostPSI = EngineState.CurrentBoostPSI;
+	RuntimeState.NitrousPercent = EngineState.NitrousRemaining;
+	RuntimeState.bNitrousActive = EngineState.bNitrousActive;
+
+	// Update drift state
+	FMGDriftState DriftState = MGVehicleMovement->GetDriftState();
+	RuntimeState.bIsDrifting = DriftState.bIsDrifting;
+	RuntimeState.DriftAngle = DriftState.DriftAngle;
+	RuntimeState.DriftScore = DriftState.DriftScore;
+
+	// Check for gear change
+	if (RuntimeState.CurrentGear != PreviousGear)
+	{
+		OnGearChanged(RuntimeState.CurrentGear);
+		PreviousGear = RuntimeState.CurrentGear;
+	}
+
+	// Check for drift state change
+	if (RuntimeState.bIsDrifting && !bWasDrifting)
+	{
+		OnDriftStarted();
+	}
+	else if (!RuntimeState.bIsDrifting && bWasDrifting)
+	{
+		OnDriftEnded(RuntimeState.DriftScore);
+	}
+	bWasDrifting = RuntimeState.bIsDrifting;
+}
+
+void AMGVehiclePawn::UpdateCamera(float DeltaTime)
+{
+	if (!Camera || !SpringArm)
+	{
+		return;
+	}
+
+	// Speed-based FOV
+	float SpeedPercent = FMath::Clamp(RuntimeState.SpeedMPH / 150.0f, 0.0f, 1.0f); // 150 mph = max
+	TargetFOV = FMath::Lerp(BaseFOV, MaxFOV, SpeedPercent * SpeedFOVMultiplier);
+
+	// Nitrous FOV boost
+	if (RuntimeState.bNitrousActive)
+	{
+		TargetFOV += 10.0f;
+	}
+
+	// Smooth FOV transition
+	float CurrentFOV = Camera->FieldOfView;
+	Camera->FieldOfView = FMath::FInterpTo(CurrentFOV, TargetFOV, DeltaTime, 5.0f);
+
+	// Drift camera shake (subtle)
+	if (RuntimeState.bIsDrifting && DriftCameraShakeIntensity > 0.0f)
+	{
+		float ShakeAmount = FMath::Abs(RuntimeState.DriftAngle) / 90.0f * DriftCameraShakeIntensity;
+		FVector ShakeOffset = FVector(
+			FMath::RandRange(-ShakeAmount, ShakeAmount),
+			FMath::RandRange(-ShakeAmount, ShakeAmount),
+			FMath::RandRange(-ShakeAmount * 0.5f, ShakeAmount * 0.5f)
+		);
+		SpringArm->AddRelativeLocation(ShakeOffset);
+	}
+}
+
+void AMGVehiclePawn::UpdateAudio(float DeltaTime)
+{
+	if (!EngineAudio)
+	{
+		return;
+	}
+
+	// Update engine sound pitch based on RPM
+	float PitchMultiplier = FMath::Lerp(0.5f, 2.0f, RuntimeState.RPMPercent);
+	EngineAudio->SetPitchMultiplier(PitchMultiplier);
+
+	// Volume based on throttle
+	FMGEngineState EngineState = MGVehicleMovement ? MGVehicleMovement->GetEngineState() : FMGEngineState();
+	float VolumeMultiplier = FMath::Lerp(0.3f, 1.0f, EngineState.ThrottlePosition);
+	EngineAudio->SetVolumeMultiplier(VolumeMultiplier);
+}
+
+void AMGVehiclePawn::UpdateVFX(float DeltaTime)
+{
+	// Exhaust flames on throttle lift at high RPM
+	if (ExhaustVFX && MGVehicleMovement)
+	{
+		FMGEngineState EngineState = MGVehicleMovement->GetEngineState();
+		bool bShouldFlame = EngineState.ThrottlePosition < 0.2f && RuntimeState.RPMPercent > 0.7f;
+
+		if (bShouldFlame && !ExhaustVFX->IsActive())
+		{
+			ExhaustVFX->Activate();
+		}
+		else if (!bShouldFlame && ExhaustVFX->IsActive())
+		{
+			ExhaustVFX->Deactivate();
+		}
+	}
+
+	// Tire smoke during drift
+	if (TireSmokeVFX)
+	{
+		if (RuntimeState.bIsDrifting && !TireSmokeVFX->IsActive())
+		{
+			TireSmokeVFX->Activate();
+		}
+		else if (!RuntimeState.bIsDrifting && TireSmokeVFX->IsActive())
+		{
+			TireSmokeVFX->Deactivate();
+		}
+	}
+
+	// Nitrous VFX
+	if (NitrousVFX)
+	{
+		if (RuntimeState.bNitrousActive && !NitrousVFX->IsActive())
+		{
+			NitrousVFX->Activate();
+			OnNitrousActivated();
+		}
+		else if (!RuntimeState.bNitrousActive && NitrousVFX->IsActive())
+		{
+			NitrousVFX->Deactivate();
+			OnNitrousDeactivated();
+		}
+	}
+}
+
+void AMGVehiclePawn::BindMovementEvents()
+{
+	if (MGVehicleMovement)
+	{
+		// Bind to movement component delegates
+		MGVehicleMovement->OnGearChanged.AddDynamic(this, &AMGVehiclePawn::OnGearChanged);
+	}
+}

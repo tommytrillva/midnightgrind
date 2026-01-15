@@ -1,0 +1,535 @@
+// Copyright Midnight Grind. All Rights Reserved.
+//
+// PS1/PS2 Era Retro Post-Process Shader
+//
+// This shader implements the complete retro rendering pipeline for the
+// MIDNIGHT GRIND visual aesthetic. Effects include:
+// - Resolution downsampling with point filtering
+// - Color quantization (limited color palette)
+// - Ordered dithering (Bayer matrix)
+// - CRT scanlines and curvature
+// - Chromatic aberration
+// - Phosphor glow
+// - Vignette
+// - Film grain/noise
+// - Neon glow (bloom on saturated colors)
+//
+// To use: Create a Post-Process Material in UE5 and use Custom nodes
+// to call these functions, or copy sections into material graph.
+
+#include "/Engine/Private/Common.ush"
+#include "/Engine/Private/PostProcessCommon.ush"
+#include "/Engine/Private/ScreenPass.ush"
+
+// ============================================================================
+// PARAMETERS (from Material Parameter Collection)
+// ============================================================================
+
+// These should match the parameter names in UMGRetroRenderingComponent
+// Parameters are passed via Material Parameter Collection
+
+// float EffectsEnabled;
+// float ResolutionScale;
+// float PointFilter;
+// float ColorLevels;
+// float DitherPattern;
+// float DitherIntensity;
+// float DitherSpread;
+// float ScanlineIntensity;
+// float ScanlineScale;
+// float CRTCurvature;
+// float ChromaticAberration;
+// float PhosphorGlowIntensity;
+// float VignetteIntensity;
+// float NoiseIntensity;
+// float Time;
+// float4 FogColor;
+
+// ============================================================================
+// DITHERING
+// ============================================================================
+
+// 4x4 Bayer dither matrix (classic PS1 pattern)
+static const float Bayer4x4[16] = {
+    0.0 / 16.0,  8.0 / 16.0,  2.0 / 16.0, 10.0 / 16.0,
+    12.0 / 16.0, 4.0 / 16.0, 14.0 / 16.0,  6.0 / 16.0,
+    3.0 / 16.0, 11.0 / 16.0,  1.0 / 16.0,  9.0 / 16.0,
+    15.0 / 16.0, 7.0 / 16.0, 13.0 / 16.0,  5.0 / 16.0
+};
+
+// Get Bayer dither value for screen position
+float GetBayerDither4x4(float2 ScreenPos)
+{
+    int2 Pos = int2(ScreenPos) % 4;
+    return Bayer4x4[Pos.y * 4 + Pos.x];
+}
+
+// 8x8 Bayer matrix for finer dithering
+float GetBayerDither8x8(float2 ScreenPos)
+{
+    int2 Pos = int2(ScreenPos) % 8;
+
+    // Generate 8x8 from 4x4 recursively
+    float Base = GetBayerDither4x4(ScreenPos);
+    int2 SubPos = Pos / 2;
+    float Offset = ((SubPos.x + SubPos.y * 2) % 4) / 64.0;
+
+    return frac(Base + Offset);
+}
+
+// Blue noise dithering (requires blue noise texture)
+float GetBlueNoiseDither(float2 ScreenPos, Texture2D BlueNoiseTexture, SamplerState BlueNoiseSampler, float Time)
+{
+    float2 UV = frac(ScreenPos / 256.0 + Time * 0.1);
+    return Texture2DSample(BlueNoiseTexture, BlueNoiseSampler, UV).r;
+}
+
+// Apply dithering to color value
+float3 ApplyDithering(float3 Color, float2 ScreenPos, float DitherValue, float Intensity, float Spread)
+{
+    // Offset dither to be centered around 0
+    float DitherOffset = (DitherValue - 0.5) * Spread * Intensity;
+
+    return Color + DitherOffset;
+}
+
+// ============================================================================
+// COLOR QUANTIZATION
+// ============================================================================
+
+// Quantize color to limited palette (PS1: 32 levels per channel = 5-bit color)
+float3 QuantizeColor(float3 Color, float Levels)
+{
+    float Step = 1.0 / (Levels - 1.0);
+    return round(Color / Step) * Step;
+}
+
+// Quantize with dithering (the complete PS1 look)
+float3 QuantizeWithDither(float3 Color, float Levels, float2 ScreenPos, float DitherIntensity, float DitherSpread)
+{
+    // Get dither value
+    float Dither = GetBayerDither4x4(ScreenPos);
+
+    // Apply dither before quantization
+    float3 DitheredColor = ApplyDithering(Color, ScreenPos, Dither, DitherIntensity, DitherSpread);
+
+    // Quantize
+    return QuantizeColor(saturate(DitheredColor), Levels);
+}
+
+// ============================================================================
+// CRT EFFECTS
+// ============================================================================
+
+// CRT barrel distortion (curved screen effect)
+float2 ApplyCRTCurvature(float2 UV, float Curvature)
+{
+    // Convert to -1 to 1 range
+    float2 Curved = UV * 2.0 - 1.0;
+
+    // Apply barrel distortion
+    float2 Offset = Curved.yx * Curved.yx * Curvature;
+    Curved = Curved + Curved * Offset;
+
+    // Convert back to 0-1 range
+    return Curved * 0.5 + 0.5;
+}
+
+// Scanline effect
+float GetScanlineValue(float2 ScreenPos, float Intensity, float Scale)
+{
+    // Create scanline pattern
+    float Scanline = sin(ScreenPos.y * 3.14159 * Scale) * 0.5 + 0.5;
+    Scanline = pow(Scanline, 1.5);
+
+    return 1.0 - (Intensity * (1.0 - Scanline));
+}
+
+// RGB phosphor pattern (shadow mask)
+float3 ApplyShadowMask(float3 Color, float2 ScreenPos, float Intensity)
+{
+    // Create RGB stripe pattern
+    int Column = int(ScreenPos.x) % 3;
+
+    float3 Mask = float3(1.0, 1.0, 1.0);
+    if (Column == 0)
+        Mask = float3(1.0, 0.7, 0.7);
+    else if (Column == 1)
+        Mask = float3(0.7, 1.0, 0.7);
+    else
+        Mask = float3(0.7, 0.7, 1.0);
+
+    return lerp(Color, Color * Mask, Intensity * 0.3);
+}
+
+// Chromatic aberration (color fringing)
+float3 ApplyChromaticAberration(Texture2D SceneTexture, SamplerState SceneSampler, float2 UV, float2 ScreenSize, float Intensity)
+{
+    // Calculate offset based on distance from center
+    float2 Center = float2(0.5, 0.5);
+    float2 Dir = UV - Center;
+    float Dist = length(Dir);
+
+    // Offset increases towards edges
+    float2 Offset = Dir * Dist * Intensity * 0.02;
+
+    float3 Result;
+    Result.r = Texture2DSample(SceneTexture, SceneSampler, UV + Offset).r;
+    Result.g = Texture2DSample(SceneTexture, SceneSampler, UV).g;
+    Result.b = Texture2DSample(SceneTexture, SceneSampler, UV - Offset).b;
+
+    return Result;
+}
+
+// ============================================================================
+// PHOSPHOR GLOW (CRT bloom)
+// ============================================================================
+
+// Simple 9-tap blur for phosphor glow
+float3 GetPhosphorGlow(Texture2D SceneTexture, SamplerState SceneSampler, float2 UV, float2 TexelSize, float Intensity)
+{
+    float3 Glow = float3(0, 0, 0);
+
+    // Sample surrounding pixels
+    for (int x = -1; x <= 1; x++)
+    {
+        for (int y = -1; y <= 1; y++)
+        {
+            float2 OffsetUV = UV + float2(x, y) * TexelSize * 2.0;
+            float3 Sample = Texture2DSample(SceneTexture, SceneSampler, OffsetUV).rgb;
+
+            // Weight by brightness
+            float Brightness = dot(Sample, float3(0.299, 0.587, 0.114));
+            Glow += Sample * Brightness;
+        }
+    }
+
+    return Glow / 9.0 * Intensity;
+}
+
+// ============================================================================
+// VIGNETTE
+// ============================================================================
+
+float GetVignette(float2 UV, float Intensity)
+{
+    float2 Center = UV - 0.5;
+    float Dist = length(Center);
+
+    // Smooth falloff
+    float Vignette = 1.0 - pow(Dist * 1.4, 2.5);
+
+    return lerp(1.0, Vignette, Intensity);
+}
+
+// ============================================================================
+// NOISE / FILM GRAIN
+// ============================================================================
+
+// Hash function for noise
+float Hash(float2 P, float Time)
+{
+    float3 P3 = frac(float3(P.xyx) * 0.1031 + Time);
+    P3 += dot(P3, P3.yzx + 33.33);
+    return frac((P3.x + P3.y) * P3.z);
+}
+
+// Film grain effect
+float3 ApplyFilmGrain(float3 Color, float2 ScreenPos, float Intensity, float Time, bool Colored)
+{
+    float Noise = Hash(ScreenPos, Time);
+
+    if (Colored)
+    {
+        // Colored noise
+        float3 NoiseColor;
+        NoiseColor.r = Hash(ScreenPos + float2(1.0, 0.0), Time);
+        NoiseColor.g = Hash(ScreenPos + float2(0.0, 1.0), Time);
+        NoiseColor.b = Hash(ScreenPos + float2(1.0, 1.0), Time);
+
+        return Color + (NoiseColor - 0.5) * Intensity;
+    }
+    else
+    {
+        // Grayscale noise
+        return Color + (Noise - 0.5) * Intensity;
+    }
+}
+
+// Interlacing effect
+float3 ApplyInterlacing(float3 Color, float2 ScreenPos, float Time, float Intensity)
+{
+    // Alternate lines based on frame
+    int Line = int(ScreenPos.y);
+    int Frame = int(Time * 60.0) % 2;
+
+    if ((Line + Frame) % 2 == 0)
+    {
+        return Color * (1.0 - Intensity * 0.3);
+    }
+
+    return Color;
+}
+
+// ============================================================================
+// NEON GLOW (MIDNIGHT GRIND signature effect)
+// ============================================================================
+
+// Detect neon-like colors (high saturation, specific hues)
+float GetNeonMask(float3 Color, float Threshold)
+{
+    // Calculate saturation
+    float MaxC = max(max(Color.r, Color.g), Color.b);
+    float MinC = min(min(Color.r, Color.g), Color.b);
+    float Saturation = (MaxC - MinC) / (MaxC + 0.001);
+
+    // Calculate brightness
+    float Brightness = dot(Color, float3(0.299, 0.587, 0.114));
+
+    // Neon colors are saturated and bright
+    float NeonScore = Saturation * Brightness;
+
+    return smoothstep(Threshold * 0.5, Threshold, NeonScore);
+}
+
+// Apply neon glow effect
+float3 ApplyNeonGlow(Texture2D SceneTexture, SamplerState SceneSampler, float2 UV, float2 TexelSize,
+                      float3 SceneColor, float Threshold, float Intensity)
+{
+    float3 Glow = float3(0, 0, 0);
+    float TotalWeight = 0.0;
+
+    // Multi-pass blur for glow
+    const int BlurRadius = 4;
+
+    for (int x = -BlurRadius; x <= BlurRadius; x++)
+    {
+        for (int y = -BlurRadius; y <= BlurRadius; y++)
+        {
+            float2 OffsetUV = UV + float2(x, y) * TexelSize * 2.0;
+            float3 Sample = Texture2DSample(SceneTexture, SceneSampler, OffsetUV).rgb;
+
+            // Weight by neon mask
+            float NeonMask = GetNeonMask(Sample, Threshold);
+            float Weight = NeonMask * exp(-0.1 * (x * x + y * y));
+
+            Glow += Sample * Weight;
+            TotalWeight += Weight;
+        }
+    }
+
+    if (TotalWeight > 0.0)
+    {
+        Glow /= TotalWeight;
+    }
+
+    // Add glow to scene
+    return SceneColor + Glow * Intensity;
+}
+
+// ============================================================================
+// DISTANCE FOG (PS1/PS2 style)
+// ============================================================================
+
+float3 ApplyDistanceFog(float3 Color, float Depth, float3 FogColor, float StartDistance, float Density)
+{
+    // Linear fog based on depth
+    float FogFactor = saturate((Depth - StartDistance) * Density * 0.001);
+
+    return lerp(Color, FogColor, FogFactor);
+}
+
+// ============================================================================
+// RESOLUTION DOWNSAMPLING
+// ============================================================================
+
+// Point sample (nearest neighbor) for pixelated look
+float3 PointSampleDownscale(Texture2D SceneTexture, SamplerState SceneSampler, float2 UV, float2 TargetResolution)
+{
+    // Snap UV to pixel grid
+    float2 PixelUV = floor(UV * TargetResolution) / TargetResolution;
+
+    return Texture2DSample(SceneTexture, SceneSampler, PixelUV).rgb;
+}
+
+// ============================================================================
+// VERTEX JITTER (for World Position Offset in vertex shader)
+// Note: This would be applied in the vertex shader, not post-process
+// ============================================================================
+
+// Snap vertex position to grid (PS1 vertex wobble)
+float3 SnapVertexToGrid(float3 WorldPosition, float GridSize)
+{
+    return round(WorldPosition / GridSize) * GridSize;
+}
+
+// Add jitter to vertex position
+float3 AddVertexJitter(float3 WorldPosition, float2 JitterOffset, float Intensity)
+{
+    return WorldPosition + float3(JitterOffset.x, JitterOffset.y, 0.0) * Intensity;
+}
+
+// ============================================================================
+// AFFINE TEXTURE MAPPING (PS1 characteristic)
+// Note: This would be applied in the vertex shader
+// ============================================================================
+
+// Calculate affine UV (no perspective correction)
+float2 CalculateAffineUV(float2 UV, float W, float Intensity)
+{
+    // PS1 didn't divide UV by W (no perspective correction)
+    // This causes texture warping on polygons
+    float2 AffineUV = UV * W;
+
+    return lerp(UV, AffineUV, Intensity);
+}
+
+// ============================================================================
+// COMPLETE POST-PROCESS CHAIN
+// ============================================================================
+
+// Main post-process function combining all effects
+float3 MGRetroPostProcess(
+    Texture2D SceneTexture,
+    SamplerState SceneSampler,
+    float2 UV,
+    float2 ScreenPos,
+    float2 ScreenSize,
+    float Depth,
+    // Parameters
+    float ResolutionScale,
+    bool UsePointFilter,
+    float ColorLevels,
+    float DitherIntensity,
+    float DitherSpread,
+    float ScanlineIntensity,
+    float ScanlineScale,
+    float CRTCurvature,
+    float ChromaticAberrationIntensity,
+    float PhosphorGlowIntensity,
+    float VignetteIntensity,
+    float NoiseIntensity,
+    float3 FogColor,
+    float FogStart,
+    float FogDensity,
+    float NeonThreshold,
+    float NeonIntensity,
+    float Time)
+{
+    float2 TexelSize = 1.0 / ScreenSize;
+
+    // 1. Apply CRT curvature to UV
+    float2 CurvedUV = ApplyCRTCurvature(UV, CRTCurvature);
+
+    // Check if UV is out of bounds (black bars on curved CRT)
+    if (CurvedUV.x < 0.0 || CurvedUV.x > 1.0 || CurvedUV.y < 0.0 || CurvedUV.y > 1.0)
+    {
+        return float3(0.0, 0.0, 0.0);
+    }
+
+    // 2. Resolution downsampling
+    float3 Color;
+    if (ResolutionScale < 1.0)
+    {
+        float2 TargetRes = ScreenSize * ResolutionScale;
+        if (UsePointFilter)
+        {
+            Color = PointSampleDownscale(SceneTexture, SceneSampler, CurvedUV, TargetRes);
+        }
+        else
+        {
+            // Bilinear sampling (smoother, more PS2-like)
+            Color = Texture2DSample(SceneTexture, SceneSampler, CurvedUV).rgb;
+        }
+    }
+    else
+    {
+        Color = Texture2DSample(SceneTexture, SceneSampler, CurvedUV).rgb;
+    }
+
+    // 3. Chromatic aberration
+    if (ChromaticAberrationIntensity > 0.0)
+    {
+        Color = ApplyChromaticAberration(SceneTexture, SceneSampler, CurvedUV, ScreenSize, ChromaticAberrationIntensity);
+    }
+
+    // 4. Distance fog
+    if (FogDensity > 0.0)
+    {
+        Color = ApplyDistanceFog(Color, Depth, FogColor, FogStart, FogDensity);
+    }
+
+    // 5. Neon glow (before color quantization for cleaner look)
+    if (NeonIntensity > 0.0)
+    {
+        Color = ApplyNeonGlow(SceneTexture, SceneSampler, CurvedUV, TexelSize, Color, NeonThreshold, NeonIntensity);
+    }
+
+    // 6. Phosphor glow
+    if (PhosphorGlowIntensity > 0.0)
+    {
+        Color += GetPhosphorGlow(SceneTexture, SceneSampler, CurvedUV, TexelSize, PhosphorGlowIntensity);
+    }
+
+    // 7. Color quantization with dithering (THE PS1 LOOK)
+    if (ColorLevels < 256.0 && ColorLevels > 0.0)
+    {
+        Color = QuantizeWithDither(Color, ColorLevels, ScreenPos, DitherIntensity, DitherSpread);
+    }
+
+    // 8. Scanlines
+    if (ScanlineIntensity > 0.0)
+    {
+        float Scanline = GetScanlineValue(ScreenPos, ScanlineIntensity, ScanlineScale);
+        Color *= Scanline;
+
+        // Apply shadow mask
+        Color = ApplyShadowMask(Color, ScreenPos, ScanlineIntensity);
+    }
+
+    // 9. Vignette
+    if (VignetteIntensity > 0.0)
+    {
+        Color *= GetVignette(UV, VignetteIntensity);
+    }
+
+    // 10. Film grain (last, on top of everything)
+    if (NoiseIntensity > 0.0)
+    {
+        Color = ApplyFilmGrain(Color, ScreenPos, NoiseIntensity, Time, false);
+    }
+
+    return saturate(Color);
+}
+
+// ============================================================================
+// SIGNATURE COLORS (MIDNIGHT GRIND Palette)
+// ============================================================================
+
+// Hot pink - Primary accent
+static const float3 MG_PINK = float3(1.0, 0.0, 0.5);
+
+// Electric blue - Secondary accent
+static const float3 MG_BLUE = float3(0.0, 0.5, 1.0);
+
+// Neon purple - Tertiary
+static const float3 MG_PURPLE = float3(0.5, 0.0, 1.0);
+
+// Night sky - Background
+static const float3 MG_NIGHT = float3(0.05, 0.02, 0.1);
+
+// Chrome - Metallic highlights
+static const float3 MG_CHROME = float3(0.8, 0.85, 0.9);
+
+// Street lamp orange - Environmental
+static const float3 MG_SODIUM = float3(1.0, 0.6, 0.2);
+
+// Check if color matches signature palette (for special effects)
+bool IsSignatureColor(float3 Color, float Threshold)
+{
+    float DistPink = distance(Color, MG_PINK);
+    float DistBlue = distance(Color, MG_BLUE);
+    float DistPurple = distance(Color, MG_PURPLE);
+
+    return min(min(DistPink, DistBlue), DistPurple) < Threshold;
+}

@@ -1,0 +1,378 @@
+# ============================================================================
+# MIDNIGHT GRIND - CI/CD Pipeline
+# ============================================================================
+# This workflow handles:
+# - Code compilation and validation
+# - Automated testing
+# - Build packaging for various platforms
+# - Deployment to staging/production
+#
+# Prerequisites:
+# - Self-hosted runners with Unreal Engine 5.4 installed
+# - GitHub Secrets configured for signing keys and deployment credentials
+# ============================================================================
+
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'release/**'
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - '.gitignore'
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+  workflow_dispatch:
+    inputs:
+      build_config:
+        description: 'Build Configuration'
+        required: true
+        default: 'Development'
+        type: choice
+        options:
+          - Development
+          - Shipping
+
+      target_platform:
+        description: 'Target Platform'
+        required: true
+        default: 'Win64'
+        type: choice
+        options:
+          - Win64
+          - Linux
+          - All
+
+      run_tests:
+        description: 'Run Automated Tests'
+        required: false
+        default: true
+        type: boolean
+
+# Concurrency: Cancel in-progress runs for the same ref
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Environment variables
+env:
+  UE_VERSION: "5.4"
+  PROJECT_NAME: "MidnightGrind"
+  PROJECT_ROOT: "prototype"
+
+jobs:
+  # ==========================================================================
+  # VALIDATION JOB
+  # ==========================================================================
+  validate:
+    name: Validate Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Check C++ Code Style
+        run: |
+          echo "Checking C++ code style..."
+          # TODO: Add clang-format check
+          # find prototype/Source -name "*.cpp" -o -name "*.h" | xargs clang-format --dry-run --Werror
+
+      - name: Validate JSON Files
+        run: |
+          echo "Validating JSON files..."
+          # Validate .uproject
+          python3 -c "import json; json.load(open('prototype/MidnightGrind.uproject'))"
+
+      - name: Check for Large Files
+        run: |
+          echo "Checking for large files not in LFS..."
+          # Find files > 100MB that aren't tracked by LFS
+          find . -type f -size +100M ! -path "./.git/*" | head -20
+
+  # ==========================================================================
+  # BUILD JOB - WINDOWS
+  # ==========================================================================
+  build-windows:
+    name: Build Windows
+    needs: validate
+    runs-on: [self-hosted, Windows, UE5]
+
+    # Only build on main/develop or manual trigger
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/develop'
+
+    env:
+      UE_ROOT: "C:\\Program Files\\Epic Games\\UE_5.4"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup Build Environment
+        run: |
+          echo "Setting up build environment..."
+          echo "UE_ROOT: $env:UE_ROOT"
+
+      - name: Generate Project Files
+        run: |
+          & "$env:UE_ROOT\Engine\Build\BatchFiles\Build.bat" `
+            -projectfiles `
+            -project="${{ github.workspace }}\${{ env.PROJECT_ROOT }}\${{ env.PROJECT_NAME }}.uproject" `
+            -game -rocket -progress
+
+      - name: Build Editor (Development)
+        if: github.event.inputs.build_config != 'Shipping'
+        run: |
+          & "$env:UE_ROOT\Engine\Build\BatchFiles\Build.bat" `
+            ${{ env.PROJECT_NAME }}Editor `
+            Win64 `
+            Development `
+            -project="${{ github.workspace }}\${{ env.PROJECT_ROOT }}\${{ env.PROJECT_NAME }}.uproject" `
+            -waitmutex
+
+      - name: Build Game (Shipping)
+        if: github.event.inputs.build_config == 'Shipping' || github.ref == 'refs/heads/main'
+        run: |
+          & "$env:UE_ROOT\Engine\Build\BatchFiles\Build.bat" `
+            ${{ env.PROJECT_NAME }} `
+            Win64 `
+            Shipping `
+            -project="${{ github.workspace }}\${{ env.PROJECT_ROOT }}\${{ env.PROJECT_NAME }}.uproject" `
+            -waitmutex
+
+      - name: Run Automation Tests
+        if: github.event.inputs.run_tests != 'false'
+        run: |
+          & "$env:UE_ROOT\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" `
+            "${{ github.workspace }}\${{ env.PROJECT_ROOT }}\${{ env.PROJECT_NAME }}.uproject" `
+            -ExecCmds="Automation RunTests MidnightGrind" `
+            -unattended `
+            -NullRHI `
+            -nosplash `
+            -log
+
+      - name: Package Game
+        if: github.ref == 'refs/heads/main' && github.event.inputs.build_config == 'Shipping'
+        run: |
+          & "$env:UE_ROOT\Engine\Build\BatchFiles\RunUAT.bat" `
+            BuildCookRun `
+            -project="${{ github.workspace }}\${{ env.PROJECT_ROOT }}\${{ env.PROJECT_NAME }}.uproject" `
+            -noP4 `
+            -platform=Win64 `
+            -clientconfig=Shipping `
+            -serverconfig=Shipping `
+            -cook `
+            -allmaps `
+            -build `
+            -stage `
+            -pak `
+            -archive `
+            -archivedirectory="${{ github.workspace }}\Packaged"
+
+      - name: Upload Build Artifacts
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MidnightGrind-Win64-${{ github.sha }}
+          path: Packaged/
+          retention-days: 14
+
+  # ==========================================================================
+  # BUILD JOB - LINUX (for Dedicated Server)
+  # ==========================================================================
+  build-linux:
+    name: Build Linux Server
+    needs: validate
+    runs-on: [self-hosted, Linux, UE5]
+
+    # Only build server on main branch
+    if: github.ref == 'refs/heads/main'
+
+    env:
+      UE_ROOT: "/opt/UnrealEngine/UE_5.4"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Build Dedicated Server
+        run: |
+          $UE_ROOT/Engine/Build/BatchFiles/Linux/Build.sh \
+            ${{ env.PROJECT_NAME }}Server \
+            Linux \
+            Shipping \
+            -project="${{ github.workspace }}/${{ env.PROJECT_ROOT }}/${{ env.PROJECT_NAME }}.uproject" \
+            -waitmutex
+
+      - name: Package Server
+        run: |
+          $UE_ROOT/Engine/Build/BatchFiles/RunUAT.sh \
+            BuildCookRun \
+            -project="${{ github.workspace }}/${{ env.PROJECT_ROOT }}/${{ env.PROJECT_NAME }}.uproject" \
+            -noP4 \
+            -platform=Linux \
+            -serverconfig=Shipping \
+            -server \
+            -noclient \
+            -cook \
+            -stage \
+            -pak \
+            -archive \
+            -archivedirectory="${{ github.workspace }}/ServerPackaged"
+
+      - name: Upload Server Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MidnightGrind-LinuxServer-${{ github.sha }}
+          path: ServerPackaged/
+          retention-days: 14
+
+  # ==========================================================================
+  # TEST JOB
+  # ==========================================================================
+  test:
+    name: Run Tests
+    needs: [build-windows]
+    runs-on: [self-hosted, Windows, UE5]
+
+    if: github.event.inputs.run_tests != 'false'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Run Unit Tests
+        run: |
+          & "$env:UE_ROOT\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" `
+            "${{ github.workspace }}\${{ env.PROJECT_ROOT }}\${{ env.PROJECT_NAME }}.uproject" `
+            -ExecCmds="Automation RunTests MidnightGrind.Unit" `
+            -unattended `
+            -NullRHI `
+            -nosplash `
+            -ReportOutputPath="${{ github.workspace }}\TestResults\UnitTests.xml"
+
+      - name: Run Integration Tests
+        run: |
+          & "$env:UE_ROOT\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" `
+            "${{ github.workspace }}\${{ env.PROJECT_ROOT }}\${{ env.PROJECT_NAME }}.uproject" `
+            -ExecCmds="Automation RunTests MidnightGrind.Integration" `
+            -unattended `
+            -NullRHI `
+            -nosplash `
+            -ReportOutputPath="${{ github.workspace }}\TestResults\IntegrationTests.xml"
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.sha }}
+          path: TestResults/
+          retention-days: 7
+
+      - name: Publish Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action/windows@v2
+        with:
+          files: TestResults/*.xml
+
+  # ==========================================================================
+  # DEPLOYMENT JOB
+  # ==========================================================================
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [build-windows, test]
+    runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/heads/develop'
+
+    environment:
+      name: staging
+      url: https://staging.midnightgrind.game
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: MidnightGrind-Win64-${{ github.sha }}
+          path: ./build
+
+      - name: Deploy to Staging Server
+        run: |
+          echo "Deploying to staging..."
+          # TODO: Add deployment script
+          # - Upload to S3/CDN
+          # - Update staging server
+          # - Send notification
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [build-windows, build-linux, test]
+    runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+
+    environment:
+      name: production
+      url: https://play.midnightgrind.game
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: MidnightGrind-*-${{ github.sha }}
+          path: ./builds
+
+      - name: Deploy to Production
+        run: |
+          echo "Deploying to production..."
+          # TODO: Add production deployment
+          # - Upload to Steam/Console stores
+          # - Update production servers
+          # - Send announcement
+
+  # ==========================================================================
+  # NOTIFICATION JOB
+  # ==========================================================================
+  notify:
+    name: Send Notifications
+    needs: [build-windows, test]
+    runs-on: ubuntu-latest
+
+    if: always()
+
+    steps:
+      - name: Notify Discord
+        if: failure()
+        run: |
+          echo "Build failed - sending Discord notification"
+          # TODO: Add Discord webhook
+          # curl -H "Content-Type: application/json" \
+          #   -d '{"content": "Build failed for ${{ github.ref }}"}' \
+          #   ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Notify Slack
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          echo "Build succeeded - sending Slack notification"
+          # TODO: Add Slack notification
