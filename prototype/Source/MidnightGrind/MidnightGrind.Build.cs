@@ -72,12 +72,11 @@ public class MidnightGrind : ModuleRules
 		});
 
 		// Platform-specific dependencies
-		if (Target.Platform == UnrealTargetPlatform.Win64 ||
-		    Target.Platform == UnrealTargetPlatform.Mac ||
-		    Target.Platform == UnrealTargetPlatform.Linux)
-		{
-			PrivateDependencyModuleNames.Add("OnlineSubsystemSteam");
-		}
+		// Steam disabled for local development
+		// if (Target.Platform == UnrealTargetPlatform.Win64)
+		// {
+		// 	PrivateDependencyModuleNames.Add("OnlineSubsystemSteam");
+		// }
 
 		// Editor-only dependencies
 		if (Target.bBuildEditor)

@@ -11,8 +11,8 @@ public class MidnightGrindTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 
-		// Networking configuration
-		bUsesSteam = true;
+		// Networking configuration - Steam disabled for local development
+		// bUsesSteam = true;
 
 		// Build optimizations
 		bOverrideBuildEnvironment = true;

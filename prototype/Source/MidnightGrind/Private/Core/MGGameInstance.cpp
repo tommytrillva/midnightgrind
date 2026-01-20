@@ -88,24 +88,9 @@ void UMGGameInstance::OnStart()
 void UMGGameInstance::DetectPlatform()
 {
 #if PLATFORM_WINDOWS
-	// Check for Steam first
-	IOnlineSubsystem* SteamOSS = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
-	if (SteamOSS && SteamOSS->IsEnabled())
-	{
-		CurrentPlatform = EMGPlatform::Steam;
-		return;
-	}
-
-	// Check for Epic
-	IOnlineSubsystem* EpicOSS = IOnlineSubsystem::Get(TEXT("EOS"));
-	if (EpicOSS && EpicOSS->IsEnabled())
-	{
-		CurrentPlatform = EMGPlatform::Epic;
-		return;
-	}
-
-	// Default to Steam for PC even if not initialized yet
-	CurrentPlatform = EMGPlatform::Steam;
+	// For now, default to Unknown (local development)
+	// Steam/Epic detection will be enabled when ready for release
+	CurrentPlatform = EMGPlatform::Unknown;
 
 #elif PLATFORM_PS5
 	CurrentPlatform = EMGPlatform::PlayStation;
@@ -120,32 +105,10 @@ void UMGGameInstance::DetectPlatform()
 
 void UMGGameInstance::InitializeSteam()
 {
-#if PLATFORM_WINDOWS || PLATFORM_MAC || PLATFORM_LINUX
-	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
-	if (OnlineSub)
-	{
-		IOnlineIdentityPtr Identity = OnlineSub->GetIdentityInterface();
-		if (Identity.IsValid())
-		{
-			// Check if already logged in
-			if (Identity->GetLoginStatus(0) == ELoginStatus::LoggedIn)
-			{
-				bSteamInitialized = true;
-				UE_LOG(LogMGGameInstance, Log, TEXT("Steam already logged in"));
-			}
-			else
-			{
-				// Attempt auto-login
-				Identity->OnLoginCompleteDelegates->AddUObject(this, &UMGGameInstance::OnSteamLoginComplete);
-				Identity->AutoLogin(0);
-			}
-		}
-	}
-	else
-	{
-		UE_LOG(LogMGGameInstance, Warning, TEXT("Steam Online Subsystem not available"));
-	}
-#endif
+	// Steam initialization disabled for local development
+	// Will be enabled when ready for Steam release
+	UE_LOG(LogMGGameInstance, Log, TEXT("Running in local/offline mode"));
+	bSteamInitialized = false;
 }
 
 void UMGGameInstance::OnSteamLoginComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error)
@@ -281,24 +244,9 @@ void UMGGameInstance::GoOnline()
 		return;
 	}
 
-	SetNetworkState(EMGNetworkState::Connecting);
-
-	// For Steam, just check if we're logged in
-	if (bSteamInitialized)
-	{
-		SetNetworkState(EMGNetworkState::Online);
-	}
-	else
-	{
-		// Retry Steam initialization
-		InitializeSteam();
-
-		// If still not initialized, stay offline
-		if (!bSteamInitialized)
-		{
-			SetNetworkState(EMGNetworkState::Offline);
-		}
-	}
+	// For local development, just mark as online (LAN play works)
+	SetNetworkState(EMGNetworkState::Online);
+	UE_LOG(LogMGGameInstance, Log, TEXT("Local network mode enabled"));
 }
 
 void UMGGameInstance::GoOffline()

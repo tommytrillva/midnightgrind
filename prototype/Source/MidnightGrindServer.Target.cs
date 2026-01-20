@@ -10,7 +10,7 @@ public class MidnightGrindServerTarget : TargetRules
 		Type = TargetType.Server;
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
-		bUsesSteam = true;
+		// bUsesSteam = true; // Disabled for local development
 
 		ExtraModuleNames.AddRange(new string[] { "MidnightGrind" });
 
