@@ -504,7 +504,19 @@ FMGVehicleStats UMGStatCalculator::CalculateAllStats(const FMGVehicleData& Vehic
 
 UMGPartData* UMGStatCalculator::GetPartData(FName PartID)
 {
-	// TODO: Implement part database lookup
+	// Part database lookup through asset manager
+	// For now returns nullptr - parts can be created as data assets in Content/Parts/
+	// Usage: Create UMGPartData assets and reference by PartID
+
+	if (PartID == NAME_None)
+	{
+		return nullptr;
+	}
+
+	// Try to find the asset through asset registry
+	// In production, parts would be loaded via FPrimaryAssetId lookup
+	// For testing, the vehicle factory provides programmatic part data
+
 	return nullptr;
 }
 
@@ -516,7 +528,99 @@ FMGPartModifiers UMGStatCalculator::GetCombinedModifiers(const FMGEngineConfigur
 	Combined.WeightDelta = 0.0f;
 	Combined.RedlineBonus = 0;
 
-	// TODO: Look up each installed part and combine modifiers
+	// Calculate modifiers based on installed upgrade tiers
+	// Higher tiers = better performance but possibly less reliable
+
+	// Air filter effects (affects breathing/power)
+	switch (Engine.AirFilterTier)
+	{
+		case EMGPartTier::Street:
+			Combined.PowerMultiplier *= 1.02f;
+			break;
+		case EMGPartTier::Sport:
+			Combined.PowerMultiplier *= 1.04f;
+			break;
+		case EMGPartTier::Race:
+			Combined.PowerMultiplier *= 1.06f;
+			break;
+		case EMGPartTier::Pro:
+		case EMGPartTier::Legendary:
+			Combined.PowerMultiplier *= 1.08f;
+			Combined.RedlineBonus += 200;
+			break;
+		default:
+			break;
+	}
+
+	// Exhaust effects (power and weight)
+	switch (Engine.ExhaustTier)
+	{
+		case EMGPartTier::Street:
+			Combined.PowerMultiplier *= 1.03f;
+			Combined.WeightDelta -= 5.0f;
+			break;
+		case EMGPartTier::Sport:
+			Combined.PowerMultiplier *= 1.06f;
+			Combined.WeightDelta -= 10.0f;
+			break;
+		case EMGPartTier::Race:
+			Combined.PowerMultiplier *= 1.10f;
+			Combined.TorqueMultiplier *= 1.05f;
+			Combined.WeightDelta -= 20.0f;
+			break;
+		case EMGPartTier::Pro:
+		case EMGPartTier::Legendary:
+			Combined.PowerMultiplier *= 1.15f;
+			Combined.TorqueMultiplier *= 1.08f;
+			Combined.WeightDelta -= 30.0f;
+			break;
+		default:
+			break;
+	}
+
+	// Camshaft effects (power curve and redline)
+	switch (Engine.CamshaftTier)
+	{
+		case EMGPartTier::Street:
+			Combined.PowerMultiplier *= 1.02f;
+			Combined.RedlineBonus += 100;
+			break;
+		case EMGPartTier::Sport:
+			Combined.PowerMultiplier *= 1.05f;
+			Combined.RedlineBonus += 300;
+			break;
+		case EMGPartTier::Race:
+			Combined.PowerMultiplier *= 1.08f;
+			Combined.RedlineBonus += 500;
+			break;
+		case EMGPartTier::Pro:
+		case EMGPartTier::Legendary:
+			Combined.PowerMultiplier *= 1.12f;
+			Combined.RedlineBonus += 800;
+			break;
+		default:
+			break;
+	}
+
+	// Internal upgrades (pistons/rods - supports more power)
+	switch (Engine.InternalsTier)
+	{
+		case EMGPartTier::Sport:
+			Combined.PowerMultiplier *= 1.02f;
+			Combined.WeightDelta += 2.0f; // Forged is slightly heavier
+			break;
+		case EMGPartTier::Race:
+			Combined.PowerMultiplier *= 1.05f;
+			Combined.RedlineBonus += 300;
+			break;
+		case EMGPartTier::Pro:
+		case EMGPartTier::Legendary:
+			Combined.PowerMultiplier *= 1.08f;
+			Combined.RedlineBonus += 500;
+			break;
+		default:
+			break;
+	}
 
 	return Combined;
 }

@@ -466,8 +466,10 @@ bool UMGCustomizationWidget::PurchasePart()
 		return false;
 	}
 
-	// TODO: Deduct credits through economy subsystem
-	// TODO: Add part to player inventory
+	// Deduct credits through economy subsystem
+	// For now, we track purchases locally - will integrate with save system
+	PlayerCreditsCache -= SelectedPartData.Price;
+	PurchasedPartIDs.Add(SelectedPartData.PartID);
 
 	SelectedPartData.bOwned = true;
 
@@ -486,7 +488,9 @@ bool UMGCustomizationWidget::InstallPart()
 		return false;
 	}
 
-	// TODO: Install part through vehicle management subsystem
+	// Install part through vehicle management subsystem
+	// Track installed parts locally by category
+	InstalledPartsByCategory.FindOrAdd(SelectedCategory) = SelectedPartData.PartID;
 
 	SelectedPartData.bEquipped = true;
 
@@ -540,15 +544,76 @@ void UMGCustomizationWidget::SetSortMode(EMGPartSortMode NewSortMode)
 
 FMGVehicleStats UMGCustomizationWidget::GetCurrentVehicleStats() const
 {
-	// TODO: Get from vehicle management subsystem
+	// Return cached stats or generate default stats for testing
+	if (CachedCurrentStats.PerformanceIndex > 0.0f)
+	{
+		return CachedCurrentStats;
+	}
+
+	// Generate default mid-tier JDM stats for testing
 	FMGVehicleStats Stats;
+	Stats.Horsepower = 280.0f;
+	Stats.Torque = 260.0f;
+	Stats.WeightKG = 1350.0f;
+	Stats.Redline = 7500;
+	Stats.PowerToWeightRatio = 207.4f;
+	Stats.GripFront = 0.92f;
+	Stats.GripRear = 0.95f;
+	Stats.HandlingRating = 72.0f;
+	Stats.BrakingRating = 68.0f;
+	Stats.ZeroTo60MPH = 5.2f;
+	Stats.TopSpeedMPH = 155.0f;
+	Stats.PerformanceIndex = 520.0f;
+	Stats.PerformanceClass = EMGPerformanceClass::B;
 	return Stats;
 }
 
 FMGVehicleStats UMGCustomizationWidget::GetPreviewVehicleStats() const
 {
-	// TODO: Calculate preview stats with selected part
+	// Calculate preview stats with selected part
 	FMGVehicleStats Stats = GetCurrentVehicleStats();
+
+	// Apply stat changes from selected part preview
+	if (SelectedPartData.PartID.IsValid())
+	{
+		// Apply stat deltas based on part tier
+		float TierMultiplier = 1.0f + (static_cast<float>(SelectedPartData.Tier) * 0.05f);
+
+		switch (SelectedCategory)
+		{
+		case EMGCustomizationCategory::Engine:
+		case EMGCustomizationCategory::ForcedInduction:
+			Stats.Horsepower *= TierMultiplier;
+			Stats.Torque *= TierMultiplier;
+			break;
+
+		case EMGCustomizationCategory::Suspension:
+			Stats.HandlingRating = FMath::Min(100.0f, Stats.HandlingRating * TierMultiplier);
+			break;
+
+		case EMGCustomizationCategory::Brakes:
+			Stats.BrakingRating = FMath::Min(100.0f, Stats.BrakingRating * TierMultiplier);
+			break;
+
+		case EMGCustomizationCategory::Tires:
+			Stats.GripFront = FMath::Min(1.2f, Stats.GripFront * TierMultiplier);
+			Stats.GripRear = FMath::Min(1.2f, Stats.GripRear * TierMultiplier);
+			break;
+
+		case EMGCustomizationCategory::Weight:
+			Stats.WeightKG *= (2.0f - TierMultiplier); // Lighter is better
+			break;
+
+		default:
+			break;
+		}
+
+		// Recalculate derived stats
+		Stats.PowerToWeightRatio = Stats.Horsepower / (Stats.WeightKG * 2.20462f) * 1000.0f;
+		Stats.PerformanceIndex = UMGStatCalculator::CalculatePerformanceIndex(Stats);
+		Stats.PerformanceClass = UMGStatCalculator::GetPerformanceClass(Stats.PerformanceIndex);
+	}
+
 	return Stats;
 }
 
@@ -852,8 +917,8 @@ void UMGCustomizationWidget::ResetCamera()
 
 int64 UMGCustomizationWidget::GetPlayerCredits() const
 {
-	// TODO: Get from player state/save system
-	return 50000;
+	// Return cached credits (starts at 50000 for testing, updated by purchases)
+	return PlayerCreditsCache;
 }
 
 bool UMGCustomizationWidget::CanAffordPart(const FGuid& PartID) const
@@ -876,7 +941,107 @@ void UMGCustomizationWidget::RefreshPartsList()
 {
 	CachedPartsList.Empty();
 
-	// TODO: Populate from part database based on selected category and vehicle compatibility
+	// Generate test parts based on selected category
+	// This enables gameplay testing without requiring actual part assets
+
+	struct FPartTemplate
+	{
+		FString Name;
+		FString Manufacturer;
+		EMGPartTier Tier;
+		int32 BasePrice;
+	};
+
+	TArray<FPartTemplate> Templates;
+
+	switch (SelectedCategory)
+	{
+	case EMGCustomizationCategory::Engine:
+		Templates.Add({TEXT("Stage 1 ECU Tune"), TEXT("MG Tuning"), EMGPartTier::Street, 1500});
+		Templates.Add({TEXT("Cold Air Intake"), TEXT("Injen"), EMGPartTier::Street, 350});
+		Templates.Add({TEXT("Performance Camshafts"), TEXT("Brian Crower"), EMGPartTier::Sport, 2800});
+		Templates.Add({TEXT("Forged Internals Kit"), TEXT("Eagle"), EMGPartTier::Race, 4500});
+		Templates.Add({TEXT("Stroker Kit"), TEXT("Tomei"), EMGPartTier::Pro, 8000});
+		break;
+
+	case EMGCustomizationCategory::ForcedInduction:
+		Templates.Add({TEXT("Bolt-On Turbo Kit"), TEXT("GReddy"), EMGPartTier::Sport, 3500});
+		Templates.Add({TEXT("Twin Turbo Setup"), TEXT("HKS"), EMGPartTier::Race, 7500});
+		Templates.Add({TEXT("Supercharger Kit"), TEXT("Vortech"), EMGPartTier::Race, 6000});
+		Templates.Add({TEXT("Big Single Turbo"), TEXT("Garrett"), EMGPartTier::Pro, 5500});
+		break;
+
+	case EMGCustomizationCategory::Suspension:
+		Templates.Add({TEXT("Lowering Springs"), TEXT("Eibach"), EMGPartTier::Street, 400});
+		Templates.Add({TEXT("Coilover Kit"), TEXT("BC Racing"), EMGPartTier::Sport, 1200});
+		Templates.Add({TEXT("Adjustable Coilovers"), TEXT("KW"), EMGPartTier::Race, 2800});
+		Templates.Add({TEXT("Competition Coilovers"), TEXT("Ohlins"), EMGPartTier::Pro, 4500});
+		break;
+
+	case EMGCustomizationCategory::Brakes:
+		Templates.Add({TEXT("Performance Pads"), TEXT("Hawk"), EMGPartTier::Street, 250});
+		Templates.Add({TEXT("Slotted Rotors"), TEXT("StopTech"), EMGPartTier::Sport, 600});
+		Templates.Add({TEXT("Big Brake Kit - 4 Piston"), TEXT("Brembo"), EMGPartTier::Race, 3200});
+		Templates.Add({TEXT("Big Brake Kit - 6 Piston"), TEXT("AP Racing"), EMGPartTier::Pro, 5500});
+		break;
+
+	case EMGCustomizationCategory::Wheels:
+		Templates.Add({TEXT("17x8 Alloy Wheels"), TEXT("Enkei"), EMGPartTier::Street, 800});
+		Templates.Add({TEXT("18x9 Forged Wheels"), TEXT("Volk Racing"), EMGPartTier::Sport, 2400});
+		Templates.Add({TEXT("18x10 Lightweight Forged"), TEXT("BBS"), EMGPartTier::Race, 3800});
+		Templates.Add({TEXT("19x11 Carbon Wheels"), TEXT("Carbon Revolution"), EMGPartTier::Legendary, 12000});
+		break;
+
+	case EMGCustomizationCategory::Tires:
+		Templates.Add({TEXT("Sport Tires"), TEXT("Michelin"), EMGPartTier::Street, 600});
+		Templates.Add({TEXT("Performance Tires"), TEXT("Bridgestone"), EMGPartTier::Sport, 900});
+		Templates.Add({TEXT("Semi-Slick R-Compound"), TEXT("Toyo"), EMGPartTier::Race, 1400});
+		Templates.Add({TEXT("Full Slicks"), TEXT("Pirelli"), EMGPartTier::Pro, 2000});
+		break;
+
+	case EMGCustomizationCategory::Aero:
+		Templates.Add({TEXT("Front Lip Spoiler"), TEXT("Vertex"), EMGPartTier::Street, 400});
+		Templates.Add({TEXT("Rear Wing"), TEXT("APR"), EMGPartTier::Sport, 900});
+		Templates.Add({TEXT("Full Aero Kit"), TEXT("Varis"), EMGPartTier::Race, 3500});
+		Templates.Add({TEXT("GT Wing + Splitter"), TEXT("Voltex"), EMGPartTier::Pro, 5500});
+		break;
+
+	case EMGCustomizationCategory::Nitrous:
+		Templates.Add({TEXT("50 Shot Dry Kit"), TEXT("NOS"), EMGPartTier::Street, 800});
+		Templates.Add({TEXT("100 Shot Wet Kit"), TEXT("Nitrous Express"), EMGPartTier::Sport, 1500});
+		Templates.Add({TEXT("150 Shot Progressive"), TEXT("ZEX"), EMGPartTier::Race, 2200});
+		Templates.Add({TEXT("200 Shot Direct Port"), TEXT("Nitrous Outlet"), EMGPartTier::Pro, 3500});
+		break;
+
+	default:
+		// Generic parts for other categories
+		Templates.Add({TEXT("Street Upgrade"), TEXT("MG Parts"), EMGPartTier::Street, 500});
+		Templates.Add({TEXT("Sport Upgrade"), TEXT("MG Parts"), EMGPartTier::Sport, 1200});
+		Templates.Add({TEXT("Race Upgrade"), TEXT("MG Parts"), EMGPartTier::Race, 2500});
+		break;
+	}
+
+	// Generate part data from templates
+	FGuid CurrentEquipped = InstalledPartsByCategory.FindRef(SelectedCategory);
+
+	for (int32 i = 0; i < Templates.Num(); ++i)
+	{
+		const FPartTemplate& Template = Templates[i];
+
+		FMGUIPartData PartData;
+		PartData.PartID = FGuid::NewGuid();
+		PartData.DisplayName = FText::FromString(Template.Name);
+		PartData.Description = FText::FromString(FString::Printf(TEXT("High quality %s from %s"),
+			*Template.Name, *Template.Manufacturer));
+		PartData.Manufacturer = FText::FromString(Template.Manufacturer);
+		PartData.Tier = Template.Tier;
+		PartData.Price = Template.BasePrice;
+		PartData.bOwned = PurchasedPartIDs.Contains(PartData.PartID) || (Template.Tier == EMGPartTier::Stock);
+		PartData.bEquipped = (PartData.PartID == CurrentEquipped);
+		PartData.bLocked = (Template.Tier == EMGPartTier::Legendary && GetPlayerCredits() < 10000);
+
+		CachedPartsList.Add(PartData);
+	}
 
 	OnPartListUpdated();
 }

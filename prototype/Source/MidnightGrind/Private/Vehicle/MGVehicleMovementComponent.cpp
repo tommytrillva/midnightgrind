@@ -299,9 +299,9 @@ void UMGVehicleMovementComponent::ApplyVehicleConfiguration(const FMGVehicleData
 
 	// Apply aero downforce - affects grip at high speeds
 	// Downforce is applied through the stability/anti-flip systems based on aero config
-	const float DownforceMultiplier = VehicleData.Aerodynamics.FrontSplitter.bInstalled ? 1.1f : 1.0f;
-	const float RearDownforce = VehicleData.Aerodynamics.RearWing.bInstalled ?
-		(1.0f + VehicleData.Aerodynamics.RearWing.DownforceLevelPercent * 0.01f * 0.3f) : 1.0f;
+	const float DownforceMultiplier = VehicleData.Aero.FrontSplitter.bInstalled ? 1.1f : 1.0f;
+	const float RearDownforce = VehicleData.Aero.RearWing.bInstalled ?
+		(1.0f + VehicleData.Aero.RearWing.DownforceLevelPercent * 0.01f * 0.3f) : 1.0f;
 
 	// Store aero values for use in physics updates (applied dynamically based on speed)
 	BaseTireGrip *= DownforceMultiplier * RearDownforce;
@@ -322,8 +322,8 @@ void UMGVehicleMovementComponent::ApplyVehicleConfiguration(const FMGVehicleData
 		EngineState.NitrousRemaining = 0.0f;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Applied vehicle configuration: %s (HP: %d, Grip F/R: %.2f/%.2f)"),
-		*VehicleData.VehicleInfo.DisplayName, VehicleData.Stats.Horsepower, FrontGrip, RearGrip);
+	UE_LOG(LogTemp, Log, TEXT("Applied vehicle configuration: %s (HP: %.0f, Grip F/R: %.2f/%.2f)"),
+		*VehicleData.DisplayName, VehicleData.Stats.Horsepower, FrontGrip, RearGrip);
 }
 
 // ==========================================

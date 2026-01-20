@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "MGCustomizationTypes.h"
+#include "Vehicle/MGVehicleData.h"
 #include "MGCustomizationWidget.generated.h"
 
 class UMGGarageSubsystem;
@@ -429,4 +430,21 @@ private:
 	FMGGarageCameraState TargetCameraState;
 	float CameraInterpAlpha = 0.0f;
 	bool bIsCameraInterpolating = false;
+
+	// ==========================================
+	// LOCAL STATE FOR TESTING
+	// (Will integrate with save system later)
+	// ==========================================
+
+	/** Cached player credits for local testing */
+	int64 PlayerCreditsCache = 50000;
+
+	/** Track purchased parts locally */
+	TSet<FGuid> PurchasedPartIDs;
+
+	/** Track installed parts by category */
+	TMap<EMGCustomizationCategory, FGuid> InstalledPartsByCategory;
+
+	/** Cached current vehicle stats */
+	mutable FMGVehicleStats CachedCurrentStats;
 };

@@ -89,6 +89,19 @@ enum class EMGDifferentialType : uint8
 };
 
 /**
+ * Transmission type
+ */
+UENUM(BlueprintType)
+enum class EMGTransmissionType : uint8
+{
+	Manual UMETA(DisplayName = "Manual"),
+	Automatic UMETA(DisplayName = "Automatic"),
+	Sequential UMETA(DisplayName = "Sequential"),
+	DCT UMETA(DisplayName = "Dual-Clutch (DCT)"),
+	CVT UMETA(DisplayName = "CVT")
+};
+
+/**
  * Tire compound type
  */
 UENUM(BlueprintType)
@@ -318,6 +331,26 @@ struct FMGEngineConfiguration
 	// Nitrous
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FMGNitrousConfig Nitrous;
+
+	// ==========================================
+	// PART TIERS (for stat calculation)
+	// ==========================================
+
+	/** Air filter upgrade tier */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tiers")
+	EMGPartTier AirFilterTier = EMGPartTier::Stock;
+
+	/** Exhaust system upgrade tier */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tiers")
+	EMGPartTier ExhaustTier = EMGPartTier::Stock;
+
+	/** Camshaft upgrade tier */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tiers")
+	EMGPartTier CamshaftTier = EMGPartTier::Stock;
+
+	/** Engine internals (pistons/rods) upgrade tier */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tiers")
+	EMGPartTier InternalsTier = EMGPartTier::Stock;
 };
 
 /**
@@ -341,6 +374,9 @@ struct FMGDrivetrainConfiguration
 	// Transmission
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName TransmissionID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EMGTransmissionType TransmissionType = EMGTransmissionType::Manual;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 GearCount = 6;
@@ -447,6 +483,13 @@ struct FMGSuspensionConfiguration
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RideHeightOffsetMM = 0.0f; // negative = lower
+
+	// Ride height per axle (mm from ground to chassis)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float FrontRideHeightMM = 150.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RearRideHeightMM = 160.0f;
 };
 
 /**
@@ -559,6 +602,51 @@ struct FMGWheelTireConfiguration
 };
 
 /**
+ * Front splitter configuration
+ */
+USTRUCT(BlueprintType)
+struct FMGFrontSplitterConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bInstalled = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SplitterID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DownforceCoefficient = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DownforceLevelPercent = 50.0f; // 0-100
+};
+
+/**
+ * Rear wing configuration
+ */
+USTRUCT(BlueprintType)
+struct FMGRearWingConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bInstalled = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName WingID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DownforceCoefficient = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DownforceLevelPercent = 50.0f; // 0-100, adjustable angle
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float WingAngle = 0.0f; // degrees
+};
+
+/**
  * Aerodynamic configuration
  */
 USTRUCT(BlueprintType)
@@ -567,22 +655,16 @@ struct FMGAeroConfiguration
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName FrontSplitterID;
+	FMGFrontSplitterConfig FrontSplitter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float FrontDownforceCoefficient = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName RearWingID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RearDownforceCoefficient = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float WingAngle = 0.0f; // degrees
+	FMGRearWingConfig RearWing;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName DiffuserID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DiffuserDownforceCoefficient = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DragCoefficient = 0.32f;
