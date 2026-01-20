@@ -1,0 +1,635 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
+#include "UI/MGRaceResultsWidget.h"
+#include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Components/Border.h"
+#include "Blueprint/WidgetTree.h"
+#include "TimerManager.h"
+
+void UMGRaceResultsWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	CreateUIElements();
+
+	SetVisibility(ESlateVisibility::Collapsed);
+}
+
+FReply UMGRaceResultsWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	FKey Key = InKeyEvent.GetKey();
+
+	// Accept/Continue
+	if (Key == EKeys::Enter || Key == EKeys::SpaceBar || Key == EKeys::Gamepad_FaceButton_Bottom)
+	{
+		HandleContinue();
+		return FReply::Handled();
+	}
+
+	// Restart
+	if (Key == EKeys::R || Key == EKeys::Gamepad_FaceButton_Left)
+	{
+		HandleRestart();
+		return FReply::Handled();
+	}
+
+	// Quit
+	if (Key == EKeys::Escape || Key == EKeys::Gamepad_FaceButton_Right)
+	{
+		HandleQuit();
+		return FReply::Handled();
+	}
+
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+}
+
+void UMGRaceResultsWidget::DisplayResults(const FMGRaceResults& Results)
+{
+	CachedResults = Results;
+	ProcessResultsData(Results);
+
+	// Update header based on player result
+	if (HeaderText)
+	{
+		if (Results.bPlayerWon)
+		{
+			HeaderText->SetText(FText::FromString(TEXT("VICTORY!")));
+			HeaderText->SetColorAndOpacity(WinnerColor);
+		}
+		else
+		{
+			int32 PlayerPos = 0;
+			for (const FMGRacerData& Racer : Results.RacerResults)
+			{
+				if (!Racer.bIsAI)
+				{
+					PlayerPos = Racer.Position;
+					break;
+				}
+			}
+			HeaderText->SetText(FText::FromString(FString::Printf(TEXT("FINISHED P%d"), PlayerPos)));
+			HeaderText->SetColorAndOpacity(PlayerHighlightColor);
+		}
+	}
+
+	// Update sub header
+	if (SubHeaderText)
+	{
+		FString RaceType;
+		switch (Results.Config.RaceType)
+		{
+			case EMGRaceType::Circuit: RaceType = TEXT("CIRCUIT RACE"); break;
+			case EMGRaceType::Sprint: RaceType = TEXT("SPRINT RACE"); break;
+			case EMGRaceType::Drift: RaceType = TEXT("DRIFT BATTLE"); break;
+			case EMGRaceType::Drag: RaceType = TEXT("DRAG RACE"); break;
+			case EMGRaceType::TimeTrial: RaceType = TEXT("TIME TRIAL"); break;
+			case EMGRaceType::PinkSlip: RaceType = TEXT("PINK SLIP RACE"); break;
+			default: RaceType = TEXT("RACE COMPLETE"); break;
+		}
+		SubHeaderText->SetText(FText::FromString(RaceType));
+	}
+
+	// Update rewards
+	if (CreditsText)
+	{
+		CreditsText->SetText(GetCreditsEarnedText());
+	}
+
+	if (ReputationText)
+	{
+		ReputationText->SetText(GetReputationEarnedText());
+	}
+
+	// Update best lap
+	if (BestLapText && Results.BestLapTime > 0.0f)
+	{
+		FString BestLapStr = FString::Printf(TEXT("FASTEST LAP: %s"), *FormatTime(Results.BestLapTime).ToString());
+		BestLapText->SetText(FText::FromString(BestLapStr));
+	}
+
+	// Clear and rebuild results list
+	if (ResultsListBox)
+	{
+		ResultsListBox->ClearChildren();
+
+		for (const FMGResultRowData& Row : ResultRows)
+		{
+			UWidget* RowWidget = CreateResultRow(Row);
+			if (RowWidget)
+			{
+				ResultsListBox->AddChild(RowWidget);
+			}
+		}
+	}
+
+	// Update prompt
+	if (PromptText)
+	{
+		PromptText->SetText(FText::FromString(TEXT("[ENTER] Continue    [R] Restart    [ESC] Quit")));
+	}
+
+	OnResultsReady();
+
+	// Play appropriate animation
+	if (Results.bPlayerWon)
+	{
+		PlayVictoryAnimation();
+	}
+	else
+	{
+		PlayDefeatAnimation();
+	}
+}
+
+void UMGRaceResultsWidget::ShowResults()
+{
+	SetVisibility(ESlateVisibility::Visible);
+	SetKeyboardFocus();
+
+	// Start row reveal animation
+	CurrentRevealRow = 0;
+	GetWorld()->GetTimerManager().SetTimer(RowRevealTimerHandle, this, &UMGRaceResultsWidget::RevealNextRow, 0.2f, true);
+}
+
+void UMGRaceResultsWidget::HideResults()
+{
+	SetVisibility(ESlateVisibility::Collapsed);
+	GetWorld()->GetTimerManager().ClearTimer(RowRevealTimerHandle);
+}
+
+FText UMGRaceResultsWidget::GetCreditsEarnedText() const
+{
+	if (CachedResults.CreditsEarned > 0)
+	{
+		return FText::FromString(FString::Printf(TEXT("+$%lld CREDITS"), CachedResults.CreditsEarned));
+	}
+	return FText::FromString(TEXT("$0 CREDITS"));
+}
+
+FText UMGRaceResultsWidget::GetReputationEarnedText() const
+{
+	if (CachedResults.ReputationEarned > 0)
+	{
+		return FText::FromString(FString::Printf(TEXT("+%d REP"), CachedResults.ReputationEarned));
+	}
+	return FText::FromString(TEXT("+0 REP"));
+}
+
+FText UMGRaceResultsWidget::GetXPEarnedText() const
+{
+	// XP calculated from position and performance
+	int32 XP = 100 - (CachedResults.RacerResults.Num() > 0 ? (CachedResults.RacerResults[0].Position - 1) * 15 : 0);
+	XP = FMath::Max(XP, 10);
+
+	return FText::FromString(FString::Printf(TEXT("+%d XP"), XP));
+}
+
+void UMGRaceResultsWidget::ProcessResultsData(const FMGRaceResults& Results)
+{
+	ResultRows.Empty();
+
+	float WinnerTime = 0.0f;
+
+	for (const FMGRacerData& Racer : Results.RacerResults)
+	{
+		FMGResultRowData Row;
+		Row.Position = Racer.Position;
+		Row.DriverName = Racer.DisplayName;
+		Row.TotalTime = Racer.TotalTime;
+		Row.BestLap = Racer.BestLapTime;
+		Row.bIsPlayer = !Racer.bIsAI;
+		Row.bIsDNF = Racer.bDNF;
+		Row.bHasBestLap = (Racer.BestLapTime > 0.0f && FMath::Abs(Racer.BestLapTime - Results.BestLapTime) < 0.001f);
+
+		if (Racer.Position == 1)
+		{
+			WinnerTime = Racer.TotalTime;
+		}
+
+		if (Racer.Position > 1 && WinnerTime > 0.0f)
+		{
+			Row.GapToWinner = Racer.TotalTime - WinnerTime;
+		}
+
+		// Get vehicle name from pawn if available
+		if (AMGVehiclePawn* Vehicle = Racer.Vehicle.Get())
+		{
+			FMGVehicleData Config = Vehicle->GetVehicleConfiguration();
+			Row.VehicleName = FText::FromString(Config.DisplayName);
+		}
+		else
+		{
+			Row.VehicleName = FText::FromString(TEXT("Unknown"));
+		}
+
+		ResultRows.Add(Row);
+	}
+
+	// Sort by position
+	ResultRows.Sort([](const FMGResultRowData& A, const FMGResultRowData& B)
+	{
+		return A.Position < B.Position;
+	});
+}
+
+void UMGRaceResultsWidget::CreateUIElements()
+{
+	if (!RootCanvas)
+	{
+		RootCanvas = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("RootCanvas"));
+		if (RootCanvas)
+		{
+			WidgetTree->RootWidget = RootCanvas;
+		}
+	}
+
+	if (!RootCanvas) return;
+
+	// Background overlay
+	UBorder* Background = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass());
+	if (Background)
+	{
+		Background->SetBrushColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.85f));
+		RootCanvas->AddChild(Background);
+
+		if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(Background->Slot))
+		{
+			Slot->SetAnchors(FAnchors(0.0f, 0.0f, 1.0f, 1.0f));
+			Slot->SetOffsets(FMargin(0.0f));
+		}
+	}
+
+	// Header
+	if (!HeaderText)
+	{
+		HeaderText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (HeaderText)
+		{
+			HeaderText->SetText(FText::FromString(TEXT("RACE COMPLETE")));
+			HeaderText->SetColorAndOpacity(WinnerColor);
+			HeaderText->SetJustification(ETextJustify::Center);
+
+			FSlateFontInfo FontInfo = HeaderText->GetFont();
+			FontInfo.Size = 72;
+			FontInfo.OutlineSettings.OutlineSize = 3;
+			FontInfo.OutlineSettings.OutlineColor = FLinearColor::Black;
+			HeaderText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(HeaderText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(HeaderText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.5f, 0.0f, 0.5f, 0.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 0.0f));
+				Slot->SetPosition(FVector2D(0.0f, 50.0f));
+				Slot->SetSize(FVector2D(800.0f, 100.0f));
+			}
+		}
+	}
+
+	// Sub header
+	if (!SubHeaderText)
+	{
+		SubHeaderText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (SubHeaderText)
+		{
+			SubHeaderText->SetText(FText::FromString(TEXT("CIRCUIT RACE")));
+			SubHeaderText->SetColorAndOpacity(PlayerHighlightColor);
+			SubHeaderText->SetJustification(ETextJustify::Center);
+
+			FSlateFontInfo FontInfo = SubHeaderText->GetFont();
+			FontInfo.Size = 28;
+			SubHeaderText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(SubHeaderText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(SubHeaderText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.5f, 0.0f, 0.5f, 0.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 0.0f));
+				Slot->SetPosition(FVector2D(0.0f, 140.0f));
+				Slot->SetSize(FVector2D(600.0f, 40.0f));
+			}
+		}
+	}
+
+	// Results list box
+	if (!ResultsListBox)
+	{
+		ResultsListBox = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+		if (ResultsListBox)
+		{
+			RootCanvas->AddChild(ResultsListBox);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(ResultsListBox->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.5f, 0.0f, 0.5f, 0.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 0.0f));
+				Slot->SetPosition(FVector2D(0.0f, 200.0f));
+				Slot->SetSize(FVector2D(900.0f, 400.0f));
+			}
+		}
+	}
+
+	// Credits display
+	if (!CreditsText)
+	{
+		CreditsText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (CreditsText)
+		{
+			CreditsText->SetText(FText::FromString(TEXT("+$0 CREDITS")));
+			CreditsText->SetColorAndOpacity(FSlateColor(FLinearColor(0.0f, 1.0f, 0.0f, 1.0f)));
+			CreditsText->SetJustification(ETextJustify::Center);
+
+			FSlateFontInfo FontInfo = CreditsText->GetFont();
+			FontInfo.Size = 36;
+			CreditsText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(CreditsText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(CreditsText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.25f, 1.0f, 0.25f, 1.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 1.0f));
+				Slot->SetPosition(FVector2D(0.0f, -150.0f));
+				Slot->SetSize(FVector2D(300.0f, 50.0f));
+			}
+		}
+	}
+
+	// Reputation display
+	if (!ReputationText)
+	{
+		ReputationText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (ReputationText)
+		{
+			ReputationText->SetText(FText::FromString(TEXT("+0 REP")));
+			ReputationText->SetColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.0f, 0.6f, 1.0f)));
+			ReputationText->SetJustification(ETextJustify::Center);
+
+			FSlateFontInfo FontInfo = ReputationText->GetFont();
+			FontInfo.Size = 36;
+			ReputationText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(ReputationText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(ReputationText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.75f, 1.0f, 0.75f, 1.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 1.0f));
+				Slot->SetPosition(FVector2D(0.0f, -150.0f));
+				Slot->SetSize(FVector2D(300.0f, 50.0f));
+			}
+		}
+	}
+
+	// Best lap
+	if (!BestLapText)
+	{
+		BestLapText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (BestLapText)
+		{
+			BestLapText->SetText(FText::FromString(TEXT("")));
+			BestLapText->SetColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.843f, 0.0f, 1.0f)));
+			BestLapText->SetJustification(ETextJustify::Center);
+
+			FSlateFontInfo FontInfo = BestLapText->GetFont();
+			FontInfo.Size = 24;
+			BestLapText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(BestLapText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(BestLapText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.5f, 1.0f, 0.5f, 1.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 1.0f));
+				Slot->SetPosition(FVector2D(0.0f, -100.0f));
+				Slot->SetSize(FVector2D(400.0f, 35.0f));
+			}
+		}
+	}
+
+	// Prompt text
+	if (!PromptText)
+	{
+		PromptText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (PromptText)
+		{
+			PromptText->SetText(FText::FromString(TEXT("[ENTER] Continue    [R] Restart    [ESC] Quit")));
+			PromptText->SetColorAndOpacity(FSlateColor(FLinearColor(0.7f, 0.7f, 0.7f, 1.0f)));
+			PromptText->SetJustification(ETextJustify::Center);
+
+			FSlateFontInfo FontInfo = PromptText->GetFont();
+			FontInfo.Size = 18;
+			PromptText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(PromptText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(PromptText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.5f, 1.0f, 0.5f, 1.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 1.0f));
+				Slot->SetPosition(FVector2D(0.0f, -30.0f));
+				Slot->SetSize(FVector2D(600.0f, 30.0f));
+			}
+		}
+	}
+}
+
+UWidget* UMGRaceResultsWidget::CreateResultRow(const FMGResultRowData& RowData)
+{
+	UHorizontalBox* Row = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
+	if (!Row) return nullptr;
+
+	// Determine row color
+	FSlateColor RowColor;
+	if (RowData.bIsPlayer)
+	{
+		RowColor = PlayerHighlightColor;
+	}
+	else if (RowData.Position == 1)
+	{
+		RowColor = WinnerColor;
+	}
+	else if (RowData.bIsDNF)
+	{
+		RowColor = DNFColor;
+	}
+	else
+	{
+		RowColor = FSlateColor(FLinearColor::White);
+	}
+
+	// Position
+	UTextBlock* PosText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+	if (PosText)
+	{
+		if (RowData.bIsDNF)
+		{
+			PosText->SetText(FText::FromString(TEXT("DNF")));
+		}
+		else
+		{
+			PosText->SetText(FText::FromString(FString::Printf(TEXT("%d"), RowData.Position)));
+		}
+		PosText->SetColorAndOpacity(RowColor);
+
+		FSlateFontInfo FontInfo = PosText->GetFont();
+		FontInfo.Size = 24;
+		PosText->SetFont(FontInfo);
+
+		Row->AddChild(PosText);
+		if (UHorizontalBoxSlot* Slot = Cast<UHorizontalBoxSlot>(PosText->Slot))
+		{
+			Slot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+			Slot->SetPadding(FMargin(10.0f, 5.0f));
+		}
+	}
+
+	// Driver name
+	UTextBlock* NameText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+	if (NameText)
+	{
+		NameText->SetText(RowData.DriverName);
+		NameText->SetColorAndOpacity(RowColor);
+
+		FSlateFontInfo FontInfo = NameText->GetFont();
+		FontInfo.Size = 20;
+		NameText->SetFont(FontInfo);
+
+		Row->AddChild(NameText);
+		if (UHorizontalBoxSlot* Slot = Cast<UHorizontalBoxSlot>(NameText->Slot))
+		{
+			Slot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+			Slot->SetPadding(FMargin(10.0f, 5.0f));
+		}
+	}
+
+	// Vehicle name
+	UTextBlock* VehicleText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+	if (VehicleText)
+	{
+		VehicleText->SetText(RowData.VehicleName);
+		VehicleText->SetColorAndOpacity(FSlateColor(FLinearColor(0.7f, 0.7f, 0.7f, 1.0f)));
+
+		FSlateFontInfo FontInfo = VehicleText->GetFont();
+		FontInfo.Size = 18;
+		VehicleText->SetFont(FontInfo);
+
+		Row->AddChild(VehicleText);
+		if (UHorizontalBoxSlot* Slot = Cast<UHorizontalBoxSlot>(VehicleText->Slot))
+		{
+			Slot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+			Slot->SetPadding(FMargin(10.0f, 5.0f));
+		}
+	}
+
+	// Total time / Gap
+	UTextBlock* TimeText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+	if (TimeText)
+	{
+		if (RowData.Position == 1)
+		{
+			TimeText->SetText(FormatTime(RowData.TotalTime));
+		}
+		else
+		{
+			TimeText->SetText(FormatGap(RowData.GapToWinner));
+		}
+		TimeText->SetColorAndOpacity(RowColor);
+
+		FSlateFontInfo FontInfo = TimeText->GetFont();
+		FontInfo.Size = 20;
+		TimeText->SetFont(FontInfo);
+
+		Row->AddChild(TimeText);
+		if (UHorizontalBoxSlot* Slot = Cast<UHorizontalBoxSlot>(TimeText->Slot))
+		{
+			Slot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+			Slot->SetPadding(FMargin(10.0f, 5.0f));
+			Slot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Right);
+		}
+	}
+
+	// Best lap indicator
+	if (RowData.bHasBestLap)
+	{
+		UTextBlock* BestText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (BestText)
+		{
+			BestText->SetText(FText::FromString(TEXT("FASTEST")));
+			BestText->SetColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.843f, 0.0f, 1.0f)));
+
+			FSlateFontInfo FontInfo = BestText->GetFont();
+			FontInfo.Size = 14;
+			BestText->SetFont(FontInfo);
+
+			Row->AddChild(BestText);
+			if (UHorizontalBoxSlot* Slot = Cast<UHorizontalBoxSlot>(BestText->Slot))
+			{
+				Slot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+				Slot->SetPadding(FMargin(10.0f, 5.0f));
+			}
+		}
+	}
+
+	return Row;
+}
+
+FText UMGRaceResultsWidget::FormatTime(float Seconds) const
+{
+	if (Seconds <= 0.0f)
+	{
+		return FText::FromString(TEXT("--:--.---"));
+	}
+
+	int32 Minutes = FMath::FloorToInt(Seconds / 60.0f);
+	float RemainingSecs = FMath::Fmod(Seconds, 60.0f);
+	int32 WholeSeconds = FMath::FloorToInt(RemainingSecs);
+	int32 Milliseconds = FMath::FloorToInt((RemainingSecs - WholeSeconds) * 1000.0f);
+
+	return FText::FromString(FString::Printf(TEXT("%d:%02d.%03d"), Minutes, WholeSeconds, Milliseconds));
+}
+
+FText UMGRaceResultsWidget::FormatGap(float Seconds) const
+{
+	if (Seconds <= 0.0f)
+	{
+		return FText::FromString(TEXT("+0.000"));
+	}
+
+	return FText::FromString(FString::Printf(TEXT("+%.3f"), Seconds));
+}
+
+void UMGRaceResultsWidget::HandleContinue()
+{
+	OnContinue.Broadcast();
+}
+
+void UMGRaceResultsWidget::HandleRestart()
+{
+	OnRestart.Broadcast();
+}
+
+void UMGRaceResultsWidget::HandleQuit()
+{
+	OnQuit.Broadcast();
+}
+
+void UMGRaceResultsWidget::RevealNextRow()
+{
+	if (CurrentRevealRow < ResultRows.Num())
+	{
+		PlayRowRevealAnimation(CurrentRevealRow);
+		CurrentRevealRow++;
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RowRevealTimerHandle);
+	}
+}
