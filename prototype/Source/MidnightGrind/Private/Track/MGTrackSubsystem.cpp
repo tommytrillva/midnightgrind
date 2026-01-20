@@ -1,8 +1,11 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Track/MGTrackSubsystem.h"
+#include "Track/MGCheckpointActor.h"
+#include "Track/MGRacingLineActor.h"
 #include "Components/SplineComponent.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGTrackSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -59,6 +62,77 @@ void UMGTrackSubsystem::InitializeTrack(UMGTrackData* TrackData)
 
 	// Would load track configuration from data asset
 	// Implementation depends on UMGTrackData structure
+}
+
+void UMGTrackSubsystem::LoadTrack(FName TrackID)
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGTrackSubsystem::LoadTrack - No world available"));
+		return;
+	}
+
+	// Clear existing data
+	ClearCheckpoints();
+	RacerProgressMap.Empty();
+
+	// Set track name in config
+	TrackConfig.TrackName = TrackID;
+
+	// Find all checkpoint actors in the world
+	TArray<AActor*> FoundCheckpoints;
+	UGameplayStatics::GetAllActorsOfClass(World, AMGCheckpointActor::StaticClass(), FoundCheckpoints);
+
+	if (FoundCheckpoints.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGTrackSubsystem::LoadTrack - No checkpoints found for track '%s'"), *TrackID.ToString());
+		return;
+	}
+
+	// Register each checkpoint using its data struct
+	for (AActor* Actor : FoundCheckpoints)
+	{
+		if (AMGCheckpointActor* Checkpoint = Cast<AMGCheckpointActor>(Actor))
+		{
+			FMGCheckpointData Data = Checkpoint->GetCheckpointData();
+			RegisterCheckpoint(Data);
+		}
+	}
+
+	// Calculate distances from start
+	float TotalDistance = 0.0f;
+	for (int32 i = 0; i < Checkpoints.Num(); ++i)
+	{
+		Checkpoints[i].DistanceFromStart = TotalDistance;
+
+		if (i < Checkpoints.Num() - 1)
+		{
+			TotalDistance += FVector::Dist(Checkpoints[i].Position, Checkpoints[i + 1].Position);
+		}
+	}
+
+	// If circuit, add distance from last checkpoint back to start
+	if (TrackConfig.bIsCircuit && Checkpoints.Num() > 1)
+	{
+		TotalDistance += FVector::Dist(Checkpoints.Last().Position, Checkpoints[0].Position);
+	}
+
+	TrackConfig.TrackLength = TotalDistance;
+
+	// Find racing line spline if available
+	TArray<AActor*> RacingLines;
+	UGameplayStatics::GetAllActorsOfClass(World, AMGRacingLineActor::StaticClass(), RacingLines);
+	if (RacingLines.Num() > 0)
+	{
+		if (AMGRacingLineActor* RacingLine = Cast<AMGRacingLineActor>(RacingLines[0]))
+		{
+			TrackSpline = RacingLine->GetSplineComponent();
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGTrackSubsystem::LoadTrack - Loaded track '%s' with %d checkpoints (Length: %.0fm)"),
+		*TrackID.ToString(), Checkpoints.Num(), TrackConfig.TrackLength / 100.0f);
 }
 
 void UMGTrackSubsystem::SetTrackConfig(const FMGTrackConfig& Config)

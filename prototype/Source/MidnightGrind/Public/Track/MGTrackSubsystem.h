@@ -199,6 +199,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Track")
 	void InitializeTrack(UMGTrackData* TrackData);
 
+	/** Load track by ID (finds checkpoints in world) */
+	UFUNCTION(BlueprintCallable, Category = "Track")
+	void LoadTrack(FName TrackID);
+
 	/** Set track configuration */
 	UFUNCTION(BlueprintCallable, Category = "Track")
 	void SetTrackConfig(const FMGTrackConfig& Config);
