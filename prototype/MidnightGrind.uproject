@@ -1,8 +1,10 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.4",
+	"EngineAssociation": "5.7",
 	"Category": "Games",
 	"Description": "MIDNIGHT GRIND - Arcade street racing with PS1/PS2 era aesthetics and deep car customization.",
+	"DisableEnginePluginsByDefault": false,
+	"IsEnterpriseProject": false,
 	"Modules": [
 		{
 			"Name": "MidnightGrind",
