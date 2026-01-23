@@ -1,36 +1,51 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Audio/MGMusicManager.h"
-#include "Components/AudioComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
+#include "Components/AudioComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGMusicManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	InitializeAudioComponents();
+	// Initialize layer volumes
+	LayerVolumes.Add(EMGMusicLayer::Base, 1.0f);
+	LayerVolumes.Add(EMGMusicLayer::Melody, 1.0f);
+	LayerVolumes.Add(EMGMusicLayer::Synths, 0.8f);
+	LayerVolumes.Add(EMGMusicLayer::Bass, 1.0f);
+	LayerVolumes.Add(EMGMusicLayer::Percussion, 0.9f);
+	LayerVolumes.Add(EMGMusicLayer::Vocals, 0.7f);
+	LayerVolumes.Add(EMGMusicLayer::Stinger, 1.0f);
 
-	UE_LOG(LogTemp, Log, TEXT("MGMusicManager initialized"));
+	InitializeDefaultTracks();
+	InitializeDefaultPlaylists();
+
+	// Set up tick timer
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().SetTimer(
+			TickTimer,
+			this,
+			&UMGMusicManager::OnTick,
+			0.05f,
+			true
+		);
+	}
 }
 
 void UMGMusicManager::Deinitialize()
 {
-	// Clear timer
+	Stop();
+
 	if (UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().ClearTimer(UpdateTimerHandle);
+		World->GetTimerManager().ClearTimer(TickTimer);
 	}
-
-	CleanupAudioComponents();
 
 	Super::Deinitialize();
 }
-
-// ==========================================
-// MUSIC CONTROL
-// ==========================================
 
 void UMGMusicManager::SetMusicState(EMGMusicState NewState)
 {
@@ -39,487 +54,462 @@ void UMGMusicManager::SetMusicState(EMGMusicState NewState)
 		return;
 	}
 
-	EMGMusicState OldState = CurrentState;
 	CurrentState = NewState;
-
-	// Determine track for new state
-	FName NewTrack = GetTrackForState(NewState);
-
-	if (!NewTrack.IsNone() && NewTrack != CurrentTrackName)
-	{
-		PlayTrack(NewTrack, TrackFadeTime);
-	}
-
-	// Adjust intensity based on state
-	switch (NewState)
-	{
-	case EMGMusicState::None:
-		StopMusic(TrackFadeTime);
-		break;
-
-	case EMGMusicState::MainMenu:
-	case EMGMusicState::Garage:
-	case EMGMusicState::PreRace:
-	case EMGMusicState::Results:
-		SetIntensity(0.0f);
-		break;
-
-	case EMGMusicState::RacingLow:
-		SetIntensity(0.25f);
-		break;
-
-	case EMGMusicState::RacingMedium:
-		SetIntensity(0.5f);
-		break;
-
-	case EMGMusicState::RacingHigh:
-		SetIntensity(0.85f);
-		break;
-
-	case EMGMusicState::Victory:
-		SetIntensity(1.0f);
-		break;
-
-	case EMGMusicState::Defeat:
-		SetIntensity(0.3f);
-		break;
-	}
-
 	OnMusicStateChanged.Broadcast(NewState);
 
-	UE_LOG(LogTemp, Log, TEXT("MGMusicManager: State changed from %d to %d"),
-		static_cast<int32>(OldState), static_cast<int32>(NewState));
+	// Get appropriate track for state
+	FName TrackID = GetTrackForState(NewState);
+	if (!TrackID.IsNone())
+	{
+		CrossfadeTo(TrackID, 1.5f);
+	}
+
+	// Update intensity based on state
+	switch (NewState)
+	{
+	case EMGMusicState::RacingLow:
+		SetRaceIntensity(0.3f);
+		break;
+	case EMGMusicState::RacingMedium:
+		SetRaceIntensity(0.6f);
+		break;
+	case EMGMusicState::RacingHigh:
+		SetRaceIntensity(0.9f);
+		break;
+	case EMGMusicState::FinalLap:
+		SetRaceIntensity(1.0f);
+		break;
+	default:
+		SetRaceIntensity(0.5f);
+		break;
+	}
 }
 
-void UMGMusicManager::SetIntensity(float Intensity)
+void UMGMusicManager::SetRaceIntensity(float Intensity)
 {
 	TargetIntensity = FMath::Clamp(Intensity, 0.0f, 1.0f);
 }
 
-void UMGMusicManager::PlayTrack(FName TrackName, float FadeTime)
+void UMGMusicManager::TriggerMusicEvent(const FMGMusicEvent& Event)
 {
-	FMGMusicTrack* Track = Tracks.Find(TrackName);
-	if (!Track)
+	// Adjust intensity
+	if (Event.IntensityModifier != 0.0f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MGMusicManager: Track '%s' not found"), *TrackName.ToString());
-		return;
+		TargetIntensity = FMath::Clamp(TargetIntensity + Event.IntensityModifier, 0.0f, 1.0f);
 	}
 
-	StartTrack(*Track, FadeTime);
-	CurrentTrackName = TrackName;
-	PlaybackTime = 0.0f;
-	BeatTimer = 0.0f;
-
-	OnTrackChanged.Broadcast(TrackName);
-
-	// Start update timer if not running
-	if (UWorld* World = GetWorld())
+	// Play stinger if requested
+	if (Event.bTriggerStinger && !Event.StingerID.IsNone())
 	{
-		if (!UpdateTimerHandle.IsValid())
-		{
-			World->GetTimerManager().SetTimer(UpdateTimerHandle,
-				FTimerDelegate::CreateUObject(this, &UMGMusicManager::OnUpdateTimer),
-				0.016f, true); // ~60fps update
-		}
+		// Would play one-shot stinger sound here
 	}
 }
 
-void UMGMusicManager::StopMusic(float FadeTime)
+void UMGMusicManager::PlayTrack(FName TrackID)
 {
-	// Fade out all layers
-	auto FadeOutComp = [FadeTime](UAudioComponent* Comp)
-	{
-		if (Comp && Comp->IsPlaying())
-		{
-			Comp->FadeOut(FadeTime, 0.0f);
-		}
-	};
-
-	FadeOutComp(BaseLayerComp);
-	FadeOutComp(LowLayerComp);
-	FadeOutComp(MediumLayerComp);
-	FadeOutComp(HighLayerComp);
-	FadeOutComp(ClimaxLayerComp);
-
-	CurrentTrackName = NAME_None;
-}
-
-void UMGMusicManager::PauseMusic()
-{
-	bIsPaused = true;
-
-	auto PauseComp = [](UAudioComponent* Comp)
-	{
-		if (Comp) Comp->SetPaused(true);
-	};
-
-	PauseComp(BaseLayerComp);
-	PauseComp(LowLayerComp);
-	PauseComp(MediumLayerComp);
-	PauseComp(HighLayerComp);
-	PauseComp(ClimaxLayerComp);
-}
-
-void UMGMusicManager::ResumeMusic()
-{
-	bIsPaused = false;
-
-	auto ResumeComp = [](UAudioComponent* Comp)
-	{
-		if (Comp) Comp->SetPaused(false);
-	};
-
-	ResumeComp(BaseLayerComp);
-	ResumeComp(LowLayerComp);
-	ResumeComp(MediumLayerComp);
-	ResumeComp(HighLayerComp);
-	ResumeComp(ClimaxLayerComp);
-}
-
-// ==========================================
-// STINGERS
-// ==========================================
-
-void UMGMusicManager::PlayStinger(FName StingerName)
-{
-	FMGMusicStinger* Stinger = Stingers.Find(StingerName);
-	if (!Stinger || !Stinger->Sound)
+	if (!TrackLibrary.Contains(TrackID))
 	{
 		return;
 	}
 
-	if (StingerComp)
-	{
-		StingerComp->SetSound(Stinger->Sound);
-		StingerComp->SetVolumeMultiplier(MusicVolume);
-		StingerComp->Play();
+	CurrentTrack = TrackLibrary[TrackID];
+	CurrentTrack.PlayCount++;
+	PlaybackPosition = 0.0f;
+	bIsPlaying = true;
 
-		// Duck music if configured
-		if (Stinger->bDuckMusic)
-		{
-			float DuckedVolume = MusicVolume * (1.0f - Stinger->DuckAmount);
+	// Update beat tracking
+	SecondsPerBeat = 60.0f / CurrentTrack.BPM;
+	BeatAccumulator = 0.0f;
 
-			if (BaseLayerComp) BaseLayerComp->SetVolumeMultiplier(DuckedVolume);
-			if (LowLayerComp) LowLayerComp->SetVolumeMultiplier(DuckedVolume);
-			if (MediumLayerComp) MediumLayerComp->SetVolumeMultiplier(DuckedVolume);
-			if (HighLayerComp) HighLayerComp->SetVolumeMultiplier(DuckedVolume);
-			if (ClimaxLayerComp) ClimaxLayerComp->SetVolumeMultiplier(DuckedVolume);
+	OnTrackChanged.Broadcast(CurrentTrack);
 
-			// Restore after stinger (simplified - would need proper tracking)
-		}
-	}
+	// Would actually start audio playback here
 }
 
-void UMGMusicManager::RegisterStinger(const FMGMusicStinger& Stinger)
+void UMGMusicManager::PlayNext()
 {
-	Stingers.Add(Stinger.StingerName, Stinger);
-}
-
-// ==========================================
-// TRACK MANAGEMENT
-// ==========================================
-
-void UMGMusicManager::RegisterTrack(const FMGMusicTrack& Track)
-{
-	Tracks.Add(Track.TrackName, Track);
-	Playlist.Add(Track.TrackName);
-}
-
-bool UMGMusicManager::GetTrack(FName TrackName, FMGMusicTrack& OutTrack) const
-{
-	const FMGMusicTrack* Track = Tracks.Find(TrackName);
-	if (Track)
-	{
-		OutTrack = *Track;
-		return true;
-	}
-	return false;
-}
-
-void UMGMusicManager::NextTrack()
-{
-	if (Playlist.Num() == 0)
+	if (CurrentPlaylist.TrackIDs.Num() == 0)
 	{
 		return;
 	}
 
-	PlaylistIndex = (PlaylistIndex + 1) % Playlist.Num();
-	PlayTrack(Playlist[PlaylistIndex], TrackFadeTime);
+	if (CurrentPlaylist.bShuffle)
+	{
+		PlaylistIndex = FMath::RandRange(0, CurrentPlaylist.TrackIDs.Num() - 1);
+	}
+	else
+	{
+		PlaylistIndex = (PlaylistIndex + 1) % CurrentPlaylist.TrackIDs.Num();
+	}
+
+	PlayTrack(CurrentPlaylist.TrackIDs[PlaylistIndex]);
 }
 
-void UMGMusicManager::PreviousTrack()
+void UMGMusicManager::PlayPrevious()
 {
-	if (Playlist.Num() == 0)
+	if (CurrentPlaylist.TrackIDs.Num() == 0)
 	{
+		return;
+	}
+
+	// If more than 3 seconds in, restart current track
+	if (PlaybackPosition > 3.0f)
+	{
+		PlaybackPosition = 0.0f;
 		return;
 	}
 
 	PlaylistIndex--;
 	if (PlaylistIndex < 0)
 	{
-		PlaylistIndex = Playlist.Num() - 1;
+		PlaylistIndex = CurrentPlaylist.TrackIDs.Num() - 1;
 	}
 
-	PlayTrack(Playlist[PlaylistIndex], TrackFadeTime);
+	PlayTrack(CurrentPlaylist.TrackIDs[PlaylistIndex]);
 }
 
-void UMGMusicManager::ShufflePlaylist()
+void UMGMusicManager::Pause()
 {
-	// Fisher-Yates shuffle
-	for (int32 i = Playlist.Num() - 1; i > 0; --i)
-	{
-		int32 j = FMath::RandRange(0, i);
-		Playlist.Swap(i, j);
-	}
-
-	PlaylistIndex = 0;
+	bIsPlaying = false;
 }
 
-// ==========================================
-// VOLUME
-// ==========================================
+void UMGMusicManager::Resume()
+{
+	bIsPlaying = true;
+}
+
+void UMGMusicManager::Stop()
+{
+	bIsPlaying = false;
+	PlaybackPosition = 0.0f;
+}
 
 void UMGMusicManager::SetMusicVolume(float Volume)
 {
 	MusicVolume = FMath::Clamp(Volume, 0.0f, 1.0f);
 }
 
-// ==========================================
-// INTERNAL
-// ==========================================
-
-void UMGMusicManager::InitializeAudioComponents()
+void UMGMusicManager::SetLayerVolume(EMGMusicLayer Layer, float Volume)
 {
-	// Create audio components for each layer
-	// These will be parented to a persistent actor or created as standalone
+	LayerVolumes.FindOrAdd(Layer) = FMath::Clamp(Volume, 0.0f, 1.0f);
+}
 
-	UWorld* World = GetWorld();
-	if (!World)
+void UMGMusicManager::FadeToVolume(float TargetVolume, float Duration)
+{
+	bFading = true;
+	FadeStartVolume = MusicVolume;
+	FadeTargetVolume = FMath::Clamp(TargetVolume, 0.0f, 1.0f);
+	FadeDuration = Duration;
+	FadeElapsed = 0.0f;
+}
+
+void UMGMusicManager::DuckMusic(float Amount, float Duration)
+{
+	bDucking = true;
+	DuckAmount = FMath::Clamp(Amount, 0.0f, 1.0f);
+	DuckDuration = Duration;
+	DuckElapsed = 0.0f;
+}
+
+void UMGMusicManager::SetPlaylist(FName PlaylistID)
+{
+	if (Playlists.Contains(PlaylistID))
+	{
+		CurrentPlaylist = Playlists[PlaylistID];
+		PlaylistIndex = 0;
+
+		if (CurrentPlaylist.TrackIDs.Num() > 0)
+		{
+			if (CurrentPlaylist.bShuffle)
+			{
+				PlaylistIndex = FMath::RandRange(0, CurrentPlaylist.TrackIDs.Num() - 1);
+			}
+			PlayTrack(CurrentPlaylist.TrackIDs[PlaylistIndex]);
+		}
+	}
+}
+
+TArray<FMGPlaylist> UMGMusicManager::GetAllPlaylists() const
+{
+	TArray<FMGPlaylist> Result;
+	Playlists.GenerateValueArray(Result);
+	return Result;
+}
+
+void UMGMusicManager::SetShuffle(bool bEnabled)
+{
+	CurrentPlaylist.bShuffle = bEnabled;
+}
+
+void UMGMusicManager::SetRepeat(bool bEnabled)
+{
+	CurrentPlaylist.bRepeat = bEnabled;
+}
+
+TArray<FMGMusicTrack> UMGMusicManager::GetAllTracks() const
+{
+	TArray<FMGMusicTrack> Result;
+	TrackLibrary.GenerateValueArray(Result);
+	return Result;
+}
+
+TArray<FMGMusicTrack> UMGMusicManager::GetTracksByGenre(FName Genre) const
+{
+	TArray<FMGMusicTrack> Result;
+	for (const auto& Pair : TrackLibrary)
+	{
+		if (Pair.Value.Genre == Genre)
+		{
+			Result.Add(Pair.Value);
+		}
+	}
+	return Result;
+}
+
+void UMGMusicManager::ToggleFavorite(FName TrackID)
+{
+	if (TrackLibrary.Contains(TrackID))
+	{
+		TrackLibrary[TrackID].bFavorite = !TrackLibrary[TrackID].bFavorite;
+	}
+}
+
+TArray<FMGMusicTrack> UMGMusicManager::GetFavorites() const
+{
+	TArray<FMGMusicTrack> Result;
+	for (const auto& Pair : TrackLibrary)
+	{
+		if (Pair.Value.bFavorite)
+		{
+			Result.Add(Pair.Value);
+		}
+	}
+	return Result;
+}
+
+float UMGMusicManager::GetTimeToNextBeat() const
+{
+	return SecondsPerBeat - BeatAccumulator;
+}
+
+float UMGMusicManager::GetCurrentBPM() const
+{
+	return CurrentTrack.BPM;
+}
+
+bool UMGMusicManager::IsOnBeat(float Tolerance) const
+{
+	return BeatAccumulator < Tolerance || (SecondsPerBeat - BeatAccumulator) < Tolerance;
+}
+
+void UMGMusicManager::OnTick()
+{
+	const float DeltaTime = 0.05f;
+
+	if (!bIsPlaying)
 	{
 		return;
 	}
 
-	auto CreateComp = [World]() -> UAudioComponent*
+	// Update playback position
+	PlaybackPosition += DeltaTime;
+	if (PlaybackPosition >= CurrentTrack.Duration)
 	{
-		UAudioComponent* Comp = NewObject<UAudioComponent>(World);
-		Comp->bAutoActivate = false;
-		Comp->bIsUISound = true; // Non-spatialized
-		Comp->bAllowSpatialization = false;
-		Comp->RegisterComponent();
-		return Comp;
-	};
-
-	BaseLayerComp = CreateComp();
-	LowLayerComp = CreateComp();
-	MediumLayerComp = CreateComp();
-	HighLayerComp = CreateComp();
-	ClimaxLayerComp = CreateComp();
-	StingerComp = CreateComp();
-}
-
-void UMGMusicManager::CleanupAudioComponents()
-{
-	auto DestroyComp = [](UAudioComponent*& Comp)
-	{
-		if (Comp)
+		if (CurrentPlaylist.bRepeat)
 		{
-			Comp->Stop();
-			Comp->DestroyComponent();
-			Comp = nullptr;
+			PlayNext();
 		}
-	};
-
-	DestroyComp(BaseLayerComp);
-	DestroyComp(LowLayerComp);
-	DestroyComp(MediumLayerComp);
-	DestroyComp(HighLayerComp);
-	DestroyComp(ClimaxLayerComp);
-	DestroyComp(StingerComp);
-}
-
-void UMGMusicManager::UpdateLayerVolumes(float DeltaTime)
-{
-	// Smooth intensity transitions
-	CurrentIntensity = FMath::FInterpTo(CurrentIntensity, TargetIntensity, DeltaTime, 3.0f);
-
-	// Calculate layer volumes based on intensity
-	// Base layer always audible
-	float BaseVol = MusicVolume;
-
-	// Low layer: full 0-0.3, fade 0.3-0.5
-	float LowVol = 0.0f;
-	if (CurrentIntensity <= 0.3f)
-	{
-		LowVol = CurrentIntensity / 0.3f;
-	}
-	else if (CurrentIntensity <= 0.5f)
-	{
-		LowVol = 1.0f - (CurrentIntensity - 0.3f) / 0.2f;
-	}
-	LowVol *= MusicVolume;
-
-	// Medium layer: fade in 0.25-0.5, full 0.5-0.7, fade 0.7-0.85
-	float MedVol = 0.0f;
-	if (CurrentIntensity >= 0.25f && CurrentIntensity <= 0.5f)
-	{
-		MedVol = (CurrentIntensity - 0.25f) / 0.25f;
-	}
-	else if (CurrentIntensity > 0.5f && CurrentIntensity <= 0.7f)
-	{
-		MedVol = 1.0f;
-	}
-	else if (CurrentIntensity > 0.7f && CurrentIntensity <= 0.85f)
-	{
-		MedVol = 1.0f - (CurrentIntensity - 0.7f) / 0.15f;
-	}
-	MedVol *= MusicVolume;
-
-	// High layer: fade in 0.6-0.8, full 0.8-1.0
-	float HighVol = 0.0f;
-	if (CurrentIntensity >= 0.6f && CurrentIntensity <= 0.8f)
-	{
-		HighVol = (CurrentIntensity - 0.6f) / 0.2f;
-	}
-	else if (CurrentIntensity > 0.8f)
-	{
-		HighVol = 1.0f;
-	}
-	HighVol *= MusicVolume;
-
-	// Climax layer: only at max intensity
-	float ClimaxVol = 0.0f;
-	if (CurrentIntensity >= 0.9f)
-	{
-		ClimaxVol = (CurrentIntensity - 0.9f) / 0.1f;
-	}
-	ClimaxVol *= MusicVolume;
-
-	// Apply volumes
-	if (BaseLayerComp) BaseLayerComp->SetVolumeMultiplier(BaseVol);
-	if (LowLayerComp) LowLayerComp->SetVolumeMultiplier(LowVol);
-	if (MediumLayerComp) MediumLayerComp->SetVolumeMultiplier(MedVol);
-	if (HighLayerComp) HighLayerComp->SetVolumeMultiplier(HighVol);
-	if (ClimaxLayerComp) ClimaxLayerComp->SetVolumeMultiplier(ClimaxVol);
-}
-
-void UMGMusicManager::StartTrack(const FMGMusicTrack& Track, float FadeTime)
-{
-	// Set sounds for each layer
-	auto SetupLayer = [FadeTime](UAudioComponent* Comp, USoundBase* Sound)
-	{
-		if (Comp)
+		else
 		{
-			if (Comp->IsPlaying())
-			{
-				Comp->FadeOut(FadeTime, 0.0f);
-			}
-
-			if (Sound)
-			{
-				Comp->SetSound(Sound);
-				Comp->FadeIn(FadeTime, 1.0f);
-			}
+			Stop();
 		}
-	};
+	}
 
-	SetupLayer(BaseLayerComp, Track.BaseLayer);
-	SetupLayer(LowLayerComp, Track.LowLayer);
-	SetupLayer(MediumLayerComp, Track.MediumLayer);
-	SetupLayer(HighLayerComp, Track.HighLayer);
-	SetupLayer(ClimaxLayerComp, Track.ClimaxLayer);
+	// Smooth intensity
+	float IntensityDelta = TargetIntensity - CurrentIntensity;
+	if (FMath::Abs(IntensityDelta) > 0.01f)
+	{
+		CurrentIntensity += FMath::Sign(IntensityDelta) * IntensitySmoothRate * DeltaTime;
+		CurrentIntensity = FMath::Clamp(CurrentIntensity, 0.0f, 1.0f);
+		UpdateIntensityMixing();
+		OnIntensityChanged.Broadcast(CurrentIntensity);
+	}
 
-	UE_LOG(LogTemp, Log, TEXT("MGMusicManager: Started track '%s'"), *Track.TrackName.ToString());
+	// Update fading
+	if (bFading)
+	{
+		FadeElapsed += DeltaTime;
+		float Alpha = FMath::Clamp(FadeElapsed / FadeDuration, 0.0f, 1.0f);
+		MusicVolume = FMath::Lerp(FadeStartVolume, FadeTargetVolume, Alpha);
+
+		if (FadeElapsed >= FadeDuration)
+		{
+			bFading = false;
+			MusicVolume = FadeTargetVolume;
+		}
+	}
+
+	// Update ducking
+	if (bDucking)
+	{
+		DuckElapsed += DeltaTime;
+		if (DuckElapsed >= DuckDuration)
+		{
+			bDucking = false;
+		}
+	}
+
+	// Beat tracking
+	UpdateBeatTracking(DeltaTime);
 }
 
-void UMGMusicManager::UpdateBeatTracking(float DeltaTime)
+void UMGMusicManager::UpdateIntensityMixing()
 {
-	FMGMusicTrack* CurrentTrack = Tracks.Find(CurrentTrackName);
-	if (!CurrentTrack || CurrentTrack->BPM <= 0.0f)
-	{
-		return;
-	}
+	// Adjust layer volumes based on intensity
+	// Low intensity: Base, Bass prominent
+	// High intensity: All layers, Percussion/Stinger prominent
 
-	float BeatInterval = 60.0f / CurrentTrack->BPM;
+	float BaseVol = 1.0f;
+	float MelodyVol = 0.5f + CurrentIntensity * 0.5f;
+	float SynthVol = 0.3f + CurrentIntensity * 0.7f;
+	float BassVol = 1.0f;
+	float PercVol = 0.4f + CurrentIntensity * 0.6f;
 
-	BeatTimer += DeltaTime;
-	if (BeatTimer >= BeatInterval)
-	{
-		BeatTimer -= BeatInterval;
-		OnBeat.Broadcast();
-	}
+	LayerVolumes[EMGMusicLayer::Base] = BaseVol;
+	LayerVolumes[EMGMusicLayer::Melody] = MelodyVol;
+	LayerVolumes[EMGMusicLayer::Synths] = SynthVol;
+	LayerVolumes[EMGMusicLayer::Bass] = BassVol;
+	LayerVolumes[EMGMusicLayer::Percussion] = PercVol;
+}
 
-	PlaybackTime += DeltaTime;
+void UMGMusicManager::CrossfadeTo(FName TrackID, float Duration)
+{
+	// Start fade out current
+	FadeToVolume(0.0f, Duration * 0.5f);
 
-	// Handle track looping
-	if (CurrentTrack->bCanLoop && PlaybackTime >= CurrentTrack->Duration)
-	{
-		PlaybackTime = 0.0f;
-	}
+	// Queue new track (simplified - would use proper async in real implementation)
+	PlayTrack(TrackID);
+	FadeToVolume(MusicVolume, Duration * 0.5f);
 }
 
 FName UMGMusicManager::GetTrackForState(EMGMusicState State) const
 {
-	// This would ideally be configured via data asset
-	// For now, return first track in playlist or specific named tracks
-
 	switch (State)
 	{
 	case EMGMusicState::MainMenu:
-		if (Tracks.Contains(FName("Menu"))) return FName("Menu");
-		break;
-
+		return FName(TEXT("MainTheme"));
 	case EMGMusicState::Garage:
-		if (Tracks.Contains(FName("Garage"))) return FName("Garage");
-		break;
-
-	case EMGMusicState::PreRace:
-		if (Tracks.Contains(FName("PreRace"))) return FName("PreRace");
-		break;
-
+		return FName(TEXT("GarageAmbient"));
+	case EMGMusicState::Lobby:
+		return FName(TEXT("LobbyVibes"));
 	case EMGMusicState::RacingLow:
 	case EMGMusicState::RacingMedium:
 	case EMGMusicState::RacingHigh:
-		// Return current racing track or random from playlist
-		if (Playlist.Num() > 0)
-		{
-			return Playlist[PlaylistIndex];
-		}
-		break;
-
+	case EMGMusicState::FinalLap:
+		return FName(TEXT("RaceTrack01"));
 	case EMGMusicState::Victory:
-		if (Tracks.Contains(FName("Victory"))) return FName("Victory");
-		break;
-
+		return FName(TEXT("VictoryFanfare"));
 	case EMGMusicState::Defeat:
-		if (Tracks.Contains(FName("Defeat"))) return FName("Defeat");
-		break;
-
+		return FName(TEXT("DefeatTheme"));
 	case EMGMusicState::Results:
-		if (Tracks.Contains(FName("Results"))) return FName("Results");
-		break;
-
+		return FName(TEXT("ResultsScreen"));
 	default:
-		break;
+		return NAME_None;
 	}
-
-	// Fallback to first track
-	if (Playlist.Num() > 0)
-	{
-		return Playlist[0];
-	}
-
-	return NAME_None;
 }
 
-void UMGMusicManager::OnUpdateTimer()
+void UMGMusicManager::InitializeDefaultTracks()
 {
-	if (bIsPaused)
+	// Create default track library with Y2K synthwave aesthetic
+	auto AddTrack = [this](FName ID, const TCHAR* Name, const TCHAR* Artist, FName Genre, float BPM, float Duration)
 	{
-		return;
+		FMGMusicTrack Track;
+		Track.TrackID = ID;
+		Track.DisplayName = FText::FromString(Name);
+		Track.Artist = FText::FromString(Artist);
+		Track.Genre = Genre;
+		Track.BPM = BPM;
+		Track.Duration = Duration;
+		TrackLibrary.Add(ID, Track);
+	};
+
+	// Menu/Ambient
+	AddTrack(FName(TEXT("MainTheme")), TEXT("Midnight Grind"), TEXT("Neon Riders"), FName(TEXT("Synthwave")), 110.0f, 240.0f);
+	AddTrack(FName(TEXT("GarageAmbient")), TEXT("Chrome Dreams"), TEXT("Digital Sunset"), FName(TEXT("Ambient")), 90.0f, 300.0f);
+	AddTrack(FName(TEXT("LobbyVibes")), TEXT("Pre-Race Tension"), TEXT("Turbo Knights"), FName(TEXT("Synthwave")), 125.0f, 180.0f);
+
+	// Racing tracks
+	AddTrack(FName(TEXT("RaceTrack01")), TEXT("Neon Highway"), TEXT("Laser Grid"), FName(TEXT("Electro")), 140.0f, 210.0f);
+	AddTrack(FName(TEXT("RaceTrack02")), TEXT("Velocity"), TEXT("Cyber Pulse"), FName(TEXT("DnB")), 174.0f, 195.0f);
+	AddTrack(FName(TEXT("RaceTrack03")), TEXT("Downtown Rush"), TEXT("Street Phantom"), FName(TEXT("House")), 128.0f, 225.0f);
+	AddTrack(FName(TEXT("RaceTrack04")), TEXT("Turbo Drift"), TEXT("Retro Wave"), FName(TEXT("Synthwave")), 132.0f, 200.0f);
+	AddTrack(FName(TEXT("RaceTrack05")), TEXT("Night Chase"), TEXT("Neon Samurai"), FName(TEXT("Electro")), 145.0f, 215.0f);
+	AddTrack(FName(TEXT("RaceTrack06")), TEXT("Pink Slip"), TEXT("The Midnight"), FName(TEXT("Synthwave")), 118.0f, 250.0f);
+	AddTrack(FName(TEXT("RaceTrack07")), TEXT("Max Speed"), TEXT("Power Glove"), FName(TEXT("Electro")), 150.0f, 185.0f);
+	AddTrack(FName(TEXT("RaceTrack08")), TEXT("Final Lap"), TEXT("Scandroid"), FName(TEXT("Synthwave")), 135.0f, 220.0f);
+
+	// Victory/Defeat
+	AddTrack(FName(TEXT("VictoryFanfare")), TEXT("Champion"), TEXT("Victory Sound"), FName(TEXT("Fanfare")), 120.0f, 30.0f);
+	AddTrack(FName(TEXT("DefeatTheme")), TEXT("Next Time"), TEXT("Loss Music"), FName(TEXT("Ambient")), 80.0f, 25.0f);
+	AddTrack(FName(TEXT("ResultsScreen")), TEXT("Tallying Up"), TEXT("Score Music"), FName(TEXT("Ambient")), 95.0f, 120.0f);
+}
+
+void UMGMusicManager::InitializeDefaultPlaylists()
+{
+	// Racing playlist
+	FMGPlaylist RacingPlaylist;
+	RacingPlaylist.PlaylistID = FName(TEXT("Racing"));
+	RacingPlaylist.DisplayName = NSLOCTEXT("MG", "RacingPlaylist", "Racing Mix");
+	RacingPlaylist.TrackIDs = {
+		FName(TEXT("RaceTrack01")),
+		FName(TEXT("RaceTrack02")),
+		FName(TEXT("RaceTrack03")),
+		FName(TEXT("RaceTrack04")),
+		FName(TEXT("RaceTrack05")),
+		FName(TEXT("RaceTrack06")),
+		FName(TEXT("RaceTrack07")),
+		FName(TEXT("RaceTrack08"))
+	};
+	RacingPlaylist.bShuffle = true;
+	RacingPlaylist.bRepeat = true;
+	Playlists.Add(RacingPlaylist.PlaylistID, RacingPlaylist);
+
+	// Synthwave only
+	FMGPlaylist SynthwavePlaylist;
+	SynthwavePlaylist.PlaylistID = FName(TEXT("Synthwave"));
+	SynthwavePlaylist.DisplayName = NSLOCTEXT("MG", "SynthwavePlaylist", "Synthwave Only");
+	SynthwavePlaylist.TrackIDs = {
+		FName(TEXT("MainTheme")),
+		FName(TEXT("RaceTrack04")),
+		FName(TEXT("RaceTrack06")),
+		FName(TEXT("RaceTrack08"))
+	};
+	SynthwavePlaylist.bShuffle = true;
+	SynthwavePlaylist.bRepeat = true;
+	Playlists.Add(SynthwavePlaylist.PlaylistID, SynthwavePlaylist);
+
+	// High energy
+	FMGPlaylist HighEnergyPlaylist;
+	HighEnergyPlaylist.PlaylistID = FName(TEXT("HighEnergy"));
+	HighEnergyPlaylist.DisplayName = NSLOCTEXT("MG", "HighEnergyPlaylist", "High Energy");
+	HighEnergyPlaylist.TrackIDs = {
+		FName(TEXT("RaceTrack02")),
+		FName(TEXT("RaceTrack05")),
+		FName(TEXT("RaceTrack07"))
+	};
+	HighEnergyPlaylist.bShuffle = true;
+	HighEnergyPlaylist.bRepeat = true;
+	Playlists.Add(HighEnergyPlaylist.PlaylistID, HighEnergyPlaylist);
+}
+
+void UMGMusicManager::UpdateBeatTracking(float DeltaTime)
+{
+	BeatAccumulator += DeltaTime;
+
+	if (BeatAccumulator >= SecondsPerBeat)
+	{
+		BeatAccumulator -= SecondsPerBeat;
+		BeatCount++;
+		OnBeat.Broadcast();
 	}
-
-	float DeltaTime = 0.016f; // Timer interval
-
-	UpdateLayerVolumes(DeltaTime);
-	UpdateBeatTracking(DeltaTime);
 }

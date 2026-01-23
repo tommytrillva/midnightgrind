@@ -4,122 +4,121 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 #include "MGMusicManager.generated.h"
 
-/**
- * Music context/state
- */
+class UAudioComponent;
+
 UENUM(BlueprintType)
 enum class EMGMusicState : uint8
 {
-	/** No music */
-	None,
-	/** Main menu */
+	Silent,
 	MainMenu,
-	/** Garage/customization */
 	Garage,
-	/** Pre-race/lobby */
-	PreRace,
-	/** Racing - low intensity */
+	Lobby,
+	Countdown,
 	RacingLow,
-	/** Racing - medium intensity */
 	RacingMedium,
-	/** Racing - high intensity (final lap, close race) */
 	RacingHigh,
-	/** Victory celebration */
+	FinalLap,
 	Victory,
-	/** Loss/defeat */
 	Defeat,
-	/** Results screen */
-	Results
+	Results,
+	Cutscene
 };
 
-/**
- * Music track with intensity layers
- */
+UENUM(BlueprintType)
+enum class EMGMusicLayer : uint8
+{
+	Base,
+	Melody,
+	Synths,
+	Bass,
+	Percussion,
+	Vocals,
+	Stinger
+};
+
 USTRUCT(BlueprintType)
 struct FMGMusicTrack
 {
 	GENERATED_BODY()
 
-	/** Track name/ID */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	FName TrackName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName TrackID;
 
-	/** Display name */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText DisplayName;
 
-	/** Base/ambient layer (always playing) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	USoundBase* BaseLayer = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText Artist;
 
-	/** Low intensity layer */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	USoundBase* LowLayer = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName Genre;
 
-	/** Medium intensity layer */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	USoundBase* MediumLayer = nullptr;
-
-	/** High intensity layer */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	USoundBase* HighLayer = nullptr;
-
-	/** Climax/peak layer (final lap, photo finish) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	USoundBase* ClimaxLayer = nullptr;
-
-	/** BPM for synchronization */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float BPM = 120.0f;
 
-	/** Track duration in seconds */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Duration = 180.0f;
 
-	/** Can this track loop? */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	bool bCanLoop = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<USoundBase> SoundAsset;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bUnlocked = true;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 PlayCount = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bFavorite = false;
 };
 
-/**
- * Stinger/one-shot music cue
- */
 USTRUCT(BlueprintType)
-struct FMGMusicStinger
+struct FMGPlaylist
 {
 	GENERATED_BODY()
 
-	/** Stinger name */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	FName StingerName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName PlaylistID;
 
-	/** Sound to play */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	USoundBase* Sound = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText DisplayName;
 
-	/** Duck other music while playing */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	bool bDuckMusic = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FName> TrackIDs;
 
-	/** Duck amount (0-1) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	float DuckAmount = 0.5f;
+	UPROPERTY(BlueprintReadWrite)
+	bool bShuffle = true;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bRepeat = true;
 };
 
-/**
- * Music Manager Subsystem
- * Handles all game music with dynamic intensity layers
- *
- * Features:
- * - Multi-layer tracks that blend based on intensity
- * - Smooth transitions between music states
- * - Beat-synced transitions
- * - Stinger support for events
- * - Playlist management
- */
+USTRUCT(BlueprintType)
+struct FMGMusicEvent
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	FName EventType;
+
+	UPROPERTY(BlueprintReadWrite)
+	float IntensityModifier = 0.0f;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bTriggerStinger = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	FName StingerID;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMusicStateChanged, EMGMusicState, NewState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrackChanged, const FMGMusicTrack&, NewTrack);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnIntensityChanged, float, NewIntensity);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBeat);
+
 UCLASS()
 class MIDNIGHTGRIND_API UMGMusicManager : public UGameInstanceSubsystem
 {
@@ -129,101 +128,95 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	// ==========================================
-	// MUSIC CONTROL
-	// ==========================================
-
-	/** Set the current music state */
 	UFUNCTION(BlueprintCallable, Category = "Music")
 	void SetMusicState(EMGMusicState NewState);
 
-	/** Get current music state */
 	UFUNCTION(BlueprintPure, Category = "Music")
 	EMGMusicState GetMusicState() const { return CurrentState; }
 
-	/** Set intensity (0-1) for racing music */
 	UFUNCTION(BlueprintCallable, Category = "Music")
-	void SetIntensity(float Intensity);
+	void SetRaceIntensity(float Intensity);
 
-	/** Get current intensity */
 	UFUNCTION(BlueprintPure, Category = "Music")
-	float GetIntensity() const { return CurrentIntensity; }
+	float GetRaceIntensity() const { return CurrentIntensity; }
 
-	/** Play a specific track */
 	UFUNCTION(BlueprintCallable, Category = "Music")
-	void PlayTrack(FName TrackName, float FadeTime = 1.0f);
+	void TriggerMusicEvent(const FMGMusicEvent& Event);
 
-	/** Stop all music */
-	UFUNCTION(BlueprintCallable, Category = "Music")
-	void StopMusic(float FadeTime = 1.0f);
+	UFUNCTION(BlueprintCallable, Category = "Music|Playback")
+	void PlayTrack(FName TrackID);
 
-	/** Pause music */
-	UFUNCTION(BlueprintCallable, Category = "Music")
-	void PauseMusic();
+	UFUNCTION(BlueprintCallable, Category = "Music|Playback")
+	void PlayNext();
 
-	/** Resume music */
-	UFUNCTION(BlueprintCallable, Category = "Music")
-	void ResumeMusic();
+	UFUNCTION(BlueprintCallable, Category = "Music|Playback")
+	void PlayPrevious();
 
-	// ==========================================
-	// STINGERS
-	// ==========================================
+	UFUNCTION(BlueprintCallable, Category = "Music|Playback")
+	void Pause();
 
-	/** Play a stinger */
-	UFUNCTION(BlueprintCallable, Category = "Music")
-	void PlayStinger(FName StingerName);
+	UFUNCTION(BlueprintCallable, Category = "Music|Playback")
+	void Resume();
 
-	/** Register a stinger */
-	UFUNCTION(BlueprintCallable, Category = "Music")
-	void RegisterStinger(const FMGMusicStinger& Stinger);
+	UFUNCTION(BlueprintCallable, Category = "Music|Playback")
+	void Stop();
 
-	// ==========================================
-	// TRACK MANAGEMENT
-	// ==========================================
+	UFUNCTION(BlueprintPure, Category = "Music|Playback")
+	bool IsPlaying() const { return bIsPlaying; }
 
-	/** Register a music track */
-	UFUNCTION(BlueprintCallable, Category = "Music")
-	void RegisterTrack(const FMGMusicTrack& Track);
+	UFUNCTION(BlueprintPure, Category = "Music|Playback")
+	FMGMusicTrack GetCurrentTrack() const { return CurrentTrack; }
 
-	/** Get current track name */
-	UFUNCTION(BlueprintPure, Category = "Music")
-	FName GetCurrentTrackName() const { return CurrentTrackName; }
-
-	/** Get track by name */
-	UFUNCTION(BlueprintPure, Category = "Music")
-	bool GetTrack(FName TrackName, FMGMusicTrack& OutTrack) const;
-
-	/** Skip to next track in playlist */
-	UFUNCTION(BlueprintCallable, Category = "Music")
-	void NextTrack();
-
-	/** Go to previous track */
-	UFUNCTION(BlueprintCallable, Category = "Music")
-	void PreviousTrack();
-
-	/** Shuffle the playlist */
-	UFUNCTION(BlueprintCallable, Category = "Music")
-	void ShufflePlaylist();
-
-	// ==========================================
-	// VOLUME
-	// ==========================================
-
-	/** Set music volume */
-	UFUNCTION(BlueprintCallable, Category = "Music")
+	UFUNCTION(BlueprintCallable, Category = "Music|Volume")
 	void SetMusicVolume(float Volume);
 
-	/** Get music volume */
-	UFUNCTION(BlueprintPure, Category = "Music")
+	UFUNCTION(BlueprintPure, Category = "Music|Volume")
 	float GetMusicVolume() const { return MusicVolume; }
 
-	// ==========================================
-	// EVENTS
-	// ==========================================
+	UFUNCTION(BlueprintCallable, Category = "Music|Volume")
+	void SetLayerVolume(EMGMusicLayer Layer, float Volume);
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMusicStateChanged, EMGMusicState, NewState);
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrackChanged, FName, TrackName);
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBeat);
+	UFUNCTION(BlueprintCallable, Category = "Music|Volume")
+	void FadeToVolume(float TargetVolume, float Duration);
+
+	UFUNCTION(BlueprintCallable, Category = "Music|Volume")
+	void DuckMusic(float DuckAmount, float Duration);
+
+	UFUNCTION(BlueprintCallable, Category = "Music|Playlist")
+	void SetPlaylist(FName PlaylistID);
+
+	UFUNCTION(BlueprintPure, Category = "Music|Playlist")
+	FMGPlaylist GetCurrentPlaylist() const { return CurrentPlaylist; }
+
+	UFUNCTION(BlueprintPure, Category = "Music|Playlist")
+	TArray<FMGPlaylist> GetAllPlaylists() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Music|Playlist")
+	void SetShuffle(bool bEnabled);
+
+	UFUNCTION(BlueprintCallable, Category = "Music|Playlist")
+	void SetRepeat(bool bEnabled);
+
+	UFUNCTION(BlueprintPure, Category = "Music|Library")
+	TArray<FMGMusicTrack> GetAllTracks() const;
+
+	UFUNCTION(BlueprintPure, Category = "Music|Library")
+	TArray<FMGMusicTrack> GetTracksByGenre(FName Genre) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Music|Library")
+	void ToggleFavorite(FName TrackID);
+
+	UFUNCTION(BlueprintPure, Category = "Music|Library")
+	TArray<FMGMusicTrack> GetFavorites() const;
+
+	UFUNCTION(BlueprintPure, Category = "Music|Beat")
+	float GetTimeToNextBeat() const;
+
+	UFUNCTION(BlueprintPure, Category = "Music|Beat")
+	float GetCurrentBPM() const;
+
+	UFUNCTION(BlueprintPure, Category = "Music|Beat")
+	bool IsOnBeat(float Tolerance = 0.1f) const;
 
 	UPROPERTY(BlueprintAssignable, Category = "Music|Events")
 	FOnMusicStateChanged OnMusicStateChanged;
@@ -232,104 +225,45 @@ public:
 	FOnTrackChanged OnTrackChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "Music|Events")
+	FOnIntensityChanged OnIntensityChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Music|Events")
 	FOnBeat OnBeat;
 
 protected:
-	// ==========================================
-	// CONFIGURATION
-	// ==========================================
-
-	/** Fade time for layer transitions */
-	UPROPERTY(EditDefaultsOnly, Category = "Music|Config")
-	float LayerFadeTime = 0.5f;
-
-	/** Fade time for track transitions */
-	UPROPERTY(EditDefaultsOnly, Category = "Music|Config")
-	float TrackFadeTime = 2.0f;
-
-	// ==========================================
-	// STATE
-	// ==========================================
-
-	/** Current music state */
-	EMGMusicState CurrentState = EMGMusicState::None;
-
-	/** Current intensity (0-1) */
-	float CurrentIntensity = 0.0f;
-
-	/** Target intensity (for smoothing) */
-	float TargetIntensity = 0.0f;
-
-	/** Music volume */
-	float MusicVolume = 0.8f;
-
-	/** Current track name */
-	FName CurrentTrackName;
-
-	/** Is music paused? */
-	bool bIsPaused = false;
-
-	/** Current playback time */
-	float PlaybackTime = 0.0f;
-
-	/** Beat timer */
-	float BeatTimer = 0.0f;
-
-	/** Playlist index */
-	int32 PlaylistIndex = 0;
-
-	// ==========================================
-	// DATA
-	// ==========================================
-
-	/** Registered tracks */
-	UPROPERTY()
-	TMap<FName, FMGMusicTrack> Tracks;
-
-	/** Registered stingers */
-	UPROPERTY()
-	TMap<FName, FMGMusicStinger> Stingers;
-
-	/** Playlist (track names) */
-	UPROPERTY()
-	TArray<FName> Playlist;
-
-	// ==========================================
-	// AUDIO COMPONENTS
-	// ==========================================
-
-	UPROPERTY()
-	UAudioComponent* BaseLayerComp = nullptr;
-
-	UPROPERTY()
-	UAudioComponent* LowLayerComp = nullptr;
-
-	UPROPERTY()
-	UAudioComponent* MediumLayerComp = nullptr;
-
-	UPROPERTY()
-	UAudioComponent* HighLayerComp = nullptr;
-
-	UPROPERTY()
-	UAudioComponent* ClimaxLayerComp = nullptr;
-
-	UPROPERTY()
-	UAudioComponent* StingerComp = nullptr;
-
-	// ==========================================
-	// INTERNAL
-	// ==========================================
-
-	void InitializeAudioComponents();
-	void CleanupAudioComponents();
-	void UpdateLayerVolumes(float DeltaTime);
-	void StartTrack(const FMGMusicTrack& Track, float FadeTime);
+	void OnTick();
+	void UpdateIntensityMixing();
+	void CrossfadeTo(FName TrackID, float Duration = 1.0f);
+	FName GetTrackForState(EMGMusicState State) const;
+	void InitializeDefaultTracks();
+	void InitializeDefaultPlaylists();
 	void UpdateBeatTracking(float DeltaTime);
 
-	/** Get appropriate track for state */
-	FName GetTrackForState(EMGMusicState State) const;
-
-	/** Timer handle for updates */
-	FTimerHandle UpdateTimerHandle;
-	void OnUpdateTimer();
+private:
+	EMGMusicState CurrentState = EMGMusicState::Silent;
+	float CurrentIntensity = 0.5f;
+	float TargetIntensity = 0.5f;
+	FMGMusicTrack CurrentTrack;
+	FMGPlaylist CurrentPlaylist;
+	int32 PlaylistIndex = 0;
+	bool bIsPlaying = false;
+	float PlaybackPosition = 0.0f;
+	float MusicVolume = 0.8f;
+	TMap<EMGMusicLayer, float> LayerVolumes;
+	TMap<FName, FMGMusicTrack> TrackLibrary;
+	TMap<FName, FMGPlaylist> Playlists;
+	float BeatAccumulator = 0.0f;
+	float SecondsPerBeat = 0.5f;
+	int32 BeatCount = 0;
+	bool bFading = false;
+	float FadeStartVolume = 0.0f;
+	float FadeTargetVolume = 0.0f;
+	float FadeDuration = 0.0f;
+	float FadeElapsed = 0.0f;
+	bool bDucking = false;
+	float DuckAmount = 0.0f;
+	float DuckDuration = 0.0f;
+	float DuckElapsed = 0.0f;
+	FTimerHandle TickTimer;
+	static constexpr float IntensitySmoothRate = 2.0f;
 };
