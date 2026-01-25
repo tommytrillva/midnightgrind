@@ -10,6 +10,7 @@
 class AMGVehiclePawn;
 class AMGSpawnPointActor;
 class APlayerController;
+class AMGRacingAIController;
 
 /**
  * Vehicle spawn request
@@ -181,6 +182,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Config")
 	TMap<FName, TSubclassOf<AMGVehiclePawn>> VehicleClassMap;
 
+	/** AI controller class to spawn for AI vehicles */
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
+	TSubclassOf<AMGRacingAIController> AIControllerClass;
+
 protected:
 	// ==========================================
 	// STATE
@@ -216,4 +221,7 @@ protected:
 
 	/** Register vehicle with race game mode */
 	void RegisterWithGameMode(AMGVehiclePawn* Vehicle, bool bIsAI, const FString& DisplayName);
+
+	/** Spawn and assign AI controller for AI vehicle */
+	void SpawnAIController(AMGVehiclePawn* Vehicle, float AISkill);
 };

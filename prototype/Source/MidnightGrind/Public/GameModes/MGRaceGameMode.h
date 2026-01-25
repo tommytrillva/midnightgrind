@@ -478,6 +478,9 @@ protected:
 	/** Notify all player controllers that race ended */
 	void NotifyPlayersRaceEnded();
 
+	/** Update HUD subsystem with player race data */
+	void UpdateHUDSubsystem();
+
 private:
 	/** Countdown accumulator */
 	float CountdownAccumulator = 0.0f;

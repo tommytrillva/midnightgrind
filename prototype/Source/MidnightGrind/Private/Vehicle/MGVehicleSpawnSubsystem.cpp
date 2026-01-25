@@ -5,6 +5,7 @@
 #include "Vehicle/MGVehiclePawn.h"
 #include "Track/MGSpawnPointActor.h"
 #include "GameModes/MGRaceGameMode.h"
+#include "AI/MGRacingAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
@@ -141,8 +142,11 @@ AMGVehiclePawn* UMGVehicleSpawnSubsystem::SpawnVehicle(const FMGVehicleSpawnRequ
 		return nullptr;
 	}
 
-	// Configure vehicle for AI if needed
-	// TODO: Set up AI controller for AI vehicles
+	// Spawn and assign AI controller for AI vehicles
+	if (Request.bIsAI)
+	{
+		SpawnAIController(Vehicle, Request.AISkill);
+	}
 
 	// Track spawned vehicle
 	FMGSpawnedVehicle SpawnedInfo;
@@ -361,4 +365,75 @@ void UMGVehicleSpawnSubsystem::RegisterWithGameMode(AMGVehiclePawn* Vehicle, boo
 	}
 
 	UE_LOG(LogMGVehicleSpawn, Log, TEXT("Registered vehicle with game mode, racer index: %d"), RacerIndex);
+}
+
+void UMGVehicleSpawnSubsystem::SpawnAIController(AMGVehiclePawn* Vehicle, float AISkill)
+{
+	if (!Vehicle)
+	{
+		return;
+	}
+
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	// Get AI controller class
+	TSubclassOf<AMGRacingAIController> ControllerClass = AIControllerClass;
+	if (!ControllerClass)
+	{
+		// Fallback to default
+		ControllerClass = AMGRacingAIController::StaticClass();
+	}
+
+	// Spawn AI controller
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AMGRacingAIController* AIController = World->SpawnActor<AMGRacingAIController>(ControllerClass, SpawnParams);
+	if (!AIController)
+	{
+		UE_LOG(LogMGVehicleSpawn, Error, TEXT("Failed to spawn AI controller for vehicle"));
+		return;
+	}
+
+	// Configure AI via driver profile
+	FMGAIDriverProfile Profile;
+	Profile.SkillRating = AISkill;
+
+	// Map skill level to difficulty
+	if (AISkill < 0.2f)
+	{
+		Profile.Difficulty = EMGAIDifficulty::Rookie;
+	}
+	else if (AISkill < 0.4f)
+	{
+		Profile.Difficulty = EMGAIDifficulty::Amateur;
+	}
+	else if (AISkill < 0.6f)
+	{
+		Profile.Difficulty = EMGAIDifficulty::Professional;
+	}
+	else if (AISkill < 0.8f)
+	{
+		Profile.Difficulty = EMGAIDifficulty::Expert;
+	}
+	else if (AISkill < 0.95f)
+	{
+		Profile.Difficulty = EMGAIDifficulty::Master;
+	}
+	else
+	{
+		Profile.Difficulty = EMGAIDifficulty::Legend;
+	}
+
+	AIController->SetDriverProfile(Profile);
+
+	// Possess the vehicle
+	AIController->Possess(Vehicle);
+
+	UE_LOG(LogMGVehicleSpawn, Log, TEXT("Spawned AI controller for vehicle (Skill: %.2f, Difficulty: %d)"),
+		AISkill, static_cast<int32>(Profile.Difficulty));
 }

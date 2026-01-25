@@ -4,6 +4,7 @@
 #include "GameModes/MGRaceGameMode.h"
 #include "Vehicle/MGVehiclePawn.h"
 #include "Core/MGPlayerController.h"
+#include "UI/MGRaceHUDSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "EngineUtils.h"
@@ -481,6 +482,9 @@ void AMGRaceGameMode::UpdatePositions()
 			OnPositionChanged.Broadcast(SortedRacers[i]->RacerIndex, NewPosition);
 		}
 	}
+
+	// Update HUD subsystem with player data
+	UpdateHUDSubsystem();
 }
 
 void AMGRaceGameMode::CheckRaceComplete()
@@ -622,5 +626,32 @@ void AMGRaceGameMode::NotifyPlayersRaceEnded()
 		{
 			PC->ClientOnRaceEnded();
 		}
+	}
+}
+
+void AMGRaceGameMode::UpdateHUDSubsystem()
+{
+	// Get HUD subsystem
+	UMGRaceHUDSubsystem* HUDSubsystem = GetWorld()->GetSubsystem<UMGRaceHUDSubsystem>();
+	if (!HUDSubsystem)
+	{
+		return;
+	}
+
+	// Update player's race status
+	if (Racers.IsValidIndex(PlayerRacerIndex))
+	{
+		const FMGRacerData& PlayerData = Racers[PlayerRacerIndex];
+
+		FMGRaceStatus Status;
+		Status.CurrentPosition = PlayerData.Position;
+		Status.TotalRacers = Racers.Num();
+		Status.CurrentLap = PlayerData.CurrentLap;
+		Status.TotalLaps = RaceConfig.LapCount;
+		Status.CurrentLapTime = PlayerData.CurrentLapTime;
+		Status.BestLapTime = PlayerData.BestLapTime;
+		Status.TotalRaceTime = PlayerData.TotalTime;
+
+		HUDSubsystem->UpdateRaceStatus(Status);
 	}
 }
