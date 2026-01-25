@@ -437,6 +437,10 @@ protected:
 	UPROPERTY()
 	TWeakObjectPtr<UMGRaceDirectorSubsystem> RaceDirectorSubsystem;
 
+	/** Cached race game mode (only valid during race) */
+	UPROPERTY()
+	TWeakObjectPtr<class AMGRaceGameMode> CachedRaceGameMode;
+
 	// ==========================================
 	// INTERNAL FLOW
 	// ==========================================
@@ -505,4 +509,21 @@ protected:
 
 	/** Cache subsystem references */
 	void CacheSubsystems();
+
+	/** Bind to race game mode events */
+	void BindRaceGameModeEvents();
+
+	/** Unbind from race game mode events */
+	void UnbindRaceGameModeEvents();
+
+	/** Convert setup to game mode config */
+	struct FMGRaceConfig ConvertSetupToConfig(const FMGRaceSetupRequest& Setup) const;
+
+	/** Handle race game mode's race started event */
+	UFUNCTION()
+	void HandleRaceStarted();
+
+	/** Handle race game mode's race finished event */
+	UFUNCTION()
+	void HandleRaceFinished(const struct FMGRaceResults& Results);
 };

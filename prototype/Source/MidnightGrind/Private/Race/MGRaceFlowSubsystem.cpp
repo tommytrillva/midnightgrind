@@ -5,6 +5,7 @@
 #include "Core/MGGameStateSubsystem.h"
 #include "RaceDirector/MGRaceDirectorSubsystem.h"
 #include "Vehicle/MGVehicleSpawnSubsystem.h"
+#include "GameModes/MGRaceGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
@@ -642,8 +643,29 @@ void UMGRaceFlowSubsystem::ExecutePreRace()
 		GameStateSubsystem->BeginPreRace();
 	}
 
-	// Start countdown after pre-race intro
-	// For MVP, skip directly to countdown
+	// Get and configure race game mode
+	if (World)
+	{
+		CachedRaceGameMode = Cast<AMGRaceGameMode>(World->GetAuthGameMode());
+		if (CachedRaceGameMode.IsValid())
+		{
+			// Configure game mode with race parameters
+			FMGRaceConfig Config = ConvertSetupToConfig(CurrentSetup);
+			CachedRaceGameMode->SetRaceConfig(Config);
+
+			// Bind to game mode events
+			BindRaceGameModeEvents();
+
+			UE_LOG(LogMGRaceFlow, Log, TEXT("Configured race game mode: %d laps, AI difficulty %.2f"),
+				Config.LapCount, Config.AIDifficulty);
+		}
+		else
+		{
+			UE_LOG(LogMGRaceFlow, Warning, TEXT("No race game mode found - using fallback"));
+		}
+	}
+
+	// Start countdown
 	SetFlowState(EMGRaceFlowState::Countdown);
 	ExecuteCountdown();
 }
@@ -652,35 +674,30 @@ void UMGRaceFlowSubsystem::ExecuteCountdown()
 {
 	UE_LOG(LogMGRaceFlow, Log, TEXT("Countdown phase"));
 
-	// Countdown is handled by RaceGameMode
-	// For MVP, proceed to racing state
-	// Full implementation would wait for countdown events
-
-	SetFlowState(EMGRaceFlowState::Racing);
-	ExecuteRacing();
+	// Start countdown via race game mode
+	if (CachedRaceGameMode.IsValid())
+	{
+		CachedRaceGameMode->StartCountdown();
+		// Race will transition to Racing when game mode broadcasts OnRaceStarted
+	}
+	else
+	{
+		// Fallback: no game mode, proceed directly
+		UE_LOG(LogMGRaceFlow, Warning, TEXT("No game mode - skipping countdown"));
+		SetFlowState(EMGRaceFlowState::Racing);
+		ExecuteRacing();
+	}
 }
 
 void UMGRaceFlowSubsystem::ExecuteRacing()
 {
-	UE_LOG(LogMGRaceFlow, Log, TEXT("Racing phase started"));
+	// Note: This is typically called via HandleRaceStarted() when game mode broadcasts OnRaceStarted
+	// This direct call path is a fallback when no game mode is available
 
-	// Start race director
-	if (RaceDirectorSubsystem.IsValid())
-	{
-		RaceDirectorSubsystem->StartRace();
-	}
-
-	// Update game state
-	if (GameStateSubsystem.IsValid())
-	{
-		GameStateSubsystem->StartRacing();
-	}
-
-	// Broadcast race started
-	OnRaceStarted.Broadcast();
+	UE_LOG(LogMGRaceFlow, Log, TEXT("Racing phase started (fallback path)"));
 
 	// Race runs until game mode signals completion
-	// This is triggered by OnRaceGameModeEnd
+	// This is triggered by HandleRaceFinished -> OnRaceGameModeEnd
 }
 
 void UMGRaceFlowSubsystem::OnRaceGameModeStart()
@@ -828,7 +845,28 @@ void UMGRaceFlowSubsystem::ExecuteRewardProcessing()
 	// Broadcast
 	OnRewardsProcessed.Broadcast(LastResult);
 
-	// Stay in results state until user continues
+	// MVP: Set input mode to menu so player can see results
+	if (UWorld* World = GetGameInstance()->GetWorld())
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0))
+		{
+			FInputModeUIOnly InputMode;
+			PC->SetInputMode(InputMode);
+			PC->SetShowMouseCursor(true);
+		}
+	}
+
+	// MVP: Auto-continue to garage after a short delay
+	// In full game, player would press Continue on results screen
+	if (UWorld* World = GetGameInstance()->GetWorld())
+	{
+		FTimerHandle TimerHandle;
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUFunction(this, FName("ContinueToGarage"));
+		World->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 5.0f, false);
+
+		UE_LOG(LogMGRaceFlow, Log, TEXT("Auto-returning to garage in 5 seconds..."));
+	}
 }
 
 void UMGRaceFlowSubsystem::ApplyRewards(const FMGRaceFlowResult& Result)
@@ -858,6 +896,10 @@ void UMGRaceFlowSubsystem::ExecuteReturn()
 {
 	UE_LOG(LogMGRaceFlow, Log, TEXT("Returning to garage"));
 
+	// Unbind from game mode events
+	UnbindRaceGameModeEvents();
+	CachedRaceGameMode = nullptr;
+
 	// Clear AI opponents
 	CurrentAIOpponents.Empty();
 
@@ -866,6 +908,9 @@ void UMGRaceFlowSubsystem::ExecuteReturn()
 	{
 		GameStateSubsystem->GoToGarage();
 	}
+
+	// Load garage level
+	UGameplayStatics::OpenLevel(GetGameInstance(), FName("L_Garage"));
 
 	// Reset to idle
 	SetFlowState(EMGRaceFlowState::Idle);
@@ -907,4 +952,110 @@ bool UMGRaceFlowSubsystem::ValidateSetup(const FMGRaceSetupRequest& Request, FSt
 	}
 
 	return true;
+}
+
+// ==========================================
+// GAME MODE INTEGRATION
+// ==========================================
+
+void UMGRaceFlowSubsystem::BindRaceGameModeEvents()
+{
+	if (!CachedRaceGameMode.IsValid())
+	{
+		return;
+	}
+
+	// Bind to race started (after countdown)
+	CachedRaceGameMode->OnRaceStarted.AddDynamic(this, &UMGRaceFlowSubsystem::HandleRaceStarted);
+
+	// Bind to race finished
+	CachedRaceGameMode->OnRaceFinished.AddDynamic(this, &UMGRaceFlowSubsystem::HandleRaceFinished);
+
+	UE_LOG(LogMGRaceFlow, Log, TEXT("Bound to race game mode events"));
+}
+
+void UMGRaceFlowSubsystem::UnbindRaceGameModeEvents()
+{
+	if (!CachedRaceGameMode.IsValid())
+	{
+		return;
+	}
+
+	CachedRaceGameMode->OnRaceStarted.RemoveDynamic(this, &UMGRaceFlowSubsystem::HandleRaceStarted);
+	CachedRaceGameMode->OnRaceFinished.RemoveDynamic(this, &UMGRaceFlowSubsystem::HandleRaceFinished);
+}
+
+FMGRaceConfig UMGRaceFlowSubsystem::ConvertSetupToConfig(const FMGRaceSetupRequest& Setup) const
+{
+	FMGRaceConfig Config;
+
+	// Convert race type name to enum
+	if (Setup.RaceType == FName("Circuit"))
+	{
+		Config.RaceType = EMGRaceType::Circuit;
+	}
+	else if (Setup.RaceType == FName("Sprint"))
+	{
+		Config.RaceType = EMGRaceType::Sprint;
+	}
+	else if (Setup.RaceType == FName("Drift"))
+	{
+		Config.RaceType = EMGRaceType::Drift;
+	}
+	else if (Setup.RaceType == FName("Drag"))
+	{
+		Config.RaceType = EMGRaceType::Drag;
+	}
+	else if (Setup.RaceType == FName("TimeTrial"))
+	{
+		Config.RaceType = EMGRaceType::TimeTrial;
+	}
+	else
+	{
+		Config.RaceType = EMGRaceType::Circuit;
+	}
+
+	Config.LapCount = Setup.LapCount;
+	Config.AIDifficulty = Setup.AIDifficulty;
+	Config.MaxRacers = Setup.AICount + 1; // +1 for player
+	Config.bPinkSlipRace = Setup.bIsPinkSlip;
+	Config.TimeOfDay = Setup.TimeOfDay;
+	Config.Weather = Setup.Weather;
+	Config.TrackName = Setup.TrackID;
+
+	return Config;
+}
+
+void UMGRaceFlowSubsystem::HandleRaceStarted()
+{
+	UE_LOG(LogMGRaceFlow, Log, TEXT("Race game mode signaled race started (GO!)"));
+
+	// Transition to racing state
+	if (CurrentState == EMGRaceFlowState::Countdown)
+	{
+		SetFlowState(EMGRaceFlowState::Racing);
+
+		// Start race director
+		if (RaceDirectorSubsystem.IsValid())
+		{
+			RaceDirectorSubsystem->StartRace();
+		}
+
+		// Update game state
+		if (GameStateSubsystem.IsValid())
+		{
+			GameStateSubsystem->StartRacing();
+		}
+
+		// Broadcast
+		OnRaceStarted.Broadcast();
+	}
+}
+
+void UMGRaceFlowSubsystem::HandleRaceFinished(const FMGRaceResults& Results)
+{
+	UE_LOG(LogMGRaceFlow, Log, TEXT("Race game mode signaled race finished"));
+
+	// Call our existing end handler
+	OnRaceGameModeEnd();
 }
