@@ -5,6 +5,8 @@
 #include "Vehicle/MGVehicleMovementComponent.h"
 #include "Vehicle/MGVehicleFactory.h"
 #include "GameModes/MGRaceGameMode.h"
+#include "Race/MGRaceFlowSubsystem.h"
+#include "Economy/MGEconomySubsystem.h"
 #include "Track/MGTrackSubsystem.h"
 #include "Track/MGSpawnPointActor.h"
 #include "Kismet/GameplayStatics.h"
@@ -238,8 +240,16 @@ void UMGDevCommands::AddCredits(int32 Amount)
 {
 	LogCommand(FString::Printf(TEXT("AddCredits(%d)"), Amount));
 
-	// Would add to economy subsystem
-	UE_LOG(LogTemp, Log, TEXT("Added %d credits"), Amount);
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGEconomySubsystem* Economy = GI->GetSubsystem<UMGEconomySubsystem>())
+		{
+			Economy->AddCredits(Amount, EMGTransactionType::Other, FText::FromString(TEXT("Dev Command")));
+			UE_LOG(LogTemp, Log, TEXT("Added %d credits. New balance: %lld"), Amount, Economy->GetCredits());
+			return;
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Could not add credits - EconomySubsystem not available"));
 }
 
 void UMGDevCommands::AddXP(int32 Amount)
@@ -387,39 +397,67 @@ void UMGDevCommands::QuickRace(int32 AICount, int32 Laps)
 {
 	LogCommand(FString::Printf(TEXT("QuickRace(%d, %d)"), AICount, Laps));
 
-	// Spawn player vehicle
-	SpawnVehicle(EMGVehiclePreset::JDM_Mid);
-
-	// Spawn AI
-	SpawnAI(AICount);
-
-	// Configure and start race
-	UWorld* World = GetWorld();
-	if (World)
+	if (UGameInstance* GI = GetGameInstance())
 	{
-		if (AMGRaceGameMode* GameMode = Cast<AMGRaceGameMode>(World->GetAuthGameMode()))
+		if (UMGRaceFlowSubsystem* RaceFlow = GI->GetSubsystem<UMGRaceFlowSubsystem>())
 		{
-			// Would configure race settings
-			UE_LOG(LogTemp, Log, TEXT("Quick Race: %d AI, %d Laps"), AICount, Laps);
+			// Create race setup
+			FMGRaceSetupRequest Setup;
+			Setup.TrackID = FName("Track_Downtown");
+			Setup.RaceType = FName("Circuit");
+			Setup.PlayerVehicleID = FName("Vehicle_SakuraGTR");
+			Setup.LapCount = Laps;
+			Setup.AICount = AICount;
+			Setup.AIDifficulty = 0.5f;
+			Setup.BaseCashReward = 5000;
+			Setup.BaseRepReward = 100;
+
+			if (RaceFlow->StartRace(Setup))
+			{
+				UE_LOG(LogTemp, Log, TEXT("Quick Race started: %d AI, %d Laps on %s"),
+					AICount, Laps, *Setup.TrackID.ToString());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Failed to start Quick Race"));
+			}
+			return;
 		}
 	}
-
-	// Start race
-	StartRace();
+	UE_LOG(LogTemp, Warning, TEXT("Could not start Quick Race - RaceFlowSubsystem not available"));
 }
 
 void UMGDevCommands::QuickTimeTrial(int32 Laps)
 {
 	LogCommand(FString::Printf(TEXT("QuickTimeTrial(%d)"), Laps));
 
-	// Spawn player vehicle
-	SpawnVehicle(EMGVehiclePreset::JDM_Mid);
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGRaceFlowSubsystem* RaceFlow = GI->GetSubsystem<UMGRaceFlowSubsystem>())
+		{
+			// Create time trial setup (no AI)
+			FMGRaceSetupRequest Setup;
+			Setup.TrackID = FName("Track_Downtown");
+			Setup.RaceType = FName("TimeTrial");
+			Setup.PlayerVehicleID = FName("Vehicle_SakuraGTR");
+			Setup.LapCount = Laps;
+			Setup.AICount = 0;
+			Setup.BaseCashReward = 3000;
+			Setup.BaseRepReward = 50;
 
-	// No AI for time trial
-	UE_LOG(LogTemp, Log, TEXT("Quick Time Trial: %d Laps"), Laps);
-
-	// Start race
-	StartRace();
+			if (RaceFlow->StartRace(Setup))
+			{
+				UE_LOG(LogTemp, Log, TEXT("Quick Time Trial started: %d Laps on %s"),
+					Laps, *Setup.TrackID.ToString());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Failed to start Quick Time Trial"));
+			}
+			return;
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Could not start Quick Time Trial - RaceFlowSubsystem not available"));
 }
 
 // ==========================================
