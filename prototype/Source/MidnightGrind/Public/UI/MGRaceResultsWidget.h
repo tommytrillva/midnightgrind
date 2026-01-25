@@ -1,16 +1,19 @@
 // Copyright Midnight Grind. All Rights Reserved.
+// Updated Stage 51: Race Flow Integration
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GameModes/MGRaceGameMode.h"
+#include "Race/MGRaceFlowSubsystem.h"
 #include "MGRaceResultsWidget.generated.h"
 
 class UTextBlock;
 class UVerticalBox;
 class UButton;
 class UCanvasPanel;
+class UMGRaceFlowSubsystem;
 
 /**
  * Individual racer result row
@@ -69,9 +72,17 @@ public:
 	// DISPLAY
 	// ==========================================
 
-	/** Display race results */
+	/** Display race results (from RaceGameMode) */
 	UFUNCTION(BlueprintCallable, Category = "Results")
 	void DisplayResults(const FMGRaceResults& Results);
+
+	/** Display results from RaceFlowSubsystem (MVP integration) */
+	UFUNCTION(BlueprintCallable, Category = "Results")
+	void DisplayFlowResults(const FMGRaceFlowResult& FlowResult);
+
+	/** Auto-populate from RaceFlowSubsystem's last result */
+	UFUNCTION(BlueprintCallable, Category = "Results")
+	void DisplayFromFlowSubsystem();
 
 	/** Show with animation */
 	UFUNCTION(BlueprintCallable, Category = "Results")
@@ -84,6 +95,46 @@ public:
 	/** Get processed result rows for display */
 	UFUNCTION(BlueprintPure, Category = "Results")
 	TArray<FMGResultRowData> GetResultRows() const { return ResultRows; }
+
+	// ==========================================
+	// FLOW SUBSYSTEM INTEGRATION
+	// ==========================================
+
+	/** Continue to garage via flow subsystem */
+	UFUNCTION(BlueprintCallable, Category = "Results|Flow")
+	void ContinueToGarage();
+
+	/** Restart race via flow subsystem */
+	UFUNCTION(BlueprintCallable, Category = "Results|Flow")
+	void RestartRace();
+
+	/** Get cached flow result */
+	UFUNCTION(BlueprintPure, Category = "Results|Flow")
+	FMGRaceFlowResult GetFlowResult() const { return CachedFlowResult; }
+
+	/** Get cash earned from flow result */
+	UFUNCTION(BlueprintPure, Category = "Results|Flow")
+	int64 GetCashEarned() const { return CachedFlowResult.CashEarned; }
+
+	/** Get reputation earned from flow result */
+	UFUNCTION(BlueprintPure, Category = "Results|Flow")
+	int32 GetRepEarned() const { return CachedFlowResult.ReputationEarned; }
+
+	/** Get XP earned from flow result */
+	UFUNCTION(BlueprintPure, Category = "Results|Flow")
+	int32 GetXPFromFlow() const { return CachedFlowResult.XPEarned; }
+
+	/** Did player win pink slip vehicle? */
+	UFUNCTION(BlueprintPure, Category = "Results|Flow")
+	bool WonPinkSlipVehicle() const { return !CachedFlowResult.PinkSlipWonVehicleID.IsNone(); }
+
+	/** Did player lose pink slip vehicle? */
+	UFUNCTION(BlueprintPure, Category = "Results|Flow")
+	bool LostPinkSlipVehicle() const { return !CachedFlowResult.PinkSlipLostVehicleID.IsNone(); }
+
+	/** Get pink slip vehicle name won/lost */
+	UFUNCTION(BlueprintPure, Category = "Results|Flow")
+	FText GetPinkSlipVehicleText() const;
 
 	// ==========================================
 	// REWARDS
@@ -175,10 +226,17 @@ protected:
 	FMGRaceResults CachedResults;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Results|State")
+	FMGRaceFlowResult CachedFlowResult;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Results|State")
 	TArray<FMGResultRowData> ResultRows;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Results|State")
 	int32 CurrentSelection = 0;
+
+	/** Cached flow subsystem reference */
+	UPROPERTY()
+	TWeakObjectPtr<UMGRaceFlowSubsystem> RaceFlowSubsystem;
 
 	// ==========================================
 	// CONFIGURATION

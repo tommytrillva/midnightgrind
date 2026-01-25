@@ -1,4 +1,5 @@
 // Copyright Midnight Grind. All Rights Reserved.
+// Updated Stage 51: Race Flow Integration
 
 #include "UI/MGRaceResultsWidget.h"
 #include "Components/TextBlock.h"
@@ -10,6 +11,8 @@
 #include "Components/Border.h"
 #include "Blueprint/WidgetTree.h"
 #include "TimerManager.h"
+#include "Race/MGRaceFlowSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGRaceResultsWidget::NativeConstruct()
 {
@@ -632,4 +635,216 @@ void UMGRaceResultsWidget::RevealNextRow()
 	{
 		GetWorld()->GetTimerManager().ClearTimer(RowRevealTimerHandle);
 	}
+}
+
+// ==========================================
+// FLOW SUBSYSTEM INTEGRATION (Stage 51)
+// ==========================================
+
+void UMGRaceResultsWidget::DisplayFlowResults(const FMGRaceFlowResult& FlowResult)
+{
+	CachedFlowResult = FlowResult;
+
+	// Convert flow result to display format
+	ResultRows.Empty();
+
+	// Create player row
+	FMGResultRowData PlayerRow;
+	PlayerRow.Position = FlowResult.PlayerPosition;
+	PlayerRow.DriverName = FText::FromString(TEXT("You"));
+	PlayerRow.VehicleName = FText::FromString(TEXT("Your Vehicle"));
+	PlayerRow.TotalTime = FlowResult.PlayerTotalTime;
+	PlayerRow.BestLap = FlowResult.PlayerBestLap;
+	PlayerRow.bIsPlayer = true;
+	PlayerRow.bIsDNF = !FlowResult.bPlayerFinished;
+	ResultRows.Add(PlayerRow);
+
+	// Add placeholder AI rows based on position
+	for (int32 i = 1; i <= FlowResult.TotalRacers; ++i)
+	{
+		if (i == FlowResult.PlayerPosition)
+		{
+			continue; // Skip player position
+		}
+
+		FMGResultRowData AIRow;
+		AIRow.Position = i;
+		AIRow.DriverName = FText::FromString(FString::Printf(TEXT("Racer %d"), i));
+		AIRow.VehicleName = FText::FromString(TEXT("Opponent"));
+		AIRow.bIsPlayer = false;
+		AIRow.bIsDNF = false;
+
+		// Estimate times based on position
+		if (i == 1)
+		{
+			AIRow.TotalTime = FlowResult.PlayerTotalTime - (FlowResult.PlayerPosition - 1) * 2.0f;
+		}
+		else
+		{
+			AIRow.TotalTime = FlowResult.PlayerTotalTime + (i - FlowResult.PlayerPosition) * 2.0f;
+		}
+
+		ResultRows.Add(AIRow);
+	}
+
+	// Sort by position
+	ResultRows.Sort([](const FMGResultRowData& A, const FMGResultRowData& B)
+	{
+		return A.Position < B.Position;
+	});
+
+	// Calculate gaps
+	float WinnerTime = ResultRows.Num() > 0 ? ResultRows[0].TotalTime : 0.0f;
+	for (FMGResultRowData& Row : ResultRows)
+	{
+		if (Row.Position > 1)
+		{
+			Row.GapToWinner = Row.TotalTime - WinnerTime;
+		}
+	}
+
+	// Update header
+	if (HeaderText)
+	{
+		if (FlowResult.bPlayerWon)
+		{
+			HeaderText->SetText(FText::FromString(TEXT("VICTORY!")));
+			HeaderText->SetColorAndOpacity(WinnerColor);
+		}
+		else
+		{
+			FString OrdinalSuffix;
+			switch (FlowResult.PlayerPosition)
+			{
+				case 1: OrdinalSuffix = TEXT("st"); break;
+				case 2: OrdinalSuffix = TEXT("nd"); break;
+				case 3: OrdinalSuffix = TEXT("rd"); break;
+				default: OrdinalSuffix = TEXT("th"); break;
+			}
+			HeaderText->SetText(FText::FromString(FString::Printf(TEXT("%d%s PLACE"), FlowResult.PlayerPosition, *OrdinalSuffix)));
+			HeaderText->SetColorAndOpacity(PlayerHighlightColor);
+		}
+	}
+
+	// Update rewards from flow result
+	if (CreditsText)
+	{
+		CreditsText->SetText(FText::FromString(FString::Printf(TEXT("+$%lld"), FlowResult.CashEarned)));
+	}
+
+	if (ReputationText)
+	{
+		ReputationText->SetText(FText::FromString(FString::Printf(TEXT("+%d REP"), FlowResult.ReputationEarned)));
+	}
+
+	// Best lap
+	if (BestLapText && FlowResult.PlayerBestLap > 0.0f)
+	{
+		BestLapText->SetText(FText::FromString(FString::Printf(TEXT("BEST LAP: %s"), *FormatTime(FlowResult.PlayerBestLap).ToString())));
+	}
+
+	// Rebuild results list
+	if (ResultsListBox)
+	{
+		ResultsListBox->ClearChildren();
+		for (const FMGResultRowData& Row : ResultRows)
+		{
+			UWidget* RowWidget = CreateResultRow(Row);
+			if (RowWidget)
+			{
+				ResultsListBox->AddChild(RowWidget);
+			}
+		}
+	}
+
+	// Pink slip display
+	if (WonPinkSlipVehicle() || LostPinkSlipVehicle())
+	{
+		if (SubHeaderText)
+		{
+			if (WonPinkSlipVehicle())
+			{
+				SubHeaderText->SetText(FText::FromString(FString::Printf(TEXT("WON: %s"), *FlowResult.PinkSlipWonVehicleID.ToString())));
+				SubHeaderText->SetColorAndOpacity(WinnerColor);
+			}
+			else
+			{
+				SubHeaderText->SetText(FText::FromString(FString::Printf(TEXT("LOST: %s"), *FlowResult.PinkSlipLostVehicleID.ToString())));
+				SubHeaderText->SetColorAndOpacity(DNFColor);
+			}
+		}
+	}
+
+	OnResultsReady();
+
+	if (FlowResult.bPlayerWon)
+	{
+		PlayVictoryAnimation();
+	}
+	else
+	{
+		PlayDefeatAnimation();
+	}
+}
+
+void UMGRaceResultsWidget::DisplayFromFlowSubsystem()
+{
+	// Get flow subsystem
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+	{
+		RaceFlowSubsystem = GI->GetSubsystem<UMGRaceFlowSubsystem>();
+		if (RaceFlowSubsystem.IsValid())
+		{
+			DisplayFlowResults(RaceFlowSubsystem->GetLastResult());
+		}
+	}
+}
+
+void UMGRaceResultsWidget::ContinueToGarage()
+{
+	if (!RaceFlowSubsystem.IsValid())
+	{
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+		{
+			RaceFlowSubsystem = GI->GetSubsystem<UMGRaceFlowSubsystem>();
+		}
+	}
+
+	if (RaceFlowSubsystem.IsValid())
+	{
+		RaceFlowSubsystem->ContinueToGarage();
+	}
+
+	OnContinue.Broadcast();
+}
+
+void UMGRaceResultsWidget::RestartRace()
+{
+	if (!RaceFlowSubsystem.IsValid())
+	{
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+		{
+			RaceFlowSubsystem = GI->GetSubsystem<UMGRaceFlowSubsystem>();
+		}
+	}
+
+	if (RaceFlowSubsystem.IsValid())
+	{
+		RaceFlowSubsystem->RestartRace();
+	}
+
+	OnRestart.Broadcast();
+}
+
+FText UMGRaceResultsWidget::GetPinkSlipVehicleText() const
+{
+	if (!CachedFlowResult.PinkSlipWonVehicleID.IsNone())
+	{
+		return FText::FromString(FString::Printf(TEXT("WON: %s"), *CachedFlowResult.PinkSlipWonVehicleID.ToString()));
+	}
+	else if (!CachedFlowResult.PinkSlipLostVehicleID.IsNone())
+	{
+		return FText::FromString(FString::Printf(TEXT("LOST: %s"), *CachedFlowResult.PinkSlipLostVehicleID.ToString()));
+	}
+	return FText::GetEmpty();
 }
