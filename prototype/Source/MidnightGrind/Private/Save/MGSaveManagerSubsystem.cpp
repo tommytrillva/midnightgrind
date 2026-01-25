@@ -1,6 +1,8 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Save/MGSaveManagerSubsystem.h"
+#include "Economy/MGEconomySubsystem.h"
+#include "Garage/MGGarageSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
@@ -281,9 +283,35 @@ void UMGSaveManagerSubsystem::GatherSubsystemData()
 	// Update play time
 	CurrentSaveGame->TotalPlayTime += GetWorld() ? GetWorld()->GetDeltaSeconds() : 0.0f;
 
-	// Subsystem data is gathered through the subsystems' SaveXXXData() methods
-	// which write directly to the CurrentSaveGame object
-	// This is done via the individual subsystem interfaces
+	UGameInstance* GI = GetGameInstance();
+	if (!GI)
+	{
+		return;
+	}
+
+	// Gather Economy data
+	if (UMGEconomySubsystem* Economy = GI->GetSubsystem<UMGEconomySubsystem>())
+	{
+		CurrentSaveGame->PlayerCash = Economy->GetCredits();
+	}
+
+	// Gather Garage data - store vehicle IDs
+	if (UMGGarageSubsystem* Garage = GI->GetSubsystem<UMGGarageSubsystem>())
+	{
+		CurrentSaveGame->UnlockedVehicles.Empty();
+		TArray<FMGOwnedVehicle> Vehicles = Garage->GetAllVehicles();
+		for (const FMGOwnedVehicle& Vehicle : Vehicles)
+		{
+			// Store vehicle model asset name as the identifier
+			if (!Vehicle.VehicleModelData.IsNull())
+			{
+				CurrentSaveGame->UnlockedVehicles.Add(FName(*Vehicle.VehicleModelData.GetAssetName()));
+			}
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("SaveManager: Gathered subsystem data - Cash: %lld, Vehicles: %d"),
+		CurrentSaveGame->PlayerCash, CurrentSaveGame->UnlockedVehicles.Num());
 }
 
 void UMGSaveManagerSubsystem::DistributeSubsystemData()
@@ -293,9 +321,32 @@ void UMGSaveManagerSubsystem::DistributeSubsystemData()
 		return;
 	}
 
-	// Subsystem data is distributed through the subsystems' LoadXXXData() methods
-	// which read from the CurrentSaveGame object
-	// This is done via the individual subsystem interfaces
+	UGameInstance* GI = GetGameInstance();
+	if (!GI)
+	{
+		return;
+	}
+
+	// Distribute Economy data
+	if (UMGEconomySubsystem* Economy = GI->GetSubsystem<UMGEconomySubsystem>())
+	{
+		Economy->SetCredits(CurrentSaveGame->PlayerCash);
+	}
+
+	// Distribute Garage data - restore vehicles
+	if (UMGGarageSubsystem* Garage = GI->GetSubsystem<UMGGarageSubsystem>())
+	{
+		// Clear existing vehicles and add saved ones
+		// Note: For MVP, we add vehicles by ID - full implementation would use complete vehicle data
+		for (const FName& VehicleID : CurrentSaveGame->UnlockedVehicles)
+		{
+			FGuid NewVehicleId;
+			Garage->AddVehicleByID(VehicleID, NewVehicleId);
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("SaveManager: Distributed subsystem data - Cash: %lld, Vehicles: %d"),
+		CurrentSaveGame->PlayerCash, CurrentSaveGame->UnlockedVehicles.Num());
 }
 
 bool UMGSaveManagerSubsystem::ValidateSaveData(const UMGSaveGame* SaveData) const
