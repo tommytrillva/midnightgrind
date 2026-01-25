@@ -385,6 +385,9 @@ protected:
 	/** Update VFX based on vehicle state */
 	virtual void UpdateVFX(float DeltaTime);
 
+	/** Update HUD subsystem with vehicle telemetry */
+	void UpdateHUDTelemetry();
+
 	// ==========================================
 	// BLUEPRINT EVENTS
 	// ==========================================

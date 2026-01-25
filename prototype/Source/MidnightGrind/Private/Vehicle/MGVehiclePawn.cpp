@@ -2,6 +2,7 @@
 
 #include "Vehicle/MGVehiclePawn.h"
 #include "Vehicle/MGVehicleMovementComponent.h"
+#include "UI/MGRaceHUDSubsystem.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/AudioComponent.h"
@@ -563,6 +564,35 @@ void AMGVehiclePawn::UpdateRuntimeState(float DeltaTime)
 		OnDriftEnded(RuntimeState.DriftScore);
 	}
 	bWasDrifting = RuntimeState.bIsDrifting;
+
+	// Update HUD subsystem with telemetry (only for player)
+	if (IsLocallyControlled())
+	{
+		UpdateHUDTelemetry();
+	}
+}
+
+void AMGVehiclePawn::UpdateHUDTelemetry()
+{
+	UMGRaceHUDSubsystem* HUDSubsystem = GetWorld()->GetSubsystem<UMGRaceHUDSubsystem>();
+	if (!HUDSubsystem)
+	{
+		return;
+	}
+
+	FMGVehicleTelemetry Telemetry;
+	Telemetry.SpeedMPH = RuntimeState.SpeedMPH;
+	Telemetry.SpeedKPH = RuntimeState.SpeedKPH;
+	Telemetry.RPM = RuntimeState.RPM;
+	Telemetry.MaxRPM = 8000.0f; // Typical redline
+	Telemetry.CurrentGear = RuntimeState.CurrentGear;
+	Telemetry.NOSAmount = RuntimeState.NitrousPercent / 100.0f;
+	Telemetry.bNOSActive = RuntimeState.bNitrousActive;
+	Telemetry.bHandbrakeOn = false; // TODO: Get from movement component
+	Telemetry.bIsDrifting = RuntimeState.bIsDrifting;
+	Telemetry.DriftAngle = RuntimeState.DriftAngle;
+
+	HUDSubsystem->UpdateVehicleTelemetry(Telemetry);
 }
 
 void AMGVehiclePawn::UpdateCamera(float DeltaTime)
