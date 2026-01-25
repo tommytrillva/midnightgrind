@@ -1,7 +1,10 @@
 // Copyright Midnight Grind. All Rights Reserved.
+// Updated Stage 52: MVP Game Entry Points
 
 #include "UI/MGMenuSubsystem.h"
 #include "UI/MGMenuWidgets.h"
+#include "Core/MGGameStateSubsystem.h"
+#include "Race/MGRaceFlowSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameUserSettings.h"
@@ -9,6 +12,8 @@
 #include "Misc/Paths.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogMGMenu, Log, All);
 
 void UMGMenuSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -392,10 +397,49 @@ void UMGMenuSubsystem::LoadSettings()
 void UMGMenuSubsystem::StartGame()
 {
 	HideMainMenu();
-	ShowLoadingScreen(FText::FromString(TEXT("Loading...")));
+	ShowLoadingScreen(FText::FromString(TEXT("Entering Garage...")));
 
-	// Would load the appropriate level here
-	// UGameplayStatics::OpenLevel(...)
+	// Get game state subsystem to manage state transition
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGGameStateSubsystem* GameState = GI->GetSubsystem<UMGGameStateSubsystem>())
+		{
+			GameState->GoToGarage();
+		}
+	}
+
+	// Load garage level - this is the entry point for MVP
+	UGameplayStatics::OpenLevel(GetGameInstance(), FName("L_Garage"));
+}
+
+void UMGMenuSubsystem::StartQuickRace()
+{
+	HideMainMenu();
+	ShowLoadingScreen(FText::FromString(TEXT("Finding Race...")));
+
+	// Start quick race via flow subsystem
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGRaceFlowSubsystem* RaceFlow = GI->GetSubsystem<UMGRaceFlowSubsystem>())
+		{
+			// Use default test race setup for MVP
+			FMGRaceSetupRequest Setup = UMGRaceFlowSubsystem::GetTestRaceSetup();
+			RaceFlow->StartRace(Setup);
+		}
+	}
+}
+
+void UMGMenuSubsystem::StartRaceFromGarage(FName TrackID, FName VehicleID)
+{
+	ShowLoadingScreen(FText::FromString(TEXT("Loading Race...")));
+
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGRaceFlowSubsystem* RaceFlow = GI->GetSubsystem<UMGRaceFlowSubsystem>())
+		{
+			RaceFlow->StartQuickRace(TrackID, VehicleID);
+		}
+	}
 }
 
 void UMGMenuSubsystem::ReturnToMainMenu()

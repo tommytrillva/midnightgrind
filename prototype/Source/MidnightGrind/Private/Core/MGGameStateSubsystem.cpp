@@ -1,6 +1,7 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Core/MGGameStateSubsystem.h"
+#include "Garage/MGGarageSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Engine/LevelStreaming.h"
@@ -100,6 +101,15 @@ void UMGGameStateSubsystem::GoToMainMenu()
 
 void UMGGameStateSubsystem::GoToGarage()
 {
+	// Ensure player has at least one vehicle (starter vehicle)
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGGarageSubsystem* Garage = GI->GetSubsystem<UMGGarageSubsystem>())
+		{
+			Garage->EnsureStarterVehicle();
+		}
+	}
+
 	FMGStateTransition Transition;
 	Transition.TargetState = EMGGameState::Garage;
 	Transition.LevelName = GarageLevel;

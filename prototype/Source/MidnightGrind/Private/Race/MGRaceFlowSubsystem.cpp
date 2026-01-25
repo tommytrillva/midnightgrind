@@ -4,7 +4,9 @@
 #include "Race/MGRaceFlowSubsystem.h"
 #include "Core/MGGameStateSubsystem.h"
 #include "RaceDirector/MGRaceDirectorSubsystem.h"
+#include "Vehicle/MGVehicleSpawnSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogMGRaceFlow, Log, All);
@@ -559,7 +561,53 @@ void UMGRaceFlowSubsystem::ExecutePreRace()
 {
 	UE_LOG(LogMGRaceFlow, Log, TEXT("Pre-race phase"));
 
-	// Register player with race director
+	// Get world for vehicle spawning
+	UWorld* World = nullptr;
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		World = GI->GetWorld();
+	}
+
+	// Spawn vehicles using spawn subsystem
+	if (World)
+	{
+		if (UMGVehicleSpawnSubsystem* SpawnSubsystem = World->GetSubsystem<UMGVehicleSpawnSubsystem>())
+		{
+			// Build AI spawn requests
+			TArray<FMGVehicleSpawnRequest> AIRequests;
+			for (const FMGAIRacerSetup& AI : CurrentAIOpponents)
+			{
+				FMGVehicleSpawnRequest Request;
+				Request.VehicleID = AI.VehicleID;
+				Request.bIsAI = true;
+				Request.DisplayName = AI.DisplayName;
+				Request.AISkill = AI.SkillLevel;
+				AIRequests.Add(Request);
+			}
+
+			// Spawn all vehicles
+			bool bSpawned = SpawnSubsystem->SpawnRaceVehicles(CurrentSetup.PlayerVehicleID, AIRequests);
+			if (bSpawned)
+			{
+				// Possess player vehicle
+				APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+				if (PC)
+				{
+					SpawnSubsystem->PossessPlayerVehicle(PC);
+				}
+			}
+			else
+			{
+				UE_LOG(LogMGRaceFlow, Warning, TEXT("Failed to spawn vehicles"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogMGRaceFlow, Warning, TEXT("Vehicle spawn subsystem not available"));
+		}
+	}
+
+	// Register with race director for timing/positions
 	if (RaceDirectorSubsystem.IsValid())
 	{
 		// Register player

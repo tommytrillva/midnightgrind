@@ -335,9 +335,17 @@ public:
 	// NAVIGATION
 	// ==========================================
 
-	/** Start new game */
+	/** Start new game - enters garage */
 	UFUNCTION(BlueprintCallable, Category = "Navigation")
 	void StartGame();
+
+	/** Start quick race from main menu (bypasses garage) */
+	UFUNCTION(BlueprintCallable, Category = "Navigation")
+	void StartQuickRace();
+
+	/** Start race from garage with selected vehicle */
+	UFUNCTION(BlueprintCallable, Category = "Navigation")
+	void StartRaceFromGarage(FName TrackID, FName VehicleID);
 
 	/** Return to main menu */
 	UFUNCTION(BlueprintCallable, Category = "Navigation")

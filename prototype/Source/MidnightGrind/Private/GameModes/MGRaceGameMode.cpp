@@ -1,9 +1,12 @@
 // Copyright Midnight Grind. All Rights Reserved.
+// Updated Stage 52: MVP Game Entry Points - Player Controller Notification
 
 #include "GameModes/MGRaceGameMode.h"
 #include "Vehicle/MGVehiclePawn.h"
+#include "Core/MGPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
+#include "EngineUtils.h"
 
 AMGRaceGameMode::AMGRaceGameMode()
 {
@@ -177,6 +180,9 @@ void AMGRaceGameMode::EndRace()
 		CalculateResults();
 		SetRaceState(EMGRaceState::Finished);
 		OnRaceFinished.Broadcast(RaceResults);
+
+		// Notify all player controllers that race has ended
+		NotifyPlayersRaceEnded();
 	}
 }
 
@@ -387,6 +393,9 @@ void AMGRaceGameMode::UpdateCountdown(float DeltaTime)
 					Vehicle->SetCurrentLap(1);
 				}
 			}
+
+			// Notify all player controllers that race has started
+			NotifyPlayersRaceStarted();
 		}
 	}
 }
@@ -586,6 +595,32 @@ void AMGRaceGameMode::FreezeAllVehicles(bool bFreeze)
 			{
 				RootPrimitive->SetSimulatePhysics(!bFreeze);
 			}
+		}
+	}
+}
+
+void AMGRaceGameMode::NotifyPlayersRaceStarted()
+{
+	// Notify all player controllers that race has started
+	for (TActorIterator<AMGPlayerController> It(GetWorld()); It; ++It)
+	{
+		AMGPlayerController* PC = *It;
+		if (PC)
+		{
+			PC->ClientOnRaceStarted();
+		}
+	}
+}
+
+void AMGRaceGameMode::NotifyPlayersRaceEnded()
+{
+	// Notify all player controllers that race has ended
+	for (TActorIterator<AMGPlayerController> It(GetWorld()); It; ++It)
+	{
+		AMGPlayerController* PC = *It;
+		if (PC)
+		{
+			PC->ClientOnRaceEnded();
 		}
 	}
 }

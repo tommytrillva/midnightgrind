@@ -1,4 +1,5 @@
 // Copyright Midnight Grind. All Rights Reserved.
+// Updated Stage 52: MVP Game Entry Points - Starter Vehicle
 
 #include "Garage/MGGarageSubsystem.h"
 #include "Vehicle/MGVehiclePawn.h"
@@ -55,6 +56,79 @@ FMGGarageResult UMGGarageSubsystem::AddVehicle(UMGVehicleModelData* VehicleModel
 
 	OnVehicleAdded.Broadcast(OutVehicleId);
 	return FMGGarageResult::Success(VehicleModelData->BasePriceMSRP);
+}
+
+FMGGarageResult UMGGarageSubsystem::AddVehicleByID(FName VehicleID, FGuid& OutVehicleId)
+{
+	// MVP: Create placeholder vehicle data based on ID
+	// In full implementation, would load from data asset
+
+	FMGOwnedVehicle NewVehicle;
+	NewVehicle.VehicleId = FGuid::NewGuid();
+	OutVehicleId = NewVehicle.VehicleId;
+
+	// Set name based on ID
+	FString DisplayName = VehicleID.ToString();
+	DisplayName.RemoveFromStart(TEXT("Vehicle_"));
+	NewVehicle.CustomName = DisplayName;
+
+	// Default paint colors
+	NewVehicle.Paint.PrimaryColor = FLinearColor::White;
+	NewVehicle.Paint.SecondaryColor = FLinearColor::Black;
+	NewVehicle.Paint.FinishType = EMGPaintFinish::Metallic;
+
+	// Set base investment (placeholder values based on vehicle tier)
+	if (VehicleID.ToString().Contains(TEXT("240SX")) ||
+		VehicleID.ToString().Contains(TEXT("Civic")) ||
+		VehicleID.ToString().Contains(TEXT("MX5")))
+	{
+		NewVehicle.TotalInvestment = 15000;
+	}
+	else if (VehicleID.ToString().Contains(TEXT("Supra")) ||
+			 VehicleID.ToString().Contains(TEXT("RX7")) ||
+			 VehicleID.ToString().Contains(TEXT("Skyline")))
+	{
+		NewVehicle.TotalInvestment = 45000;
+	}
+	else
+	{
+		NewVehicle.TotalInvestment = 25000;
+	}
+
+	OwnedVehicles.Add(NewVehicle);
+
+	// If this is the first vehicle, select it
+	if (OwnedVehicles.Num() == 1)
+	{
+		SelectVehicle(OutVehicleId);
+	}
+
+	OnVehicleAdded.Broadcast(OutVehicleId);
+	UE_LOG(LogTemp, Log, TEXT("Added vehicle by ID: %s (GUID: %s)"), *VehicleID.ToString(), *OutVehicleId.ToString());
+
+	return FMGGarageResult::Success();
+}
+
+void UMGGarageSubsystem::EnsureStarterVehicle()
+{
+	// If player already has vehicles, do nothing
+	if (OwnedVehicles.Num() > 0)
+	{
+		return;
+	}
+
+	// MVP: Give player a Nissan 240SX as starter
+	FGuid StarterVehicleId;
+	FMGGarageResult Result = AddVehicleByID(FName("Vehicle_240SX"), StarterVehicleId);
+
+	if (Result.bSuccess)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Starter vehicle added: Vehicle_240SX"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to add starter vehicle"));
+	}
 }
 
 FMGGarageResult UMGGarageSubsystem::RemoveVehicle(const FGuid& VehicleId)
