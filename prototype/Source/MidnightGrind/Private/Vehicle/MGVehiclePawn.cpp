@@ -588,7 +588,7 @@ void AMGVehiclePawn::UpdateHUDTelemetry()
 	Telemetry.CurrentGear = RuntimeState.CurrentGear;
 	Telemetry.NOSAmount = RuntimeState.NitrousPercent / 100.0f;
 	Telemetry.bNOSActive = RuntimeState.bNitrousActive;
-	Telemetry.bHandbrakeOn = false; // TODO: Get from movement component
+	Telemetry.bHandbrakeOn = MGVehicleMovement ? MGVehicleMovement->IsHandbrakeEngaged() : false;
 	Telemetry.bIsDrifting = RuntimeState.bIsDrifting;
 	Telemetry.DriftAngle = RuntimeState.DriftAngle;
 

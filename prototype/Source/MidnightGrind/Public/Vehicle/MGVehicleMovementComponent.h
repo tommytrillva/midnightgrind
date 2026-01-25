@@ -176,6 +176,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	float GetWheelSlipRatio(int32 WheelIndex) const;
 
+	/** Check if handbrake is engaged */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
+	bool IsHandbrakeEngaged() const { return bHandbrakeEngaged; }
+
 	// ==========================================
 	// TUNING PARAMETERS
 	// ==========================================

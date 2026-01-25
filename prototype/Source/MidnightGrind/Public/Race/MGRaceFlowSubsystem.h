@@ -10,6 +10,8 @@
 class UMGGameStateSubsystem;
 class UMGVehicleManagerSubsystem;
 class UMGRaceDirectorSubsystem;
+class UMGEconomySubsystem;
+class UMGGarageSubsystem;
 
 /**
  * Race setup request from garage
@@ -436,6 +438,12 @@ protected:
 
 	UPROPERTY()
 	TWeakObjectPtr<UMGRaceDirectorSubsystem> RaceDirectorSubsystem;
+
+	UPROPERTY()
+	TWeakObjectPtr<UMGEconomySubsystem> EconomySubsystem;
+
+	UPROPERTY()
+	TWeakObjectPtr<UMGGarageSubsystem> GarageSubsystem;
 
 	/** Cached race game mode (only valid during race) */
 	UPROPERTY()

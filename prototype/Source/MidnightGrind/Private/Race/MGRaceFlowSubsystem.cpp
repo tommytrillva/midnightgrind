@@ -5,6 +5,8 @@
 #include "Core/MGGameStateSubsystem.h"
 #include "RaceDirector/MGRaceDirectorSubsystem.h"
 #include "Vehicle/MGVehicleSpawnSubsystem.h"
+#include "Economy/MGEconomySubsystem.h"
+#include "Garage/MGGarageSubsystem.h"
 #include "GameModes/MGRaceGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
@@ -154,6 +156,8 @@ void UMGRaceFlowSubsystem::CacheSubsystems()
 	{
 		GameStateSubsystem = GI->GetSubsystem<UMGGameStateSubsystem>();
 		RaceDirectorSubsystem = GI->GetSubsystem<UMGRaceDirectorSubsystem>();
+		EconomySubsystem = GI->GetSubsystem<UMGEconomySubsystem>();
+		GarageSubsystem = GI->GetSubsystem<UMGGarageSubsystem>();
 	}
 }
 
@@ -871,24 +875,77 @@ void UMGRaceFlowSubsystem::ExecuteRewardProcessing()
 
 void UMGRaceFlowSubsystem::ApplyRewards(const FMGRaceFlowResult& Result)
 {
-	// MVP: Just log rewards
-	// TODO: Apply to progression subsystem
-
-	UE_LOG(LogMGRaceFlow, Log, TEXT("Applied rewards - Cash: %lld, Rep: %d, XP: %d"),
+	UE_LOG(LogMGRaceFlow, Log, TEXT("Applying rewards - Cash: %lld, Rep: %d, XP: %d"),
 		Result.CashEarned,
 		Result.ReputationEarned,
 		Result.XPEarned);
+
+	// Award race winnings through Economy subsystem
+	if (EconomySubsystem.IsValid() && Result.CashEarned > 0)
+	{
+		EconomySubsystem->AwardRaceWinnings(Result.CashEarned, CurrentSetup.TrackID);
+		UE_LOG(LogMGRaceFlow, Log, TEXT("Awarded %lld credits via EconomySubsystem"), Result.CashEarned);
+	}
 
 	// Pink slip vehicle transfer
 	if (!Result.PinkSlipWonVehicleID.IsNone())
 	{
 		UE_LOG(LogMGRaceFlow, Log, TEXT("Won vehicle via pink slip: %s"), *Result.PinkSlipWonVehicleID.ToString());
-		// TODO: Add vehicle to player garage
+
+		// Add vehicle to player garage
+		if (GarageSubsystem.IsValid())
+		{
+			FGuid NewVehicleId;
+			FMGGarageResult GarageResult = GarageSubsystem->AddVehicleByID(Result.PinkSlipWonVehicleID, NewVehicleId);
+			if (GarageResult.bSuccess)
+			{
+				UE_LOG(LogMGRaceFlow, Log, TEXT("Added pink slip vehicle to garage: %s"), *NewVehicleId.ToString());
+			}
+			else
+			{
+				UE_LOG(LogMGRaceFlow, Warning, TEXT("Failed to add pink slip vehicle: %s"), *GarageResult.ErrorMessage.ToString());
+			}
+		}
+
+		// Record pink slip win in economy
+		if (EconomySubsystem.IsValid())
+		{
+			EconomySubsystem->ProcessPinkSlipWin(0, Result.PinkSlipWonVehicleID);
+		}
 	}
 	else if (!Result.PinkSlipLostVehicleID.IsNone())
 	{
 		UE_LOG(LogMGRaceFlow, Warning, TEXT("Lost vehicle via pink slip: %s"), *Result.PinkSlipLostVehicleID.ToString());
-		// TODO: Remove vehicle from player garage
+
+		// Remove vehicle from player garage
+		if (GarageSubsystem.IsValid())
+		{
+			// Find and remove the vehicle with matching model ID
+			TArray<FMGOwnedVehicle> Vehicles = GarageSubsystem->GetAllVehicles();
+			for (const FMGOwnedVehicle& Vehicle : Vehicles)
+			{
+				// Match by vehicle ID (checking soft pointer path contains the ID)
+				if (Vehicle.VehicleModelData.GetAssetName().Contains(Result.PinkSlipLostVehicleID.ToString()))
+				{
+					FMGGarageResult GarageResult = GarageSubsystem->RemoveVehicle(Vehicle.VehicleId);
+					if (GarageResult.bSuccess)
+					{
+						UE_LOG(LogMGRaceFlow, Log, TEXT("Removed pink slip lost vehicle from garage"));
+					}
+					else
+					{
+						UE_LOG(LogMGRaceFlow, Warning, TEXT("Failed to remove pink slip vehicle: %s"), *GarageResult.ErrorMessage.ToString());
+					}
+					break;
+				}
+			}
+		}
+
+		// Record pink slip loss in economy
+		if (EconomySubsystem.IsValid())
+		{
+			EconomySubsystem->ProcessPinkSlipLoss(0, Result.PinkSlipLostVehicleID);
+		}
 	}
 }
 
