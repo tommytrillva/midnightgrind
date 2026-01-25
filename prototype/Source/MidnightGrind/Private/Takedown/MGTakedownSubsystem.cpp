@@ -1,8 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Takedown/MGTakedownSubsystem.h"
+#include "Save/MGSaveManagerSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGTakedownSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -883,12 +885,64 @@ FLinearColor UMGTakedownSubsystem::GetAggressionColor() const
 
 void UMGTakedownSubsystem::SaveTakedownData()
 {
-	// TODO: Implement save to SaveGame object
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return;
+	}
+
+	UMGSaveManagerSubsystem* SaveManager = GameInstance->GetSubsystem<UMGSaveManagerSubsystem>();
+	if (!SaveManager)
+	{
+		return;
+	}
+
+	UMGSaveGame* SaveGame = SaveManager->GetSaveDataMutable();
+	if (!SaveGame)
+	{
+		return;
+	}
+
+	// Save takedown stats
+	SaveGame->TakedownData.TotalTakedowns = LifetimeStats.TotalTakedowns;
+	SaveGame->TakedownData.PoliceTakedowns = LifetimeStats.PoliceTakedowns;
+	SaveGame->TakedownData.RacerTakedowns = LifetimeStats.RacerTakedowns;
+	SaveGame->TakedownData.TrafficTakedowns = LifetimeStats.TrafficTakedowns;
+	SaveGame->TakedownData.PerfectTakedowns = LifetimeStats.PerfectTakedowns;
+	SaveGame->TakedownData.DoubleTakedowns = LifetimeStats.DoubleTakedowns;
+	SaveGame->TakedownData.TripleTakedowns = LifetimeStats.TripleTakedowns;
+	SaveGame->TakedownData.TotalTakedownScore = LifetimeStats.TotalTakedownScore;
 }
 
 void UMGTakedownSubsystem::LoadTakedownData()
 {
-	// TODO: Implement load from SaveGame object
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return;
+	}
+
+	UMGSaveManagerSubsystem* SaveManager = GameInstance->GetSubsystem<UMGSaveManagerSubsystem>();
+	if (!SaveManager)
+	{
+		return;
+	}
+
+	const UMGSaveGame* SaveGame = SaveManager->GetCurrentSaveData();
+	if (!SaveGame)
+	{
+		return;
+	}
+
+	// Load takedown stats
+	LifetimeStats.TotalTakedowns = SaveGame->TakedownData.TotalTakedowns;
+	LifetimeStats.PoliceTakedowns = SaveGame->TakedownData.PoliceTakedowns;
+	LifetimeStats.RacerTakedowns = SaveGame->TakedownData.RacerTakedowns;
+	LifetimeStats.TrafficTakedowns = SaveGame->TakedownData.TrafficTakedowns;
+	LifetimeStats.PerfectTakedowns = SaveGame->TakedownData.PerfectTakedowns;
+	LifetimeStats.DoubleTakedowns = SaveGame->TakedownData.DoubleTakedowns;
+	LifetimeStats.TripleTakedowns = SaveGame->TakedownData.TripleTakedowns;
+	LifetimeStats.TotalTakedownScore = SaveGame->TakedownData.TotalTakedownScore;
 }
 
 void UMGTakedownSubsystem::TickAggression(float DeltaTime)

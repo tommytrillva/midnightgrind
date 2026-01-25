@@ -534,17 +534,66 @@ void UMGGarageSubsystem::ApplyCustomizationToVehicle(AMGVehiclePawn* Vehicle, co
 	// Get calculated stats
 	FMGVehicleStats Stats = GetVehicleStats(VehicleId);
 
-	// TODO: Apply stats to vehicle movement component
-	// Vehicle->ApplyVehicleStats(Stats);
+	// Apply stats to vehicle movement component
+	if (UMGVehicleMovementComponent* Movement = Vehicle->GetMGVehicleMovement())
+	{
+		// Create vehicle configuration from stats
+		FMGVehicleData VehicleConfig;
+		VehicleConfig.PerformanceIndex = OwnedVehicle.PerformanceIndex;
+		VehicleConfig.MaxHorsePower = Stats.HorsePower;
+		VehicleConfig.MaxTorque = Stats.Torque;
+		VehicleConfig.Weight = Stats.Weight;
+		VehicleConfig.TopSpeed = Stats.TopSpeed;
+		VehicleConfig.Acceleration = Stats.Acceleration;
+		VehicleConfig.Handling = Stats.Handling;
+		VehicleConfig.Braking = Stats.Braking;
+		VehicleConfig.NitrousCapacity = Stats.NitrousCapacity;
 
-	// TODO: Apply paint to mesh materials
-	// Vehicle->ApplyPaint(OwnedVehicle.Paint);
+		Vehicle->LoadVehicleConfiguration(VehicleConfig);
+	}
 
-	// TODO: Apply visual parts (body kits, spoilers, etc.)
-	// for (const auto& Pair : OwnedVehicle.InstalledParts)
-	// {
-	//     Vehicle->ApplyVisualPart(Pair.Key, Pair.Value.PartData);
-	// }
+	// Apply paint to mesh materials
+	if (USkeletalMeshComponent* Mesh = Vehicle->GetMesh())
+	{
+		for (int32 i = 0; i < Mesh->GetNumMaterials(); ++i)
+		{
+			UMaterialInterface* BaseMaterial = Mesh->GetMaterial(i);
+			if (BaseMaterial)
+			{
+				UMaterialInstanceDynamic* DynMat = UMaterialInstanceDynamic::Create(BaseMaterial, Vehicle);
+				if (DynMat)
+				{
+					// Apply primary and secondary colors
+					DynMat->SetVectorParameterValue(TEXT("PrimaryColor"), OwnedVehicle.Paint.PrimaryColor);
+					DynMat->SetVectorParameterValue(TEXT("SecondaryColor"), OwnedVehicle.Paint.SecondaryColor);
+					DynMat->SetScalarParameterValue(TEXT("Metallic"), OwnedVehicle.Paint.Metallic);
+					DynMat->SetScalarParameterValue(TEXT("Roughness"), OwnedVehicle.Paint.Roughness);
+					DynMat->SetScalarParameterValue(TEXT("ClearCoat"), OwnedVehicle.Paint.ClearCoat);
+
+					Mesh->SetMaterial(i, DynMat);
+				}
+			}
+		}
+	}
+
+	// Apply visual parts (body kits, spoilers, etc.)
+	for (const auto& Pair : OwnedVehicle.InstalledParts)
+	{
+		const FName& SlotName = Pair.Key;
+		const FMGInstalledPart& InstalledPart = Pair.Value;
+
+		if (InstalledPart.PartData)
+		{
+			// Apply mesh attachment for visual parts
+			if (UStaticMesh* PartMesh = InstalledPart.PartData->PartMesh.LoadSynchronous())
+			{
+				UStaticMeshComponent* PartComp = NewObject<UStaticMeshComponent>(Vehicle);
+				PartComp->SetStaticMesh(PartMesh);
+				PartComp->AttachToComponent(Vehicle->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SlotName);
+				PartComp->RegisterComponent();
+			}
+		}
+	}
 
 	UE_LOG(LogTemp, Log, TEXT("Applied customization to vehicle: %s (PI: %d)"),
 		*OwnedVehicle.CustomName, OwnedVehicle.PerformanceIndex);

@@ -1,8 +1,10 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Police/MGPoliceSubsystem.h"
+#include "Police/MGPoliceUnit.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGPoliceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -351,8 +353,44 @@ int32 UMGPoliceSubsystem::SpawnPoliceUnit(EMGPoliceUnitType UnitType, FVector Sp
 	NewUnit.Behavior = EMGPoliceBehavior::Alerted;
 	NewUnit.Health = 100.0f;
 
-	// TODO: Actually spawn the police vehicle actor here
-	// NewUnit.UnitActor = SpawnedActor;
+	// Spawn the police vehicle actor
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		// Get spawn rotation facing the player
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+		if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(World, 0))
+		{
+			FVector ToPlayer = PlayerPawn->GetActorLocation() - SpawnLocation;
+			ToPlayer.Z = 0.0f;
+			SpawnRotation = ToPlayer.Rotation();
+		}
+
+		AMGPoliceUnit* SpawnedUnit = World->SpawnActor<AMGPoliceUnit>(
+			AMGPoliceUnit::StaticClass(),
+			SpawnLocation,
+			SpawnRotation,
+			SpawnParams
+		);
+
+		if (SpawnedUnit)
+		{
+			// Initialize the unit
+			SpawnedUnit->InitializeUnit(NewUnit.UnitID, EMGPoliceState::Alerted);
+
+			// Set pursuit target to player
+			if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(World, 0))
+			{
+				SpawnedUnit->SetPursuitTarget(PlayerPawn);
+				SpawnedUnit->StartPursuit();
+			}
+
+			NewUnit.UnitActor = SpawnedUnit;
+		}
+	}
 
 	ActiveUnits.Add(NewUnit);
 
@@ -367,10 +405,10 @@ void UMGPoliceSubsystem::DespawnPoliceUnit(int32 UnitID)
 	{
 		if (ActiveUnits[i].UnitID == UnitID)
 		{
-			// TODO: Destroy the actor
+			// Destroy the actor
 			if (ActiveUnits[i].UnitActor.IsValid())
 			{
-				// ActiveUnits[i].UnitActor->Destroy();
+				ActiveUnits[i].UnitActor->Destroy();
 			}
 
 			ActiveUnits.RemoveAt(i);
@@ -385,7 +423,7 @@ void UMGPoliceSubsystem::DespawnAllUnits()
 	{
 		if (Unit.UnitActor.IsValid())
 		{
-			// Unit.UnitActor->Destroy();
+			Unit.UnitActor->Destroy();
 		}
 	}
 

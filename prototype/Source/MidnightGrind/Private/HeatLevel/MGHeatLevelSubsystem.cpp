@@ -1,8 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "HeatLevel/MGHeatLevelSubsystem.h"
+#include "Save/MGSaveManagerSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGHeatLevelSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -779,12 +781,66 @@ int32 UMGHeatLevelSubsystem::GetHeatLevelStars(EMGHeatLevel Level) const
 
 void UMGHeatLevelSubsystem::SaveHeatData()
 {
-	// TODO: Implement save to SaveGame object
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return;
+	}
+
+	UMGSaveManagerSubsystem* SaveManager = GameInstance->GetSubsystem<UMGSaveManagerSubsystem>();
+	if (!SaveManager)
+	{
+		return;
+	}
+
+	UMGSaveGame* SaveGame = SaveManager->GetSaveDataMutable();
+	if (!SaveGame)
+	{
+		return;
+	}
+
+	// Save lifetime stats
+	SaveGame->HeatLevelData.TotalPursuitsEscaped = LifetimeStats.TotalPursuitsEvaded;
+	SaveGame->HeatLevelData.TotalPursuitsBusted = LifetimeStats.TotalPursuitsBusted;
+	SaveGame->HeatLevelData.MaxHeatLevelReached = static_cast<int32>(LifetimeStats.HighestHeatLevel);
+	SaveGame->HeatLevelData.LongestPursuitDuration = LifetimeStats.LongestPursuitTime;
+	SaveGame->HeatLevelData.TotalFinesPaid = LifetimeStats.TotalCostPaid;
+	SaveGame->HeatLevelData.TotalBountyEarned = LifetimeStats.TotalBountyEarned;
+	SaveGame->HeatLevelData.CopsDisabledTotal = LifetimeStats.TotalUnitsDisabled;
+	SaveGame->HeatLevelData.RoadblocksEvadedTotal = LifetimeStats.RoadblocksEvaded;
+	SaveGame->HeatLevelData.SpikeStripsEvadedTotal = LifetimeStats.SpikeStripsEvaded;
 }
 
 void UMGHeatLevelSubsystem::LoadHeatData()
 {
-	// TODO: Implement load from SaveGame object
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return;
+	}
+
+	UMGSaveManagerSubsystem* SaveManager = GameInstance->GetSubsystem<UMGSaveManagerSubsystem>();
+	if (!SaveManager)
+	{
+		return;
+	}
+
+	const UMGSaveGame* SaveGame = SaveManager->GetCurrentSaveData();
+	if (!SaveGame)
+	{
+		return;
+	}
+
+	// Load lifetime stats
+	LifetimeStats.TotalPursuitsEvaded = SaveGame->HeatLevelData.TotalPursuitsEscaped;
+	LifetimeStats.TotalPursuitsBusted = SaveGame->HeatLevelData.TotalPursuitsBusted;
+	LifetimeStats.HighestHeatLevel = static_cast<EMGHeatLevel>(SaveGame->HeatLevelData.MaxHeatLevelReached);
+	LifetimeStats.LongestPursuitTime = SaveGame->HeatLevelData.LongestPursuitDuration;
+	LifetimeStats.TotalCostPaid = SaveGame->HeatLevelData.TotalFinesPaid;
+	LifetimeStats.TotalBountyEarned = SaveGame->HeatLevelData.TotalBountyEarned;
+	LifetimeStats.TotalUnitsDisabled = SaveGame->HeatLevelData.CopsDisabledTotal;
+	LifetimeStats.RoadblocksEvaded = SaveGame->HeatLevelData.RoadblocksEvadedTotal;
+	LifetimeStats.SpikeStripsEvaded = SaveGame->HeatLevelData.SpikeStripsEvadedTotal;
 }
 
 void UMGHeatLevelSubsystem::UpdateHeatLevel()
