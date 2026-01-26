@@ -1259,13 +1259,13 @@ float AMGAIRacerController::CalculateTargetSpeed()
 		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
 		{
 			// Get road grip multiplier based on weather (dry=1.0, wet=0.7, icy=0.4, etc.)
-			const float WeatherGrip = WeatherSubsystem->GetRoadGripMultiplier();
+			const float WeatherGrip = WeatherSubsystem->GetGripMultiplier();
 			BaseSpeed *= WeatherGrip;
 
 			// Additional caution in poor visibility conditions
-			const EMGWeatherType WeatherType = WeatherSubsystem->GetCurrentWeatherType();
-			if (WeatherType == EMGWeatherType::HeavyFog ||
-				WeatherType == EMGWeatherType::Blizzard ||
+			const EMGWeatherType WeatherType = WeatherSubsystem->GetWeatherType();
+			if (WeatherType == EMGWeatherType::Fog ||
+				WeatherType == EMGWeatherType::Snow ||
 				WeatherType == EMGWeatherType::Thunderstorm)
 			{
 				// Reduce speed further due to visibility concerns
@@ -1275,12 +1275,13 @@ float AMGAIRacerController::CalculateTargetSpeed()
 				BaseSpeed *= (1.0f - VisibilityCaution);
 			}
 
-			// Check hydroplaning risk for standing water
-			const float HydroplaningRisk = WeatherSubsystem->GetHydroplaningRisk();
-			if (HydroplaningRisk > 0.3f)
+			// Additional caution for flooded roads (hydroplaning risk)
+			const EMGRoadCondition RoadCondition = WeatherSubsystem->GetRoadCondition();
+			if (RoadCondition == EMGRoadCondition::Flooded)
 			{
-				// Skilled drivers slow down appropriately for hydroplaning
-				const float HydroCaution = HydroplaningRisk * 0.2f;
+				// Skilled drivers slow down appropriately for hydroplaning risk
+				const float HydroCaution = DriverProfile ?
+					FMath::Lerp(0.25f, 0.15f, DriverProfile->Skill.SkillLevel) : 0.20f;
 				BaseSpeed *= (1.0f - HydroCaution);
 			}
 		}
