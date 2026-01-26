@@ -249,6 +249,9 @@ protected:
 
 	/** Report result */
 	void ReportResult(bool bSuccess, const FString& Message);
+
+	/** Load career event configuration by ID */
+	FMGRaceSetupRequest LoadCareerEventConfig(FName EventID);
 };
 
 /**

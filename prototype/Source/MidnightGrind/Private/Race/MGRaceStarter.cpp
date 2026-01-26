@@ -163,18 +163,9 @@ bool UMGRaceStarter::StartCareerRace(FName EventID)
 {
 	CacheSubsystems();
 
-	// MVP: Career races use standard race setup
-	// TODO: Load event configuration from data asset
-
-	FMGRaceSetupRequest Setup;
-	Setup.RaceType = FName("Circuit");
-	Setup.TrackID = FName("Track_Downtown");
+	// Load event configuration from career event definitions
+	FMGRaceSetupRequest Setup = LoadCareerEventConfig(EventID);
 	Setup.PlayerVehicleID = GetSelectedVehicleID();
-	Setup.LapCount = 3;
-	Setup.AICount = 7;
-	Setup.AIDifficulty = 0.6f;
-	Setup.BaseCashReward = 7500;
-	Setup.BaseRepReward = 150;
 	FillDefaultValues(Setup);
 
 	if (RaceFlowSubsystem.IsValid())
@@ -185,6 +176,144 @@ bool UMGRaceStarter::StartCareerRace(FName EventID)
 	}
 
 	return false;
+}
+
+FMGRaceSetupRequest UMGRaceStarter::LoadCareerEventConfig(FName EventID)
+{
+	FMGRaceSetupRequest Setup;
+
+	// Career event configurations - MVP event definitions
+	// These define the progression of career mode races
+	static TMap<FName, FMGRaceSetupRequest> CareerEvents;
+	if (CareerEvents.Num() == 0)
+	{
+		// Chapter 1: Street Novice
+		{
+			FMGRaceSetupRequest Event;
+			Event.RaceType = FName("Circuit");
+			Event.TrackID = FName("Track_Downtown");
+			Event.LapCount = 2;
+			Event.AICount = 3;
+			Event.AIDifficulty = 0.3f;
+			Event.BaseCashReward = 2500;
+			Event.BaseRepReward = 50;
+			CareerEvents.Add(FName("Career_Ch1_Race1"), Event);
+		}
+		{
+			FMGRaceSetupRequest Event;
+			Event.RaceType = FName("Sprint");
+			Event.TrackID = FName("Track_Downtown");
+			Event.LapCount = 1;
+			Event.AICount = 3;
+			Event.AIDifficulty = 0.35f;
+			Event.BaseCashReward = 3000;
+			Event.BaseRepReward = 75;
+			CareerEvents.Add(FName("Career_Ch1_Race2"), Event);
+		}
+		{
+			FMGRaceSetupRequest Event;
+			Event.RaceType = FName("Circuit");
+			Event.TrackID = FName("Track_Industrial");
+			Event.LapCount = 3;
+			Event.AICount = 5;
+			Event.AIDifficulty = 0.4f;
+			Event.BaseCashReward = 4000;
+			Event.BaseRepReward = 100;
+			CareerEvents.Add(FName("Career_Ch1_Boss"), Event);
+		}
+
+		// Chapter 2: Rising Rep
+		{
+			FMGRaceSetupRequest Event;
+			Event.RaceType = FName("Circuit");
+			Event.TrackID = FName("Track_Highway");
+			Event.LapCount = 3;
+			Event.AICount = 5;
+			Event.AIDifficulty = 0.45f;
+			Event.BaseCashReward = 5000;
+			Event.BaseRepReward = 125;
+			CareerEvents.Add(FName("Career_Ch2_Race1"), Event);
+		}
+		{
+			FMGRaceSetupRequest Event;
+			Event.RaceType = FName("Drag");
+			Event.TrackID = FName("Track_Dragstrip");
+			Event.LapCount = 1;
+			Event.AICount = 1;
+			Event.AIDifficulty = 0.5f;
+			Event.BaseCashReward = 6000;
+			Event.BaseRepReward = 150;
+			CareerEvents.Add(FName("Career_Ch2_Race2"), Event);
+		}
+		{
+			FMGRaceSetupRequest Event;
+			Event.RaceType = FName("Circuit");
+			Event.TrackID = FName("Track_Mountain");
+			Event.LapCount = 3;
+			Event.AICount = 7;
+			Event.AIDifficulty = 0.55f;
+			Event.BaseCashReward = 7500;
+			Event.BaseRepReward = 175;
+			CareerEvents.Add(FName("Career_Ch2_Boss"), Event);
+		}
+
+		// Chapter 3: Midnight Elite
+		{
+			FMGRaceSetupRequest Event;
+			Event.RaceType = FName("TimeAttack");
+			Event.TrackID = FName("Track_Downtown");
+			Event.LapCount = 3;
+			Event.AICount = 0;
+			Event.AIDifficulty = 0.0f;
+			Event.BaseCashReward = 8000;
+			Event.BaseRepReward = 200;
+			CareerEvents.Add(FName("Career_Ch3_Race1"), Event);
+		}
+		{
+			FMGRaceSetupRequest Event;
+			Event.RaceType = FName("Circuit");
+			Event.TrackID = FName("Track_Highway");
+			Event.LapCount = 5;
+			Event.AICount = 7;
+			Event.AIDifficulty = 0.65f;
+			Event.BaseCashReward = 10000;
+			Event.BaseRepReward = 250;
+			CareerEvents.Add(FName("Career_Ch3_Race2"), Event);
+		}
+		{
+			FMGRaceSetupRequest Event;
+			Event.RaceType = FName("PinkSlip");
+			Event.TrackID = FName("Track_Mountain");
+			Event.LapCount = 3;
+			Event.AICount = 1;
+			Event.AIDifficulty = 0.75f;
+			Event.bIsPinkSlip = true;
+			Event.BaseCashReward = 0;
+			Event.BaseRepReward = 500;
+			CareerEvents.Add(FName("Career_Ch3_Boss"), Event);
+		}
+	}
+
+	// Look up the event
+	if (const FMGRaceSetupRequest* FoundEvent = CareerEvents.Find(EventID))
+	{
+		Setup = *FoundEvent;
+		UE_LOG(LogMGRaceStarter, Log, TEXT("Loaded career event config: %s"), *EventID.ToString());
+	}
+	else
+	{
+		// Fallback to default configuration
+		UE_LOG(LogMGRaceStarter, Warning, TEXT("Career event not found: %s - using defaults"), *EventID.ToString());
+		Setup.RaceType = FName("Circuit");
+		Setup.TrackID = FName("Track_Downtown");
+		Setup.LapCount = 3;
+		Setup.AICount = 5;
+		Setup.AIDifficulty = 0.5f;
+		Setup.BaseCashReward = 5000;
+		Setup.BaseRepReward = 100;
+	}
+
+	return Setup;
 }
 
 // ==========================================

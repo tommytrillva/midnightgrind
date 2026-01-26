@@ -638,16 +638,91 @@ bool UMGStatCalculator::IsPartCompatible(const UMGPartData* Part, FName VehicleM
 		return false;
 	}
 
-	// Check required parts
-	for (const FName& RequiredPart : Part->RequiredParts)
+	// Helper to collect all installed part IDs from vehicle configuration
+	TSet<FName> InstalledPartIDs;
+
+	// Engine parts
+	InstalledPartIDs.Add(Vehicle.Engine.EngineBlockID);
+	InstalledPartIDs.Add(Vehicle.Engine.CylinderHeadID);
+	InstalledPartIDs.Add(Vehicle.Engine.CamshaftID);
+	InstalledPartIDs.Add(Vehicle.Engine.IntakeManifoldID);
+	InstalledPartIDs.Add(Vehicle.Engine.ThrottleBodyID);
+	InstalledPartIDs.Add(Vehicle.Engine.AirFilterID);
+	InstalledPartIDs.Add(Vehicle.Engine.ExhaustManifoldID);
+	InstalledPartIDs.Add(Vehicle.Engine.ExhaustSystemID);
+	InstalledPartIDs.Add(Vehicle.Engine.PistonsID);
+	InstalledPartIDs.Add(Vehicle.Engine.ConnectingRodsID);
+	InstalledPartIDs.Add(Vehicle.Engine.CrankshaftID);
+	InstalledPartIDs.Add(Vehicle.Engine.FlywheelID);
+	InstalledPartIDs.Add(Vehicle.Engine.FuelInjectorsID);
+	InstalledPartIDs.Add(Vehicle.Engine.FuelPumpID);
+	InstalledPartIDs.Add(Vehicle.Engine.SparkPlugsID);
+	InstalledPartIDs.Add(Vehicle.Engine.ECUID);
+
+	// Forced induction parts
+	InstalledPartIDs.Add(Vehicle.Engine.ForcedInduction.TurboID);
+	InstalledPartIDs.Add(Vehicle.Engine.ForcedInduction.WastegateID);
+	InstalledPartIDs.Add(Vehicle.Engine.ForcedInduction.BlowOffValveID);
+	InstalledPartIDs.Add(Vehicle.Engine.ForcedInduction.IntercoolerID);
+
+	// Nitrous
+	if (Vehicle.Engine.Nitrous.bInstalled)
 	{
-		// TODO: Check if required part is installed
+		InstalledPartIDs.Add(Vehicle.Engine.Nitrous.SystemID);
 	}
 
-	// Check incompatible parts
+	// Drivetrain parts
+	InstalledPartIDs.Add(Vehicle.Drivetrain.ClutchID);
+	InstalledPartIDs.Add(Vehicle.Drivetrain.TransmissionID);
+	InstalledPartIDs.Add(Vehicle.Drivetrain.DifferentialID);
+	InstalledPartIDs.Add(Vehicle.Drivetrain.DriveshaftID);
+
+	// Suspension parts
+	InstalledPartIDs.Add(Vehicle.Suspension.FrontSpringsID);
+	InstalledPartIDs.Add(Vehicle.Suspension.FrontDampersID);
+	InstalledPartIDs.Add(Vehicle.Suspension.FrontSwayBarID);
+	InstalledPartIDs.Add(Vehicle.Suspension.RearSpringsID);
+	InstalledPartIDs.Add(Vehicle.Suspension.RearDampersID);
+	InstalledPartIDs.Add(Vehicle.Suspension.RearSwayBarID);
+
+	// Brake parts
+	InstalledPartIDs.Add(Vehicle.Brakes.FrontRotorsID);
+	InstalledPartIDs.Add(Vehicle.Brakes.FrontCalipersID);
+	InstalledPartIDs.Add(Vehicle.Brakes.FrontPadsID);
+	InstalledPartIDs.Add(Vehicle.Brakes.RearRotorsID);
+	InstalledPartIDs.Add(Vehicle.Brakes.RearCalipersID);
+	InstalledPartIDs.Add(Vehicle.Brakes.RearPadsID);
+	InstalledPartIDs.Add(Vehicle.Brakes.BrakeLinesID);
+
+	// Wheel/Tire parts
+	InstalledPartIDs.Add(Vehicle.WheelsTires.FrontWheelID);
+	InstalledPartIDs.Add(Vehicle.WheelsTires.RearWheelID);
+
+	// Aero parts
+	InstalledPartIDs.Add(Vehicle.Aero.FrontSplitter.SplitterID);
+	InstalledPartIDs.Add(Vehicle.Aero.RearWing.WingID);
+	InstalledPartIDs.Add(Vehicle.Aero.DiffuserID);
+
+	// Remove empty/none entries
+	InstalledPartIDs.Remove(NAME_None);
+	InstalledPartIDs.Remove(FName());
+
+	// Check required parts - all required parts must be installed
+	for (const FName& RequiredPart : Part->RequiredParts)
+	{
+		if (!InstalledPartIDs.Contains(RequiredPart))
+		{
+			return false; // Missing required part
+		}
+	}
+
+	// Check incompatible parts - none of these can be installed
 	for (const FName& IncompatiblePart : Part->IncompatibleParts)
 	{
-		// TODO: Check if incompatible part is installed
+		if (InstalledPartIDs.Contains(IncompatiblePart))
+		{
+			return false; // Incompatible part is installed
+		}
 	}
 
 	return true;

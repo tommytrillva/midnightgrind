@@ -629,8 +629,39 @@ float UMGVehicleMovementComponent::CalculateCurrentPower() const
 		Power *= NitrousPowerMultiplier;
 	}
 
-	// Apply engine condition
-	// TODO: Factor in part conditions
+	// Apply engine condition - worn parts reduce power output
+	float ConditionMultiplier = 1.0f;
+	if (CurrentConfiguration.PartConditions.Num() > 0)
+	{
+		// Check engine-related part conditions
+		static const TArray<FName> EngineParts = {
+			FName("Engine"), FName("Turbo"), FName("Supercharger"),
+			FName("Exhaust"), FName("AirFilter"), FName("FuelSystem")
+		};
+
+		float TotalCondition = 0.0f;
+		int32 PartCount = 0;
+
+		for (const FName& PartName : EngineParts)
+		{
+			if (const float* Condition = CurrentConfiguration.PartConditions.Find(PartName))
+			{
+				TotalCondition += *Condition;
+				PartCount++;
+			}
+		}
+
+		if (PartCount > 0)
+		{
+			// Average condition affects power
+			// At 100% condition = 100% power
+			// At 50% condition = 85% power
+			// At 0% condition = 70% power
+			const float AverageCondition = TotalCondition / PartCount;
+			ConditionMultiplier = FMath::Lerp(0.70f, 1.0f, AverageCondition / 100.0f);
+		}
+	}
+	Power *= ConditionMultiplier;
 
 	return Power;
 }
