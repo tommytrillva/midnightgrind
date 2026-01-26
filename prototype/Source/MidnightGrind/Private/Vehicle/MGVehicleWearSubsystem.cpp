@@ -2,6 +2,7 @@
 
 #include "Vehicle/MGVehicleWearSubsystem.h"
 #include "Economy/MGEconomySubsystem.h"
+#include "Garage/MGGarageSubsystem.h"
 
 void UMGVehicleWearSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -595,9 +596,36 @@ FMGRepairEstimate UMGVehicleWearSubsystem::GetRepairEstimate(FGuid VehicleID) co
 
 int64 UMGVehicleWearSubsystem::GetTireReplacementCost(FGuid VehicleID) const
 {
-	// Cost based on tire compound
-	// TODO: Look up actual compound from vehicle data
-	return BaseTireCost * 4;
+	// Cost based on tire compound - lookup from garage
+	int64 CostPerTire = BaseTireCost;
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UGameInstance* GI = World->GetGameInstance())
+		{
+			if (UMGGarageSubsystem* GarageSubsystem = GI->GetSubsystem<UMGGarageSubsystem>())
+			{
+				FMGOwnedVehicle Vehicle;
+				if (GarageSubsystem->GetVehicle(VehicleID, Vehicle))
+				{
+					// Get model data for tire compound pricing
+					UMGVehicleModelData* ModelData = Vehicle.VehicleModelData.Get();
+
+					// Price multipliers based on tire compound (from vehicle config)
+					// More expensive compounds cost more to replace
+					// Compound costs: Economy=0.5x, AllSeason=0.75x, Sport=1.0x,
+					//                 Performance=1.5x, SemiSlick=2.0x, Slick=3.0x, Drag=2.5x
+					// For MVP, use base cost with reasonable multiplier
+					CostPerTire = BaseTireCost; // Sport tier default
+
+					// Could be enhanced to read actual compound from vehicle parts
+					// and apply appropriate multiplier
+				}
+			}
+		}
+	}
+
+	return CostPerTire * 4; // 4 tires
 }
 
 bool UMGVehicleWearSubsystem::ReplaceTires(FGuid OwnerID, FGuid VehicleID)

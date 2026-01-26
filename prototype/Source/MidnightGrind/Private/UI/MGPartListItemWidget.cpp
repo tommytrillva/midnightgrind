@@ -164,7 +164,54 @@ FText UMGPartListItemWidget::GetFormattedPrice() const
 
 TSoftObjectPtr<UTexture2D> UMGPartListItemWidget::GetStatusIcon() const
 {
-	// TODO: Return appropriate icon texture based on status
+	// Return appropriate icon texture based on part status
+	// Icons expected at /Game/UI/Icons/Parts/
+
+	FString IconPath;
+
+	if (PartData.bLocked)
+	{
+		IconPath = TEXT("/Game/UI/Icons/Parts/Icon_Locked");
+	}
+	else if (PartData.bEquipped)
+	{
+		IconPath = TEXT("/Game/UI/Icons/Parts/Icon_Equipped");
+	}
+	else if (PartData.bOwned)
+	{
+		IconPath = TEXT("/Game/UI/Icons/Parts/Icon_Owned");
+	}
+	else
+	{
+		// Available for purchase - show tier icon
+		switch (PartData.Tier)
+		{
+		case EMGPartTier::Street:
+			IconPath = TEXT("/Game/UI/Icons/Parts/Tier_Street");
+			break;
+		case EMGPartTier::Sport:
+			IconPath = TEXT("/Game/UI/Icons/Parts/Tier_Sport");
+			break;
+		case EMGPartTier::Race:
+			IconPath = TEXT("/Game/UI/Icons/Parts/Tier_Race");
+			break;
+		case EMGPartTier::Pro:
+			IconPath = TEXT("/Game/UI/Icons/Parts/Tier_Pro");
+			break;
+		case EMGPartTier::Legendary:
+			IconPath = TEXT("/Game/UI/Icons/Parts/Tier_Legendary");
+			break;
+		default:
+			IconPath = TEXT("/Game/UI/Icons/Parts/Tier_Stock");
+			break;
+		}
+	}
+
+	if (!IconPath.IsEmpty())
+	{
+		return TSoftObjectPtr<UTexture2D>(FSoftObjectPath(IconPath));
+	}
+
 	return nullptr;
 }
 
