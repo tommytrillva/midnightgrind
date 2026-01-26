@@ -1,6 +1,7 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Traffic/MGTrafficSubsystem.h"
+#include "Traffic/MGTrafficVehicle.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
@@ -94,8 +95,27 @@ int32 UMGTrafficSubsystem::SpawnTrafficVehicle(FVector Location, FRotator Rotati
 		NewVehicle.TargetSpeed *= 0.8f;
 	}
 
-	// TODO: Actually spawn the vehicle actor
-	// NewVehicle.VehicleActor = SpawnedActor;
+	// Spawn the vehicle actor
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		AMGTrafficVehicle* SpawnedVehicle = World->SpawnActor<AMGTrafficVehicle>(
+			AMGTrafficVehicle::StaticClass(),
+			Location,
+			Rotation,
+			SpawnParams
+		);
+
+		if (SpawnedVehicle)
+		{
+			SpawnedVehicle->InitializeVehicle(NewVehicle.VehicleID, Type, NewVehicle.Behavior);
+			SpawnedVehicle->SetTargetSpeed(NewVehicle.TargetSpeed);
+			NewVehicle.VehicleActor = SpawnedVehicle;
+		}
+	}
 
 	ActiveVehicles.Add(NewVehicle.VehicleID, NewVehicle);
 	TotalVehiclesSpawned++;
@@ -376,18 +396,43 @@ void UMGTrafficSubsystem::UpdateTraffic(float DeltaTime)
 
 void UMGTrafficSubsystem::UpdateVehicleAI(FMGTrafficVehicleState& Vehicle, float DeltaTime)
 {
-	// Accelerate/decelerate towards target speed
-	float SpeedDiff = Vehicle.TargetSpeed - Vehicle.CurrentSpeed;
-	float Acceleration = 10.0f; // mph/s
-	float Deceleration = 20.0f;
+	// If we have a valid actor, sync state from the actor
+	if (Vehicle.VehicleActor.IsValid())
+	{
+		AMGTrafficVehicle* VehicleActor = Vehicle.VehicleActor.Get();
+		Vehicle.Location = VehicleActor->GetActorLocation();
+		Vehicle.Rotation = VehicleActor->GetActorRotation();
+		Vehicle.CurrentSpeed = VehicleActor->GetCurrentSpeedMPH();
 
-	if (SpeedDiff > 0)
-	{
-		Vehicle.CurrentSpeed += FMath::Min(Acceleration * DeltaTime, SpeedDiff);
+		// Update behavior on the actor if changed
+		if (Vehicle.Behavior != VehicleActor->GetBehavior())
+		{
+			VehicleActor->SetBehavior(Vehicle.Behavior);
+		}
+
+		// Update target speed on the actor
+		VehicleActor->SetTargetSpeed(Vehicle.TargetSpeed);
 	}
-	else if (SpeedDiff < 0)
+	else
 	{
-		Vehicle.CurrentSpeed += FMath::Max(-Deceleration * DeltaTime, SpeedDiff);
+		// Fallback for vehicles without actors (legacy behavior)
+		float SpeedDiff = Vehicle.TargetSpeed - Vehicle.CurrentSpeed;
+		float Acceleration = 10.0f; // mph/s
+		float Deceleration = 20.0f;
+
+		if (SpeedDiff > 0)
+		{
+			Vehicle.CurrentSpeed += FMath::Min(Acceleration * DeltaTime, SpeedDiff);
+		}
+		else if (SpeedDiff < 0)
+		{
+			Vehicle.CurrentSpeed += FMath::Max(-Deceleration * DeltaTime, SpeedDiff);
+		}
+
+		// Move vehicle forward
+		float SpeedCmPerSec = Vehicle.CurrentSpeed * 44.704f; // mph to cm/s
+		FVector Forward = Vehicle.Rotation.Vector();
+		Vehicle.Location += Forward * SpeedCmPerSec * DeltaTime;
 	}
 
 	// Behavior-specific updates
@@ -428,11 +473,6 @@ void UMGTrafficSubsystem::UpdateVehicleAI(FMGTrafficVehicleState& Vehicle, float
 			}
 		}
 	}
-
-	// Move vehicle forward
-	float SpeedCmPerSec = Vehicle.CurrentSpeed * 44.704f; // mph to cm/s
-	FVector Forward = Vehicle.Rotation.Vector();
-	Vehicle.Location += Forward * SpeedCmPerSec * DeltaTime;
 }
 
 void UMGTrafficSubsystem::UpdateTrafficLights(float DeltaTime)

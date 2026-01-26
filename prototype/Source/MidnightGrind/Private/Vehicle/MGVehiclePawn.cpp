@@ -388,6 +388,38 @@ void AMGVehiclePawn::RespawnAtCheckpoint()
 	OnVehicleRespawn.Broadcast();
 }
 
+void AMGVehiclePawn::ApplyTireDamage(float DamageAmount)
+{
+	TireHealth = FMath::Clamp(TireHealth - DamageAmount, 0.0f, 100.0f);
+
+	// Apply handling penalty when tires are damaged
+	if (MGVehicleMovement && TireHealth < 100.0f)
+	{
+		// Calculate grip reduction based on tire health
+		float GripMultiplier = FMath::GetMappedRangeValueClamped(
+			FVector2D(0.0f, 100.0f),
+			FVector2D(0.3f, 1.0f),
+			TireHealth
+		);
+
+		// Apply to movement component
+		MGVehicleMovement->SetTireGripMultiplier(GripMultiplier);
+
+		// Max speed reduction when tires are very damaged
+		if (TireHealth < 30.0f)
+		{
+			float SpeedMultiplier = FMath::GetMappedRangeValueClamped(
+				FVector2D(0.0f, 30.0f),
+				FVector2D(0.5f, 1.0f),
+				TireHealth
+			);
+			MGVehicleMovement->SetMaxSpeedMultiplier(SpeedMultiplier);
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Vehicle tire damage applied: %.1f, Health now: %.1f"), DamageAmount, TireHealth);
+}
+
 // ==========================================
 // INPUT HANDLERS
 // ==========================================

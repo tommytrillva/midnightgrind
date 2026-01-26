@@ -255,7 +255,10 @@ bool UMGPlayerMarketSubsystem::PlaceBid(FGuid BidderID, FGuid ListingID, int64 B
 
 	// Verify bidder has funds (for autobid, check max amount)
 	int64 RequiredFunds = bAutoBid ? MaxAutoBidAmount : BidAmount;
-	// TODO: Check bidder balance via EconomySubsystem
+	if (EconomySubsystem && !EconomySubsystem->CanAfford(RequiredFunds))
+	{
+		return false; // Bidder cannot afford this bid
+	}
 
 	// Store previous high bidder for notification
 	FGuid PreviousHighBidder = Listing->HighestBidderID;
@@ -336,7 +339,10 @@ bool UMGPlayerMarketSubsystem::ExecuteBuyNow(FGuid BuyerID, FGuid ListingID)
 	}
 
 	// Check buyer has funds
-	// TODO: Verify via EconomySubsystem
+	if (EconomySubsystem && !EconomySubsystem->CanAfford(Listing->BuyNowPrice))
+	{
+		return false; // Buyer cannot afford the buy now price
+	}
 
 	// Calculate fees
 	int64 SalePrice = Listing->BuyNowPrice;
@@ -690,7 +696,10 @@ bool UMGPlayerMarketSubsystem::CreateTradeOffer(FGuid InitiatorID, FGuid Recipie
 	}
 
 	// Verify initiator has the offered cash
-	// TODO: Check via EconomySubsystem
+	if (OfferedCash > 0 && EconomySubsystem && !EconomySubsystem->CanAfford(OfferedCash))
+	{
+		return false; // Initiator cannot afford the offered cash amount
+	}
 
 	FMGTradeOffer Offer;
 	Offer.InitiatorID = InitiatorID;

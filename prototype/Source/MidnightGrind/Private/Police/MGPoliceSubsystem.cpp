@@ -2,6 +2,8 @@
 
 #include "Police/MGPoliceSubsystem.h"
 #include "Police/MGPoliceUnit.h"
+#include "Police/MGPoliceRoadblock.h"
+#include "Police/MGSpikeStrip.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -474,7 +476,33 @@ void UMGPoliceSubsystem::SpawnRoadblock(FVector Location, FVector Direction)
 		return;
 	}
 
-	// TODO: Spawn roadblock actors
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	// Spawn roadblock actor
+	AMGPoliceRoadblock* Roadblock = World->SpawnActor<AMGPoliceRoadblock>(
+		AMGPoliceRoadblock::StaticClass(),
+		Location,
+		FRotator::ZeroRotator,
+		SpawnParams
+	);
+
+	if (Roadblock)
+	{
+		static int32 RoadblockIDCounter = 0;
+		Roadblock->Initialize(++RoadblockIDCounter, Direction);
+		Roadblock->SetNumVehicles(FMath::RandRange(2, 3));
+
+		UE_LOG(LogTemp, Log, TEXT("Police: Roadblock spawned at %s"), *Location.ToString());
+	}
+
+	// Also spawn police units at the roadblock
 	SpawnPoliceUnit(EMGPoliceUnitType::Roadblock, Location);
 }
 
@@ -486,8 +514,32 @@ void UMGPoliceSubsystem::DeploySpikeStrip(FVector Location, FVector Direction)
 		return;
 	}
 
-	// TODO: Spawn spike strip actor
-	SpawnPoliceUnit(EMGPoliceUnitType::SpikeStrip, Location);
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	// Spawn spike strip actor
+	AMGSpikeStrip* SpikeStrip = World->SpawnActor<AMGSpikeStrip>(
+		AMGSpikeStrip::StaticClass(),
+		Location,
+		FRotator::ZeroRotator,
+		SpawnParams
+	);
+
+	if (SpikeStrip)
+	{
+		static int32 SpikeStripIDCounter = 0;
+		SpikeStrip->Initialize(++SpikeStripIDCounter, Direction);
+		SpikeStrip->SetLength(FMath::RandRange(400.0f, 800.0f));
+		SpikeStrip->Deploy();
+
+		UE_LOG(LogTemp, Log, TEXT("Police: Spike strip deployed at %s"), *Location.ToString());
+	}
 }
 
 // ==========================================
@@ -656,9 +708,23 @@ void UMGPoliceSubsystem::UpdatePursuit(float DeltaTime)
 	// Update player position tracking
 	if (PlayerVehicle.IsValid())
 	{
-		PlayerLastKnownPosition = PlayerVehicle->GetActorLocation();
+		FVector NewPosition = PlayerVehicle->GetActorLocation();
 
-		// TODO: Track top speed, distance traveled, etc.
+		// Track distance traveled during pursuit
+		if (bInPursuit)
+		{
+			float DistanceTraveled = FVector::Dist(PlayerLastKnownPosition, NewPosition);
+			CurrentPursuitStats.TotalDistance += DistanceTraveled / 100.0f; // Convert to meters
+
+			// Track top speed
+			float CurrentSpeed = PlayerVehicle->GetRuntimeState().SpeedMPH;
+			if (CurrentSpeed > CurrentPursuitStats.TopSpeed)
+			{
+				CurrentPursuitStats.TopSpeed = CurrentSpeed;
+			}
+		}
+
+		PlayerLastKnownPosition = NewPosition;
 	}
 }
 
@@ -773,8 +839,7 @@ void UMGPoliceSubsystem::UpdateBustedState(float DeltaTime)
 	}
 
 	// Check if player is stopped and surrounded
-	// TODO: Get actual vehicle speed
-	float PlayerSpeed = 0.0f; // PlayerVehicle->GetVehicleSpeed();
+	float PlayerSpeed = PlayerVehicle->GetRuntimeState().SpeedMPH;
 
 	bool bPlayerStopped = PlayerSpeed < 5.0f;
 	bool bCopsNearby = false;
@@ -862,8 +927,24 @@ void UMGPoliceSubsystem::SpawnUnitsForHeatLevel()
 			UnitType = (FMath::RandRange(0, 2) == 0) ? EMGPoliceUnitType::Interceptor : EMGPoliceUnitType::Patrol;
 		}
 
-		// TODO: Calculate proper spawn location behind/around player
-		FVector SpawnLocation = PlayerLastKnownPosition + FVector(FMath::RandRange(-1000.0f, 1000.0f) * 100.0f, FMath::RandRange(-1000.0f, 1000.0f) * 100.0f, 0.0f);
+		// Calculate spawn location behind or to the sides of the player
+		FVector SpawnLocation = PlayerLastKnownPosition;
+		if (PlayerVehicle.IsValid())
+		{
+			FVector PlayerForward = PlayerVehicle->GetActorForwardVector();
+			FVector PlayerRight = PlayerVehicle->GetActorRightVector();
+
+			// Spawn primarily behind the player, with some side variance
+			float BehindDistance = FMath::RandRange(8000.0f, 15000.0f); // 80-150m behind
+			float SideOffset = FMath::RandRange(-5000.0f, 5000.0f); // Up to 50m to either side
+
+			SpawnLocation = PlayerLastKnownPosition - PlayerForward * BehindDistance + PlayerRight * SideOffset;
+		}
+		else
+		{
+			// Fallback if no player vehicle reference
+			SpawnLocation = PlayerLastKnownPosition + FVector(FMath::RandRange(-10000.0f, 10000.0f), FMath::RandRange(-10000.0f, 10000.0f), 0.0f);
+		}
 
 		SpawnPoliceUnit(UnitType, SpawnLocation);
 		CurrentUnits++;

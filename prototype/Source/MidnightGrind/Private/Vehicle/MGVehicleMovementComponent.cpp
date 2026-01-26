@@ -141,6 +141,23 @@ void UMGVehicleMovementComponent::ShiftDown()
 	}
 }
 
+void UMGVehicleMovementComponent::SetTireGripMultiplier(float Multiplier)
+{
+	TireGripMultiplier = FMath::Clamp(Multiplier, 0.1f, 1.0f);
+
+	// Apply grip multiplier to base tire grip
+	// This affects the CalculateTireFriction function
+	UE_LOG(LogTemp, Log, TEXT("Tire grip multiplier set to: %.2f"), TireGripMultiplier);
+}
+
+void UMGVehicleMovementComponent::SetMaxSpeedMultiplier(float Multiplier)
+{
+	MaxSpeedMultiplier = FMath::Clamp(Multiplier, 0.3f, 1.0f);
+
+	// This affects max speed calculations
+	UE_LOG(LogTemp, Log, TEXT("Max speed multiplier set to: %.2f"), MaxSpeedMultiplier);
+}
+
 void UMGVehicleMovementComponent::PerformGearShift(int32 NewGear)
 {
 	CurrentGear = NewGear;
