@@ -83,6 +83,7 @@ void AMGAIRacerController::Tick(float DeltaTime)
 	UpdatePerception();
 	UpdateRacingLineProgress();
 	UpdateTactics(DeltaTime);
+	UpdateMoodAndLearning(DeltaTime); // NEW: Adaptive AI - mood and learning systems
 	UpdateStateMachine(DeltaTime);
 	CalculateSteering(DeltaTime);
 	ApplySteering();
@@ -215,15 +216,38 @@ void AMGAIRacerController::NotifyCollision(AActor* OtherActor, const FVector& Im
 		{
 			FVector Velocity = VehiclePawn->GetVelocity();
 			float ImpactSeverity = FMath::Abs(FVector::DotProduct(Velocity, ImpactNormal));
+			float NormalizedSeverity = FMath::Clamp(ImpactSeverity / 2000.0f, 0.0f, 1.0f);
+
+			// Record contact in driver profile for aggression escalation
+			if (DriverProfile && OtherActor)
+			{
+				APawn* OtherPawn = Cast<APawn>(OtherActor);
+				bool bWasPlayer = OtherPawn && Cast<APlayerController>(OtherPawn->GetController()) != nullptr;
+
+				// Determine if contact seemed intentional
+				bool bSeemedIntentional = false;
+				if (OtherPawn)
+				{
+					FVector TheirVelocity = OtherPawn->GetVelocity();
+					FVector ToUs = VehiclePawn->GetActorLocation() - OtherPawn->GetActorLocation();
+					float DotTowardUs = FVector::DotProduct(TheirVelocity.GetSafeNormal(), ToUs.GetSafeNormal());
+					bSeemedIntentional = DotTowardUs > 0.5f && TheirVelocity.Size() > 500.0f;
+				}
+
+				DriverProfile->RecordContact(OtherActor, NormalizedSeverity, bWasPlayer, bSeemedIntentional);
+				HandleContactResponse(DriverProfile->GetContactResponse(NormalizedSeverity), OtherActor, NormalizedSeverity);
+			}
 
 			// Only enter recovery for significant impacts
 			if (ImpactSeverity > 500.0f)
 			{
-				SetState(EMGAIDrivingState::Recovering);
-				RecoveryTimer = FMath::Lerp(1.0f, 3.0f, FMath::Clamp(ImpactSeverity / 2000.0f, 0.0f, 1.0f));
+				// Check state BEFORE calling SetState, as SetState modifies CurrentState
+				bool bWasOvertaking = (CurrentState == EMGAIDrivingState::Overtaking);
 
-				// If we were overtaking, abort the maneuver
-				if (CurrentState == EMGAIDrivingState::Overtaking)
+				SetState(EMGAIDrivingState::Recovering);
+				RecoveryTimer = FMath::Lerp(1.0f, 3.0f, NormalizedSeverity);
+
+				if (bWasOvertaking)
 				{
 					OvertakeTimer = 0.0f;
 				}
@@ -1310,11 +1334,13 @@ bool AMGAIRacerController::ShouldAttemptOvertake() const
 		return false;
 	}
 
-	// Check profile aggression
+	// Check effective aggression (includes mood modifiers)
 	float OvertakeChance = OvertakeThreshold;
 	if (DriverProfile)
 	{
-		OvertakeChance = DriverProfile->Aggression.OvertakeAggression;
+		// Use effective aggression which factors in mood and rivalry
+		float EffectiveAggression = DriverProfile->GetEffectiveAggression();
+		OvertakeChance = DriverProfile->Aggression.OvertakeAggression * EffectiveAggression;
 	}
 
 	// Modify by difficulty
@@ -1395,7 +1421,9 @@ bool AMGAIRacerController::ShouldDefendPosition() const
 	float DefendChance = 0.5f;
 	if (DriverProfile)
 	{
-		DefendChance = DriverProfile->Aggression.DefenseAggression;
+		// Use effective aggression which factors in mood (frustrated/vengeful AI defends harder)
+		float EffectiveAggression = DriverProfile->GetEffectiveAggression();
+		DefendChance = DriverProfile->Aggression.DefenseAggression * EffectiveAggression;
 	}
 
 	// More likely against player (adds challenge without cheating physics)
@@ -1792,7 +1820,10 @@ float AMGAIRacerController::GetSituationalRiskLevel() const
 
 	if (DriverProfile)
 	{
-		BaseRisk = DriverProfile->Aggression.RiskTaking;
+		// Use effective aggression which includes mood modifiers
+		// Desperate/Vengeful AI takes MORE risks, Intimidated takes LESS
+		float EffectiveAggression = DriverProfile->GetEffectiveAggression();
+		BaseRisk = DriverProfile->Aggression.RiskTaking * EffectiveAggression;
 	}
 
 	// Increase risk when behind
@@ -1826,10 +1857,12 @@ float AMGAIRacerController::CalculateBrakingDistance(float CurrentSpeed, float T
 
 	float Deceleration = AIConstants::DefaultBrakingDecel * AIConstants::MetersToUnits;
 
-	// Apply skill factor - better skill = later braking (shorter distance)
+	// Apply effective skill factor - better skill = later braking (shorter distance)
+	// Mood affects skill: InTheZone = better braking, Desperate = worse
 	if (DriverProfile)
 	{
-		Deceleration *= (0.8f + 0.4f * DriverProfile->Skill.BrakingAccuracy);
+		float EffectiveSkill = DriverProfile->GetEffectiveSkill();
+		Deceleration *= (0.8f + 0.4f * DriverProfile->Skill.BrakingAccuracy * EffectiveSkill);
 	}
 
 	// Apply weather conditions to braking
@@ -1853,8 +1886,9 @@ float AMGAIRacerController::CalculateBrakingDistance(float CurrentSpeed, float T
 				RoadCondition == EMGRoadCondition::Icy)
 			{
 				// Add safety margin for reduced grip - more skilled = smaller margin needed
+				// Effective skill factors in mood: confident AI uses smaller margins
 				const float SafetyMargin = DriverProfile ?
-					FMath::Lerp(1.3f, 1.1f, DriverProfile->Skill.SkillLevel) : 1.2f;
+					FMath::Lerp(1.3f, 1.1f, DriverProfile->GetEffectiveSkill()) : 1.2f;
 				Deceleration /= SafetyMargin;
 			}
 		}
@@ -1863,4 +1897,283 @@ float AMGAIRacerController::CalculateBrakingDistance(float CurrentSpeed, float T
 	float Distance = (CurrentSpeed * CurrentSpeed - TargetSpeed * TargetSpeed) / (2.0f * Deceleration);
 
 	return Distance;
+}
+
+// ==========================================
+// ADAPTIVE BEHAVIOR & LEARNING
+// ==========================================
+
+void AMGAIRacerController::UpdateMoodAndLearning(float DeltaTime)
+{
+	if (!DriverProfile)
+	{
+		return;
+	}
+
+	// Track position changes for mood updates
+	static int32 LastKnownPosition = CurrentRacePosition;
+	float PositionDelta = static_cast<float>(LastKnownPosition - CurrentRacePosition);
+
+	// TODO: Track damage (needs vehicle damage system integration)
+	float DamageReceived = 0.0f;
+
+	// Track if we were overtaken this frame
+	bool bWasOvertakenThisFrame = (CurrentState == EMGAIDrivingState::Defending && TimeInState < 0.5f);
+
+	// Update mood based on race events
+	DriverProfile->UpdateMood(PositionDelta, DamageReceived, bWasOvertakenThisFrame);
+
+	// Remember position for next update
+	LastKnownPosition = CurrentRacePosition;
+
+	// Learn from player behavior (if player is nearby)
+	APawn* PlayerVehicle = GetPlayerVehicle();
+	if (PlayerVehicle)
+	{
+		FMGAIVehiclePerception PlayerPerception;
+		bool bFoundPlayer = false;
+
+		// Find player in perceived vehicles
+		for (const FMGAIVehiclePerception& Perceived : PerceivedVehicles)
+		{
+			if (Perceived.bIsPlayer)
+			{
+				PlayerPerception = Perceived;
+				bFoundPlayer = true;
+				break;
+			}
+		}
+
+		// If player is close enough to observe, learn their behavior
+		if (bFoundPlayer && PlayerPerception.Distance < 30.0f * AIConstants::MetersToUnits)
+		{
+			// Observe aggression from their proximity and overtaking attempts
+			float ObservedAggression = 0.5f; // Baseline
+			if (PlayerPerception.Distance < 10.0f * AIConstants::MetersToUnits)
+			{
+				ObservedAggression = 0.8f; // Very close = aggressive
+			}
+			if (PlayerPerception.SpeedDifference > 100.0f)
+			{
+				ObservedAggression += 0.2f; // Fast closing = aggressive
+			}
+
+			// Observe braking (TODO: needs actual braking detection)
+			float ObservedBraking = 0.5f; // Placeholder
+
+			// Observe overtake side preference
+			float OvertakeSide = PlayerPerception.bIsOnLeft ? -1.0f : 1.0f;
+
+			// Feed observations to learning system (throttled to once per second)
+			static float LearningTimer = 0.0f;
+			LearningTimer += DeltaTime;
+			if (LearningTimer > 1.0f)
+			{
+				DriverProfile->LearnPlayerBehavior(ObservedAggression, ObservedBraking, OvertakeSide);
+				LearningTimer = 0.0f;
+			}
+		}
+	}
+}
+
+// ==========================================
+// AGGRESSION RESPONSE SYSTEM
+// ==========================================
+
+void AMGAIRacerController::HandleContactResponse(EMGContactResponse Response, AActor* Offender, float Severity)
+{
+	if (!DriverProfile || !Offender)
+	{
+		return;
+	}
+
+	switch (Response)
+	{
+		case EMGContactResponse::Ignore:
+			// Do nothing - focus on racing
+			break;
+
+		case EMGContactResponse::BackOff:
+			// Reduce aggression temporarily, increase following gap
+			MinFollowingGap = FMath::Min(MinFollowingGap + 0.5f, 3.0f);
+			// If we were overtaking the offender, abort
+			if (CurrentState == EMGAIDrivingState::Overtaking && TacticalData.TacticalTarget == Offender)
+			{
+				SetState(EMGAIDrivingState::Racing);
+				TacticalData.TacticalTarget = nullptr;
+			}
+			break;
+
+		case EMGContactResponse::Retaliate:
+			// Enter battle mode with offender
+			DriverProfile->EnterBattleMode(Offender);
+			// If they're ahead, start aggressive pursuit
+			for (const FMGAIVehiclePerception& Perceived : PerceivedVehicles)
+			{
+				if (Perceived.Vehicle == Offender && Perceived.bIsAhead)
+				{
+					TacticalData.TacticalTarget = Offender;
+					TacticalData.OvertakeStrategy = EMGOvertakeStrategy::Pressure;
+					break;
+				}
+			}
+			break;
+
+		case EMGContactResponse::Protect:
+			// Become more defensive, avoid contact
+			MinFollowingGap = FMath::Min(MinFollowingGap + 1.0f, 3.0f);
+			if (TacticalData.CatchUpMode == EMGCatchUpMode::MaxEffort)
+			{
+				TacticalData.CatchUpMode = EMGCatchUpMode::RiskTaking;
+			}
+			else if (TacticalData.CatchUpMode == EMGCatchUpMode::RiskTaking)
+			{
+				TacticalData.CatchUpMode = EMGCatchUpMode::None;
+			}
+			break;
+
+		case EMGContactResponse::Mirror:
+			{
+				APawn* OffenderPawn = Cast<APawn>(Offender);
+				if (OffenderPawn)
+				{
+					float TheirSpeed = OffenderPawn->GetVelocity().Size();
+					if (TheirSpeed > GetCurrentSpeed() * 1.1f)
+					{
+						DriverProfile->EnterBattleMode(Offender);
+					}
+				}
+			}
+			break;
+
+		case EMGContactResponse::Report:
+			// Record the incident for future reference
+			break;
+	}
+}
+
+void AMGAIRacerController::ApplyAggressionModifiers(FMGAISteeringOutput& Output)
+{
+	if (!DriverProfile)
+	{
+		return;
+	}
+
+	float EscalatedAggression = DriverProfile->GetEscalatedAggression();
+	Output.Throttle = FMath::Min(Output.Throttle * (1.0f + EscalatedAggression * 0.1f), 1.0f);
+
+	if (Output.Brake > 0.0f && EscalatedAggression > 0.7f)
+	{
+		Output.Brake *= (1.0f - (EscalatedAggression - 0.7f) * 0.3f);
+	}
+
+	FMGPersonalityBehaviors Behaviors = DriverProfile->GetEffectivePersonalityBehaviors();
+
+	if (Behaviors.BrakePointBias > 0.0f && Output.Brake > 0.0f)
+	{
+		Output.Brake *= (1.0f - Behaviors.BrakePointBias * 0.2f);
+	}
+	else if (Behaviors.BrakePointBias < 0.0f && Output.Brake > 0.0f)
+	{
+		Output.Brake = FMath::Min(Output.Brake * (1.0f - Behaviors.BrakePointBias * 0.2f), 1.0f);
+	}
+
+	for (const FMGAIVehiclePerception& Perceived : PerceivedVehicles)
+	{
+		if (Perceived.Distance < 5.0f * AIConstants::MetersToUnits)
+		{
+			Output.Confidence *= Behaviors.SideBySideWillingness;
+			break;
+		}
+	}
+
+	if (DriverProfile->CurrentAggressionStage == EMGAggressionStage::Rage)
+	{
+		if (FMath::FRand() < 0.05f)
+		{
+			Output.Steering += FMath::FRandRange(-0.15f, 0.15f);
+			Output.Steering = FMath::Clamp(Output.Steering, -1.0f, 1.0f);
+		}
+		if (FMath::FRand() < 0.03f)
+		{
+			Output.Brake *= FMath::FRandRange(0.7f, 1.3f);
+			Output.Brake = FMath::Clamp(Output.Brake, 0.0f, 1.0f);
+		}
+	}
+}
+
+bool AMGAIRacerController::ShouldAttemptDirtyMove(AActor* Target) const
+{
+	if (!DriverProfile || !Target)
+	{
+		return false;
+	}
+
+	bool bIsDefending = (CurrentState == EMGAIDrivingState::Defending);
+	if (!DriverProfile->WillUseDirtyTactics(CurrentRacePosition, bIsDefending))
+	{
+		return false;
+	}
+
+	if (DriverProfile->HasGrudgeAgainst(Target))
+	{
+		float GrudgeIntensity = DriverProfile->GetGrudgeIntensity(Target);
+		return FMath::FRand() < GrudgeIntensity * 0.5f;
+	}
+
+	APawn* TargetPawn = Cast<APawn>(Target);
+	if (TargetPawn)
+	{
+		bool bIsPlayer = Cast<APlayerController>(TargetPawn->GetController()) != nullptr;
+		if (bIsPlayer && DriverProfile->Aggression.bTargetsPlayer)
+		{
+			return FMath::FRand() < DriverProfile->GetEscalatedAggression() * 0.3f;
+		}
+	}
+
+	return FMath::FRand() < DriverProfile->GetEscalatedAggression() * 0.1f;
+}
+
+float AMGAIRacerController::GetPersonalityBrakeAdjustment() const
+{
+	if (!DriverProfile)
+	{
+		return 0.0f;
+	}
+
+	FMGPersonalityBehaviors Behaviors = DriverProfile->GetEffectivePersonalityBehaviors();
+	float Adjustment = Behaviors.BrakePointBias;
+
+	switch (DriverProfile->CurrentAggressionStage)
+	{
+		case EMGAggressionStage::Elevated:
+			Adjustment += 0.1f;
+			break;
+		case EMGAggressionStage::High:
+			Adjustment += 0.2f;
+			break;
+		case EMGAggressionStage::Maximum:
+			Adjustment += 0.3f;
+			break;
+		case EMGAggressionStage::Rage:
+			Adjustment += 0.4f;
+			break;
+		default:
+			break;
+	}
+
+	if (DriverProfile->CurrentMood == EMGAIMood::Desperate)
+	{
+		Adjustment += 0.2f;
+	}
+	else if (DriverProfile->CurrentMood == EMGAIMood::Intimidated)
+	{
+		Adjustment -= 0.15f;
+	}
+	else if (DriverProfile->CurrentMood == EMGAIMood::InTheZone)
+	{
+		Adjustment += 0.1f;
+	}
+
+	return FMath::Clamp(Adjustment, -0.5f, 0.5f);
 }

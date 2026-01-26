@@ -2,7 +2,7 @@
 
 #include "Social/MGCrewSubsystem.h"
 
-void UMGCrewSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+void UDEPRECATED_MGCrewSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
@@ -10,7 +10,7 @@ void UMGCrewSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	CreateMockData();
 }
 
-void UMGCrewSubsystem::Deinitialize()
+void UDEPRECATED_MGCrewSubsystem::Deinitialize()
 {
 	Super::Deinitialize();
 }
@@ -19,7 +19,7 @@ void UMGCrewSubsystem::Deinitialize()
 // CREW STATE
 // ==========================================
 
-bool UMGCrewSubsystem::CanPerformAction(EMGCrewRole RequiredRole) const
+bool UDEPRECATED_MGCrewSubsystem::CanPerformAction(EMGCrewRole RequiredRole) const
 {
 	return static_cast<int32>(MyRole) >= static_cast<int32>(RequiredRole);
 }
@@ -28,7 +28,7 @@ bool UMGCrewSubsystem::CanPerformAction(EMGCrewRole RequiredRole) const
 // CREW MANAGEMENT
 // ==========================================
 
-bool UMGCrewSubsystem::CreateCrew(FText Name, FString Tag, FText Description)
+bool UDEPRECATED_MGCrewSubsystem::CreateCrew(FText Name, FString Tag, FText Description)
 {
 	if (bIsInCrew)
 	{
@@ -75,7 +75,7 @@ bool UMGCrewSubsystem::CreateCrew(FText Name, FString Tag, FText Description)
 	return true;
 }
 
-bool UMGCrewSubsystem::LeaveCrew()
+bool UDEPRECATED_MGCrewSubsystem::LeaveCrew()
 {
 	if (!bIsInCrew)
 	{
@@ -103,7 +103,7 @@ bool UMGCrewSubsystem::LeaveCrew()
 	return true;
 }
 
-bool UMGCrewSubsystem::DisbandCrew()
+bool UDEPRECATED_MGCrewSubsystem::DisbandCrew()
 {
 	if (!bIsInCrew || MyRole != EMGCrewRole::Leader)
 	{
@@ -119,7 +119,7 @@ bool UMGCrewSubsystem::DisbandCrew()
 	return true;
 }
 
-bool UMGCrewSubsystem::UpdateCrewSettings(const FMGCrewData& NewSettings)
+bool UDEPRECATED_MGCrewSubsystem::UpdateCrewSettings(const FMGCrewData& NewSettings)
 {
 	if (!bIsInCrew || !CanPerformAction(EMGCrewRole::CoLeader))
 	{
@@ -149,7 +149,7 @@ bool UMGCrewSubsystem::UpdateCrewSettings(const FMGCrewData& NewSettings)
 // MEMBERSHIP
 // ==========================================
 
-bool UMGCrewSubsystem::RequestToJoinCrew(const FString& CrewID, FText Message)
+bool UDEPRECATED_MGCrewSubsystem::RequestToJoinCrew(const FString& CrewID, FText Message)
 {
 	if (bIsInCrew)
 	{
@@ -160,7 +160,7 @@ bool UMGCrewSubsystem::RequestToJoinCrew(const FString& CrewID, FText Message)
 	return true;
 }
 
-bool UMGCrewSubsystem::AcceptJoinRequest(const FString& RequestID)
+bool UDEPRECATED_MGCrewSubsystem::AcceptJoinRequest(const FString& RequestID)
 {
 	if (!bIsInCrew || !CanPerformAction(EMGCrewRole::Officer))
 	{
@@ -200,7 +200,7 @@ bool UMGCrewSubsystem::AcceptJoinRequest(const FString& RequestID)
 	return true;
 }
 
-bool UMGCrewSubsystem::DeclineJoinRequest(const FString& RequestID)
+bool UDEPRECATED_MGCrewSubsystem::DeclineJoinRequest(const FString& RequestID)
 {
 	if (!bIsInCrew || !CanPerformAction(EMGCrewRole::Officer))
 	{
@@ -215,7 +215,7 @@ bool UMGCrewSubsystem::DeclineJoinRequest(const FString& RequestID)
 	return true;
 }
 
-bool UMGCrewSubsystem::InvitePlayer(const FString& PlayerID)
+bool UDEPRECATED_MGCrewSubsystem::InvitePlayer(const FString& PlayerID)
 {
 	if (!bIsInCrew || !CanPerformAction(EMGCrewRole::Officer))
 	{
@@ -231,7 +231,7 @@ bool UMGCrewSubsystem::InvitePlayer(const FString& PlayerID)
 	return true;
 }
 
-bool UMGCrewSubsystem::AcceptCrewInvite(const FString& InviteID)
+bool UDEPRECATED_MGCrewSubsystem::AcceptCrewInvite(const FString& InviteID)
 {
 	if (bIsInCrew)
 	{
@@ -258,7 +258,7 @@ bool UMGCrewSubsystem::AcceptCrewInvite(const FString& InviteID)
 	return true;
 }
 
-bool UMGCrewSubsystem::DeclineCrewInvite(const FString& InviteID)
+bool UDEPRECATED_MGCrewSubsystem::DeclineCrewInvite(const FString& InviteID)
 {
 	PendingInvites.RemoveAll([InviteID](const FMGCrewInvite& I)
 	{
@@ -268,7 +268,7 @@ bool UMGCrewSubsystem::DeclineCrewInvite(const FString& InviteID)
 	return true;
 }
 
-bool UMGCrewSubsystem::KickMember(const FString& PlayerID)
+bool UDEPRECATED_MGCrewSubsystem::KickMember(const FString& PlayerID)
 {
 	if (!bIsInCrew || !CanPerformAction(EMGCrewRole::Officer))
 	{
@@ -305,7 +305,7 @@ bool UMGCrewSubsystem::KickMember(const FString& PlayerID)
 	return true;
 }
 
-bool UMGCrewSubsystem::PromoteMember(const FString& PlayerID)
+bool UDEPRECATED_MGCrewSubsystem::PromoteMember(const FString& PlayerID)
 {
 	if (!bIsInCrew || !CanPerformAction(EMGCrewRole::CoLeader))
 	{
@@ -341,7 +341,7 @@ bool UMGCrewSubsystem::PromoteMember(const FString& PlayerID)
 	return true;
 }
 
-bool UMGCrewSubsystem::DemoteMember(const FString& PlayerID)
+bool UDEPRECATED_MGCrewSubsystem::DemoteMember(const FString& PlayerID)
 {
 	if (!bIsInCrew || !CanPerformAction(EMGCrewRole::CoLeader))
 	{
@@ -374,7 +374,7 @@ bool UMGCrewSubsystem::DemoteMember(const FString& PlayerID)
 	return true;
 }
 
-bool UMGCrewSubsystem::TransferLeadership(const FString& PlayerID)
+bool UDEPRECATED_MGCrewSubsystem::TransferLeadership(const FString& PlayerID)
 {
 	if (!bIsInCrew || MyRole != EMGCrewRole::Leader)
 	{
@@ -417,7 +417,7 @@ bool UMGCrewSubsystem::TransferLeadership(const FString& PlayerID)
 // SEARCH
 // ==========================================
 
-TArray<FMGCrewSearchResult> UMGCrewSubsystem::SearchCrews(const FString& Query, int32 MaxResults)
+TArray<FMGCrewSearchResult> UDEPRECATED_MGCrewSubsystem::SearchCrews(const FString& Query, int32 MaxResults)
 {
 	TArray<FMGCrewSearchResult> Results;
 
@@ -440,7 +440,7 @@ TArray<FMGCrewSearchResult> UMGCrewSubsystem::SearchCrews(const FString& Query, 
 	return Results;
 }
 
-TArray<FMGCrewSearchResult> UMGCrewSubsystem::GetRecommendedCrews()
+TArray<FMGCrewSearchResult> UDEPRECATED_MGCrewSubsystem::GetRecommendedCrews()
 {
 	TArray<FMGCrewSearchResult> Results;
 
@@ -465,7 +465,7 @@ TArray<FMGCrewSearchResult> UMGCrewSubsystem::GetRecommendedCrews()
 	return Results;
 }
 
-TArray<FMGCrewSearchResult> UMGCrewSubsystem::GetTopCrews(int32 Count)
+TArray<FMGCrewSearchResult> UDEPRECATED_MGCrewSubsystem::GetTopCrews(int32 Count)
 {
 	TArray<FMGCrewSearchResult> Results;
 
@@ -491,7 +491,7 @@ TArray<FMGCrewSearchResult> UMGCrewSubsystem::GetTopCrews(int32 Count)
 // LIVERIES
 // ==========================================
 
-bool UMGCrewSubsystem::ShareLivery(const FMGSharedLivery& Livery)
+bool UDEPRECATED_MGCrewSubsystem::ShareLivery(const FMGSharedLivery& Livery)
 {
 	if (!bIsInCrew)
 	{
@@ -513,7 +513,7 @@ bool UMGCrewSubsystem::ShareLivery(const FMGSharedLivery& Livery)
 	return true;
 }
 
-bool UMGCrewSubsystem::DownloadLivery(const FString& LiveryID)
+bool UDEPRECATED_MGCrewSubsystem::DownloadLivery(const FString& LiveryID)
 {
 	FMGSharedLivery* Livery = CurrentCrew.SharedLiveries.FindByPredicate([LiveryID](const FMGSharedLivery& L)
 	{
@@ -529,7 +529,7 @@ bool UMGCrewSubsystem::DownloadLivery(const FString& LiveryID)
 	return false;
 }
 
-void UMGCrewSubsystem::LikeLivery(const FString& LiveryID)
+void UDEPRECATED_MGCrewSubsystem::LikeLivery(const FString& LiveryID)
 {
 	FMGSharedLivery* Livery = CurrentCrew.SharedLiveries.FindByPredicate([LiveryID](const FMGSharedLivery& L)
 	{
@@ -542,7 +542,7 @@ void UMGCrewSubsystem::LikeLivery(const FString& LiveryID)
 	}
 }
 
-bool UMGCrewSubsystem::DeleteSharedLivery(const FString& LiveryID)
+bool UDEPRECATED_MGCrewSubsystem::DeleteSharedLivery(const FString& LiveryID)
 {
 	if (!bIsInCrew)
 	{
@@ -577,7 +577,7 @@ bool UMGCrewSubsystem::DeleteSharedLivery(const FString& LiveryID)
 // CREW VS CREW
 // ==========================================
 
-bool UMGCrewSubsystem::StartCrewBattle(const FString& OpponentCrewID)
+bool UDEPRECATED_MGCrewSubsystem::StartCrewBattle(const FString& OpponentCrewID)
 {
 	if (!bIsInCrew || !CanPerformAction(EMGCrewRole::Officer))
 	{
@@ -603,12 +603,12 @@ bool UMGCrewSubsystem::StartCrewBattle(const FString& OpponentCrewID)
 	return true;
 }
 
-FMGCrewBattle UMGCrewSubsystem::GetCurrentBattle() const
+FMGCrewBattle UDEPRECATED_MGCrewSubsystem::GetCurrentBattle() const
 {
 	return CurrentCrew.ActiveBattle;
 }
 
-void UMGCrewSubsystem::ReportBattleScore(int32 ScoreEarned)
+void UDEPRECATED_MGCrewSubsystem::ReportBattleScore(int32 ScoreEarned)
 {
 	if (!bIsInCrew || !CurrentCrew.ActiveBattle.bIsActive)
 	{
@@ -643,7 +643,7 @@ void UMGCrewSubsystem::ReportBattleScore(int32 ScoreEarned)
 // CONTRIBUTION
 // ==========================================
 
-void UMGCrewSubsystem::ContributeXP(int32 Amount)
+void UDEPRECATED_MGCrewSubsystem::ContributeXP(int32 Amount)
 {
 	if (!bIsInCrew)
 	{
@@ -667,7 +667,7 @@ void UMGCrewSubsystem::ContributeXP(int32 Amount)
 	OnCrewUpdated.Broadcast(CurrentCrew);
 }
 
-void UMGCrewSubsystem::ContributeToChallenge(FName ChallengeID, int32 Amount)
+void UDEPRECATED_MGCrewSubsystem::ContributeToChallenge(FName ChallengeID, int32 Amount)
 {
 	if (!bIsInCrew)
 	{
@@ -703,7 +703,7 @@ void UMGCrewSubsystem::ContributeToChallenge(FName ChallengeID, int32 Amount)
 // PERKS
 // ==========================================
 
-float UMGCrewSubsystem::GetPerkValue(FName PerkID) const
+float UDEPRECATED_MGCrewSubsystem::GetPerkValue(FName PerkID) const
 {
 	if (!bIsInCrew)
 	{
@@ -718,7 +718,7 @@ float UMGCrewSubsystem::GetPerkValue(FName PerkID) const
 	return Perk ? Perk->Value : 0.0f;
 }
 
-bool UMGCrewSubsystem::IsPerkUnlocked(FName PerkID) const
+bool UDEPRECATED_MGCrewSubsystem::IsPerkUnlocked(FName PerkID) const
 {
 	if (!bIsInCrew)
 	{
@@ -737,7 +737,7 @@ bool UMGCrewSubsystem::IsPerkUnlocked(FName PerkID) const
 // UTILITY
 // ==========================================
 
-FText UMGCrewSubsystem::GetRoleDisplayName(EMGCrewRole Role)
+FText UDEPRECATED_MGCrewSubsystem::GetRoleDisplayName(EMGCrewRole Role)
 {
 	switch (Role)
 	{
@@ -756,13 +756,13 @@ FText UMGCrewSubsystem::GetRoleDisplayName(EMGCrewRole Role)
 	}
 }
 
-int64 UMGCrewSubsystem::GetXPForCrewLevel(int32 Level)
+int64 UDEPRECATED_MGCrewSubsystem::GetXPForCrewLevel(int32 Level)
 {
 	// Exponential growth
 	return static_cast<int64>(1000.0 * FMath::Pow(1.5, Level - 1));
 }
 
-bool UMGCrewSubsystem::IsValidCrewTag(const FString& Tag)
+bool UDEPRECATED_MGCrewSubsystem::IsValidCrewTag(const FString& Tag)
 {
 	if (Tag.Len() < 2 || Tag.Len() > 4)
 	{
@@ -785,7 +785,7 @@ bool UMGCrewSubsystem::IsValidCrewTag(const FString& Tag)
 // INTERNAL
 // ==========================================
 
-void UMGCrewSubsystem::InitializePerks()
+void UDEPRECATED_MGCrewSubsystem::InitializePerks()
 {
 	AllPerks.Empty();
 
@@ -862,7 +862,7 @@ void UMGCrewSubsystem::InitializePerks()
 	}
 }
 
-void UMGCrewSubsystem::UpdatePerkStatus()
+void UDEPRECATED_MGCrewSubsystem::UpdatePerkStatus()
 {
 	CurrentCrew.Perks = AllPerks;
 
@@ -879,7 +879,7 @@ void UMGCrewSubsystem::UpdatePerkStatus()
 	}
 }
 
-void UMGCrewSubsystem::CheckCrewLevelUp()
+void UDEPRECATED_MGCrewSubsystem::CheckCrewLevelUp()
 {
 	while (CurrentCrew.XP >= CurrentCrew.XPToNextLevel)
 	{
@@ -896,7 +896,7 @@ void UMGCrewSubsystem::CheckCrewLevelUp()
 	}
 }
 
-void UMGCrewSubsystem::AddActivityToFeed(EMGCrewActivityType Type, FText PlayerName, FText Description, int32 Value)
+void UDEPRECATED_MGCrewSubsystem::AddActivityToFeed(EMGCrewActivityType Type, FText PlayerName, FText Description, int32 Value)
 {
 	FMGCrewActivity Activity;
 	Activity.Type = Type;
@@ -914,7 +914,7 @@ void UMGCrewSubsystem::AddActivityToFeed(EMGCrewActivityType Type, FText PlayerN
 	}
 }
 
-void UMGCrewSubsystem::CreateMockData()
+void UDEPRECATED_MGCrewSubsystem::CreateMockData()
 {
 	// Mock pending invites
 	{

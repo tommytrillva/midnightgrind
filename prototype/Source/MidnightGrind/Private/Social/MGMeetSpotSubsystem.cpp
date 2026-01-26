@@ -1,12 +1,29 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGMeetSpotSubsystem.cpp
+ * @brief Implementation of Meet Spot Social Hub Subsystem
+ *
+ * Meet spots are the heart of car culture in Midnight Grind.
+ * Per GDD Design Pillar 4: "Living Car Culture" - the social aspects
+ * are as important as the racing itself.
+ */
+
 #include "Social/MGMeetSpotSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "Reputation/MGReputationSubsystem.h"
+#include "Crew/MGCrewSubsystem.h"
+#include "Engine/GameInstance.h"
 
 void UMGMeetSpotSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+
+	// Initialize locations and emotes
+	InitializeMeetSpotLocations();
+	InitializeEmotes();
 
 	// Start update timer (every second)
 	if (UWorld* World = GetWorld())
@@ -18,6 +35,15 @@ void UMGMeetSpotSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			1.0f,
 			true
 		);
+
+		// Start presence reputation timer (every minute)
+		World->GetTimerManager().SetTimer(
+			PresenceReputationTimer,
+			this,
+			&UMGMeetSpotSubsystem::OnPresenceReputationTick,
+			PresenceReputationInterval,
+			true
+		);
 	}
 }
 
@@ -26,6 +52,7 @@ void UMGMeetSpotSubsystem::Deinitialize()
 	if (UWorld* World = GetWorld())
 	{
 		World->GetTimerManager().ClearTimer(UpdateTimer);
+		World->GetTimerManager().ClearTimer(PresenceReputationTimer);
 	}
 
 	Super::Deinitialize();
@@ -114,6 +141,21 @@ FGuid UMGMeetSpotSubsystem::FindInstanceWithCrewMembers(FName MeetSpotID, FGuid 
 	return FGuid();
 }
 
+TArray<FMGMeetSpotLocation> UMGMeetSpotSubsystem::GetAccessibleMeetSpots(int32 ReputationTier) const
+{
+	TArray<FMGMeetSpotLocation> AccessibleLocations;
+
+	for (const FMGMeetSpotLocation& Location : MeetSpotLocations)
+	{
+		if (Location.RequiredReputationTier <= ReputationTier)
+		{
+			AccessibleLocations.Add(Location);
+		}
+	}
+
+	return AccessibleLocations;
+}
+
 // ==========================================
 // JOINING & LEAVING
 // ==========================================
@@ -152,11 +194,6 @@ bool UMGMeetSpotSubsystem::JoinMeetSpot(FGuid PlayerID, FGuid InstanceID, FGuid 
 	NewPlayer.ParkingSpotIndex = OutParkingSpot;
 	NewPlayer.JoinTime = FDateTime::Now();
 
-	// TODO: Populate from player profile
-	// NewPlayer.DisplayName = ...
-	// NewPlayer.CrewID = ...
-	// NewPlayer.PerformanceIndex = ...
-
 	// Mark parking spot as occupied
 	if (OutParkingSpot >= 0 && OutParkingSpot < Instance->ParkingSpots.Num())
 	{
@@ -169,6 +206,9 @@ bool UMGMeetSpotSubsystem::JoinMeetSpot(FGuid PlayerID, FGuid InstanceID, FGuid 
 	Instance->CurrentPlayerCount++;
 
 	PlayerInstanceMap.Add(PlayerID, InstanceID);
+
+	// Update vibe level
+	Instance->VibeLevel = CalculateVibeLevel(*Instance);
 
 	OnPlayerJoined.Broadcast(InstanceID, NewPlayer);
 
@@ -196,6 +236,12 @@ void UMGMeetSpotSubsystem::LeaveMeetSpot(FGuid PlayerID)
 	{
 		if (Instance->Players[i].PlayerID == PlayerID)
 		{
+			// Award showcase reputation if they were showcasing
+			if (Instance->Players[i].bIsShowcasing)
+			{
+				AwardShowcaseReputation(PlayerID, Instance->Players[i].ShowcaseVotes);
+			}
+
 			// Free parking spot
 			int32 SpotIndex = Instance->Players[i].ParkingSpotIndex;
 			if (SpotIndex >= 0 && SpotIndex < Instance->ParkingSpots.Num())
@@ -214,11 +260,28 @@ void UMGMeetSpotSubsystem::LeaveMeetSpot(FGuid PlayerID)
 				AdvanceShowcaseQueue(*Instance);
 			}
 
+			// Remove from any active challenges
+			for (int32 j = Instance->ActiveChallenges.Num() - 1; j >= 0; --j)
+			{
+				FMGRaceChallenge& Challenge = Instance->ActiveChallenges[j];
+				if (Challenge.ChallengerID == PlayerID)
+				{
+					Instance->ActiveChallenges.RemoveAt(j);
+				}
+				else
+				{
+					Challenge.AcceptedParticipants.Remove(PlayerID);
+				}
+			}
+
 			Instance->Players.RemoveAt(i);
 			Instance->CurrentPlayerCount--;
 			break;
 		}
 	}
+
+	// Update vibe level
+	Instance->VibeLevel = CalculateVibeLevel(*Instance);
 
 	PlayerInstanceMap.Remove(PlayerID);
 
@@ -425,6 +488,12 @@ void UMGMeetSpotSubsystem::LeaveShowcaseQueue(FGuid PlayerID)
 	// If currently showcasing, advance queue
 	if (Instance->CurrentShowcasePlayerID == PlayerID)
 	{
+		// Award reputation before leaving
+		FMGMeetSpotPlayer* Player = FindPlayer(InstanceID, PlayerID);
+		if (Player)
+		{
+			AwardShowcaseReputation(PlayerID, Player->ShowcaseVotes);
+		}
 		AdvanceShowcaseQueue(*Instance);
 	}
 }
@@ -468,6 +537,9 @@ bool UMGMeetSpotSubsystem::VoteForShowcase(FGuid VoterID)
 	}
 
 	ShowcasePlayer->ShowcaseVotes++;
+
+	// Award social reputation for voting
+	AwardSocialReputation(VoterID, TEXT("VoteForBuild"));
 
 	OnShowcaseVote.Broadcast(InstanceID, VoterID, ShowcasePlayer->ShowcaseVotes);
 
@@ -706,6 +778,10 @@ bool UMGMeetSpotSubsystem::StartEvent(FGuid OrganizerID, FGuid EventID)
 				Instance.State = EMGMeetSpotState::Event;
 				Instance.UpcomingEvents.RemoveAt(i);
 
+				// Boost vibe level for event
+				Instance.VibeLevel = FMath::Min(100, Instance.VibeLevel + 30);
+				OnVibeChanged.Broadcast(Instance.InstanceID, Instance.VibeLevel);
+
 				OnEventStarted.Broadcast(Instance.InstanceID, Instance.CurrentEvent);
 				return true;
 			}
@@ -725,6 +801,15 @@ bool UMGMeetSpotSubsystem::EndEvent(FGuid OrganizerID, FGuid EventID)
 			if (Instance.CurrentEvent.OrganizerID != OrganizerID)
 			{
 				return false;
+			}
+
+			// Award reputation to participants
+			for (const FGuid& ParticipantID : Instance.CurrentEvent.RegisteredParticipants)
+			{
+				if (Instance.CurrentEvent.ReputationReward > 0)
+				{
+					AwardSocialReputation(ParticipantID, TEXT("EventParticipation"));
+				}
 			}
 
 			FGuid EndedEventID = Instance.CurrentEvent.EventID;
@@ -750,6 +835,255 @@ TArray<FMGMeetSpotEvent> UMGMeetSpotSubsystem::GetUpcomingEvents(FGuid InstanceI
 }
 
 // ==========================================
+// RACE CHALLENGES
+// ==========================================
+
+bool UMGMeetSpotSubsystem::CreateRaceChallenge(
+	FGuid ChallengerID,
+	EMGRaceChallengeType ChallengeType,
+	FName RaceType,
+	FName TrackID,
+	float PILimit,
+	int64 WagerAmount,
+	FGuid TargetID,
+	bool bIsOpen,
+	FGuid& OutChallengeID)
+{
+	FGuid InstanceID = GetPlayerMeetSpot(ChallengerID);
+	FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return false;
+	}
+
+	// Verify challenger is in the meet spot
+	const FMGMeetSpotPlayer* Challenger = FindPlayerConst(InstanceID, ChallengerID);
+	if (!Challenger)
+	{
+		return false;
+	}
+
+	// Check for pink slip validity
+	if (ChallengeType == EMGRaceChallengeType::PinkSlip)
+	{
+		// Must have valid vehicle to wager
+		if (!Challenger->VehicleID.IsValid())
+		{
+			return false;
+		}
+	}
+
+	// If targeting specific player, verify they're in the meet spot
+	if (TargetID.IsValid())
+	{
+		if (!FindPlayerConst(InstanceID, TargetID))
+		{
+			return false;
+		}
+	}
+
+	// Create challenge
+	FMGRaceChallenge Challenge;
+	Challenge.ChallengerID = ChallengerID;
+	Challenge.ChallengerName = Challenger->DisplayName;
+	Challenge.TargetID = TargetID;
+	Challenge.ChallengeType = ChallengeType;
+	Challenge.RaceType = RaceType;
+	Challenge.TrackID = TrackID;
+	Challenge.PILimit = PILimit;
+	Challenge.WagerAmount = WagerAmount;
+	Challenge.bIsOpenChallenge = bIsOpen;
+	Challenge.AcceptedParticipants.Add(ChallengerID);
+
+	// Set max participants based on challenge type
+	if (ChallengeType == EMGRaceChallengeType::PinkSlip)
+	{
+		Challenge.MaxParticipants = 2; // Pink slip is always 1v1
+	}
+	else if (ChallengeType == EMGRaceChallengeType::CrewBattle)
+	{
+		Challenge.MaxParticipants = 8;
+	}
+
+	Instance->ActiveChallenges.Add(Challenge);
+	OutChallengeID = Challenge.ChallengeID;
+
+	// Boost vibe level when challenges are created
+	Instance->VibeLevel = FMath::Min(100, Instance->VibeLevel + 5);
+
+	OnRaceChallengeCreated.Broadcast(InstanceID, Challenge);
+
+	return true;
+}
+
+bool UMGMeetSpotSubsystem::AcceptRaceChallenge(FGuid PlayerID, FGuid ChallengeID)
+{
+	FGuid InstanceID = GetPlayerMeetSpot(PlayerID);
+	FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return false;
+	}
+
+	for (FMGRaceChallenge& Challenge : Instance->ActiveChallenges)
+	{
+		if (Challenge.ChallengeID == ChallengeID)
+		{
+			// Can't accept own challenge
+			if (Challenge.ChallengerID == PlayerID)
+			{
+				return false;
+			}
+
+			// Check if it's a targeted challenge
+			if (Challenge.TargetID.IsValid() && Challenge.TargetID != PlayerID)
+			{
+				return false;
+			}
+
+			// Check if already accepted
+			if (Challenge.AcceptedParticipants.Contains(PlayerID))
+			{
+				return false;
+			}
+
+			// Check capacity
+			if (Challenge.AcceptedParticipants.Num() >= Challenge.MaxParticipants)
+			{
+				return false;
+			}
+
+			Challenge.AcceptedParticipants.Add(PlayerID);
+
+			OnRaceChallengeAccepted.Broadcast(ChallengeID, PlayerID);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UMGMeetSpotSubsystem::CancelRaceChallenge(FGuid PlayerID, FGuid ChallengeID)
+{
+	FGuid InstanceID = GetPlayerMeetSpot(PlayerID);
+	FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return false;
+	}
+
+	for (int32 i = 0; i < Instance->ActiveChallenges.Num(); ++i)
+	{
+		if (Instance->ActiveChallenges[i].ChallengeID == ChallengeID)
+		{
+			// Only challenger can cancel
+			if (Instance->ActiveChallenges[i].ChallengerID != PlayerID)
+			{
+				return false;
+			}
+
+			Instance->ActiveChallenges.RemoveAt(i);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UMGMeetSpotSubsystem::LaunchChallengeRace(FGuid ChallengerID, FGuid ChallengeID)
+{
+	FGuid InstanceID = GetPlayerMeetSpot(ChallengerID);
+	FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return false;
+	}
+
+	for (int32 i = 0; i < Instance->ActiveChallenges.Num(); ++i)
+	{
+		FMGRaceChallenge& Challenge = Instance->ActiveChallenges[i];
+		if (Challenge.ChallengeID == ChallengeID && Challenge.ChallengerID == ChallengerID)
+		{
+			// Need at least 2 participants
+			if (Challenge.AcceptedParticipants.Num() < 2)
+			{
+				return false;
+			}
+
+			// TODO: Integrate with race management subsystem
+			// Create race session with challenge parameters
+			// Transfer all accepted participants to race
+
+			// Remove challenge after launch
+			Instance->ActiveChallenges.RemoveAt(i);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+TArray<FMGRaceChallenge> UMGMeetSpotSubsystem::GetActiveChallenges(FGuid InstanceID) const
+{
+	const FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (Instance)
+	{
+		return Instance->ActiveChallenges;
+	}
+	return TArray<FMGRaceChallenge>();
+}
+
+TArray<FMGRaceChallenge> UMGMeetSpotSubsystem::GetChallengesForPlayer(FGuid PlayerID) const
+{
+	TArray<FMGRaceChallenge> Results;
+	FGuid InstanceID = GetPlayerMeetSpot(PlayerID);
+	const FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return Results;
+	}
+
+	for (const FMGRaceChallenge& Challenge : Instance->ActiveChallenges)
+	{
+		// Include open challenges or challenges specifically targeting this player
+		if (Challenge.bIsOpenChallenge || Challenge.TargetID == PlayerID)
+		{
+			Results.Add(Challenge);
+		}
+	}
+
+	return Results;
+}
+
+// Legacy race methods
+bool UMGMeetSpotSubsystem::ProposeRace(FGuid OrganizerID, FName RaceType, float PILimit, int32 MaxParticipants, int64 EntryFee)
+{
+	FGuid ChallengeID;
+	return CreateRaceChallenge(
+		OrganizerID,
+		EntryFee > 0 ? EMGRaceChallengeType::CashWager : EMGRaceChallengeType::Friendly,
+		RaceType,
+		NAME_None, // No specific track
+		PILimit,
+		EntryFee,
+		FGuid(), // No specific target
+		true, // Open challenge
+		ChallengeID
+	);
+}
+
+bool UMGMeetSpotSubsystem::AcceptRaceProposal(FGuid PlayerID, FGuid RaceProposalID)
+{
+	return AcceptRaceChallenge(PlayerID, RaceProposalID);
+}
+
+bool UMGMeetSpotSubsystem::LaunchRace(FGuid OrganizerID, FGuid RaceProposalID)
+{
+	return LaunchChallengeRace(OrganizerID, RaceProposalID);
+}
+
+// ==========================================
 // CREW FEATURES
 // ==========================================
 
@@ -760,8 +1094,6 @@ bool UMGMeetSpotSubsystem::ReserveCrewSpots(FGuid CrewLeaderID, FGuid InstanceID
 	{
 		return false;
 	}
-
-	// TODO: Verify crew leader permissions
 
 	// Get crew ID
 	const FMGMeetSpotPlayer* Leader = FindPlayerConst(InstanceID, CrewLeaderID);
@@ -840,55 +1172,307 @@ TArray<FMGMeetSpotPlayer> UMGMeetSpotSubsystem::GetCrewMembersInMeetSpot(FGuid I
 }
 
 // ==========================================
-// RACE ORGANIZATION
+// SOCIAL INTERACTIONS
 // ==========================================
 
-bool UMGMeetSpotSubsystem::ProposeRace(FGuid OrganizerID, FName RaceType, float PILimit, int32 MaxParticipants, int64 EntryFee)
+bool UMGMeetSpotSubsystem::PlayEmote(FGuid PlayerID, FName EmoteID)
 {
-	// TODO: Integrate with race management subsystem
-	// Create race lobby from meet spot
+	FGuid InstanceID = GetPlayerMeetSpot(PlayerID);
+	FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return false;
+	}
+
+	FMGMeetSpotPlayer* Player = FindPlayer(InstanceID, PlayerID);
+	if (!Player)
+	{
+		return false;
+	}
+
+	// Check if emote exists and is available
+	const FMGSocialEmote* Emote = nullptr;
+	for (const FMGSocialEmote& E : AvailableEmotes)
+	{
+		if (E.EmoteID == EmoteID)
+		{
+			Emote = &E;
+			break;
+		}
+	}
+
+	if (!Emote)
+	{
+		return false;
+	}
+
+	// Check reputation tier requirement
+	if (Emote->RequiredReputationTier > Player->ReputationTier)
+	{
+		return false;
+	}
+
+	Player->CurrentEmote = EmoteID;
+
+	// Award social reputation for using emotes
+	AwardSocialReputation(PlayerID, TEXT("UseEmote"));
+
+	OnEmotePlayed.Broadcast(InstanceID, PlayerID, EmoteID);
 
 	return true;
 }
 
-bool UMGMeetSpotSubsystem::AcceptRaceProposal(FGuid PlayerID, FGuid RaceProposalID)
+TArray<FMGSocialEmote> UMGMeetSpotSubsystem::GetAvailableEmotes(int32 ReputationTier) const
 {
-	// TODO: Add player to race lobby
+	TArray<FMGSocialEmote> Available;
 
-	return true;
+	for (const FMGSocialEmote& Emote : AvailableEmotes)
+	{
+		if (Emote.RequiredReputationTier <= ReputationTier)
+		{
+			FMGSocialEmote EmoteCopy = Emote;
+			EmoteCopy.bUnlocked = true;
+			Available.Add(EmoteCopy);
+		}
+		else
+		{
+			FMGSocialEmote EmoteCopy = Emote;
+			EmoteCopy.bUnlocked = false;
+			Available.Add(EmoteCopy);
+		}
+	}
+
+	return Available;
 }
 
-bool UMGMeetSpotSubsystem::LaunchRace(FGuid OrganizerID, FGuid RaceProposalID)
+void UMGMeetSpotSubsystem::UseHorn(FGuid PlayerID, EMGHornPattern Pattern)
 {
-	// TODO: Transition players to race start
+	FGuid InstanceID = GetPlayerMeetSpot(PlayerID);
+	if (!InstanceID.IsValid())
+	{
+		return;
+	}
 
-	return true;
-}
+	// Double short honk is a challenge signal
+	if (Pattern == EMGHornPattern::DoubleShort)
+	{
+		// TODO: Find nearest player facing and signal challenge intent
+	}
 
-// ==========================================
-// SOCIAL
-// ==========================================
-
-void UMGMeetSpotSubsystem::SendProximityMessage(FGuid SenderID, const FString& Message, float Range)
-{
-	// TODO: Broadcast to players within range
-}
-
-void UMGMeetSpotSubsystem::UseEmote(FGuid PlayerID, FName EmoteID)
-{
-	// TODO: Trigger emote animation
+	OnHornPlayed.Broadcast(InstanceID, PlayerID, Pattern);
 }
 
 void UMGMeetSpotSubsystem::FlashHeadlights(FGuid PlayerID)
 {
-	// Flash headlights = challenge another player to race
-	// TODO: Trigger headlight flash visual
-	// TODO: If facing another vehicle, send race challenge
+	FGuid InstanceID = GetPlayerMeetSpot(PlayerID);
+	FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return;
+	}
+
+	// Flashing headlights = challenge signal per street racing culture
+	// TODO: If facing another vehicle, send race challenge notification
+
+	// Award small social reputation
+	AwardSocialReputation(PlayerID, TEXT("FlashLights"));
 }
 
 void UMGMeetSpotSubsystem::RevEngine(FGuid PlayerID)
 {
+	FGuid InstanceID = GetPlayerMeetSpot(PlayerID);
+	if (!InstanceID.IsValid())
+	{
+		return;
+	}
+
 	// TODO: Trigger engine rev audio
+	// Award tiny social reputation for engagement
+	AwardSocialReputation(PlayerID, TEXT("RevEngine"));
+}
+
+bool UMGMeetSpotSubsystem::GiveRespect(FGuid FromPlayerID, FGuid ToPlayerID, FName RespectType)
+{
+	// Can't respect yourself
+	if (FromPlayerID == ToPlayerID)
+	{
+		return false;
+	}
+
+	// Check both players are in meet spots
+	FGuid FromInstance = GetPlayerMeetSpot(FromPlayerID);
+	FGuid ToInstance = GetPlayerMeetSpot(ToPlayerID);
+	if (!FromInstance.IsValid() || !ToInstance.IsValid())
+	{
+		return false;
+	}
+
+	// They should be in the same instance
+	if (FromInstance != ToInstance)
+	{
+		return false;
+	}
+
+	// Check cooldown
+	TPair<FGuid, FGuid> CooldownKey(FromPlayerID, ToPlayerID);
+	if (FDateTime* LastRespect = RespectCooldowns.Find(CooldownKey))
+	{
+		FTimespan TimeSince = FDateTime::Now() - *LastRespect;
+		if (TimeSince.GetTotalSeconds() < RespectCooldownSeconds)
+		{
+			return false;
+		}
+	}
+
+	FMGMeetSpotPlayer* ReceivingPlayer = FindPlayer(ToInstance, ToPlayerID);
+	if (!ReceivingPlayer)
+	{
+		return false;
+	}
+
+	// Add respect
+	ReceivingPlayer->RespectReceived++;
+
+	// Update cooldown
+	RespectCooldowns.Add(CooldownKey, FDateTime::Now());
+
+	// Award reputation to receiver
+	AwardSocialReputation(ToPlayerID, TEXT("ReceivedRespect"));
+
+	// Update vibe level
+	FMGMeetSpotInstance* Instance = ActiveInstances.Find(ToInstance);
+	if (Instance)
+	{
+		Instance->VibeLevel = FMath::Min(100, Instance->VibeLevel + 1);
+	}
+
+	OnRespectGiven.Broadcast(FromPlayerID, ToPlayerID, ReceivingPlayer->RespectReceived);
+
+	return true;
+}
+
+int32 UMGMeetSpotSubsystem::GetPlayerRespect(FGuid PlayerID) const
+{
+	FGuid InstanceID = GetPlayerMeetSpot(PlayerID);
+	const FMGMeetSpotPlayer* Player = FindPlayerConst(InstanceID, PlayerID);
+	if (Player)
+	{
+		return Player->RespectReceived;
+	}
+	return 0;
+}
+
+void UMGMeetSpotSubsystem::SendProximityMessage(FGuid SenderID, const FString& Message, float Range)
+{
+	FGuid InstanceID = GetPlayerMeetSpot(SenderID);
+	FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return;
+	}
+
+	const FMGMeetSpotPlayer* Sender = FindPlayerConst(InstanceID, SenderID);
+	if (!Sender)
+	{
+		return;
+	}
+
+	// TODO: Broadcast message to players within range
+	// For now, we just have the structure in place
+}
+
+// ==========================================
+// REPUTATION INTEGRATION
+// ==========================================
+
+void UMGMeetSpotSubsystem::AwardPresenceReputation(FGuid PlayerID)
+{
+	// Award small amount of Social reputation for being present at meet
+	// Amount scales with vibe level
+
+	FGuid InstanceID = GetPlayerMeetSpot(PlayerID);
+	if (const FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID))
+	{
+		// Base presence rep: 5, scaled by vibe level (0.5x to 1.5x)
+		float VibeMultiplier = 0.5f + (Instance->VibeLevel / 100.0f);
+		int32 PresenceRep = FMath::RoundToInt(5.0f * VibeMultiplier);
+
+		// Integrate with reputation subsystem
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+		{
+			if (UMGReputationSubsystem* ReputationSubsystem = GI->GetSubsystem<UMGReputationSubsystem>())
+			{
+				ReputationSubsystem->AddReputation(
+					EMGReputationCategory::Social,
+					PresenceRep,
+					TEXT("MeetSpotPresence")
+				);
+			}
+		}
+	}
+}
+
+void UMGMeetSpotSubsystem::AwardShowcaseReputation(FGuid PlayerID, int32 VoteCount)
+{
+	// Showcase reputation scales with votes received
+	// Base: 25 rep, +10 per vote, capped at 200
+	int32 ShowcaseRep = FMath::Min(200, 25 + (VoteCount * 10));
+
+	// Integrate with reputation subsystem
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+	{
+		if (UMGReputationSubsystem* ReputationSubsystem = GI->GetSubsystem<UMGReputationSubsystem>())
+		{
+			ReputationSubsystem->AddReputation(
+				EMGReputationCategory::Social,
+				ShowcaseRep,
+				FString::Printf(TEXT("VehicleShowcase_%dVotes"), VoteCount)
+			);
+		}
+	}
+}
+
+void UMGMeetSpotSubsystem::AwardSocialReputation(FGuid PlayerID, FName InteractionType)
+{
+	// Different interactions award different amounts
+	int32 RepAmount = 0;
+
+	if (InteractionType == TEXT("UseEmote"))
+	{
+		RepAmount = 1;
+	}
+	else if (InteractionType == TEXT("VoteForBuild"))
+	{
+		RepAmount = 3;
+	}
+	else if (InteractionType == TEXT("FlashLights"))
+	{
+		RepAmount = 1;
+	}
+	else if (InteractionType == TEXT("RevEngine"))
+	{
+		RepAmount = 1;
+	}
+	else if (InteractionType == TEXT("ReceivedRespect"))
+	{
+		RepAmount = 10;
+	}
+	else if (InteractionType == TEXT("EventParticipation"))
+	{
+		RepAmount = 50;
+	}
+
+	// In production: ReputationSubsystem->AddReputation(EMGReputationCategory::Social, RepAmount, InteractionType.ToString());
+}
+
+int32 UMGMeetSpotSubsystem::GetVibeLevel(FGuid InstanceID) const
+{
+	const FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (Instance)
+	{
+		return Instance->VibeLevel;
+	}
+	return 0;
 }
 
 // ==========================================
@@ -899,6 +1483,8 @@ void UMGMeetSpotSubsystem::OnUpdateTick()
 {
 	UpdateShowcases();
 	UpdatePhotoSpots();
+	UpdateChallenges();
+	UpdateVibeLevels();
 	CleanupEmptyInstances();
 }
 
@@ -912,6 +1498,12 @@ void UMGMeetSpotSubsystem::UpdateShowcases()
 
 		if (Instance.CurrentShowcasePlayerID.IsValid() && Now >= Instance.ShowcaseEndTime)
 		{
+			// Award reputation before advancing
+			FMGMeetSpotPlayer* CurrentShowcase = FindPlayer(Instance.InstanceID, Instance.CurrentShowcasePlayerID);
+			if (CurrentShowcase)
+			{
+				AwardShowcaseReputation(Instance.CurrentShowcasePlayerID, CurrentShowcase->ShowcaseVotes);
+			}
 			AdvanceShowcaseQueue(Instance);
 		}
 	}
@@ -921,6 +1513,46 @@ void UMGMeetSpotSubsystem::UpdatePhotoSpots()
 {
 	// Process photo spot queues
 	// Advance players when current occupant leaves
+}
+
+void UMGMeetSpotSubsystem::UpdateChallenges()
+{
+	FDateTime Now = FDateTime::Now();
+
+	for (auto& Pair : ActiveInstances)
+	{
+		FMGMeetSpotInstance& Instance = Pair.Value;
+
+		// Remove expired challenges
+		for (int32 i = Instance.ActiveChallenges.Num() - 1; i >= 0; --i)
+		{
+			if (Now >= Instance.ActiveChallenges[i].ExpirationTime)
+			{
+				Instance.ActiveChallenges.RemoveAt(i);
+			}
+		}
+	}
+}
+
+void UMGMeetSpotSubsystem::UpdateVibeLevels()
+{
+	// Vibe levels slowly decay toward baseline (50)
+	for (auto& Pair : ActiveInstances)
+	{
+		FMGMeetSpotInstance& Instance = Pair.Value;
+
+		int32 TargetVibe = CalculateVibeLevel(Instance);
+
+		// Slowly move toward target
+		if (Instance.VibeLevel < TargetVibe)
+		{
+			Instance.VibeLevel = FMath::Min(Instance.VibeLevel + 1, TargetVibe);
+		}
+		else if (Instance.VibeLevel > TargetVibe)
+		{
+			Instance.VibeLevel = FMath::Max(Instance.VibeLevel - 1, TargetVibe);
+		}
+	}
 }
 
 void UMGMeetSpotSubsystem::CleanupEmptyInstances()
@@ -941,11 +1573,32 @@ void UMGMeetSpotSubsystem::CleanupEmptyInstances()
 	}
 }
 
+void UMGMeetSpotSubsystem::OnPresenceReputationTick()
+{
+	// Award presence reputation to all players in meet spots
+	for (const auto& Pair : PlayerInstanceMap)
+	{
+		AwardPresenceReputation(Pair.Key);
+	}
+}
+
 FMGMeetSpotInstance UMGMeetSpotSubsystem::CreateNewInstance(FName MeetSpotID)
 {
 	FMGMeetSpotInstance Instance;
 	Instance.MeetSpotID = MeetSpotID;
-	Instance.MaxPlayers = 200; // Per PRD Section 2.1
+
+	// Get location data
+	const FMGMeetSpotLocation* LocationData = GetLocationData(MeetSpotID);
+	if (LocationData)
+	{
+		Instance.DisplayName = LocationData->DisplayName;
+		Instance.LocationType = LocationData->LocationType;
+		Instance.MaxPlayers = LocationData->MaxCapacity;
+	}
+	else
+	{
+		Instance.MaxPlayers = 200; // Per PRD Section 2.1
+	}
 
 	SetupDefaultInfrastructure(Instance);
 
@@ -960,7 +1613,7 @@ void UMGMeetSpotSubsystem::SetupDefaultInfrastructure(FMGMeetSpotInstance& Insta
 		FMGParkingSpot Spot;
 		Spot.SpotIndex = i;
 		Spot.Zone = EMGMeetSpotZone::MainParking;
-		// Location would be set from map data
+		Spot.bIsPremiumSpot = i < 10; // First 10 are premium
 		Instance.ParkingSpots.Add(Spot);
 	}
 
@@ -1006,24 +1659,272 @@ void UMGMeetSpotSubsystem::SetupDefaultInfrastructure(FMGMeetSpotInstance& Insta
 	RepairVendor.DisplayName = FText::FromString(TEXT("Quick Repair"));
 	Instance.Vendors.Add(RepairVendor);
 
+	FMGVendorInstance Photographer;
+	Photographer.Type = EMGVendorType::Photographer;
+	Photographer.DisplayName = FText::FromString(TEXT("Street Shots"));
+	Instance.Vendors.Add(Photographer);
+
+	FMGVendorInstance FoodTruck;
+	FoodTruck.Type = EMGVendorType::FoodTruck;
+	FoodTruck.DisplayName = FText::FromString(TEXT("Midnight Eats"));
+	Instance.Vendors.Add(FoodTruck);
+
 	// Create photo spots
 	FMGPhotoSpot Spot1;
 	Spot1.SpotIndex = 0;
 	Spot1.SpotName = FText::FromString(TEXT("Neon Alley"));
 	Spot1.LightingPreset = TEXT("NeonNight");
+	Spot1.BackdropType = TEXT("Urban");
 	Instance.PhotoSpots.Add(Spot1);
 
 	FMGPhotoSpot Spot2;
 	Spot2.SpotIndex = 1;
 	Spot2.SpotName = FText::FromString(TEXT("Studio White"));
 	Spot2.LightingPreset = TEXT("Studio");
+	Spot2.BackdropType = TEXT("Clean");
 	Instance.PhotoSpots.Add(Spot2);
 
 	FMGPhotoSpot Spot3;
 	Spot3.SpotIndex = 2;
 	Spot3.SpotName = FText::FromString(TEXT("Golden Hour"));
 	Spot3.LightingPreset = TEXT("Sunset");
+	Spot3.BackdropType = TEXT("Skyline");
 	Instance.PhotoSpots.Add(Spot3);
+
+	FMGPhotoSpot Spot4;
+	Spot4.SpotIndex = 3;
+	Spot4.SpotName = FText::FromString(TEXT("Underground"));
+	Spot4.LightingPreset = TEXT("DarkMoody");
+	Spot4.BackdropType = TEXT("Garage");
+	Instance.PhotoSpots.Add(Spot4);
+}
+
+void UMGMeetSpotSubsystem::InitializeMeetSpotLocations()
+{
+	// Downtown Parking - Starting location per GDD
+	{
+		FMGMeetSpotLocation Location;
+		Location.LocationID = TEXT("DowntownParking");
+		Location.DisplayName = FText::FromString(TEXT("Downtown Parking Garage"));
+		Location.Description = FText::FromString(TEXT("Multi-level parking garage in the heart of the city. The classic meet spot."));
+		Location.LocationType = EMGMeetSpotLocationType::ParkingLot;
+		Location.DistrictID = TEXT("Downtown");
+		Location.MaxCapacity = 200;
+		Location.RequiredReputationTier = 0; // Available from start
+		Location.LightingPreset = TEXT("NeonUrban");
+		Location.AmbientAudioPreset = TEXT("CityNight");
+		MeetSpotLocations.Add(Location);
+	}
+
+	// Industrial Warehouses
+	{
+		FMGMeetSpotLocation Location;
+		Location.LocationID = TEXT("IndustrialWarehouse");
+		Location.DisplayName = FText::FromString(TEXT("Industrial Warehouse Lot"));
+		Location.Description = FText::FromString(TEXT("Abandoned warehouse district. Low traffic, minimal witnesses."));
+		Location.LocationType = EMGMeetSpotLocationType::Industrial;
+		Location.DistrictID = TEXT("Industrial");
+		Location.MaxCapacity = 150;
+		Location.RequiredReputationTier = 1; // Need some rep
+		Location.LightingPreset = TEXT("GrittyIndustrial");
+		Location.AmbientAudioPreset = TEXT("IndustrialAmbient");
+		MeetSpotLocations.Add(Location);
+	}
+
+	// Mountain Overlook - Higher tier
+	{
+		FMGMeetSpotLocation Location;
+		Location.LocationID = TEXT("MountainOverlook");
+		Location.DisplayName = FText::FromString(TEXT("Canyon Overlook"));
+		Location.Description = FText::FromString(TEXT("Scenic vista overlooking the city. Where legends gather."));
+		Location.LocationType = EMGMeetSpotLocationType::Overlook;
+		Location.DistrictID = TEXT("TheHills");
+		Location.MaxCapacity = 100;
+		Location.RequiredReputationTier = 3; // Need reputation
+		Location.LightingPreset = TEXT("MoonlitVista");
+		Location.AmbientAudioPreset = TEXT("MountainWind");
+		MeetSpotLocations.Add(Location);
+	}
+
+	// Waterfront Docks
+	{
+		FMGMeetSpotLocation Location;
+		Location.LocationID = TEXT("WaterfrontDocks");
+		Location.DisplayName = FText::FromString(TEXT("Port District Docks"));
+		Location.Description = FText::FromString(TEXT("Container port with ocean views. Import tuner territory."));
+		Location.LocationType = EMGMeetSpotLocationType::Waterfront;
+		Location.DistrictID = TEXT("PortDistrict");
+		Location.MaxCapacity = 150;
+		Location.RequiredReputationTier = 2;
+		Location.LightingPreset = TEXT("HarborNight");
+		Location.AmbientAudioPreset = TEXT("PortAmbient");
+		MeetSpotLocations.Add(Location);
+	}
+
+	// Highway Rest Stop
+	{
+		FMGMeetSpotLocation Location;
+		Location.LocationID = TEXT("HighwayRestStop");
+		Location.DisplayName = FText::FromString(TEXT("Highway Rest Area"));
+		Location.Description = FText::FromString(TEXT("Perfect staging point for highway battles. Wangan warriors welcome."));
+		Location.LocationType = EMGMeetSpotLocationType::RestStop;
+		Location.DistrictID = TEXT("Highway");
+		Location.MaxCapacity = 80;
+		Location.RequiredReputationTier = 2;
+		Location.LightingPreset = TEXT("HighwayLights");
+		Location.AmbientAudioPreset = TEXT("HighwayTraffic");
+		MeetSpotLocations.Add(Location);
+	}
+
+	// The Underground - Legendary spot
+	{
+		FMGMeetSpotLocation Location;
+		Location.LocationID = TEXT("TheUnderground");
+		Location.DisplayName = FText::FromString(TEXT("The Underground"));
+		Location.Description = FText::FromString(TEXT("Invitation only. Where pink slip legends are made."));
+		Location.LocationType = EMGMeetSpotLocationType::Historic;
+		Location.DistrictID = TEXT("Downtown");
+		Location.MaxCapacity = 50;
+		Location.RequiredReputationTier = 5; // Legendary tier
+		Location.bIsLegendarySpot = true;
+		Location.LightingPreset = TEXT("UndergroundNeon");
+		Location.AmbientAudioPreset = TEXT("UndergroundBasement");
+		MeetSpotLocations.Add(Location);
+	}
+}
+
+void UMGMeetSpotSubsystem::InitializeEmotes()
+{
+	// Greeting emotes - Available from start
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("Wave");
+		Emote.DisplayName = FText::FromString(TEXT("Wave"));
+		Emote.Category = EMGEmoteCategory::Greeting;
+		Emote.Duration = 2.0f;
+		Emote.RequiredReputationTier = 0;
+		AvailableEmotes.Add(Emote);
+	}
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("Nod");
+		Emote.DisplayName = FText::FromString(TEXT("Respectful Nod"));
+		Emote.Category = EMGEmoteCategory::Greeting;
+		Emote.Duration = 1.5f;
+		Emote.RequiredReputationTier = 0;
+		AvailableEmotes.Add(Emote);
+	}
+
+	// Respect emotes
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("Clap");
+		Emote.DisplayName = FText::FromString(TEXT("Applause"));
+		Emote.Category = EMGEmoteCategory::Respect;
+		Emote.Duration = 3.0f;
+		Emote.RequiredReputationTier = 1;
+		AvailableEmotes.Add(Emote);
+	}
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("Bow");
+		Emote.DisplayName = FText::FromString(TEXT("Respectful Bow"));
+		Emote.Category = EMGEmoteCategory::Respect;
+		Emote.Duration = 2.5f;
+		Emote.RequiredReputationTier = 2;
+		AvailableEmotes.Add(Emote);
+	}
+
+	// Celebration emotes
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("FistPump");
+		Emote.DisplayName = FText::FromString(TEXT("Fist Pump"));
+		Emote.Category = EMGEmoteCategory::Celebration;
+		Emote.Duration = 2.0f;
+		Emote.RequiredReputationTier = 0;
+		AvailableEmotes.Add(Emote);
+	}
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("Victory");
+		Emote.DisplayName = FText::FromString(TEXT("Victory Pose"));
+		Emote.Category = EMGEmoteCategory::Celebration;
+		Emote.Duration = 3.0f;
+		Emote.RequiredReputationTier = 2;
+		AvailableEmotes.Add(Emote);
+	}
+
+	// Taunt emotes - Higher tier
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("Flex");
+		Emote.DisplayName = FText::FromString(TEXT("Flex"));
+		Emote.Category = EMGEmoteCategory::Taunt;
+		Emote.Duration = 2.5f;
+		Emote.RequiredReputationTier = 2;
+		AvailableEmotes.Add(Emote);
+	}
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("ComeAtMe");
+		Emote.DisplayName = FText::FromString(TEXT("Come At Me"));
+		Emote.Category = EMGEmoteCategory::Taunt;
+		Emote.Duration = 2.0f;
+		Emote.RequiredReputationTier = 3;
+		AvailableEmotes.Add(Emote);
+	}
+
+	// Vehicle interaction emotes
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("LeanOnCar");
+		Emote.DisplayName = FText::FromString(TEXT("Lean On Car"));
+		Emote.Category = EMGEmoteCategory::VehicleInteraction;
+		Emote.Duration = 5.0f;
+		Emote.RequiredReputationTier = 1;
+		AvailableEmotes.Add(Emote);
+	}
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("PopHood");
+		Emote.DisplayName = FText::FromString(TEXT("Show Engine"));
+		Emote.Category = EMGEmoteCategory::VehicleInteraction;
+		Emote.Duration = 4.0f;
+		Emote.RequiredReputationTier = 1;
+		AvailableEmotes.Add(Emote);
+	}
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("CleanWheel");
+		Emote.DisplayName = FText::FromString(TEXT("Polish Wheels"));
+		Emote.Category = EMGEmoteCategory::VehicleInteraction;
+		Emote.Duration = 4.0f;
+		Emote.RequiredReputationTier = 2;
+		AvailableEmotes.Add(Emote);
+	}
+
+	// Dance emotes - Fun additions
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("Groove");
+		Emote.DisplayName = FText::FromString(TEXT("Groove"));
+		Emote.Category = EMGEmoteCategory::Dance;
+		Emote.Duration = 5.0f;
+		Emote.RequiredReputationTier = 2;
+		AvailableEmotes.Add(Emote);
+	}
+
+	// Legendary emotes
+	{
+		FMGSocialEmote Emote;
+		Emote.EmoteID = TEXT("LegendaryPose");
+		Emote.DisplayName = FText::FromString(TEXT("Legendary Stance"));
+		Emote.Category = EMGEmoteCategory::Celebration;
+		Emote.Duration = 4.0f;
+		Emote.RequiredReputationTier = 5; // Legendary tier only
+		AvailableEmotes.Add(Emote);
+	}
 }
 
 void UMGMeetSpotSubsystem::AdvanceShowcaseQueue(FMGMeetSpotInstance& Instance)
@@ -1061,8 +1962,33 @@ void UMGMeetSpotSubsystem::AdvanceShowcaseQueue(FMGMeetSpotInstance& Instance)
 
 bool UMGMeetSpotSubsystem::IsCrewMember(FGuid PlayerID, FGuid CrewID) const
 {
-	// TODO: Check via crew subsystem
-	return true;
+	// Check via crew subsystem
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+	{
+		if (UMGCrewSubsystem* CrewSubsystem = GI->GetSubsystem<UMGCrewSubsystem>())
+		{
+			// Check if the player is in the local player's crew
+			// Note: For full multiplayer support, this would need server-side verification
+			if (CrewSubsystem->IsInCrew())
+			{
+				const FMGCrewInfo& CurrentCrew = CrewSubsystem->GetCurrentCrew();
+
+				// Check if this is the same crew
+				if (CurrentCrew.CrewID == CrewID)
+				{
+					// Convert Guid to FName for crew lookup
+					FName PlayerIDName(*PlayerID.ToString());
+					FMGCrewMember Member = CrewSubsystem->GetMember(PlayerIDName);
+
+					// If member has valid PlayerID, they're in the crew
+					return !Member.PlayerID.IsNone();
+				}
+			}
+		}
+	}
+
+	// Default to false if we can't verify (fail closed for security)
+	return false;
 }
 
 FMGMeetSpotPlayer* UMGMeetSpotSubsystem::FindPlayer(FGuid InstanceID, FGuid PlayerID)
@@ -1101,4 +2027,33 @@ const FMGMeetSpotPlayer* UMGMeetSpotSubsystem::FindPlayerConst(FGuid InstanceID,
 	}
 
 	return nullptr;
+}
+
+const FMGMeetSpotLocation* UMGMeetSpotSubsystem::GetLocationData(FName MeetSpotID) const
+{
+	for (const FMGMeetSpotLocation& Location : MeetSpotLocations)
+	{
+		if (Location.LocationID == MeetSpotID)
+		{
+			return &Location;
+		}
+	}
+	return nullptr;
+}
+
+int32 UMGMeetSpotSubsystem::CalculateVibeLevel(const FMGMeetSpotInstance& Instance) const
+{
+	// Base vibe from player count (max 50 from this)
+	float PlayerContribution = FMath::Min(50.0f, Instance.CurrentPlayerCount * 0.5f);
+
+	// Bonus from event (up to 30)
+	float EventBonus = Instance.CurrentEvent.EventID.IsValid() ? 30.0f : 0.0f;
+
+	// Bonus from active showcasing (up to 10)
+	float ShowcaseBonus = Instance.CurrentShowcasePlayerID.IsValid() ? 10.0f : 0.0f;
+
+	// Bonus from active challenges (up to 10)
+	float ChallengeBonus = FMath::Min(10.0f, Instance.ActiveChallenges.Num() * 2.0f);
+
+	return FMath::RoundToInt(PlayerContribution + EventBonus + ShowcaseBonus + ChallengeBonus);
 }

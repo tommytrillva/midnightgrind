@@ -1,4 +1,5 @@
 // Copyright Midnight Grind. All Rights Reserved.
+// Task #5: Economy Subsystem - Balanced for car culture grind
 
 #pragma once
 
@@ -27,6 +28,12 @@ enum class EMGTransactionType : uint8
 	BountyReward,
 	CrewBonus,
 	Wager,
+	DailyBonus,
+	MilestoneReward,
+	TournamentPrize,
+	MarketplaceSale,
+	MarketplacePurchase,
+	Trade,
 	Other
 };
 
@@ -101,6 +108,10 @@ struct FMGShopItem
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shop")
 	int32 RequiredLevel = 0;
 
+	/** Required REP tier (0=None, 1=Rookie, 2=Known, 3=Respected, 4=Feared, 5=Legend) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shop")
+	int32 RequiredREPTier = 0;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shop")
 	TSoftObjectPtr<UTexture2D> Icon;
 
@@ -140,6 +151,9 @@ struct FMGChallengeReward
 	int64 XPReward = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Challenge")
+	int32 REPReward = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Challenge")
 	bool bCompleted = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Challenge")
@@ -157,6 +171,14 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPurchaseResult, bool, bSuccess, 
 /**
  * Game Instance Subsystem for the game economy
  * Handles credits, transactions, purchases, and economic events
+ *
+ * BALANCE PHILOSOPHY:
+ * - "Feel the Grind, Not the Frustration" - Progression should be satisfying
+ * - Risk = Reward - Higher stakes races pay proportionally more
+ * - Car Culture Authenticity - Parts and vehicles priced realistically
+ * - The Build Journey Matters - Upgrading a car should feel meaningful
+ *
+ * See MGEconomyBalanceConfig.cpp for all balance values
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGEconomySubsystem : public UGameInstanceSubsystem
@@ -292,6 +314,22 @@ public:
 	bool HasActiveWager() const { return ActiveWager > 0; }
 
 	// ==========================================
+	// DAILY BONUSES
+	// ==========================================
+
+	/** Claim daily login bonus */
+	UFUNCTION(BlueprintCallable, Category = "Economy|Daily")
+	bool ClaimDailyLoginBonus(int64& OutBonusAmount);
+
+	/** Get current login streak days */
+	UFUNCTION(BlueprintPure, Category = "Economy|Daily")
+	int32 GetLoginStreakDays() const { return LoginStreakDays; }
+
+	/** Check if daily bonus is available */
+	UFUNCTION(BlueprintPure, Category = "Economy|Daily")
+	bool IsDailyBonusAvailable() const;
+
+	// ==========================================
 	// UTILITY
 	// ==========================================
 
@@ -324,9 +362,14 @@ protected:
 	// DATA
 	// ==========================================
 
-	/** Current credit balance */
+	/**
+	 * Current credit balance
+	 * Starting cash: $7,500 (enough for meaningful first upgrades)
+	 * Tutorial completion bonus: $2,500 additional
+	 * See MGEconomyBalanceConfig.cpp for balance rationale
+	 */
 	UPROPERTY(SaveGame)
-	int64 Credits = 10000; // Starting credits
+	int64 Credits = 7500; // Starting credits - balanced for meaningful first upgrades
 
 	/** Total credits earned all-time */
 	UPROPERTY(SaveGame)
@@ -350,4 +393,12 @@ protected:
 	/** Active wager race ID */
 	UPROPERTY(SaveGame)
 	FName ActiveWagerRaceID;
+
+	/** Current login streak days */
+	UPROPERTY(SaveGame)
+	int32 LoginStreakDays = 0;
+
+	/** Last login date for streak tracking */
+	UPROPERTY(SaveGame)
+	FDateTime LastLoginDate;
 };

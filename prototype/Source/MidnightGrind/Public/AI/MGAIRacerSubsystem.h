@@ -12,47 +12,67 @@ class UMGAIDriverRoster;
 class AMGAIRacerController;
 
 /**
- * Spawn configuration for AI racers
+ * @brief Spawn configuration for AI racers
+ *
+ * Configures how AI opponents are spawned and their base behavior.
+ * Per GDD Pillar 5 (Unified Challenge), AI uses skill-based catch-up
+ * instead of rubber-banding that violates physics.
  */
 USTRUCT(BlueprintType)
 struct FMGAISpawnConfig
 {
 	GENERATED_BODY()
 
-	/** Number of AI racers */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/** Number of AI racers to spawn */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
 	int32 RacerCount = 7;
 
-	/** Minimum skill level */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	/** Minimum skill level for driver selection (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float MinSkill = 0.4f;
 
-	/** Maximum skill level */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	/** Maximum skill level for driver selection (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float MaxSkill = 0.9f;
 
-	/** Difficulty modifier */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.5", ClampMax = "1.5"))
+	/**
+	 * Difficulty modifier affecting AI decision quality
+	 * 0.5 = Easy (more mistakes), 1.0 = Normal, 1.5 = Hard (optimal)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Difficulty", meta = (ClampMin = "0.5", ClampMax = "1.5"))
 	float DifficultyModifier = 1.0f;
 
-	/** Enable rubber banding */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/**
+	 * Enable skill-based catch-up system
+	 * When enabled, AI will take calculated risks to catch up or drive
+	 * conservatively when leading. This does NOT provide physics cheats.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Difficulty")
+	bool bEnableSkillBasedCatchUp = true;
+
+	/**
+	 * @deprecated Use bEnableSkillBasedCatchUp instead
+	 * Legacy rubber banding flag - mapped to skill-based catch-up
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Difficulty", meta = (DeprecatedProperty, DeprecationMessage = "Use bEnableSkillBasedCatchUp instead"))
 	bool bEnableRubberBanding = true;
 
-	/** Rubber band strength */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	/**
+	 * @deprecated No longer used - skill-based catch-up has fixed behavior
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Difficulty", meta = (DeprecatedProperty, DeprecationMessage = "No longer used"))
 	float RubberBandStrength = 0.3f;
 
-	/** Include rival driver */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/** Include rival driver (targets player specifically) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
 	bool bIncludeRival = false;
 
-	/** Specific drivers to include */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/** Specific driver profiles to include in race */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
 	TArray<UMGAIDriverProfile*> RequiredDrivers;
 
-	/** Vehicle class restriction */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/** Restrict AI to specific vehicle class */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
 	FName VehicleClassRestriction;
 };
 
@@ -121,6 +141,11 @@ public:
 	virtual void Deinitialize() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override { return true; }
+
+	// Tickable requirements for UWorldSubsystem
+	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(UMGAIRacerSubsystem, STATGROUP_Tickables); }
+	virtual bool IsTickable() const override { return !IsTemplate() && bIsTickEnabled; }
+	virtual bool IsTickableWhenPaused() const override { return false; }
 
 	// ==========================================
 	// EVENTS
@@ -198,8 +223,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AI|Control")
 	void SetAllDifficulty(float DifficultyMultiplier);
 
-	/** Enable/disable rubber banding for all */
+	/**
+	 * Enable/disable skill-based catch-up for all AI
+	 * When enabled, AI will take calculated risks to catch up or drive
+	 * conservatively when leading. Does NOT provide physics advantages.
+	 * @param bEnabled Enable catch-up behavior
+	 */
 	UFUNCTION(BlueprintCallable, Category = "AI|Control")
+	void SetAllSkillBasedCatchUp(bool bEnabled);
+
+	/**
+	 * @deprecated Use SetAllSkillBasedCatchUp instead
+	 * Enable/disable skill-based catch-up for all AI
+	 * @param bEnabled Enable catch-up behavior
+	 * @param Strength Deprecated - no longer used
+	 */
+	UFUNCTION(BlueprintCallable, Category = "AI|Control", meta = (DeprecatedFunction, DeprecationMessage = "Use SetAllSkillBasedCatchUp instead"))
 	void SetAllRubberBanding(bool bEnabled, float Strength = 0.3f);
 
 	// ==========================================
@@ -251,6 +290,13 @@ public:
 	FMGAIRacerInfo GetClosestToPlayer() const;
 
 protected:
+	// ==========================================
+	// TICK CONTROL
+	// ==========================================
+
+	/** Whether subsystem ticking is enabled */
+	bool bIsTickEnabled = true;
+
 	// ==========================================
 	// CONFIGURATION
 	// ==========================================

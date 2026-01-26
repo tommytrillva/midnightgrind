@@ -70,6 +70,126 @@ struct FMGAISkillParams
 };
 
 /**
+ * Contact response type - how AI reacts to being hit
+ */
+UENUM(BlueprintType)
+enum class EMGContactResponse : uint8
+{
+	/** Ignore minor contact, focus on racing */
+	Ignore,
+	/** Back off to avoid further damage */
+	BackOff,
+	/** Increase aggression against the offender */
+	Retaliate,
+	/** Go into survival mode, protect the car */
+	Protect,
+	/** Match the aggressor's behavior */
+	Mirror,
+	/** Report to race stewards (if applicable) */
+	Report
+};
+
+/**
+ * Contact event data - records who hit whom
+ */
+USTRUCT(BlueprintType)
+struct FMGAIContactEvent
+{
+	GENERATED_BODY()
+
+	/** Actor that made contact */
+	UPROPERTY(BlueprintReadOnly)
+	TWeakObjectPtr<AActor> Offender;
+
+	/** Was this player-caused */
+	UPROPERTY(BlueprintReadOnly)
+	bool bWasPlayer = false;
+
+	/** Impact severity (0-1) */
+	UPROPERTY(BlueprintReadOnly)
+	float Severity = 0.0f;
+
+	/** Time of contact */
+	UPROPERTY(BlueprintReadOnly)
+	float TimeStamp = 0.0f;
+
+	/** Number of contacts from this offender */
+	UPROPERTY(BlueprintReadOnly)
+	int32 ContactCount = 1;
+
+	/** Was this intentional (based on their trajectory) */
+	UPROPERTY(BlueprintReadOnly)
+	bool bSeemedIntentional = false;
+};
+
+/**
+ * Aggression escalation stage
+ */
+UENUM(BlueprintType)
+enum class EMGAggressionStage : uint8
+{
+	/** Normal racing behavior */
+	Baseline,
+	/** Slightly elevated - racing harder */
+	Elevated,
+	/** High aggression - taking more risks */
+	High,
+	/** Maximum aggression - win at all costs */
+	Maximum,
+	/** Rage mode - making mistakes from over-aggression */
+	Rage
+};
+
+/**
+ * Personality behavior modifiers - unique quirks per personality type
+ */
+USTRUCT(BlueprintType)
+struct FMGPersonalityBehaviors
+{
+	GENERATED_BODY()
+
+	/** Brake point adjustment (-1 = early, +1 = late) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "-1.0", ClampMax = "1.0"))
+	float BrakePointBias = 0.0f;
+
+	/** Line preference (-1 = inside, +1 = outside) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "-1.0", ClampMax = "1.0"))
+	float LineBias = 0.0f;
+
+	/** How much they weave/move on straights (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float StraightLineWeaving = 0.0f;
+
+	/** Tendency to use bump-drafting (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float BumpDraftingTendency = 0.0f;
+
+	/** Chance to feint before making a move (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float FeintChance = 0.0f;
+
+	/** Willingness to go side-by-side through corners (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float SideBySideWillingness = 0.5f;
+
+	/** Tendency to push others wide (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float PushWideTendency = 0.0f;
+
+	/** Tendency to chop across opponent's nose (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float ChopTendency = 0.0f;
+
+	/** How much they adjust based on opponent skill (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float AdaptToOpponentSkill = 0.5f;
+
+	/** Special move probability (dive bombs, last-second passes) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float SpecialMoveProbability = 0.1f;
+};
+
+/**
  * AI aggression parameters
  */
 USTRUCT(BlueprintType)
@@ -104,6 +224,74 @@ struct FMGAIAggressionParams
 	/** Will specifically target/block player */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bTargetsPlayer = false;
+
+	// ==========================================
+	// NEW: Aggression Escalation System
+	// ==========================================
+
+	/** How quickly aggression escalates when provoked (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float EscalationRate = 0.5f;
+
+	/** How quickly aggression de-escalates when left alone (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float DeescalationRate = 0.3f;
+
+	/** Threshold to enter high aggression (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float HighAggressionThreshold = 0.7f;
+
+	/** Threshold to enter maximum aggression (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float MaxAggressionThreshold = 0.9f;
+
+	/** Can this AI enter rage mode (makes mistakes) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bCanEnterRageMode = false;
+
+	// ==========================================
+	// NEW: Contact Response System
+	// ==========================================
+
+	/** How AI responds to minor contact */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EMGContactResponse MinorContactResponse = EMGContactResponse::Ignore;
+
+	/** How AI responds to major contact */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EMGContactResponse MajorContactResponse = EMGContactResponse::Retaliate;
+
+	/** Contact severity threshold for "major" (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float MajorContactThreshold = 0.5f;
+
+	/** How long AI remembers contact grudges (seconds) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "120.0"))
+	float GrudgeMemoryDuration = 30.0f;
+
+	/** Retaliation intensity multiplier */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.5", ClampMax = "2.0"))
+	float RetaliationIntensity = 1.0f;
+
+	// ==========================================
+	// NEW: Dirty Driving Thresholds
+	// ==========================================
+
+	/** Willingness to make contact to defend (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float DefenseContactWillingness = 0.2f;
+
+	/** Willingness to make contact to attack (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float AttackContactWillingness = 0.1f;
+
+	/** Only goes dirty when losing (preserves sportsmanship when ahead) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bOnlyDirtyWhenLosing = true;
+
+	/** Position threshold where dirty tactics become acceptable */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "1", ClampMax = "20"))
+	int32 DirtyTacticsPositionThreshold = 4;
 };
 
 /**
@@ -178,6 +366,120 @@ struct FMGAISpeedParams
 	/** Drift speed penalty tolerance */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float DriftTolerance = 0.3f;
+};
+
+/**
+ * AI mood that affects behavior during race
+ */
+UENUM(BlueprintType)
+enum class EMGAIMood : uint8
+{
+	/** Normal racing behavior */
+	Neutral,
+	/** More aggressive, took risks */
+	Frustrated,
+	/** Playing it safe, confident */
+	Confident,
+	/** Desperate, makes mistakes */
+	Desperate,
+	/** Focused, optimal performance */
+	InTheZone,
+	/** Intimidated by player */
+	Intimidated,
+	/** Seeking revenge */
+	Vengeful
+};
+
+/**
+ * Adaptive learning data - how AI learns from races against player
+ */
+USTRUCT(BlueprintType)
+struct FMGAIAdaptiveData
+{
+	GENERATED_BODY()
+
+	/** Times raced against player */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 RacesAgainstPlayer = 0;
+
+	/** Wins against player */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 WinsAgainstPlayer = 0;
+
+	/** Losses against player */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 LossesAgainstPlayer = 0;
+
+	/** Track-specific skill adjustments */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<FName, float> TrackSkillModifiers;
+
+	/** Learned player tendencies */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PlayerAggressionEstimate = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PlayerBrakingPointEstimate = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PlayerOvertakePreference = 0.0f; // -1 left, +1 right
+
+	/** Performance improvement over time */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SkillGrowthFactor = 0.0f;
+
+	/** Get effective skill multiplier based on learning */
+	float GetLearningMultiplier() const
+	{
+		// AI improves slightly with experience
+		return 1.0f + FMath::Clamp(SkillGrowthFactor, 0.0f, 0.1f);
+	}
+
+	/** Get win rate against player */
+	float GetWinRateAgainstPlayer() const
+	{
+		if (RacesAgainstPlayer == 0) return 0.5f;
+		return static_cast<float>(WinsAgainstPlayer) / static_cast<float>(RacesAgainstPlayer);
+	}
+};
+
+/**
+ * Rival relationship data
+ */
+USTRUCT(BlueprintType)
+struct FMGRivalRelationship
+{
+	GENERATED_BODY()
+
+	/** Rivalry intensity (-1 = friendly, +1 = hostile) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "-1.0", ClampMax = "1.0"))
+	float Intensity = 0.0f;
+
+	/** Respect level (affects behavior) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float Respect = 0.5f;
+
+	/** History events that shaped rivalry */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FString> RivalryHistory;
+
+	/** Last race result against this rival */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 LastRacePosition = 0; // 0 = no race yet
+
+	/** Pink slips won from rival */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 PinkSlipsWon = 0;
+
+	/** Pink slips lost to rival */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 PinkSlipsLost = 0;
+
+	/** Is this an active nemesis */
+	bool IsNemesis() const { return Intensity > 0.7f && Respect > 0.5f; }
+
+	/** Is this a friendly rival */
+	bool IsFriendlyRival() const { return Intensity < -0.3f || Respect > 0.8f; }
 };
 
 /**
@@ -293,6 +595,206 @@ public:
 	/** Create modified profile with difficulty adjustment */
 	UFUNCTION(BlueprintCallable, Category = "Utility")
 	void ApplyDifficultyModifier(float Modifier);
+
+	// ==========================================
+	// PERSONALITY BEHAVIORS
+	// ==========================================
+
+	/** Personality-specific behavior modifiers */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Personality")
+	FMGPersonalityBehaviors PersonalityBehaviors;
+
+	// ==========================================
+	// ADAPTIVE BEHAVIOR
+	// ==========================================
+
+	/** Adaptive learning data */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Adaptive")
+	FMGAIAdaptiveData AdaptiveData;
+
+	/** Current mood (affects behavior in race) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Adaptive")
+	EMGAIMood CurrentMood = EMGAIMood::Neutral;
+
+	/** Rival relationship with player */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Adaptive")
+	FMGRivalRelationship PlayerRivalry;
+
+	// ==========================================
+	// RUNTIME AGGRESSION STATE
+	// ==========================================
+
+	/** Current aggression escalation stage */
+	UPROPERTY(BlueprintReadOnly, Category = "Runtime")
+	EMGAggressionStage CurrentAggressionStage = EMGAggressionStage::Baseline;
+
+	/** Current accumulated aggression level (0-1) */
+	UPROPERTY(BlueprintReadOnly, Category = "Runtime")
+	float AccumulatedAggression = 0.0f;
+
+	/** Recent contact events for grudge tracking */
+	UPROPERTY(BlueprintReadOnly, Category = "Runtime")
+	TArray<FMGAIContactEvent> RecentContacts;
+
+	/** Current grudge target (who we're mad at) */
+	UPROPERTY(BlueprintReadOnly, Category = "Runtime")
+	TWeakObjectPtr<AActor> CurrentGrudgeTarget;
+
+	/** Time in current aggression stage */
+	UPROPERTY(BlueprintReadOnly, Category = "Runtime")
+	float TimeInAggressionStage = 0.0f;
+
+	/** Is currently in battle mode (fighting for position) */
+	UPROPERTY(BlueprintReadOnly, Category = "Runtime")
+	bool bInBattleMode = false;
+
+	/** Current battle opponent */
+	UPROPERTY(BlueprintReadOnly, Category = "Runtime")
+	TWeakObjectPtr<AActor> BattleOpponent;
+
+	/** Update adaptive data after race */
+	UFUNCTION(BlueprintCallable, Category = "Adaptive")
+	void RecordRaceResult(bool bWon, FName TrackID, float FinishTimeDelta);
+
+	/** Update mood based on race events */
+	UFUNCTION(BlueprintCallable, Category = "Adaptive")
+	void UpdateMood(float PositionDelta, float DamageReceived, bool bWasOvertaken);
+
+	/** Get effective skill with adaptive modifiers */
+	UFUNCTION(BlueprintPure, Category = "Adaptive")
+	float GetEffectiveSkill() const;
+
+	/** Get effective aggression with mood modifiers */
+	UFUNCTION(BlueprintPure, Category = "Adaptive")
+	float GetEffectiveAggression() const;
+
+	/** Learn from player behavior */
+	UFUNCTION(BlueprintCallable, Category = "Adaptive")
+	void LearnPlayerBehavior(float ObservedAggression, float ObservedBraking, float OvertakeSide);
+
+	/** Get predicted player behavior */
+	UFUNCTION(BlueprintPure, Category = "Adaptive")
+	void GetPredictedPlayerBehavior(float& OutAggression, float& OutBrakingPoint, float& OutOvertakeSide) const;
+
+	/** Update rivalry based on race outcome */
+	UFUNCTION(BlueprintCallable, Category = "Adaptive")
+	void UpdateRivalry(bool bPlayerWon, bool bWasPinkSlip, const FString& EventDescription);
+
+	// ==========================================
+	// AGGRESSION ESCALATION SYSTEM
+	// ==========================================
+
+	/**
+	 * Record a contact event
+	 * @param Offender Who hit us
+	 * @param Severity Impact severity (0-1)
+	 * @param bWasPlayer Was this caused by the player
+	 * @param bSeemedIntentional Did it seem deliberate
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Aggression")
+	void RecordContact(AActor* Offender, float Severity, bool bWasPlayer, bool bSeemedIntentional);
+
+	/**
+	 * Update aggression state (call each frame during race)
+	 * @param DeltaTime Frame delta time
+	 * @param CurrentPosition Current race position
+	 * @param bUnderPressure Is there an opponent close behind
+	 * @param bApplyingPressure Is there an opponent close ahead we're chasing
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Aggression")
+	void UpdateAggressionState(float DeltaTime, int32 CurrentPosition, bool bUnderPressure, bool bApplyingPressure);
+
+	/**
+	 * Get current effective aggression including escalation
+	 * @return Effective aggression level (0-1, can exceed base)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Aggression")
+	float GetEscalatedAggression() const;
+
+	/**
+	 * Get the appropriate contact response for given severity
+	 * @param Severity Contact severity (0-1)
+	 * @return Response type
+	 */
+	UFUNCTION(BlueprintPure, Category = "Aggression")
+	EMGContactResponse GetContactResponse(float Severity) const;
+
+	/**
+	 * Check if we have a grudge against a specific actor
+	 * @param Actor Actor to check
+	 * @return True if we're holding a grudge
+	 */
+	UFUNCTION(BlueprintPure, Category = "Aggression")
+	bool HasGrudgeAgainst(AActor* Actor) const;
+
+	/**
+	 * Get grudge intensity against a specific actor (0-1)
+	 * @param Actor Actor to check
+	 * @return Grudge intensity, 0 if no grudge
+	 */
+	UFUNCTION(BlueprintPure, Category = "Aggression")
+	float GetGrudgeIntensity(AActor* Actor) const;
+
+	/**
+	 * Check if dirty tactics are acceptable in current situation
+	 * @param CurrentPosition Current race position
+	 * @param bIsDefending True if defending position
+	 * @return True if willing to use dirty tactics
+	 */
+	UFUNCTION(BlueprintPure, Category = "Aggression")
+	bool WillUseDirtyTactics(int32 CurrentPosition, bool bIsDefending) const;
+
+	/**
+	 * Enter battle mode with opponent
+	 * @param Opponent The opponent we're battling
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Aggression")
+	void EnterBattleMode(AActor* Opponent);
+
+	/**
+	 * Exit battle mode
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Aggression")
+	void ExitBattleMode();
+
+	/**
+	 * Reset all aggression state (call at race start)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Aggression")
+	void ResetAggressionState();
+
+	/**
+	 * Get personality-adjusted behavior values
+	 * @param OutBehaviors Output behavior modifiers with personality applied
+	 */
+	UFUNCTION(BlueprintPure, Category = "Personality")
+	FMGPersonalityBehaviors GetEffectivePersonalityBehaviors() const;
+
+	/**
+	 * Should this AI feint before making a move
+	 * @return True if should feint this time
+	 */
+	UFUNCTION(BlueprintPure, Category = "Personality")
+	bool ShouldFeint() const;
+
+	/**
+	 * Get special move probability based on situation
+	 * @param bIsFinalLap Is this the final lap
+	 * @param bIsForPosition Is this for a meaningful position
+	 * @return Probability (0-1) of attempting special move
+	 */
+	UFUNCTION(BlueprintPure, Category = "Personality")
+	float GetSpecialMoveProbability(bool bIsFinalLap, bool bIsForPosition) const;
+
+protected:
+	/** Clean up expired grudges */
+	void CleanupExpiredGrudges(float CurrentTime);
+
+	/** Calculate aggression stage from accumulated level */
+	EMGAggressionStage CalculateAggressionStage(float AggressionLevel) const;
+
+	/** Apply personality defaults to behavior struct */
+	void ApplyPersonalityDefaults();
 };
 
 /**

@@ -1,5 +1,31 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGCrewSubsystem.h
+ * @deprecated This file is DEPRECATED. Use the comprehensive implementation at:
+ *             Source/MidnightGrind/Public/Crew/MGCrewSubsystem.h
+ *
+ * The Crew/ folder contains the full crew system with:
+ * - 7-rank hierarchy (Prospect through Leader)
+ * - 19 permissions mapped to ranks
+ * - Shared garage system
+ * - Territory system with bonuses
+ * - Treasury management
+ * - Crew chat with multiple message types
+ * - Challenges system
+ * - Integration with CrewBattles subsystem
+ * - Full Doxygen documentation
+ *
+ * This Social/ version will be removed in a future update.
+ * DO NOT USE THIS FILE FOR NEW DEVELOPMENT.
+ *
+ * To migrate:
+ * 1. Include "Crew/MGCrewSubsystem.h" instead of "Social/MGCrewSubsystem.h"
+ * 2. Update enum references from EMGCrewRole to EMGCrewRank
+ * 3. Update struct references (FMGCrewData -> FMGCrewInfo, etc.)
+ * 4. Note: The Crew/ version uses FName for PlayerID instead of FString
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -10,6 +36,7 @@ class UTexture2D;
 
 /**
  * Crew member role
+ * @deprecated Use EMGCrewRank from Crew/MGCrewSubsystem.h instead
  */
 UENUM(BlueprintType)
 enum class EMGCrewRole : uint8
@@ -283,6 +310,189 @@ struct FMGSharedLivery
 	/** Is featured */
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsFeatured = false;
+};
+
+/**
+ * Territory control zone
+ */
+USTRUCT(BlueprintType)
+struct FMGTerritoryZone
+{
+	GENERATED_BODY()
+
+	/** Zone ID */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName ZoneID;
+
+	/** Display name */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText DisplayName;
+
+	/** Zone description */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText Description;
+
+	/** World location center */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector WorldLocation = FVector::ZeroVector;
+
+	/** Zone radius in cm */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Radius = 100000.0f;
+
+	/** Controlling crew ID (empty = unclaimed) */
+	UPROPERTY(BlueprintReadOnly)
+	FString ControllingCrewID;
+
+	/** Controlling crew name */
+	UPROPERTY(BlueprintReadOnly)
+	FText ControllingCrewName;
+
+	/** Control points (0-100, 100 = full control) */
+	UPROPERTY(BlueprintReadOnly)
+	float ControlPoints = 0.0f;
+
+	/** Contestation state */
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsContested = false;
+
+	/** Contesting crew ID */
+	UPROPERTY(BlueprintReadOnly)
+	FString ContestingCrewID;
+
+	/** Bonus type for controlling crew */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName BonusType;
+
+	/** Bonus value (percentage) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float BonusValue = 5.0f;
+
+	/** Icon for map */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* MapIcon = nullptr;
+
+	/** Time until control resets if undefended (hours) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DecayTimeHours = 24.0f;
+
+	/** Last activity timestamp */
+	UPROPERTY(BlueprintReadOnly)
+	FDateTime LastActivity;
+};
+
+/**
+ * Crew hierarchy for alliances/rivalries
+ */
+USTRUCT(BlueprintType)
+struct FMGCrewRelationship
+{
+	GENERATED_BODY()
+
+	/** Other crew ID */
+	UPROPERTY(BlueprintReadOnly)
+	FString OtherCrewID;
+
+	/** Other crew name */
+	UPROPERTY(BlueprintReadOnly)
+	FText OtherCrewName;
+
+	/** Relationship type: -1 = rival, 0 = neutral, 1 = ally */
+	UPROPERTY(BlueprintReadOnly)
+	int32 RelationshipType = 0;
+
+	/** Battles won against this crew */
+	UPROPERTY(BlueprintReadOnly)
+	int32 BattlesWon = 0;
+
+	/** Battles lost against this crew */
+	UPROPERTY(BlueprintReadOnly)
+	int32 BattlesLost = 0;
+
+	/** Territories taken from this crew */
+	UPROPERTY(BlueprintReadOnly)
+	int32 TerritoriesTaken = 0;
+
+	/** Territories lost to this crew */
+	UPROPERTY(BlueprintReadOnly)
+	int32 TerritoriesLost = 0;
+
+	/** Alliance formed date (if allies) */
+	UPROPERTY(BlueprintReadOnly)
+	FDateTime AllianceDate;
+
+	/** Is relationship mutual */
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsMutual = false;
+};
+
+/**
+ * Crew event for live activities
+ */
+USTRUCT(BlueprintType)
+struct FMGCrewEvent
+{
+	GENERATED_BODY()
+
+	/** Event ID */
+	UPROPERTY(BlueprintReadOnly)
+	FString EventID;
+
+	/** Event name */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText EventName;
+
+	/** Event description */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText Description;
+
+	/** Event type (cruise, battle, takeover, etc.) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName EventType;
+
+	/** Start location */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector StartLocation = FVector::ZeroVector;
+
+	/** Start time */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FDateTime StartTime;
+
+	/** Duration in minutes */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 DurationMinutes = 60;
+
+	/** Minimum participants */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MinParticipants = 4;
+
+	/** Maximum participants */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxParticipants = 20;
+
+	/** Current participant count */
+	UPROPERTY(BlueprintReadOnly)
+	int32 CurrentParticipants = 0;
+
+	/** Participants signed up */
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FString> ParticipantIDs;
+
+	/** Is this a recurring event */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsRecurring = false;
+
+	/** Recurrence pattern (daily, weekly, etc.) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName RecurrencePattern;
+
+	/** XP reward for participation */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 XPReward = 500;
+
+	/** Token reward for winning */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TokenReward = 100;
 };
 
 /**
@@ -582,9 +792,16 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCrewBattleEnded, const FMGCrewBa
 /**
  * Crew Subsystem
  * Manages crew/club functionality
+ *
+ * @deprecated This class is DEPRECATED and will cause linker conflicts with the
+ *             comprehensive implementation in Crew/MGCrewSubsystem.h.
+ *             Migrate to that version for all new development.
+ *
+ * @see UMGCrewSubsystem in Crew/MGCrewSubsystem.h for the current implementation
  */
-UCLASS()
-class MIDNIGHTGRIND_API UMGCrewSubsystem : public UGameInstanceSubsystem
+UE_DEPRECATED(5.0, "Use UMGCrewSubsystem from Crew/MGCrewSubsystem.h instead. This version will be removed.")
+UCLASS(Deprecated)
+class MIDNIGHTGRIND_API UDEPRECATED_MGCrewSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 

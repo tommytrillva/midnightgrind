@@ -1,7 +1,10 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Wager/MGWagerSubsystem.h"
+#include "Garage/MGGarageSubsystem.h"
+#include "Core/MGSaveSubsystem.h"
 #include "Engine/World.h"
+#include "Engine/GameInstance.h"
 #include "TimerManager.h"
 
 void UMGWagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -557,16 +560,61 @@ bool UMGWagerSubsystem::DoStakesMatch(const FMGWagerStake& Stake1, const FMGWage
 
 bool UMGWagerSubsystem::CanAffordStake(const FMGWagerStake& Stake) const
 {
-	// This would integrate with economy system
-	// For now, return true
-	return true;
+	// Get save subsystem to check currency
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return false;
+	}
+
+	UMGSaveSubsystem* SaveSubsystem = GameInstance->GetSubsystem<UMGSaveSubsystem>();
+	if (!SaveSubsystem)
+	{
+		return false;
+	}
+
+	switch (Stake.StakeType)
+	{
+	case EMGWagerType::Currency:
+		return SaveSubsystem->GetCurrentCash() >= Stake.CurrencyAmount;
+
+	case EMGWagerType::Vehicle:
+		// Vehicle ownership is checked separately
+		return true;
+
+	case EMGWagerType::Part:
+		return SaveSubsystem->GetPartQuantity(Stake.PartID) > 0;
+
+	default:
+		return true;
+	}
 }
 
 bool UMGWagerSubsystem::OwnsVehicle(FName VehicleID) const
 {
-	// This would integrate with garage/inventory system
-	// For now, return true
-	return true;
+	// Get garage subsystem to check vehicle ownership
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return false;
+	}
+
+	UMGGarageSubsystem* Garage = GameInstance->GetSubsystem<UMGGarageSubsystem>();
+	if (!Garage)
+	{
+		return false;
+	}
+
+	// Convert FName to FGuid for garage lookup
+	// In full implementation, VehicleID would be the GUID string
+	FGuid VehicleGuid;
+	if (FGuid::Parse(VehicleID.ToString(), VehicleGuid))
+	{
+		FMGOwnedVehicle Vehicle;
+		return Garage->GetVehicle(VehicleGuid, Vehicle);
+	}
+
+	return false;
 }
 
 void UMGWagerSubsystem::SetConfig(const FMGWagerConfig& NewConfig)
@@ -752,9 +800,71 @@ void UMGWagerSubsystem::ProcessWagerCompletion(FMGWager& Wager, FName WinnerID)
 
 void UMGWagerSubsystem::TransferStake(const FMGWagerStake& Stake, FName FromPlayer, FName ToPlayer)
 {
-	// This would integrate with economy/inventory systems
-	// For now, just broadcast the event
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return;
+	}
+
 	bool bReceived = (ToPlayer == LocalPlayerID);
+	bool bLost = (FromPlayer == LocalPlayerID);
+
+	switch (Stake.StakeType)
+	{
+	case EMGWagerType::Currency:
+		{
+			UMGSaveSubsystem* SaveSubsystem = GameInstance->GetSubsystem<UMGSaveSubsystem>();
+			if (SaveSubsystem)
+			{
+				if (bReceived)
+				{
+					// Won currency
+					SaveSubsystem->AddCash(Stake.CurrencyAmount);
+					UE_LOG(LogTemp, Log, TEXT("Wager won: +%lld credits"), Stake.CurrencyAmount);
+				}
+				else if (bLost)
+				{
+					// Lost currency (should already be locked)
+					SaveSubsystem->SpendCash(Stake.CurrencyAmount);
+					UE_LOG(LogTemp, Log, TEXT("Wager lost: -%lld credits"), Stake.CurrencyAmount);
+				}
+			}
+		}
+		break;
+
+	case EMGWagerType::Vehicle:
+		{
+			// Vehicle transfers are handled by MGPinkSlipSubsystem for permanent pink slip races
+			// This path is for non-pink-slip vehicle wagers if they exist
+			UE_LOG(LogTemp, Warning,
+				TEXT("Vehicle stake transfer via WagerSubsystem - should use PinkSlipSubsystem for permanent transfers"));
+
+			// For pink slip races, the MGPinkSlipSubsystem handles the actual transfer
+			// This just broadcasts the event
+		}
+		break;
+
+	case EMGWagerType::Part:
+		{
+			UMGSaveSubsystem* SaveSubsystem = GameInstance->GetSubsystem<UMGSaveSubsystem>();
+			if (SaveSubsystem)
+			{
+				if (bReceived)
+				{
+					SaveSubsystem->AddPartToInventory(Stake.PartID, 1);
+				}
+				else if (bLost)
+				{
+					SaveSubsystem->RemovePartFromInventory(Stake.PartID, 1);
+				}
+			}
+		}
+		break;
+
+	default:
+		break;
+	}
+
 	OnStakeTransferred.Broadcast(Stake, bReceived);
 }
 

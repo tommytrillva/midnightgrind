@@ -2,6 +2,11 @@
 
 #include "GameModes/RaceTypes/MGPinkSlipHandler.h"
 #include "GameModes/MGRaceConfiguration.h"
+#include "PinkSlip/MGPinkSlipSubsystem.h"
+#include "Garage/MGGarageSubsystem.h"
+#include "Reputation/MGReputationSubsystem.h"
+#include "Engine/GameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 UMGPinkSlipHandler::UMGPinkSlipHandler()
 {
@@ -198,7 +203,15 @@ EMGPinkSlipVerification UMGPinkSlipHandler::VerifyParticipant(int32 ParticipantI
 
 	FMGPinkSlipParticipant& Participant = Participants[ParticipantIndex];
 
-	// Check PI difference
+	// AI opponents always pass verification
+	if (Participant.bIsAI)
+	{
+		Participant.VerificationStatus = EMGPinkSlipVerification::Passed;
+		OnVerified.Broadcast(ParticipantIndex, Participant.VerificationStatus);
+		return Participant.VerificationStatus;
+	}
+
+	// Check PI difference first (applies to both players)
 	int32 OtherIndex = 1 - ParticipantIndex;
 	if (Participants[OtherIndex].VehiclePI > 0)
 	{
@@ -211,15 +224,66 @@ EMGPinkSlipVerification UMGPinkSlipHandler::VerifyParticipant(int32 ParticipantI
 		}
 	}
 
-	// Would check other requirements here:
-	// - REP tier
-	// - Is only vehicle
-	// - Trade lock
-	// - Account standing
-	// - Disconnects
-	// - Cooldown
+	// Use PinkSlipSubsystem for comprehensive eligibility checking
+	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this);
+	if (GameInstance)
+	{
+		UMGPinkSlipSubsystem* PinkSlipSubsystem = GameInstance->GetSubsystem<UMGPinkSlipSubsystem>();
+		if (PinkSlipSubsystem)
+		{
+			// Get opponent PI for matching check
+			int32 OpponentPI = Participants[OtherIndex].VehiclePI;
 
-	// For now, assume passed
+			// Perform full eligibility check
+			EMGPinkSlipEligibility Eligibility = PinkSlipSubsystem->CheckVehicleEligibility(
+				Participant.VehicleID,
+				OpponentPI
+			);
+
+			// Map eligibility to verification status
+			switch (Eligibility)
+			{
+			case EMGPinkSlipEligibility::Eligible:
+				Participant.VerificationStatus = EMGPinkSlipVerification::Passed;
+				break;
+
+			case EMGPinkSlipEligibility::OnlyVehicle:
+				Participant.VerificationStatus = EMGPinkSlipVerification::OnlyVehicle;
+				break;
+
+			case EMGPinkSlipEligibility::VehicleTradeLocked:
+				Participant.VerificationStatus = EMGPinkSlipVerification::TradeLocked;
+				break;
+
+			case EMGPinkSlipEligibility::InsufficientREP:
+				Participant.VerificationStatus = EMGPinkSlipVerification::InsufficientREP;
+				break;
+
+			case EMGPinkSlipEligibility::OnCooldown:
+				Participant.VerificationStatus = EMGPinkSlipVerification::OnCooldown;
+				break;
+
+			case EMGPinkSlipEligibility::PIOutOfRange:
+				Participant.VerificationStatus = EMGPinkSlipVerification::PIOutOfRange;
+				break;
+
+			case EMGPinkSlipEligibility::DisconnectPenalty:
+				Participant.VerificationStatus = EMGPinkSlipVerification::DisconnectPenalty;
+				break;
+
+			case EMGPinkSlipEligibility::AccountRestricted:
+			default:
+				Participant.VerificationStatus = EMGPinkSlipVerification::AccountRestricted;
+				break;
+			}
+
+			OnVerified.Broadcast(ParticipantIndex, Participant.VerificationStatus);
+			return Participant.VerificationStatus;
+		}
+	}
+
+	// Fallback: If no subsystem available, pass verification
+	// This allows offline/test scenarios to work
 	Participant.VerificationStatus = EMGPinkSlipVerification::Passed;
 	OnVerified.Broadcast(ParticipantIndex, Participant.VerificationStatus);
 	return Participant.VerificationStatus;
@@ -313,9 +377,12 @@ void UMGPinkSlipHandler::ProcessTransfer()
 		return;
 	}
 
+	// Check for photo finish before recording
+	CheckPhotoFinish();
+
 	int32 LoserIndex = 1 - WinnerIndex;
 
-	// Build transfer record
+	// Build transfer record for handler
 	TransferRecord.TransferID = FGuid::NewGuid();
 	TransferRecord.Timestamp = FDateTime::UtcNow();
 	TransferRecord.WinnerID = Participants[WinnerIndex].PlayerID;
@@ -326,17 +393,50 @@ void UMGPinkSlipHandler::ProcessTransfer()
 	TransferRecord.RaceType = InnerRaceHandler ? FName(*InnerRaceHandler->GetRaceTypeName().ToString()) : FName(TEXT("Unknown"));
 	TransferRecord.bWasAgainstAI = Participants[LoserIndex].bIsAI;
 
-	// Apply cooldown to loser
-	ApplyCooldown(Participants[LoserIndex].PlayerID);
+	// CRITICAL: Execute permanent vehicle transfer via PinkSlipSubsystem
+	// This is the point of no return - the title changes hands FOREVER
+	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this);
+	if (GameInstance)
+	{
+		UMGPinkSlipSubsystem* PinkSlipSubsystem = GameInstance->GetSubsystem<UMGPinkSlipSubsystem>();
+		if (PinkSlipSubsystem)
+		{
+			// Execute the PERMANENT transfer
+			FMGPinkSlipTransferRecord FullRecord = PinkSlipSubsystem->ExecuteTransfer(
+				Participants[WinnerIndex].PlayerID,
+				Participants[LoserIndex].PlayerID,
+				Participants[LoserIndex].VehicleID,
+				NAME_None, // Track ID - would come from race configuration
+				TransferRecord.RaceType,
+				FinishTimeDifference,
+				Witnesses.Num()
+			);
 
-	// Apply trade lock to won vehicle
-	ApplyTradeLock(Participants[LoserIndex].VehicleID);
+			UE_LOG(LogTemp, Warning, TEXT("PINK SLIP COMPLETE: %s won %s's vehicle (%s)"),
+				*Participants[WinnerIndex].PlayerID,
+				*Participants[LoserIndex].PlayerID,
+				*TransferRecord.VehicleName.ToString());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("CRITICAL: PinkSlipSubsystem not found - transfer NOT executed!"));
+		}
+	}
 
-	// Record transfer
+	// Broadcast dramatic moment - keys change hands
+	BroadcastDramaticMoment(EMGPinkSlipMoment::KeysChange, WinnerIndex);
+
+	// Walk of shame for loser
+	BroadcastDramaticMoment(EMGPinkSlipMoment::WalkOfShame, LoserIndex);
+
+	// Record transfer for witnesses
 	RecordTransfer();
 
 	SetState(EMGPinkSlipState::Complete);
 	bRaceComplete = true;
+
+	// Start rematch window
+	RematchWindowRemaining = RematchWindowSeconds;
 
 	OnTransferComplete.Broadcast(TransferRecord);
 }
@@ -508,36 +608,73 @@ void UMGPinkSlipHandler::FetchVehicleInfo(int32 ParticipantIndex)
 
 	FMGPinkSlipParticipant& Participant = Participants[ParticipantIndex];
 
-	// Would fetch from garage/database subsystem
-	// For now, use placeholder values
-	Participant.VehicleName = NSLOCTEXT("MG", "UnknownVehicle", "Vehicle");
-	Participant.VehiclePI = 500;
-	Participant.EstimatedValue = 50000;
+	// For AI opponents, use preset values
+	if (Participant.bIsAI)
+	{
+		Participant.VehicleName = NSLOCTEXT("MG", "AIVehicle", "AI Vehicle");
+		Participant.VehiclePI = 500;
+		Participant.EstimatedValue = 50000;
+		return;
+	}
 
-	// TODO: Integrate with MGGarageSubsystem to get actual vehicle data
-	// if (UMGGarageSubsystem* Garage = GetGarageSubsystem())
-	// {
-	//     FMGVehicleData VehicleData;
-	//     if (Garage->GetVehicleData(Participant.VehicleID, VehicleData))
-	//     {
-	//         Participant.VehicleName = FText::FromString(VehicleData.DisplayName);
-	//         Participant.VehiclePI = FMath::RoundToInt(VehicleData.Stats.PerformanceIndex);
-	//         Participant.EstimatedValue = FMath::RoundToInt64(VehicleData.Stats.EstimatedValue);
-	//     }
-	// }
+	// Fetch from garage subsystem for player vehicles
+	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this);
+	if (!GameInstance)
+	{
+		return;
+	}
+
+	UMGGarageSubsystem* Garage = GameInstance->GetSubsystem<UMGGarageSubsystem>();
+	if (!Garage)
+	{
+		return;
+	}
+
+	FMGOwnedVehicle VehicleData;
+	if (Garage->GetVehicle(Participant.VehicleID, VehicleData))
+	{
+		Participant.VehicleName = FText::FromString(VehicleData.CustomName);
+		Participant.VehiclePI = VehicleData.PerformanceIndex;
+		Participant.EstimatedValue = Garage->CalculateSellValue(Participant.VehicleID);
+
+		UE_LOG(LogTemp, Log, TEXT("Pink slip participant %d: %s (PI: %d, Value: %lld)"),
+			ParticipantIndex,
+			*VehicleData.CustomName,
+			Participant.VehiclePI,
+			Participant.EstimatedValue);
+	}
+	else
+	{
+		// Fallback to defaults if vehicle not found
+		Participant.VehicleName = NSLOCTEXT("MG", "UnknownVehicle", "Unknown Vehicle");
+		Participant.VehiclePI = 500;
+		Participant.EstimatedValue = 50000;
+
+		UE_LOG(LogTemp, Warning, TEXT("Pink slip: Could not find vehicle %s in garage"),
+			*Participant.VehicleID.ToString());
+	}
 }
 
 bool UMGPinkSlipHandler::CheckREPRequirement(const FString& PlayerID) const
 {
-	// Would check player's REP tier against MinREPTier
-	// For now, return true
+	// Get reputation subsystem and check tier
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+	{
+		if (UMGReputationSubsystem* ReputationSubsystem = GI->GetSubsystem<UMGReputationSubsystem>())
+		{
+			// Get player's overall reputation tier
+			EMGReputationTier PlayerTier = ReputationSubsystem->GetTier(EMGReputationCategory::Overall);
 
-	// TODO: Integrate with MGPlayerProgression
-	// if (UMGPlayerProgression* Progression = GetProgressionSubsystem())
-	// {
-	//     return Progression->GetREPTier(PlayerID) >= MinREPTier;
-	// }
+			// Convert tier enum to numeric for comparison
+			const int32 PlayerTierValue = static_cast<int32>(PlayerTier);
 
+			// MinREPTier: 0=Unknown, 1=Rookie, 2=Regular, 3=Respected, 4=Elite, 5=Legend
+			return PlayerTierValue >= MinREPTier;
+		}
+	}
+
+	// If we can't access the reputation system, default to allowing (fail open)
+	UE_LOG(LogTemp, Warning, TEXT("PinkSlipHandler: Could not access ReputationSubsystem, allowing player"));
 	return true;
 }
 

@@ -4,6 +4,7 @@
 #include "ChaosVehicleWheel.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 #include "SimpleVehicle/SimpleWheelSim.h"
+#include "Weather/MGWeatherSubsystem.h"
 
 UMGVehicleMovementComponent::UMGVehicleMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -29,7 +30,9 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	// Update core systems
 	UpdateEngineSimulation(DeltaTime);
 	UpdateBoostSimulation(DeltaTime);
+	UpdateTurboShaftSimulation(DeltaTime); // Advanced turbo physics
 	UpdateDriftPhysics(DeltaTime);
+	UpdateDriftScoring(DeltaTime); // Enhanced drift scoring with chains
 	UpdateNitrousSystem(DeltaTime);
 	ApplyStabilityControl(DeltaTime);
 	ApplyAntiFlipForce(DeltaTime);
@@ -41,7 +44,7 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	UpdateAntiLag(DeltaTime);
 	UpdateLaunchControl(DeltaTime);
 	UpdateBrakeSystem(DeltaTime);
-	UpdateSurfaceDetection(DeltaTime); // NEW: Surface grip detection
+	UpdateSurfaceDetection(DeltaTime); // Surface grip detection with weather integration
 	ApplyDifferentialBehavior(DeltaTime);
 
 	// Update shift cooldown
@@ -346,6 +349,21 @@ void UMGVehicleMovementComponent::ApplyVehicleConfiguration(const FMGVehicleData
 	{
 		EngineState.NitrousRemaining = 0.0f;
 	}
+
+	// Initialize turbo state for advanced simulation
+	if (VehicleData.Engine.ForcedInduction.Type == EMGForcedInductionType::Turbo_Single ||
+		VehicleData.Engine.ForcedInduction.Type == EMGForcedInductionType::Turbo_Twin)
+	{
+		// Set max shaft RPM based on turbo size (smaller turbos spin faster)
+		// Twin turbos use smaller units
+		EngineState.TurboState.MaxShaftRPM = (VehicleData.Engine.ForcedInduction.Type == EMGForcedInductionType::Turbo_Twin)
+			? 180000.0f : 150000.0f;
+		EngineState.TurboState.ShaftRPM = 0.0f;
+		EngineState.TurboState.CompressorEfficiency = 0.0f;
+	}
+
+	// Calculate and apply part wear effects
+	UpdatePartWearEffects();
 
 	UE_LOG(LogTemp, Log, TEXT("Applied vehicle configuration: %s (HP: %.0f, Grip F/R: %.2f/%.2f)"),
 		*VehicleData.DisplayName, VehicleData.Stats.Horsepower, FrontGrip, RearGrip);
@@ -719,17 +737,32 @@ float UMGVehicleMovementComponent::CalculateTireFriction(int32 WheelIndex) const
 	// Apply damage multiplier
 	BaseFriction *= TireGripMultiplier;
 
+	// Apply suspension wear effects (worn suspension reduces effective grip)
+	BaseFriction *= PartWearEffects.SuspensionEfficiency;
+
 	return BaseFriction;
 }
 
 float UMGVehicleMovementComponent::CalculateCurrentPower() const
 {
-	float Power = CurrentConfiguration.Stats.Horsepower;
+	float Power = 0.0f;
+	float Torque = 0.0f;
 
-	// Apply boost multiplier
+	// Sample power curve at current RPM for realistic power delivery
+	SamplePowerCurve(EngineState.CurrentRPM, Power, Torque);
+
+	// Store current dyno values in engine state (const_cast for caching)
+	const_cast<FMGEngineState&>(EngineState).CurrentHorsepower = Power;
+	const_cast<FMGEngineState&>(EngineState).CurrentTorque = Torque;
+
+	// Apply boost multiplier with forced induction efficiency
 	if (EngineState.CurrentBoostPSI > 0.0f)
 	{
-		const float BoostMultiplier = 1.0f + (EngineState.CurrentBoostPSI / 20.0f); // ~5% per PSI
+		float BoostMultiplier = 1.0f + (EngineState.CurrentBoostPSI / 20.0f); // ~5% per PSI
+
+		// Apply forced induction wear (affects boost effectiveness)
+		BoostMultiplier = 1.0f + (BoostMultiplier - 1.0f) * PartWearEffects.ForcedInductionEfficiency;
+
 		Power *= BoostMultiplier;
 	}
 
@@ -739,39 +772,31 @@ float UMGVehicleMovementComponent::CalculateCurrentPower() const
 		Power *= NitrousPowerMultiplier;
 	}
 
-	// Apply engine condition - worn parts reduce power output
-	float ConditionMultiplier = 1.0f;
-	if (CurrentConfiguration.PartConditions.Num() > 0)
+	// Apply part wear effects from the wear system
+	Power *= PartWearEffects.EngineEfficiency;
+	Power *= PartWearEffects.DrivetrainEfficiency;
+
+	// Apply overheating penalty
+	if (EngineState.bOverheating)
 	{
-		// Check engine-related part conditions
-		static const TArray<FName> EngineParts = {
-			FName("Engine"), FName("Turbo"), FName("Supercharger"),
-			FName("Exhaust"), FName("AirFilter"), FName("FuelSystem")
-		};
+		const float OverheatThreshold = 115.0f;
+		const float CriticalTemp = 130.0f;
 
-		float TotalCondition = 0.0f;
-		int32 PartCount = 0;
-
-		for (const FName& PartName : EngineParts)
+		if (EngineState.EngineTemperature >= CriticalTemp)
 		{
-			if (const float* Condition = CurrentConfiguration.PartConditions.Find(PartName))
-			{
-				TotalCondition += *Condition;
-				PartCount++;
-			}
+			// Critical - severe power loss (limp mode)
+			Power *= 0.5f;
 		}
-
-		if (PartCount > 0)
+		else
 		{
-			// Average condition affects power
-			// At 100% condition = 100% power
-			// At 50% condition = 85% power
-			// At 0% condition = 70% power
-			const float AverageCondition = TotalCondition / PartCount;
-			ConditionMultiplier = FMath::Lerp(0.70f, 1.0f, AverageCondition / 100.0f);
+			// Gradual power loss between overheat threshold and critical
+			const float OverheatProgress = (EngineState.EngineTemperature - OverheatThreshold) / (CriticalTemp - OverheatThreshold);
+			Power *= FMath::Lerp(1.0f, 0.5f, OverheatProgress);
 		}
 	}
-	Power *= ConditionMultiplier;
+
+	// Apply max speed multiplier (from damage system)
+	Power *= MaxSpeedMultiplier;
 
 	return Power;
 }
@@ -1030,6 +1055,9 @@ void UMGVehicleMovementComponent::UpdateBrakeSystem(float DeltaTime)
 			(BrakeFadeMaxTemp - BrakeFadeStartTemp);
 		EngineState.BrakeFadeMultiplier = FMath::Lerp(1.0f, BrakeFadeMinEfficiency, FadeProgress);
 	}
+
+	// Apply brake pad wear effect (worn pads have reduced stopping power)
+	EngineState.BrakeFadeMultiplier *= PartWearEffects.BrakePadEfficiency;
 }
 
 void UMGVehicleMovementComponent::ApplyDifferentialBehavior(float DeltaTime)
@@ -1170,7 +1198,11 @@ float UMGVehicleMovementComponent::CalculateSpeedSteeringFactor() const
 	// Non-linear reduction - more sensitive at higher speeds
 	const float Reduction = FMath::Pow(SpeedFactor, 1.5f) * SpeedSensitiveSteeringFactor;
 
-	return 1.0f - Reduction;
+	// Apply steering wear effect (worn steering is less precise)
+	const float SteeringPrecision = PartWearEffects.SteeringPrecision;
+
+	// Worn steering adds slight imprecision (reduced responsiveness)
+	return (1.0f - Reduction) * SteeringPrecision;
 }
 
 float UMGVehicleMovementComponent::GetDifferentialLockFactor() const
@@ -1334,20 +1366,492 @@ void UMGVehicleMovementComponent::UpdateSurfaceDetection(float DeltaTime)
 			WheelSurface.TimeOnSurface += DeltaTime;
 		}
 
-		// Update wetness level based on weather or surface type
-		// TODO: Integrate with weather system when available
+		// Update wetness level based on weather system
+		float TargetWetness = 0.0f;
+
+		// Get weather subsystem for precipitation data
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+			{
+				const FMGWeatherState& WeatherState = WeatherSubsystem->GetCurrentWeather();
+
+				// Set target wetness based on road condition from weather
+				switch (WeatherState.RoadCondition)
+				{
+					case EMGRoadCondition::Dry:
+						TargetWetness = 0.0f;
+						break;
+					case EMGRoadCondition::Damp:
+						TargetWetness = 0.3f;
+						break;
+					case EMGRoadCondition::Wet:
+						TargetWetness = 0.7f;
+						break;
+					case EMGRoadCondition::StandingWater:
+						TargetWetness = 1.0f;
+						break;
+					case EMGRoadCondition::Icy:
+						TargetWetness = 0.2f; // Ice is slippery but not wet
+						break;
+					case EMGRoadCondition::Snowy:
+						TargetWetness = 0.5f; // Snow melts under tires
+						break;
+					default:
+						TargetWetness = 0.0f;
+				}
+
+				// Add precipitation contribution
+				TargetWetness = FMath::Max(TargetWetness, WeatherState.Intensity.Precipitation);
+			}
+		}
+
+		// Surface type can override wetness (e.g., explicitly wet surface)
 		if (WheelSurface.SurfaceType == EMGSurfaceType::Wet)
 		{
-			// Gradually increase wetness on wet surfaces
-			WheelSurface.WetnessLevel = FMath::FInterpTo(WheelSurface.WetnessLevel, 1.0f, DeltaTime, 2.0f);
+			TargetWetness = FMath::Max(TargetWetness, 0.8f);
 		}
-		else
-		{
-			// Dry off when not on wet surface
-			WheelSurface.WetnessLevel = FMath::FInterpTo(WheelSurface.WetnessLevel, 0.0f, DeltaTime, 0.5f);
-		}
+
+		// Interpolate wetness level for smooth transitions
+		const float WetnessChangeRate = TargetWetness > WheelSurface.WetnessLevel ? 2.0f : 0.5f;
+		WheelSurface.WetnessLevel = FMath::FInterpTo(WheelSurface.WetnessLevel, TargetWetness, DeltaTime, WetnessChangeRate);
 
 		// Update contact state (simplified - full implementation would check actual wheel contact)
 		WheelSurface.bHasContact = IsGrounded();
+	}
+}
+
+// ==========================================
+// POWER CURVE / DYNO INTEGRATION
+// ==========================================
+
+void UMGVehicleMovementComponent::SamplePowerCurve(float RPM, float& OutHorsepower, float& OutTorque) const
+{
+	const FMGPowerCurve& PowerCurve = CurrentConfiguration.PowerCurve;
+
+	// Handle empty power curve - fall back to flat power model
+	if (PowerCurve.CurvePoints.Num() == 0)
+	{
+		OutHorsepower = CurrentConfiguration.Stats.Horsepower;
+		OutTorque = CurrentConfiguration.Stats.Torque;
+		return;
+	}
+
+	// Clamp RPM to valid range
+	const float ClampedRPM = FMath::Clamp(RPM, 800.0f, (float)PowerCurve.Redline);
+
+	// Find the two curve points to interpolate between
+	int32 LowerIndex = 0;
+	int32 UpperIndex = 0;
+
+	for (int32 i = 0; i < PowerCurve.CurvePoints.Num(); ++i)
+	{
+		if (PowerCurve.CurvePoints[i].RPM <= ClampedRPM)
+		{
+			LowerIndex = i;
+		}
+		if (PowerCurve.CurvePoints[i].RPM >= ClampedRPM)
+		{
+			UpperIndex = i;
+			break;
+		}
+		UpperIndex = i; // Handle case where RPM is above all points
+	}
+
+	// If we're at exact point or only have one point
+	if (LowerIndex == UpperIndex || PowerCurve.CurvePoints.Num() == 1)
+	{
+		OutHorsepower = PowerCurve.CurvePoints[LowerIndex].Horsepower;
+		OutTorque = PowerCurve.CurvePoints[LowerIndex].Torque;
+		return;
+	}
+
+	// Linear interpolation between points
+	const FMGPowerCurvePoint& LowerPoint = PowerCurve.CurvePoints[LowerIndex];
+	const FMGPowerCurvePoint& UpperPoint = PowerCurve.CurvePoints[UpperIndex];
+
+	const float RPMRange = (float)(UpperPoint.RPM - LowerPoint.RPM);
+	const float Alpha = (RPMRange > 0.0f) ? (ClampedRPM - LowerPoint.RPM) / RPMRange : 0.0f;
+
+	OutHorsepower = FMath::Lerp(LowerPoint.Horsepower, UpperPoint.Horsepower, Alpha);
+	OutTorque = FMath::Lerp(LowerPoint.Torque, UpperPoint.Torque, Alpha);
+}
+
+// ==========================================
+// ENHANCED DRIFT SCORING SYSTEM
+// ==========================================
+
+EMGDriftAngleTier UMGVehicleMovementComponent::CalculateDriftAngleTier(float AbsAngle) const
+{
+	if (AbsAngle < DriftAngleThreshold)
+	{
+		return EMGDriftAngleTier::None;
+	}
+	else if (AbsAngle < DriftAngleTierMild)
+	{
+		return EMGDriftAngleTier::Mild;
+	}
+	else if (AbsAngle < DriftAngleTierStandard)
+	{
+		return EMGDriftAngleTier::Standard;
+	}
+	else if (AbsAngle < DriftAngleTierAggressive)
+	{
+		return EMGDriftAngleTier::Aggressive;
+	}
+	else if (AbsAngle < DriftAngleTierExtreme)
+	{
+		return EMGDriftAngleTier::Extreme;
+	}
+	else
+	{
+		return EMGDriftAngleTier::Insane;
+	}
+}
+
+float UMGVehicleMovementComponent::GetDriftTierBonusMultiplier(EMGDriftAngleTier Tier) const
+{
+	switch (Tier)
+	{
+		case EMGDriftAngleTier::None:       return 0.0f;
+		case EMGDriftAngleTier::Mild:       return 1.0f;
+		case EMGDriftAngleTier::Standard:   return 1.5f;
+		case EMGDriftAngleTier::Aggressive: return 2.0f;
+		case EMGDriftAngleTier::Extreme:    return 3.0f;
+		case EMGDriftAngleTier::Insane:     return 5.0f;
+		default:                            return 1.0f;
+	}
+}
+
+void UMGVehicleMovementComponent::UpdateDriftScoring(float DeltaTime)
+{
+	const float AbsDriftAngle = FMath::Abs(DriftState.DriftAngle);
+	const bool bWasDrifting = DriftState.bIsDrifting;
+
+	// Update drift status
+	DriftState.bIsDrifting = AbsDriftAngle > DriftAngleThreshold;
+
+	if (DriftState.bIsDrifting)
+	{
+		// Update drift duration
+		DriftState.DriftDuration += DeltaTime;
+
+		// Track peak angle for this drift
+		if (AbsDriftAngle > DriftState.PeakAngle)
+		{
+			DriftState.PeakAngle = AbsDriftAngle;
+		}
+
+		// Update angle tier
+		DriftState.CurrentAngleTier = CalculateDriftAngleTier(AbsDriftAngle);
+
+		// Check for direction change (e-brake transitions, etc.)
+		const float CurrentDirection = FMath::Sign(DriftState.DriftAngle);
+		if (LastDriftDirection != 0.0f && CurrentDirection != LastDriftDirection)
+		{
+			DriftState.bDirectionChanged = true;
+		}
+		LastDriftDirection = CurrentDirection;
+
+		// Build chain multiplier over time
+		DriftChainBuildTimer += DeltaTime;
+		if (DriftChainBuildTimer >= DriftChainBuildTime)
+		{
+			DriftChainBuildTimer = 0.0f;
+			if (DriftState.ChainMultiplier < DriftMaxChainMultiplier)
+			{
+				DriftState.ChainMultiplier++;
+			}
+		}
+
+		// Reset chain continuation timer
+		DriftState.TimeSinceLastDrift = 0.0f;
+
+		// Calculate score for this frame
+		// Base score from time drifting
+		float FrameScore = DriftBasePointsPerSecond * DeltaTime;
+
+		// Angle bonus (more angle = more points)
+		const float AngleBonusFactor = (AbsDriftAngle - DriftAngleThreshold) * DriftAngleBonusMultiplier * 0.01f;
+		FrameScore *= (1.0f + AngleBonusFactor);
+
+		// Speed bonus (faster = more points)
+		const float SpeedFactor = FMath::Clamp(GetSpeedMPH() / 100.0f, 0.0f, 2.0f);
+		FrameScore *= (1.0f + SpeedFactor * DriftSpeedBonusMultiplier * 0.5f);
+
+		// Tier bonus
+		const float TierBonus = GetDriftTierBonusMultiplier(DriftState.CurrentAngleTier);
+		FrameScore *= TierBonus;
+
+		// Direction change bonus
+		if (DriftState.bDirectionChanged)
+		{
+			FrameScore *= DriftDirectionChangeBonusMultiplier;
+		}
+
+		// Apply chain multiplier
+		FrameScore *= DriftState.ChainMultiplier;
+
+		// Accumulate score
+		DriftState.DriftScore += FrameScore;
+		DriftState.ChainTotalScore += FrameScore;
+
+		// Broadcast score update periodically (every 0.5 seconds of drift time)
+		static float ScoreBroadcastAccumulator = 0.0f;
+		ScoreBroadcastAccumulator += DeltaTime;
+		if (ScoreBroadcastAccumulator >= 0.5f)
+		{
+			ScoreBroadcastAccumulator = 0.0f;
+			AwardDriftScore(DriftState.DriftScore, TierBonus);
+		}
+	}
+	else
+	{
+		// Not currently drifting
+		if (bWasDrifting)
+		{
+			// Just ended a drift - award final score for this drift
+			const float TierBonus = GetDriftTierBonusMultiplier(DriftState.CurrentAngleTier);
+			AwardDriftScore(DriftState.DriftScore, TierBonus);
+
+			// Increment drifts in chain
+			DriftState.DriftsInChain++;
+
+			// Reset single-drift tracking
+			DriftState.DriftScore = 0.0f;
+			DriftState.DriftDuration = 0.0f;
+			DriftState.PeakAngle = 0.0f;
+			DriftState.bDirectionChanged = false;
+			DriftState.CurrentAngleTier = EMGDriftAngleTier::None;
+			LastDriftDirection = 0.0f;
+		}
+
+		// Update chain continuation window
+		DriftState.TimeSinceLastDrift += DeltaTime;
+
+		// Check if chain should break
+		if (DriftState.TimeSinceLastDrift > DriftChainContinuationWindow && DriftState.ChainMultiplier > 1)
+		{
+			BreakDriftChain();
+		}
+	}
+}
+
+void UMGVehicleMovementComponent::AwardDriftScore(float BaseScore, float AngleBonus)
+{
+	if (BaseScore > 0.0f)
+	{
+		OnDriftScoreAwarded.Broadcast(BaseScore, DriftState.ChainMultiplier, AngleBonus);
+	}
+}
+
+void UMGVehicleMovementComponent::BreakDriftChain()
+{
+	// Broadcast chain broken with total score
+	if (DriftState.ChainTotalScore > 0.0f)
+	{
+		OnDriftChainBroken.Broadcast(DriftState.ChainTotalScore);
+	}
+
+	// Reset chain state
+	DriftState.ChainMultiplier = 1;
+	DriftState.ChainTotalScore = 0.0f;
+	DriftState.DriftsInChain = 0;
+	DriftState.TimeSinceLastDrift = 0.0f;
+	DriftChainBuildTimer = 0.0f;
+}
+
+// ==========================================
+// ADVANCED TURBO SHAFT SIMULATION
+// ==========================================
+
+void UMGVehicleMovementComponent::UpdateTurboShaftSimulation(float DeltaTime)
+{
+	const FMGForcedInductionConfig& FI = CurrentConfiguration.Engine.ForcedInduction;
+
+	// Only for turbo vehicles
+	if (FI.Type != EMGForcedInductionType::Turbo_Single &&
+		FI.Type != EMGForcedInductionType::Turbo_Twin)
+	{
+		EngineState.TurboState.ShaftRPM = 0.0f;
+		EngineState.TurboState.CompressorEfficiency = 0.0f;
+		return;
+	}
+
+	FMGTurboState& Turbo = EngineState.TurboState;
+
+	// Calculate exhaust gas energy based on RPM, throttle, and engine load
+	// Higher RPM and throttle = more exhaust energy = faster spool
+	const float RPMFactor = EngineState.CurrentRPM / CurrentConfiguration.Stats.Redline;
+	const float LoadFactor = EngineState.ThrottlePosition * EngineState.EngineLoad;
+
+	// Exhaust gas temperature increases with load (affects spool rate)
+	const float TargetEGT = 400.0f + (600.0f * RPMFactor * LoadFactor); // 400-1000C range
+	Turbo.ExhaustGasTemp = FMath::FInterpTo(Turbo.ExhaustGasTemp, TargetEGT, DeltaTime, 5.0f);
+
+	// Calculate exhaust flow energy (drives turbine)
+	const float ExhaustEnergy = RPMFactor * LoadFactor * TurboExhaustFlowCoef;
+
+	// Turbine wheel acceleration (shaft inertia affects response)
+	// F = ma -> a = F/m, where higher inertia = lower acceleration
+	const float InertiaFactor = 1.0f / FMath::Max(TurboShaftInertia, 0.1f);
+
+	// Target shaft RPM based on exhaust energy and turbo size
+	const float MaxShaftRPM = Turbo.MaxShaftRPM;
+	const float TargetShaftRPM = ExhaustEnergy * MaxShaftRPM;
+
+	// Apply spool-up/spool-down with inertia
+	// Twin turbo spools slightly faster (smaller turbines)
+	float SpoolRate = BoostBuildupRate * InertiaFactor;
+	if (FI.Type == EMGForcedInductionType::Turbo_Twin)
+	{
+		SpoolRate *= 1.3f; // Twin turbos spool faster
+	}
+
+	// Spool up faster when on throttle, decay faster when off
+	if (EngineState.ThrottlePosition > 0.3f && EngineState.CurrentRPM >= FI.BoostThresholdRPM)
+	{
+		Turbo.ShaftRPM = FMath::FInterpTo(Turbo.ShaftRPM, TargetShaftRPM, DeltaTime, SpoolRate);
+	}
+	else
+	{
+		// Coast down with natural friction
+		Turbo.ShaftRPM = FMath::FInterpTo(Turbo.ShaftRPM, 0.0f, DeltaTime, BoostDecayRate * InertiaFactor);
+	}
+
+	// Calculate compressor efficiency based on operating point
+	// Efficiency is best at mid-range, drops at extremes (surge/choke)
+	const float ShaftRatio = Turbo.ShaftRPM / MaxShaftRPM;
+	if (ShaftRatio < 0.3f)
+	{
+		// Below optimal - low efficiency
+		Turbo.CompressorEfficiency = ShaftRatio * TurboCompressorPeakEfficiency / 0.3f;
+	}
+	else if (ShaftRatio < 0.8f)
+	{
+		// Optimal range
+		Turbo.CompressorEfficiency = TurboCompressorPeakEfficiency;
+	}
+	else
+	{
+		// Approaching choke - efficiency drops
+		Turbo.CompressorEfficiency = TurboCompressorPeakEfficiency * (1.0f - (ShaftRatio - 0.8f) * 0.5f);
+	}
+
+	// Check for compressor surge (high boost, low airflow)
+	// Surge occurs when throttle is suddenly closed at high boost
+	const float CurrentBoostRatio = EngineState.CurrentBoostPSI / FMath::Max(FI.MaxBoostPSI, 1.0f);
+	Turbo.bInSurge = (CurrentBoostRatio > 0.7f && EngineState.ThrottlePosition < 0.2f && Turbo.ShaftRPM > MaxShaftRPM * 0.6f);
+
+	if (Turbo.bInSurge)
+	{
+		// Surge causes boost fluctuation and efficiency loss
+		Turbo.CompressorEfficiency *= 0.5f;
+		// Could add audio/visual effects here
+	}
+
+	// Calculate actual boost from shaft RPM and efficiency
+	const float BoostFromShaft = (Turbo.ShaftRPM / MaxShaftRPM) * FI.MaxBoostPSI * Turbo.CompressorEfficiency;
+
+	// Apply backpressure effect (exhaust restrictions reduce boost)
+	Turbo.BackpressureFactor = 1.0f; // Could be affected by exhaust mods
+	const float FinalBoost = BoostFromShaft * Turbo.BackpressureFactor;
+
+	// Update engine state boost (this replaces the simpler model in UpdateBoostSimulation)
+	EngineState.CurrentBoostPSI = FinalBoost;
+	EngineState.BoostBuildupPercent = Turbo.ShaftRPM / MaxShaftRPM;
+}
+
+// ==========================================
+// PART WEAR EFFECTS SYSTEM
+// ==========================================
+
+void UMGVehicleMovementComponent::UpdatePartWearEffects()
+{
+	// Reset effects
+	PartWearEffects = FMGPartWearEffects();
+
+	const TMap<FName, float>& PartConditions = CurrentConfiguration.PartConditions;
+
+	// Helper lambda to get condition with default
+	auto GetCondition = [&PartConditions](const FName& PartName, float DefaultValue = 100.0f) -> float
+	{
+		if (const float* Condition = PartConditions.Find(PartName))
+		{
+			return *Condition;
+		}
+		return DefaultValue;
+	};
+
+	// Suspension wear affects damping and handling
+	const float FrontSuspCondition = GetCondition(FName("FrontSuspension"));
+	const float RearSuspCondition = GetCondition(FName("RearSuspension"));
+	const float AvgSuspCondition = (FrontSuspCondition + RearSuspCondition) * 0.5f;
+	// At 100% = 1.0 efficiency, at 0% = (1 - impact) efficiency
+	PartWearEffects.SuspensionEfficiency = 1.0f - ((100.0f - AvgSuspCondition) / 100.0f * SuspensionWearHandlingImpact);
+
+	// Brake wear affects stopping power
+	const float FrontBrakeCondition = GetCondition(FName("FrontBrakes"));
+	const float RearBrakeCondition = GetCondition(FName("RearBrakes"));
+	const float AvgBrakeCondition = (FrontBrakeCondition + RearBrakeCondition) * 0.5f;
+	PartWearEffects.BrakePadEfficiency = 1.0f - ((100.0f - AvgBrakeCondition) / 100.0f * BrakeWearStoppingImpact);
+
+	// Steering wear affects responsiveness
+	const float SteeringCondition = GetCondition(FName("Steering"));
+	PartWearEffects.SteeringPrecision = 1.0f - ((100.0f - SteeringCondition) / 100.0f * SteeringWearPrecisionImpact);
+
+	// Drivetrain wear affects power delivery
+	const float ClutchCondition = GetCondition(FName("Clutch"));
+	const float TransmissionCondition = GetCondition(FName("Transmission"));
+	const float DifferentialCondition = GetCondition(FName("Differential"));
+	const float AvgDrivetrainCondition = (ClutchCondition + TransmissionCondition + DifferentialCondition) / 3.0f;
+	PartWearEffects.DrivetrainEfficiency = FMath::Lerp(0.85f, 1.0f, AvgDrivetrainCondition / 100.0f);
+
+	// Engine wear affects power output
+	const float EngineCondition = GetCondition(FName("Engine"));
+	PartWearEffects.EngineEfficiency = FMath::Lerp(0.70f, 1.0f, EngineCondition / 100.0f);
+
+	// Forced induction wear affects boost
+	const float TurboCondition = GetCondition(FName("Turbo"));
+	const float SuperchargerCondition = GetCondition(FName("Supercharger"));
+	const float FICondition = FMath::Max(TurboCondition, SuperchargerCondition);
+	PartWearEffects.ForcedInductionEfficiency = FMath::Lerp(0.60f, 1.0f, FICondition / 100.0f);
+
+	// Broadcast warnings for critically worn parts
+	for (const auto& PartEntry : PartConditions)
+	{
+		if (PartEntry.Value <= PartWearWarningThreshold && PartEntry.Value > 0.0f)
+		{
+			OnPartWearWarning.Broadcast(PartEntry.Key, PartEntry.Value);
+		}
+	}
+
+	// Apply wear effects to handling
+	ApplyPartWearToHandling();
+}
+
+void UMGVehicleMovementComponent::ApplyPartWearToHandling()
+{
+	// This method applies the wear effects to actual physics parameters
+	// Called after UpdatePartWearEffects and when configuration changes
+
+	// Note: Some effects are applied directly in CalculateTireFriction, CalculateCurrentPower, etc.
+	// This method handles effects that need to modify component properties directly
+
+	// Worn steering reduces effective steering speed
+	// (Applied through CalculateSpeedSteeringFactor indirectly)
+
+	// Worn suspension affects stability
+	// (Applied through ApplyStabilityControl indirectly by reducing effectiveness)
+
+	// Log wear status for debugging
+	if (PartWearEffects.EngineEfficiency < 0.9f ||
+		PartWearEffects.DrivetrainEfficiency < 0.95f ||
+		PartWearEffects.BrakePadEfficiency < 0.9f)
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("Part wear affecting performance - Engine: %.0f%%, Drivetrain: %.0f%%, Brakes: %.0f%%"),
+			PartWearEffects.EngineEfficiency * 100.0f,
+			PartWearEffects.DrivetrainEfficiency * 100.0f,
+			PartWearEffects.BrakePadEfficiency * 100.0f);
 	}
 }

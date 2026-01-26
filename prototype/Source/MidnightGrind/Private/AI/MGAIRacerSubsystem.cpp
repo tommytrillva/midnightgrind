@@ -87,7 +87,11 @@ void UMGAIRacerSubsystem::SpawnAIRacers(const FMGAISpawnConfig& Config)
 		{
 			// Configure based on config
 			RacerInfo.Controller->SetDifficultyMultiplier(Config.DifficultyModifier);
-			RacerInfo.Controller->SetRubberBandingEnabled(Config.bEnableRubberBanding);
+
+			// Use skill-based catch-up (NOT rubber banding - per GDD Pillar 5)
+			// Legacy bEnableRubberBanding is mapped to the new system
+			bool bEnableCatchUp = Config.bEnableSkillBasedCatchUp || Config.bEnableRubberBanding;
+			RacerInfo.Controller->SetSkillBasedCatchUpEnabled(bEnableCatchUp);
 
 			// Set racing line
 			if (RacingLinePoints.Num() > 0)
@@ -252,15 +256,22 @@ void UMGAIRacerSubsystem::SetAllDifficulty(float DifficultyMultiplier)
 	}
 }
 
-void UMGAIRacerSubsystem::SetAllRubberBanding(bool bEnabled, float Strength)
+void UMGAIRacerSubsystem::SetAllSkillBasedCatchUp(bool bEnabled)
 {
 	for (FMGAIRacerInfo& Racer : ActiveRacers)
 	{
 		if (Racer.Controller)
 		{
-			Racer.Controller->SetRubberBandingEnabled(bEnabled);
+			Racer.Controller->SetSkillBasedCatchUpEnabled(bEnabled);
 		}
 	}
+}
+
+void UMGAIRacerSubsystem::SetAllRubberBanding(bool bEnabled, float Strength)
+{
+	// Note: Strength parameter is deprecated - skill-based catch-up uses
+	// fixed behavior based on race situation (per GDD Pillar 5: Unified Challenge)
+	SetAllSkillBasedCatchUp(bEnabled);
 }
 
 // ==========================================

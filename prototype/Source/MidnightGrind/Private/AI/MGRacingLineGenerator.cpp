@@ -862,6 +862,32 @@ TArray<FMGAIRacingLinePoint> UMGRacingLineGenerator::BuildRacingLinePoints(
 	TSet<int32> ApexSet(ApexIndices);
 	TSet<int32> BrakingSet(BrakingStarts);
 
+	// Find overtaking zones (long straights with low curvature)
+	TSet<int32> OvertakingZones;
+	int32 StraightLength = 0;
+	for (int32 i = 0; i < Positions.Num(); ++i)
+	{
+		if (Curvatures[i] < 0.005f)
+		{
+			StraightLength++;
+		}
+		else
+		{
+			// Mark long straights as overtaking zones
+			if (StraightLength > 10)
+			{
+				for (int32 j = i - StraightLength; j < i; ++j)
+				{
+					if (j >= 0)
+					{
+						OvertakingZones.Add(j);
+					}
+				}
+			}
+			StraightLength = 0;
+		}
+	}
+
 	float AccumulatedDistance = 0.0f;
 
 	for (int32 i = 0; i < Positions.Num(); ++i)
@@ -876,10 +902,47 @@ TArray<FMGAIRacingLinePoint> UMGRacingLineGenerator::BuildRacingLinePoints(
 		int32 Next = (i + 1) % Positions.Num();
 		Point.Direction = (Positions[Next] - Positions[i]).GetSafeNormal();
 
+		// Store curvature for AI decision-making
+		Point.Curvature = Curvatures[i];
+
 		// Mark special zones
 		Point.bIsApex = ApexSet.Contains(i);
 		Point.bIsBrakingZone = BrakingSet.Contains(i);
 		Point.bIsAccelerationZone = i > 0 && Speeds[i] > Speeds[i - 1];
+		Point.bIsOvertakingZone = OvertakingZones.Contains(i);
+
+		// Calculate optimal gear based on speed (simplified)
+		// Assumes typical gear ratios for racing car
+		if (Speeds[i] < 15.0f)
+		{
+			Point.OptimalGear = 1;
+		}
+		else if (Speeds[i] < 25.0f)
+		{
+			Point.OptimalGear = 2;
+		}
+		else if (Speeds[i] < 40.0f)
+		{
+			Point.OptimalGear = 3;
+		}
+		else if (Speeds[i] < 55.0f)
+		{
+			Point.OptimalGear = 4;
+		}
+		else if (Speeds[i] < 70.0f)
+		{
+			Point.OptimalGear = 5;
+		}
+		else
+		{
+			Point.OptimalGear = 6;
+		}
+
+		// Default grip level (would be set per-track in editor)
+		Point.GripLevel = 1.0f;
+
+		// Default camber (would be set per-track in editor)
+		Point.CamberAngle = 0.0f;
 
 		Result.Add(Point);
 
