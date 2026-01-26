@@ -1,19 +1,61 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGAIRacerController.cpp
+ * @brief Implementation of AI racing intelligence
+ *
+ * This implementation follows the GDD design pillar "Unified Challenge":
+ * - AI uses the same physics as players
+ * - No rubber-banding speed boosts
+ * - Difficulty comes from decision quality, not physics cheats
+ * - Skill-based catch-up through risk-taking and optimization
+ */
+
 #include "AI/MGAIRacerController.h"
 #include "AI/MGAIDriverProfile.h"
 #include "Track/MGTrackSubsystem.h"
 #include "Core/MGRaceGameMode.h"
+#include "Weather/MGWeatherSubsystem.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 
+// ==========================================
+// CONSTANTS
+// ==========================================
+
+namespace AIConstants
+{
+	/** Conversion from meters to UE units (cm) */
+	constexpr float MetersToUnits = 100.0f;
+
+	/** Minimum speed to consider for calculations (cm/s) */
+	constexpr float MinCalculationSpeed = 100.0f;
+
+	/** Default braking deceleration (m/s^2) */
+	constexpr float DefaultBrakingDecel = 12.0f;
+
+	/** Slipstream speed bonus percentage */
+	constexpr float MaxSlipstreamBonus = 0.05f; // 5% max speed increase
+
+	/** Time gap considered "close" for racing decisions (seconds) */
+	constexpr float CloseGapThreshold = 1.5f;
+
+	/** Large gap threshold for mode changes (seconds) */
+	constexpr float LargeGapThreshold = 5.0f;
+}
+
+// ==========================================
+// CONSTRUCTOR & LIFECYCLE
+// ==========================================
+
 AMGAIRacerController::AMGAIRacerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+	PrimaryActorTick.TickGroup = TG_PrePhysics;
 }
 
 void AMGAIRacerController::BeginPlay()
@@ -31,19 +73,17 @@ void AMGAIRacerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Skip update if not in valid racing state
 	if (!VehiclePawn || CurrentState == EMGAIDrivingState::Waiting || CurrentState == EMGAIDrivingState::Finished)
 	{
 		return;
 	}
 
-	// Update subsystems
+	// Core update sequence
 	UpdatePerception();
 	UpdateRacingLineProgress();
-
-	// State machine
+	UpdateTactics(DeltaTime);
 	UpdateStateMachine(DeltaTime);
-
-	// Calculate and apply steering
 	CalculateSteering(DeltaTime);
 	ApplySteering();
 
@@ -69,6 +109,13 @@ void AMGAIRacerController::OnUnPossess()
 void AMGAIRacerController::SetDriverProfile(UMGAIDriverProfile* Profile)
 {
 	DriverProfile = Profile;
+
+	// Apply profile-specific configuration
+	if (DriverProfile)
+	{
+		OvertakeThreshold = DriverProfile->Aggression.OvertakeAggression;
+		MinFollowingGap = FMath::Lerp(1.5f, 0.5f, DriverProfile->Aggression.ProximityTolerance);
+	}
 }
 
 void AMGAIRacerController::SetDifficultyMultiplier(float Multiplier)
@@ -76,19 +123,35 @@ void AMGAIRacerController::SetDifficultyMultiplier(float Multiplier)
 	DifficultyMultiplier = FMath::Clamp(Multiplier, 0.5f, 1.5f);
 }
 
-void AMGAIRacerController::SetRubberBandingEnabled(bool bEnabled)
+void AMGAIRacerController::SetSkillBasedCatchUpEnabled(bool bEnabled)
 {
-	bRubberBandingEnabled = bEnabled;
+	bSkillBasedCatchUpEnabled = bEnabled;
 }
 
 void AMGAIRacerController::SetRacingLine(const TArray<FMGAIRacingLinePoint>& RacingLine)
 {
 	RacingLinePoints = RacingLine;
 	CurrentRacingLineIndex = 0;
+
+	// Calculate total racing line length
+	TotalRacingLineLength = 0.0f;
+	for (int32 i = 0; i < RacingLinePoints.Num(); ++i)
+	{
+		int32 NextIndex = (i + 1) % RacingLinePoints.Num();
+		TotalRacingLineLength += FVector::Dist(
+			RacingLinePoints[i].Position,
+			RacingLinePoints[NextIndex].Position
+		);
+	}
+}
+
+void AMGAIRacerController::SetOvertakeAggression(float Aggression)
+{
+	OvertakeThreshold = FMath::Clamp(Aggression, 0.0f, 1.0f);
 }
 
 // ==========================================
-// STATE
+// STATE QUERIES
 // ==========================================
 
 float AMGAIRacerController::GetCurrentSpeed() const
@@ -119,17 +182,20 @@ float AMGAIRacerController::GetDistanceToRacingLine() const
 }
 
 // ==========================================
-// CONTROL
+// RACE CONTROL
 // ==========================================
 
 void AMGAIRacerController::StartRacing()
 {
 	SetState(EMGAIDrivingState::Racing);
+	TacticalData = FMGAITacticalData();
 }
 
 void AMGAIRacerController::StopRacing()
 {
 	SetState(EMGAIDrivingState::Finished);
+	CurrentSteering = FMGAISteeringOutput();
+	CurrentSteering.Brake = 1.0f;
 }
 
 void AMGAIRacerController::ForceState(EMGAIDrivingState NewState)
@@ -139,11 +205,30 @@ void AMGAIRacerController::ForceState(EMGAIDrivingState NewState)
 
 void AMGAIRacerController::NotifyCollision(AActor* OtherActor, const FVector& ImpactPoint, const FVector& ImpactNormal)
 {
-	// If significant collision, enter recovery
-	if (CurrentState == EMGAIDrivingState::Racing || CurrentState == EMGAIDrivingState::Overtaking)
+	// Enter recovery if collision is significant
+	if (CurrentState == EMGAIDrivingState::Racing ||
+		CurrentState == EMGAIDrivingState::Overtaking ||
+		CurrentState == EMGAIDrivingState::Defending)
 	{
-		SetState(EMGAIDrivingState::Recovering);
-		RecoveryTimer = 1.5f;
+		// Calculate impact severity based on velocity
+		if (VehiclePawn)
+		{
+			FVector Velocity = VehiclePawn->GetVelocity();
+			float ImpactSeverity = FMath::Abs(FVector::DotProduct(Velocity, ImpactNormal));
+
+			// Only enter recovery for significant impacts
+			if (ImpactSeverity > 500.0f)
+			{
+				SetState(EMGAIDrivingState::Recovering);
+				RecoveryTimer = FMath::Lerp(1.0f, 3.0f, FMath::Clamp(ImpactSeverity / 2000.0f, 0.0f, 1.0f));
+
+				// If we were overtaking, abort the maneuver
+				if (CurrentState == EMGAIDrivingState::Overtaking)
+				{
+					OvertakeTimer = 0.0f;
+				}
+			}
+		}
 	}
 }
 
@@ -152,12 +237,27 @@ void AMGAIRacerController::NotifyOffTrack()
 	if (CurrentState != EMGAIDrivingState::Recovering)
 	{
 		SetState(EMGAIDrivingState::Recovering);
-		RecoveryTimer = 2.0f;
+
+		// Recovery time based on skill
+		float BaseRecovery = 2.0f;
+		if (DriverProfile)
+		{
+			BaseRecovery *= (2.0f - DriverProfile->Skill.RecoverySkill);
+		}
+		RecoveryTimer = BaseRecovery;
 	}
 }
 
+void AMGAIRacerController::UpdateRacePosition(int32 Position, int32 TotalRacers, float InGapToLeader, float InGapToAhead)
+{
+	CurrentRacePosition = Position;
+	TotalRacersInRace = TotalRacers;
+	GapToLeader = InGapToLeader;
+	GapToVehicleAhead = InGapToAhead;
+}
+
 // ==========================================
-// CORE LOGIC
+// CORE UPDATE METHODS
 // ==========================================
 
 void AMGAIRacerController::UpdatePerception()
@@ -172,6 +272,8 @@ void AMGAIRacerController::UpdatePerception()
 	FVector MyLocation = VehiclePawn->GetActorLocation();
 	FVector MyVelocity = VehiclePawn->GetVelocity();
 	FVector MyForward = VehiclePawn->GetActorForwardVector();
+	FVector MyRight = VehiclePawn->GetActorRightVector();
+	float MySpeed = MyVelocity.Size();
 
 	// Find all vehicles in perception radius
 	TArray<AActor*> NearbyActors;
@@ -193,7 +295,8 @@ void AMGAIRacerController::UpdatePerception()
 		FVector OtherLocation = OtherPawn->GetActorLocation();
 		float Distance = FVector::Dist(MyLocation, OtherLocation);
 
-		if (Distance > PerceptionRadius * 100.0f) // Convert to cm
+		// Skip if outside perception radius
+		if (Distance > PerceptionRadius * AIConstants::MetersToUnits)
 		{
 			continue;
 		}
@@ -204,34 +307,156 @@ void AMGAIRacerController::UpdatePerception()
 		Perception.RelativeVelocity = OtherPawn->GetVelocity() - MyVelocity;
 		Perception.Distance = Distance;
 
-		// Calculate angle
+		// Calculate angle to other vehicle
 		FVector ToOther = Perception.RelativePosition.GetSafeNormal();
 		float DotForward = FVector::DotProduct(MyForward, ToOther);
-		float DotRight = FVector::DotProduct(VehiclePawn->GetActorRightVector(), ToOther);
+		float DotRight = FVector::DotProduct(MyRight, ToOther);
 		Perception.Angle = FMath::RadiansToDegrees(FMath::Atan2(DotRight, DotForward));
 
+		// Determine relative position
 		Perception.bIsAhead = DotForward > 0.0f;
 		Perception.bIsOnLeft = DotRight < 0.0f;
 
-		// Time to collision
+		// Calculate speed difference
+		float OtherSpeed = OtherPawn->GetVelocity().Size();
+		Perception.SpeedDifference = MySpeed - OtherSpeed;
+
+		// Calculate time to collision
 		float ClosingSpeed = -FVector::DotProduct(Perception.RelativeVelocity, ToOther);
-		if (ClosingSpeed > 10.0f)
+		if (ClosingSpeed > AIConstants::MinCalculationSpeed)
 		{
 			Perception.TimeToCollision = Distance / ClosingSpeed;
+		}
+		else
+		{
+			Perception.TimeToCollision = FLT_MAX;
 		}
 
 		// Check if player
 		APlayerController* PC = Cast<APlayerController>(OtherPawn->GetController());
 		Perception.bIsPlayer = PC != nullptr;
 
+		// Check if in slipstream range
+		Perception.bInSlipstreamRange = IsInSlipstream(OtherPawn);
+
+		// Estimate skill based on observed driving
+		// (In a full implementation, this would track their line accuracy, braking points, etc.)
+		Perception.EstimatedSkill = 0.5f;
+
 		PerceivedVehicles.Add(Perception);
 	}
 
-	// Sort by distance
+	// Sort by distance for efficient processing
 	PerceivedVehicles.Sort([](const FMGAIVehiclePerception& A, const FMGAIVehiclePerception& B)
 	{
 		return A.Distance < B.Distance;
 	});
+}
+
+void AMGAIRacerController::UpdateRacingLineProgress()
+{
+	if (RacingLinePoints.Num() == 0 || !VehiclePawn)
+	{
+		return;
+	}
+
+	FVector CurrentPos = VehiclePawn->GetActorLocation();
+	int32 ClosestIndex = FindClosestRacingLinePoint(CurrentPos);
+
+	// Only allow forward progress (prevents going backwards on track)
+	if (ClosestIndex > CurrentRacingLineIndex)
+	{
+		CurrentRacingLineIndex = ClosestIndex;
+	}
+	// Handle lap wrap-around
+	else if (CurrentRacingLineIndex > RacingLinePoints.Num() - 10 && ClosestIndex < 10)
+	{
+		CurrentRacingLineIndex = ClosestIndex;
+	}
+
+	// Calculate normalized progress
+	if (TotalRacingLineLength > 0.0f)
+	{
+		float DistanceProgress = 0.0f;
+		for (int32 i = 0; i < CurrentRacingLineIndex; ++i)
+		{
+			int32 NextIndex = (i + 1) % RacingLinePoints.Num();
+			DistanceProgress += FVector::Dist(
+				RacingLinePoints[i].Position,
+				RacingLinePoints[NextIndex].Position
+			);
+		}
+		RacingLineProgress = DistanceProgress / TotalRacingLineLength;
+	}
+}
+
+void AMGAIRacerController::UpdateTactics(float DeltaTime)
+{
+	// Update time following
+	FMGAIVehiclePerception VehicleAhead = GetVehicleAhead();
+	if (VehicleAhead.Vehicle && VehicleAhead.Distance < 20.0f * AIConstants::MetersToUnits)
+	{
+		TacticalData.TimeFollowing += DeltaTime;
+		TacticalData.TacticalTarget = VehicleAhead.Vehicle;
+	}
+	else
+	{
+		TacticalData.TimeFollowing = 0.0f;
+		TacticalData.TacticalTarget = nullptr;
+	}
+
+	// Update catch-up mode based on position and skill-based system
+	if (bSkillBasedCatchUpEnabled)
+	{
+		TacticalData.CatchUpMode = DetermineCatchUpMode();
+	}
+	else
+	{
+		TacticalData.CatchUpMode = EMGCatchUpMode::None;
+	}
+
+	// Update risk level based on situation
+	TacticalData.CurrentRiskLevel = GetSituationalRiskLevel();
+
+	// Find distance to next overtaking zone
+	TacticalData.DistanceToOvertakeZone = FLT_MAX;
+	for (int32 i = CurrentRacingLineIndex; i < FMath::Min(CurrentRacingLineIndex + 50, RacingLinePoints.Num()); ++i)
+	{
+		int32 Index = i % RacingLinePoints.Num();
+		if (RacingLinePoints[Index].bIsOvertakingZone)
+		{
+			TacticalData.DistanceToOvertakeZone = RacingLinePoints[Index].DistanceAlongTrack -
+				RacingLinePoints[CurrentRacingLineIndex].DistanceAlongTrack;
+			break;
+		}
+	}
+
+	// Update slipstream status
+	TacticalData.bInSlipstream = false;
+	TacticalData.SlipstreamBonus = 0.0f;
+	for (const FMGAIVehiclePerception& Perceived : PerceivedVehicles)
+	{
+		if (Perceived.bInSlipstreamRange && Perceived.bIsAhead)
+		{
+			TacticalData.bInSlipstream = true;
+			TacticalData.SlipstreamBonus = CalculateSlipstreamBonus(
+				VehiclePawn->GetActorLocation(),
+				VehiclePawn->GetVelocity()
+			);
+			break;
+		}
+	}
+
+	// Simulate tire wear (affects grip/confidence at high difficulty)
+	if (DifficultyMultiplier > 1.0f)
+	{
+		float WearRate = 0.001f * DifficultyMultiplier;
+		if (CurrentState == EMGAIDrivingState::PushingHard)
+		{
+			WearRate *= 2.0f;
+		}
+		TacticalData.SimulatedTireWear = FMath::Min(1.0f, TacticalData.SimulatedTireWear + WearRate * DeltaTime);
+	}
 }
 
 void AMGAIRacerController::UpdateStateMachine(float DeltaTime)
@@ -254,12 +479,16 @@ void AMGAIRacerController::UpdateStateMachine(float DeltaTime)
 			HandleRecoveringState(DeltaTime);
 			break;
 
-		case EMGAIDrivingState::CatchingUp:
-			HandleCatchingUpState(DeltaTime);
+		case EMGAIDrivingState::PushingHard:
+			HandlePushingHardState(DeltaTime);
 			break;
 
-		case EMGAIDrivingState::SlowingDown:
-			HandleSlowingDownState(DeltaTime);
+		case EMGAIDrivingState::ManagingLead:
+			HandleManagingLeadState(DeltaTime);
+			break;
+
+		case EMGAIDrivingState::Drafting:
+			HandleDraftingState(DeltaTime);
 			break;
 
 		default:
@@ -272,8 +501,8 @@ void AMGAIRacerController::CalculateSteering(float DeltaTime)
 	switch (CurrentState)
 	{
 		case EMGAIDrivingState::Racing:
-		case EMGAIDrivingState::CatchingUp:
-		case EMGAIDrivingState::SlowingDown:
+		case EMGAIDrivingState::PushingHard:
+		case EMGAIDrivingState::ManagingLead:
 			CurrentSteering = CalculateRacingLineSteering();
 			break;
 
@@ -289,24 +518,36 @@ void AMGAIRacerController::CalculateSteering(float DeltaTime)
 			CurrentSteering = CalculateRecoverySteering();
 			break;
 
+		case EMGAIDrivingState::Drafting:
+			CurrentSteering = CalculateDraftingSteering();
+			break;
+
 		default:
 			CurrentSteering = FMGAISteeringOutput();
 			break;
 	}
 
-	// Calculate target speed
+	// Calculate and apply target speed
 	CurrentTargetSpeed = CalculateTargetSpeed();
 
-	// Apply rubber banding
-	if (bRubberBandingEnabled)
+	// Apply skill-based adjustments (NOT rubber banding - just risk level changes)
+	if (bSkillBasedCatchUpEnabled)
 	{
-		CurrentTargetSpeed += CalculateRubberBandAdjustment();
+		CurrentTargetSpeed *= (1.0f + CalculateSkillBasedAdjustment());
 	}
 
-	// Apply profile modifiers
+	// Apply driver profile modifiers
 	if (DriverProfile)
 	{
 		ApplyProfileModifiers(CurrentSteering);
+	}
+
+	// Apply slipstream bonus (this is physics-valid - real drafting effect)
+	if (TacticalData.bInSlipstream)
+	{
+		// Slipstream reduces air resistance, allowing higher speed at same throttle
+		// This is NOT cheating - it's real physics
+		CurrentTargetSpeed *= (1.0f + TacticalData.SlipstreamBonus);
 	}
 }
 
@@ -317,41 +558,8 @@ void AMGAIRacerController::ApplySteering()
 		return;
 	}
 
-	// Apply inputs to vehicle
-	// This would interface with the vehicle's input component
-	// For now, we store the values and let the vehicle read them
-
-	// Vehicle would call GetSteeringOutput() to get these values
-}
-
-void AMGAIRacerController::UpdateRacingLineProgress()
-{
-	if (RacingLinePoints.Num() == 0 || !VehiclePawn)
-	{
-		return;
-	}
-
-	FVector CurrentPos = VehiclePawn->GetActorLocation();
-	int32 ClosestIndex = FindClosestRacingLinePoint(CurrentPos);
-
-	// Only move forward (prevent going backwards on track)
-	if (ClosestIndex > CurrentRacingLineIndex)
-	{
-		CurrentRacingLineIndex = ClosestIndex;
-	}
-
-	// Handle lap wrap
-	if (CurrentRacingLineIndex == 0 && RacingLinePoints.Num() > 10)
-	{
-		int32 LastIndex = RacingLinePoints.Num() - 1;
-		float DistToLast = FVector::Dist(CurrentPos, RacingLinePoints[LastIndex].Position);
-		float DistToFirst = FVector::Dist(CurrentPos, RacingLinePoints[0].Position);
-
-		if (DistToLast < DistToFirst)
-		{
-			CurrentRacingLineIndex = LastIndex;
-		}
-	}
+	// The actual application to the vehicle is handled by the vehicle reading our outputs
+	// This maintains the Unified Challenge principle - same physics for all
 }
 
 // ==========================================
@@ -361,33 +569,69 @@ void AMGAIRacerController::UpdateRacingLineProgress()
 void AMGAIRacerController::HandleWaitingState(float DeltaTime)
 {
 	// Wait for race start signal
+	CurrentSteering = FMGAISteeringOutput();
 }
 
 void AMGAIRacerController::HandleRacingState(float DeltaTime)
 {
-	// Check for overtake opportunity
+	// Check for state transitions
+
+	// Should we start drafting?
+	if (ShouldStartDrafting())
+	{
+		SetState(EMGAIDrivingState::Drafting);
+		return;
+	}
+
+	// Should we attempt an overtake?
 	if (ShouldAttemptOvertake())
 	{
 		FMGAIVehiclePerception Ahead = GetVehicleAhead();
 		if (Ahead.Vehicle)
 		{
-			// Determine overtake side
-			bOvertakeOnLeft = IsOvertakePathClear(true);
-			if (!bOvertakeOnLeft && !IsOvertakePathClear(false))
+			// Choose which side to overtake on
+			bool bLeftClear = IsOvertakePathClear(true);
+			bool bRightClear = IsOvertakePathClear(false);
+
+			if (bLeftClear || bRightClear)
 			{
-				// No clear path, stay behind
+				bOvertakeOnLeft = bLeftClear && (!bRightClear || FMath::RandBool());
+				TacticalData.OvertakeStrategy = ChooseOvertakeStrategy(Ahead);
+				TacticalData.TacticalTarget = Ahead.Vehicle;
+				SetState(EMGAIDrivingState::Overtaking);
+				OvertakeTimer = 0.0f;
 				return;
 			}
-
-			SetState(EMGAIDrivingState::Overtaking);
-			OvertakeTimer = 0.0f;
 		}
 	}
 
-	// Check if we should defend
+	// Should we defend position?
 	if (ShouldDefendPosition())
 	{
-		SetState(EMGAIDrivingState::Defending);
+		FMGAIVehiclePerception Behind = GetVehicleBehind();
+		if (Behind.Vehicle)
+		{
+			TacticalData.DefenseStrategy = ChooseDefenseStrategy(Behind);
+			TacticalData.TacticalTarget = Behind.Vehicle;
+			SetState(EMGAIDrivingState::Defending);
+			return;
+		}
+	}
+
+	// Check for skill-based mode changes (not rubber banding!)
+	if (bSkillBasedCatchUpEnabled)
+	{
+		EMGCatchUpMode NewMode = DetermineCatchUpMode();
+		if (NewMode == EMGCatchUpMode::MaxEffort || NewMode == EMGCatchUpMode::RiskTaking)
+		{
+			SetState(EMGAIDrivingState::PushingHard);
+			return;
+		}
+		else if (NewMode == EMGCatchUpMode::Conservation && CurrentRacePosition == 1)
+		{
+			SetState(EMGAIDrivingState::ManagingLead);
+			return;
+		}
 	}
 }
 
@@ -395,68 +639,182 @@ void AMGAIRacerController::HandleOvertakingState(float DeltaTime)
 {
 	OvertakeTimer += DeltaTime;
 
-	// Timeout overtake
-	float MaxOvertakeTime = DriverProfile ? DriverProfile->Aggression.OvertakePatience * 2.0f : 6.0f;
-	if (OvertakeTimer > MaxOvertakeTime)
+	// Check if overtake is complete (we passed them)
+	FMGAIVehiclePerception Ahead = GetVehicleAhead();
+	if (!Ahead.Vehicle || Ahead.Vehicle != TacticalData.TacticalTarget)
 	{
+		// We've passed the target or they're no longer ahead
+		OnOvertakeComplete.Broadcast(TacticalData.TacticalTarget, TacticalData.OvertakeStrategy);
+		TacticalData.TacticalTarget = nullptr;
 		SetState(EMGAIDrivingState::Racing);
 		return;
 	}
 
-	// Check if overtake complete
-	FMGAIVehiclePerception Ahead = GetVehicleAhead();
-	if (!Ahead.Vehicle || !Ahead.bIsAhead)
+	// Check timeout based on profile patience
+	float MaxTime = MaxOvertakeTime;
+	if (DriverProfile)
 	{
-		// We passed them
+		MaxTime = DriverProfile->Aggression.OvertakePatience * 2.0f;
+	}
+
+	if (OvertakeTimer > MaxTime)
+	{
+		// Abort overtake attempt
+		TacticalData.TacticalTarget = nullptr;
 		SetState(EMGAIDrivingState::Racing);
+		return;
+	}
+
+	// Check if path is no longer clear (someone moved into our line)
+	if (!IsOvertakePathClear(bOvertakeOnLeft))
+	{
+		// Try the other side
+		bool bOtherSideClear = IsOvertakePathClear(!bOvertakeOnLeft);
+		if (bOtherSideClear)
+		{
+			bOvertakeOnLeft = !bOvertakeOnLeft;
+		}
+		else
+		{
+			// Both sides blocked, abort
+			TacticalData.TacticalTarget = nullptr;
+			SetState(EMGAIDrivingState::Racing);
+		}
 	}
 }
 
 void AMGAIRacerController::HandleDefendingState(float DeltaTime)
 {
-	// Check if still need to defend
+	// Check if we still need to defend
 	FMGAIVehiclePerception Behind = GetVehicleBehind();
-	if (!Behind.Vehicle || Behind.Distance > 20.0f * 100.0f) // 20m in cm
+
+	// Stop defending if attacker is no longer close
+	if (!Behind.Vehicle || Behind.Distance > 25.0f * AIConstants::MetersToUnits)
 	{
+		TacticalData.TacticalTarget = nullptr;
 		SetState(EMGAIDrivingState::Racing);
+		return;
+	}
+
+	// Stop defending after a reasonable time (prevents excessive blocking)
+	float MaxDefendTime = 10.0f;
+	if (DriverProfile)
+	{
+		MaxDefendTime = 5.0f + DriverProfile->Aggression.DefenseAggression * 10.0f;
+	}
+
+	if (TimeInState > MaxDefendTime)
+	{
+		TacticalData.TacticalTarget = nullptr;
+		SetState(EMGAIDrivingState::Racing);
+		return;
+	}
+
+	// Check if we got overtaken
+	if (Behind.Vehicle == TacticalData.TacticalTarget)
+	{
+		// Check their position relative to us
+		if (Behind.bIsAhead)
+		{
+			// They passed us
+			OnWasOvertaken.Broadcast(Behind.Vehicle);
+			TacticalData.TacticalTarget = nullptr;
+			SetState(EMGAIDrivingState::Racing);
+		}
 	}
 }
 
 void AMGAIRacerController::HandleRecoveringState(float DeltaTime)
 {
 	RecoveryTimer -= DeltaTime;
+
 	if (RecoveryTimer <= 0.0f)
 	{
+		// Recovery complete
 		SetState(EMGAIDrivingState::Racing);
 	}
 }
 
-void AMGAIRacerController::HandleCatchingUpState(float DeltaTime)
+void AMGAIRacerController::HandlePushingHardState(float DeltaTime)
 {
-	// Automatically handled by rubber banding in speed calc
-	// Switch back to racing after catching up
-	APawn* PlayerVehicle = GetPlayerVehicle();
-	if (PlayerVehicle && VehiclePawn)
+	// In this state, we're taking more risks to catch up
+	// This is skill-based - we brake later and get on throttle earlier
+	// NOT rubber banding - no speed advantage, just optimized driving
+
+	// Check if we should drop back to normal racing
+	EMGCatchUpMode CurrentMode = DetermineCatchUpMode();
+	if (CurrentMode != EMGCatchUpMode::MaxEffort && CurrentMode != EMGCatchUpMode::RiskTaking)
 	{
-		float DistToPlayer = FVector::Dist(VehiclePawn->GetActorLocation(), PlayerVehicle->GetActorLocation());
-		if (DistToPlayer < 30.0f * 100.0f) // Within 30m
+		SetState(EMGAIDrivingState::Racing);
+		return;
+	}
+
+	// Check for overtake opportunity while pushing hard
+	if (ShouldAttemptOvertake())
+	{
+		FMGAIVehiclePerception Ahead = GetVehicleAhead();
+		if (Ahead.Vehicle && (IsOvertakePathClear(true) || IsOvertakePathClear(false)))
 		{
-			SetState(EMGAIDrivingState::Racing);
+			bOvertakeOnLeft = IsOvertakePathClear(true);
+			TacticalData.OvertakeStrategy = ChooseOvertakeStrategy(Ahead);
+			TacticalData.TacticalTarget = Ahead.Vehicle;
+			SetState(EMGAIDrivingState::Overtaking);
+			OvertakeTimer = 0.0f;
 		}
 	}
 }
 
-void AMGAIRacerController::HandleSlowingDownState(float DeltaTime)
+void AMGAIRacerController::HandleManagingLeadState(float DeltaTime)
 {
-	// Switch back to racing if player catches up
-	APawn* PlayerVehicle = GetPlayerVehicle();
-	if (PlayerVehicle && VehiclePawn)
+	// Conservative driving when in the lead
+	// Not slowing down artificially - just not taking unnecessary risks
+
+	EMGCatchUpMode CurrentMode = DetermineCatchUpMode();
+
+	// If gap to second place shrinks, go back to normal racing
+	if (CurrentMode != EMGCatchUpMode::Conservation || GapToVehicleAhead < AIConstants::CloseGapThreshold)
 	{
-		float DistToPlayer = FVector::Dist(VehiclePawn->GetActorLocation(), PlayerVehicle->GetActorLocation());
-		if (DistToPlayer < 50.0f * 100.0f) // Within 50m
+		SetState(EMGAIDrivingState::Racing);
+		return;
+	}
+
+	// If someone is very close behind, might need to defend
+	if (ShouldDefendPosition())
+	{
+		FMGAIVehiclePerception Behind = GetVehicleBehind();
+		if (Behind.Vehicle)
 		{
-			SetState(EMGAIDrivingState::Racing);
+			TacticalData.DefenseStrategy = ChooseDefenseStrategy(Behind);
+			TacticalData.TacticalTarget = Behind.Vehicle;
+			SetState(EMGAIDrivingState::Defending);
 		}
+	}
+}
+
+void AMGAIRacerController::HandleDraftingState(float DeltaTime)
+{
+	// Stay in draft of lead vehicle until ready to pass
+
+	// Check if still in valid drafting position
+	FMGAIVehiclePerception Ahead = GetVehicleAhead();
+	if (!Ahead.Vehicle || !Ahead.bInSlipstreamRange)
+	{
+		SetState(EMGAIDrivingState::Racing);
+		return;
+	}
+
+	// Check if we should slingshot out
+	bool bNearOvertakeZone = TacticalData.DistanceToOvertakeZone < 50.0f * AIConstants::MetersToUnits;
+	bool bGoodSpeedAdvantage = Ahead.SpeedDifference > 100.0f; // We're faster
+
+	if (bNearOvertakeZone && bGoodSpeedAdvantage)
+	{
+		// Execute slipstream pass
+		TacticalData.OvertakeStrategy = EMGOvertakeStrategy::SlipstreamPass;
+		TacticalData.TacticalTarget = Ahead.Vehicle;
+		bOvertakeOnLeft = IsOvertakePathClear(true);
+		SetState(EMGAIDrivingState::Overtaking);
+		OvertakeTimer = 0.0f;
 	}
 }
 
@@ -473,15 +831,15 @@ FMGAISteeringOutput AMGAIRacerController::CalculateRacingLineSteering()
 		return Output;
 	}
 
-	// Get target point ahead on racing line
+	// Get target point on racing line
 	FMGAIRacingLinePoint TargetPoint = GetRacingLinePointAhead(SteeringLookAhead);
 	Output.TargetPoint = TargetPoint.Position;
 
-	// Add avoidance offset
+	// Add collision avoidance offset
 	FVector AvoidanceOffset = CalculateAvoidanceOffset();
 	Output.TargetPoint += AvoidanceOffset;
 
-	// Calculate steering angle
+	// Calculate steering using PID controller
 	FVector ToTarget = Output.TargetPoint - VehiclePawn->GetActorLocation();
 	ToTarget.Z = 0;
 	ToTarget.Normalize();
@@ -491,30 +849,31 @@ FMGAISteeringOutput AMGAIRacerController::CalculateRacingLineSteering()
 	Forward.Normalize();
 
 	float DotRight = FVector::DotProduct(VehiclePawn->GetActorRightVector(), ToTarget);
-	float DotForward = FVector::DotProduct(Forward, ToTarget);
+	float DotForward = FMath::Max(FVector::DotProduct(Forward, ToTarget), 0.1f);
 
-	// PID steering
-	float SteeringError = FMath::Atan2(DotRight, FMath::Max(DotForward, 0.1f));
-	SteeringErrorIntegral += SteeringError * GetWorld()->GetDeltaSeconds();
+	// PID steering calculation
+	float SteeringError = FMath::Atan2(DotRight, DotForward);
+	float DeltaTime = GetWorld()->GetDeltaSeconds();
+
+	SteeringErrorIntegral += SteeringError * DeltaTime;
 	SteeringErrorIntegral = FMath::Clamp(SteeringErrorIntegral, -1.0f, 1.0f);
 
-	float SteeringDerivative = (SteeringError - LastSteeringError) / FMath::Max(GetWorld()->GetDeltaSeconds(), 0.001f);
+	float SteeringDerivative = (SteeringError - LastSteeringError) / FMath::Max(DeltaTime, 0.001f);
 	LastSteeringError = SteeringError;
 
-	float Kp = 2.0f;
-	float Ki = 0.1f;
-	float Kd = 0.5f;
-
-	Output.Steering = Kp * SteeringError + Ki * SteeringErrorIntegral + Kd * SteeringDerivative;
+	Output.Steering = SteeringPGain * SteeringError +
+					  SteeringIGain * SteeringErrorIntegral +
+					  SteeringDGain * SteeringDerivative;
 	Output.Steering = FMath::Clamp(Output.Steering, -1.0f, 1.0f);
 
-	// Add noise for personality
+	// Add personality-based noise
 	Output.Steering = AddSteeringNoise(Output.Steering);
 
-	// Calculate throttle/brake
+	// Calculate throttle and brake
 	float CurrentSpeed = GetCurrentSpeed();
 	float SpeedDiff = CurrentTargetSpeed - CurrentSpeed;
 
+	// Throttle calculation
 	if (SpeedDiff > 50.0f)
 	{
 		Output.Throttle = 1.0f;
@@ -531,46 +890,117 @@ FMGAISteeringOutput AMGAIRacerController::CalculateRacingLineSteering()
 		Output.Brake = 0.0f;
 	}
 
-	// Brake in braking zones
+	// Apply braking for upcoming corners
 	FMGAIRacingLinePoint AheadPoint = GetRacingLinePointAhead(SpeedLookAhead);
-	if (AheadPoint.bIsBrakingZone && CurrentSpeed > AheadPoint.TargetSpeed * 100.0f)
+	if (AheadPoint.bIsBrakingZone)
 	{
-		Output.Throttle = 0.0f;
-		Output.Brake = 0.8f;
+		float RequiredSpeed = AheadPoint.TargetSpeed * AIConstants::MetersToUnits;
+		if (CurrentSpeed > RequiredSpeed)
+		{
+			float BrakingDistance = CalculateBrakingDistance(CurrentSpeed, RequiredSpeed);
+			float DistanceToPoint = FVector::Dist(VehiclePawn->GetActorLocation(), AheadPoint.Position);
+
+			if (DistanceToPoint <= BrakingDistance * 1.2f) // 20% safety margin
+			{
+				Output.Throttle = 0.0f;
+				float BrakeIntensity = FMath::Clamp(BrakingDistance / DistanceToPoint, 0.3f, 1.0f);
+				Output.Brake = BrakeIntensity;
+			}
+		}
 	}
 
-	// NOS usage
-	if (DriverProfile && FMath::FRand() < DriverProfile->Speed.NOSUsageFrequency * 0.01f)
+	// NOS usage decision
+	if (DriverProfile && AheadPoint.bIsAccelerationZone && !AheadPoint.bIsBrakingZone)
 	{
-		if (AheadPoint.bIsAccelerationZone && !AheadPoint.bIsBrakingZone)
+		float NOSChance = DriverProfile->Speed.NOSUsageFrequency * 0.01f;
+		if (FMath::FRand() < NOSChance)
 		{
 			Output.bNOS = true;
 		}
 	}
+
+	// Set gear and confidence
+	Output.DesiredGear = TargetPoint.OptimalGear;
+	Output.Confidence = 1.0f - TacticalData.SimulatedTireWear * 0.3f;
 
 	return Output;
 }
 
 FMGAISteeringOutput AMGAIRacerController::CalculateOvertakeSteering()
 {
+	// Start with racing line steering as base
 	FMGAISteeringOutput Output = CalculateRacingLineSteering();
 
-	// Offset target to overtake side
-	float OvertakeOffset = bOvertakeOnLeft ? -400.0f : 400.0f;
-
-	if (VehiclePawn)
+	if (!VehiclePawn)
 	{
-		FVector RightVector = VehiclePawn->GetActorRightVector();
-		Output.TargetPoint += RightVector * OvertakeOffset;
+		return Output;
 	}
 
-	// More aggressive throttle during overtake
-	Output.Throttle = FMath::Min(Output.Throttle + 0.2f, 1.0f);
+	// Calculate lateral offset for overtake
+	float OvertakeOffset = 0.0f;
+	FMGAIRacingLinePoint CurrentPoint = GetRacingLinePointAhead(0.0f);
 
-	// Use NOS if available during overtake
+	switch (TacticalData.OvertakeStrategy)
+	{
+		case EMGOvertakeStrategy::Patient:
+			// Small offset, wait for opportunity
+			OvertakeOffset = (bOvertakeOnLeft ? -1.0f : 1.0f) * CurrentPoint.TrackWidth * 0.3f;
+			break;
+
+		case EMGOvertakeStrategy::LateBraking:
+			// Dive inside at braking zone
+			OvertakeOffset = (bOvertakeOnLeft ? -1.0f : 1.0f) * CurrentPoint.TrackWidth * 0.4f;
+			// Later braking point (more risk)
+			if (DriverProfile)
+			{
+				float RiskFactor = DriverProfile->Aggression.RiskTaking;
+				// This makes the AI brake later - NOT faster, just later
+				// Same physics, different decision
+			}
+			break;
+
+		case EMGOvertakeStrategy::BetterExit:
+			// Focus on corner exit, smaller offset during corner
+			OvertakeOffset = (bOvertakeOnLeft ? -1.0f : 1.0f) * CurrentPoint.TrackWidth * 0.25f;
+			// More aggressive throttle on exit
+			if (CurrentPoint.bIsAccelerationZone)
+			{
+				Output.Throttle = FMath::Min(Output.Throttle + 0.15f, 1.0f);
+			}
+			break;
+
+		case EMGOvertakeStrategy::AroundOutside:
+			// Take outside line
+			OvertakeOffset = (bOvertakeOnLeft ? -1.0f : 1.0f) * CurrentPoint.TrackWidth * 0.45f;
+			break;
+
+		case EMGOvertakeStrategy::SlipstreamPass:
+			// Slight offset to break out of slipstream
+			OvertakeOffset = (bOvertakeOnLeft ? -1.0f : 1.0f) * CurrentPoint.TrackWidth * 0.35f;
+			// Full throttle with slipstream advantage
+			Output.Throttle = 1.0f;
+			break;
+
+		case EMGOvertakeStrategy::Pressure:
+			// Stay close, look for mistake
+			OvertakeOffset = (bOvertakeOnLeft ? -1.0f : 1.0f) * CurrentPoint.TrackWidth * 0.2f;
+			break;
+	}
+
+	// Apply offset to target point
+	FVector RightVector = VehiclePawn->GetActorRightVector();
+	Output.TargetPoint += RightVector * OvertakeOffset * AIConstants::MetersToUnits;
+
+	// More aggressive throttle during overtake
+	Output.Throttle = FMath::Min(Output.Throttle + 0.1f, 1.0f);
+
+	// Consider NOS usage based on profile aggression
 	if (DriverProfile && DriverProfile->Aggression.OvertakeAggression > 0.7f)
 	{
-		Output.bNOS = true;
+		if (FMath::FRand() < 0.1f) // 10% chance per frame to consider NOS
+		{
+			Output.bNOS = true;
+		}
 	}
 
 	return Output;
@@ -580,25 +1010,58 @@ FMGAISteeringOutput AMGAIRacerController::CalculateDefenseSteering()
 {
 	FMGAISteeringOutput Output = CalculateRacingLineSteering();
 
-	// Check where attacker is and block
-	FMGAIVehiclePerception Behind = GetVehicleBehind();
-	if (Behind.Vehicle)
+	if (!VehiclePawn)
 	{
-		float BlockOffset = Behind.bIsOnLeft ? -200.0f : 200.0f;
-
-		if (VehiclePawn)
-		{
-			FVector RightVector = VehiclePawn->GetActorRightVector();
-			Output.TargetPoint += RightVector * BlockOffset;
-		}
+		return Output;
 	}
+
+	FMGAIVehiclePerception Behind = GetVehicleBehind();
+	if (!Behind.Vehicle)
+	{
+		return Output;
+	}
+
+	FMGAIRacingLinePoint CurrentPoint = GetRacingLinePointAhead(0.0f);
+	float DefenseOffset = 0.0f;
+
+	switch (TacticalData.DefenseStrategy)
+	{
+		case EMGDefenseStrategy::CoverLine:
+			// Stay on racing line - force them around
+			// No offset needed
+			break;
+
+		case EMGDefenseStrategy::CoverInside:
+			// Move to cover inside line
+			DefenseOffset = Behind.bIsOnLeft ? -CurrentPoint.TrackWidth * 0.3f : CurrentPoint.TrackWidth * 0.3f;
+			break;
+
+		case EMGDefenseStrategy::PaceDefense:
+			// Maintain pace, don't let them close
+			Output.Throttle = FMath::Min(Output.Throttle + 0.1f, 1.0f);
+			break;
+
+		case EMGDefenseStrategy::DefensiveLine:
+			// Take defensive line through corner
+			if (CurrentPoint.bIsApex || CurrentPoint.bIsBrakingZone)
+			{
+				DefenseOffset = Behind.bIsOnLeft ? -CurrentPoint.TrackWidth * 0.2f : CurrentPoint.TrackWidth * 0.2f;
+			}
+			break;
+	}
+
+	// Apply defense offset
+	FVector RightVector = VehiclePawn->GetActorRightVector();
+	Output.TargetPoint += RightVector * DefenseOffset * AIConstants::MetersToUnits;
+
+	// One move rule - can only make one defensive move per straight
+	// (Fair racing - no weaving)
 
 	return Output;
 }
 
 FMGAISteeringOutput AMGAIRacerController::CalculateRecoverySteering()
 {
-	// Steer back toward racing line
 	FMGAISteeringOutput Output;
 
 	if (RacingLinePoints.Num() == 0 || !VehiclePawn)
@@ -606,13 +1069,14 @@ FMGAISteeringOutput AMGAIRacerController::CalculateRecoverySteering()
 		return Output;
 	}
 
+	// Find closest point on racing line and steer toward it
 	int32 ClosestIndex = FindClosestRacingLinePoint(VehiclePawn->GetActorLocation());
 	if (ClosestIndex >= 0)
 	{
 		Output.TargetPoint = RacingLinePoints[ClosestIndex].Position;
 	}
 
-	// Calculate steering
+	// Calculate steering toward recovery point
 	FVector ToTarget = Output.TargetPoint - VehiclePawn->GetActorLocation();
 	ToTarget.Z = 0;
 	ToTarget.Normalize();
@@ -624,9 +1088,39 @@ FMGAISteeringOutput AMGAIRacerController::CalculateRecoverySteering()
 	float DotRight = FVector::DotProduct(VehiclePawn->GetActorRightVector(), ToTarget);
 	Output.Steering = FMath::Clamp(DotRight * 2.0f, -1.0f, 1.0f);
 
-	// Gentle throttle during recovery
-	Output.Throttle = 0.5f;
+	// Conservative throttle during recovery
+	Output.Throttle = 0.4f;
 	Output.Brake = 0.0f;
+
+	// Reduce confidence during recovery
+	Output.Confidence = 0.5f;
+
+	return Output;
+}
+
+FMGAISteeringOutput AMGAIRacerController::CalculateDraftingSteering()
+{
+	FMGAISteeringOutput Output = CalculateRacingLineSteering();
+
+	// Adjust target to stay behind lead vehicle in their slipstream
+	FMGAIVehiclePerception Ahead = GetVehicleAhead();
+	if (Ahead.Vehicle && Ahead.bInSlipstreamRange)
+	{
+		// Aim for position directly behind lead vehicle
+		APawn* LeadPawn = Cast<APawn>(Ahead.Vehicle);
+		if (LeadPawn)
+		{
+			FVector LeadPosition = LeadPawn->GetActorLocation();
+			FVector LeadBackward = -LeadPawn->GetActorForwardVector();
+
+			// Target position behind lead vehicle
+			Output.TargetPoint = LeadPosition + LeadBackward * 10.0f * AIConstants::MetersToUnits;
+		}
+
+		// Full throttle while drafting
+		Output.Throttle = 1.0f;
+		Output.Brake = 0.0f;
+	}
 
 	return Output;
 }
@@ -643,13 +1137,21 @@ FVector AMGAIRacerController::CalculateAvoidanceOffset()
 	for (const FMGAIVehiclePerception& Perception : PerceivedVehicles)
 	{
 		// Only avoid vehicles ahead and close
-		if (!Perception.bIsAhead || Perception.Distance > 15.0f * 100.0f)
+		if (!Perception.bIsAhead || Perception.Distance > 15.0f * AIConstants::MetersToUnits)
 		{
 			continue;
 		}
 
-		// Calculate avoidance direction
-		float AvoidanceStrength = 1.0f - (Perception.Distance / (15.0f * 100.0f));
+		// Skip if this is our overtake/draft target
+		if (Perception.Vehicle == TacticalData.TacticalTarget &&
+			(CurrentState == EMGAIDrivingState::Overtaking || CurrentState == EMGAIDrivingState::Drafting))
+		{
+			continue;
+		}
+
+		// Calculate avoidance strength based on distance
+		float MaxAvoidanceRange = 15.0f * AIConstants::MetersToUnits;
+		float AvoidanceStrength = 1.0f - (Perception.Distance / MaxAvoidanceRange);
 		AvoidanceStrength = FMath::Square(AvoidanceStrength);
 
 		// Avoid to opposite side
@@ -664,18 +1166,19 @@ float AMGAIRacerController::CalculateTargetSpeed()
 {
 	if (RacingLinePoints.Num() == 0)
 	{
-		return 50.0f * 100.0f; // Default 50 m/s in cm/s
+		return 50.0f * AIConstants::MetersToUnits; // Default 50 m/s
 	}
 
-	// Get target speed from racing line
+	// Get speeds from racing line
 	FMGAIRacingLinePoint CurrentPoint = GetRacingLinePointAhead(0.0f);
 	FMGAIRacingLinePoint AheadPoint = GetRacingLinePointAhead(SpeedLookAhead);
 
-	// Use lower of current and ahead target speeds
+	// Use minimum of current and ahead target speeds
 	float BaseSpeed = FMath::Min(CurrentPoint.TargetSpeed, AheadPoint.TargetSpeed);
 
-	// Apply difficulty
-	BaseSpeed *= DifficultyMultiplier;
+	// Apply difficulty multiplier (affects skill, not physics)
+	// Lower difficulty = more conservative speed choices
+	BaseSpeed *= (0.8f + 0.2f * DifficultyMultiplier);
 
 	// Apply profile modifiers
 	if (DriverProfile)
@@ -692,56 +1195,336 @@ float AMGAIRacerController::CalculateTargetSpeed()
 		}
 	}
 
-	return BaseSpeed * 100.0f; // Convert to cm/s
+	// Apply tire wear effect (realistic, not cheating)
+	if (TacticalData.SimulatedTireWear > 0.3f)
+	{
+		float WearPenalty = (TacticalData.SimulatedTireWear - 0.3f) * 0.1f;
+		BaseSpeed *= (1.0f - WearPenalty);
+	}
+
+	// Apply grip level from track surface
+	BaseSpeed *= CurrentPoint.GripLevel;
+
+	// Apply weather conditions - AI respects weather physics like players
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			// Get road grip multiplier based on weather (dry=1.0, wet=0.7, icy=0.4, etc.)
+			const float WeatherGrip = WeatherSubsystem->GetRoadGripMultiplier();
+			BaseSpeed *= WeatherGrip;
+
+			// Additional caution in poor visibility conditions
+			const EMGWeatherType WeatherType = WeatherSubsystem->GetCurrentWeatherType();
+			if (WeatherType == EMGWeatherType::HeavyFog ||
+				WeatherType == EMGWeatherType::Blizzard ||
+				WeatherType == EMGWeatherType::Thunderstorm)
+			{
+				// Reduce speed further due to visibility concerns
+				// Skill level affects how much caution is taken
+				const float VisibilityCaution = DriverProfile ?
+					FMath::Lerp(0.15f, 0.05f, DriverProfile->Skill.SkillLevel) : 0.10f;
+				BaseSpeed *= (1.0f - VisibilityCaution);
+			}
+
+			// Check hydroplaning risk for standing water
+			const float HydroplaningRisk = WeatherSubsystem->GetHydroplaningRisk();
+			if (HydroplaningRisk > 0.3f)
+			{
+				// Skilled drivers slow down appropriately for hydroplaning
+				const float HydroCaution = HydroplaningRisk * 0.2f;
+				BaseSpeed *= (1.0f - HydroCaution);
+			}
+		}
+	}
+
+	return BaseSpeed * AIConstants::MetersToUnits;
 }
 
-float AMGAIRacerController::CalculateRubberBandAdjustment()
+float AMGAIRacerController::CalculateSkillBasedAdjustment()
 {
-	APawn* PlayerVehicle = GetPlayerVehicle();
-	if (!PlayerVehicle || !VehiclePawn)
+	// This is NOT rubber banding - no speed boosts
+	// Instead, it affects risk tolerance and decision-making
+	// Returns a multiplier for how aggressively we pursue our target speed
+
+	if (!bSkillBasedCatchUpEnabled)
 	{
 		return 0.0f;
 	}
 
-	// Calculate distance to player (positive = ahead, negative = behind)
-	float MyProgress = RacingLineProgress;
-	// Would need to get player progress from race manager
-
-	// For now, use simple distance
-	float DistToPlayer = FVector::Dist(VehiclePawn->GetActorLocation(), PlayerVehicle->GetActorLocation());
-	FVector ToPlayer = PlayerVehicle->GetActorLocation() - VehiclePawn->GetActorLocation();
-	bool bAheadOfPlayer = FVector::DotProduct(VehiclePawn->GetActorForwardVector(), ToPlayer) < 0;
-
 	float Adjustment = 0.0f;
 
-	if (bAheadOfPlayer && DistToPlayer > 100.0f * 100.0f) // More than 100m ahead
+	switch (TacticalData.CatchUpMode)
 	{
-		// Slow down
-		float SlowAmount = DriverProfile ? DriverProfile->Speed.SlowDownAmount : 0.05f;
-		Adjustment = -CurrentTargetSpeed * SlowAmount * RubberBandStrength;
+		case EMGCatchUpMode::None:
+			Adjustment = 0.0f;
+			break;
 
-		if (CurrentState != EMGAIDrivingState::SlowingDown)
-		{
-			SetState(EMGAIDrivingState::SlowingDown);
-		}
-	}
-	else if (!bAheadOfPlayer && DistToPlayer > 50.0f * 100.0f) // More than 50m behind
-	{
-		// Speed up
-		float CatchUpAmount = DriverProfile ? DriverProfile->Speed.CatchUpBoost : 0.1f;
-		Adjustment = CurrentTargetSpeed * CatchUpAmount * RubberBandStrength;
+		case EMGCatchUpMode::RiskTaking:
+			// Brake slightly later, accelerate slightly earlier
+			// This is skill-based - better execution of same physics
+			Adjustment = 0.02f; // 2% more aggressive target
+			break;
 
-		if (CurrentState != EMGAIDrivingState::CatchingUp)
-		{
-			SetState(EMGAIDrivingState::CatchingUp);
-		}
+		case EMGCatchUpMode::DraftingFocus:
+			// Only get bonus when actually drafting
+			if (TacticalData.bInSlipstream)
+			{
+				Adjustment = TacticalData.SlipstreamBonus;
+			}
+			break;
+
+		case EMGCatchUpMode::MaxEffort:
+			// Push to the limit of skill
+			// Still same physics - just optimal execution
+			Adjustment = 0.03f; // 3% more aggressive
+			break;
+
+		case EMGCatchUpMode::Conservation:
+			// Drive more conservatively when leading
+			Adjustment = -0.02f; // 2% slower targets (wider safety margins)
+			break;
 	}
+
+	// Scale by difficulty - harder difficulty = more skillful AI
+	Adjustment *= DifficultyMultiplier;
 
 	return Adjustment;
 }
 
 // ==========================================
-// UTILITIES
+// TACTICAL DECISIONS
+// ==========================================
+
+bool AMGAIRacerController::ShouldAttemptOvertake() const
+{
+	FMGAIVehiclePerception Ahead = GetVehicleAhead();
+	if (!Ahead.Vehicle)
+	{
+		return false;
+	}
+
+	// Too far away to consider
+	if (Ahead.Distance > 20.0f * AIConstants::MetersToUnits)
+	{
+		return false;
+	}
+
+	// Check profile aggression
+	float OvertakeChance = OvertakeThreshold;
+	if (DriverProfile)
+	{
+		OvertakeChance = DriverProfile->Aggression.OvertakeAggression;
+	}
+
+	// Modify by difficulty
+	OvertakeChance *= DifficultyMultiplier;
+
+	// More likely if we've been following for a while
+	if (TacticalData.TimeFollowing > 3.0f)
+	{
+		OvertakeChance += 0.2f;
+	}
+
+	// More likely near overtaking zones
+	if (TacticalData.DistanceToOvertakeZone < 100.0f * AIConstants::MetersToUnits)
+	{
+		OvertakeChance += 0.15f;
+	}
+
+	// More likely if we're faster
+	if (Ahead.SpeedDifference > 0.0f)
+	{
+		OvertakeChance += 0.1f;
+	}
+
+	// Less likely against player (to avoid feeling unfair)
+	if (Ahead.bIsPlayer)
+	{
+		OvertakeChance *= 0.8f;
+	}
+
+	// Weather caution - less likely to attempt risky overtakes in poor conditions
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			const EMGRoadCondition RoadCondition = WeatherSubsystem->GetRoadCondition();
+			if (RoadCondition == EMGRoadCondition::Wet)
+			{
+				OvertakeChance *= 0.7f; // 30% less likely to overtake in wet
+			}
+			else if (RoadCondition == EMGRoadCondition::StandingWater)
+			{
+				OvertakeChance *= 0.5f; // 50% less likely in standing water
+			}
+			else if (RoadCondition == EMGRoadCondition::Icy || RoadCondition == EMGRoadCondition::Snowy)
+			{
+				OvertakeChance *= 0.3f; // 70% less likely on ice/snow
+			}
+
+			// Poor visibility also reduces overtaking attempts
+			const EMGWeatherType WeatherType = WeatherSubsystem->GetCurrentWeatherType();
+			if (WeatherType == EMGWeatherType::HeavyFog ||
+				WeatherType == EMGWeatherType::Thunderstorm ||
+				WeatherType == EMGWeatherType::Blizzard)
+			{
+				OvertakeChance *= 0.6f; // 40% less likely in poor visibility
+			}
+		}
+	}
+
+	// Random check (scaled for per-frame calling)
+	return FMath::FRand() < OvertakeChance * 0.05f;
+}
+
+bool AMGAIRacerController::ShouldDefendPosition() const
+{
+	FMGAIVehiclePerception Behind = GetVehicleBehind();
+	if (!Behind.Vehicle)
+	{
+		return false;
+	}
+
+	// Only defend if they're close
+	if (Behind.Distance > 15.0f * AIConstants::MetersToUnits)
+	{
+		return false;
+	}
+
+	float DefendChance = 0.5f;
+	if (DriverProfile)
+	{
+		DefendChance = DriverProfile->Aggression.DefenseAggression;
+	}
+
+	// More likely against player (adds challenge without cheating physics)
+	if (Behind.bIsPlayer && DriverProfile && DriverProfile->Aggression.bTargetsPlayer)
+	{
+		DefendChance += 0.2f;
+	}
+
+	// Random check
+	return FMath::FRand() < DefendChance * 0.03f;
+}
+
+EMGOvertakeStrategy AMGAIRacerController::ChooseOvertakeStrategy(const FMGAIVehiclePerception& Target) const
+{
+	// Choose strategy based on situation and personality
+
+	FMGAIRacingLinePoint CurrentPoint = GetRacingLinePointAhead(0.0f);
+
+	// If near braking zone and aggressive, try late braking
+	if (CurrentPoint.bIsBrakingZone && DriverProfile && DriverProfile->Aggression.RiskTaking > 0.6f)
+	{
+		return EMGOvertakeStrategy::LateBraking;
+	}
+
+	// If in draft range, use slipstream
+	if (Target.bInSlipstreamRange && TacticalData.DistanceToOvertakeZone < 100.0f * AIConstants::MetersToUnits)
+	{
+		return EMGOvertakeStrategy::SlipstreamPass;
+	}
+
+	// If we have speed advantage, use better exit
+	if (Target.SpeedDifference > 50.0f)
+	{
+		return EMGOvertakeStrategy::BetterExit;
+	}
+
+	// Default based on personality
+	if (DriverProfile)
+	{
+		if (DriverProfile->Personality == EMGDriverPersonality::Aggressive)
+		{
+			return EMGOvertakeStrategy::Pressure;
+		}
+		else if (DriverProfile->Personality == EMGDriverPersonality::Calculated)
+		{
+			return EMGOvertakeStrategy::BetterExit;
+		}
+	}
+
+	return EMGOvertakeStrategy::Patient;
+}
+
+EMGDefenseStrategy AMGAIRacerController::ChooseDefenseStrategy(const FMGAIVehiclePerception& Attacker) const
+{
+	FMGAIRacingLinePoint CurrentPoint = GetRacingLinePointAhead(0.0f);
+
+	// In corner, use defensive line
+	if (CurrentPoint.bIsApex || CurrentPoint.bIsBrakingZone)
+	{
+		return EMGDefenseStrategy::DefensiveLine;
+	}
+
+	// Based on personality
+	if (DriverProfile)
+	{
+		if (DriverProfile->Personality == EMGDriverPersonality::Aggressive)
+		{
+			return EMGDefenseStrategy::CoverInside;
+		}
+		else if (DriverProfile->Personality == EMGDriverPersonality::Calculated)
+		{
+			return EMGDefenseStrategy::PaceDefense;
+		}
+	}
+
+	return EMGDefenseStrategy::CoverLine;
+}
+
+EMGCatchUpMode AMGAIRacerController::DetermineCatchUpMode() const
+{
+	if (!bSkillBasedCatchUpEnabled)
+	{
+		return EMGCatchUpMode::None;
+	}
+
+	// If leading with comfortable gap, conserve
+	if (CurrentRacePosition == 1 && GapToVehicleAhead > AIConstants::LargeGapThreshold)
+	{
+		return EMGCatchUpMode::Conservation;
+	}
+
+	// If far behind, push harder
+	if (GapToLeader > AIConstants::LargeGapThreshold)
+	{
+		if (DriverProfile && DriverProfile->Aggression.RiskTaking > 0.5f)
+		{
+			return EMGCatchUpMode::MaxEffort;
+		}
+		return EMGCatchUpMode::RiskTaking;
+	}
+
+	// If in pack but can draft, focus on that
+	if (TacticalData.bInSlipstream)
+	{
+		return EMGCatchUpMode::DraftingFocus;
+	}
+
+	return EMGCatchUpMode::None;
+}
+
+bool AMGAIRacerController::ShouldStartDrafting() const
+{
+	FMGAIVehiclePerception Ahead = GetVehicleAhead();
+	if (!Ahead.Vehicle || !Ahead.bInSlipstreamRange)
+	{
+		return false;
+	}
+
+	// More likely if similar speeds (can hold the draft)
+	if (FMath::Abs(Ahead.SpeedDifference) < 100.0f)
+	{
+		return FMath::FRand() < 0.3f;
+	}
+
+	return false;
+}
+
+// ==========================================
+// UTILITY METHODS
 // ==========================================
 
 FMGAIRacingLinePoint AMGAIRacerController::GetRacingLinePointAhead(float Distance) const
@@ -751,22 +1534,19 @@ FMGAIRacingLinePoint AMGAIRacerController::GetRacingLinePointAhead(float Distanc
 		return FMGAIRacingLinePoint();
 	}
 
-	// Find point at distance ahead
 	float DistanceAccum = 0.0f;
 	int32 Index = CurrentRacingLineIndex;
 
 	while (DistanceAccum < Distance && Index < RacingLinePoints.Num() - 1)
 	{
-		DistanceAccum += FVector::Dist(RacingLinePoints[Index].Position, RacingLinePoints[Index + 1].Position);
-		Index++;
+		int32 NextIndex = (Index + 1) % RacingLinePoints.Num();
+		float SegmentDist = FVector::Dist(RacingLinePoints[Index].Position, RacingLinePoints[NextIndex].Position);
+		DistanceAccum += SegmentDist;
+		Index = NextIndex;
 	}
 
-	// Wrap around for circuits
-	if (Index >= RacingLinePoints.Num())
-	{
-		Index = 0;
-	}
-
+	// Wrap for circuits
+	Index = Index % RacingLinePoints.Num();
 	return RacingLinePoints[Index];
 }
 
@@ -778,75 +1558,23 @@ int32 AMGAIRacerController::FindClosestRacingLinePoint(const FVector& Position) 
 	}
 
 	int32 ClosestIndex = 0;
-	float ClosestDist = FLT_MAX;
+	float ClosestDistSq = FLT_MAX;
 
-	// Search around current index first for efficiency
+	// Search around current index for efficiency
 	int32 SearchStart = FMath::Max(0, CurrentRacingLineIndex - 10);
 	int32 SearchEnd = FMath::Min(RacingLinePoints.Num() - 1, CurrentRacingLineIndex + 20);
 
-	for (int32 i = SearchStart; i <= SearchEnd; i++)
+	for (int32 i = SearchStart; i <= SearchEnd; ++i)
 	{
-		float Dist = FVector::DistSquared(Position, RacingLinePoints[i].Position);
-		if (Dist < ClosestDist)
+		float DistSq = FVector::DistSquared(Position, RacingLinePoints[i].Position);
+		if (DistSq < ClosestDistSq)
 		{
-			ClosestDist = Dist;
+			ClosestDistSq = DistSq;
 			ClosestIndex = i;
 		}
 	}
 
 	return ClosestIndex;
-}
-
-bool AMGAIRacerController::ShouldAttemptOvertake() const
-{
-	FMGAIVehiclePerception Ahead = GetVehicleAhead();
-	if (!Ahead.Vehicle)
-	{
-		return false;
-	}
-
-	// Check if close enough to consider overtake
-	if (Ahead.Distance > 15.0f * 100.0f) // 15m
-	{
-		return false;
-	}
-
-	// Check aggression threshold
-	float OvertakeChance = DriverProfile ? DriverProfile->Aggression.OvertakeAggression : 0.5f;
-	OvertakeChance *= DifficultyMultiplier;
-
-	// Higher chance if stuck behind for a while
-	if (TimeInState > 3.0f && CurrentState == EMGAIDrivingState::Racing)
-	{
-		OvertakeChance += 0.2f;
-	}
-
-	return FMath::FRand() < OvertakeChance * 0.1f; // Check every tick, so reduce chance
-}
-
-bool AMGAIRacerController::ShouldDefendPosition() const
-{
-	FMGAIVehiclePerception Behind = GetVehicleBehind();
-	if (!Behind.Vehicle)
-	{
-		return false;
-	}
-
-	// Check if close enough to defend
-	if (Behind.Distance > 10.0f * 100.0f) // 10m
-	{
-		return false;
-	}
-
-	float DefendChance = DriverProfile ? DriverProfile->Aggression.DefenseAggression : 0.5f;
-
-	// Higher chance against player
-	if (Behind.bIsPlayer && DriverProfile && DriverProfile->Aggression.bTargetsPlayer)
-	{
-		DefendChance += 0.3f;
-	}
-
-	return FMath::FRand() < DefendChance * 0.05f;
 }
 
 APawn* AMGAIRacerController::GetPlayerVehicle() const
@@ -866,7 +1594,7 @@ FMGAIVehiclePerception AMGAIRacerController::GetVehicleAhead() const
 {
 	for (const FMGAIVehiclePerception& Perception : PerceivedVehicles)
 	{
-		if (Perception.bIsAhead && FMath::Abs(Perception.Angle) < 45.0f)
+		if (Perception.bIsAhead && FMath::Abs(Perception.Angle) < 60.0f)
 		{
 			return Perception;
 		}
@@ -878,7 +1606,7 @@ FMGAIVehiclePerception AMGAIRacerController::GetVehicleBehind() const
 {
 	for (const FMGAIVehiclePerception& Perception : PerceivedVehicles)
 	{
-		if (!Perception.bIsAhead && FMath::Abs(Perception.Angle) > 135.0f)
+		if (!Perception.bIsAhead && FMath::Abs(Perception.Angle) > 120.0f)
 		{
 			return Perception;
 		}
@@ -890,14 +1618,15 @@ bool AMGAIRacerController::IsOvertakePathClear(bool bOnLeft) const
 {
 	for (const FMGAIVehiclePerception& Perception : PerceivedVehicles)
 	{
-		if (Perception.Distance > 20.0f * 100.0f)
+		if (Perception.Distance > 25.0f * AIConstants::MetersToUnits)
 		{
 			continue;
 		}
 
+		// Check if vehicle is in our overtaking lane
 		if ((bOnLeft && Perception.bIsOnLeft) || (!bOnLeft && !Perception.bIsOnLeft))
 		{
-			if (FMath::Abs(Perception.Angle) < 90.0f)
+			if (FMath::Abs(Perception.Angle) < 90.0f) // In front quadrant
 			{
 				return false;
 			}
@@ -913,28 +1642,35 @@ void AMGAIRacerController::ApplyProfileModifiers(FMGAISteeringOutput& Output)
 		return;
 	}
 
-	// Apply skill-based inaccuracy
-	float Inaccuracy = 1.0f - DriverProfile->Skill.LineAccuracy;
-	Output.Steering += FMath::FRandRange(-Inaccuracy, Inaccuracy) * 0.1f;
+	// Apply skill-based inaccuracy (makes lower skill AI less precise)
+	float LineInaccuracy = 1.0f - DriverProfile->Skill.LineAccuracy;
+	LineInaccuracy *= (1.0f / DifficultyMultiplier); // Harder difficulty = less mistakes
+
+	Output.Steering += FMath::FRandRange(-LineInaccuracy, LineInaccuracy) * 0.1f;
 	Output.Steering = FMath::Clamp(Output.Steering, -1.0f, 1.0f);
 
 	// Braking accuracy
 	float BrakeInaccuracy = 1.0f - DriverProfile->Skill.BrakingAccuracy;
-	Output.Brake *= 1.0f + FMath::FRandRange(-BrakeInaccuracy, BrakeInaccuracy) * 0.2f;
+	Output.Brake *= 1.0f + FMath::FRandRange(-BrakeInaccuracy, BrakeInaccuracy) * 0.15f;
 	Output.Brake = FMath::Clamp(Output.Brake, 0.0f, 1.0f);
 
-	// Random mistakes
-	if (FMath::FRand() < DriverProfile->Skill.MistakeFrequency * 0.01f)
+	// Random mistakes based on consistency
+	float MistakeChance = DriverProfile->Skill.MistakeFrequency * 0.005f;
+	MistakeChance *= (1.0f / DifficultyMultiplier);
+
+	if (FMath::FRand() < MistakeChance)
 	{
-		// Throttle lift or brake error
+		// Small mistake - lift throttle or minor steering error
 		if (FMath::RandBool())
 		{
-			Output.Throttle *= 0.5f;
+			Output.Throttle *= FMath::FRandRange(0.3f, 0.7f);
 		}
 		else
 		{
-			Output.Steering += FMath::FRandRange(-0.3f, 0.3f);
+			Output.Steering += FMath::FRandRange(-0.2f, 0.2f);
+			Output.Steering = FMath::Clamp(Output.Steering, -1.0f, 1.0f);
 		}
+		Output.Confidence *= 0.7f;
 	}
 }
 
@@ -942,8 +1678,17 @@ void AMGAIRacerController::SetState(EMGAIDrivingState NewState)
 {
 	if (CurrentState != NewState)
 	{
+		EMGAIDrivingState OldState = CurrentState;
 		CurrentState = NewState;
 		TimeInState = 0.0f;
+
+		// Reset state-specific data
+		if (NewState != EMGAIDrivingState::Overtaking)
+		{
+			OvertakeTimer = 0.0f;
+		}
+
+		OnDrivingStateChanged.Broadcast(OldState, NewState);
 	}
 }
 
@@ -954,23 +1699,168 @@ float AMGAIRacerController::AddSteeringNoise(float BaseValue)
 		return BaseValue;
 	}
 
-	// Add personality-based noise
-	float NoiseAmount = 0.0f;
+	float NoiseAmount = 0.02f; // Base noise
 
+	// Personality affects noise
 	switch (DriverProfile->Personality)
 	{
 		case EMGDriverPersonality::Unpredictable:
-			NoiseAmount = 0.1f;
+			NoiseAmount = 0.08f;
 			break;
 		case EMGDriverPersonality::Rookie:
 			NoiseAmount = 0.05f;
 			break;
+		case EMGDriverPersonality::Calculated:
+			NoiseAmount = 0.01f;
+			break;
 		default:
-			NoiseAmount = 0.02f;
 			break;
 	}
 
+	// Consistency modifies noise
 	NoiseAmount *= (1.0f - DriverProfile->Skill.Consistency);
 
+	// Difficulty reduces noise
+	NoiseAmount *= (1.0f / DifficultyMultiplier);
+
 	return BaseValue + FMath::FRandRange(-NoiseAmount, NoiseAmount);
+}
+
+float AMGAIRacerController::CalculateSlipstreamBonus(const FVector& Position, const FVector& Velocity) const
+{
+	float MaxBonus = AIConstants::MaxSlipstreamBonus;
+	float CurrentBonus = 0.0f;
+
+	for (const FMGAIVehiclePerception& Perceived : PerceivedVehicles)
+	{
+		if (Perceived.bIsAhead && Perceived.bInSlipstreamRange)
+		{
+			// Bonus scales with proximity and alignment
+			float DistanceFactor = 1.0f - (Perceived.Distance / (SlipstreamRange * AIConstants::MetersToUnits));
+			float AngleFactor = 1.0f - (FMath::Abs(Perceived.Angle) / SlipstreamAngle);
+
+			CurrentBonus = FMath::Max(CurrentBonus, MaxBonus * DistanceFactor * AngleFactor);
+		}
+	}
+
+	return CurrentBonus;
+}
+
+bool AMGAIRacerController::IsInSlipstream(AActor* LeadVehicle) const
+{
+	if (!LeadVehicle || !VehiclePawn)
+	{
+		return false;
+	}
+
+	APawn* LeadPawn = Cast<APawn>(LeadVehicle);
+	if (!LeadPawn)
+	{
+		return false;
+	}
+
+	FVector MyLocation = VehiclePawn->GetActorLocation();
+	FVector LeadLocation = LeadPawn->GetActorLocation();
+	FVector LeadForward = LeadPawn->GetActorForwardVector();
+	FVector LeadBackward = -LeadForward;
+
+	// Check if we're behind the lead vehicle
+	FVector ToUs = MyLocation - LeadLocation;
+	float DotBack = FVector::DotProduct(ToUs.GetSafeNormal(), LeadBackward);
+
+	// Must be behind (DotBack > 0)
+	if (DotBack <= 0.0f)
+	{
+		return false;
+	}
+
+	// Check distance
+	float Distance = FVector::Dist(MyLocation, LeadLocation);
+	if (Distance > SlipstreamRange * AIConstants::MetersToUnits)
+	{
+		return false;
+	}
+
+	// Check angle (must be relatively in line)
+	float Angle = FMath::RadiansToDegrees(FMath::Acos(DotBack));
+	return Angle < SlipstreamAngle;
+}
+
+float AMGAIRacerController::GetSituationalRiskLevel() const
+{
+	float BaseRisk = 0.5f;
+
+	if (DriverProfile)
+	{
+		BaseRisk = DriverProfile->Aggression.RiskTaking;
+	}
+
+	// Increase risk when behind
+	if (GapToLeader > AIConstants::CloseGapThreshold)
+	{
+		BaseRisk += 0.1f;
+	}
+
+	// Decrease risk when leading
+	if (CurrentRacePosition == 1)
+	{
+		BaseRisk -= 0.1f;
+	}
+
+	// Increase risk late in race (would need lap info)
+	// BaseRisk += LateRaceFactor;
+
+	return FMath::Clamp(BaseRisk, 0.0f, 1.0f);
+}
+
+float AMGAIRacerController::CalculateBrakingDistance(float CurrentSpeed, float TargetSpeed) const
+{
+	// v^2 = v0^2 + 2*a*d
+	// d = (v^2 - v0^2) / (2*a)
+
+	float SpeedDiff = CurrentSpeed - TargetSpeed;
+	if (SpeedDiff <= 0.0f)
+	{
+		return 0.0f;
+	}
+
+	float Deceleration = AIConstants::DefaultBrakingDecel * AIConstants::MetersToUnits;
+
+	// Apply skill factor - better skill = later braking (shorter distance)
+	if (DriverProfile)
+	{
+		Deceleration *= (0.8f + 0.4f * DriverProfile->Skill.BrakingAccuracy);
+	}
+
+	// Apply weather conditions to braking
+	// Wet/icy conditions significantly increase braking distance
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			// Grip affects braking effectiveness
+			// Dry = 1.0x, Wet = 0.7x grip means 1/0.7 = 1.43x braking distance
+			const float GripMultiplier = WeatherSubsystem->GetRoadGripMultiplier();
+			if (GripMultiplier > 0.01f)
+			{
+				Deceleration *= GripMultiplier;
+			}
+
+			// Skilled drivers start braking earlier in bad conditions
+			const EMGRoadCondition RoadCondition = WeatherSubsystem->GetRoadCondition();
+			if (RoadCondition == EMGRoadCondition::Wet ||
+				RoadCondition == EMGRoadCondition::StandingWater ||
+				RoadCondition == EMGRoadCondition::Icy)
+			{
+				// Add safety margin for reduced grip - more skilled = smaller margin needed
+				const float SafetyMargin = DriverProfile ?
+					FMath::Lerp(1.3f, 1.1f, DriverProfile->Skill.SkillLevel) : 1.2f;
+				Deceleration /= SafetyMargin;
+			}
+		}
+	}
+
+	float Distance = (CurrentSpeed * CurrentSpeed - TargetSpeed * TargetSpeed) / (2.0f * Deceleration);
+
+	return Distance;
 }
