@@ -41,6 +41,7 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	UpdateAntiLag(DeltaTime);
 	UpdateLaunchControl(DeltaTime);
 	UpdateBrakeSystem(DeltaTime);
+	UpdateSurfaceDetection(DeltaTime); // NEW: Surface grip detection
 	ApplyDifferentialBehavior(DeltaTime);
 
 	// Update shift cooldown
@@ -678,6 +679,31 @@ float UMGVehicleMovementComponent::CalculateTireFriction(int32 WheelIndex) const
 	const float ConditionFactor = FMath::Lerp(0.5f, 1.0f, Condition / 100.0f);
 	BaseFriction *= ConditionFactor;
 
+	// NEW: Apply surface type grip multiplier
+	if (WheelIndex >= 0 && WheelIndex < 4)
+	{
+		const EMGSurfaceType SurfaceType = WheelSurfaceStates[WheelIndex].SurfaceType;
+		const float SurfaceGrip = GetSurfaceGripMultiplier(SurfaceType);
+		BaseFriction *= SurfaceGrip;
+
+		// Additional wetness modifier for surfaces that can be wet
+		const float Wetness = WheelSurfaceStates[WheelIndex].WetnessLevel;
+		if (Wetness > 0.0f && SurfaceType != EMGSurfaceType::Ice && SurfaceType != EMGSurfaceType::Sand)
+		{
+			// Wetness further reduces grip (interpolate toward wet surface grip)
+			const float DryGrip = SurfaceGrip;
+			const float WetGrip = SurfaceGrip * 0.65f; // Wet reduces by 35%
+			BaseFriction *= FMath::Lerp(1.0f, WetGrip / DryGrip, Wetness);
+		}
+	}
+
+	// Apply tire temperature effects
+	if (WheelIndex >= 0 && WheelIndex < 4)
+	{
+		const float TempGripMultiplier = TireTemperatures[WheelIndex].GetGripMultiplier();
+		BaseFriction *= FMath::Lerp(1.0f, TempGripMultiplier, TireTempGripInfluence);
+	}
+
 	// Apply drift modifier
 	if (DriftState.bIsDrifting && WheelIndex >= 2) // Rear wheels during drift
 	{
@@ -689,6 +715,9 @@ float UMGVehicleMovementComponent::CalculateTireFriction(int32 WheelIndex) const
 	{
 		BaseFriction *= HandbrakeFrictionMultiplier;
 	}
+
+	// Apply damage multiplier
+	BaseFriction *= TireGripMultiplier;
 
 	return BaseFriction;
 }
@@ -1162,5 +1191,163 @@ float UMGVehicleMovementComponent::GetDifferentialLockFactor() const
 			return 1.0f;
 		default:
 			return 0.0f;
+	}
+}
+
+// ==========================================
+// SURFACE DETECTION SYSTEM
+// ==========================================
+
+float UMGVehicleMovementComponent::GetSurfaceGripMultiplier(EMGSurfaceType SurfaceType) const
+{
+	switch (SurfaceType)
+	{
+		case EMGSurfaceType::Asphalt:  return SurfaceGrip_Asphalt;
+		case EMGSurfaceType::Concrete: return SurfaceGrip_Concrete;
+		case EMGSurfaceType::Wet:      return SurfaceGrip_Wet;
+		case EMGSurfaceType::Dirt:     return SurfaceGrip_Dirt;
+		case EMGSurfaceType::Gravel:   return SurfaceGrip_Gravel;
+		case EMGSurfaceType::Ice:      return SurfaceGrip_Ice;
+		case EMGSurfaceType::Snow:     return SurfaceGrip_Snow;
+		case EMGSurfaceType::Grass:    return SurfaceGrip_Grass;
+		case EMGSurfaceType::Sand:     return SurfaceGrip_Sand;
+		case EMGSurfaceType::OffRoad:  return SurfaceGrip_OffRoad;
+		default:                        return 1.0f;
+	}
+}
+
+EMGSurfaceType UMGVehicleMovementComponent::DetectWheelSurfaceType(int32 WheelIndex) const
+{
+	if (!GetOwner())
+	{
+		return EMGSurfaceType::Asphalt;
+	}
+
+	// Get wheel world location for trace
+	// For now, we'll use the vehicle's location as approximation
+	// In full implementation, you'd get actual wheel socket locations
+	const FVector VehicleLocation = GetOwner()->GetActorLocation();
+	const FVector TraceStart = VehicleLocation + FVector(0.0f, 0.0f, 50.0f);
+	const FVector TraceEnd = VehicleLocation - FVector(0.0f, 0.0f, 200.0f);
+
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+
+	// Perform line trace to detect surface
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+	{
+		// Check physical material to determine surface type
+		if (UPhysicalMaterial* PhysMat = HitResult.PhysMaterial.Get())
+		{
+			// Surface type detection based on physical material properties
+			// This is a simplified version - in production you'd use custom physical materials
+			const float Friction = PhysMat->Friction;
+
+			if (Friction < 0.3f)
+			{
+				return EMGSurfaceType::Ice;
+			}
+			else if (Friction < 0.5f)
+			{
+				return EMGSurfaceType::Wet;
+			}
+			else if (Friction < 0.7f)
+			{
+				return EMGSurfaceType::Dirt;
+			}
+			else if (Friction < 0.85f)
+			{
+				return EMGSurfaceType::Concrete;
+			}
+			else
+			{
+				return EMGSurfaceType::Asphalt;
+			}
+		}
+
+		// Check surface name/tags for more specific detection
+		if (AActor* HitActor = HitResult.GetActor())
+		{
+			// Check for surface tags (designers can tag surfaces)
+			if (HitActor->Tags.Contains(FName("Surface_Wet")))
+			{
+				return EMGSurfaceType::Wet;
+			}
+			else if (HitActor->Tags.Contains(FName("Surface_Dirt")))
+			{
+				return EMGSurfaceType::Dirt;
+			}
+			else if (HitActor->Tags.Contains(FName("Surface_Gravel")))
+			{
+				return EMGSurfaceType::Gravel;
+			}
+			else if (HitActor->Tags.Contains(FName("Surface_Ice")))
+			{
+				return EMGSurfaceType::Ice;
+			}
+			else if (HitActor->Tags.Contains(FName("Surface_Snow")))
+			{
+				return EMGSurfaceType::Snow;
+			}
+			else if (HitActor->Tags.Contains(FName("Surface_Grass")))
+			{
+				return EMGSurfaceType::Grass;
+			}
+			else if (HitActor->Tags.Contains(FName("Surface_Sand")))
+			{
+				return EMGSurfaceType::Sand;
+			}
+			else if (HitActor->Tags.Contains(FName("Surface_OffRoad")))
+			{
+				return EMGSurfaceType::OffRoad;
+			}
+		}
+	}
+
+	// Default to asphalt if no surface detected
+	return EMGSurfaceType::Asphalt;
+}
+
+void UMGVehicleMovementComponent::UpdateSurfaceDetection(float DeltaTime)
+{
+	// Update surface state for each wheel
+	for (int32 WheelIdx = 0; WheelIdx < 4; ++WheelIdx)
+	{
+		FMGWheelSurfaceState& WheelSurface = WheelSurfaceStates[WheelIdx];
+
+		// Detect current surface type
+		const EMGSurfaceType NewSurfaceType = DetectWheelSurfaceType(WheelIdx);
+
+		// Check if surface changed
+		if (NewSurfaceType != WheelSurface.SurfaceType)
+		{
+			WheelSurface.SurfaceType = NewSurfaceType;
+			WheelSurface.TimeOnSurface = 0.0f;
+
+			// Log surface change for debugging
+			//UE_LOG(LogTemp, VeryVerbose, TEXT("Wheel %d surface changed to %d"), WheelIdx, (int32)NewSurfaceType);
+		}
+		else
+		{
+			// Accumulate time on surface
+			WheelSurface.TimeOnSurface += DeltaTime;
+		}
+
+		// Update wetness level based on weather or surface type
+		// TODO: Integrate with weather system when available
+		if (WheelSurface.SurfaceType == EMGSurfaceType::Wet)
+		{
+			// Gradually increase wetness on wet surfaces
+			WheelSurface.WetnessLevel = FMath::FInterpTo(WheelSurface.WetnessLevel, 1.0f, DeltaTime, 2.0f);
+		}
+		else
+		{
+			// Dry off when not on wet surface
+			WheelSurface.WetnessLevel = FMath::FInterpTo(WheelSurface.WetnessLevel, 0.0f, DeltaTime, 0.5f);
+		}
+
+		// Update contact state (simplified - full implementation would check actual wheel contact)
+		WheelSurface.bHasContact = IsGrounded();
 	}
 }

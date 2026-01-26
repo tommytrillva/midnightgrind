@@ -165,6 +165,68 @@ struct FMGWeightTransfer
 };
 
 /**
+ * @brief Road surface types with different grip characteristics
+ */
+UENUM(BlueprintType)
+enum class EMGSurfaceType : uint8
+{
+	/** Smooth asphalt (optimal grip) */
+	Asphalt UMETA(DisplayName = "Asphalt"),
+
+	/** Concrete surface (slightly less grip than asphalt) */
+	Concrete UMETA(DisplayName = "Concrete"),
+
+	/** Wet asphalt/concrete (significantly reduced grip) */
+	Wet UMETA(DisplayName = "Wet Surface"),
+
+	/** Dirt road (reduced grip, loose surface) */
+	Dirt UMETA(DisplayName = "Dirt"),
+
+	/** Gravel surface (low grip, high slip) */
+	Gravel UMETA(DisplayName = "Gravel"),
+
+	/** Ice (extremely low grip) */
+	Ice UMETA(DisplayName = "Ice"),
+
+	/** Snow (low grip, soft surface) */
+	Snow UMETA(DisplayName = "Snow"),
+
+	/** Grass (very low grip when wet, moderate when dry) */
+	Grass UMETA(DisplayName = "Grass"),
+
+	/** Sand (extremely low grip, high resistance) */
+	Sand UMETA(DisplayName = "Sand"),
+
+	/** Off-road trail (mixed surface, reduced grip) */
+	OffRoad UMETA(DisplayName = "Off-Road")
+};
+
+/**
+ * @brief Per-wheel surface tracking for dynamic grip calculation
+ */
+USTRUCT(BlueprintType)
+struct FMGWheelSurfaceState
+{
+	GENERATED_BODY()
+
+	/** Current surface type this wheel is on */
+	UPROPERTY(BlueprintReadOnly, Category = "Surface")
+	EMGSurfaceType SurfaceType = EMGSurfaceType::Asphalt;
+
+	/** Time spent on current surface (for temperature/wear effects) */
+	UPROPERTY(BlueprintReadOnly, Category = "Surface")
+	float TimeOnSurface = 0.0f;
+
+	/** Surface wetness level (0 = dry, 1 = fully wet) */
+	UPROPERTY(BlueprintReadOnly, Category = "Surface")
+	float WetnessLevel = 0.0f;
+
+	/** Whether wheel is currently in contact with ground */
+	UPROPERTY(BlueprintReadOnly, Category = "Surface")
+	bool bHasContact = true;
+};
+
+/**
  * @brief Turbo state for advanced lag simulation
  */
 USTRUCT(BlueprintType)
@@ -696,6 +758,55 @@ public:
 	float TireTempGripInfluence = 0.5f; // 0-1, how much temp affects grip
 
 	// ==========================================
+	// TUNING PARAMETERS - SURFACE GRIP
+	// ==========================================
+
+	/**
+	 * @brief Surface type grip multipliers
+	 * These values affect tire grip based on road surface
+	 */
+
+	/** Asphalt grip (baseline = 1.0) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.5", ClampMax = "1.5"))
+	float SurfaceGrip_Asphalt = 1.0f;
+
+	/** Concrete grip (slightly less than asphalt) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.5", ClampMax = "1.5"))
+	float SurfaceGrip_Concrete = 0.95f;
+
+	/** Wet surface grip (significantly reduced) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.3", ClampMax = "1.0"))
+	float SurfaceGrip_Wet = 0.65f;
+
+	/** Dirt road grip */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.3", ClampMax = "0.9"))
+	float SurfaceGrip_Dirt = 0.70f;
+
+	/** Gravel surface grip (loose, high slip) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.2", ClampMax = "0.8"))
+	float SurfaceGrip_Gravel = 0.55f;
+
+	/** Ice grip (extremely low) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.1", ClampMax = "0.5"))
+	float SurfaceGrip_Ice = 0.20f;
+
+	/** Snow grip (low, soft) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.2", ClampMax = "0.6"))
+	float SurfaceGrip_Snow = 0.40f;
+
+	/** Grass grip (very low) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.2", ClampMax = "0.7"))
+	float SurfaceGrip_Grass = 0.45f;
+
+	/** Sand grip (extremely low, high resistance) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.1", ClampMax = "0.5"))
+	float SurfaceGrip_Sand = 0.30f;
+
+	/** Off-road trail grip */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Surface", meta = (ClampMin = "0.3", ClampMax = "0.8"))
+	float SurfaceGrip_OffRoad = 0.60f;
+
+	// ==========================================
 	// TUNING PARAMETERS - WEIGHT TRANSFER
 	// ==========================================
 
@@ -871,6 +982,10 @@ protected:
 	UPROPERTY()
 	FMGTireTemperature TireTemperatures[4];
 
+	/** Surface state per wheel (FL, FR, RL, RR) for dynamic grip calculation */
+	UPROPERTY()
+	FMGWheelSurfaceState WheelSurfaceStates[4];
+
 	// Weight transfer state
 	UPROPERTY()
 	FMGWeightTransfer WeightTransferState;
@@ -930,6 +1045,26 @@ protected:
 
 	/** Get tire grip coefficient for compound */
 	static float GetTireCompoundGrip(EMGTireCompound Compound);
+
+	/**
+	 * @brief Get grip multiplier for specific surface type
+	 * @param SurfaceType The surface type to query
+	 * @return Grip multiplier for this surface (0.1 to 1.5)
+	 */
+	float GetSurfaceGripMultiplier(EMGSurfaceType SurfaceType) const;
+
+	/**
+	 * @brief Detect surface type from wheel contact
+	 * @param WheelIndex Wheel index to detect (0-3)
+	 * @return Detected surface type
+	 */
+	EMGSurfaceType DetectWheelSurfaceType(int32 WheelIndex) const;
+
+	/**
+	 * @brief Update surface detection for all wheels
+	 * @param DeltaTime Time step for simulation
+	 */
+	virtual void UpdateSurfaceDetection(float DeltaTime);
 
 	/** Perform gear shift */
 	void PerformGearShift(int32 NewGear);
