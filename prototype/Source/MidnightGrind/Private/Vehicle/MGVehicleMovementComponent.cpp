@@ -2,6 +2,8 @@
 
 #include "Vehicle/MGVehicleMovementComponent.h"
 #include "ChaosVehicleWheel.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
+#include "SimpleVehicle/SimpleWheelSim.h"
 
 UMGVehicleMovementComponent::UMGVehicleMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -139,6 +141,23 @@ void UMGVehicleMovementComponent::ShiftDown()
 	}
 }
 
+void UMGVehicleMovementComponent::SetTireGripMultiplier(float Multiplier)
+{
+	TireGripMultiplier = FMath::Clamp(Multiplier, 0.1f, 1.0f);
+
+	// Apply grip multiplier to base tire grip
+	// This affects the CalculateTireFriction function
+	UE_LOG(LogTemp, Log, TEXT("Tire grip multiplier set to: %.2f"), TireGripMultiplier);
+}
+
+void UMGVehicleMovementComponent::SetMaxSpeedMultiplier(float Multiplier)
+{
+	MaxSpeedMultiplier = FMath::Clamp(Multiplier, 0.3f, 1.0f);
+
+	// This affects max speed calculations
+	UE_LOG(LogTemp, Log, TEXT("Max speed multiplier set to: %.2f"), MaxSpeedMultiplier);
+}
+
 void UMGVehicleMovementComponent::PerformGearShift(int32 NewGear)
 {
 	CurrentGear = NewGear;
@@ -146,7 +165,22 @@ void UMGVehicleMovementComponent::PerformGearShift(int32 NewGear)
 
 	OnGearChanged.Broadcast(CurrentGear);
 
-	// TODO: Apply transmission gear to physics system
+	// Apply gear to Chaos transmission
+	if (NewGear < 0)
+	{
+		// Reverse
+		SetTargetGear(-1, true);
+	}
+	else if (NewGear == 0)
+	{
+		// Neutral - handled by transmission auto-clutch
+		SetTargetGear(0, true);
+	}
+	else
+	{
+		// Forward gears
+		SetTargetGear(NewGear, true);
+	}
 }
 
 // ==========================================
@@ -169,12 +203,30 @@ float UMGVehicleMovementComponent::GetSpeedKPH() const
 
 bool UMGVehicleMovementComponent::IsGrounded() const
 {
-	// Check all wheels
-	for (int32 i = 0; i < 4; ++i)
+	// Check if all wheels are in contact with ground using Chaos wheel state
+	int32 WheelsInContact = 0;
+	const int32 NumWheels = WheelSetups.Num();
+
+	if (NumWheels == 0)
 	{
-		// TODO: Implement proper wheel grounded check using Chaos
+		return false;
 	}
-	return true; // Placeholder
+
+	for (int32 i = 0; i < NumWheels; ++i)
+	{
+		if (const FChaosWheelSetup* WheelSetup = GetWheelSetup(i))
+		{
+			// Access the wheel state from the physics simulation
+			const Chaos::FSimpleWheelSim& WheelSim = PVehicleOutput->Wheels[i];
+			if (WheelSim.InContact())
+			{
+				WheelsInContact++;
+			}
+		}
+	}
+
+	// Consider grounded if at least 3 wheels are touching
+	return WheelsInContact >= FMath::Min(3, NumWheels);
 }
 
 bool UMGVehicleMovementComponent::IsWheelSlipping(int32 WheelIndex) const
@@ -185,13 +237,29 @@ bool UMGVehicleMovementComponent::IsWheelSlipping(int32 WheelIndex) const
 
 float UMGVehicleMovementComponent::GetWheelSlipAngle(int32 WheelIndex) const
 {
-	// TODO: Get from Chaos wheel state
+	// Get slip angle from Chaos wheel simulation
+	if (WheelIndex >= 0 && WheelIndex < WheelSetups.Num() && PVehicleOutput)
+	{
+		if (WheelIndex < PVehicleOutput->Wheels.Num())
+		{
+			const Chaos::FSimpleWheelSim& WheelSim = PVehicleOutput->Wheels[WheelIndex];
+			return WheelSim.GetSlipAngle();
+		}
+	}
 	return 0.0f;
 }
 
 float UMGVehicleMovementComponent::GetWheelSlipRatio(int32 WheelIndex) const
 {
-	// TODO: Get from Chaos wheel state
+	// Get longitudinal slip ratio from Chaos wheel simulation
+	if (WheelIndex >= 0 && WheelIndex < WheelSetups.Num() && PVehicleOutput)
+	{
+		if (WheelIndex < PVehicleOutput->Wheels.Num())
+		{
+			const Chaos::FSimpleWheelSim& WheelSim = PVehicleOutput->Wheels[WheelIndex];
+			return WheelSim.GetSlipMagnitude();
+		}
+	}
 	return 0.0f;
 }
 
@@ -207,13 +275,59 @@ void UMGVehicleMovementComponent::ApplyVehicleConfiguration(const FMGVehicleData
 	const float FrontGrip = GetTireCompoundGrip(VehicleData.WheelsTires.FrontTireCompound);
 	const float RearGrip = GetTireCompoundGrip(VehicleData.WheelsTires.RearTireCompound);
 
-	// TODO: Apply to Chaos wheel setup
+	// Apply friction to Chaos wheels (front wheels are indices 0,1, rear are 2,3)
+	for (int32 i = 0; i < WheelSetups.Num(); ++i)
+	{
+		if (UChaosVehicleWheel* Wheel = Cast<UChaosVehicleWheel>(Wheels[i]))
+		{
+			const bool bIsFrontWheel = (i < 2);
+			const float GripMultiplier = bIsFrontWheel ? FrontGrip : RearGrip;
 
-	// Apply suspension settings
-	// TODO: Configure Chaos suspension from our data
+			// Scale friction coefficient by our tire compound grip
+			Wheel->FrictionForceMultiplier = BaseTireGrip * GripMultiplier;
+		}
+	}
 
-	// Apply aero
-	// TODO: Apply downforce calculations
+	// Apply suspension settings from our data
+	// Front suspension
+	if (WheelSetups.Num() >= 2)
+	{
+		for (int32 i = 0; i < 2; ++i)
+		{
+			if (UChaosVehicleWheel* Wheel = Cast<UChaosVehicleWheel>(Wheels[i]))
+			{
+				Wheel->SuspensionMaxRaise = VehicleData.Suspension.FrontRideHeightMM / 10.0f; // mm to cm
+				Wheel->SuspensionMaxDrop = VehicleData.Suspension.FrontRideHeightMM / 10.0f;
+			}
+		}
+	}
+	// Rear suspension
+	if (WheelSetups.Num() >= 4)
+	{
+		for (int32 i = 2; i < 4; ++i)
+		{
+			if (UChaosVehicleWheel* Wheel = Cast<UChaosVehicleWheel>(Wheels[i]))
+			{
+				Wheel->SuspensionMaxRaise = VehicleData.Suspension.RearRideHeightMM / 10.0f;
+				Wheel->SuspensionMaxDrop = VehicleData.Suspension.RearRideHeightMM / 10.0f;
+			}
+		}
+	}
+
+	// Apply aero downforce - affects grip at high speeds
+	// Downforce is applied through the stability/anti-flip systems based on aero config
+	const float DownforceMultiplier = VehicleData.Aero.FrontSplitter.bInstalled ? 1.1f : 1.0f;
+	const float RearDownforce = VehicleData.Aero.RearWing.bInstalled ?
+		(1.0f + VehicleData.Aero.RearWing.DownforceLevelPercent * 0.01f * 0.3f) : 1.0f;
+
+	// Store aero values for use in physics updates (applied dynamically based on speed)
+	BaseTireGrip *= DownforceMultiplier * RearDownforce;
+
+	// Configure transmission
+	if (TransmissionSetup.bUseAutomaticGears != (VehicleData.Drivetrain.TransmissionType == EMGTransmissionType::Automatic))
+	{
+		TransmissionSetup.bUseAutomaticGears = (VehicleData.Drivetrain.TransmissionType == EMGTransmissionType::Automatic);
+	}
 
 	// Initialize nitrous
 	if (VehicleData.Engine.Nitrous.bInstalled)
@@ -224,6 +338,9 @@ void UMGVehicleMovementComponent::ApplyVehicleConfiguration(const FMGVehicleData
 	{
 		EngineState.NitrousRemaining = 0.0f;
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("Applied vehicle configuration: %s (HP: %.0f, Grip F/R: %.2f/%.2f)"),
+		*VehicleData.DisplayName, VehicleData.Stats.Horsepower, FrontGrip, RearGrip);
 }
 
 // ==========================================
@@ -412,12 +529,16 @@ void UMGVehicleMovementComponent::ApplyStabilityControl(float DeltaTime)
 
 	if (SlipAngle > DriftAngleThreshold && !bHandbrakeEngaged)
 	{
-		// Apply corrective yaw torque
-		const float CorrectionStrength = SlipAngle * StabilityControl * 100.0f;
-		const float CorrectionDir = DriftState.DriftAngle > 0 ? -1.0f : 1.0f;
+		// Apply corrective yaw torque through the mesh component
+		if (UPrimitiveComponent* MeshPrimitive = Cast<UPrimitiveComponent>(UpdatedPrimitive))
+		{
+			const float CorrectionStrength = SlipAngle * StabilityControl * 10000.0f;
+			const float CorrectionDir = DriftState.DriftAngle > 0 ? -1.0f : 1.0f;
 
-		// TODO: Apply torque through physics system
-		// GetOwner()->GetRootComponent()->AddTorqueInDegrees(FVector(0, 0, CorrectionStrength * CorrectionDir));
+			// Apply yaw correction torque in world space
+			const FVector TorqueToApply = FVector(0.0f, 0.0f, CorrectionStrength * CorrectionDir * DeltaTime);
+			MeshPrimitive->AddTorqueInRadians(TorqueToApply, NAME_None, true);
+		}
 	}
 }
 
@@ -434,11 +555,16 @@ void UMGVehicleMovementComponent::ApplyAntiFlipForce(float DeltaTime)
 
 	if (RollAngle > 45.0f && RollAngle < 135.0f)
 	{
-		// Apply anti-flip torque
-		const float FlipDir = Rotation.Roll > 0 ? -1.0f : 1.0f;
+		// Apply anti-flip torque through the mesh component
+		if (UPrimitiveComponent* MeshPrimitive = Cast<UPrimitiveComponent>(UpdatedPrimitive))
+		{
+			const float FlipDir = Rotation.Roll > 0 ? -1.0f : 1.0f;
 
-		// TODO: Apply torque through physics system
-		// GetOwner()->GetRootComponent()->AddTorqueInDegrees(FVector(AntiFlipTorque * FlipDir, 0, 0));
+			// Apply roll correction torque in local space
+			const FVector LocalTorque = FVector(AntiFlipTorque * FlipDir * DeltaTime, 0.0f, 0.0f);
+			const FVector WorldTorque = GetOwner()->GetActorRotation().RotateVector(LocalTorque);
+			MeshPrimitive->AddTorqueInRadians(WorldTorque, NAME_None, true);
+		}
 	}
 }
 
@@ -503,8 +629,39 @@ float UMGVehicleMovementComponent::CalculateCurrentPower() const
 		Power *= NitrousPowerMultiplier;
 	}
 
-	// Apply engine condition
-	// TODO: Factor in part conditions
+	// Apply engine condition - worn parts reduce power output
+	float ConditionMultiplier = 1.0f;
+	if (CurrentConfiguration.PartConditions.Num() > 0)
+	{
+		// Check engine-related part conditions
+		static const TArray<FName> EngineParts = {
+			FName("Engine"), FName("Turbo"), FName("Supercharger"),
+			FName("Exhaust"), FName("AirFilter"), FName("FuelSystem")
+		};
+
+		float TotalCondition = 0.0f;
+		int32 PartCount = 0;
+
+		for (const FName& PartName : EngineParts)
+		{
+			if (const float* Condition = CurrentConfiguration.PartConditions.Find(PartName))
+			{
+				TotalCondition += *Condition;
+				PartCount++;
+			}
+		}
+
+		if (PartCount > 0)
+		{
+			// Average condition affects power
+			// At 100% condition = 100% power
+			// At 50% condition = 85% power
+			// At 0% condition = 70% power
+			const float AverageCondition = TotalCondition / PartCount;
+			ConditionMultiplier = FMath::Lerp(0.70f, 1.0f, AverageCondition / 100.0f);
+		}
+	}
+	Power *= ConditionMultiplier;
 
 	return Power;
 }

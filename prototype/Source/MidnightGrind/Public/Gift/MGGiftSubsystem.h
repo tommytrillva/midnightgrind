@@ -1,0 +1,405 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Subsystems/GameInstanceSubsystem.h"
+#include "MGGiftSubsystem.generated.h"
+
+UENUM(BlueprintType)
+enum class EMGGiftType : uint8
+{
+	Item,
+	Vehicle,
+	Currency,
+	SeasonPass,
+	Bundle,
+	Custom
+};
+
+UENUM(BlueprintType)
+enum class EMGGiftStatus : uint8
+{
+	Pending,
+	Sent,
+	Delivered,
+	Claimed,
+	Expired,
+	Returned,
+	Cancelled
+};
+
+UENUM(BlueprintType)
+enum class EMGGiftWrapStyle : uint8
+{
+	Default,
+	Birthday,
+	Holiday,
+	Victory,
+	Special,
+	Premium,
+	Animated
+};
+
+USTRUCT(BlueprintType)
+struct FMGGiftItem
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName ItemID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText DisplayName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EMGGiftType GiftType = EMGGiftType::Item;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Quantity = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrencyValue = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<UTexture2D> Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsGiftable = true;
+};
+
+USTRUCT(BlueprintType)
+struct FMGGift
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGuid GiftID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SenderID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString SenderName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName RecipientID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString RecipientName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FMGGiftItem> Items;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText PersonalMessage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EMGGiftStatus Status = EMGGiftStatus::Pending;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EMGGiftWrapStyle WrapStyle = EMGGiftWrapStyle::Default;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FDateTime SentAt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FDateTime ExpiresAt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FDateTime ClaimedAt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsAnonymous = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalValue = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FMGGiftBundle
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName BundleID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText BundleName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FMGGiftItem> Contents;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Price = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 DiscountPercent = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bLimitedTime = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FDateTime AvailableUntil;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<UTexture2D> BundleIcon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EMGGiftWrapStyle DefaultWrap = EMGGiftWrapStyle::Special;
+};
+
+USTRUCT(BlueprintType)
+struct FMGGiftHistory
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGuid GiftID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bWasSent = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName OtherPlayerID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString OtherPlayerName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalValue = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FDateTime TransactionDate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EMGGiftStatus FinalStatus = EMGGiftStatus::Claimed;
+};
+
+USTRUCT(BlueprintType)
+struct FMGGiftSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAcceptGiftsFromFriends = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAcceptGiftsFromAnyone = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAcceptAnonymousGifts = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bNotifyOnGiftReceived = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAutoClaimGifts = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxPendingGifts = 50;
+};
+
+USTRUCT(BlueprintType)
+struct FMGGiftStats
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalGiftsSent = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalGiftsReceived = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalValueSent = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TotalValueReceived = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 UniqueRecipients = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 UniqueSenders = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName MostGenerousTo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName MostGenerousFrom;
+};
+
+// Delegates
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGiftSent, const FMGGift&, Gift);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGiftReceived, const FMGGift&, Gift);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGiftClaimed, FGuid, GiftID, const TArray<FMGGiftItem>&, Items);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGiftExpired, FGuid, GiftID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGiftReturned, const FMGGift&, Gift);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGiftStatusChanged, FGuid, GiftID, EMGGiftStatus, NewStatus);
+
+UCLASS()
+class MIDNIGHTGRIND_API UMGGiftSubsystem : public UGameInstanceSubsystem
+{
+	GENERATED_BODY()
+
+public:
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Deinitialize() override;
+	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
+
+	// Sending Gifts
+	UFUNCTION(BlueprintCallable, Category = "Gift|Send")
+	FGuid SendGift(FName RecipientID, const TArray<FMGGiftItem>& Items, const FText& Message, EMGGiftWrapStyle WrapStyle = EMGGiftWrapStyle::Default, bool bAnonymous = false);
+
+	UFUNCTION(BlueprintCallable, Category = "Gift|Send")
+	FGuid SendCurrencyGift(FName RecipientID, int32 Amount, const FText& Message, bool bAnonymous = false);
+
+	UFUNCTION(BlueprintCallable, Category = "Gift|Send")
+	FGuid SendBundleGift(FName RecipientID, FName BundleID, const FText& Message, bool bAnonymous = false);
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Send")
+	bool CanSendGift(FName RecipientID) const;
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Send")
+	bool CanGiftItem(FName ItemID) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Gift|Send")
+	bool CancelGift(FGuid GiftID);
+
+	// Receiving Gifts
+	UFUNCTION(BlueprintPure, Category = "Gift|Receive")
+	TArray<FMGGift> GetPendingGifts() const;
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Receive")
+	int32 GetPendingGiftCount() const;
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Receive")
+	FMGGift GetGift(FGuid GiftID) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Gift|Receive")
+	TArray<FMGGiftItem> ClaimGift(FGuid GiftID);
+
+	UFUNCTION(BlueprintCallable, Category = "Gift|Receive")
+	TArray<FMGGiftItem> ClaimAllGifts();
+
+	UFUNCTION(BlueprintCallable, Category = "Gift|Receive")
+	bool ReturnGift(FGuid GiftID);
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Receive")
+	bool CanAcceptGiftFrom(FName SenderID) const;
+
+	// Gift Bundles
+	UFUNCTION(BlueprintPure, Category = "Gift|Bundles")
+	TArray<FMGGiftBundle> GetAvailableBundles() const;
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Bundles")
+	FMGGiftBundle GetBundle(FName BundleID) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Gift|Bundles")
+	void RegisterBundle(const FMGGiftBundle& Bundle);
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Bundles")
+	int32 GetBundlePrice(FName BundleID) const;
+
+	// Giftable Items
+	UFUNCTION(BlueprintPure, Category = "Gift|Items")
+	TArray<FMGGiftItem> GetGiftableItems() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Gift|Items")
+	void RegisterGiftableItem(const FMGGiftItem& Item);
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Items")
+	FMGGiftItem GetGiftableItem(FName ItemID) const;
+
+	// History
+	UFUNCTION(BlueprintPure, Category = "Gift|History")
+	TArray<FMGGiftHistory> GetSentHistory(int32 MaxEntries = 50) const;
+
+	UFUNCTION(BlueprintPure, Category = "Gift|History")
+	TArray<FMGGiftHistory> GetReceivedHistory(int32 MaxEntries = 50) const;
+
+	UFUNCTION(BlueprintPure, Category = "Gift|History")
+	TArray<FMGGiftHistory> GetHistoryWithPlayer(FName PlayerID) const;
+
+	// Settings
+	UFUNCTION(BlueprintCallable, Category = "Gift|Settings")
+	void SetGiftSettings(const FMGGiftSettings& NewSettings);
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Settings")
+	FMGGiftSettings GetGiftSettings() const { return Settings; }
+
+	// Stats
+	UFUNCTION(BlueprintPure, Category = "Gift|Stats")
+	FMGGiftStats GetGiftStats() const { return Stats; }
+
+	UFUNCTION(BlueprintPure, Category = "Gift|Stats")
+	int32 GetTotalGiftsWithPlayer(FName PlayerID) const;
+
+	// Network (receive from server)
+	UFUNCTION(BlueprintCallable, Category = "Gift|Network")
+	void ReceiveGift(const FMGGift& Gift);
+
+	UFUNCTION(BlueprintCallable, Category = "Gift|Network")
+	void UpdateGiftStatus(FGuid GiftID, EMGGiftStatus NewStatus);
+
+	// Delegates
+	UPROPERTY(BlueprintAssignable, Category = "Gift|Events")
+	FOnGiftSent OnGiftSent;
+
+	UPROPERTY(BlueprintAssignable, Category = "Gift|Events")
+	FOnGiftReceived OnGiftReceived;
+
+	UPROPERTY(BlueprintAssignable, Category = "Gift|Events")
+	FOnGiftClaimed OnGiftClaimed;
+
+	UPROPERTY(BlueprintAssignable, Category = "Gift|Events")
+	FOnGiftExpired OnGiftExpired;
+
+	UPROPERTY(BlueprintAssignable, Category = "Gift|Events")
+	FOnGiftReturned OnGiftReturned;
+
+	UPROPERTY(BlueprintAssignable, Category = "Gift|Events")
+	FOnGiftStatusChanged OnGiftStatusChanged;
+
+protected:
+	void OnGiftTick();
+	void CheckExpiredGifts();
+	void AddToHistory(const FMGGift& Gift, bool bWasSent);
+	void UpdateStats(const FMGGift& Gift, bool bWasSent);
+	void SaveGiftData();
+	void LoadGiftData();
+	int32 CalculateGiftValue(const TArray<FMGGiftItem>& Items) const;
+
+	UPROPERTY()
+	TArray<FMGGift> PendingReceivedGifts;
+
+	UPROPERTY()
+	TArray<FMGGift> SentGifts;
+
+	UPROPERTY()
+	TArray<FMGGiftHistory> GiftHistory;
+
+	UPROPERTY()
+	TMap<FName, FMGGiftBundle> AvailableBundles;
+
+	UPROPERTY()
+	TMap<FName, FMGGiftItem> GiftableItems;
+
+	UPROPERTY()
+	FMGGiftSettings Settings;
+
+	UPROPERTY()
+	FMGGiftStats Stats;
+
+	UPROPERTY()
+	FName LocalPlayerID;
+
+	UPROPERTY()
+	int32 GiftExpirationDays = 30;
+
+	FTimerHandle GiftTickHandle;
+};

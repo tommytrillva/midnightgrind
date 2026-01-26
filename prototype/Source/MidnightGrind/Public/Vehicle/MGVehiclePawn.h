@@ -229,6 +229,22 @@ public:
 	void RespawnAtCheckpoint();
 
 	// ==========================================
+	// DAMAGE
+	// ==========================================
+
+	/** Apply tire damage (from spike strips, etc.) */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Damage")
+	void ApplyTireDamage(float DamageAmount);
+
+	/** Get current tire health (0-100) */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	float GetTireHealth() const { return TireHealth; }
+
+	/** Check if tires are flat */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	bool AreTiresFlat() const { return TireHealth <= 0.0f; }
+
+	// ==========================================
 	// INPUT CONFIGURATION
 	// ==========================================
 
@@ -385,6 +401,9 @@ protected:
 	/** Update VFX based on vehicle state */
 	virtual void UpdateVFX(float DeltaTime);
 
+	/** Update HUD subsystem with vehicle telemetry */
+	void UpdateHUDTelemetry();
+
 	// ==========================================
 	// BLUEPRINT EVENTS
 	// ==========================================
@@ -449,6 +468,10 @@ protected:
 
 	/** Target FOV (for smooth transitions) */
 	float TargetFOV = 90.0f;
+
+	/** Current tire health (0-100) */
+	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|State")
+	float TireHealth = 100.0f;
 
 private:
 	/** Cached MG movement component */

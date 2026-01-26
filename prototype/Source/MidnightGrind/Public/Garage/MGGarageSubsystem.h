@@ -357,6 +357,18 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Garage")
 	bool OwnsVehicleType(UMGVehicleModelData* VehicleModelData) const;
 
+	/** Check if player has any vehicles, give starter if not */
+	UFUNCTION(BlueprintCallable, Category = "Garage")
+	void EnsureStarterVehicle();
+
+	/** Does player have the starter vehicle? */
+	UFUNCTION(BlueprintPure, Category = "Garage")
+	bool HasStarterVehicle() const { return OwnedVehicles.Num() > 0; }
+
+	/** Add a vehicle by ID (for MVP - creates placeholder data) */
+	UFUNCTION(BlueprintCallable, Category = "Garage")
+	FMGGarageResult AddVehicleByID(FName VehicleID, FGuid& OutVehicleId);
+
 	// ==========================================
 	// CUSTOMIZATION - PARTS
 	// ==========================================

@@ -137,6 +137,26 @@ public:
 	void ShiftDown();
 
 	// ==========================================
+	// DAMAGE EFFECTS
+	// ==========================================
+
+	/** Set tire grip multiplier (from damage) */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Damage")
+	void SetTireGripMultiplier(float Multiplier);
+
+	/** Get current tire grip multiplier */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	float GetTireGripMultiplier() const { return TireGripMultiplier; }
+
+	/** Set max speed multiplier (from damage) */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Damage")
+	void SetMaxSpeedMultiplier(float Multiplier);
+
+	/** Get current max speed multiplier */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	float GetMaxSpeedMultiplier() const { return MaxSpeedMultiplier; }
+
+	// ==========================================
 	// STATE QUERIES
 	// ==========================================
 
@@ -175,6 +195,10 @@ public:
 	/** Get slip ratio for a wheel */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	float GetWheelSlipRatio(int32 WheelIndex) const;
+
+	/** Check if handbrake is engaged */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
+	bool IsHandbrakeEngaged() const { return bHandbrakeEngaged; }
 
 	// ==========================================
 	// TUNING PARAMETERS
@@ -293,6 +317,13 @@ protected:
 
 	UPROPERTY()
 	float LastBoostBroadcast = 0.0f;
+
+	// Damage multipliers
+	UPROPERTY()
+	float TireGripMultiplier = 1.0f;
+
+	UPROPERTY()
+	float MaxSpeedMultiplier = 1.0f;
 
 	// ==========================================
 	// INTERNAL METHODS

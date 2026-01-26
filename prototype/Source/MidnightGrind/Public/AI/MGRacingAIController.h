@@ -7,202 +7,195 @@
 #include "MGRacingAIController.generated.h"
 
 class AMGVehiclePawn;
-class AMGTrackSpline;
 class AMGCheckpoint;
+class USplineComponent;
 
 /**
- * AI difficulty levels
+ * AI difficulty preset
  */
 UENUM(BlueprintType)
 enum class EMGAIDifficulty : uint8
 {
-	Rookie		UMETA(DisplayName = "Rookie"),
-	Amateur		UMETA(DisplayName = "Amateur"),
-	Pro			UMETA(DisplayName = "Pro"),
-	Expert		UMETA(DisplayName = "Expert"),
-	Legend		UMETA(DisplayName = "Legend")
+	/** Beginner - slow, makes mistakes */
+	Rookie,
+	/** Easy - below average */
+	Amateur,
+	/** Normal - average racer */
+	Professional,
+	/** Hard - skilled racer */
+	Expert,
+	/** Very Hard - near-perfect */
+	Master,
+	/** Impossible - perfect lines, max speed */
+	Legend
 };
 
 /**
- * AI driving personality/style
+ * AI personality type
  */
 UENUM(BlueprintType)
 enum class EMGAIPersonality : uint8
 {
-	Cautious	UMETA(DisplayName = "Cautious"),		// Brakes early, avoids contact
-	Balanced	UMETA(DisplayName = "Balanced"),		// Standard racing behavior
-	Aggressive	UMETA(DisplayName = "Aggressive"),		// Late braking, contact OK
-	Dirty		UMETA(DisplayName = "Dirty"),			// Will block and ram
-	Drifter		UMETA(DisplayName = "Drifter")			// Prefers sliding through corners
+	/** Balanced driving */
+	Balanced,
+	/** Aggressive - takes risks, blocks */
+	Aggressive,
+	/** Defensive - safe lines, avoids contact */
+	Defensive,
+	/** Drifter - prioritizes style */
+	Showoff,
+	/** Calculated - optimal racing line */
+	Calculated,
+	/** Unpredictable - varies behavior */
+	Wildcard
 };
 
 /**
- * AI driver profile - configures behavior characteristics
+ * AI state
+ */
+UENUM(BlueprintType)
+enum class EMGAIState : uint8
+{
+	/** Waiting for race start */
+	Waiting,
+	/** Normal racing */
+	Racing,
+	/** Catching up to pack */
+	CatchingUp,
+	/** Defending position */
+	Defending,
+	/** Attempting overtake */
+	Overtaking,
+	/** Recovering from incident */
+	Recovering,
+	/** Finished race */
+	Finished
+};
+
+/**
+ * AI driver profile - defines unique characteristics
  */
 USTRUCT(BlueprintType)
 struct FMGAIDriverProfile
 {
 	GENERATED_BODY()
 
-	/** Display name for this AI driver */
+	/** Driver name */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Profile")
 	FText DriverName;
 
 	/** Difficulty level */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Profile")
-	EMGAIDifficulty Difficulty = EMGAIDifficulty::Amateur;
+	EMGAIDifficulty Difficulty = EMGAIDifficulty::Professional;
 
-	/** Driving personality */
+	/** Personality type */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Profile")
 	EMGAIPersonality Personality = EMGAIPersonality::Balanced;
 
-	/** Skill rating 0-100 (affects racing line accuracy) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0", ClampMax = "100"))
-	float SkillRating = 50.0f;
+	/** Skill rating (0-1) affects all driving */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float SkillRating = 0.7f;
 
-	/** Reaction time in seconds (lower = better) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.05", ClampMax = "0.5"))
-	float ReactionTime = 0.2f;
+	/** Cornering ability (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float CorneringSkill = 0.7f;
 
-	/** How much the AI wanders from ideal line (0 = perfect, 1 = sloppy) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0", ClampMax = "1"))
-	float LineVariation = 0.3f;
-
-	/** Braking skill - how close to optimal braking points (0-1) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0", ClampMax = "1"))
+	/** Braking ability (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float BrakingSkill = 0.7f;
 
-	/** Throttle control skill (0-1) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0", ClampMax = "1"))
-	float ThrottleControl = 0.7f;
-
-	/** How aggressively AI defends position (0-1) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior", meta = (ClampMin = "0", ClampMax = "1"))
-	float DefensiveAggression = 0.5f;
-
-	/** How aggressively AI attacks for overtakes (0-1) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior", meta = (ClampMin = "0", ClampMax = "1"))
+	/** Overtaking aggression (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float OvertakeAggression = 0.5f;
 
-	/** Willingness to use nitrous (0-1) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior", meta = (ClampMin = "0", ClampMax = "1"))
-	float NitrousUsage = 0.5f;
+	/** Defensive ability (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float DefensiveSkill = 0.5f;
 
-	/** Target speed multiplier (0.8-1.2) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed", meta = (ClampMin = "0.8", ClampMax = "1.2"))
-	float SpeedMultiplier = 1.0f;
+	/** Consistency (0-1) - higher = fewer mistakes */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float Consistency = 0.8f;
 
-	/** Create default profile for difficulty */
-	static FMGAIDriverProfile CreateForDifficulty(EMGAIDifficulty Difficulty);
+	/** Risk tolerance (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float RiskTolerance = 0.5f;
+
+	/** Reaction time in seconds */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill", meta = (ClampMin = "0.1", ClampMax = "1.0"))
+	float ReactionTime = 0.3f;
+
+	/** Top speed limiter (0-1, 1 = full speed) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Limits", meta = (ClampMin = "0.5", ClampMax = "1.0"))
+	float TopSpeedFactor = 0.95f;
+
+	/** Preferred racing line offset (-1 to 1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior", meta = (ClampMin = "-1.0", ClampMax = "1.0"))
+	float PreferredLineOffset = 0.0f;
+
+	/** Catchup enabled (rubber banding) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior")
+	bool bUseCatchup = true;
+
+	/** NOS usage strategy (0 = conservative, 1 = aggressive) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float NOSAggression = 0.5f;
+
+	/** Generate from difficulty preset */
+	void GenerateFromDifficulty(EMGAIDifficulty InDifficulty);
 };
 
 /**
- * Current AI driving state
+ * Steering target info
  */
 USTRUCT(BlueprintType)
-struct FMGAIDrivingState
+struct FMGAISteeringTarget
 {
 	GENERATED_BODY()
 
-	/** Current distance along track spline */
+	/** World location to steer toward */
 	UPROPERTY(BlueprintReadOnly)
-	float CurrentTrackDistance = 0.0f;
+	FVector Location = FVector::ZeroVector;
 
-	/** Target distance we're driving toward */
-	UPROPERTY(BlueprintReadOnly)
-	float TargetTrackDistance = 0.0f;
-
-	/** Current target world position */
-	UPROPERTY(BlueprintReadOnly)
-	FVector TargetPosition = FVector::ZeroVector;
-
-	/** Target speed for current segment (cm/s) */
+	/** Desired speed at this point */
 	UPROPERTY(BlueprintReadOnly)
 	float TargetSpeed = 0.0f;
 
-	/** Current throttle output (-1 to 1) */
+	/** Distance to target */
 	UPROPERTY(BlueprintReadOnly)
-	float ThrottleOutput = 0.0f;
+	float Distance = 0.0f;
 
-	/** Current steering output (-1 to 1) */
+	/** Is this a braking zone */
 	UPROPERTY(BlueprintReadOnly)
-	float SteeringOutput = 0.0f;
+	bool bBrakingZone = false;
 
-	/** Current brake output (0 to 1) */
+	/** Suggested gear */
 	UPROPERTY(BlueprintReadOnly)
-	float BrakeOutput = 0.0f;
-
-	/** Is handbrake engaged? */
-	UPROPERTY(BlueprintReadOnly)
-	bool bHandbrake = false;
-
-	/** Is nitrous active? */
-	UPROPERTY(BlueprintReadOnly)
-	bool bNitrous = false;
-
-	/** Current race position */
-	UPROPERTY(BlueprintReadOnly)
-	int32 CurrentPosition = 0;
-
-	/** Distance to vehicle ahead (cm, -1 if leading) */
-	UPROPERTY(BlueprintReadOnly)
-	float DistanceToVehicleAhead = -1.0f;
-
-	/** Distance to vehicle behind (cm, -1 if last) */
-	UPROPERTY(BlueprintReadOnly)
-	float DistanceToVehicleBehind = -1.0f;
-
-	/** Is currently attempting overtake? */
-	UPROPERTY(BlueprintReadOnly)
-	bool bAttemptingOvertake = false;
-
-	/** Is currently defending position? */
-	UPROPERTY(BlueprintReadOnly)
-	bool bDefendingPosition = false;
+	int32 SuggestedGear = 0;
 };
 
 /**
- * Rubber-banding configuration
+ * Delegate declarations
  */
-USTRUCT(BlueprintType)
-struct FMGRubberBandingConfig
-{
-	GENERATED_BODY()
-
-	/** Enable rubber-banding catch-up mechanics */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rubber Banding")
-	bool bEnabled = true;
-
-	/** Distance behind leader to start catching up (cm) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rubber Banding")
-	float CatchUpStartDistance = 5000.0f; // 50 meters
-
-	/** Maximum catch-up speed boost (multiplier) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rubber Banding")
-	float MaxCatchUpBoost = 1.15f; // 15% faster
-
-	/** Distance ahead to start slowing down (cm) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rubber Banding")
-	float SlowDownStartDistance = 5000.0f;
-
-	/** Minimum slow-down factor (multiplier) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rubber Banding")
-	float MinSlowDownFactor = 0.92f; // 8% slower
-
-	/** How aggressively rubber-banding scales with distance (1 = linear) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rubber Banding")
-	float ScalingExponent = 1.5f;
-
-	/** Only apply to AI (not player) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rubber Banding")
-	bool bAIOnly = true;
-};
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAIStateChanged, EMGAIState, NewState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAIOvertakeAttempt, AActor*, TargetVehicle, bool, bSuccess);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAIMistake);
 
 /**
- * AI Controller for racing vehicles
- * Handles racing line following, overtaking, and race strategy
+ * Racing AI Controller
+ * Controls AI opponent vehicles with configurable behavior
+ *
+ * Features:
+ * - Difficulty presets from Rookie to Legend
+ * - Personality-based behavior variation
+ * - Racing line following with spline support
+ * - Overtaking and defensive maneuvers
+ * - Rubber banding (catchup) system
+ * - Mistake simulation based on skill
+ * - NOS usage strategy
+ * - Collision avoidance
+ * - Blueprint-extensible
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class MIDNIGHTGRIND_API AMGRacingAIController : public AAIController
 {
 	GENERATED_BODY()
@@ -210,185 +203,225 @@ class MIDNIGHTGRIND_API AMGRacingAIController : public AAIController
 public:
 	AMGRacingAIController();
 
-	// AAIController interface
-	virtual void OnPossess(APawn* InPawn) override;
-	virtual void OnUnPossess() override;
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
-	// ==========================================
-	// INITIALIZATION
-	// ==========================================
-
-	/** Set the track spline for navigation */
-	UFUNCTION(BlueprintCallable, Category = "Racing AI")
-	void SetTrackSpline(AMGTrackSpline* InTrackSpline);
-
-	/** Set the AI driver profile */
-	UFUNCTION(BlueprintCallable, Category = "Racing AI")
-	void SetDriverProfile(const FMGAIDriverProfile& InProfile);
-
-	/** Set rubber-banding configuration */
-	UFUNCTION(BlueprintCallable, Category = "Racing AI")
-	void SetRubberBandingConfig(const FMGRubberBandingConfig& InConfig);
-
-	/** Initialize for race start */
-	UFUNCTION(BlueprintCallable, Category = "Racing AI")
-	void InitializeForRace();
-
-	// ==========================================
-	// RACE CONTROL
-	// ==========================================
-
-	/** Start racing (enable AI control) */
-	UFUNCTION(BlueprintCallable, Category = "Racing AI")
-	void StartRacing();
-
-	/** Stop racing (disable AI control) */
-	UFUNCTION(BlueprintCallable, Category = "Racing AI")
-	void StopRacing();
-
-	/** Pause/resume AI */
-	UFUNCTION(BlueprintCallable, Category = "Racing AI")
-	void SetPaused(bool bPaused);
-
-	/** Update race position info */
-	UFUNCTION(BlueprintCallable, Category = "Racing AI")
-	void UpdateRacePosition(int32 Position, float DistanceToAhead, float DistanceToBehind);
-
-	// ==========================================
-	// STATE & DATA
-	// ==========================================
-
-	/** Get current driving state */
-	UFUNCTION(BlueprintPure, Category = "Racing AI")
-	const FMGAIDrivingState& GetDrivingState() const { return DrivingState; }
-
-	/** Get driver profile */
-	UFUNCTION(BlueprintPure, Category = "Racing AI")
-	const FMGAIDriverProfile& GetDriverProfile() const { return DriverProfile; }
-
-	/** Get the controlled vehicle */
-	UFUNCTION(BlueprintPure, Category = "Racing AI")
-	AMGVehiclePawn* GetVehicle() const { return ControlledVehicle; }
-
-	/** Is AI currently racing? */
-	UFUNCTION(BlueprintPure, Category = "Racing AI")
-	bool IsRacing() const { return bIsRacing && !bIsPaused; }
-
-protected:
-	// ==========================================
-	// DRIVING LOGIC
-	// ==========================================
-
-	/** Main driving update */
-	virtual void UpdateDriving(float DeltaTime);
-
-	/** Calculate target point on track */
-	virtual void UpdateTargetPoint();
-
-	/** Calculate steering toward target */
-	virtual float CalculateSteering();
-
-	/** Calculate throttle/brake based on speed and upcoming track */
-	virtual void CalculateSpeedControl(float& OutThrottle, float& OutBrake);
-
-	/** Decide whether to use nitrous */
-	virtual bool ShouldUseNitrous();
-
-	/** Decide whether to use handbrake for drift */
-	virtual bool ShouldUseDriftHandbrake();
-
-	/** Apply rubber-banding speed adjustment */
-	virtual float ApplyRubberBanding(float BaseSpeed);
-
-	/** Check for and handle overtaking situations */
-	virtual void UpdateOvertakeLogic();
-
-	/** Check for and handle defensive driving */
-	virtual void UpdateDefenseLogic();
-
-	/** Add variation/mistakes based on skill */
-	virtual void ApplySkillVariation(float DeltaTime);
-
-	/** Get lookahead distance based on speed */
-	float GetLookaheadDistance() const;
-
-	/** Get optimal speed for track curvature */
-	float GetOptimalSpeedForCurvature(float Curvature) const;
-
-	// ==========================================
-	// COMPONENTS & REFERENCES
-	// ==========================================
-
-	/** The vehicle being controlled */
-	UPROPERTY()
-	TObjectPtr<AMGVehiclePawn> ControlledVehicle;
-
-	/** Track spline for navigation */
-	UPROPERTY()
-	TObjectPtr<AMGTrackSpline> TrackSpline;
+	virtual void OnPossess(APawn* InPawn) override;
 
 	// ==========================================
 	// CONFIGURATION
 	// ==========================================
 
-	/** AI driver profile */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Racing AI")
+	/** Set driver profile */
+	UFUNCTION(BlueprintCallable, Category = "AI|Config")
+	void SetDriverProfile(const FMGAIDriverProfile& Profile);
+
+	/** Get driver profile */
+	UFUNCTION(BlueprintPure, Category = "AI|Config")
+	const FMGAIDriverProfile& GetDriverProfile() const { return DriverProfile; }
+
+	/** Set difficulty (generates profile) */
+	UFUNCTION(BlueprintCallable, Category = "AI|Config")
+	void SetDifficulty(EMGAIDifficulty Difficulty);
+
+	/** Set racing line spline */
+	UFUNCTION(BlueprintCallable, Category = "AI|Config")
+	void SetRacingLine(USplineComponent* Spline);
+
+	/** Enable/disable AI control */
+	UFUNCTION(BlueprintCallable, Category = "AI|Config")
+	void SetAIEnabled(bool bEnabled);
+
+	// ==========================================
+	// RACE CONTROL
+	// ==========================================
+
+	/** Start racing */
+	UFUNCTION(BlueprintCallable, Category = "AI|Race")
+	void StartRacing();
+
+	/** Stop racing */
+	UFUNCTION(BlueprintCallable, Category = "AI|Race")
+	void StopRacing();
+
+	/** Set current checkpoint target */
+	UFUNCTION(BlueprintCallable, Category = "AI|Race")
+	void SetTargetCheckpoint(AMGCheckpoint* Checkpoint);
+
+	/** Set race position info */
+	UFUNCTION(BlueprintCallable, Category = "AI|Race")
+	void SetRacePosition(int32 Position, int32 TotalRacers);
+
+	/** Get current state */
+	UFUNCTION(BlueprintPure, Category = "AI|Race")
+	EMGAIState GetAIState() const { return CurrentState; }
+
+	// ==========================================
+	// QUERIES
+	// ==========================================
+
+	/** Get current steering target */
+	UFUNCTION(BlueprintPure, Category = "AI|Query")
+	FMGAISteeringTarget GetCurrentSteeringTarget() const { return CurrentTarget; }
+
+	/** Get throttle output (0-1) */
+	UFUNCTION(BlueprintPure, Category = "AI|Query")
+	float GetThrottleOutput() const { return ThrottleOutput; }
+
+	/** Get brake output (0-1) */
+	UFUNCTION(BlueprintPure, Category = "AI|Query")
+	float GetBrakeOutput() const { return BrakeOutput; }
+
+	/** Get steering output (-1 to 1) */
+	UFUNCTION(BlueprintPure, Category = "AI|Query")
+	float GetSteeringOutput() const { return SteeringOutput; }
+
+	/** Should use NOS */
+	UFUNCTION(BlueprintPure, Category = "AI|Query")
+	bool ShouldUseNOS() const { return bWantsNOS; }
+
+	/** Get vehicle being controlled */
+	UFUNCTION(BlueprintPure, Category = "AI|Query")
+	AMGVehiclePawn* GetControlledVehicle() const { return ControlledVehicle; }
+
+	// ==========================================
+	// EVENTS
+	// ==========================================
+
+	/** AI state changed */
+	UPROPERTY(BlueprintAssignable, Category = "AI|Events")
+	FOnAIStateChanged OnAIStateChanged;
+
+	/** AI attempted overtake */
+	UPROPERTY(BlueprintAssignable, Category = "AI|Events")
+	FOnAIOvertakeAttempt OnOvertakeAttempt;
+
+	/** AI made a mistake */
+	UPROPERTY(BlueprintAssignable, Category = "AI|Events")
+	FOnAIMistake OnMistake;
+
+protected:
+	// ==========================================
+	// BEHAVIOR METHODS (Override in Blueprint)
+	// ==========================================
+
+	/** Calculate steering toward target - override for custom behavior */
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Behavior")
+	float CalculateSteering(const FVector& TargetLocation);
+
+	/** Calculate throttle - override for custom behavior */
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Behavior")
+	float CalculateThrottle(float TargetSpeed, float CurrentSpeed);
+
+	/** Calculate brake - override for custom behavior */
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Behavior")
+	float CalculateBrake(float TargetSpeed, float CurrentSpeed, float DistanceToCorner);
+
+	/** Decide if should attempt overtake */
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Behavior")
+	bool ShouldAttemptOvertake(AActor* VehicleAhead, float Distance);
+
+	/** Decide if should use NOS */
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Behavior")
+	bool ShouldActivateNOS();
+
+	/** Called when making a mistake */
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Behavior")
+	void OnMakeMistake();
+
+	// ==========================================
+	// INTERNAL
+	// ==========================================
+
+	/** Update state machine */
+	void UpdateState(float DeltaTime);
+
+	/** Update navigation */
+	void UpdateNavigation(float DeltaTime);
+
+	/** Update vehicle inputs */
+	void UpdateVehicleInputs(float DeltaTime);
+
+	/** Apply inputs to vehicle */
+	void ApplyInputsToVehicle();
+
+	/** Find racing line target */
+	FVector GetRacingLineTarget(float LookaheadDistance) const;
+
+	/** Check for vehicles ahead */
+	AActor* DetectVehicleAhead(float& OutDistance) const;
+
+	/** Calculate catchup boost */
+	float CalculateCatchupBoost() const;
+
+	/** Should make random mistake */
+	bool ShouldMakeMistake() const;
+
+	/** Set new state */
+	void SetState(EMGAIState NewState);
+
+	/** Get speed for current section */
+	float GetTargetSpeedForSection() const;
+
+private:
+	/** Driver profile */
+	UPROPERTY(EditAnywhere, Category = "AI")
 	FMGAIDriverProfile DriverProfile;
 
-	/** Rubber-banding configuration */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Racing AI")
-	FMGRubberBandingConfig RubberBandingConfig;
-
-	/** How far ahead to look on track (base value, scales with speed) */
-	UPROPERTY(EditAnywhere, Category = "Racing AI|Tuning")
-	float BaseLookaheadDistance = 1500.0f; // 15 meters
-
-	/** Speed factor for lookahead (cm/s to distance ratio) */
-	UPROPERTY(EditAnywhere, Category = "Racing AI|Tuning")
-	float LookaheadSpeedFactor = 0.5f;
-
-	/** Maximum lookahead distance */
-	UPROPERTY(EditAnywhere, Category = "Racing AI|Tuning")
-	float MaxLookaheadDistance = 8000.0f; // 80 meters
-
-	/** Steering sensitivity */
-	UPROPERTY(EditAnywhere, Category = "Racing AI|Tuning")
-	float SteeringSensitivity = 2.0f;
-
-	/** Maximum speed (cm/s) on straights */
-	UPROPERTY(EditAnywhere, Category = "Racing AI|Tuning")
-	float MaxStraightSpeed = 8000.0f; // ~180 mph
-
-	/** Minimum speed (cm/s) in tight corners */
-	UPROPERTY(EditAnywhere, Category = "Racing AI|Tuning")
-	float MinCornerSpeed = 1500.0f; // ~35 mph
-
-	// ==========================================
-	// RUNTIME STATE
-	// ==========================================
-
-	/** Current driving state */
-	UPROPERTY(BlueprintReadOnly, Category = "Racing AI")
-	FMGAIDrivingState DrivingState;
-
-	/** Is actively racing? */
+	/** Racing line spline */
 	UPROPERTY()
-	bool bIsRacing = false;
+	TWeakObjectPtr<USplineComponent> RacingLineSpline;
 
-	/** Is paused? */
+	/** Target checkpoint */
 	UPROPERTY()
-	bool bIsPaused = false;
+	TWeakObjectPtr<AMGCheckpoint> TargetCheckpoint;
 
-	/** Accumulated time for skill variation */
-	float SkillVariationTimer = 0.0f;
+	/** Controlled vehicle */
+	UPROPERTY()
+	TObjectPtr<AMGVehiclePawn> ControlledVehicle;
 
-	/** Current random steering offset (from mistakes) */
-	float CurrentSteeringNoise = 0.0f;
+	/** Current state */
+	EMGAIState CurrentState = EMGAIState::Waiting;
 
-	/** Current random throttle offset */
-	float CurrentThrottleNoise = 0.0f;
+	/** Current steering target */
+	FMGAISteeringTarget CurrentTarget;
 
-	/** Time since last nitrous use */
-	float TimeSinceNitrous = 0.0f;
+	/** Output values */
+	float ThrottleOutput = 0.0f;
+	float BrakeOutput = 0.0f;
+	float SteeringOutput = 0.0f;
+	bool bWantsNOS = false;
+
+	/** Race info */
+	int32 CurrentPosition = 0;
+	int32 TotalRacers = 0;
+
+	/** Progress along racing line (0-1) */
+	float RacingLineProgress = 0.0f;
+
+	/** Is AI enabled */
+	bool bAIEnabled = true;
+
+	/** Time in current state */
+	float StateTime = 0.0f;
+
+	/** Mistake cooldown */
+	float MistakeCooldown = 0.0f;
+
+	/** Overtake attempt cooldown */
+	float OvertakeCooldown = 0.0f;
+
+	/** Lookahead distance for racing line */
+	UPROPERTY(EditAnywhere, Category = "AI|Navigation")
+	float LookaheadDistance = 2000.0f;
+
+	/** Detection range for vehicles ahead */
+	UPROPERTY(EditAnywhere, Category = "AI|Navigation")
+	float VehicleDetectionRange = 5000.0f;
+
+	/** Steering smoothing */
+	UPROPERTY(EditAnywhere, Category = "AI|Control")
+	float SteeringSmoothSpeed = 5.0f;
+
+	/** Previous steering for smoothing */
+	float PreviousSteering = 0.0f;
 };

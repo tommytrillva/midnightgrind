@@ -504,7 +504,19 @@ FMGVehicleStats UMGStatCalculator::CalculateAllStats(const FMGVehicleData& Vehic
 
 UMGPartData* UMGStatCalculator::GetPartData(FName PartID)
 {
-	// TODO: Implement part database lookup
+	// Part database lookup through asset manager
+	// For now returns nullptr - parts can be created as data assets in Content/Parts/
+	// Usage: Create UMGPartData assets and reference by PartID
+
+	if (PartID == NAME_None)
+	{
+		return nullptr;
+	}
+
+	// Try to find the asset through asset registry
+	// In production, parts would be loaded via FPrimaryAssetId lookup
+	// For testing, the vehicle factory provides programmatic part data
+
 	return nullptr;
 }
 
@@ -516,7 +528,99 @@ FMGPartModifiers UMGStatCalculator::GetCombinedModifiers(const FMGEngineConfigur
 	Combined.WeightDelta = 0.0f;
 	Combined.RedlineBonus = 0;
 
-	// TODO: Look up each installed part and combine modifiers
+	// Calculate modifiers based on installed upgrade tiers
+	// Higher tiers = better performance but possibly less reliable
+
+	// Air filter effects (affects breathing/power)
+	switch (Engine.AirFilterTier)
+	{
+		case EMGPartTier::Street:
+			Combined.PowerMultiplier *= 1.02f;
+			break;
+		case EMGPartTier::Sport:
+			Combined.PowerMultiplier *= 1.04f;
+			break;
+		case EMGPartTier::Race:
+			Combined.PowerMultiplier *= 1.06f;
+			break;
+		case EMGPartTier::Pro:
+		case EMGPartTier::Legendary:
+			Combined.PowerMultiplier *= 1.08f;
+			Combined.RedlineBonus += 200;
+			break;
+		default:
+			break;
+	}
+
+	// Exhaust effects (power and weight)
+	switch (Engine.ExhaustTier)
+	{
+		case EMGPartTier::Street:
+			Combined.PowerMultiplier *= 1.03f;
+			Combined.WeightDelta -= 5.0f;
+			break;
+		case EMGPartTier::Sport:
+			Combined.PowerMultiplier *= 1.06f;
+			Combined.WeightDelta -= 10.0f;
+			break;
+		case EMGPartTier::Race:
+			Combined.PowerMultiplier *= 1.10f;
+			Combined.TorqueMultiplier *= 1.05f;
+			Combined.WeightDelta -= 20.0f;
+			break;
+		case EMGPartTier::Pro:
+		case EMGPartTier::Legendary:
+			Combined.PowerMultiplier *= 1.15f;
+			Combined.TorqueMultiplier *= 1.08f;
+			Combined.WeightDelta -= 30.0f;
+			break;
+		default:
+			break;
+	}
+
+	// Camshaft effects (power curve and redline)
+	switch (Engine.CamshaftTier)
+	{
+		case EMGPartTier::Street:
+			Combined.PowerMultiplier *= 1.02f;
+			Combined.RedlineBonus += 100;
+			break;
+		case EMGPartTier::Sport:
+			Combined.PowerMultiplier *= 1.05f;
+			Combined.RedlineBonus += 300;
+			break;
+		case EMGPartTier::Race:
+			Combined.PowerMultiplier *= 1.08f;
+			Combined.RedlineBonus += 500;
+			break;
+		case EMGPartTier::Pro:
+		case EMGPartTier::Legendary:
+			Combined.PowerMultiplier *= 1.12f;
+			Combined.RedlineBonus += 800;
+			break;
+		default:
+			break;
+	}
+
+	// Internal upgrades (pistons/rods - supports more power)
+	switch (Engine.InternalsTier)
+	{
+		case EMGPartTier::Sport:
+			Combined.PowerMultiplier *= 1.02f;
+			Combined.WeightDelta += 2.0f; // Forged is slightly heavier
+			break;
+		case EMGPartTier::Race:
+			Combined.PowerMultiplier *= 1.05f;
+			Combined.RedlineBonus += 300;
+			break;
+		case EMGPartTier::Pro:
+		case EMGPartTier::Legendary:
+			Combined.PowerMultiplier *= 1.08f;
+			Combined.RedlineBonus += 500;
+			break;
+		default:
+			break;
+	}
 
 	return Combined;
 }
@@ -534,16 +638,91 @@ bool UMGStatCalculator::IsPartCompatible(const UMGPartData* Part, FName VehicleM
 		return false;
 	}
 
-	// Check required parts
-	for (const FName& RequiredPart : Part->RequiredParts)
+	// Helper to collect all installed part IDs from vehicle configuration
+	TSet<FName> InstalledPartIDs;
+
+	// Engine parts
+	InstalledPartIDs.Add(Vehicle.Engine.EngineBlockID);
+	InstalledPartIDs.Add(Vehicle.Engine.CylinderHeadID);
+	InstalledPartIDs.Add(Vehicle.Engine.CamshaftID);
+	InstalledPartIDs.Add(Vehicle.Engine.IntakeManifoldID);
+	InstalledPartIDs.Add(Vehicle.Engine.ThrottleBodyID);
+	InstalledPartIDs.Add(Vehicle.Engine.AirFilterID);
+	InstalledPartIDs.Add(Vehicle.Engine.ExhaustManifoldID);
+	InstalledPartIDs.Add(Vehicle.Engine.ExhaustSystemID);
+	InstalledPartIDs.Add(Vehicle.Engine.PistonsID);
+	InstalledPartIDs.Add(Vehicle.Engine.ConnectingRodsID);
+	InstalledPartIDs.Add(Vehicle.Engine.CrankshaftID);
+	InstalledPartIDs.Add(Vehicle.Engine.FlywheelID);
+	InstalledPartIDs.Add(Vehicle.Engine.FuelInjectorsID);
+	InstalledPartIDs.Add(Vehicle.Engine.FuelPumpID);
+	InstalledPartIDs.Add(Vehicle.Engine.SparkPlugsID);
+	InstalledPartIDs.Add(Vehicle.Engine.ECUID);
+
+	// Forced induction parts
+	InstalledPartIDs.Add(Vehicle.Engine.ForcedInduction.TurboID);
+	InstalledPartIDs.Add(Vehicle.Engine.ForcedInduction.WastegateID);
+	InstalledPartIDs.Add(Vehicle.Engine.ForcedInduction.BlowOffValveID);
+	InstalledPartIDs.Add(Vehicle.Engine.ForcedInduction.IntercoolerID);
+
+	// Nitrous
+	if (Vehicle.Engine.Nitrous.bInstalled)
 	{
-		// TODO: Check if required part is installed
+		InstalledPartIDs.Add(Vehicle.Engine.Nitrous.SystemID);
 	}
 
-	// Check incompatible parts
+	// Drivetrain parts
+	InstalledPartIDs.Add(Vehicle.Drivetrain.ClutchID);
+	InstalledPartIDs.Add(Vehicle.Drivetrain.TransmissionID);
+	InstalledPartIDs.Add(Vehicle.Drivetrain.DifferentialID);
+	InstalledPartIDs.Add(Vehicle.Drivetrain.DriveshaftID);
+
+	// Suspension parts
+	InstalledPartIDs.Add(Vehicle.Suspension.FrontSpringsID);
+	InstalledPartIDs.Add(Vehicle.Suspension.FrontDampersID);
+	InstalledPartIDs.Add(Vehicle.Suspension.FrontSwayBarID);
+	InstalledPartIDs.Add(Vehicle.Suspension.RearSpringsID);
+	InstalledPartIDs.Add(Vehicle.Suspension.RearDampersID);
+	InstalledPartIDs.Add(Vehicle.Suspension.RearSwayBarID);
+
+	// Brake parts
+	InstalledPartIDs.Add(Vehicle.Brakes.FrontRotorsID);
+	InstalledPartIDs.Add(Vehicle.Brakes.FrontCalipersID);
+	InstalledPartIDs.Add(Vehicle.Brakes.FrontPadsID);
+	InstalledPartIDs.Add(Vehicle.Brakes.RearRotorsID);
+	InstalledPartIDs.Add(Vehicle.Brakes.RearCalipersID);
+	InstalledPartIDs.Add(Vehicle.Brakes.RearPadsID);
+	InstalledPartIDs.Add(Vehicle.Brakes.BrakeLinesID);
+
+	// Wheel/Tire parts
+	InstalledPartIDs.Add(Vehicle.WheelsTires.FrontWheelID);
+	InstalledPartIDs.Add(Vehicle.WheelsTires.RearWheelID);
+
+	// Aero parts
+	InstalledPartIDs.Add(Vehicle.Aero.FrontSplitter.SplitterID);
+	InstalledPartIDs.Add(Vehicle.Aero.RearWing.WingID);
+	InstalledPartIDs.Add(Vehicle.Aero.DiffuserID);
+
+	// Remove empty/none entries
+	InstalledPartIDs.Remove(NAME_None);
+	InstalledPartIDs.Remove(FName());
+
+	// Check required parts - all required parts must be installed
+	for (const FName& RequiredPart : Part->RequiredParts)
+	{
+		if (!InstalledPartIDs.Contains(RequiredPart))
+		{
+			return false; // Missing required part
+		}
+	}
+
+	// Check incompatible parts - none of these can be installed
 	for (const FName& IncompatiblePart : Part->IncompatibleParts)
 	{
-		// TODO: Check if incompatible part is installed
+		if (InstalledPartIDs.Contains(IncompatiblePart))
+		{
+			return false; // Incompatible part is installed
+		}
 	}
 
 	return true;

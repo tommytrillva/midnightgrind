@@ -2,6 +2,7 @@
 
 #include "Vehicle/MGVehiclePawn.h"
 #include "Vehicle/MGVehicleMovementComponent.h"
+#include "UI/MGRaceHUDSubsystem.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/AudioComponent.h"
@@ -387,6 +388,38 @@ void AMGVehiclePawn::RespawnAtCheckpoint()
 	OnVehicleRespawn.Broadcast();
 }
 
+void AMGVehiclePawn::ApplyTireDamage(float DamageAmount)
+{
+	TireHealth = FMath::Clamp(TireHealth - DamageAmount, 0.0f, 100.0f);
+
+	// Apply handling penalty when tires are damaged
+	if (MGVehicleMovement && TireHealth < 100.0f)
+	{
+		// Calculate grip reduction based on tire health
+		float GripMultiplier = FMath::GetMappedRangeValueClamped(
+			FVector2D(0.0f, 100.0f),
+			FVector2D(0.3f, 1.0f),
+			TireHealth
+		);
+
+		// Apply to movement component
+		MGVehicleMovement->SetTireGripMultiplier(GripMultiplier);
+
+		// Max speed reduction when tires are very damaged
+		if (TireHealth < 30.0f)
+		{
+			float SpeedMultiplier = FMath::GetMappedRangeValueClamped(
+				FVector2D(0.0f, 30.0f),
+				FVector2D(0.5f, 1.0f),
+				TireHealth
+			);
+			MGVehicleMovement->SetMaxSpeedMultiplier(SpeedMultiplier);
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Vehicle tire damage applied: %.1f, Health now: %.1f"), DamageAmount, TireHealth);
+}
+
 // ==========================================
 // INPUT HANDLERS
 // ==========================================
@@ -563,6 +596,35 @@ void AMGVehiclePawn::UpdateRuntimeState(float DeltaTime)
 		OnDriftEnded(RuntimeState.DriftScore);
 	}
 	bWasDrifting = RuntimeState.bIsDrifting;
+
+	// Update HUD subsystem with telemetry (only for player)
+	if (IsLocallyControlled())
+	{
+		UpdateHUDTelemetry();
+	}
+}
+
+void AMGVehiclePawn::UpdateHUDTelemetry()
+{
+	UMGRaceHUDSubsystem* HUDSubsystem = GetWorld()->GetSubsystem<UMGRaceHUDSubsystem>();
+	if (!HUDSubsystem)
+	{
+		return;
+	}
+
+	FMGVehicleTelemetry Telemetry;
+	Telemetry.SpeedMPH = RuntimeState.SpeedMPH;
+	Telemetry.SpeedKPH = RuntimeState.SpeedKPH;
+	Telemetry.RPM = RuntimeState.RPM;
+	Telemetry.MaxRPM = 8000.0f; // Typical redline
+	Telemetry.CurrentGear = RuntimeState.CurrentGear;
+	Telemetry.NOSAmount = RuntimeState.NitrousPercent / 100.0f;
+	Telemetry.bNOSActive = RuntimeState.bNitrousActive;
+	Telemetry.bHandbrakeOn = MGVehicleMovement ? MGVehicleMovement->IsHandbrakeEngaged() : false;
+	Telemetry.bIsDrifting = RuntimeState.bIsDrifting;
+	Telemetry.DriftAngle = RuntimeState.DriftAngle;
+
+	HUDSubsystem->UpdateVehicleTelemetry(Telemetry);
 }
 
 void AMGVehiclePawn::UpdateCamera(float DeltaTime)

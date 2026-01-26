@@ -1,9 +1,14 @@
 // Copyright Midnight Grind. All Rights Reserved.
+// Updated Stage 52: MVP Game Entry Points - Player Controller Notification
 
 #include "GameModes/MGRaceGameMode.h"
 #include "Vehicle/MGVehiclePawn.h"
+#include "Core/MGPlayerController.h"
+#include "UI/MGRaceHUDSubsystem.h"
+#include "Track/MGCheckpoint.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
+#include "EngineUtils.h"
 
 AMGRaceGameMode::AMGRaceGameMode()
 {
@@ -177,6 +182,9 @@ void AMGRaceGameMode::EndRace()
 		CalculateResults();
 		SetRaceState(EMGRaceState::Finished);
 		OnRaceFinished.Broadcast(RaceResults);
+
+		// Notify all player controllers that race has ended
+		NotifyPlayersRaceEnded();
 	}
 }
 
@@ -387,6 +395,9 @@ void AMGRaceGameMode::UpdateCountdown(float DeltaTime)
 					Vehicle->SetCurrentLap(1);
 				}
 			}
+
+			// Notify all player controllers that race has started
+			NotifyPlayersRaceStarted();
 		}
 	}
 }
@@ -422,7 +433,40 @@ void AMGRaceGameMode::UpdatePositions()
 			// Progress = (Lap * CheckpointCount + CurrentCheckpoint) + fractional progress to next checkpoint
 			float Progress = (Racer.CurrentLap * Checkpoints.Num()) + Racer.CurrentCheckpoint;
 
-			// TODO: Add fractional progress based on distance to next checkpoint
+			// Add fractional progress based on distance to next checkpoint
+			int32 NextCheckpointIndex = (Racer.CurrentCheckpoint + 1) % Checkpoints.Num();
+			if (Checkpoints.IsValidIndex(Racer.CurrentCheckpoint) && Checkpoints.IsValidIndex(NextCheckpointIndex))
+			{
+				AMGCheckpoint* CurrentCP = Checkpoints[Racer.CurrentCheckpoint].Get();
+				AMGCheckpoint* NextCP = Checkpoints[NextCheckpointIndex].Get();
+
+				if (CurrentCP && NextCP)
+				{
+					FVector VehiclePos = Vehicle->GetActorLocation();
+					FVector CurrentCPPos = CurrentCP->GetActorLocation();
+					FVector NextCPPos = NextCP->GetActorLocation();
+
+					// Calculate total distance between checkpoints
+					float TotalDist = FVector::Dist(CurrentCPPos, NextCPPos);
+					if (TotalDist > 0.0f)
+					{
+						// Calculate distance vehicle has traveled from current checkpoint toward next
+						float DistFromCurrent = FVector::Dist(CurrentCPPos, VehiclePos);
+
+						// Use dot product to check if vehicle is actually progressing toward next checkpoint
+						FVector ToNextCP = (NextCPPos - CurrentCPPos).GetSafeNormal();
+						FVector ToVehicle = (VehiclePos - CurrentCPPos).GetSafeNormal();
+						float DotProgress = FVector::DotProduct(ToNextCP, ToVehicle);
+
+						// Only add progress if moving toward next checkpoint
+						if (DotProgress > 0.0f)
+						{
+							float FractionalProgress = FMath::Clamp(DistFromCurrent / TotalDist, 0.0f, 0.99f);
+							Progress += FractionalProgress;
+						}
+					}
+				}
+			}
 
 			Racer.TotalDistance = Progress;
 		}
@@ -472,6 +516,9 @@ void AMGRaceGameMode::UpdatePositions()
 			OnPositionChanged.Broadcast(SortedRacers[i]->RacerIndex, NewPosition);
 		}
 	}
+
+	// Update HUD subsystem with player data
+	UpdateHUDSubsystem();
 }
 
 void AMGRaceGameMode::CheckRaceComplete()
@@ -587,5 +634,58 @@ void AMGRaceGameMode::FreezeAllVehicles(bool bFreeze)
 				RootPrimitive->SetSimulatePhysics(!bFreeze);
 			}
 		}
+	}
+}
+
+void AMGRaceGameMode::NotifyPlayersRaceStarted()
+{
+	// Notify all player controllers that race has started
+	for (TActorIterator<AMGPlayerController> It(GetWorld()); It; ++It)
+	{
+		AMGPlayerController* PC = *It;
+		if (PC)
+		{
+			PC->ClientOnRaceStarted();
+		}
+	}
+}
+
+void AMGRaceGameMode::NotifyPlayersRaceEnded()
+{
+	// Notify all player controllers that race has ended
+	for (TActorIterator<AMGPlayerController> It(GetWorld()); It; ++It)
+	{
+		AMGPlayerController* PC = *It;
+		if (PC)
+		{
+			PC->ClientOnRaceEnded();
+		}
+	}
+}
+
+void AMGRaceGameMode::UpdateHUDSubsystem()
+{
+	// Get HUD subsystem
+	UMGRaceHUDSubsystem* HUDSubsystem = GetWorld()->GetSubsystem<UMGRaceHUDSubsystem>();
+	if (!HUDSubsystem)
+	{
+		return;
+	}
+
+	// Update player's race status
+	if (Racers.IsValidIndex(PlayerRacerIndex))
+	{
+		const FMGRacerData& PlayerData = Racers[PlayerRacerIndex];
+
+		FMGRaceStatus Status;
+		Status.CurrentPosition = PlayerData.Position;
+		Status.TotalRacers = Racers.Num();
+		Status.CurrentLap = PlayerData.CurrentLap;
+		Status.TotalLaps = RaceConfig.LapCount;
+		Status.CurrentLapTime = PlayerData.CurrentLapTime;
+		Status.BestLapTime = PlayerData.BestLapTime;
+		Status.TotalRaceTime = PlayerData.TotalTime;
+
+		HUDSubsystem->UpdateRaceStatus(Status);
 	}
 }

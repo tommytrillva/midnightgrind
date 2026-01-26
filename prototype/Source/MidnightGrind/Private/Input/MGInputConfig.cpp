@@ -82,10 +82,75 @@ FKey UMGVehicleInputConfig::GetDefaultKeyboardBinding(FName ActionName)
 
 TSoftObjectPtr<UTexture2D> UMGInputUtility::GetKeyIcon(FKey Key, bool bGamepad)
 {
-	// TODO: Return actual icon textures from a data table or asset
-	// This would typically reference textures like:
-	// /Game/UI/Icons/Input/Xbox_A.Xbox_A
-	// /Game/UI/Icons/Input/Keyboard_W.Keyboard_W
+	// Return icon texture paths based on key type
+	// Icons are expected at /Game/UI/Icons/Input/
+	// Naming convention: Xbox_{Button}, PS_{Button}, Keyboard_{Key}
+
+	FString IconPath;
+
+	if (bGamepad)
+	{
+		// Xbox controller icons (default for gamepad)
+		static TMap<FKey, FString> GamepadIcons = {
+			{ EKeys::Gamepad_FaceButton_Bottom, TEXT("/Game/UI/Icons/Input/Xbox_A") },
+			{ EKeys::Gamepad_FaceButton_Right, TEXT("/Game/UI/Icons/Input/Xbox_B") },
+			{ EKeys::Gamepad_FaceButton_Left, TEXT("/Game/UI/Icons/Input/Xbox_X") },
+			{ EKeys::Gamepad_FaceButton_Top, TEXT("/Game/UI/Icons/Input/Xbox_Y") },
+			{ EKeys::Gamepad_LeftShoulder, TEXT("/Game/UI/Icons/Input/Xbox_LB") },
+			{ EKeys::Gamepad_RightShoulder, TEXT("/Game/UI/Icons/Input/Xbox_RB") },
+			{ EKeys::Gamepad_LeftTrigger, TEXT("/Game/UI/Icons/Input/Xbox_LT") },
+			{ EKeys::Gamepad_RightTrigger, TEXT("/Game/UI/Icons/Input/Xbox_RT") },
+			{ EKeys::Gamepad_LeftThumbstick, TEXT("/Game/UI/Icons/Input/Xbox_LS") },
+			{ EKeys::Gamepad_RightThumbstick, TEXT("/Game/UI/Icons/Input/Xbox_RS") },
+			{ EKeys::Gamepad_DPad_Up, TEXT("/Game/UI/Icons/Input/Xbox_DPad_Up") },
+			{ EKeys::Gamepad_DPad_Down, TEXT("/Game/UI/Icons/Input/Xbox_DPad_Down") },
+			{ EKeys::Gamepad_DPad_Left, TEXT("/Game/UI/Icons/Input/Xbox_DPad_Left") },
+			{ EKeys::Gamepad_DPad_Right, TEXT("/Game/UI/Icons/Input/Xbox_DPad_Right") },
+			{ EKeys::Gamepad_Special_Left, TEXT("/Game/UI/Icons/Input/Xbox_View") },
+			{ EKeys::Gamepad_Special_Right, TEXT("/Game/UI/Icons/Input/Xbox_Menu") },
+		};
+
+		if (const FString* Found = GamepadIcons.Find(Key))
+		{
+			IconPath = *Found;
+		}
+	}
+	else
+	{
+		// Keyboard/mouse icons
+		static TMap<FKey, FString> KeyboardIcons = {
+			{ EKeys::W, TEXT("/Game/UI/Icons/Input/Key_W") },
+			{ EKeys::A, TEXT("/Game/UI/Icons/Input/Key_A") },
+			{ EKeys::S, TEXT("/Game/UI/Icons/Input/Key_S") },
+			{ EKeys::D, TEXT("/Game/UI/Icons/Input/Key_D") },
+			{ EKeys::E, TEXT("/Game/UI/Icons/Input/Key_E") },
+			{ EKeys::Q, TEXT("/Game/UI/Icons/Input/Key_Q") },
+			{ EKeys::R, TEXT("/Game/UI/Icons/Input/Key_R") },
+			{ EKeys::C, TEXT("/Game/UI/Icons/Input/Key_C") },
+			{ EKeys::V, TEXT("/Game/UI/Icons/Input/Key_V") },
+			{ EKeys::M, TEXT("/Game/UI/Icons/Input/Key_M") },
+			{ EKeys::SpaceBar, TEXT("/Game/UI/Icons/Input/Key_Space") },
+			{ EKeys::LeftShift, TEXT("/Game/UI/Icons/Input/Key_Shift") },
+			{ EKeys::LeftControl, TEXT("/Game/UI/Icons/Input/Key_Ctrl") },
+			{ EKeys::LeftAlt, TEXT("/Game/UI/Icons/Input/Key_Alt") },
+			{ EKeys::Escape, TEXT("/Game/UI/Icons/Input/Key_Esc") },
+			{ EKeys::Enter, TEXT("/Game/UI/Icons/Input/Key_Enter") },
+			{ EKeys::LeftMouseButton, TEXT("/Game/UI/Icons/Input/Mouse_Left") },
+			{ EKeys::RightMouseButton, TEXT("/Game/UI/Icons/Input/Mouse_Right") },
+			{ EKeys::MiddleMouseButton, TEXT("/Game/UI/Icons/Input/Mouse_Middle") },
+		};
+
+		if (const FString* Found = KeyboardIcons.Find(Key))
+		{
+			IconPath = *Found;
+		}
+	}
+
+	// Return soft reference to texture (actual loading deferred)
+	if (!IconPath.IsEmpty())
+	{
+		return TSoftObjectPtr<UTexture2D>(FSoftObjectPath(IconPath));
+	}
 
 	return nullptr;
 }
@@ -145,9 +210,42 @@ bool UMGInputUtility::IsUsingGamepad(const UObject* WorldContextObject)
 		return false;
 	}
 
-	// Check if any gamepad input was received recently
-	// This is a simplified check - a real implementation would track input device
-	return false; // TODO: Implement proper input device tracking
+	// Use common subsystem to track last input device type
+	// Check if the player has any active gamepad input by checking analog stick values
+	// This detects gamepad usage based on recent input activity
+
+	// Check if any gamepad axis has non-zero value (indicates gamepad is being used)
+	float LeftStickX = PC->GetInputAnalogKeyState(EKeys::Gamepad_LeftX);
+	float LeftStickY = PC->GetInputAnalogKeyState(EKeys::Gamepad_LeftY);
+	float RightStickX = PC->GetInputAnalogKeyState(EKeys::Gamepad_RightX);
+	float RightStickY = PC->GetInputAnalogKeyState(EKeys::Gamepad_RightY);
+	float LeftTrigger = PC->GetInputAnalogKeyState(EKeys::Gamepad_LeftTriggerAxis);
+	float RightTrigger = PC->GetInputAnalogKeyState(EKeys::Gamepad_RightTriggerAxis);
+
+	// If any gamepad input is active, player is using gamepad
+	const float Threshold = 0.1f;
+	if (FMath::Abs(LeftStickX) > Threshold ||
+		FMath::Abs(LeftStickY) > Threshold ||
+		FMath::Abs(RightStickX) > Threshold ||
+		FMath::Abs(RightStickY) > Threshold ||
+		LeftTrigger > Threshold ||
+		RightTrigger > Threshold)
+	{
+		return true;
+	}
+
+	// Also check for any gamepad button being pressed
+	if (PC->IsInputKeyDown(EKeys::Gamepad_FaceButton_Bottom) ||
+		PC->IsInputKeyDown(EKeys::Gamepad_FaceButton_Right) ||
+		PC->IsInputKeyDown(EKeys::Gamepad_FaceButton_Left) ||
+		PC->IsInputKeyDown(EKeys::Gamepad_FaceButton_Top) ||
+		PC->IsInputKeyDown(EKeys::Gamepad_LeftShoulder) ||
+		PC->IsInputKeyDown(EKeys::Gamepad_RightShoulder))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 float UMGInputUtility::ApplyDeadZone(float Value, float DeadZone, float MaxValue)

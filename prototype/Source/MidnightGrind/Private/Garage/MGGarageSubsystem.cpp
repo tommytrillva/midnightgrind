@@ -1,4 +1,5 @@
 // Copyright Midnight Grind. All Rights Reserved.
+// Updated Stage 52: MVP Game Entry Points - Starter Vehicle
 
 #include "Garage/MGGarageSubsystem.h"
 #include "Vehicle/MGVehiclePawn.h"
@@ -55,6 +56,79 @@ FMGGarageResult UMGGarageSubsystem::AddVehicle(UMGVehicleModelData* VehicleModel
 
 	OnVehicleAdded.Broadcast(OutVehicleId);
 	return FMGGarageResult::Success(VehicleModelData->BasePriceMSRP);
+}
+
+FMGGarageResult UMGGarageSubsystem::AddVehicleByID(FName VehicleID, FGuid& OutVehicleId)
+{
+	// MVP: Create placeholder vehicle data based on ID
+	// In full implementation, would load from data asset
+
+	FMGOwnedVehicle NewVehicle;
+	NewVehicle.VehicleId = FGuid::NewGuid();
+	OutVehicleId = NewVehicle.VehicleId;
+
+	// Set name based on ID
+	FString DisplayName = VehicleID.ToString();
+	DisplayName.RemoveFromStart(TEXT("Vehicle_"));
+	NewVehicle.CustomName = DisplayName;
+
+	// Default paint colors
+	NewVehicle.Paint.PrimaryColor = FLinearColor::White;
+	NewVehicle.Paint.SecondaryColor = FLinearColor::Black;
+	NewVehicle.Paint.FinishType = EMGPaintFinish::Metallic;
+
+	// Set base investment (placeholder values based on vehicle tier)
+	if (VehicleID.ToString().Contains(TEXT("240SX")) ||
+		VehicleID.ToString().Contains(TEXT("Civic")) ||
+		VehicleID.ToString().Contains(TEXT("MX5")))
+	{
+		NewVehicle.TotalInvestment = 15000;
+	}
+	else if (VehicleID.ToString().Contains(TEXT("Supra")) ||
+			 VehicleID.ToString().Contains(TEXT("RX7")) ||
+			 VehicleID.ToString().Contains(TEXT("Skyline")))
+	{
+		NewVehicle.TotalInvestment = 45000;
+	}
+	else
+	{
+		NewVehicle.TotalInvestment = 25000;
+	}
+
+	OwnedVehicles.Add(NewVehicle);
+
+	// If this is the first vehicle, select it
+	if (OwnedVehicles.Num() == 1)
+	{
+		SelectVehicle(OutVehicleId);
+	}
+
+	OnVehicleAdded.Broadcast(OutVehicleId);
+	UE_LOG(LogTemp, Log, TEXT("Added vehicle by ID: %s (GUID: %s)"), *VehicleID.ToString(), *OutVehicleId.ToString());
+
+	return FMGGarageResult::Success();
+}
+
+void UMGGarageSubsystem::EnsureStarterVehicle()
+{
+	// If player already has vehicles, do nothing
+	if (OwnedVehicles.Num() > 0)
+	{
+		return;
+	}
+
+	// MVP: Give player a Nissan 240SX as starter
+	FGuid StarterVehicleId;
+	FMGGarageResult Result = AddVehicleByID(FName("Vehicle_240SX"), StarterVehicleId);
+
+	if (Result.bSuccess)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Starter vehicle added: Vehicle_240SX"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to add starter vehicle"));
+	}
 }
 
 FMGGarageResult UMGGarageSubsystem::RemoveVehicle(const FGuid& VehicleId)
@@ -534,17 +608,66 @@ void UMGGarageSubsystem::ApplyCustomizationToVehicle(AMGVehiclePawn* Vehicle, co
 	// Get calculated stats
 	FMGVehicleStats Stats = GetVehicleStats(VehicleId);
 
-	// TODO: Apply stats to vehicle movement component
-	// Vehicle->ApplyVehicleStats(Stats);
+	// Apply stats to vehicle movement component
+	if (UMGVehicleMovementComponent* Movement = Vehicle->GetMGVehicleMovement())
+	{
+		// Create vehicle configuration from stats
+		FMGVehicleData VehicleConfig;
+		VehicleConfig.PerformanceIndex = OwnedVehicle.PerformanceIndex;
+		VehicleConfig.MaxHorsePower = Stats.HorsePower;
+		VehicleConfig.MaxTorque = Stats.Torque;
+		VehicleConfig.Weight = Stats.Weight;
+		VehicleConfig.TopSpeed = Stats.TopSpeed;
+		VehicleConfig.Acceleration = Stats.Acceleration;
+		VehicleConfig.Handling = Stats.Handling;
+		VehicleConfig.Braking = Stats.Braking;
+		VehicleConfig.NitrousCapacity = Stats.NitrousCapacity;
 
-	// TODO: Apply paint to mesh materials
-	// Vehicle->ApplyPaint(OwnedVehicle.Paint);
+		Vehicle->LoadVehicleConfiguration(VehicleConfig);
+	}
 
-	// TODO: Apply visual parts (body kits, spoilers, etc.)
-	// for (const auto& Pair : OwnedVehicle.InstalledParts)
-	// {
-	//     Vehicle->ApplyVisualPart(Pair.Key, Pair.Value.PartData);
-	// }
+	// Apply paint to mesh materials
+	if (USkeletalMeshComponent* Mesh = Vehicle->GetMesh())
+	{
+		for (int32 i = 0; i < Mesh->GetNumMaterials(); ++i)
+		{
+			UMaterialInterface* BaseMaterial = Mesh->GetMaterial(i);
+			if (BaseMaterial)
+			{
+				UMaterialInstanceDynamic* DynMat = UMaterialInstanceDynamic::Create(BaseMaterial, Vehicle);
+				if (DynMat)
+				{
+					// Apply primary and secondary colors
+					DynMat->SetVectorParameterValue(TEXT("PrimaryColor"), OwnedVehicle.Paint.PrimaryColor);
+					DynMat->SetVectorParameterValue(TEXT("SecondaryColor"), OwnedVehicle.Paint.SecondaryColor);
+					DynMat->SetScalarParameterValue(TEXT("Metallic"), OwnedVehicle.Paint.Metallic);
+					DynMat->SetScalarParameterValue(TEXT("Roughness"), OwnedVehicle.Paint.Roughness);
+					DynMat->SetScalarParameterValue(TEXT("ClearCoat"), OwnedVehicle.Paint.ClearCoat);
+
+					Mesh->SetMaterial(i, DynMat);
+				}
+			}
+		}
+	}
+
+	// Apply visual parts (body kits, spoilers, etc.)
+	for (const auto& Pair : OwnedVehicle.InstalledParts)
+	{
+		const FName& SlotName = Pair.Key;
+		const FMGInstalledPart& InstalledPart = Pair.Value;
+
+		if (InstalledPart.PartData)
+		{
+			// Apply mesh attachment for visual parts
+			if (UStaticMesh* PartMesh = InstalledPart.PartData->PartMesh.LoadSynchronous())
+			{
+				UStaticMeshComponent* PartComp = NewObject<UStaticMeshComponent>(Vehicle);
+				PartComp->SetStaticMesh(PartMesh);
+				PartComp->AttachToComponent(Vehicle->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SlotName);
+				PartComp->RegisterComponent();
+			}
+		}
+	}
 
 	UE_LOG(LogTemp, Log, TEXT("Applied customization to vehicle: %s (PI: %d)"),
 		*OwnedVehicle.CustomName, OwnedVehicle.PerformanceIndex);

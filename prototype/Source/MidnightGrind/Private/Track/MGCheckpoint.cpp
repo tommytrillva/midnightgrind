@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Kismet/GameplayStatics.h"
 
 // ==========================================
@@ -167,7 +168,20 @@ void AMGCheckpoint::UpdateVisuals()
 		break;
 	}
 
-	// TODO: Apply color to mesh material
+	// Apply color to mesh material via dynamic material instance
+	if (CheckpointMesh && CheckpointMesh->GetStaticMesh())
+	{
+		UMaterialInterface* BaseMaterial = CheckpointMesh->GetMaterial(0);
+		if (BaseMaterial)
+		{
+			UMaterialInstanceDynamic* DynamicMaterial = CheckpointMesh->CreateAndSetMaterialInstanceDynamic(0);
+			if (DynamicMaterial)
+			{
+				DynamicMaterial->SetVectorParameterValue(TEXT("EmissiveColor"), CheckpointColor);
+				DynamicMaterial->SetVectorParameterValue(TEXT("BaseColor"), CheckpointColor);
+			}
+		}
+	}
 }
 
 // ==========================================

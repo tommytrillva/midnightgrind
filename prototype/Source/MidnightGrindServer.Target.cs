@@ -8,8 +8,9 @@ public class MidnightGrindServerTarget : TargetRules
 	public MidnightGrindServerTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Server;
-		DefaultBuildSettings = BuildSettingsVersion.V5;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
+		DefaultBuildSettings = BuildSettingsVersion.Latest;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+		// bUsesSteam = true; // Disabled for local development
 
 		ExtraModuleNames.AddRange(new string[] { "MidnightGrind" });
 

@@ -472,6 +472,15 @@ protected:
 	/** Freeze all vehicles (during countdown) */
 	void FreezeAllVehicles(bool bFreeze);
 
+	/** Notify all player controllers that race started */
+	void NotifyPlayersRaceStarted();
+
+	/** Notify all player controllers that race ended */
+	void NotifyPlayersRaceEnded();
+
+	/** Update HUD subsystem with player race data */
+	void UpdateHUDSubsystem();
+
 private:
 	/** Countdown accumulator */
 	float CountdownAccumulator = 0.0f;

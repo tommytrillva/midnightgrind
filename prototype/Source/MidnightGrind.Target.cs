@@ -8,8 +8,18 @@ public class MidnightGrindTarget : TargetRules
 	public MidnightGrindTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.V5;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
+		DefaultBuildSettings = BuildSettingsVersion.Latest;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+
+		// Networking configuration - Steam disabled for local development
+		// bUsesSteam = true;
+
+		// Build optimizations
+		bOverrideBuildEnvironment = true;
+		bCompileRecast = true;
+		bCompileNavmeshSegmentLinks = true;
+		bCompileNavmeshClusterLinks = true;
+		bWithPushModel = true;
 
 		ExtraModuleNames.AddRange(new string[] { "MidnightGrind" });
 
