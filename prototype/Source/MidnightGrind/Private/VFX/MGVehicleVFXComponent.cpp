@@ -84,6 +84,14 @@ void UMGVehicleVFXComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (WindParticlesComp) WindParticlesComp->DestroyComponent();
 	if (RainInteractionComp) RainInteractionComp->DestroyComponent();
 
+	// Cleanup wear VFX components
+	if (ClutchOverheatSmokeComp) ClutchOverheatSmokeComp->DestroyComponent();
+	if (OilLeakComp) OilLeakComp->DestroyComponent();
+	for (UNiagaraComponent* Comp : BrakeGlowComps)
+	{
+		if (Comp) Comp->DestroyComponent();
+	}
+
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -920,4 +928,237 @@ bool UMGVehicleVFXComponent::GetWheelTransform(int32 WheelIndex, FVector& OutLoc
 	}
 
 	return false;
+}
+
+// ==========================================
+// WEAR SYSTEM VFX IMPLEMENTATIONS
+// ==========================================
+
+void UMGVehicleVFXComponent::TriggerClutchOverheatSmoke(float Intensity)
+{
+	ClutchOverheatIntensity = FMath::Clamp(Intensity, 0.0f, 1.0f);
+
+	if (ClutchOverheatIntensity > 0.0f)
+	{
+		// Spawn or update clutch smoke
+		if (!ClutchOverheatSmokeComp && ClutchOverheatSmokeSystem)
+		{
+			// Spawn at bell housing area (between engine and transmission)
+			ClutchOverheatSmokeComp = SpawnAttachedNiagara(ClutchOverheatSmokeSystem, EngineSocketName,
+				FVector(-30.0f, 0.0f, -20.0f)); // Offset toward transmission
+		}
+
+		if (ClutchOverheatSmokeComp)
+		{
+			ClutchOverheatSmokeComp->Activate();
+			ClutchOverheatSmokeComp->SetVariableFloat(FName("SmokeIntensity"), ClutchOverheatIntensity);
+
+			// Smoke color gets darker/blacker as intensity increases (friction material burning)
+			const float Darkness = FMath::Lerp(0.5f, 0.1f, ClutchOverheatIntensity);
+			ClutchOverheatSmokeComp->SetVariableLinearColor(FName("SmokeColor"),
+				FLinearColor(Darkness, Darkness, Darkness, 1.0f));
+		}
+	}
+}
+
+void UMGVehicleVFXComponent::StopClutchOverheatSmoke()
+{
+	ClutchOverheatIntensity = 0.0f;
+
+	if (ClutchOverheatSmokeComp)
+	{
+		ClutchOverheatSmokeComp->Deactivate();
+	}
+}
+
+void UMGVehicleVFXComponent::TriggerTireBlowout(int32 WheelIndex)
+{
+	FVector WheelLocation;
+	FRotator WheelRotation;
+
+	if (GetWheelTransform(WheelIndex, WheelLocation, WheelRotation))
+	{
+		// Spawn blowout debris and smoke burst
+		if (TireBlowoutSystem)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				GetWorld(),
+				TireBlowoutSystem,
+				WheelLocation,
+				WheelRotation,
+				FVector(1.0f),
+				true,
+				true,
+				ENCPoolMethod::AutoRelease
+			);
+		}
+
+		// Also spawn regular debris
+		SpawnDebris(WheelLocation, WheelRotation.Vector() * -1.0f, 10);
+
+		// Update tire state to show it's blown
+		if (TireStates.IsValidIndex(WheelIndex))
+		{
+			TireStates[WheelIndex].bIsSmoking = true;
+		}
+	}
+}
+
+void UMGVehicleVFXComponent::SetBrakeGlowIntensity(int32 WheelIndex, float GlowIntensity)
+{
+	if (WheelIndex < 0 || WheelIndex >= 4)
+	{
+		return;
+	}
+
+	BrakeGlowIntensities[WheelIndex] = FMath::Clamp(GlowIntensity, 0.0f, 1.0f);
+
+	// Initialize brake glow components if needed
+	if (BrakeGlowComps.Num() < 4 && BrakeGlowSystem)
+	{
+		BrakeGlowComps.SetNum(4);
+		for (int32 i = 0; i < 4; ++i)
+		{
+			if (WheelSocketNames.IsValidIndex(i))
+			{
+				BrakeGlowComps[i] = SpawnAttachedNiagara(BrakeGlowSystem, WheelSocketNames[i],
+					FVector(5.0f, 0.0f, 0.0f)); // Offset slightly inward toward brake
+				if (BrakeGlowComps[i])
+				{
+					BrakeGlowComps[i]->Deactivate();
+				}
+			}
+		}
+	}
+
+	// Update the specific brake's glow
+	if (BrakeGlowComps.IsValidIndex(WheelIndex) && BrakeGlowComps[WheelIndex])
+	{
+		if (GlowIntensity > 0.1f)
+		{
+			BrakeGlowComps[WheelIndex]->Activate();
+			BrakeGlowComps[WheelIndex]->SetVariableFloat(FName("GlowIntensity"), GlowIntensity);
+
+			// Color from dull red (low) to bright orange/yellow (high)
+			FLinearColor GlowColor = FLinearColor::LerpUsingHSV(
+				FLinearColor(0.8f, 0.2f, 0.0f), // Dull red
+				FLinearColor(1.0f, 0.9f, 0.3f), // Bright yellow-white
+				GlowIntensity
+			);
+			BrakeGlowComps[WheelIndex]->SetVariableLinearColor(FName("GlowColor"), GlowColor);
+		}
+		else
+		{
+			BrakeGlowComps[WheelIndex]->Deactivate();
+		}
+	}
+}
+
+void UMGVehicleVFXComponent::TriggerEngineDamageSmoke(int32 SmokeType)
+{
+	// 0 = light (oil), 1 = medium (coolant), 2 = heavy (failure)
+
+	if (!EngineSmokeSystem)
+	{
+		return;
+	}
+
+	if (!EngineSmokeComp)
+	{
+		EngineSmokeComp = SpawnAttachedNiagara(EngineSmokeSystem, EngineSocketName);
+	}
+
+	if (EngineSmokeComp)
+	{
+		EngineSmokeComp->Activate();
+
+		// Configure based on smoke type
+		float Intensity = 0.0f;
+		FLinearColor SmokeColor;
+
+		switch (SmokeType)
+		{
+		case 0: // Light oil smoke - blue/gray tint
+			Intensity = 0.3f;
+			SmokeColor = FLinearColor(0.4f, 0.4f, 0.5f, 1.0f);
+			break;
+
+		case 1: // Coolant steam - white
+			Intensity = 0.6f;
+			SmokeColor = FLinearColor(0.9f, 0.9f, 0.95f, 1.0f);
+			break;
+
+		case 2: // Heavy failure - dark black/gray
+		default:
+			Intensity = 1.0f;
+			SmokeColor = FLinearColor(0.15f, 0.15f, 0.15f, 1.0f);
+			break;
+		}
+
+		EngineSmokeComp->SetVariableFloat(FName("SmokeIntensity"), Intensity);
+		EngineSmokeComp->SetVariableLinearColor(FName("SmokeColor"), SmokeColor);
+	}
+}
+
+void UMGVehicleVFXComponent::StopEngineDamageSmoke()
+{
+	if (EngineSmokeComp)
+	{
+		EngineSmokeComp->Deactivate();
+	}
+}
+
+void UMGVehicleVFXComponent::TriggerTransmissionGrind()
+{
+	if (!TransmissionGrindSystem)
+	{
+		return;
+	}
+
+	// Spawn one-shot grind sparks at transmission location
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return;
+	}
+
+	// Transmission is roughly center-rear of engine
+	FVector SpawnLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * -50.0f;
+	SpawnLocation.Z -= 30.0f; // Below the vehicle
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		TransmissionGrindSystem,
+		SpawnLocation,
+		Owner->GetActorRotation(),
+		FVector(1.0f),
+		true,
+		true,
+		ENCPoolMethod::AutoRelease
+	);
+}
+
+void UMGVehicleVFXComponent::SetOilLeakRate(float LeakRate)
+{
+	CurrentOilLeakRate = FMath::Clamp(LeakRate, 0.0f, 1.0f);
+
+	if (CurrentOilLeakRate > 0.0f)
+	{
+		if (!OilLeakComp && OilLeakSystem)
+		{
+			// Spawn at oil pan location (bottom center of engine)
+			OilLeakComp = SpawnAttachedNiagara(OilLeakSystem, EngineSocketName,
+				FVector(0.0f, 0.0f, -40.0f));
+		}
+
+		if (OilLeakComp)
+		{
+			OilLeakComp->Activate();
+			OilLeakComp->SetVariableFloat(FName("DripRate"), CurrentOilLeakRate);
+		}
+	}
+	else if (OilLeakComp)
+	{
+		OilLeakComp->Deactivate();
+	}
 }

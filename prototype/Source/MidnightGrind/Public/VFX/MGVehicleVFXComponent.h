@@ -204,6 +204,67 @@ public:
 	void SpawnDebris(FVector Location, FVector Direction, int32 DebrisCount = 5);
 
 	// ==========================================
+	// WEAR SYSTEM VFX HOOKS
+	// ==========================================
+
+	/**
+	 * Trigger clutch overheat smoke effect.
+	 * Called when clutch temperature exceeds safe threshold.
+	 * @param Intensity 0-1 intensity based on overheat severity
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Wear")
+	void TriggerClutchOverheatSmoke(float Intensity);
+
+	/**
+	 * Stop clutch overheat smoke effect.
+	 * Called when clutch cools back down.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Wear")
+	void StopClutchOverheatSmoke();
+
+	/**
+	 * Trigger tire blowout effect.
+	 * Spawns debris and smoke at the wheel position.
+	 * @param WheelIndex Wheel that blew out (0-3: FL, FR, RL, RR)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Wear")
+	void TriggerTireBlowout(int32 WheelIndex);
+
+	/**
+	 * Set brake glow intensity for visual feedback.
+	 * @param WheelIndex Wheel brake to update (0-3)
+	 * @param GlowIntensity 0-1 glow amount (0 = cold, 1 = glowing hot)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Wear")
+	void SetBrakeGlowIntensity(int32 WheelIndex, float GlowIntensity);
+
+	/**
+	 * Trigger engine damage smoke (oil leak, coolant leak, etc.)
+	 * @param SmokeType 0 = light (oil), 1 = medium (coolant), 2 = heavy (failure)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Wear")
+	void TriggerEngineDamageSmoke(int32 SmokeType);
+
+	/**
+	 * Stop engine damage smoke effects.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Wear")
+	void StopEngineDamageSmoke();
+
+	/**
+	 * Trigger transmission grind sparks (money shift / bad downshift).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Wear")
+	void TriggerTransmissionGrind();
+
+	/**
+	 * Update oil leak drips from under the vehicle.
+	 * @param LeakRate 0-1 severity of leak (0 = none, 1 = heavy)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Wear")
+	void SetOilLeakRate(float LeakRate);
+
+	// ==========================================
 	// ENVIRONMENT INTERACTION
 	// ==========================================
 
@@ -295,6 +356,30 @@ protected:
 	/** Engine fire system */
 	UPROPERTY(EditDefaultsOnly, Category = "VFX|Systems|Damage")
 	UNiagaraSystem* EngineFireSystem = nullptr;
+
+	// ==========================================
+	// WEAR SYSTEMS
+	// ==========================================
+
+	/** Clutch overheat smoke system (darker, oily smoke from bell housing) */
+	UPROPERTY(EditDefaultsOnly, Category = "VFX|Systems|Wear")
+	UNiagaraSystem* ClutchOverheatSmokeSystem = nullptr;
+
+	/** Tire blowout debris system */
+	UPROPERTY(EditDefaultsOnly, Category = "VFX|Systems|Wear")
+	UNiagaraSystem* TireBlowoutSystem = nullptr;
+
+	/** Brake glow system (emissive disc effect) */
+	UPROPERTY(EditDefaultsOnly, Category = "VFX|Systems|Wear")
+	UNiagaraSystem* BrakeGlowSystem = nullptr;
+
+	/** Oil leak drip system */
+	UPROPERTY(EditDefaultsOnly, Category = "VFX|Systems|Wear")
+	UNiagaraSystem* OilLeakSystem = nullptr;
+
+	/** Transmission grind sparks */
+	UPROPERTY(EditDefaultsOnly, Category = "VFX|Systems|Wear")
+	UNiagaraSystem* TransmissionGrindSystem = nullptr;
 
 	/** Puddle splash system */
 	UPROPERTY(EditDefaultsOnly, Category = "VFX|Systems|Environment")
@@ -421,6 +506,28 @@ protected:
 
 	UPROPERTY()
 	UNiagaraComponent* RainInteractionComp = nullptr;
+
+	// ==========================================
+	// WEAR VFX COMPONENTS
+	// ==========================================
+
+	UPROPERTY()
+	UNiagaraComponent* ClutchOverheatSmokeComp = nullptr;
+
+	UPROPERTY()
+	TArray<UNiagaraComponent*> BrakeGlowComps;
+
+	UPROPERTY()
+	UNiagaraComponent* OilLeakComp = nullptr;
+
+	/** Current clutch overheat intensity */
+	float ClutchOverheatIntensity = 0.0f;
+
+	/** Per-wheel brake glow intensity */
+	float BrakeGlowIntensities[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+	/** Oil leak rate */
+	float CurrentOilLeakRate = 0.0f;
 
 	// ==========================================
 	// INTERNAL
