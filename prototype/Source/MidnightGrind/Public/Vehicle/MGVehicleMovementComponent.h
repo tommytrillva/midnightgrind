@@ -1655,6 +1655,21 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	float GetSpeedKPH() const;
 
+	/**
+	 * Get cached speed in MPH (updated once per tick).
+	 * Use this for frequent access within the same frame to avoid recalculation.
+	 * For single-shot queries, use GetSpeedMPH() instead.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
+	FORCEINLINE float GetCachedSpeedMPH() const { return CachedSpeedMPH; }
+
+	/**
+	 * Check if vehicle is currently moving (speed > 1 MPH).
+	 * Cached value updated each tick.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
+	FORCEINLINE bool IsVehicleMoving() const { return bIsVehicleMoving; }
+
 	/** Check if vehicle is grounded (all wheels on surface) */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	bool IsGrounded() const;
@@ -2598,6 +2613,19 @@ protected:
 	UPROPERTY()
 	float MaxSpeedMultiplier = 1.0f;
 
+	// Fuel system state
+	/** Power multiplier from fuel starvation (1.0 = normal, 0.0 = no fuel) */
+	UPROPERTY()
+	float FuelStarvationMultiplier = 1.0f;
+
+	/** Current fuel weight in kilograms for mass calculations */
+	UPROPERTY()
+	float CurrentFuelWeightKg = 0.0f;
+
+	/** Initial vehicle mass without fuel (cached on configuration) */
+	UPROPERTY()
+	float BaseMassKg = 0.0f;
+
 	// Weather effect multipliers
 	UPROPERTY()
 	float WeatherGripMultiplier = 1.0f;
@@ -2684,6 +2712,28 @@ protected:
 
 	// Drift chain build timer
 	float DriftChainBuildTimer = 0.0f;
+
+	// ==========================================
+	// TICK OPTIMIZATION
+	// ==========================================
+
+	/** Frame counter for update frequency management */
+	int32 TickFrameCounter = 0;
+
+	/** Cached speed value updated once per tick (MPH) */
+	float CachedSpeedMPH = 0.0f;
+
+	/** Whether vehicle is moving (speed > threshold) */
+	bool bIsVehicleMoving = false;
+
+	/** Cached grounded state (updated every few frames) */
+	bool bCachedIsGrounded = true;
+
+	/** Frame interval for non-critical updates (wear, temperature) */
+	static constexpr int32 SlowUpdateInterval = 5;
+
+	/** Frame interval for physics-related but non-essential updates */
+	static constexpr int32 MediumUpdateInterval = 2;
 
 	// ==========================================
 	// SUSPENSION GEOMETRY STATE

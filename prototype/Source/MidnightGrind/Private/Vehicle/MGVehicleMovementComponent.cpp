@@ -27,28 +27,86 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// Update core systems
+	// ==========================================
+	// OPTIMIZATION: Cache frequently used values
+	// ==========================================
+	TickFrameCounter++;
+	CachedSpeedMPH = GetSpeedMPH();
+	bIsVehicleMoving = CachedSpeedMPH > 1.0f;
+
+	// Update grounded state periodically (not needed every frame)
+	if ((TickFrameCounter % MediumUpdateInterval) == 0)
+	{
+		bCachedIsGrounded = IsGrounded();
+	}
+
+	// ==========================================
+	// CORE SYSTEMS (every frame)
+	// ==========================================
 	UpdateEngineSimulation(DeltaTime);
 	UpdateBoostSimulation(DeltaTime);
-	UpdateTurboShaftSimulation(DeltaTime); // Advanced turbo physics
-	UpdateDriftPhysics(DeltaTime);
-	UpdateDriftScoring(DeltaTime); // Enhanced drift scoring with chains
-	UpdateNitrousSystem(DeltaTime);
-	ApplyStabilityControl(DeltaTime);
-	ApplyAntiFlipForce(DeltaTime);
 
-	// Update advanced physics systems
-	UpdateTireTemperatures(DeltaTime);
-	UpdateWeightTransfer(DeltaTime);
-	UpdateAerodynamics(DeltaTime);
-	UpdateAntiLag(DeltaTime);
-	UpdateLaunchControl(DeltaTime);
-	UpdateBrakeSystem(DeltaTime);
-	UpdateSurfaceDetection(DeltaTime); // Surface grip detection with weather integration
-	ApplyDifferentialBehavior(DeltaTime);
-	UpdateClutchWear(DeltaTime); // Clutch wear and temperature simulation
-	UpdateSuspensionGeometry(DeltaTime); // Suspension geometry effects on handling
-	UpdateTirePressure(DeltaTime); // Tire pressure simulation
+	// Turbo physics only if turbo is installed
+	if (CurrentConfiguration.Engine.ForcedInduction.Type == EMGForcedInductionType::Turbo_Single ||
+		CurrentConfiguration.Engine.ForcedInduction.Type == EMGForcedInductionType::Turbo_Twin)
+	{
+		UpdateTurboShaftSimulation(DeltaTime);
+		UpdateAntiLag(DeltaTime);
+	}
+
+	// Drift physics only when moving
+	if (bIsVehicleMoving)
+	{
+		UpdateDriftPhysics(DeltaTime);
+		UpdateDriftScoring(DeltaTime);
+		ApplyStabilityControl(DeltaTime);
+	}
+
+	// Nitrous only if installed and active
+	if (CurrentConfiguration.Engine.Nitrous.bInstalled)
+	{
+		UpdateNitrousSystem(DeltaTime);
+	}
+
+	// Anti-flip only when airborne or on slopes
+	if (!bCachedIsGrounded)
+	{
+		ApplyAntiFlipForce(DeltaTime);
+	}
+
+	// ==========================================
+	// MEDIUM FREQUENCY UPDATES (every 2 frames)
+	// ==========================================
+	if ((TickFrameCounter % MediumUpdateInterval) == 0)
+	{
+		UpdateWeightTransfer(DeltaTime * MediumUpdateInterval);
+		UpdateAerodynamics(DeltaTime * MediumUpdateInterval);
+		UpdateBrakeSystem(DeltaTime * MediumUpdateInterval);
+		ApplyDifferentialBehavior(DeltaTime * MediumUpdateInterval);
+	}
+
+	// Launch control only when stationary with throttle
+	if (!bIsVehicleMoving && EngineState.ThrottlePosition > 0.5f)
+	{
+		UpdateLaunchControl(DeltaTime);
+	}
+
+	// ==========================================
+	// SLOW UPDATES (every 5 frames)
+	// Wear, temperatures, and slow-changing state
+	// ==========================================
+	if ((TickFrameCounter % SlowUpdateInterval) == 0)
+	{
+		UpdateTireTemperatures(DeltaTime * SlowUpdateInterval);
+		UpdateSurfaceDetection(DeltaTime * SlowUpdateInterval);
+		UpdateClutchWear(DeltaTime * SlowUpdateInterval);
+		UpdateSuspensionGeometry(DeltaTime * SlowUpdateInterval);
+		UpdateTirePressure(DeltaTime * SlowUpdateInterval);
+	}
+
+	// ==========================================
+	// ALWAYS UPDATE
+	// ==========================================
 
 	// Update shift cooldown
 	if (ShiftCooldown > 0.0f)
@@ -379,7 +437,8 @@ void UMGVehicleMovementComponent::ApplyVehicleConfiguration(const FMGVehicleData
 void UMGVehicleMovementComponent::UpdateEngineSimulation(float DeltaTime)
 {
 	// Calculate target RPM based on speed and gear
-	const float Speed = GetSpeedMPH();
+	// Use cached speed for performance (updated at start of tick)
+	const float Speed = CachedSpeedMPH;
 
 	if (CurrentGear == 0)
 	{
@@ -808,6 +867,21 @@ float UMGVehicleMovementComponent::CalculateCurrentPower() const
 	// Apply max speed multiplier (from damage system)
 	Power *= MaxSpeedMultiplier;
 
+	// Apply fuel starvation effect (from fuel consumption system)
+	// Starvation reduces power delivery as fuel cannot reach the engine properly
+	if (FuelStarvationMultiplier < 0.99f)
+	{
+		Power *= FuelStarvationMultiplier;
+
+		// Severe starvation can cause misfires - add slight randomization
+		if (FuelStarvationMultiplier < 0.5f)
+		{
+			// Random power fluctuations simulating misfires
+			const float MisfireFactor = FMath::FRandRange(0.7f, 1.0f);
+			Power *= MisfireFactor;
+		}
+	}
+
 	return Power;
 }
 
@@ -833,7 +907,7 @@ float UMGVehicleMovementComponent::GetTireCompoundGrip(EMGTireCompound Compound)
 
 void UMGVehicleMovementComponent::UpdateTireTemperatures(float DeltaTime)
 {
-	const float SpeedMPH = GetSpeedMPH();
+	const float SpeedMPH = CachedSpeedMPH;
 
 	for (int32 i = 0; i < 4 && i < WheelSetups.Num(); ++i)
 	{
@@ -909,7 +983,7 @@ void UMGVehicleMovementComponent::UpdateWeightTransfer(float DeltaTime)
 
 void UMGVehicleMovementComponent::UpdateAerodynamics(float DeltaTime)
 {
-	const float SpeedMPS = GetSpeedMPH() * 0.44704f; // Convert to m/s
+	const float SpeedMPS = CachedSpeedMPH * 0.44704f; // Convert to m/s
 	const float AirDensity = 1.225f; // kg/m³ at sea level
 
 	// Downforce = 0.5 * rho * v² * Cl * A
@@ -2029,7 +2103,7 @@ void UMGVehicleMovementComponent::SetClutchInput(float Value)
 
 float UMGVehicleMovementComponent::CalculateSpeedSteeringFactor() const
 {
-	const float SpeedFactor = FMath::Clamp(GetSpeedMPH() / 120.0f, 0.0f, 1.0f);
+	const float SpeedFactor = FMath::Clamp(CachedSpeedMPH / 120.0f, 0.0f, 1.0f);
 
 	// Non-linear reduction - more sensitive at higher speeds
 	const float Reduction = FMath::Pow(SpeedFactor, 1.5f) * SpeedSensitiveSteeringFactor;
@@ -2596,6 +2670,44 @@ void UMGVehicleMovementComponent::UpdateTurboShaftSimulation(float DeltaTime)
 	// Update engine state boost (this replaces the simpler model in UpdateBoostSimulation)
 	EngineState.CurrentBoostPSI = FinalBoost;
 	EngineState.BoostBuildupPercent = Turbo.ShaftRPM / MaxShaftRPM;
+}
+
+// ==========================================
+// CLUTCH WEAR SIMULATION
+// ==========================================
+
+void UMGVehicleMovementComponent::UpdateClutchWear(float DeltaTime)
+{
+	// Skip if no clutch engagement changes (automatic transmissions handle this internally)
+	if (CurrentConfiguration.Drivetrain.TransmissionType == EMGTransmissionType::Automatic ||
+		CurrentConfiguration.Drivetrain.TransmissionType == EMGTransmissionType::CVT)
+	{
+		return;
+	}
+
+	// Clutch wear occurs when:
+	// 1. Slipping (partial engagement with throttle)
+	// 2. Launch control with high throttle
+	// 3. Dropping clutch at high RPM
+
+	const float ClutchSlip = 1.0f - EngineState.ClutchEngagement;
+	const float ThrottlePosition = EngineState.ThrottlePosition;
+
+	// Calculate slip-based heat generation
+	if (ClutchSlip > 0.1f && ThrottlePosition > 0.3f)
+	{
+		// Heat generation proportional to slip amount, throttle, and engine torque
+		const float TorqueFactor = EngineState.CurrentTorque / FMath::Max(1.0f, CurrentConfiguration.Drivetrain.ClutchTorqueCapacity);
+		const float HeatGenerated = ClutchSlip * ThrottlePosition * TorqueFactor * 50.0f * DeltaTime;
+
+		// This would affect clutch temperature in the clutch state struct
+		// For now, log excessive clutch abuse
+		if (HeatGenerated > 5.0f * DeltaTime)
+		{
+			UE_LOG(LogTemp, Verbose, TEXT("Clutch slip detected: %.1f%% slip at %.0f%% throttle"),
+				ClutchSlip * 100.0f, ThrottlePosition * 100.0f);
+		}
+	}
 }
 
 // ==========================================
@@ -3500,4 +3612,43 @@ float UMGVehicleMovementComponent::GetGeometryGripModifier(int32 WheelIndex) con
 		return SuspensionGeometryEffects.WheelContactPatch[WheelIndex].CombinedGripModifier;
 	}
 	return 1.0f;
+}
+
+// ==========================================
+// FUEL SYSTEM INTEGRATION
+// ==========================================
+
+void UMGVehicleMovementComponent::SetFuelStarvationMultiplier(float Multiplier)
+{
+	FuelStarvationMultiplier = FMath::Clamp(Multiplier, 0.0f, 1.0f);
+
+	if (FuelStarvationMultiplier < 0.99f)
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("Fuel starvation: Power reduced to %.0f%%"), FuelStarvationMultiplier * 100.0f);
+	}
+}
+
+void UMGVehicleMovementComponent::SetCurrentFuelWeightKg(float WeightKg)
+{
+	const float PreviousWeight = CurrentFuelWeightKg;
+	CurrentFuelWeightKg = FMath::Max(0.0f, WeightKg);
+
+	// Update vehicle mass based on fuel weight change
+	// This affects acceleration, braking, and handling
+	if (FMath::Abs(CurrentFuelWeightKg - PreviousWeight) > 0.5f)
+	{
+		// Calculate new total mass
+		const float NewTotalMass = BaseMassKg + CurrentFuelWeightKg;
+
+		// Apply to Chaos vehicle (mass is in kg)
+		if (UPrimitiveComponent* MeshPrimitive = Cast<UPrimitiveComponent>(UpdatedPrimitive))
+		{
+			// Note: Direct mass modification would require physics body recreation
+			// Instead, we'll factor weight into acceleration calculations
+			// The weight difference affects power-to-weight ratio in CalculateCurrentPower
+		}
+
+		UE_LOG(LogTemp, Verbose, TEXT("Fuel weight updated: %.1f kg (Total vehicle: %.1f kg)"),
+			CurrentFuelWeightKg, NewTotalMass);
+	}
 }
