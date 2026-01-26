@@ -130,15 +130,37 @@ void UMGMusicSubsystem::SetStation(FName StationID)
 
 void UMGMusicSubsystem::NextStation()
 {
+	if (RadioStations.Num() == 0)
+	{
+		return;
+	}
 	int32 CurrentIndex = RadioStations.IndexOfByPredicate([this](const FMGRadioStation& S) { return S.StationID == CurrentStationID; });
-	CurrentIndex = (CurrentIndex + 1) % RadioStations.Num();
+	if (CurrentIndex == INDEX_NONE)
+	{
+		CurrentIndex = 0;
+	}
+	else
+	{
+		CurrentIndex = (CurrentIndex + 1) % RadioStations.Num();
+	}
 	SetStation(RadioStations[CurrentIndex].StationID);
 }
 
 void UMGMusicSubsystem::PreviousStation()
 {
+	if (RadioStations.Num() == 0)
+	{
+		return;
+	}
 	int32 CurrentIndex = RadioStations.IndexOfByPredicate([this](const FMGRadioStation& S) { return S.StationID == CurrentStationID; });
-	CurrentIndex = (CurrentIndex - 1 + RadioStations.Num()) % RadioStations.Num();
+	if (CurrentIndex == INDEX_NONE)
+	{
+		CurrentIndex = 0;
+	}
+	else
+	{
+		CurrentIndex = (CurrentIndex - 1 + RadioStations.Num()) % RadioStations.Num();
+	}
 	SetStation(RadioStations[CurrentIndex].StationID);
 }
 
@@ -314,6 +336,10 @@ float UMGMusicSubsystem::GetTimeSinceLastBeat() const
 float UMGMusicSubsystem::GetBeatProgress() const
 {
 	float BPM = GetCurrentBPM();
+	if (BPM <= 0.0f)
+	{
+		return 0.0f;
+	}
 	float BeatInterval = 60.0f / BPM;
 	return GetTimeSinceLastBeat() / BeatInterval;
 }

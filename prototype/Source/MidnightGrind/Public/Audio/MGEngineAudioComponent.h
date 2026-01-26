@@ -10,6 +10,48 @@
 #include "MGEngineAudioComponent.generated.h"
 
 /**
+ * Engine audio parameters for middleware integration.
+ * All values are normalized 0-1 for easy use in audio graphs.
+ */
+USTRUCT(BlueprintType)
+struct FMGEngineAudioParams
+{
+	GENERATED_BODY()
+
+	/** Normalized RPM (0 = idle, 1 = redline) */
+	UPROPERTY(BlueprintReadOnly, Category = "Engine Audio")
+	float RPMNormalized = 0.0f;
+
+	/** Normalized engine load (0 = coasting, 1 = full load) */
+	UPROPERTY(BlueprintReadOnly, Category = "Engine Audio")
+	float LoadNormalized = 0.0f;
+
+	/** Throttle position (0 = closed, 1 = WOT) */
+	UPROPERTY(BlueprintReadOnly, Category = "Engine Audio")
+	float ThrottleNormalized = 0.0f;
+
+	/** Normalized boost level (0 = no boost, 1 = max boost) */
+	UPROPERTY(BlueprintReadOnly, Category = "Engine Audio")
+	float BoostNormalized = 0.0f;
+
+	/** Current gear as float for smooth transitions */
+	UPROPERTY(BlueprintReadOnly, Category = "Engine Audio")
+	float GearNormalized = 0.0f;
+
+	/** Is engine on throttle (load > threshold) */
+	UPROPERTY(BlueprintReadOnly, Category = "Engine Audio")
+	bool bOnThrottle = false;
+
+	/** Is at rev limiter */
+	UPROPERTY(BlueprintReadOnly, Category = "Engine Audio")
+	bool bAtLimiter = false;
+
+	/** Is in deceleration (off throttle, high RPM) */
+	UPROPERTY(BlueprintReadOnly, Category = "Engine Audio")
+	bool bDecel = false;
+};
+
+/**
  * Engine sound layer type
  */
 UENUM(BlueprintType)
@@ -239,6 +281,72 @@ public:
 	bool IsOnThrottle() const { return CurrentThrottle > ThrottleOnThreshold; }
 
 	// ==========================================
+	// AUDIO PARAMETER OUTPUT
+	// These functions provide normalized values for audio system integration
+	// ==========================================
+
+	/**
+	 * Get normalized RPM value (0-1 from idle to redline).
+	 * Use for pitch/volume control in audio middleware.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Engine Audio|Output")
+	float GetNormalizedRPM() const;
+
+	/**
+	 * Get normalized engine load (0-1).
+	 * Higher load = fuller engine sound.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Engine Audio|Output")
+	float GetNormalizedLoad() const { return FMath::Clamp(CurrentLoad, 0.0f, 1.0f); }
+
+	/**
+	 * Get normalized boost level (0-1 from no boost to max boost).
+	 * Use for turbo whistle/blow-off valve sounds.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Engine Audio|Output")
+	float GetNormalizedBoost() const { return FMath::Clamp(CurrentBoost, 0.0f, 1.0f); }
+
+	/**
+	 * Set current boost level (0-1 normalized).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Engine Audio")
+	void SetBoost(float NewBoost);
+
+	/**
+	 * Get all audio parameters in a single struct for efficient integration.
+	 * @return Struct containing RPM, load, throttle, boost, gear as normalized 0-1 values
+	 */
+	UFUNCTION(BlueprintPure, Category = "Engine Audio|Output")
+	FMGEngineAudioParams GetAudioParams() const;
+
+	/**
+	 * Trigger exhaust backfire effect.
+	 * Call on aggressive downshifts, anti-lag pops, etc.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Engine Audio")
+	void TriggerBackfire();
+
+	/**
+	 * Trigger blow-off valve sound (turbo dump).
+	 * Call when throttle closes at high boost.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Engine Audio")
+	void TriggerBlowOffValve();
+
+	/**
+	 * Should audio system play BOV sound this frame?
+	 * Returns true momentarily when conditions are met.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Engine Audio|Output")
+	bool ShouldPlayBOV() const { return bBOVTriggered; }
+
+	/**
+	 * Should audio system play backfire sound this frame?
+	 */
+	UFUNCTION(BlueprintPure, Category = "Engine Audio|Output")
+	bool ShouldPlayBackfire() const { return bBackfireTriggered; }
+
+	// ==========================================
 	// EVENTS
 	// ==========================================
 
@@ -309,6 +417,21 @@ protected:
 
 	/** Was at limiter last frame? */
 	bool bWasAtLimiter = false;
+
+	/** Current boost level (normalized 0-1) */
+	float CurrentBoost = 0.0f;
+
+	/** Previous throttle for BOV detection */
+	float PreviousThrottle = 0.0f;
+
+	/** BOV triggered this frame */
+	bool bBOVTriggered = false;
+
+	/** Backfire triggered this frame */
+	bool bBackfireTriggered = false;
+
+	/** Maximum gear count for normalization */
+	int32 MaxGears = 6;
 
 	// ==========================================
 	// AUDIO COMPONENTS

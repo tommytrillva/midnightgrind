@@ -182,26 +182,97 @@ struct FMGWheelSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// === Steering Settings ===
+
+	/** Wheel rotation range in degrees (e.g., 900, 1080) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Steering")
 	float SteeringRotation = 900.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/** Steering input curve (1.0 = linear, >1 = more center precision) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Steering", meta = (ClampMin = "0.5", ClampMax = "3.0"))
 	float SteeringLinearity = 1.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ForceFeedbackStrength = 0.7f;
+	/** Steering deadzone */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Steering", meta = (ClampMin = "0.0", ClampMax = "0.2"))
+	float SteeringDeadzone = 0.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bForceFeedbackEnabled = true;
+	/** Invert steering direction */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Steering")
+	bool bInvertSteering = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// === Pedal Settings ===
+
+	/** Throttle pedal deadzone */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pedals", meta = (ClampMin = "0.0", ClampMax = "0.3"))
+	float ThrottleDeadzone = 0.05f;
+
+	/** Brake pedal deadzone */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pedals", meta = (ClampMin = "0.0", ClampMax = "0.3"))
+	float BrakeDeadzone = 0.05f;
+
+	/** Clutch pedal deadzone */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pedals", meta = (ClampMin = "0.0", ClampMax = "0.3"))
+	float ClutchDeadzone = 0.1f;
+
+	/** Legacy: general pedal deadzone (deprecated, use specific deadzones) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pedals")
 	float PedalDeadZone = 0.05f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/** Use combined pedal axis (for older wheels) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pedals")
 	bool bCombinedPedals = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/** Invert clutch pedal */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pedals")
 	bool bInvertClutch = false;
+
+	// === Force Feedback Settings ===
+
+	/** Enable force feedback */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback")
+	bool bForceFeedbackEnabled = true;
+
+	/** Master force feedback strength */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float ForceFeedbackStrength = 0.7f;
+
+	/** Self-centering spring strength */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float SelfCenteringStrength = 0.5f;
+
+	/** Road feel / tire feedback strength */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float RoadFeelStrength = 0.6f;
+
+	/** Collision impact feedback strength */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float CollisionStrength = 0.8f;
+
+	/** Curb/rumble strip feedback strength */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float CurbStrength = 0.5f;
+
+	/** Engine vibration at redline strength */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float EngineVibrationStrength = 0.3f;
+
+	/** Damper effect strength */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float DamperStrength = 0.2f;
+
+	/** Minimum force threshold (helps with weak FFB motors) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback", meta = (ClampMin = "0.0", ClampMax = "0.2"))
+	float MinForceThreshold = 0.02f;
+
+	/** Show FFB clipping indicator */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ForceFeedback")
+	bool bShowFFBClipping = true;
+
+	// === Profile Settings ===
+
+	/** Currently selected wheel profile name */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Profile")
+	FString ActiveProfileName = TEXT("Default");
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMGOnBindingChanged, EMGInputAction, Action, FKey, NewKey);

@@ -1313,9 +1313,11 @@ protected:
 	TMap<FGuid, FMGMeetSpotInstance> ActiveInstances;
 
 	/** Player to instance mapping */
+	UPROPERTY()
 	TMap<FGuid, FGuid> PlayerInstanceMap;
 
 	/** Photo spot queues (SpotIndex -> PlayerQueue) */
+	UPROPERTY()
 	TMap<int32, TArray<FGuid>> PhotoSpotQueues;
 
 	/** Defined meet spot locations */

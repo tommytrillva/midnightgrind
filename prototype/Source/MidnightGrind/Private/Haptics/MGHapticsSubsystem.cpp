@@ -3,6 +3,8 @@
 #include "Haptics/MGHapticsSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "RacingWheel/MGRacingWheelSubsystem.h"
+#include "RacingWheel/MGRacingWheelTypes.h"
 
 void UMGHapticsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -77,6 +79,9 @@ void UMGHapticsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			true
 		);
 	}
+
+	// Cache racing wheel subsystem
+	CacheRacingWheelSubsystem();
 }
 
 void UMGHapticsSubsystem::Deinitialize()
@@ -791,4 +796,89 @@ int32 UMGHapticsSubsystem::GetNextPrioritySlot(int32 Priority)
 	}
 
 	return LowestPriorityIndex;
+}
+
+void UMGHapticsSubsystem::CacheRacingWheelSubsystem()
+{
+	if (UGameInstance* GameInstance = GetGameInstance())
+	{
+		RacingWheelSubsystem = GameInstance->GetSubsystem<UMGRacingWheelSubsystem>();
+	}
+}
+
+bool UMGHapticsSubsystem::IsRacingWheelConnected() const
+{
+	return RacingWheelSubsystem.IsValid() && RacingWheelSubsystem->IsWheelConnected();
+}
+
+void UMGHapticsSubsystem::RouteToWheelFFB(EMGHapticType Type, float Intensity)
+{
+	if (!IsRacingWheelConnected())
+	{
+		return;
+	}
+
+	// Map haptic types to wheel FFB effects
+	switch (Type)
+	{
+	case EMGHapticType::Collision:
+		RacingWheelSubsystem->TriggerCollisionFFB(Intensity, FVector::ForwardVector);
+		break;
+
+	case EMGHapticType::LandingImpact:
+		RacingWheelSubsystem->TriggerCollisionFFB(Intensity * 0.7f, FVector::UpVector);
+		break;
+
+	case EMGHapticType::SurfaceChange:
+		{
+			FName SurfaceName = NAME_None;
+			switch (CurrentSurface)
+			{
+			case EMGSurfaceType::Gravel: SurfaceName = FName("Gravel"); break;
+			case EMGSurfaceType::Dirt: SurfaceName = FName("Dirt"); break;
+			case EMGSurfaceType::Grass: SurfaceName = FName("Grass"); break;
+			case EMGSurfaceType::Sand: SurfaceName = FName("Sand"); break;
+			case EMGSurfaceType::Rumblestrip: SurfaceName = FName("Kerb"); break;
+			default: break;
+			}
+			if (SurfaceName != NAME_None)
+			{
+				RacingWheelSubsystem->TriggerSurfaceFFB(SurfaceName, Intensity);
+			}
+		}
+		break;
+
+	case EMGHapticType::Drift:
+		// Drift feedback is handled by the FFB processor based on vehicle data
+		break;
+
+	case EMGHapticType::GearShift:
+		{
+			FMGFFBEffect Effect;
+			Effect.EffectType = EMGFFBEffectType::SawtoothDown;
+			Effect.Magnitude = Intensity * 0.3f;
+			Effect.Duration = 0.08f;
+			Effect.Frequency = 50.0f;
+			RacingWheelSubsystem->PlayFFBEffect(Effect);
+		}
+		break;
+
+	case EMGHapticType::NitroActivate:
+		{
+			FMGFFBEffect Effect;
+			Effect.EffectType = EMGFFBEffectType::SineWave;
+			Effect.Magnitude = Intensity * 0.4f;
+			Effect.Duration = 0.3f;
+			Effect.Frequency = 80.0f;
+			RacingWheelSubsystem->PlayFFBEffect(Effect);
+		}
+		break;
+
+	case EMGHapticType::RedlineWarning:
+		RacingWheelSubsystem->UpdateEngineFFB(1.0f);
+		break;
+
+	default:
+		break;
+	}
 }

@@ -1,0 +1,40 @@
+{
+    "ProfileName": "Generic",
+    "TargetModel": "Generic_DirectInput",
+    "Description": "Generic profile for unknown or unsupported racing wheels",
+
+    "Steering": {
+        "SteeringRotation": 900.0,
+        "SteeringDeadzone": 0.02,
+        "SteeringLinearity": 1.0,
+        "InvertSteering": false
+    },
+
+    "Pedals": {
+        "ThrottleDeadzone": 0.05,
+        "BrakeDeadzone": 0.05,
+        "ClutchDeadzone": 0.1,
+        "ThrottleGamma": 1.0,
+        "BrakeGamma": 1.0,
+        "CombinedPedals": false,
+        "InvertClutch": false
+    },
+
+    "ForceFeedback": {
+        "FFBEnabled": true,
+        "FFBStrength": 0.7,
+        "SelfCenteringStrength": 0.5,
+        "RoadFeelStrength": 0.5,
+        "CollisionStrength": 0.8,
+        "CurbStrength": 0.5,
+        "EngineVibrationStrength": 0.2,
+        "UndersteerStrength": 0.4,
+        "OversteerStrength": 0.5,
+        "MinForceThreshold": 0.03,
+        "DamperStrength": 0.2,
+        "FrictionStrength": 0.15,
+        "ShowFFBClipping": true
+    },
+
+    "Notes": "This profile uses conservative settings that should work with most DirectInput wheels. Adjust steering rotation to match your wheel's physical rotation range."
+}

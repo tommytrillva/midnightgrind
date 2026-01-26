@@ -1,0 +1,547 @@
+{
+  "Version": "1.0",
+  "TotalChapters": 5,
+  "TotalMissions": 50,
+
+  "Chapters": [
+    {
+      "ID": "CHAPTER_01",
+      "Name": "Fresh Meat",
+      "Description": "You're nobody. A kid with a beater and a dream. Prove you belong on these streets.",
+      "LevelRange": { "Min": 1, "Max": 10 },
+      "REPTierRequired": "UNKNOWN",
+      "UnlockRequirements": { "Tutorial": true },
+      "Rewards": {
+        "Cash": 15000,
+        "REP": 500,
+        "Unlock": "Pink Slip Races"
+      },
+      "Missions": [
+        {
+          "ID": "M01_01",
+          "Name": "First Steps",
+          "Type": "Tutorial",
+          "Description": "Learn the basics of street racing. Win your first race.",
+          "Objectives": [
+            { "Type": "CompleteRace", "Count": 1 },
+            { "Type": "FinishTop3", "Count": 1 }
+          ],
+          "Rewards": { "Cash": 2500, "REP": 50 },
+          "Track": "TEST_TRACK_01",
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "M01_02",
+          "Name": "Getting Known",
+          "Type": "Race",
+          "Description": "Win three races to start building your reputation.",
+          "Objectives": [
+            { "Type": "WinRace", "Count": 3 }
+          ],
+          "Rewards": { "Cash": 3000, "REP": 100 },
+          "Track": "Any",
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "M01_03",
+          "Name": "Night Moves",
+          "Type": "Race",
+          "Description": "Complete your first night race.",
+          "Objectives": [
+            { "Type": "WinRace", "Count": 1, "Condition": "Night" }
+          ],
+          "Rewards": { "Cash": 2000, "REP": 75 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "M01_04",
+          "Name": "Garage Time",
+          "Type": "Upgrade",
+          "Description": "Install your first performance upgrade.",
+          "Objectives": [
+            { "Type": "InstallPart", "Count": 1, "Category": "Engine" }
+          ],
+          "Rewards": { "Cash": 1000, "REP": 25 },
+          "Difficulty": "Tutorial"
+        },
+        {
+          "ID": "M01_05",
+          "Name": "Meet the Scene",
+          "Type": "Social",
+          "Description": "Visit a meet spot and check out other builds.",
+          "Objectives": [
+            { "Type": "VisitMeetSpot", "Count": 1 }
+          ],
+          "Rewards": { "Cash": 500, "REP": 50 },
+          "Difficulty": "Tutorial"
+        },
+        {
+          "ID": "M01_06",
+          "Name": "Local Rival",
+          "Type": "Showdown",
+          "Description": "A local racer thinks you're getting too confident. Shut them down.",
+          "Objectives": [
+            { "Type": "DefeatRival", "RivalID": "AI_ROOKIE_01" }
+          ],
+          "Rewards": { "Cash": 4000, "REP": 150 },
+          "Track": "TEST_TRACK_01",
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "M01_07",
+          "Name": "Quick Cash",
+          "Type": "Race",
+          "Description": "Win five races to bank some serious cash for upgrades.",
+          "Objectives": [
+            { "Type": "WinRace", "Count": 5 }
+          ],
+          "Rewards": { "Cash": 5000, "REP": 100 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "M01_08",
+          "Name": "Chapter Boss: Weekend Warrior",
+          "Type": "Boss",
+          "Description": "This hothead thinks they own these streets. Time to educate them.",
+          "Objectives": [
+            { "Type": "DefeatBoss", "BossID": "AI_ROOKIE_02" }
+          ],
+          "Rewards": { "Cash": 7500, "REP": 250, "Unlock": "Chapter 2" },
+          "Track": "TEST_TRACK_01",
+          "Difficulty": "Medium",
+          "IsBossMission": true
+        }
+      ]
+    },
+    {
+      "ID": "CHAPTER_02",
+      "Name": "Street Credit",
+      "Description": "You've proven you can race. Now prove you can build. The real scene awaits.",
+      "LevelRange": { "Min": 11, "Max": 20 },
+      "REPTierRequired": "ROOKIE",
+      "UnlockRequirements": { "Chapter": "CHAPTER_01" },
+      "Rewards": {
+        "Cash": 35000,
+        "REP": 1000,
+        "Unlock": "Crew System"
+      },
+      "Missions": [
+        {
+          "ID": "M02_01",
+          "Name": "Drift Initiation",
+          "Type": "Drift",
+          "Description": "Learn to drift. Score 5000 points in a drift zone.",
+          "Objectives": [
+            { "Type": "DriftScore", "Score": 5000 }
+          ],
+          "Rewards": { "Cash": 3000, "REP": 100 },
+          "Track": "INDUSTRIAL_DOCKS_01",
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "M02_02",
+          "Name": "Mountain Calling",
+          "Type": "Race",
+          "Description": "Your first touge run. Don't fall off the mountain.",
+          "Objectives": [
+            { "Type": "CompleteRace", "Count": 1, "Track": "HARUNA_PASS_01" }
+          ],
+          "Rewards": { "Cash": 4000, "REP": 150 },
+          "Track": "HARUNA_PASS_01",
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "M02_03",
+          "Name": "Build Progress",
+          "Type": "Upgrade",
+          "Description": "Install at least 5 performance parts on your car.",
+          "Objectives": [
+            { "Type": "InstallPart", "Count": 5 }
+          ],
+          "Rewards": { "Cash": 2000, "REP": 75 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "M02_04",
+          "Name": "Heat Rising",
+          "Type": "Pursuit",
+          "Description": "Escape from the police at Heat Level 2.",
+          "Objectives": [
+            { "Type": "EscapePursuit", "HeatLevel": 2 }
+          ],
+          "Rewards": { "Cash": 5000, "REP": 200 },
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "M02_05",
+          "Name": "Touge Battle",
+          "Type": "Race",
+          "Description": "Win your first touge battle.",
+          "Objectives": [
+            { "Type": "WinRace", "Count": 1, "Track": "HARUNA_PASS_01" }
+          ],
+          "Rewards": { "Cash": 6000, "REP": 200 },
+          "Track": "HARUNA_PASS_01",
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "M02_06",
+          "Name": "Crew Prospect",
+          "Type": "Social",
+          "Description": "Join a crew or create your own.",
+          "Objectives": [
+            { "Type": "JoinCrew", "Count": 1 }
+          ],
+          "Rewards": { "Cash": 1000, "REP": 100 },
+          "Difficulty": "Tutorial"
+        },
+        {
+          "ID": "M02_07",
+          "Name": "Drift Competition",
+          "Type": "Drift",
+          "Description": "Score over 10,000 points in a single drift run.",
+          "Objectives": [
+            { "Type": "DriftScore", "Score": 10000, "SingleRun": true }
+          ],
+          "Rewards": { "Cash": 5000, "REP": 175 },
+          "Track": "INDUSTRIAL_DOCKS_01",
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "M02_08",
+          "Name": "First Pink Slip",
+          "Type": "PinkSlip",
+          "Description": "Win your first pink slip race. The stakes are real.",
+          "Objectives": [
+            { "Type": "WinPinkSlip", "Count": 1 }
+          ],
+          "Rewards": { "Cash": 0, "REP": 300, "Note": "Keep the car you win" },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "M02_09",
+          "Name": "JDM Purist Challenge",
+          "Type": "Showdown",
+          "Description": "A JDM purist wants to test your skills. Accept the challenge.",
+          "Objectives": [
+            { "Type": "DefeatRival", "RivalID": "AI_STREET_03" }
+          ],
+          "Rewards": { "Cash": 6000, "REP": 225 },
+          "Track": "HARUNA_PASS_01",
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "M02_10",
+          "Name": "Chapter Boss: Drift King Wannabe",
+          "Type": "Boss",
+          "Description": "They call themselves the Drift King. Show them what real sideways looks like.",
+          "Objectives": [
+            { "Type": "DefeatBoss", "BossID": "AI_STREET_01" }
+          ],
+          "Rewards": { "Cash": 12000, "REP": 400, "Unlock": "Chapter 3" },
+          "Track": "INDUSTRIAL_DOCKS_01",
+          "Difficulty": "Hard",
+          "IsBossMission": true,
+          "RaceType": "Drift"
+        }
+      ]
+    },
+    {
+      "ID": "CHAPTER_03",
+      "Name": "Rising Heat",
+      "Description": "You're making a name. The crews notice. So do the cops. Time to pick a side.",
+      "LevelRange": { "Min": 21, "Max": 30 },
+      "REPTierRequired": "REGULAR",
+      "UnlockRequirements": { "Chapter": "CHAPTER_02" },
+      "Rewards": {
+        "Cash": 60000,
+        "REP": 2000,
+        "Unlock": "Highway Racing"
+      },
+      "Missions": [
+        {
+          "ID": "M03_01",
+          "Name": "Highway Introduction",
+          "Type": "Race",
+          "Description": "Your first run on the Bayshore Highway. Feel the speed.",
+          "Objectives": [
+            { "Type": "CompleteRace", "Count": 1, "Track": "WANGAN_HIGHWAY_01" }
+          ],
+          "Rewards": { "Cash": 5000, "REP": 200 },
+          "Track": "WANGAN_HIGHWAY_01",
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "M03_02",
+          "Name": "Speed Milestone",
+          "Type": "Challenge",
+          "Description": "Reach 150 MPH on the highway.",
+          "Objectives": [
+            { "Type": "ReachSpeed", "Speed": 150, "Unit": "MPH" }
+          ],
+          "Rewards": { "Cash": 4000, "REP": 150 },
+          "Track": "WANGAN_HIGHWAY_01",
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "M03_03",
+          "Name": "Heat Level 3",
+          "Type": "Pursuit",
+          "Description": "Escape from the police at Heat Level 3.",
+          "Objectives": [
+            { "Type": "EscapePursuit", "HeatLevel": 3 }
+          ],
+          "Rewards": { "Cash": 8000, "REP": 300 },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "M03_04",
+          "Name": "Crew Territory",
+          "Type": "Territory",
+          "Description": "Help your crew claim a territory.",
+          "Objectives": [
+            { "Type": "ClaimTerritory", "Count": 1 }
+          ],
+          "Rewards": { "Cash": 10000, "REP": 350 },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "M03_05",
+          "Name": "Highway Battle",
+          "Type": "Race",
+          "Description": "Win a highway battle against traffic.",
+          "Objectives": [
+            { "Type": "WinRace", "Count": 1, "Track": "WANGAN_HIGHWAY_01", "Traffic": true }
+          ],
+          "Rewards": { "Cash": 7500, "REP": 275 },
+          "Track": "WANGAN_HIGHWAY_01",
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "M03_06",
+          "Name": "Class C Champion",
+          "Type": "Tournament",
+          "Description": "Win the Class C street championship.",
+          "Objectives": [
+            { "Type": "WinTournament", "Class": "C" }
+          ],
+          "Rewards": { "Cash": 20000, "REP": 500 },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "M03_07",
+          "Name": "Chapter Boss: Muscle Maniac",
+          "Type": "Boss",
+          "Description": "They say V8 power beats everything. Time to test that theory.",
+          "Objectives": [
+            { "Type": "DefeatBoss", "BossID": "AI_STREET_02" }
+          ],
+          "Rewards": { "Cash": 15000, "REP": 500, "Unlock": "Chapter 4" },
+          "Track": "WANGAN_HIGHWAY_01",
+          "Difficulty": "Hard",
+          "IsBossMission": true
+        }
+      ]
+    },
+    {
+      "ID": "CHAPTER_04",
+      "Name": "Underground Elite",
+      "Description": "You've earned respect. The elite circles open their doors. But glory comes with danger.",
+      "LevelRange": { "Min": 31, "Max": 40 },
+      "REPTierRequired": "RESPECTED",
+      "UnlockRequirements": { "Chapter": "CHAPTER_03" },
+      "Rewards": {
+        "Cash": 100000,
+        "REP": 3500,
+        "Unlock": "Legendary Parts"
+      },
+      "Missions": [
+        {
+          "ID": "M04_01",
+          "Name": "Pro Circuit",
+          "Type": "Race",
+          "Description": "Compete in your first pro-level race.",
+          "Objectives": [
+            { "Type": "WinRace", "Count": 1, "Tier": "A" }
+          ],
+          "Rewards": { "Cash": 12000, "REP": 400 },
+          "Difficulty": "Expert"
+        },
+        {
+          "ID": "M04_02",
+          "Name": "180 Club",
+          "Type": "Challenge",
+          "Description": "Reach 180 MPH. Join the elite speeders.",
+          "Objectives": [
+            { "Type": "ReachSpeed", "Speed": 180, "Unit": "MPH" }
+          ],
+          "Rewards": { "Cash": 10000, "REP": 350 },
+          "Track": "WANGAN_HIGHWAY_01",
+          "Difficulty": "Expert"
+        },
+        {
+          "ID": "M04_03",
+          "Name": "Touge Master Challenge",
+          "Type": "Showdown",
+          "Description": "The Touge Master accepts your challenge. Don't disappoint.",
+          "Objectives": [
+            { "Type": "DefeatRival", "RivalID": "AI_RACER_03" }
+          ],
+          "Rewards": { "Cash": 15000, "REP": 500 },
+          "Track": "HARUNA_PASS_01",
+          "Difficulty": "Expert"
+        },
+        {
+          "ID": "M04_04",
+          "Name": "Heat Level 4",
+          "Type": "Pursuit",
+          "Description": "Escape from the police at Heat Level 4. They're not playing anymore.",
+          "Objectives": [
+            { "Type": "EscapePursuit", "HeatLevel": 4 }
+          ],
+          "Rewards": { "Cash": 15000, "REP": 450 },
+          "Difficulty": "Expert"
+        },
+        {
+          "ID": "M04_05",
+          "Name": "High Stakes Pink Slip",
+          "Type": "PinkSlip",
+          "Description": "Win a pink slip race against a Class B vehicle.",
+          "Objectives": [
+            { "Type": "WinPinkSlip", "Count": 1, "OpponentClass": "B" }
+          ],
+          "Rewards": { "Cash": 0, "REP": 600 },
+          "Difficulty": "Expert"
+        },
+        {
+          "ID": "M04_06",
+          "Name": "Drift Legend Challenge",
+          "Type": "Showdown",
+          "Description": "A D1 veteran wants to see what you've got.",
+          "Objectives": [
+            { "Type": "DefeatRival", "RivalID": "AI_PRO_02" }
+          ],
+          "Rewards": { "Cash": 20000, "REP": 600 },
+          "Track": "INDUSTRIAL_DOCKS_01",
+          "Difficulty": "Expert",
+          "RaceType": "Drift"
+        },
+        {
+          "ID": "M04_07",
+          "Name": "Chapter Boss: Highway Hunter",
+          "Type": "Boss",
+          "Description": "The fastest highway racer. They've never lost on the Wangan.",
+          "Objectives": [
+            { "Type": "DefeatBoss", "BossID": "AI_RACER_02" }
+          ],
+          "Rewards": { "Cash": 25000, "REP": 750, "Unlock": "Chapter 5" },
+          "Track": "WANGAN_HIGHWAY_01",
+          "Difficulty": "Expert",
+          "IsBossMission": true
+        }
+      ]
+    },
+    {
+      "ID": "CHAPTER_05",
+      "Name": "Legend Status",
+      "Description": "Only the best reach this level. The final challenges await. Become immortal.",
+      "LevelRange": { "Min": 41, "Max": 50 },
+      "REPTierRequired": "ELITE",
+      "UnlockRequirements": { "Chapter": "CHAPTER_04" },
+      "Rewards": {
+        "Cash": 200000,
+        "REP": 5000,
+        "Unlock": "Legend Title"
+      },
+      "Missions": [
+        {
+          "ID": "M05_01",
+          "Name": "200 MPH Club",
+          "Type": "Challenge",
+          "Description": "Break the 200 MPH barrier. True speed.",
+          "Objectives": [
+            { "Type": "ReachSpeed", "Speed": 200, "Unit": "MPH" }
+          ],
+          "Rewards": { "Cash": 25000, "REP": 600 },
+          "Track": "WANGAN_HIGHWAY_01",
+          "Difficulty": "Legendary"
+        },
+        {
+          "ID": "M05_02",
+          "Name": "Heat Level 5 Escape",
+          "Type": "Pursuit",
+          "Description": "Survive and escape Maximum Heat. Helicopters, spikes, everything.",
+          "Objectives": [
+            { "Type": "EscapePursuit", "HeatLevel": 5 }
+          ],
+          "Rewards": { "Cash": 30000, "REP": 750 },
+          "Difficulty": "Legendary"
+        },
+        {
+          "ID": "M05_03",
+          "Name": "Mountain Ghost Showdown",
+          "Type": "Boss",
+          "Description": "They race with their lights off. Can you keep up in the dark?",
+          "Objectives": [
+            { "Type": "DefeatBoss", "BossID": "AI_BOSS_02" }
+          ],
+          "Rewards": { "Cash": 40000, "REP": 1000 },
+          "Track": "HARUNA_PASS_01",
+          "Difficulty": "Legendary",
+          "IsBossMission": true,
+          "SpecialCondition": "HeadlightsOff"
+        },
+        {
+          "ID": "M05_04",
+          "Name": "Wangan Devil Showdown",
+          "Type": "Boss",
+          "Description": "The speed demon. 1000hp Supra. The fastest on the bay.",
+          "Objectives": [
+            { "Type": "DefeatBoss", "BossID": "AI_BOSS_03" }
+          ],
+          "Rewards": { "Cash": 50000, "REP": 1200 },
+          "Track": "WANGAN_HIGHWAY_01",
+          "Difficulty": "Legendary",
+          "IsBossMission": true
+        },
+        {
+          "ID": "M05_05",
+          "Name": "The King's Challenge",
+          "Type": "Boss",
+          "Description": "The undisputed champion. No one has beaten them. Until now.",
+          "Objectives": [
+            { "Type": "DefeatBoss", "BossID": "AI_BOSS_01" }
+          ],
+          "Rewards": { "Cash": 100000, "REP": 2000, "Title": "Street Legend" },
+          "Track": "TEST_TRACK_01",
+          "Difficulty": "Legendary",
+          "IsBossMission": true,
+          "FinalBoss": true
+        }
+      ]
+    }
+  ],
+
+  "MilestoneUnlocks": {
+    "REPMilestones": [
+      { "REP": 100, "Unlock": "Marketplace Access" },
+      { "REP": 250, "Unlock": "Crew Creation" },
+      { "REP": 500, "Unlock": "Pink Slip Races" },
+      { "REP": 1000, "Unlock": "Elite Meets" },
+      { "REP": 2500, "Unlock": "VIP Events" },
+      { "REP": 5000, "Unlock": "Legend Status" }
+    ],
+    "LevelMilestones": [
+      { "Level": 5, "Unlock": "Class C Vehicles" },
+      { "Level": 10, "Unlock": "Night Racing" },
+      { "Level": 15, "Unlock": "Crew Territory" },
+      { "Level": 20, "Unlock": "Class B Vehicles" },
+      { "Level": 25, "Unlock": "Highway Racing" },
+      { "Level": 30, "Unlock": "Class A Vehicles" },
+      { "Level": 35, "Unlock": "Pro Circuits" },
+      { "Level": 40, "Unlock": "Class S Vehicles" },
+      { "Level": 45, "Unlock": "Legend Parts" },
+      { "Level": 50, "Unlock": "Everything" }
+    ]
+  }
+}

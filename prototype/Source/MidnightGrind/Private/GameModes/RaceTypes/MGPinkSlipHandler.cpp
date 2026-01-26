@@ -78,8 +78,8 @@ void UMGPinkSlipHandler::UpdateRace(float DeltaTime)
 	{
 		InnerRaceHandler->UpdateRace(DeltaTime);
 
-		// Check if inner race completed
-		if (InnerRaceHandler->IsRaceComplete())
+		// Check if inner race completed (with null safety)
+		if (InnerRaceHandler && InnerRaceHandler->IsRaceComplete())
 		{
 			TArray<FMGRaceResult> InnerResults = InnerRaceHandler->GetResults();
 			if (InnerResults.Num() > 0)

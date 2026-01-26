@@ -78,6 +78,18 @@ public class MidnightGrind : ModuleRules
 		// 	PrivateDependencyModuleNames.Add("OnlineSubsystemSteam");
 		// }
 
+		// Racing Wheel / DirectInput support (Windows only)
+		if (Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			PublicAdditionalLibraries.Add("dinput8.lib");
+			PublicAdditionalLibraries.Add("dxguid.lib");
+			PublicDefinitions.Add("WITH_DIRECTINPUT_WHEEL=1");
+		}
+		else
+		{
+			PublicDefinitions.Add("WITH_DIRECTINPUT_WHEEL=0");
+		}
+
 		// Editor-only dependencies
 		if (Target.bBuildEditor)
 		{

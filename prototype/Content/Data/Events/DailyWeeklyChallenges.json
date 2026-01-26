@@ -1,0 +1,219 @@
+{
+  "Version": "1.0",
+
+  "DailyChallenges": {
+    "RotationPool": [
+      {
+        "ID": "DAILY_RACE_01",
+        "Name": "Daily Racer",
+        "Description": "Complete 5 races today.",
+        "Objectives": [{ "Type": "CompleteRace", "Count": 5 }],
+        "Rewards": { "Cash": 3000, "REP": 50 },
+        "Difficulty": "Easy"
+      },
+      {
+        "ID": "DAILY_WIN_01",
+        "Name": "Victory Lap",
+        "Description": "Win 3 races today.",
+        "Objectives": [{ "Type": "WinRace", "Count": 3 }],
+        "Rewards": { "Cash": 5000, "REP": 75 },
+        "Difficulty": "Medium"
+      },
+      {
+        "ID": "DAILY_DRIFT_01",
+        "Name": "Sideways Saturday",
+        "Description": "Score 25,000 drift points today.",
+        "Objectives": [{ "Type": "DriftScore", "Score": 25000 }],
+        "Rewards": { "Cash": 4000, "REP": 60 },
+        "Difficulty": "Medium"
+      },
+      {
+        "ID": "DAILY_PERFECT_01",
+        "Name": "Perfect Run",
+        "Description": "Complete a race without crashing.",
+        "Objectives": [{ "Type": "CompleteRace", "Count": 1, "NoCrash": true }],
+        "Rewards": { "Cash": 2500, "REP": 40 },
+        "Difficulty": "Easy"
+      },
+      {
+        "ID": "DAILY_NEAR_01",
+        "Name": "Close Call",
+        "Description": "Achieve 10 near-misses in traffic.",
+        "Objectives": [{ "Type": "NearMiss", "Count": 10 }],
+        "Rewards": { "Cash": 3500, "REP": 55 },
+        "Difficulty": "Medium"
+      },
+      {
+        "ID": "DAILY_TOUGE_01",
+        "Name": "Mountain Runner",
+        "Description": "Complete a touge run.",
+        "Objectives": [{ "Type": "CompleteRace", "Count": 1, "Track": "HARUNA_PASS_01" }],
+        "Rewards": { "Cash": 4500, "REP": 70 },
+        "Difficulty": "Medium"
+      },
+      {
+        "ID": "DAILY_HIGHWAY_01",
+        "Name": "Highway Star",
+        "Description": "Complete a highway race.",
+        "Objectives": [{ "Type": "CompleteRace", "Count": 1, "Track": "WANGAN_HIGHWAY_01" }],
+        "Rewards": { "Cash": 4500, "REP": 70 },
+        "Difficulty": "Medium"
+      },
+      {
+        "ID": "DAILY_SOCIAL_01",
+        "Name": "Scene Presence",
+        "Description": "Spend 10 minutes at a meet spot.",
+        "Objectives": [{ "Type": "MeetSpotTime", "Minutes": 10 }],
+        "Rewards": { "Cash": 1500, "REP": 100 },
+        "Difficulty": "Easy"
+      },
+      {
+        "ID": "DAILY_ESCAPE_01",
+        "Name": "Outlaw",
+        "Description": "Escape from the police.",
+        "Objectives": [{ "Type": "EscapePursuit", "Count": 1 }],
+        "Rewards": { "Cash": 5000, "REP": 80 },
+        "Difficulty": "Hard"
+      },
+      {
+        "ID": "DAILY_COMBO_01",
+        "Name": "Chain Master",
+        "Description": "Achieve a 5x drift combo.",
+        "Objectives": [{ "Type": "DriftCombo", "Multiplier": 5 }],
+        "Rewards": { "Cash": 3000, "REP": 50 },
+        "Difficulty": "Medium"
+      }
+    ],
+    "SelectionRules": {
+      "Count": 3,
+      "Method": "Random",
+      "ResetTime": "04:00 UTC"
+    }
+  },
+
+  "WeeklyChallenges": {
+    "RotationPool": [
+      {
+        "ID": "WEEKLY_RACE_01",
+        "Name": "Road Warrior",
+        "Description": "Complete 25 races this week.",
+        "Objectives": [{ "Type": "CompleteRace", "Count": 25 }],
+        "Rewards": { "Cash": 15000, "REP": 300 },
+        "Difficulty": "Medium"
+      },
+      {
+        "ID": "WEEKLY_WIN_01",
+        "Name": "Champion",
+        "Description": "Win 15 races this week.",
+        "Objectives": [{ "Type": "WinRace", "Count": 15 }],
+        "Rewards": { "Cash": 25000, "REP": 500 },
+        "Difficulty": "Hard"
+      },
+      {
+        "ID": "WEEKLY_DRIFT_01",
+        "Name": "Drift Week",
+        "Description": "Score 200,000 drift points this week.",
+        "Objectives": [{ "Type": "DriftScore", "Score": 200000 }],
+        "Rewards": { "Cash": 20000, "REP": 400 },
+        "Difficulty": "Hard"
+      },
+      {
+        "ID": "WEEKLY_CASH_01",
+        "Name": "Money Maker",
+        "Description": "Earn $100,000 from races this week.",
+        "Objectives": [{ "Type": "EarnCash", "Amount": 100000, "Source": "Races" }],
+        "Rewards": { "Cash": 25000, "REP": 350 },
+        "Difficulty": "Hard"
+      },
+      {
+        "ID": "WEEKLY_REP_01",
+        "Name": "Reputation Builder",
+        "Description": "Earn 1,000 REP this week.",
+        "Objectives": [{ "Type": "EarnREP", "Amount": 1000 }],
+        "Rewards": { "Cash": 20000, "REP": 500 },
+        "Difficulty": "Hard"
+      },
+      {
+        "ID": "WEEKLY_ESCAPE_01",
+        "Name": "Ghost Driver",
+        "Description": "Escape from police 5 times this week.",
+        "Objectives": [{ "Type": "EscapePursuit", "Count": 5 }],
+        "Rewards": { "Cash": 30000, "REP": 600 },
+        "Difficulty": "Expert"
+      },
+      {
+        "ID": "WEEKLY_TOUGE_01",
+        "Name": "Mountain Master",
+        "Description": "Win 5 touge battles this week.",
+        "Objectives": [{ "Type": "WinRace", "Count": 5, "Track": "HARUNA_PASS_01" }],
+        "Rewards": { "Cash": 25000, "REP": 450 },
+        "Difficulty": "Hard"
+      },
+      {
+        "ID": "WEEKLY_HIGHWAY_01",
+        "Name": "Speed King",
+        "Description": "Win 5 highway battles this week.",
+        "Objectives": [{ "Type": "WinRace", "Count": 5, "Track": "WANGAN_HIGHWAY_01" }],
+        "Rewards": { "Cash": 25000, "REP": 450 },
+        "Difficulty": "Hard"
+      },
+      {
+        "ID": "WEEKLY_UPGRADE_01",
+        "Name": "Build Master",
+        "Description": "Install 10 performance parts this week.",
+        "Objectives": [{ "Type": "InstallPart", "Count": 10 }],
+        "Rewards": { "Cash": 10000, "REP": 200 },
+        "Difficulty": "Medium"
+      },
+      {
+        "ID": "WEEKLY_CREW_01",
+        "Name": "Crew Pride",
+        "Description": "Complete 10 crew races this week.",
+        "Objectives": [{ "Type": "CompleteRace", "Count": 10, "CrewRace": true }],
+        "Rewards": { "Cash": 20000, "REP": 400 },
+        "Difficulty": "Hard"
+      }
+    ],
+    "SelectionRules": {
+      "Count": 5,
+      "Method": "Random",
+      "ResetTime": "04:00 UTC Monday"
+    }
+  },
+
+  "SpecialEvents": {
+    "MonthlyChallenges": [
+      {
+        "ID": "MONTHLY_LEGEND_01",
+        "Name": "Legend of the Month",
+        "Description": "Achieve the highest combined score across all weekly challenges.",
+        "Type": "Leaderboard",
+        "Rewards": { "Cash": 100000, "REP": 2000, "Title": "Monthly Legend" },
+        "Duration": "1 Month"
+      }
+    ],
+    "SeasonalEvents": [
+      {
+        "ID": "SEASON_SUMMER_01",
+        "Name": "Summer Showdown",
+        "Description": "Season-long championship with weekly qualifiers.",
+        "Rewards": { "Cash": 500000, "REP": 10000, "Vehicle": "Exclusive" },
+        "Duration": "3 Months"
+      }
+    ]
+  },
+
+  "StreakBonuses": {
+    "DailyStreak": {
+      "3Days": { "CashBonus": 1000, "REPBonus": 25 },
+      "7Days": { "CashBonus": 5000, "REPBonus": 100 },
+      "14Days": { "CashBonus": 10000, "REPBonus": 250 },
+      "30Days": { "CashBonus": 35000, "REPBonus": 750 }
+    },
+    "WeeklyStreak": {
+      "2Weeks": { "CashBonus": 10000, "REPBonus": 200 },
+      "4Weeks": { "CashBonus": 25000, "REPBonus": 500 },
+      "8Weeks": { "CashBonus": 75000, "REPBonus": 1500 }
+    }
+  }
+}

@@ -903,7 +903,10 @@ void UMGWagerSubsystem::AddToHistory(const FMGWager& Wager, bool bWon)
 		Entry.StakeLost = bWon ? FMGWagerStake() : Wager.Opponent.Stake;
 	}
 
-	Entry.Outcome = bWon ? EMGWagerOutcome::WonByInitiator : EMGWagerOutcome::WonByOpponent;
+	// Determine actual winner based on who the local player is
+	// bWon indicates if LOCAL player won, but Outcome should reflect Initiator vs Opponent
+	bool bInitiatorWon = (Wager.Initiator.PlayerID == LocalPlayerID) ? bWon : !bWon;
+	Entry.Outcome = bInitiatorWon ? EMGWagerOutcome::WonByInitiator : EMGWagerOutcome::WonByOpponent;
 
 	// Add to front of history
 	WagerHistory.Insert(Entry, 0);

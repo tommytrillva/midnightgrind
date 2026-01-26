@@ -539,6 +539,13 @@ void UMGFuelConsumptionComponent::UpdateFuelStarvation(float DeltaTime)
 			StarvationState.StarvationSeverity = 0.0f;
 		}
 	}
+
+	// Apply starvation effect to movement component
+	if (MovementComponent)
+	{
+		const float PowerMultiplier = StarvationState.GetPowerReductionFactor();
+		MovementComponent->SetFuelStarvationMultiplier(PowerMultiplier);
+	}
 }
 
 void UMGFuelConsumptionComponent::UpdateTelemetry(float DeltaTime, float FrameConsumption)
@@ -613,10 +620,13 @@ void UMGFuelConsumptionComponent::UpdateWeightEffects()
 	{
 		LastBroadcastWeight = CurrentWeightKg;
 		OnFuelWeightChanged.Broadcast(CurrentWeightKg, WeightReduction);
-	}
 
-	// The actual physics weight adjustment would be handled by the vehicle pawn
-	// by querying GetFuelWeightKg() and adjusting mass accordingly
+		// Update movement component with new fuel weight
+		if (MovementComponent)
+		{
+			MovementComponent->SetCurrentFuelWeightKg(CurrentWeightKg);
+		}
+	}
 }
 
 void UMGFuelConsumptionComponent::CheckFuelWarnings()

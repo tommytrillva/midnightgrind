@@ -6,6 +6,8 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MGHapticsSubsystem.generated.h"
 
+class UMGRacingWheelSubsystem;
+
 UENUM(BlueprintType)
 enum class EMGHapticType : uint8
 {
@@ -389,6 +391,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Haptics|State")
 	float GetControllerBatteryLevel() const;
 
+	// Racing Wheel Integration
+	UFUNCTION(BlueprintPure, Category = "Haptics|Wheel")
+	bool IsRacingWheelConnected() const;
+
+	/**
+	 * Route haptic feedback to racing wheel FFB when connected
+	 * Call this when you want haptic feedback to also trigger wheel FFB
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Haptics|Wheel")
+	void RouteToWheelFFB(EMGHapticType Type, float Intensity);
+
 	// Delegates
 	UPROPERTY(BlueprintAssignable, Category = "Haptics|Events")
 	FOnHapticStarted OnHapticStarted;
@@ -452,4 +465,11 @@ protected:
 	float ControllerBatteryLevel = 1.0f;
 
 	FTimerHandle HapticsTickHandle;
+
+	/** Racing wheel subsystem reference */
+	UPROPERTY()
+	TWeakObjectPtr<UMGRacingWheelSubsystem> RacingWheelSubsystem;
+
+	/** Cache racing wheel subsystem */
+	void CacheRacingWheelSubsystem();
 };

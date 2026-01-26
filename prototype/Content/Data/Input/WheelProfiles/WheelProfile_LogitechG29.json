@@ -1,0 +1,57 @@
+{
+    "ProfileName": "Logitech_G29",
+    "TargetModel": "Logitech_G29",
+    "Description": "Default profile for Logitech G29 Driving Force Racing Wheel",
+
+    "Steering": {
+        "SteeringRotation": 900.0,
+        "SteeringDeadzone": 0.0,
+        "SteeringLinearity": 1.0,
+        "InvertSteering": false
+    },
+
+    "Pedals": {
+        "ThrottleDeadzone": 0.03,
+        "BrakeDeadzone": 0.03,
+        "ClutchDeadzone": 0.1,
+        "ThrottleGamma": 1.0,
+        "BrakeGamma": 1.0,
+        "CombinedPedals": false,
+        "InvertClutch": false
+    },
+
+    "ForceFeedback": {
+        "FFBEnabled": true,
+        "FFBStrength": 0.75,
+        "SelfCenteringStrength": 0.5,
+        "RoadFeelStrength": 0.6,
+        "CollisionStrength": 0.85,
+        "CurbStrength": 0.6,
+        "EngineVibrationStrength": 0.25,
+        "UndersteerStrength": 0.4,
+        "OversteerStrength": 0.6,
+        "MinForceThreshold": 0.02,
+        "DamperStrength": 0.15,
+        "FrictionStrength": 0.1,
+        "ShowFFBClipping": true
+    },
+
+    "ButtonMapping": {
+        "Notes": "G29 PlayStation button layout",
+        "Button0": "Cross",
+        "Button1": "Square",
+        "Button2": "Circle",
+        "Button3": "Triangle",
+        "Button4": "LeftPaddle",
+        "Button5": "RightPaddle",
+        "Button6": "R2",
+        "Button7": "L2",
+        "Button8": "Share",
+        "Button9": "Options",
+        "Button10": "R3",
+        "Button11": "L3",
+        "Button12": "PS",
+        "Button13": "Plus",
+        "Button14": "Minus"
+    }
+}

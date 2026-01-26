@@ -15,7 +15,7 @@
 #include "AI/MGAIDriverProfile.h"
 #include "Track/MGTrackSubsystem.h"
 #include "Core/MGRaceGameMode.h"
-#include "Environment/MGWeatherSubsystem.h"
+#include "Weather/MGWeatherSubsystem.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
@@ -1259,13 +1259,13 @@ float AMGAIRacerController::CalculateTargetSpeed()
 		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
 		{
 			// Get road grip multiplier based on weather (dry=1.0, wet=0.7, icy=0.4, etc.)
-			const float WeatherGrip = WeatherSubsystem->GetGripMultiplier();
+			const float WeatherGrip = WeatherSubsystem->GetRoadGripMultiplier();
 			BaseSpeed *= WeatherGrip;
 
 			// Additional caution in poor visibility conditions
-			const EMGWeatherType WeatherType = WeatherSubsystem->GetWeatherType();
-			if (WeatherType == EMGWeatherType::Fog ||
-				WeatherType == EMGWeatherType::Snow ||
+			const EMGWeatherType WeatherType = WeatherSubsystem->GetCurrentWeatherType();
+			if (WeatherType == EMGWeatherType::HeavyFog ||
+				WeatherType == EMGWeatherType::Blizzard ||
 				WeatherType == EMGWeatherType::Thunderstorm)
 			{
 				// Reduce speed further due to visibility concerns
@@ -1275,13 +1275,12 @@ float AMGAIRacerController::CalculateTargetSpeed()
 				BaseSpeed *= (1.0f - VisibilityCaution);
 			}
 
-			// Additional caution for flooded roads (hydroplaning risk)
-			const EMGRoadCondition RoadCondition = WeatherSubsystem->GetRoadCondition();
-			if (RoadCondition == EMGRoadCondition::Flooded)
+			// Check hydroplaning risk for standing water
+			const float HydroplaningRisk = WeatherSubsystem->GetHydroplaningRisk();
+			if (HydroplaningRisk > 0.3f)
 			{
-				// Skilled drivers slow down appropriately for hydroplaning risk
-				const float HydroCaution = DriverProfile ?
-					FMath::Lerp(0.25f, 0.15f, DriverProfile->Skill.SkillLevel) : 0.20f;
+				// Skilled drivers slow down appropriately for hydroplaning
+				const float HydroCaution = HydroplaningRisk * 0.2f;
 				BaseSpeed *= (1.0f - HydroCaution);
 			}
 		}
@@ -1425,20 +1424,20 @@ bool AMGAIRacerController::ShouldAttemptOvertake() const
 			{
 				OvertakeChance *= 0.7f; // 30% less likely to overtake in wet
 			}
-			else if (RoadCondition == EMGRoadCondition::Flooded)
+			else if (RoadCondition == EMGRoadCondition::StandingWater)
 			{
-				OvertakeChance *= 0.5f; // 50% less likely in flooded conditions
+				OvertakeChance *= 0.5f; // 50% less likely in standing water
 			}
-			else if (RoadCondition == EMGRoadCondition::Icy)
+			else if (RoadCondition == EMGRoadCondition::Icy || RoadCondition == EMGRoadCondition::Snowy)
 			{
-				OvertakeChance *= 0.3f; // 70% less likely on ice
+				OvertakeChance *= 0.3f; // 70% less likely on ice/snow
 			}
 
 			// Poor visibility also reduces overtaking attempts
-			const EMGWeatherType WeatherType = WeatherSubsystem->GetWeatherType();
-			if (WeatherType == EMGWeatherType::Fog ||
+			const EMGWeatherType WeatherType = WeatherSubsystem->GetCurrentWeatherType();
+			if (WeatherType == EMGWeatherType::HeavyFog ||
 				WeatherType == EMGWeatherType::Thunderstorm ||
-				WeatherType == EMGWeatherType::Snow)
+				WeatherType == EMGWeatherType::Blizzard)
 			{
 				OvertakeChance *= 0.6f; // 40% less likely in poor visibility
 			}
@@ -1918,7 +1917,7 @@ float AMGAIRacerController::CalculateBrakingDistance(float CurrentSpeed, float T
 		{
 			// Grip affects braking effectiveness
 			// Dry = 1.0x, Wet = 0.7x grip means 1/0.7 = 1.43x braking distance
-			const float GripMultiplier = WeatherSubsystem->GetGripMultiplier();
+			const float GripMultiplier = WeatherSubsystem->GetRoadGripMultiplier();
 			if (GripMultiplier > 0.01f)
 			{
 				Deceleration *= GripMultiplier;
@@ -1927,7 +1926,7 @@ float AMGAIRacerController::CalculateBrakingDistance(float CurrentSpeed, float T
 			// Skilled drivers start braking earlier in bad conditions
 			const EMGRoadCondition RoadCondition = WeatherSubsystem->GetRoadCondition();
 			if (RoadCondition == EMGRoadCondition::Wet ||
-				RoadCondition == EMGRoadCondition::Flooded ||
+				RoadCondition == EMGRoadCondition::StandingWater ||
 				RoadCondition == EMGRoadCondition::Icy)
 			{
 				// Add safety margin for reduced grip - more skilled = smaller margin needed

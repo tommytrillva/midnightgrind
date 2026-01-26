@@ -600,7 +600,7 @@ FVector UMGTrafficSubsystem::GetLanePosition(int32 RoadID, int32 LaneIndex, floa
 		float SegmentLength = FVector::Dist(Road->SplinePoints[i-1], Road->SplinePoints[i]);
 		if (CurrentDist + SegmentLength >= TargetDist)
 		{
-			float Alpha = (TargetDist - CurrentDist) / SegmentLength;
+			float Alpha = (SegmentLength > KINDA_SMALL_NUMBER) ? (TargetDist - CurrentDist) / SegmentLength : 0.0f;
 			FVector BasePos = FMath::Lerp(Road->SplinePoints[i-1], Road->SplinePoints[i], Alpha);
 
 			// Offset for lane

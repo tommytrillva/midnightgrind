@@ -13,6 +13,12 @@ enum class EMGTireCompound : uint8;
  *
  * Describes the reason for tire pressure loss during gameplay.
  * Used for damage feedback, audio cues, and repair cost calculation.
+ *
+ * Different causes have different leak rates and severity:
+ * - Natural/Slow leaks: Minutes to hours to become problematic
+ * - Moderate damage: Minutes to become critical
+ * - Spike strips: Seconds to flatten
+ * - Blowout: Instant catastrophic failure
  */
 UENUM(BlueprintType)
 enum class EMGPressureLossCause : uint8
@@ -43,415 +49,21 @@ enum class EMGPressureLossCause : uint8
 };
 
 /**
- * @brief Tire pressure state with comprehensive physics simulation
- *
- * Models realistic tire pressure behavior including:
- * - Temperature-pressure relationship (ideal gas law approximation)
- * - Pressure effects on contact patch size and shape
- * - Pressure influence on grip, wear rate, and fuel economy
- * - Multiple pressure loss scenarios (punctures, slow leaks, blowouts)
- * - Optimal pressure ranges that vary by tire compound
- *
- * Physical relationships modeled:
- *
- * Lower pressure provides:
- * - Larger contact patch = more mechanical grip (up to a point)
- * - Faster tire wear due to increased deformation and heat
- * - Higher rolling resistance = worse fuel economy
- * - Higher operating temperatures from sidewall flex
- * - More compliant ride over bumps
- *
- * Higher pressure provides:
- * - Smaller contact patch = reduced grip area
- * - Slower tire wear from reduced deformation
- * - Lower rolling resistance = better fuel economy
- * - Lower operating temperatures
- * - Harsher ride, less compliance
- * - Risk of reduced traction on uneven surfaces
- *
- * @see FMGTireTemperature for temperature modeling
- * @see FMGTireCompoundData for compound-specific optimal pressures
- */
-USTRUCT(BlueprintType)
-struct MIDNIGHTGRIND_API FMGTirePressureState
-{
-	GENERATED_BODY()
-
-	// ==========================================
-	// CURRENT STATE
-	// ==========================================
-
-	/** Current tire pressure in PSI (pounds per square inch) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Current", meta = (ClampMin = "0.0", ClampMax = "60.0"))
-	float CurrentPressurePSI = 32.0f;
-
-	/** Cold pressure setting (baseline pressure when tire is at ambient temperature) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Current", meta = (ClampMin = "20.0", ClampMax = "50.0"))
-	float ColdPressurePSI = 32.0f;
-
-	/** Hot pressure (calculated from temperature using ideal gas law approximation) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Current")
-	float HotPressurePSI = 32.0f;
-
-	/** Target optimal pressure for current compound and conditions */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Current")
-	float OptimalPressurePSI = 32.0f;
-
-	// ==========================================
-	// PRESSURE LOSS STATE
-	// ==========================================
-
-	/** Whether the tire has any active pressure loss */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Loss")
-	bool bHasLeak = false;
-
-	/** Whether the tire is completely flat (pressure below functional threshold) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Loss")
-	bool bIsFlat = false;
-
-	/** Whether the tire has suffered a catastrophic blowout */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Loss")
-	bool bIsBlownOut = false;
-
-	/** Current cause of pressure loss */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Loss")
-	EMGPressureLossCause LeakCause = EMGPressureLossCause::None;
-
-	/** Rate of pressure loss in PSI per second */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Loss")
-	float LeakRatePSIPerSecond = 0.0f;
-
-	/** Time since leak started in seconds */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Loss")
-	float LeakDuration = 0.0f;
-
-	/** Total pressure lost to leaks this session in PSI */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Loss")
-	float TotalPressureLost = 0.0f;
-
-	// ==========================================
-	// PERFORMANCE EFFECTS
-	// ==========================================
-
-	/** Contact patch size multiplier (1.0 = optimal, >1.0 = larger patch from low pressure) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Effects")
-	float ContactPatchMultiplier = 1.0f;
-
-	/** Grip multiplier from pressure (optimal pressure = 1.0) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Effects")
-	float PressureGripMultiplier = 1.0f;
-
-	/** Wear rate multiplier from pressure (lower pressure = faster wear) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Effects")
-	float PressureWearMultiplier = 1.0f;
-
-	/** Heat generation multiplier from pressure (lower pressure = more heat) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Effects")
-	float PressureHeatMultiplier = 1.0f;
-
-	/** Rolling resistance multiplier (lower pressure = higher resistance) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Effects")
-	float RollingResistanceMultiplier = 1.0f;
-
-	/** Fuel economy effect (1.0 = no effect, <1.0 = worse economy from low pressure) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Effects")
-	float FuelEconomyMultiplier = 1.0f;
-
-	// ==========================================
-	// DIAGNOSTIC DATA
-	// ==========================================
-
-	/** Pressure deviation from optimal (negative = under-inflated, positive = over-inflated) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Diagnostics")
-	float PressureDeviationPSI = 0.0f;
-
-	/** Percentage of optimal pressure (100% = perfect) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Diagnostics")
-	float PressurePercent = 100.0f;
-
-	/** Time spent at critically low pressure in seconds (for damage tracking) */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Diagnostics")
-	float TimeAtCriticalPressure = 0.0f;
-
-	/** Number of punctures/damage events this tire has sustained */
-	UPROPERTY(BlueprintReadOnly, Category = "Pressure|Diagnostics")
-	int32 DamageEventCount = 0;
-
-	// ==========================================
-	// HELPER METHODS
-	// ==========================================
-
-	/**
-	 * @brief Calculate grip multiplier based on current pressure vs optimal
-	 *
-	 * Grip curve models real tire behavior:
-	 * - At optimal pressure: 1.0 grip (baseline)
-	 * - Slightly under-inflated (5-10%): 1.02-1.07 grip (larger contact patch bonus)
-	 * - Significantly under-inflated (>15%): Grip drops due to sidewall flex instability
-	 * - Over-inflated: Grip reduces linearly due to smaller contact patch
-	 * - Flat tire: Minimal grip (0.1-0.3) with severe handling issues
-	 *
-	 * @return Grip multiplier in range [0.15, 1.07]
-	 */
-	float CalculateGripMultiplier() const
-	{
-		if (bIsBlownOut || bIsFlat)
-		{
-			return 0.15f; // Severely compromised grip
-		}
-
-		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalPressurePSI, 1.0f);
-
-		if (PressureRatio < 0.5f)
-		{
-			// Critically low - severe grip loss from sidewall collapse
-			return 0.3f + (PressureRatio * 0.4f);
-		}
-		else if (PressureRatio < 0.85f)
-		{
-			// Under-inflated but functional - grip improves then plateaus
-			const float UnderInflateRatio = (PressureRatio - 0.5f) / 0.35f;
-			return FMath::Lerp(0.5f, 1.05f, UnderInflateRatio);
-		}
-		else if (PressureRatio <= 0.95f)
-		{
-			// Slightly under-inflated - sweet spot for maximum grip
-			return 1.03f + (0.95f - PressureRatio) * 0.4f; // 1.03 to 1.07
-		}
-		else if (PressureRatio <= 1.05f)
-		{
-			// Near optimal - baseline grip
-			return 1.0f;
-		}
-		else if (PressureRatio <= 1.15f)
-		{
-			// Slightly over-inflated - reduced contact patch
-			return 1.0f - ((PressureRatio - 1.05f) * 0.5f); // 1.0 to 0.95
-		}
-		else
-		{
-			// Significantly over-inflated - accelerating grip loss
-			return FMath::Max(0.7f, 0.95f - ((PressureRatio - 1.15f) * 1.5f));
-		}
-	}
-
-	/**
-	 * @brief Calculate wear rate multiplier based on pressure
-	 *
-	 * Under-inflated tires wear faster due to:
-	 * - Increased contact patch area under load
-	 * - More sidewall flex generating internal heat
-	 * - Uneven wear patterns (edges wear faster than center)
-	 *
-	 * Over-inflated tires have moderate wear increase:
-	 * - Concentrated wear in center of tread
-	 * - Less total contact area but higher pressure per unit area
-	 *
-	 * @return Wear rate multiplier (1.0 = normal, >1.0 = faster wear)
-	 */
-	float CalculateWearMultiplier() const
-	{
-		if (bIsBlownOut || bIsFlat)
-		{
-			return 5.0f; // Catastrophic wear when running flat
-		}
-
-		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalPressurePSI, 1.0f);
-
-		if (PressureRatio < 0.7f)
-		{
-			// Severely under-inflated - rapid wear from excessive deformation
-			return 3.0f - (PressureRatio * 2.0f);
-		}
-		else if (PressureRatio < 0.9f)
-		{
-			// Under-inflated - accelerated wear
-			return 1.0f + ((0.9f - PressureRatio) * 3.0f);
-		}
-		else if (PressureRatio <= 1.1f)
-		{
-			// Optimal range - normal wear
-			return 1.0f;
-		}
-		else
-		{
-			// Over-inflated - moderate wear increase from center wear
-			return 1.0f + ((PressureRatio - 1.1f) * 1.5f);
-		}
-	}
-
-	/**
-	 * @brief Calculate contact patch size multiplier
-	 *
-	 * Lower pressure = larger contact patch (more rubber contacting road)
-	 * Higher pressure = smaller contact patch (less rubber on road)
-	 * Relationship is approximately inverse within normal operating range.
-	 *
-	 * @return Contact patch size multiplier in range [0.5, 1.4]
-	 */
-	float CalculateContactPatchMultiplier() const
-	{
-		if (bIsBlownOut || bIsFlat)
-		{
-			return 0.5f; // Deformed tire has inconsistent, reduced contact
-		}
-
-		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalPressurePSI, 1.0f);
-
-		// Inverse relationship - lower pressure = larger patch
-		// But extremely low pressure causes sidewall collapse reducing effective contact
-		if (PressureRatio < 0.5f)
-		{
-			return 0.8f; // Collapsed sidewall reduces effective contact
-		}
-
-		return FMath::Clamp(1.5f - (PressureRatio * 0.5f), 0.7f, 1.4f);
-	}
-
-	/**
-	 * @brief Calculate heat generation multiplier based on pressure
-	 *
-	 * Lower pressure = more sidewall flex = more internal heat generation
-	 * This is a primary cause of tire failures when running under-inflated.
-	 *
-	 * @return Heat generation multiplier (1.0 = normal, >1.0 = more heat)
-	 */
-	float CalculateHeatMultiplier() const
-	{
-		if (bIsBlownOut || bIsFlat)
-		{
-			return 3.0f; // Massive heat from running on sidewall/rim
-		}
-
-		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalPressurePSI, 1.0f);
-
-		if (PressureRatio < 0.7f)
-		{
-			// Severely under-inflated - extreme heat buildup risk
-			return 2.5f - (PressureRatio * 1.5f);
-		}
-		else if (PressureRatio < 0.9f)
-		{
-			// Under-inflated - increased heat from sidewall flex
-			return 1.0f + ((0.9f - PressureRatio) * 2.5f);
-		}
-		else if (PressureRatio <= 1.1f)
-		{
-			// Optimal range - normal heat generation
-			return 1.0f;
-		}
-		else
-		{
-			// Over-inflated - slightly less heat (smaller contact, less deformation)
-			return FMath::Max(0.85f, 1.0f - ((PressureRatio - 1.1f) * 0.5f));
-		}
-	}
-
-	/**
-	 * @brief Calculate rolling resistance multiplier for fuel economy
-	 *
-	 * Lower pressure increases rolling resistance due to:
-	 * - More tire deformation per rotation
-	 * - Larger contact patch creating more friction
-	 * - Energy lost to internal tire heating
-	 *
-	 * @return Rolling resistance multiplier (1.0 = optimal, >1.0 = more resistance)
-	 */
-	float CalculateRollingResistanceMultiplier() const
-	{
-		if (bIsBlownOut || bIsFlat)
-		{
-			return 3.0f; // Massive resistance when flat
-		}
-
-		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalPressurePSI, 1.0f);
-
-		if (PressureRatio < 0.85f)
-		{
-			// Under-inflated - significant rolling resistance increase
-			return 1.0f + ((0.85f - PressureRatio) * 2.0f);
-		}
-		else if (PressureRatio <= 1.1f)
-		{
-			// Optimal range
-			return 1.0f;
-		}
-		else
-		{
-			// Over-inflated - slightly reduced resistance (also less grip though)
-			return FMath::Max(0.95f, 1.0f - ((PressureRatio - 1.1f) * 0.3f));
-		}
-	}
-
-	/**
-	 * @brief Check if pressure is in a warning state requiring driver attention
-	 * @return True if pressure is significantly off optimal or has active issues
-	 */
-	bool NeedsAttention() const
-	{
-		if (bIsFlat || bIsBlownOut || bHasLeak)
-		{
-			return true;
-		}
-
-		const float DeviationPercent = FMath::Abs(PressureDeviationPSI) / FMath::Max(OptimalPressurePSI, 1.0f) * 100.0f;
-		return DeviationPercent > 10.0f; // More than 10% off optimal
-	}
-
-	/**
-	 * @brief Check if tire is in critical state requiring immediate action
-	 * @return True if tire is critically low, damaged, or rapidly losing pressure
-	 */
-	bool IsCritical() const
-	{
-		return bIsFlat || bIsBlownOut || CurrentPressurePSI < 15.0f || LeakRatePSIPerSecond > 1.0f;
-	}
-
-	/**
-	 * @brief Reset pressure state to defaults
-	 * @param DefaultPressure The default cold pressure to set in PSI
-	 * @param Optimal The optimal pressure for current compound in PSI
-	 */
-	void Reset(float DefaultPressure = 32.0f, float Optimal = 32.0f)
-	{
-		CurrentPressurePSI = DefaultPressure;
-		ColdPressurePSI = DefaultPressure;
-		HotPressurePSI = DefaultPressure;
-		OptimalPressurePSI = Optimal;
-		bHasLeak = false;
-		bIsFlat = false;
-		bIsBlownOut = false;
-		LeakCause = EMGPressureLossCause::None;
-		LeakRatePSIPerSecond = 0.0f;
-		LeakDuration = 0.0f;
-		TotalPressureLost = 0.0f;
-		TimeAtCriticalPressure = 0.0f;
-		DamageEventCount = 0;
-		UpdateEffects();
-	}
-
-	/**
-	 * @brief Update all calculated effect multipliers based on current pressure
-	 * Should be called after any pressure value changes
-	 */
-	void UpdateEffects()
-	{
-		PressureGripMultiplier = CalculateGripMultiplier();
-		PressureWearMultiplier = CalculateWearMultiplier();
-		ContactPatchMultiplier = CalculateContactPatchMultiplier();
-		PressureHeatMultiplier = CalculateHeatMultiplier();
-		RollingResistanceMultiplier = CalculateRollingResistanceMultiplier();
-		FuelEconomyMultiplier = 1.0f / FMath::Max(RollingResistanceMultiplier, 0.1f);
-		PressureDeviationPSI = CurrentPressurePSI - OptimalPressurePSI;
-		PressurePercent = (CurrentPressurePSI / FMath::Max(OptimalPressurePSI, 1.0f)) * 100.0f;
-	}
-};
-
-/**
  * @brief Configuration for tire pressure simulation tuning
  *
  * Contains all tunable parameters for the tire pressure physics system.
- * Default values are based on typical passenger car tires.
+ * Designers can adjust these values to balance realism vs gameplay.
+ *
+ * Default values are based on typical passenger car tires with
+ * some acceleration for gameplay purposes.
+ *
+ * Key relationships:
+ * - Lower pressure = more grip (larger contact patch) but faster wear
+ * - Higher pressure = less grip but better fuel economy and slower wear
+ * - Temperature increases pressure (ideal gas law)
+ * - Leaks and damage cause pressure loss over time
+ *
+ * @see FMGTirePressureState for runtime pressure state
  */
 USTRUCT(BlueprintType)
 struct MIDNIGHTGRIND_API FMGTirePressureConfig
@@ -525,7 +137,7 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	 * @brief Natural pressure loss rate in PSI per hour
 	 *
 	 * All tires slowly lose pressure through rubber permeation.
-	 * Typical: 1-2 PSI per month = ~0.001-0.003 PSI/hour
+	 * Real-world: 1-2 PSI per month = ~0.001-0.003 PSI/hour
 	 * Accelerated for gameplay: 0.01-0.05 PSI/hour
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Leaks", meta = (ClampMin = "0.0", ClampMax = "0.1"))
@@ -553,6 +165,7 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	 * @brief Spike strip puncture rate in PSI per second
 	 *
 	 * Rapid but not instant - tire deflates over 10-30 seconds.
+	 * Creates tense gameplay as player loses control gradually.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Leaks", meta = (ClampMin = "0.5", ClampMax = "5.0"))
 	float SpikeStripLeakRatePSIPerSec = 1.5f;
@@ -587,6 +200,7 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	 * @brief Optimal pressure for Street compound in PSI
 	 *
 	 * Street tires work best at standard pressures.
+	 * Good all-around balance of grip and longevity.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Compounds", meta = (ClampMin = "28.0", ClampMax = "38.0"))
 	float OptimalPressure_Street = 32.0f;
@@ -594,7 +208,8 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	/**
 	 * @brief Optimal pressure for Sport compound in PSI
 	 *
-	 * Sport tires benefit from slightly lower pressure.
+	 * Sport tires benefit from slightly lower pressure
+	 * for increased contact patch and grip.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Compounds", meta = (ClampMin = "26.0", ClampMax = "36.0"))
 	float OptimalPressure_Sport = 30.0f;
@@ -603,6 +218,7 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	 * @brief Optimal pressure for Track compound in PSI
 	 *
 	 * Track tires run lower for maximum contact patch.
+	 * Requires more careful heat management.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Compounds", meta = (ClampMin = "24.0", ClampMax = "34.0"))
 	float OptimalPressure_Track = 28.0f;
@@ -610,7 +226,8 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	/**
 	 * @brief Optimal pressure for Drift compound in PSI
 	 *
-	 * Drift tires often run slightly higher in rear for slip.
+	 * Drift tires often run slightly higher in rear
+	 * to promote controlled oversteer and slip.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Compounds", meta = (ClampMin = "28.0", ClampMax = "40.0"))
 	float OptimalPressure_Drift = 34.0f;
@@ -618,7 +235,8 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	/**
 	 * @brief Optimal pressure for Rain compound in PSI
 	 *
-	 * Rain tires need higher pressure to resist hydroplaning.
+	 * Rain tires need higher pressure to maintain tread shape
+	 * and resist hydroplaning through water channels.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Compounds", meta = (ClampMin = "30.0", ClampMax = "40.0"))
 	float OptimalPressure_Rain = 35.0f;
@@ -627,6 +245,7 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	 * @brief Optimal pressure for OffRoad compound in PSI
 	 *
 	 * Off-road tires run lower for better traction on loose surfaces.
+	 * Larger contact patch helps with soft terrain.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Compounds", meta = (ClampMin = "20.0", ClampMax = "32.0"))
 	float OptimalPressure_OffRoad = 26.0f;
@@ -656,13 +275,16 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	/**
 	 * @brief Base blowout probability per second when conditions met
 	 *
-	 * Probability increases with speed and temperature.
+	 * Probability increases with speed, temperature, and low pressure.
+	 * Keep low to make blowouts feel dramatic but not frustrating.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Blowout", meta = (ClampMin = "0.0", ClampMax = "0.1"))
 	float BlowoutBaseProbabilityPerSec = 0.01f;
 
 	/**
-	 * @brief Speed multiplier for blowout probability (per 100 km/h)
+	 * @brief Speed multiplier for blowout probability (per 100 mph)
+	 *
+	 * Higher speeds increase blowout risk when other conditions are met.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Blowout", meta = (ClampMin = "0.0", ClampMax = "2.0"))
 	float BlowoutSpeedMultiplier = 0.5f;
@@ -673,18 +295,27 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 
 	/**
 	 * @brief Enable natural pressure loss over time
+	 *
+	 * When true, tires slowly lose pressure even without damage.
+	 * Adds strategic element to longer races/sessions.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Simulation")
 	bool bEnableNaturalPressureLoss = true;
 
 	/**
 	 * @brief Enable temperature-based pressure changes
+	 *
+	 * When true, tire pressure increases as tires heat up.
+	 * Creates realistic "cold tire" behavior at race start.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Simulation")
 	bool bEnableTemperaturePressureEffect = true;
 
 	/**
 	 * @brief Enable random blowout chance when conditions are dangerous
+	 *
+	 * When true, severely compromised tires can blow out randomly.
+	 * Creates tension and consequences for poor tire management.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Simulation")
 	bool bEnableBlowoutSimulation = true;
@@ -693,6 +324,7 @@ struct MIDNIGHTGRIND_API FMGTirePressureConfig
 	 * @brief Time scale for pressure simulation (1.0 = real time)
 	 *
 	 * Higher values accelerate pressure changes for gameplay.
+	 * Use > 1.0 for arcade feel, 1.0 for simulation.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure|Simulation", meta = (ClampMin = "0.1", ClampMax = "10.0"))
 	float PressureSimulationTimeScale = 1.0f;

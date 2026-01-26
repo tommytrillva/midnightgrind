@@ -430,3 +430,64 @@ float UMGEngineAudioComponent::GetNormalizedRPM() const
 
 	return FMath::Clamp((CurrentRPM - Preset.IdleRPM) / Range, 0.0f, 1.0f);
 }
+
+// ==========================================
+// AUDIO PARAMETER OUTPUT
+// ==========================================
+
+void UMGEngineAudioComponent::SetBoost(float NewBoost)
+{
+	// Detect BOV condition: throttle closed quickly while at high boost
+	if (CurrentBoost > 0.5f && CurrentThrottle < 0.2f && PreviousThrottle > 0.7f)
+	{
+		TriggerBlowOffValve();
+	}
+
+	PreviousThrottle = CurrentThrottle;
+	CurrentBoost = FMath::Clamp(NewBoost, 0.0f, 1.0f);
+}
+
+FMGEngineAudioParams UMGEngineAudioComponent::GetAudioParams() const
+{
+	FMGEngineAudioParams Params;
+
+	Params.RPMNormalized = GetNormalizedRPM();
+	Params.LoadNormalized = FMath::Clamp(CurrentLoad, 0.0f, 1.0f);
+	Params.ThrottleNormalized = FMath::Clamp(CurrentThrottle, 0.0f, 1.0f);
+	Params.BoostNormalized = FMath::Clamp(CurrentBoost, 0.0f, 1.0f);
+
+	// Normalize gear (0 = reverse, 0.5 = neutral, 1 = max gear)
+	if (MaxGears > 0)
+	{
+		Params.GearNormalized = FMath::Clamp((float)(CurrentGear + 1) / (float)(MaxGears + 1), 0.0f, 1.0f);
+	}
+
+	Params.bOnThrottle = CurrentThrottle > ThrottleOnThreshold;
+	Params.bAtLimiter = CurrentRPM >= Preset.LimiterRPM - 50.0f;
+	Params.bDecel = !Params.bOnThrottle && Params.RPMNormalized > 0.3f;
+
+	return Params;
+}
+
+void UMGEngineAudioComponent::TriggerBackfire()
+{
+	bBackfireTriggered = true;
+	OnExhaustPop.Broadcast();
+
+	// Reset on next tick
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+	{
+		bBackfireTriggered = false;
+	});
+}
+
+void UMGEngineAudioComponent::TriggerBlowOffValve()
+{
+	bBOVTriggered = true;
+
+	// Reset on next tick
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+	{
+		bBOVTriggered = false;
+	});
+}

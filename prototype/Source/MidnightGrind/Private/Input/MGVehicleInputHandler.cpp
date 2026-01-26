@@ -5,6 +5,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/PlayerController.h"
+#include "RacingWheel/MGRacingWheelSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 UMGVehicleInputHandler::UMGVehicleInputHandler()
 {
@@ -89,6 +91,9 @@ void UMGVehicleInputHandler::BeginPlay()
 
 	// Detect initial controller type
 	DetectControllerType();
+
+	// Cache racing wheel subsystem
+	CacheRacingWheelSubsystem();
 }
 
 void UMGVehicleInputHandler::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -98,6 +103,12 @@ void UMGVehicleInputHandler::TickComponent(float DeltaTime, ELevelTick TickType,
 	if (CurrentInputMode == EMGVehicleInputMode::Disabled || CurrentInputMode == EMGVehicleInputMode::Menu)
 	{
 		return;
+	}
+
+	// Check for racing wheel input first
+	if (IsRacingWheelConnected())
+	{
+		ProcessRacingWheelInput();
 	}
 
 	// Process steering with assists
@@ -181,6 +192,15 @@ void UMGVehicleInputHandler::SetContinuousForceFeedback(float LeftIntensity, flo
 	float ScaledLeft = LeftIntensity * SensitivitySettings.ForceFeedbackStrength;
 	float ScaledRight = RightIntensity * SensitivitySettings.ForceFeedbackStrength;
 
+	// Route to racing wheel if connected
+	if (IsRacingWheelConnected())
+	{
+		RouteFFBToWheel(ScaledLeft, ScaledRight);
+		bForceFeedbackActive = true;
+		return;
+	}
+
+	// Fall back to gamepad vibration
 	if (APlayerController* PC = Cast<APlayerController>(Cast<APawn>(GetOwner())->GetController()))
 	{
 		PC->PlayDynamicForceFeedback(ScaledLeft, -1.0f, true, false, false, false);
@@ -431,13 +451,86 @@ void UMGVehicleInputHandler::ApplyInputsToVehicle()
 
 void UMGVehicleInputHandler::DetectControllerType()
 {
-	// Would detect based on last input device used
-	// For now, default to gamepad
+	// Check for racing wheel first
+	if (RacingWheelSubsystem && RacingWheelSubsystem->IsWheelConnected())
+	{
+		if (DetectedControllerType != EMGControllerType::RacingWheel)
+		{
+			DetectedControllerType = EMGControllerType::RacingWheel;
+			OnControllerTypeChanged.Broadcast(DetectedControllerType);
+		}
+		return;
+	}
+
+	// Default to gamepad
 	EMGControllerType NewType = EMGControllerType::Gamepad;
 
 	if (DetectedControllerType != NewType)
 	{
 		DetectedControllerType = NewType;
 		OnControllerTypeChanged.Broadcast(NewType);
+	}
+}
+
+bool UMGVehicleInputHandler::IsRacingWheelConnected() const
+{
+	return RacingWheelSubsystem && RacingWheelSubsystem->IsWheelConnected();
+}
+
+void UMGVehicleInputHandler::CacheRacingWheelSubsystem()
+{
+	if (UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this))
+	{
+		RacingWheelSubsystem = GameInstance->GetSubsystem<UMGRacingWheelSubsystem>();
+	}
+}
+
+void UMGVehicleInputHandler::ProcessRacingWheelInput()
+{
+	if (!RacingWheelSubsystem || !RacingWheelSubsystem->IsWheelConnected())
+	{
+		return;
+	}
+
+	// Get input directly from wheel subsystem
+	CurrentInputState.Steering = RacingWheelSubsystem->GetSteeringInput();
+	CurrentInputState.Throttle = RacingWheelSubsystem->GetThrottleInput();
+	CurrentInputState.Brake = RacingWheelSubsystem->GetBrakeInput();
+	CurrentInputState.Clutch = RacingWheelSubsystem->GetClutchInput();
+
+	// Handle paddle shifter events
+	if (RacingWheelSubsystem->WasShiftUpPressed() && !AssistSettings.bAutoShift)
+	{
+		CurrentInputState.bShiftUpRequested = true;
+		OnGearShift.Broadcast(true);
+	}
+	if (RacingWheelSubsystem->WasShiftDownPressed() && !AssistSettings.bAutoShift)
+	{
+		CurrentInputState.bShiftDownRequested = true;
+		OnGearShift.Broadcast(false);
+	}
+}
+
+void UMGVehicleInputHandler::RouteFFBToWheel(float LeftIntensity, float RightIntensity)
+{
+	if (!RacingWheelSubsystem || !RacingWheelSubsystem->IsWheelConnected())
+	{
+		return;
+	}
+
+	// Convert stereo gamepad vibration to wheel FFB
+	// For wheels, we typically want directional force rather than vibration
+	// Use the difference between left and right for direction
+	float Direction = RightIntensity - LeftIntensity;
+	float Magnitude = (LeftIntensity + RightIntensity) * 0.5f;
+
+	if (FMath::Abs(Magnitude) > 0.01f)
+	{
+		FMGFFBEffect Effect;
+		Effect.EffectType = EMGFFBEffectType::ConstantForce;
+		Effect.Magnitude = FMath::Clamp(Direction, -1.0f, 1.0f) * Magnitude;
+		Effect.Duration = 0.1f; // Short pulse
+
+		RacingWheelSubsystem->PlayFFBEffect(Effect);
 	}
 }

@@ -386,6 +386,9 @@ FText UMGEconomySubsystem::GetTransactionTypeName(EMGTransactionType Type)
 		case EMGTransactionType::CrewBonus:		return NSLOCTEXT("Transaction", "CrewBonus", "Crew Bonus");
 		case EMGTransactionType::Wager:			return NSLOCTEXT("Transaction", "Wager", "Wager");
 		case EMGTransactionType::DynoRental:	return NSLOCTEXT("Transaction", "DynoRental", "Dyno Rental");
+		case EMGTransactionType::ToolPurchase:	return NSLOCTEXT("Transaction", "ToolPurchase", "Tool Purchase");
+		case EMGTransactionType::GarageUpgrade:	return NSLOCTEXT("Transaction", "GarageUpgrade", "Garage Upgrade");
+		case EMGTransactionType::FuelPurchase:	return NSLOCTEXT("Transaction", "FuelPurchase", "Fuel Purchase");
 		default:								return NSLOCTEXT("Transaction", "Other", "Other");
 	}
 }

@@ -579,6 +579,6 @@ void UMGCrossPlaySubsystem::UpdateSessionStats()
         MaxLat = FMath::Max(MaxLat, static_cast<int32>(Player.Latency));
     }
 
-    CurrentSession.AverageLatency = TotalLatency / CurrentSession.Players.Num();
+    CurrentSession.AverageLatency = (CurrentSession.Players.Num() > 0) ? TotalLatency / CurrentSession.Players.Num() : 0;
     CurrentSession.MaxLatency = MaxLat;
 }

@@ -10,6 +10,7 @@
 class UInputMappingContext;
 class UInputAction;
 class AMGVehiclePawn;
+class UMGRacingWheelSubsystem;
 
 /**
  * Input mode for vehicle control
@@ -259,6 +260,18 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Input|Mode")
 	EMGControllerType GetControllerType() const { return DetectedControllerType; }
 
+	/**
+	 * Check if a racing wheel is connected
+	 */
+	UFUNCTION(BlueprintPure, Category = "Input|Mode")
+	bool IsRacingWheelConnected() const;
+
+	/**
+	 * Get the racing wheel subsystem
+	 */
+	UFUNCTION(BlueprintPure, Category = "Input|Mode")
+	UMGRacingWheelSubsystem* GetRacingWheelSubsystem() const { return RacingWheelSubsystem; }
+
 	// ==========================================
 	// INPUT STATE
 	// ==========================================
@@ -497,4 +510,17 @@ private:
 
 	/** Force feedback timer */
 	float ForceFeedbackTimer = 0.0f;
+
+	/** Racing wheel subsystem reference */
+	UPROPERTY()
+	TObjectPtr<UMGRacingWheelSubsystem> RacingWheelSubsystem;
+
+	/** Cache wheel subsystem */
+	void CacheRacingWheelSubsystem();
+
+	/** Process input from racing wheel if connected */
+	void ProcessRacingWheelInput();
+
+	/** Route FFB to wheel subsystem when connected */
+	void RouteFFBToWheel(float LeftIntensity, float RightIntensity);
 };
