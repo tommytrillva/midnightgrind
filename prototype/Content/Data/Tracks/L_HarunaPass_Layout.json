@@ -1,0 +1,338 @@
+{
+  "TrackID": "HARUNA_PASS_01",
+  "DisplayName": "Mt. Haruna Pass",
+  "Description": "A legendary mountain touge course winding through dense forests. Tight hairpins, blind crests, and treacherous drops demand respect. Only the brave race here after dark.",
+  "Type": "PointToPoint",
+  "Environment": "Mountain",
+  "TimeOfDay": "Night",
+  "Weather": "Clear",
+  "RaceType": "Touge",
+
+  "Dimensions": {
+    "Length": 4800,
+    "LengthUnit": "meters",
+    "Width": 8,
+    "WidthUnit": "meters",
+    "Elevation": "Mountain",
+    "MaxElevationChange": 380,
+    "StartElevation": 1200,
+    "EndElevation": 820
+  },
+
+  "Layout": {
+    "Type": "Downhill Touge",
+    "Direction": "Downhill",
+    "Sections": [
+      {
+        "ID": "S01_Summit",
+        "Type": "Straight",
+        "Length": 200,
+        "Width": 8,
+        "Surface": "Asphalt",
+        "Elevation": 1200,
+        "Features": ["StartLine", "Overlook", "GuardRail"]
+      },
+      {
+        "ID": "S02_FirstHairpin",
+        "Type": "Hairpin",
+        "Radius": 15,
+        "Angle": 180,
+        "Direction": "Right",
+        "Width": 7,
+        "Surface": "Asphalt",
+        "Banking": -3,
+        "Elevation": 1180,
+        "Features": ["Apex", "GuardRail", "DropOff"]
+      },
+      {
+        "ID": "S03_ForestStraight",
+        "Type": "Straight",
+        "Length": 350,
+        "Width": 8,
+        "Surface": "Asphalt",
+        "Elevation": 1150,
+        "Features": ["BlindCrest", "TreeLine"]
+      },
+      {
+        "ID": "S04_S_Curves",
+        "Type": "Chicane",
+        "Sections": [
+          { "Direction": "Left", "Radius": 30, "Angle": 45 },
+          { "Direction": "Right", "Radius": 25, "Angle": 60 }
+        ],
+        "Width": 7,
+        "Surface": "Asphalt",
+        "Elevation": 1100,
+        "Features": ["DriftZone"]
+      },
+      {
+        "ID": "S05_DropStraight",
+        "Type": "Straight",
+        "Length": 280,
+        "Width": 8,
+        "Surface": "Asphalt",
+        "Gradient": -8,
+        "Elevation": 1050,
+        "Features": ["Steep"]
+      },
+      {
+        "ID": "S06_SecondHairpin",
+        "Type": "Hairpin",
+        "Radius": 12,
+        "Angle": 180,
+        "Direction": "Left",
+        "Width": 7,
+        "Surface": "Asphalt",
+        "Banking": -2,
+        "Elevation": 1000,
+        "Features": ["Apex", "TightEntry", "Gutter"]
+      },
+      {
+        "ID": "S07_MidSection",
+        "Type": "Winding",
+        "Length": 600,
+        "Corners": [
+          { "Direction": "Right", "Radius": 40, "Angle": 35 },
+          { "Direction": "Left", "Radius": 50, "Angle": 40 },
+          { "Direction": "Right", "Radius": 35, "Angle": 50 }
+        ],
+        "Width": 8,
+        "Surface": "Asphalt",
+        "Elevation": 950,
+        "Features": ["Flowing", "TreeTunnel"]
+      },
+      {
+        "ID": "S08_ThirdHairpin",
+        "Type": "Hairpin",
+        "Radius": 18,
+        "Angle": 180,
+        "Direction": "Right",
+        "Width": 7,
+        "Surface": "Asphalt",
+        "Banking": -4,
+        "Elevation": 880,
+        "Features": ["Apex", "DriftZone", "Cliff"]
+      },
+      {
+        "ID": "S09_LowerForest",
+        "Type": "Straight",
+        "Length": 400,
+        "Width": 8,
+        "Surface": "Asphalt",
+        "Elevation": 850,
+        "Features": ["SpeedTrap", "GuardRail"]
+      },
+      {
+        "ID": "S10_FinalSweeper",
+        "Type": "Corner",
+        "Radius": 80,
+        "Angle": 90,
+        "Direction": "Left",
+        "Width": 9,
+        "Surface": "Asphalt",
+        "Banking": 2,
+        "Elevation": 830,
+        "Features": ["HighSpeed", "DriftZone"]
+      },
+      {
+        "ID": "S11_FinishStraight",
+        "Type": "Straight",
+        "Length": 250,
+        "Width": 10,
+        "Surface": "Asphalt",
+        "Elevation": 820,
+        "Features": ["FinishLine", "ParkingLot"]
+      }
+    ],
+    "TotalCorners": 12,
+    "TotalHairpins": 3,
+    "LongestStraight": 400
+  },
+
+  "Checkpoints": [
+    {
+      "ID": "CP_Start",
+      "Position": { "X": 0, "Y": 0, "Z": 1200 },
+      "Type": "Start",
+      "Width": 10,
+      "Index": 0
+    },
+    {
+      "ID": "CP_Sector1",
+      "Position": { "X": 400, "Y": 200, "Z": 1100 },
+      "Type": "Sector",
+      "Width": 10,
+      "Index": 1
+    },
+    {
+      "ID": "CP_Sector2",
+      "Position": { "X": 800, "Y": 600, "Z": 950 },
+      "Type": "Sector",
+      "Width": 10,
+      "Index": 2
+    },
+    {
+      "ID": "CP_Sector3",
+      "Position": { "X": 1000, "Y": 1200, "Z": 850 },
+      "Type": "Sector",
+      "Width": 10,
+      "Index": 3
+    },
+    {
+      "ID": "CP_Finish",
+      "Position": { "X": 1200, "Y": 1500, "Z": 820 },
+      "Type": "Finish",
+      "Width": 12,
+      "Index": 4
+    }
+  ],
+
+  "StartGrid": {
+    "Positions": [
+      { "Position": { "X": 0, "Y": 0, "Z": 1200 }, "Rotation": 180, "GridSlot": 1 },
+      { "Position": { "X": -15, "Y": -3, "Z": 1200 }, "Rotation": 180, "GridSlot": 2 }
+    ],
+    "MaxParticipants": 2,
+    "FormationType": "Side-by-Side"
+  },
+
+  "Environment": {
+    "Lighting": {
+      "TimeOfDay": "Night",
+      "MoonPhase": "Waning",
+      "AmbientIntensity": 0.08,
+      "DirectionalIntensity": 0.15,
+      "DirectionalColor": "#B8C4D0"
+    },
+    "Atmosphere": {
+      "FogDensity": 0.015,
+      "FogColor": "#1A2030",
+      "FogStartDistance": 200,
+      "FogEndDistance": 2000
+    },
+    "TrackLighting": [
+      {
+        "Type": "None",
+        "Notes": "Touge has no track lighting - headlights only"
+      }
+    ],
+    "Props": [
+      { "Type": "GuardRail", "Placement": "CliffEdges" },
+      { "Type": "Tree", "Placement": "ForestSections", "Density": "Dense" },
+      { "Type": "Rock", "Placement": "Cliffside", "Density": "Medium" },
+      { "Type": "Shrine", "Placement": "Summit", "Count": 1 },
+      { "Type": "Vending", "Placement": "Parking", "Count": 2 },
+      { "Type": "Cone", "Placement": "Hairpins", "Count": 6 }
+    ],
+    "Hazards": [
+      { "Type": "Cliff", "Location": "S02, S06, S08", "Severity": "Fatal" },
+      { "Type": "Leaves", "Location": "ForestSections", "GripReduction": 0.15 },
+      { "Type": "Gravel", "Location": "CornerExits", "GripReduction": 0.4 }
+    ]
+  },
+
+  "Gutters": {
+    "Enabled": true,
+    "Locations": [
+      { "Section": "S02_FirstHairpin", "Side": "Inside", "Depth": 0.15 },
+      { "Section": "S06_SecondHairpin", "Side": "Inside", "Depth": 0.12 },
+      { "Section": "S08_ThirdHairpin", "Side": "Inside", "Depth": 0.18 }
+    ],
+    "SpeedBonus": 0.05,
+    "DamageRisk": 0.1
+  },
+
+  "DriftZones": [
+    {
+      "ID": "DZ_FirstHairpin",
+      "Section": "S02",
+      "StartOffset": 0,
+      "EndOffset": 180,
+      "Multiplier": 1.5
+    },
+    {
+      "ID": "DZ_SCurves",
+      "Section": "S04",
+      "StartOffset": 0,
+      "EndOffset": 150,
+      "Multiplier": 1.3
+    },
+    {
+      "ID": "DZ_SecondHairpin",
+      "Section": "S06",
+      "StartOffset": 0,
+      "EndOffset": 180,
+      "Multiplier": 1.6
+    },
+    {
+      "ID": "DZ_ThirdHairpin",
+      "Section": "S08",
+      "StartOffset": 0,
+      "EndOffset": 180,
+      "Multiplier": 1.8
+    },
+    {
+      "ID": "DZ_FinalSweeper",
+      "Section": "S10",
+      "StartOffset": 0,
+      "EndOffset": 200,
+      "Multiplier": 1.4
+    }
+  ],
+
+  "Records": {
+    "LapRecord": {
+      "Time": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    },
+    "TopSpeed": {
+      "Speed": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    },
+    "BestDriftScore": {
+      "Score": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    }
+  },
+
+  "RaceConfigurations": [
+    {
+      "Name": "Touge Battle",
+      "Type": "Chase",
+      "Participants": 2,
+      "AIEnabled": true,
+      "Notes": "Lead car sets pace, chaser tries to pass or gap to win"
+    },
+    {
+      "Name": "Time Attack",
+      "Type": "TimeAttack",
+      "Participants": 1,
+      "AIEnabled": false,
+      "GhostCar": true
+    },
+    {
+      "Name": "Drift Run",
+      "Type": "DriftAttack",
+      "Participants": 1,
+      "AIEnabled": false,
+      "ScoreMode": "DriftPoints"
+    },
+    {
+      "Name": "Pink Slip Battle",
+      "Type": "PinkSlip",
+      "Participants": 2,
+      "AIEnabled": true,
+      "Stakes": "Vehicle"
+    }
+  ],
+
+  "Lore": {
+    "History": "Mt. Haruna has been a proving ground for street racers since the 1980s. Its unforgiving hairpins have claimed many cars and careers. Local legend speaks of a driver who mastered the gutter technique here, forever changing how the mountain was run.",
+    "LocalCrew": "Haruna Speed Stars",
+    "Difficulty": "Expert",
+    "Reputation": "Legendary"
+  }
+}

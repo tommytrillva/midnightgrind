@@ -1,0 +1,315 @@
+{
+  "TrackID": "WANGAN_HIGHWAY_01",
+  "DisplayName": "Bayshore Highway",
+  "Description": "The ultimate test of top speed. This coastal highway stretches into the night, where only the fastest machines dare to compete. Traffic weaves through the lanes as racers push past 200mph.",
+  "Type": "PointToPoint",
+  "Environment": "Highway",
+  "TimeOfDay": "Night",
+  "Weather": "Clear",
+  "RaceType": "Highway",
+
+  "Dimensions": {
+    "Length": 12000,
+    "LengthUnit": "meters",
+    "Width": 16,
+    "WidthUnit": "meters",
+    "Lanes": 4,
+    "Elevation": "Flat",
+    "MaxElevationChange": 15
+  },
+
+  "Layout": {
+    "Type": "Highway Sprint",
+    "Direction": "Eastbound",
+    "Sections": [
+      {
+        "ID": "S01_OnRamp",
+        "Type": "MergeRamp",
+        "Length": 300,
+        "Width": 8,
+        "Surface": "Asphalt",
+        "Features": ["StartLine", "Merge"]
+      },
+      {
+        "ID": "S02_MainStretch1",
+        "Type": "Straight",
+        "Length": 3000,
+        "Width": 16,
+        "Lanes": 4,
+        "Surface": "Asphalt",
+        "Features": ["Traffic", "SpeedTrap"]
+      },
+      {
+        "ID": "S03_BridgeSection",
+        "Type": "Bridge",
+        "Length": 1500,
+        "Width": 16,
+        "Lanes": 4,
+        "Surface": "Concrete",
+        "Features": ["NoShoulder", "ExpansionJoints", "OceanView"]
+      },
+      {
+        "ID": "S04_Sweeper",
+        "Type": "Corner",
+        "Radius": 800,
+        "Angle": 45,
+        "Direction": "Right",
+        "Width": 16,
+        "Lanes": 4,
+        "Surface": "Asphalt",
+        "Banking": 4,
+        "Features": ["HighSpeed", "Traffic"]
+      },
+      {
+        "ID": "S05_MainStretch2",
+        "Type": "Straight",
+        "Length": 2500,
+        "Width": 16,
+        "Lanes": 4,
+        "Surface": "Asphalt",
+        "Features": ["Traffic", "Overpass"]
+      },
+      {
+        "ID": "S06_TunnelEntry",
+        "Type": "Straight",
+        "Length": 500,
+        "Width": 14,
+        "Lanes": 4,
+        "Surface": "Asphalt",
+        "Features": ["TunnelStart"]
+      },
+      {
+        "ID": "S07_Tunnel",
+        "Type": "Tunnel",
+        "Length": 2000,
+        "Width": 14,
+        "Lanes": 4,
+        "Surface": "Concrete",
+        "Features": ["Enclosed", "Echoes", "NoEmergencyLane"]
+      },
+      {
+        "ID": "S08_TunnelExit",
+        "Type": "Straight",
+        "Length": 500,
+        "Width": 16,
+        "Lanes": 4,
+        "Surface": "Asphalt",
+        "Features": ["TunnelEnd", "LightChange"]
+      },
+      {
+        "ID": "S09_FinalStretch",
+        "Type": "Straight",
+        "Length": 1700,
+        "Width": 16,
+        "Lanes": 4,
+        "Surface": "Asphalt",
+        "Features": ["Traffic", "FinishLine", "OffRamp"]
+      }
+    ],
+    "TotalCorners": 1,
+    "LongestStraight": 3000
+  },
+
+  "Traffic": {
+    "Enabled": true,
+    "Density": "Medium",
+    "Types": [
+      { "Type": "Sedan", "Percent": 40, "Speed": 60 },
+      { "Type": "Truck", "Percent": 25, "Speed": 50 },
+      { "Type": "Sports", "Percent": 15, "Speed": 70 },
+      { "Type": "Van", "Percent": 15, "Speed": 55 },
+      { "Type": "Bus", "Percent": 5, "Speed": 45 }
+    ],
+    "LaneUsage": {
+      "RightLane": "Trucks, Slow Traffic",
+      "MiddleLanes": "Mixed",
+      "LeftLane": "Fast Traffic, Clear"
+    },
+    "Behavior": {
+      "LaneChange": true,
+      "Braking": true,
+      "Honking": true,
+      "Reaction": "Startled"
+    }
+  },
+
+  "Checkpoints": [
+    {
+      "ID": "CP_Start",
+      "Position": { "X": 0, "Y": 0, "Z": 0 },
+      "Type": "Start",
+      "Width": 20,
+      "Index": 0
+    },
+    {
+      "ID": "CP_Sector1",
+      "Position": { "X": 3000, "Y": 0, "Z": 0 },
+      "Type": "Sector",
+      "Width": 20,
+      "Index": 1
+    },
+    {
+      "ID": "CP_Bridge",
+      "Position": { "X": 4500, "Y": 0, "Z": 5 },
+      "Type": "SpeedTrap",
+      "Width": 20,
+      "Index": 2
+    },
+    {
+      "ID": "CP_Sector2",
+      "Position": { "X": 7500, "Y": 400, "Z": 0 },
+      "Type": "Sector",
+      "Width": 20,
+      "Index": 3
+    },
+    {
+      "ID": "CP_Tunnel",
+      "Position": { "X": 9000, "Y": 400, "Z": -10 },
+      "Type": "SpeedTrap",
+      "Width": 18,
+      "Index": 4
+    },
+    {
+      "ID": "CP_Finish",
+      "Position": { "X": 12000, "Y": 400, "Z": 0 },
+      "Type": "Finish",
+      "Width": 20,
+      "Index": 5
+    }
+  ],
+
+  "StartGrid": {
+    "Positions": [
+      { "Position": { "X": 0, "Y": 0, "Z": 0 }, "Rotation": 0, "GridSlot": 1 },
+      { "Position": { "X": -15, "Y": 4, "Z": 0 }, "Rotation": 0, "GridSlot": 2 },
+      { "Position": { "X": -30, "Y": 0, "Z": 0 }, "Rotation": 0, "GridSlot": 3 },
+      { "Position": { "X": -45, "Y": 4, "Z": 0 }, "Rotation": 0, "GridSlot": 4 }
+    ],
+    "MaxParticipants": 4,
+    "FormationType": "Rolling"
+  },
+
+  "Environment": {
+    "Lighting": {
+      "TimeOfDay": "Night",
+      "MoonPhase": "New",
+      "AmbientIntensity": 0.1,
+      "DirectionalIntensity": 0.05,
+      "DirectionalColor": "#A0A0C0"
+    },
+    "Atmosphere": {
+      "FogDensity": 0.008,
+      "FogColor": "#101020",
+      "FogStartDistance": 1000,
+      "FogEndDistance": 8000
+    },
+    "TrackLighting": [
+      {
+        "Type": "HighwayLight",
+        "Spacing": 100,
+        "Color": "#FFE4B0",
+        "Intensity": 30000,
+        "Height": 15
+      },
+      {
+        "Type": "TunnelLight",
+        "Spacing": 25,
+        "Color": "#FFD080",
+        "Intensity": 50000,
+        "Height": 5
+      }
+    ],
+    "Props": [
+      { "Type": "HighwaySign", "Placement": "Overpasses" },
+      { "Type": "Barrier", "Placement": "Median" },
+      { "Type": "GuardRail", "Placement": "Shoulders" },
+      { "Type": "Building", "Placement": "Background", "Type": "Skyline" },
+      { "Type": "Billboard", "Placement": "Roadside", "Count": 8 }
+    ],
+    "Skyline": {
+      "Enabled": true,
+      "Buildings": "Tokyo-style",
+      "LightDensity": "High"
+    },
+    "Ocean": {
+      "Enabled": true,
+      "Location": "BridgeSection",
+      "Reflection": true
+    }
+  },
+
+  "SpeedTraps": [
+    {
+      "ID": "ST_Bridge",
+      "Position": { "X": 4500, "Y": 0, "Z": 5 },
+      "Name": "Bayshore Bridge",
+      "TargetSpeed": 180
+    },
+    {
+      "ID": "ST_Tunnel",
+      "Position": { "X": 9000, "Y": 400, "Z": -10 },
+      "Name": "Tunnel Sprint",
+      "TargetSpeed": 200
+    }
+  ],
+
+  "Records": {
+    "LapRecord": {
+      "Time": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    },
+    "TopSpeed": {
+      "Speed": 0,
+      "Holder": "None",
+      "Vehicle": "None",
+      "Location": "Bridge"
+    },
+    "FastestRun": {
+      "Time": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    }
+  },
+
+  "RaceConfigurations": [
+    {
+      "Name": "Highway Battle",
+      "Type": "Sprint",
+      "Participants": 2,
+      "Traffic": true,
+      "AIEnabled": true
+    },
+    {
+      "Name": "Speed Attack",
+      "Type": "TopSpeed",
+      "Participants": 1,
+      "Traffic": false,
+      "AIEnabled": false,
+      "Target": "MaxSpeed"
+    },
+    {
+      "Name": "C1 Style",
+      "Type": "Sprint",
+      "Participants": 4,
+      "Traffic": true,
+      "AIEnabled": true,
+      "Notes": "Full pack highway racing"
+    },
+    {
+      "Name": "Time Trial",
+      "Type": "TimeAttack",
+      "Participants": 1,
+      "Traffic": true,
+      "AIEnabled": false,
+      "GhostCar": true
+    }
+  ],
+
+  "Lore": {
+    "History": "The Bayshore Highway has been the domain of speed kings since the expressway opened. Here, raw horsepower matters more than handling finesse. The legendary midnight battles draw racers from across the country, all seeking to claim the title of fastest on the bay.",
+    "LocalCrew": "Midnight Club",
+    "Difficulty": "Advanced",
+    "Reputation": "Speed Kings"
+  }
+}

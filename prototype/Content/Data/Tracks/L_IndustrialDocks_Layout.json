@@ -1,0 +1,260 @@
+{
+  "TrackID": "INDUSTRIAL_DOCKS_01",
+  "DisplayName": "Port District",
+  "Description": "A sprawling industrial port with container yards, warehouses, and loading docks. The open spaces between shipping containers create a labyrinth perfect for drift competitions and crew meets.",
+  "Type": "FreeRoam",
+  "Environment": "Industrial",
+  "TimeOfDay": "Night",
+  "Weather": "Clear",
+  "RaceType": "FreeRoam",
+
+  "Dimensions": {
+    "AreaSize": 2000,
+    "AreaSizeUnit": "meters",
+    "Elevation": "Flat",
+    "MaxElevationChange": 5
+  },
+
+  "Layout": {
+    "Type": "Open Area",
+    "Zones": [
+      {
+        "ID": "Z01_MainYard",
+        "Type": "OpenArea",
+        "Size": { "Width": 400, "Length": 600 },
+        "Surface": "Concrete",
+        "Features": ["MeetSpot", "Drift Practice", "Spectator Area"]
+      },
+      {
+        "ID": "Z02_ContainerMaze",
+        "Type": "Maze",
+        "Size": { "Width": 300, "Length": 400 },
+        "Surface": "Asphalt",
+        "Features": ["TightCorners", "Shortcuts", "Hidden Routes"]
+      },
+      {
+        "ID": "Z03_LoadingDock",
+        "Type": "Covered",
+        "Size": { "Width": 200, "Length": 300 },
+        "Surface": "Concrete",
+        "Features": ["Warehouse", "RollerDoors", "Echo"]
+      },
+      {
+        "ID": "Z04_PierStrip",
+        "Type": "Straight",
+        "Length": 500,
+        "Width": 20,
+        "Surface": "Concrete",
+        "Features": ["Drag Strip", "Water Edge", "Crane"]
+      },
+      {
+        "ID": "Z05_ParkingStructure",
+        "Type": "MultiLevel",
+        "Levels": 3,
+        "Size": { "Width": 150, "Length": 200 },
+        "Surface": "Concrete",
+        "Features": ["Ramps", "DriftZone", "View"]
+      }
+    ],
+    "Connections": [
+      { "From": "Z01_MainYard", "To": "Z02_ContainerMaze", "Type": "Open" },
+      { "From": "Z01_MainYard", "To": "Z03_LoadingDock", "Type": "Gate" },
+      { "From": "Z01_MainYard", "To": "Z04_PierStrip", "Type": "Open" },
+      { "From": "Z02_ContainerMaze", "To": "Z05_ParkingStructure", "Type": "Ramp" }
+    ]
+  },
+
+  "Courses": {
+    "DriftCourse": {
+      "ID": "DOCK_DRIFT_01",
+      "Name": "Container Slide",
+      "Type": "Drift",
+      "Length": 800,
+      "Checkpoints": [
+        { "ID": "DD_Start", "Position": { "X": 100, "Y": 100, "Z": 0 } },
+        { "ID": "DD_Turn1", "Position": { "X": 250, "Y": 150, "Z": 0 } },
+        { "ID": "DD_Turn2", "Position": { "X": 350, "Y": 300, "Z": 0 } },
+        { "ID": "DD_Turn3", "Position": { "X": 200, "Y": 400, "Z": 0 } },
+        { "ID": "DD_Finish", "Position": { "X": 100, "Y": 350, "Z": 0 } }
+      ],
+      "DriftZones": [
+        { "ID": "DDZ_1", "StartCP": "DD_Turn1", "EndCP": "DD_Turn2", "Multiplier": 1.5 },
+        { "ID": "DDZ_2", "StartCP": "DD_Turn2", "EndCP": "DD_Turn3", "Multiplier": 1.8 },
+        { "ID": "DDZ_3", "StartCP": "DD_Turn3", "EndCP": "DD_Finish", "Multiplier": 1.3 }
+      ]
+    },
+    "CircuitCourse": {
+      "ID": "DOCK_CIRCUIT_01",
+      "Name": "Port Run",
+      "Type": "Circuit",
+      "Length": 2200,
+      "Laps": 3,
+      "Sections": [
+        { "ID": "PC_Start", "Type": "Straight", "Length": 300 },
+        { "ID": "PC_Turn1", "Type": "Corner", "Radius": 40, "Angle": 90 },
+        { "ID": "PC_Container", "Type": "Chicane", "Length": 400 },
+        { "ID": "PC_Turn2", "Type": "Corner", "Radius": 30, "Angle": 90 },
+        { "ID": "PC_Pier", "Type": "Straight", "Length": 450 },
+        { "ID": "PC_Turn3", "Type": "Hairpin", "Radius": 15, "Angle": 180 },
+        { "ID": "PC_Warehouse", "Type": "Straight", "Length": 250 },
+        { "ID": "PC_Turn4", "Type": "Corner", "Radius": 50, "Angle": 90 },
+        { "ID": "PC_Return", "Type": "Straight", "Length": 350 }
+      ]
+    },
+    "DragStrip": {
+      "ID": "DOCK_DRAG_01",
+      "Name": "Pier Drag",
+      "Type": "Drag",
+      "Length": 402,
+      "Lanes": 2,
+      "Surface": "Concrete",
+      "Features": ["Christmas Tree", "Timing System", "Burnout Box"]
+    }
+  },
+
+  "MeetSpots": [
+    {
+      "ID": "MS_MainYard",
+      "Name": "Container Yard Meet",
+      "Capacity": 50,
+      "Features": ["Showcase", "Trade", "Challenge"],
+      "Unlocks": { "REPTier": "ROOKIE", "Level": 5 }
+    },
+    {
+      "ID": "MS_ParkingRoof",
+      "Name": "Rooftop Overlook",
+      "Capacity": 20,
+      "Features": ["View", "Private", "Crew Only"],
+      "Unlocks": { "REPTier": "RESPECTED", "Level": 15 }
+    }
+  ],
+
+  "Environment": {
+    "Lighting": {
+      "TimeOfDay": "Night",
+      "MoonPhase": "Half",
+      "AmbientIntensity": 0.12,
+      "DirectionalIntensity": 0.08,
+      "DirectionalColor": "#C0C8D0"
+    },
+    "Atmosphere": {
+      "FogDensity": 0.02,
+      "FogColor": "#1C2028",
+      "FogStartDistance": 300,
+      "FogEndDistance": 2500
+    },
+    "TrackLighting": [
+      {
+        "Type": "IndustrialFlood",
+        "Placement": "YardCorners",
+        "Color": "#FFE0B0",
+        "Intensity": 80000,
+        "Height": 25
+      },
+      {
+        "Type": "StreetLight",
+        "Spacing": 40,
+        "Color": "#FFC070",
+        "Intensity": 25000,
+        "Height": 10
+      },
+      {
+        "Type": "WarehouseLight",
+        "Placement": "Interior",
+        "Color": "#FFD080",
+        "Intensity": 15000,
+        "Height": 6
+      }
+    ],
+    "Props": [
+      { "Type": "Container", "Placement": "Maze", "Count": 150, "Colors": ["Red", "Blue", "Green", "Yellow", "Orange"] },
+      { "Type": "Crane", "Placement": "Pier", "Count": 3 },
+      { "Type": "Forklift", "Placement": "Warehouse", "Count": 8 },
+      { "Type": "Pallet", "Placement": "Random", "Count": 50 },
+      { "Type": "Barrel", "Placement": "Random", "Count": 30 },
+      { "Type": "Light Tower", "Placement": "Yard", "Count": 4 },
+      { "Type": "Fence", "Placement": "Perimeter" },
+      { "Type": "SecurityBooth", "Placement": "Entrance", "Count": 1 }
+    ],
+    "Water": {
+      "Enabled": true,
+      "Location": "PierEdge",
+      "Reflection": true
+    }
+  },
+
+  "Hazards": [
+    { "Type": "WaterEdge", "Location": "Z04_PierStrip", "Severity": "Instant Reset" },
+    { "Type": "Container", "Location": "Z02_ContainerMaze", "Severity": "Collision" },
+    { "Type": "Barrier", "Location": "Perimeter", "Severity": "Collision" }
+  ],
+
+  "Police": {
+    "PatrolEnabled": true,
+    "PatrolRoutes": [
+      { "Route": "Perimeter", "Frequency": "Low" },
+      { "Route": "MainEntrance", "Frequency": "Medium" }
+    ],
+    "ResponseTime": 45,
+    "MaxUnits": 4,
+    "SpawnPoints": [
+      { "Position": { "X": 0, "Y": 0, "Z": 0 }, "Name": "Main Gate" },
+      { "Position": { "X": 500, "Y": 600, "Z": 0 }, "Name": "North Gate" }
+    ]
+  },
+
+  "Records": {
+    "DriftHighScore": {
+      "Score": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    },
+    "CircuitLap": {
+      "Time": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    },
+    "DragQuarter": {
+      "Time": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    }
+  },
+
+  "RaceConfigurations": [
+    {
+      "Name": "Drift Battle",
+      "Type": "Drift",
+      "Course": "DOCK_DRIFT_01",
+      "Participants": 2,
+      "Rounds": 3
+    },
+    {
+      "Name": "Port Circuit",
+      "Type": "Circuit",
+      "Course": "DOCK_CIRCUIT_01",
+      "Participants": 8,
+      "Laps": 3
+    },
+    {
+      "Name": "Pier Drag",
+      "Type": "Drag",
+      "Course": "DOCK_DRAG_01",
+      "Participants": 2,
+      "Format": "BestOf3"
+    },
+    {
+      "Name": "Free Roam",
+      "Type": "FreeRoam",
+      "Participants": 16,
+      "Features": ["Practice", "Socialize", "Trade"]
+    }
+  ],
+
+  "Lore": {
+    "History": "The Port District became a racing hotspot when the shipping industry declined. Now, on weekend nights, the container yards transform into an underground motorsport mecca. Crews stake out territories, drift battles echo between metal walls, and deals are made in warehouse shadows.",
+    "LocalCrew": "Dock Workers",
+    "Difficulty": "Intermediate",
+    "Reputation": "Neutral Ground"
+  }
+}

@@ -1,0 +1,569 @@
+{
+  "Version": "1.0",
+  "TotalProfiles": 15,
+
+  "PersonalityTypes": {
+    "Aggressive": {
+      "Description": "Always pushing, high risk-taking, relentless pressure",
+      "BaseAggression": 0.8,
+      "RiskTolerance": 0.9,
+      "OvertakeBias": "Immediate",
+      "DefenseBias": "Blocking"
+    },
+    "Calculated": {
+      "Description": "Patient, waits for opportunities, efficient",
+      "BaseAggression": 0.5,
+      "RiskTolerance": 0.4,
+      "OvertakeBias": "Setup",
+      "DefenseBias": "Positioning"
+    },
+    "Defensive": {
+      "Description": "Protects position, rarely attacks",
+      "BaseAggression": 0.3,
+      "RiskTolerance": 0.2,
+      "OvertakeBias": "Opportunistic",
+      "DefenseBias": "Heavy"
+    },
+    "Reckless": {
+      "Description": "All or nothing, high crash rate",
+      "BaseAggression": 0.95,
+      "RiskTolerance": 1.0,
+      "OvertakeBias": "Forced",
+      "DefenseBias": "None"
+    },
+    "Smooth": {
+      "Description": "Clean racing, respects space",
+      "BaseAggression": 0.4,
+      "RiskTolerance": 0.3,
+      "OvertakeBias": "Clean",
+      "DefenseBias": "Fair"
+    },
+    "Adaptive": {
+      "Description": "Changes style based on situation",
+      "BaseAggression": 0.6,
+      "RiskTolerance": 0.6,
+      "OvertakeBias": "Situational",
+      "DefenseBias": "Situational"
+    },
+    "Dirty": {
+      "Description": "Will bump, block, and push limits of rules",
+      "BaseAggression": 0.85,
+      "RiskTolerance": 0.7,
+      "OvertakeBias": "Contact",
+      "DefenseBias": "Aggressive"
+    }
+  },
+
+  "DriverProfiles": [
+    {
+      "ID": "AI_ROOKIE_01",
+      "Name": "Street Novice",
+      "Personality": "Calculated",
+      "Tier": "D",
+      "Skill": {
+        "Braking": 0.55,
+        "LineAccuracy": 0.50,
+        "ReactionTime": 0.45,
+        "Consistency": 0.50,
+        "WetWeather": 0.40
+      },
+      "Aggression": {
+        "Overtake": 0.35,
+        "Defense": 0.30,
+        "RiskTaking": 0.25
+      },
+      "Racecraft": {
+        "Awareness": 0.45,
+        "Anticipation": 0.40,
+        "Strategy": 0.35
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.85,
+        "CatchUp": 0.10,
+        "SlowDown": 0.05
+      },
+      "PreferredVehicles": ["BEATER_SEDAN", "KAZE_CIVIC"],
+      "Backstory": "Just got their license and a cheap car. Eager but inexperienced."
+    },
+    {
+      "ID": "AI_ROOKIE_02",
+      "Name": "Weekend Warrior",
+      "Personality": "Aggressive",
+      "Tier": "D",
+      "Skill": {
+        "Braking": 0.50,
+        "LineAccuracy": 0.45,
+        "ReactionTime": 0.55,
+        "Consistency": 0.40,
+        "WetWeather": 0.35
+      },
+      "Aggression": {
+        "Overtake": 0.65,
+        "Defense": 0.50,
+        "RiskTaking": 0.70
+      },
+      "Racecraft": {
+        "Awareness": 0.40,
+        "Anticipation": 0.35,
+        "Strategy": 0.30
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.82,
+        "CatchUp": 0.12,
+        "SlowDown": 0.03
+      },
+      "PreferredVehicles": ["KAZE_CIVIC", "BEATER_SEDAN"],
+      "Backstory": "Watches too many racing videos, overestimates their abilities."
+    },
+    {
+      "ID": "AI_STREET_01",
+      "Name": "Drift King Wannabe",
+      "Personality": "Smooth",
+      "Tier": "C",
+      "Skill": {
+        "Braking": 0.60,
+        "LineAccuracy": 0.55,
+        "ReactionTime": 0.60,
+        "Consistency": 0.55,
+        "WetWeather": 0.50,
+        "Drifting": 0.70
+      },
+      "Aggression": {
+        "Overtake": 0.45,
+        "Defense": 0.40,
+        "RiskTaking": 0.50
+      },
+      "Racecraft": {
+        "Awareness": 0.55,
+        "Anticipation": 0.50,
+        "Strategy": 0.45
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.88,
+        "CatchUp": 0.08,
+        "SlowDown": 0.06
+      },
+      "PreferredVehicles": ["TENSHI_240", "KUMO_350Z"],
+      "Backstory": "Lives for the slide. More style than speed, but improving."
+    },
+    {
+      "ID": "AI_STREET_02",
+      "Name": "Muscle Maniac",
+      "Personality": "Aggressive",
+      "Tier": "C",
+      "Skill": {
+        "Braking": 0.55,
+        "LineAccuracy": 0.50,
+        "ReactionTime": 0.65,
+        "Consistency": 0.50,
+        "WetWeather": 0.40
+      },
+      "Aggression": {
+        "Overtake": 0.75,
+        "Defense": 0.60,
+        "RiskTaking": 0.70
+      },
+      "Racecraft": {
+        "Awareness": 0.50,
+        "Anticipation": 0.45,
+        "Strategy": 0.40
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.90,
+        "CatchUp": 0.06,
+        "SlowDown": 0.08
+      },
+      "PreferredVehicles": ["STALLION_GT", "PHANTOM_CAMARO"],
+      "Backstory": "Believes power beats everything. Loves straight lines."
+    },
+    {
+      "ID": "AI_STREET_03",
+      "Name": "JDM Purist",
+      "Personality": "Calculated",
+      "Tier": "C",
+      "Skill": {
+        "Braking": 0.65,
+        "LineAccuracy": 0.65,
+        "ReactionTime": 0.60,
+        "Consistency": 0.65,
+        "WetWeather": 0.55
+      },
+      "Aggression": {
+        "Overtake": 0.50,
+        "Defense": 0.55,
+        "RiskTaking": 0.40
+      },
+      "Racecraft": {
+        "Awareness": 0.60,
+        "Anticipation": 0.60,
+        "Strategy": 0.55
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.89,
+        "CatchUp": 0.07,
+        "SlowDown": 0.05
+      },
+      "PreferredVehicles": ["KAZE_CIVIC", "TENSHI_240", "KARASU_RX7"],
+      "Backstory": "Knows their car inside out. Methodical and consistent."
+    },
+    {
+      "ID": "AI_RACER_01",
+      "Name": "Track Day Terror",
+      "Personality": "Adaptive",
+      "Tier": "B",
+      "Skill": {
+        "Braking": 0.75,
+        "LineAccuracy": 0.72,
+        "ReactionTime": 0.70,
+        "Consistency": 0.70,
+        "WetWeather": 0.60
+      },
+      "Aggression": {
+        "Overtake": 0.65,
+        "Defense": 0.60,
+        "RiskTaking": 0.55
+      },
+      "Racecraft": {
+        "Awareness": 0.70,
+        "Anticipation": 0.65,
+        "Strategy": 0.60
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.92,
+        "CatchUp": 0.05,
+        "SlowDown": 0.06
+      },
+      "PreferredVehicles": ["SAKURA_GTR", "RONIN_EVO", "GHOST_E46"],
+      "Backstory": "Amateur track racer who shows up to street events. Very fast."
+    },
+    {
+      "ID": "AI_RACER_02",
+      "Name": "Highway Hunter",
+      "Personality": "Reckless",
+      "Tier": "B",
+      "Skill": {
+        "Braking": 0.68,
+        "LineAccuracy": 0.65,
+        "ReactionTime": 0.80,
+        "Consistency": 0.55,
+        "WetWeather": 0.50,
+        "TrafficWeaving": 0.85
+      },
+      "Aggression": {
+        "Overtake": 0.85,
+        "Defense": 0.40,
+        "RiskTaking": 0.90
+      },
+      "Racecraft": {
+        "Awareness": 0.75,
+        "Anticipation": 0.70,
+        "Strategy": 0.45
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.94,
+        "CatchUp": 0.03,
+        "SlowDown": 0.08
+      },
+      "PreferredVehicles": ["RAIJIN_SUPRA", "SAKURA_GTR", "VIPER_CORVETTE"],
+      "Backstory": "Lives for the Wangan. Top speed obsessed, reflexes honed by traffic."
+    },
+    {
+      "ID": "AI_RACER_03",
+      "Name": "Touge Master",
+      "Personality": "Smooth",
+      "Tier": "B",
+      "Skill": {
+        "Braking": 0.80,
+        "LineAccuracy": 0.78,
+        "ReactionTime": 0.72,
+        "Consistency": 0.75,
+        "WetWeather": 0.70,
+        "Drifting": 0.75,
+        "GutterRun": 0.80
+      },
+      "Aggression": {
+        "Overtake": 0.55,
+        "Defense": 0.70,
+        "RiskTaking": 0.50
+      },
+      "Racecraft": {
+        "Awareness": 0.75,
+        "Anticipation": 0.80,
+        "Strategy": 0.70
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.91,
+        "CatchUp": 0.04,
+        "SlowDown": 0.05
+      },
+      "PreferredVehicles": ["TENSHI_240", "KARASU_RX7", "RONIN_EVO"],
+      "Backstory": "Grew up on the mountains. Knows every corner, every gutter."
+    },
+    {
+      "ID": "AI_PRO_01",
+      "Name": "Circuit Champion",
+      "Personality": "Calculated",
+      "Tier": "A",
+      "Skill": {
+        "Braking": 0.88,
+        "LineAccuracy": 0.85,
+        "ReactionTime": 0.82,
+        "Consistency": 0.85,
+        "WetWeather": 0.80
+      },
+      "Aggression": {
+        "Overtake": 0.70,
+        "Defense": 0.75,
+        "RiskTaking": 0.55
+      },
+      "Racecraft": {
+        "Awareness": 0.85,
+        "Anticipation": 0.85,
+        "Strategy": 0.80
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.95,
+        "CatchUp": 0.02,
+        "SlowDown": 0.04
+      },
+      "PreferredVehicles": ["SAKURA_GTR", "RAIJIN_SUPRA", "SHOGUN_NSX"],
+      "Backstory": "Former pro driver, now racing underground for the thrill."
+    },
+    {
+      "ID": "AI_PRO_02",
+      "Name": "Drift Legend",
+      "Personality": "Smooth",
+      "Tier": "A",
+      "Skill": {
+        "Braking": 0.82,
+        "LineAccuracy": 0.80,
+        "ReactionTime": 0.78,
+        "Consistency": 0.80,
+        "WetWeather": 0.75,
+        "Drifting": 0.95,
+        "Tandem": 0.92
+      },
+      "Aggression": {
+        "Overtake": 0.50,
+        "Defense": 0.60,
+        "RiskTaking": 0.60
+      },
+      "Racecraft": {
+        "Awareness": 0.88,
+        "Anticipation": 0.85,
+        "Strategy": 0.70
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.90,
+        "CatchUp": 0.05,
+        "SlowDown": 0.03
+      },
+      "PreferredVehicles": ["TENSHI_240", "KARASU_RX7", "DRIFT_KING_SILVIA"],
+      "Backstory": "D1 Grand Prix veteran. Their drift lines are works of art."
+    },
+    {
+      "ID": "AI_PRO_03",
+      "Name": "Speed Demon",
+      "Personality": "Aggressive",
+      "Tier": "A",
+      "Skill": {
+        "Braking": 0.85,
+        "LineAccuracy": 0.82,
+        "ReactionTime": 0.88,
+        "Consistency": 0.78,
+        "WetWeather": 0.72,
+        "TrafficWeaving": 0.90
+      },
+      "Aggression": {
+        "Overtake": 0.88,
+        "Defense": 0.65,
+        "RiskTaking": 0.82
+      },
+      "Racecraft": {
+        "Awareness": 0.82,
+        "Anticipation": 0.78,
+        "Strategy": 0.65
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.97,
+        "CatchUp": 0.01,
+        "SlowDown": 0.06
+      },
+      "PreferredVehicles": ["RAIJIN_SUPRA", "DEMON_CHALLENGER", "VIPER_CORVETTE"],
+      "Backstory": "Top speed record holder. Fearless at 200mph."
+    },
+    {
+      "ID": "AI_BOSS_01",
+      "Name": "The King",
+      "Personality": "Adaptive",
+      "Tier": "S",
+      "Skill": {
+        "Braking": 0.95,
+        "LineAccuracy": 0.93,
+        "ReactionTime": 0.92,
+        "Consistency": 0.90,
+        "WetWeather": 0.88,
+        "Drifting": 0.88,
+        "TrafficWeaving": 0.85
+      },
+      "Aggression": {
+        "Overtake": 0.80,
+        "Defense": 0.85,
+        "RiskTaking": 0.70
+      },
+      "Racecraft": {
+        "Awareness": 0.95,
+        "Anticipation": 0.92,
+        "Strategy": 0.90
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.98,
+        "CatchUp": 0.0,
+        "SlowDown": 0.02
+      },
+      "PreferredVehicles": ["LEGEND_R35", "SPECTER_911", "SHADOW_LFA"],
+      "Backstory": "The undisputed ruler of the midnight scene. No one has beaten them in years.",
+      "IsBoss": true,
+      "BossRace": "Championship Final"
+    },
+    {
+      "ID": "AI_BOSS_02",
+      "Name": "Mountain Ghost",
+      "Personality": "Smooth",
+      "Tier": "S",
+      "Skill": {
+        "Braking": 0.92,
+        "LineAccuracy": 0.95,
+        "ReactionTime": 0.88,
+        "Consistency": 0.92,
+        "WetWeather": 0.90,
+        "Drifting": 0.90,
+        "GutterRun": 0.95
+      },
+      "Aggression": {
+        "Overtake": 0.65,
+        "Defense": 0.90,
+        "RiskTaking": 0.55
+      },
+      "Racecraft": {
+        "Awareness": 0.92,
+        "Anticipation": 0.95,
+        "Strategy": 0.85
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.96,
+        "CatchUp": 0.0,
+        "SlowDown": 0.03
+      },
+      "PreferredVehicles": ["KARASU_RX7", "RONIN_EVO", "SHOGUN_NSX"],
+      "Backstory": "A legend of the touge. They say he races with his headlights off.",
+      "IsBoss": true,
+      "BossRace": "Mt. Haruna Showdown"
+    },
+    {
+      "ID": "AI_BOSS_03",
+      "Name": "Wangan Devil",
+      "Personality": "Reckless",
+      "Tier": "S",
+      "Skill": {
+        "Braking": 0.88,
+        "LineAccuracy": 0.85,
+        "ReactionTime": 0.95,
+        "Consistency": 0.82,
+        "WetWeather": 0.78,
+        "TrafficWeaving": 0.98
+      },
+      "Aggression": {
+        "Overtake": 0.95,
+        "Defense": 0.50,
+        "RiskTaking": 0.95
+      },
+      "Racecraft": {
+        "Awareness": 0.90,
+        "Anticipation": 0.88,
+        "Strategy": 0.60
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.99,
+        "CatchUp": 0.0,
+        "SlowDown": 0.05
+      },
+      "PreferredVehicles": ["RAIJIN_SUPRA", "LEGEND_R35", "FLASH_AMG"],
+      "Backstory": "Fastest on the highway. Their Supra is a 1000hp monster.",
+      "IsBoss": true,
+      "BossRace": "Bayshore Challenge"
+    },
+    {
+      "ID": "AI_RIVAL_01",
+      "Name": "Your Shadow",
+      "Personality": "Adaptive",
+      "Tier": "Dynamic",
+      "Skill": {
+        "Braking": "PlayerMatched",
+        "LineAccuracy": "PlayerMatched",
+        "ReactionTime": "PlayerMatched",
+        "Consistency": "PlayerMatched"
+      },
+      "Aggression": {
+        "Overtake": "PlayerMatched +0.1",
+        "Defense": "PlayerMatched",
+        "RiskTaking": "PlayerMatched"
+      },
+      "SpeedParams": {
+        "BaseSpeed": "PlayerMatched +0.02",
+        "CatchUp": 0.0,
+        "SlowDown": 0.0
+      },
+      "PreferredVehicles": ["PlayerSimilar"],
+      "Backstory": "A mysterious rival who always seems to match your skill. They push you to be better.",
+      "IsRival": true,
+      "DynamicScaling": true
+    }
+  ],
+
+  "RubberBanding": {
+    "Enabled": true,
+    "CatchUpMax": 0.15,
+    "SlowDownMax": 0.10,
+    "DistanceThreshold": 500,
+    "GapMaintenance": true
+  },
+
+  "MoodEffects": {
+    "Confident": {
+      "SkillBonus": 0.05,
+      "AggressionBonus": 0.1,
+      "Trigger": "LapRecord, OvertakeStreak"
+    },
+    "Frustrated": {
+      "SkillPenalty": 0.05,
+      "AggressionBonus": 0.2,
+      "Trigger": "BeingOvertaken, Crash"
+    },
+    "Intimidated": {
+      "SkillPenalty": 0.08,
+      "AggressionPenalty": 0.15,
+      "Trigger": "LargeGap, ReputationDifference"
+    },
+    "Focused": {
+      "SkillBonus": 0.03,
+      "ConsistencyBonus": 0.1,
+      "Trigger": "CloseRace, FinalLap"
+    },
+    "Desperate": {
+      "AggressionBonus": 0.25,
+      "RiskBonus": 0.3,
+      "Trigger": "LastPlace, TimeRunningOut"
+    },
+    "Relaxed": {
+      "ConsistencyBonus": 0.05,
+      "AggressionPenalty": 0.1,
+      "Trigger": "LargeLead, PracticeMode"
+    },
+    "Vengeful": {
+      "AggressionBonus": 0.3,
+      "TargetFocus": true,
+      "Trigger": "BeenHit, LostToSamePlayer"
+    }
+  }
+}
