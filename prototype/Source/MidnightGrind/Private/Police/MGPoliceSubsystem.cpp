@@ -670,8 +670,7 @@ void UMGPoliceSubsystem::SpawnRoadblock(FVector Location, FVector Direction)
 
 	if (Roadblock)
 	{
-		static int32 RoadblockIDCounter = 0;
-		Roadblock->Initialize(++RoadblockIDCounter, Direction);
+		Roadblock->Initialize(NextRoadblockID++, Direction);
 		Roadblock->SetNumVehicles(FMath::RandRange(2, 3));
 
 		ActiveRoadblocks.Add(Roadblock);
@@ -710,8 +709,7 @@ void UMGPoliceSubsystem::DeploySpikeStrip(FVector Location, FVector Direction)
 
 	if (SpikeStrip)
 	{
-		static int32 SpikeStripIDCounter = 0;
-		SpikeStrip->Initialize(++SpikeStripIDCounter, Direction);
+		SpikeStrip->Initialize(NextSpikeStripID++, Direction);
 		SpikeStrip->SetLength(FMath::RandRange(400.0f, 800.0f));
 		SpikeStrip->Deploy();
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "MGPartInstallation.h"
 #include "MGTuningSubsystem.generated.h"
 
 UENUM(BlueprintType)
@@ -103,6 +104,78 @@ struct FMGTuningPart
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bInstalled = false;
+
+	// ==========================================
+	// INSTALLATION PROPERTIES
+	// ==========================================
+
+	/**
+	 * @brief Installation difficulty level
+	 *
+	 * Determines DIY success rates, required skill level, and base install time.
+	 * Simple = bolt-on parts, Expert = engine builds, ShopOnly = requires professional
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Installation")
+	EMGInstallDifficulty InstallDifficulty = EMGInstallDifficulty::Moderate;
+
+	/**
+	 * @brief Base installation time in minutes
+	 *
+	 * Default times by difficulty:
+	 * - Simple: 15 min
+	 * - Moderate: 60 min
+	 * - Complex: 240 min (4 hours)
+	 * - Expert: 480 min (8 hours)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Installation", meta = (ClampMin = "5", ClampMax = "2880"))
+	int32 InstallTimeMinutes = 60;
+
+	/**
+	 * @brief Whether installation requires vehicle on a lift
+	 *
+	 * Parts underneath the car (exhaust, suspension, drivetrain)
+	 * require lift access for DIY installation
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Installation")
+	bool bRequiresLift = false;
+
+	/**
+	 * @brief Whether installation requires special tools
+	 *
+	 * Torque wrenches, spring compressors, bearing pullers, etc.
+	 * Affects DIY success rate if player lacks required tools
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Installation")
+	bool bRequiresSpecialTools = false;
+
+	/**
+	 * @brief Specific tool IDs required for installation
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Installation")
+	TArray<FName> RequiredToolIDs;
+
+	/**
+	 * @brief Whether dyno tuning is required after installation
+	 *
+	 * Performance parts affecting fuel/air need professional tuning
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Installation")
+	bool bRequiresDynoTuning = false;
+
+	/**
+	 * @brief Convert to FMGInstallationRequirements struct
+	 */
+	FMGInstallationRequirements GetInstallationRequirements() const
+	{
+		FMGInstallationRequirements Reqs;
+		Reqs.Difficulty = InstallDifficulty;
+		Reqs.InstallTimeMinutes = InstallTimeMinutes;
+		Reqs.bRequiresLift = bRequiresLift;
+		Reqs.bRequiresSpecialTools = bRequiresSpecialTools;
+		Reqs.RequiredToolIDs = RequiredToolIDs;
+		Reqs.bRequiresDynoTuning = bRequiresDynoTuning;
+		return Reqs;
+	}
 };
 
 USTRUCT(BlueprintType)

@@ -2,6 +2,10 @@
 
 #include "Shortcut/MGShortcutSubsystem.h"
 #include "Save/MGSaveManagerSubsystem.h"
+#include "Career/MGCareerSubsystem.h"
+#include "Reputation/MGReputationSubsystem.h"
+#include "Engine/GameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGShortcutSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -131,9 +135,88 @@ bool UMGShortcutSubsystem::TryEnterShortcut(const FString& ShortcutId, FVector P
 	}
 
 	// Check unlock requirement
-	if (Shortcut->bRequiresUnlock)
+	if (Shortcut->bRequiresUnlock && !Shortcut->UnlockRequirement.IsEmpty())
 	{
-		// TODO: Check unlock condition
+		// Parse unlock requirement and verify
+		// Supported formats:
+		// - "CHAPTER_<name>" - requires reaching a career chapter
+		// - "MILESTONE_<name>" - requires completing a milestone
+		// - "REP_<tier>" - requires a reputation tier
+		// - "SHORTCUT_<id>" - requires mastering another shortcut
+
+		const FString& Requirement = Shortcut->UnlockRequirement;
+		bool bUnlocked = false;
+
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+		{
+			if (Requirement.StartsWith(TEXT("CHAPTER_")))
+			{
+				// Check career chapter requirement
+				if (UMGCareerSubsystem* CareerSubsystem = GI->GetSubsystem<UMGCareerSubsystem>())
+				{
+					FString ChapterName = Requirement.RightChop(8);
+					EMGCareerChapter RequiredChapter = EMGCareerChapter::Newcomer;
+
+					if (ChapterName == TEXT("Rising")) RequiredChapter = EMGCareerChapter::Rising;
+					else if (ChapterName == TEXT("Contender")) RequiredChapter = EMGCareerChapter::Contender;
+					else if (ChapterName == TEXT("Champion")) RequiredChapter = EMGCareerChapter::Champion;
+					else if (ChapterName == TEXT("Legend")) RequiredChapter = EMGCareerChapter::Legend;
+
+					bUnlocked = static_cast<int32>(CareerSubsystem->GetCurrentChapter()) >= static_cast<int32>(RequiredChapter);
+				}
+			}
+			else if (Requirement.StartsWith(TEXT("MILESTONE_")))
+			{
+				// Check milestone requirement
+				if (UMGCareerSubsystem* CareerSubsystem = GI->GetSubsystem<UMGCareerSubsystem>())
+				{
+					FString MilestoneName = Requirement.RightChop(10);
+					EMGCareerMilestone RequiredMilestone = EMGCareerMilestone::FirstRace;
+
+					if (MilestoneName == TEXT("FirstWin")) RequiredMilestone = EMGCareerMilestone::FirstWin;
+					else if (MilestoneName == TEXT("FirstPodium")) RequiredMilestone = EMGCareerMilestone::FirstPodium;
+					else if (MilestoneName == TEXT("JoinedCrew")) RequiredMilestone = EMGCareerMilestone::JoinedCrew;
+					else if (MilestoneName == TEXT("DefeatedRival")) RequiredMilestone = EMGCareerMilestone::DefeatedRival;
+					else if (MilestoneName == TEXT("WonTournament")) RequiredMilestone = EMGCareerMilestone::WonTournament;
+
+					bUnlocked = CareerSubsystem->HasCompletedMilestone(RequiredMilestone);
+				}
+			}
+			else if (Requirement.StartsWith(TEXT("REP_")))
+			{
+				// Check reputation tier requirement
+				if (UMGReputationSubsystem* ReputationSubsystem = GI->GetSubsystem<UMGReputationSubsystem>())
+				{
+					FString TierName = Requirement.RightChop(4);
+					EMGReputationTier RequiredTier = EMGReputationTier::Rookie;
+
+					if (TierName == TEXT("Regular")) RequiredTier = EMGReputationTier::Regular;
+					else if (TierName == TEXT("Respected")) RequiredTier = EMGReputationTier::Respected;
+					else if (TierName == TEXT("Elite")) RequiredTier = EMGReputationTier::Elite;
+					else if (TierName == TEXT("Legend")) RequiredTier = EMGReputationTier::Legend;
+
+					EMGReputationTier CurrentTier = ReputationSubsystem->GetTier(EMGReputationCategory::Overall);
+					bUnlocked = static_cast<int32>(CurrentTier) >= static_cast<int32>(RequiredTier);
+				}
+			}
+			else if (Requirement.StartsWith(TEXT("SHORTCUT_")))
+			{
+				// Check mastery of another shortcut
+				FString RequiredShortcutId = Requirement.RightChop(9);
+				EMGShortcutState RequiredState = GetShortcutState(RequiredShortcutId);
+				bUnlocked = RequiredState == EMGShortcutState::Mastered;
+			}
+			else
+			{
+				// Unknown requirement type - default to unlocked
+				bUnlocked = true;
+			}
+		}
+
+		if (!bUnlocked)
+		{
+			return false;
+		}
 	}
 
 	// Start shortcut

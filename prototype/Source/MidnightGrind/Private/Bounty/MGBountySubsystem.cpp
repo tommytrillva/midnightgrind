@@ -1,8 +1,11 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Bounty/MGBountySubsystem.h"
+#include "Career/MGCareerSubsystem.h"
 #include "Engine/World.h"
+#include "Engine/GameInstance.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGBountySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -703,7 +706,44 @@ bool UMGBountySubsystem::CanAcceptBounty(const FString& PlayerId, const FString&
 		}
 	}
 
-	// TODO: Check player level requirement
+	// Check player level requirement via Career subsystem
+	if (Def->RequiredPlayerLevel > 1)
+	{
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+		{
+			if (UMGCareerSubsystem* CareerSubsystem = GI->GetSubsystem<UMGCareerSubsystem>())
+			{
+				// Calculate player level from career chapter and progress
+				const EMGCareerChapter CurrentChapter = CareerSubsystem->GetCurrentChapter();
+				const float ChapterProgress = CareerSubsystem->GetChapterProgressPercent();
+
+				int32 PlayerLevel = 1;
+				switch (CurrentChapter)
+				{
+					case EMGCareerChapter::Newcomer:
+						PlayerLevel = 1 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+					case EMGCareerChapter::Rising:
+						PlayerLevel = 11 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+					case EMGCareerChapter::Contender:
+						PlayerLevel = 21 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+					case EMGCareerChapter::Champion:
+						PlayerLevel = 31 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+					case EMGCareerChapter::Legend:
+						PlayerLevel = 41 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+				}
+
+				if (PlayerLevel < Def->RequiredPlayerLevel)
+				{
+					return false;
+				}
+			}
+		}
+	}
 
 	return true;
 }

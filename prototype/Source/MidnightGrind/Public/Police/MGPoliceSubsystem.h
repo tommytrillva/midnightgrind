@@ -1484,6 +1484,14 @@ private:
 	UPROPERTY()
 	int32 NextUnitID = 1;
 
+	/** Next roadblock ID to assign */
+	UPROPERTY()
+	int32 NextRoadblockID = 1;
+
+	/** Next spike strip ID to assign */
+	UPROPERTY()
+	int32 NextSpikeStripID = 1;
+
 	/** Time since last unit spawn */
 	UPROPERTY()
 	float TimeSinceLastSpawn = 0.0f;

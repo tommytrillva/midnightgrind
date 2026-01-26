@@ -6,6 +6,9 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "MGWeatherSubsystem.generated.h"
 
+// Forward declarations for weather racing integration
+class UMGWeatherRacingSubsystem;
+
 /**
  * Weather condition types
  */

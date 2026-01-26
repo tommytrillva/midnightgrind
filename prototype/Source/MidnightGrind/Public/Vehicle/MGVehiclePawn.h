@@ -724,31 +724,69 @@ protected:
 	// BLUEPRINT EVENTS
 	// ==========================================
 
-	/** Called when gear changes */
+	/**
+	 * @brief Blueprint event called when the current gear changes.
+	 *
+	 * Implement in Blueprint to play gear shift sounds or animations.
+	 *
+	 * @param NewGear The new gear number (-1 = reverse, 0 = neutral, 1+ = forward).
+	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle|Events")
 	void OnGearChanged(int32 NewGear);
 
-	/** Called when drift starts */
+	/**
+	 * @brief Blueprint event called when a drift begins.
+	 *
+	 * Implement in Blueprint to start drift effects, sounds, or UI elements.
+	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle|Events")
 	void OnDriftStarted();
 
-	/** Called when drift ends */
+	/**
+	 * @brief Blueprint event called when a drift ends.
+	 *
+	 * Implement in Blueprint to finalize drift scoring display
+	 * and play completion effects.
+	 *
+	 * @param TotalScore The final score earned from this drift.
+	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle|Events")
 	void OnDriftEnded(float TotalScore);
 
-	/** Called when nitrous activates */
+	/**
+	 * @brief Blueprint event called when nitrous is activated.
+	 *
+	 * Implement in Blueprint to start nitrous flame effects and audio.
+	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle|Events")
 	void OnNitrousActivated();
 
-	/** Called when nitrous deactivates */
+	/**
+	 * @brief Blueprint event called when nitrous is deactivated.
+	 *
+	 * Implement in Blueprint to stop nitrous effects gracefully.
+	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle|Events")
 	void OnNitrousDeactivated();
 
-	/** Called when boost spools up */
+	/**
+	 * @brief Blueprint event called when turbo reaches full boost.
+	 *
+	 * Implement in Blueprint to play spool-up completion sound
+	 * or display boost indicator.
+	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle|Events")
 	void OnBoostSpooled();
 
-	/** Called on collision */
+	/**
+	 * @brief Blueprint event called when the vehicle collides with something.
+	 *
+	 * Implement in Blueprint to play impact sounds, spawn debris,
+	 * or apply damage based on impact force.
+	 *
+	 * @param HitResult Details about the collision including location and normal.
+	 * @param ImpactForce Magnitude of the collision force.
+	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle|Events")
 	void OnVehicleCollision(const FHitResult& HitResult, float ImpactForce);
 
@@ -756,47 +794,57 @@ protected:
 	// STATE
 	// ==========================================
 
-	/** Current vehicle configuration */
+	/** @brief Complete vehicle configuration data including engine, drivetrain, and tuning. */
 	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|State")
 	FMGVehicleData VehicleConfiguration;
 
-	/** Current runtime state */
+	/** @brief Current frame's runtime telemetry state for HUD and game systems. */
 	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|State")
 	FMGVehicleRuntimeState RuntimeState;
 
-	/** Current camera mode */
+	/** @brief Currently active camera viewing mode. */
 	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|State")
 	EMGCameraMode CurrentCameraMode = EMGCameraMode::Chase;
 
-	/** Is looking behind */
+	/** @brief True if the look-behind view is currently active. */
 	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|State")
 	bool bIsLookingBehind = false;
 
-	/** Last checkpoint transform for respawn */
+	/** @brief Transform of the last checkpoint passed, used for respawn positioning. */
 	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|State")
 	FTransform LastCheckpointTransform;
 
-	/** Previous gear for change detection */
+	/** @brief Previous frame's gear for detecting gear changes. */
 	int32 PreviousGear = 0;
 
-	/** Was drifting last frame */
+	/** @brief Whether the vehicle was drifting in the previous frame. */
 	bool bWasDrifting = false;
 
-	/** Target FOV (for smooth transitions) */
+	/** @brief Target FOV for smooth interpolation during speed changes. */
 	float TargetFOV = 90.0f;
 
-	/** Current tire health (0-100) */
+	/** @brief Current tire condition percentage (0.0 = flat, 100.0 = new). */
 	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|State")
 	float TireHealth = 100.0f;
 
 private:
-	/** Cached MG movement component */
+	/** @brief Cached pointer to the custom movement component for fast access. */
 	UPROPERTY()
 	TObjectPtr<UMGVehicleMovementComponent> MGVehicleMovement;
 
-	/** Setup component hierarchy */
+	/**
+	 * @brief Initialize and configure all vehicle subcomponents.
+	 *
+	 * Creates spring arm, cameras, audio components, and VFX systems.
+	 * Called during construction.
+	 */
 	void SetupComponents();
 
-	/** Bind to movement component events */
+	/**
+	 * @brief Subscribe to movement component delegate events.
+	 *
+	 * Binds to gear change, drift, nitrous, and boost events
+	 * from the movement component.
+	 */
 	void BindMovementEvents();
 };

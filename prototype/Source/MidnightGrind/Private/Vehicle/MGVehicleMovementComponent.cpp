@@ -1061,6 +1061,10 @@ void UMGVehicleMovementComponent::UpdateBrakeSystem(float DeltaTime)
 	EngineState.BrakeFadeMultiplier *= PartWearEffects.BrakePadEfficiency;
 }
 
+// ==========================================
+// REALISTIC DIFFERENTIAL SIMULATION
+// ==========================================
+
 void UMGVehicleMovementComponent::ApplyDifferentialBehavior(float DeltaTime)
 {
 	if (!IsGrounded() || WheelSetups.Num() < 4)
@@ -1068,54 +1072,876 @@ void UMGVehicleMovementComponent::ApplyDifferentialBehavior(float DeltaTime)
 		return;
 	}
 
-	const EMGDifferentialType DiffType = CurrentConfiguration.Drivetrain.DifferentialType;
-	const float LockFactor = GetDifferentialLockFactor();
+	// Update wheel angular velocities for differential calculations
+	UpdateWheelAngularVelocities(DeltaTime);
 
-	// Apply differential behavior based on type
-	// This affects how power is distributed between driven wheels
-	switch (CurrentConfiguration.Drivetrain.DrivetrainType)
+	const EMGDifferentialType DiffType = CurrentConfiguration.Drivetrain.DifferentialType;
+	const EMGDrivetrainType DriveType = CurrentConfiguration.Drivetrain.DrivetrainType;
+
+	// Calculate input torque to drivetrain based on current power output
+	const float EngineTorque = EngineState.CurrentTorque * ClutchWearState.GetTorqueTransferEfficiency();
+	const float DrivetrainTorque = EngineTorque * PartWearEffects.DrivetrainEfficiency;
+
+	// Determine if we're accelerating or decelerating (engine braking)
+	const bool bIsAccelerating = EngineState.ThrottlePosition > 0.1f;
+
+	// Simulate differentials based on drivetrain type
+	switch (DriveType)
 	{
 		case EMGDrivetrainType::RWD:
 		{
-			// Rear wheel drive - differential affects wheels 2 and 3
-			const float LeftSlip = GetWheelSlipRatio(2);
-			const float RightSlip = GetWheelSlipRatio(3);
+			// Rear wheel drive - only rear differential active
+			SimulateDifferentialByType(
+				DeltaTime,
+				RearDiffState,
+				DiffType,
+				RearLSDConfig,
+				2, 3,  // Rear left, rear right wheel indices
+				DrivetrainTorque,
+				bIsAccelerating);
 
-			if (DiffType == EMGDifferentialType::LSD_2Way ||
-				DiffType == EMGDifferentialType::Locked)
-			{
-				// Locked diff tends to cause understeer on power
-				// but better for acceleration
-				if (DriftState.bIsDrifting)
-				{
-					// Help maintain drift angle
-					const float DriftCorrection = DriftState.DriftAngle * 0.01f * LockFactor;
-					// Would apply torque correction here
-				}
-			}
+			// Apply torque effects to rear wheels
+			ApplyDifferentialTorqueToWheels(DeltaTime, RearDiffState, 2, 3);
+
+			// Front diff is not driven in RWD
+			FrontDiffState = FMGDifferentialState();
 			break;
 		}
 
 		case EMGDrivetrainType::FWD:
 		{
-			// Front wheel drive - torque steer simulation
-			if (EngineState.ThrottlePosition > 0.7f && GetSpeedMPH() < 40.0f)
+			// Front wheel drive - only front differential active
+			SimulateDifferentialByType(
+				DeltaTime,
+				FrontDiffState,
+				DiffType,
+				FrontLSDConfig,
+				0, 1,  // Front left, front right wheel indices
+				DrivetrainTorque,
+				bIsAccelerating);
+
+			// Apply torque effects to front wheels
+			ApplyDifferentialTorqueToWheels(DeltaTime, FrontDiffState, 0, 1);
+
+			// Torque steer simulation for FWD
+			if (EngineState.ThrottlePosition > 0.5f && GetSpeedMPH() < 50.0f)
 			{
-				// Torque steer pulls toward stronger grip side
-				// LSD reduces this effect
-				const float TorqueSteerAmount = (1.0f - LockFactor * 0.5f) * 0.05f;
-				TargetSteering += TorqueSteerAmount * FMath::Sign(TargetSteering + 0.001f);
+				// Torque steer pulls toward wheel with less grip
+				// LSD reduces this effect by evening out torque distribution
+				const float TorqueSteerReduction = FrontDiffState.LockPercent * 0.7f;
+				const float TorqueSteerAmount = (1.0f - TorqueSteerReduction) * 0.03f * EngineState.ThrottlePosition;
+
+				// Weight transfer affects which side pulls
+				const float LateralBias = WeightTransferState.LateralTransfer;
+				TargetSteering += TorqueSteerAmount * FMath::Sign(LateralBias + 0.001f);
 			}
+
+			// Rear diff is not driven in FWD
+			RearDiffState = FMGDifferentialState();
 			break;
 		}
 
 		case EMGDrivetrainType::AWD:
 		{
-			// All wheel drive - power split behavior
-			// Center diff behavior would go here
+			// All wheel drive - center diff splits torque front/rear, then axle diffs split left/right
+			const float FrontTorque = DrivetrainTorque * AWDFrontBias;
+			const float RearTorque = DrivetrainTorque * (1.0f - AWDFrontBias);
+
+			// Simulate center differential
+			SimulateCenterDifferential(DeltaTime, CenterDiffState, DrivetrainTorque, bIsAccelerating);
+
+			// Simulate front differential
+			SimulateDifferentialByType(
+				DeltaTime,
+				FrontDiffState,
+				DiffType,
+				FrontLSDConfig,
+				0, 1,
+				FrontTorque * CenterDiffState.LeftWheelTorqueRatio * 2.0f,
+				bIsAccelerating);
+
+			// Simulate rear differential
+			SimulateDifferentialByType(
+				DeltaTime,
+				RearDiffState,
+				DiffType,
+				RearLSDConfig,
+				2, 3,
+				RearTorque * CenterDiffState.RightWheelTorqueRatio * 2.0f,
+				bIsAccelerating);
+
+			// Apply torque effects
+			ApplyDifferentialTorqueToWheels(DeltaTime, FrontDiffState, 0, 1);
+			ApplyDifferentialTorqueToWheels(DeltaTime, RearDiffState, 2, 3);
 			break;
 		}
 	}
+
+	// Integrate differential behavior with weight transfer
+	IntegrateDifferentialWithWeightTransfer(DeltaTime);
+
+	// Update power distribution visualization data
+	UpdatePowerDistributionData(DeltaTime);
+
+	// Broadcast lockup changes for UI/audio (with hysteresis)
+	const float CurrentLockPercent = (DriveType == EMGDrivetrainType::FWD) ?
+		FrontDiffState.LockPercent : RearDiffState.LockPercent;
+
+	if (FMath::Abs(CurrentLockPercent - LastBroadcastLockPercent) > 0.15f)
+	{
+		LastBroadcastLockPercent = CurrentLockPercent;
+		OnDifferentialLockup.Broadcast(CurrentLockPercent, bIsAccelerating);
+	}
+}
+
+void UMGVehicleMovementComponent::SimulateDifferentialByType(
+	float DeltaTime,
+	FMGDifferentialState& OutState,
+	EMGDifferentialType DiffType,
+	const FMGLSDConfiguration& Config,
+	int32 LeftWheelIdx,
+	int32 RightWheelIdx,
+	float InputTorque,
+	bool bIsAccelerating)
+{
+	switch (DiffType)
+	{
+		case EMGDifferentialType::Open:
+			SimulateOpenDifferential(DeltaTime, OutState, LeftWheelIdx, RightWheelIdx, InputTorque);
+			break;
+
+		case EMGDifferentialType::LSD_1Way:
+			Simulate1WayLSD(DeltaTime, OutState, Config, LeftWheelIdx, RightWheelIdx, InputTorque, bIsAccelerating);
+			break;
+
+		case EMGDifferentialType::LSD_1_5Way:
+			Simulate1Point5WayLSD(DeltaTime, OutState, Config, LeftWheelIdx, RightWheelIdx, InputTorque, bIsAccelerating);
+			break;
+
+		case EMGDifferentialType::LSD_2Way:
+			Simulate2WayLSD(DeltaTime, OutState, Config, LeftWheelIdx, RightWheelIdx, InputTorque, bIsAccelerating);
+			break;
+
+		case EMGDifferentialType::Torsen:
+			SimulateTorsenDifferential(DeltaTime, OutState, Config, LeftWheelIdx, RightWheelIdx, InputTorque);
+			break;
+
+		case EMGDifferentialType::Locked:
+			SimulateLockedDifferential(DeltaTime, OutState, LeftWheelIdx, RightWheelIdx, InputTorque);
+			break;
+	}
+}
+
+void UMGVehicleMovementComponent::UpdateWheelAngularVelocities(float DeltaTime)
+{
+	for (int32 i = 0; i < 4 && i < WheelSetups.Num(); ++i)
+	{
+		if (PVehicleOutput && i < PVehicleOutput->Wheels.Num())
+		{
+			// Get wheel angular velocity from Chaos simulation
+			const Chaos::FSimpleWheelSim& WheelSim = PVehicleOutput->Wheels[i];
+			WheelAngularVelocities[i] = WheelSim.GetAngularVelocity();
+		}
+	}
+}
+
+void UMGVehicleMovementComponent::SimulateOpenDifferential(
+	float DeltaTime,
+	FMGDifferentialState& OutState,
+	int32 LeftWheelIdx,
+	int32 RightWheelIdx,
+	float InputTorque)
+{
+	// Open differential: torque goes to path of least resistance
+	// This means the wheel with less grip spins freely
+	OutState.InputTorque = InputTorque;
+	OutState.LockPercent = 0.0f;
+	OutState.AccelLockPercent = 0.0f;
+	OutState.DecelLockPercent = 0.0f;
+	OutState.bIsLocking = false;
+	OutState.ActivePreloadTorque = 0.0f;
+
+	// Get wheel speeds
+	const float LeftSpeed = WheelAngularVelocities[LeftWheelIdx];
+	const float RightSpeed = WheelAngularVelocities[RightWheelIdx];
+
+	OutState.LeftWheelAngularVelocity = LeftSpeed;
+	OutState.RightWheelAngularVelocity = RightSpeed;
+	OutState.WheelSpeedDifferential = LeftSpeed - RightSpeed;
+	OutState.NormalizedSpeedDiff = FMath::Clamp(OutState.WheelSpeedDifferential / 10.0f, -1.0f, 1.0f);
+
+	// Get grip/load for each wheel
+	const float LeftGrip = CalculateTireFriction(LeftWheelIdx) * WeightTransferState.GetWheelLoadMultiplier(LeftWheelIdx);
+	const float RightGrip = CalculateTireFriction(RightWheelIdx) * WeightTransferState.GetWheelLoadMultiplier(RightWheelIdx);
+	const float TotalGrip = LeftGrip + RightGrip;
+
+	// Open diff distributes torque inversely proportional to grip
+	// Less grip = more torque (wheel spins)
+	if (TotalGrip > KINDA_SMALL_NUMBER)
+	{
+		// Inverse grip distribution - open diff sends torque to spinning wheel
+		const float LeftRatio = RightGrip / TotalGrip;  // Inverse!
+		const float RightRatio = LeftGrip / TotalGrip;
+
+		// Check for significant speed differential (inside wheel spinning)
+		if (FMath::Abs(OutState.WheelSpeedDifferential) > OpenDiffSpinThreshold)
+		{
+			// Amplify the bias toward spinning wheel
+			const float SpinBias = FMath::Clamp(FMath::Abs(OutState.WheelSpeedDifferential) / 5.0f, 1.0f, 3.0f);
+			if (LeftSpeed > RightSpeed)
+			{
+				// Left spinning more - send more torque to left (open diff behavior)
+				OutState.LeftWheelTorqueRatio = FMath::Clamp(LeftRatio * SpinBias, 0.2f, 0.9f);
+				OutState.RightWheelTorqueRatio = 1.0f - OutState.LeftWheelTorqueRatio;
+			}
+			else
+			{
+				OutState.RightWheelTorqueRatio = FMath::Clamp(RightRatio * SpinBias, 0.2f, 0.9f);
+				OutState.LeftWheelTorqueRatio = 1.0f - OutState.RightWheelTorqueRatio;
+			}
+		}
+		else
+		{
+			// Normal distribution
+			OutState.LeftWheelTorqueRatio = LeftRatio;
+			OutState.RightWheelTorqueRatio = RightRatio;
+		}
+	}
+	else
+	{
+		// Equal split fallback
+		OutState.LeftWheelTorqueRatio = 0.5f;
+		OutState.RightWheelTorqueRatio = 0.5f;
+	}
+
+	OutState.BiasTorque = 0.0f;
+}
+
+void UMGVehicleMovementComponent::Simulate1WayLSD(
+	float DeltaTime,
+	FMGDifferentialState& OutState,
+	const FMGLSDConfiguration& Config,
+	int32 LeftWheelIdx,
+	int32 RightWheelIdx,
+	float InputTorque,
+	bool bIsAccelerating)
+{
+	/**
+	 * 1-Way LSD: Locks under acceleration ONLY
+	 *
+	 * Popular for drifting because:
+	 * - On throttle: Both wheels drive together for traction
+	 * - Off throttle: Acts like open diff, allows easy rotation
+	 * - Easy to initiate and maintain drifts
+	 */
+
+	OutState.InputTorque = InputTorque;
+	OutState.bUnderAcceleration = bIsAccelerating;
+
+	// Get wheel speeds
+	const float LeftSpeed = WheelAngularVelocities[LeftWheelIdx];
+	const float RightSpeed = WheelAngularVelocities[RightWheelIdx];
+
+	OutState.LeftWheelAngularVelocity = LeftSpeed;
+	OutState.RightWheelAngularVelocity = RightSpeed;
+	OutState.WheelSpeedDifferential = LeftSpeed - RightSpeed;
+	OutState.NormalizedSpeedDiff = FMath::Clamp(OutState.WheelSpeedDifferential / 10.0f, -1.0f, 1.0f);
+
+	float TargetLockPercent = 0.0f;
+	float AccelLock = 0.0f;
+	float DecelLock = 0.0f;
+
+	if (bIsAccelerating && InputTorque > Config.MinSpeedDiffThreshold)
+	{
+		// Calculate acceleration lockup using ramp angle
+		AccelLock = CalculateLSDLockup(
+			InputTorque,
+			Config.AccelRampAngleDeg,
+			Config.PreloadTorqueNm,
+			Config.MaxLockPercent,
+			Config.ClutchFrictionCoef,
+			Config.ClutchPlateCount);
+
+		TargetLockPercent = AccelLock;
+		OutState.bIsLocking = AccelLock > 0.05f;
+	}
+	else
+	{
+		// 1-way: NO lockup on deceleration
+		DecelLock = 0.0f;
+		TargetLockPercent = 0.0f;
+		OutState.bIsLocking = false;
+	}
+
+	// Smooth transition to target lock
+	OutState.LockPercent = FMath::FInterpTo(OutState.LockPercent, TargetLockPercent, DeltaTime, Config.LockResponseRate);
+	OutState.AccelLockPercent = AccelLock;
+	OutState.DecelLockPercent = DecelLock;
+	OutState.ActivePreloadTorque = Config.PreloadTorqueNm;
+
+	// Calculate torque distribution based on lockup
+	CalculateTorqueDistribution(OutState, LeftWheelIdx, RightWheelIdx, InputTorque);
+}
+
+void UMGVehicleMovementComponent::Simulate1Point5WayLSD(
+	float DeltaTime,
+	FMGDifferentialState& OutState,
+	const FMGLSDConfiguration& Config,
+	int32 LeftWheelIdx,
+	int32 RightWheelIdx,
+	float InputTorque,
+	bool bIsAccelerating)
+{
+	/**
+	 * 1.5-Way LSD: Full lock on accel, partial lock on decel
+	 *
+	 * Good balance between:
+	 * - Full acceleration traction (like 2-way)
+	 * - Easier rotation on decel than 2-way (but not as free as 1-way)
+	 * - More predictable trail braking behavior
+	 */
+
+	OutState.InputTorque = InputTorque;
+	OutState.bUnderAcceleration = bIsAccelerating;
+
+	// Get wheel speeds
+	const float LeftSpeed = WheelAngularVelocities[LeftWheelIdx];
+	const float RightSpeed = WheelAngularVelocities[RightWheelIdx];
+
+	OutState.LeftWheelAngularVelocity = LeftSpeed;
+	OutState.RightWheelAngularVelocity = RightSpeed;
+	OutState.WheelSpeedDifferential = LeftSpeed - RightSpeed;
+	OutState.NormalizedSpeedDiff = FMath::Clamp(OutState.WheelSpeedDifferential / 10.0f, -1.0f, 1.0f);
+
+	float TargetLockPercent = 0.0f;
+	float AccelLock = 0.0f;
+	float DecelLock = 0.0f;
+
+	// Calculate base lockup from torque/preload
+	const float BaseLockup = CalculateLSDLockup(
+		FMath::Abs(InputTorque),
+		Config.AccelRampAngleDeg,
+		Config.PreloadTorqueNm,
+		Config.MaxLockPercent,
+		Config.ClutchFrictionCoef,
+		Config.ClutchPlateCount);
+
+	if (bIsAccelerating)
+	{
+		// Full lockup on acceleration
+		AccelLock = BaseLockup;
+		TargetLockPercent = AccelLock;
+	}
+	else
+	{
+		// Partial lockup on deceleration (use coast factor)
+		DecelLock = BaseLockup * Config.CoastLockFactor;
+
+		// Also use the decel ramp angle for additional scaling
+		const float DecelRampFactor = FMath::Tan(FMath::DegreesToRadians(Config.AccelRampAngleDeg)) /
+			FMath::Max(FMath::Tan(FMath::DegreesToRadians(Config.DecelRampAngleDeg)), 0.1f);
+		DecelLock *= FMath::Min(DecelRampFactor, 1.0f);
+
+		TargetLockPercent = DecelLock;
+	}
+
+	OutState.bIsLocking = TargetLockPercent > 0.05f;
+
+	// Smooth transition
+	OutState.LockPercent = FMath::FInterpTo(OutState.LockPercent, TargetLockPercent, DeltaTime, Config.LockResponseRate);
+	OutState.AccelLockPercent = AccelLock;
+	OutState.DecelLockPercent = DecelLock;
+	OutState.ActivePreloadTorque = Config.PreloadTorqueNm;
+
+	// Calculate torque distribution
+	CalculateTorqueDistribution(OutState, LeftWheelIdx, RightWheelIdx, InputTorque);
+}
+
+void UMGVehicleMovementComponent::Simulate2WayLSD(
+	float DeltaTime,
+	FMGDifferentialState& OutState,
+	const FMGLSDConfiguration& Config,
+	int32 LeftWheelIdx,
+	int32 RightWheelIdx,
+	float InputTorque,
+	bool bIsAccelerating)
+{
+	/**
+	 * 2-Way LSD: Equal lockup in both directions
+	 *
+	 * Most aggressive LSD type:
+	 * - Maximum traction on acceleration
+	 * - Also locks on deceleration (can cause push on entry)
+	 * - Most stable but least forgiving
+	 * - Good for grip racing, challenging for drifting
+	 */
+
+	OutState.InputTorque = InputTorque;
+	OutState.bUnderAcceleration = bIsAccelerating;
+
+	// Get wheel speeds
+	const float LeftSpeed = WheelAngularVelocities[LeftWheelIdx];
+	const float RightSpeed = WheelAngularVelocities[RightWheelIdx];
+
+	OutState.LeftWheelAngularVelocity = LeftSpeed;
+	OutState.RightWheelAngularVelocity = RightSpeed;
+	OutState.WheelSpeedDifferential = LeftSpeed - RightSpeed;
+	OutState.NormalizedSpeedDiff = FMath::Clamp(OutState.WheelSpeedDifferential / 10.0f, -1.0f, 1.0f);
+
+	// 2-way uses same ramp angle for both directions
+	const float EffectiveRampAngle = Config.AccelRampAngleDeg;
+
+	const float Lockup = CalculateLSDLockup(
+		FMath::Abs(InputTorque),
+		EffectiveRampAngle,
+		Config.PreloadTorqueNm,
+		Config.MaxLockPercent,
+		Config.ClutchFrictionCoef,
+		Config.ClutchPlateCount);
+
+	// Same lockup for both directions
+	OutState.AccelLockPercent = Lockup;
+	OutState.DecelLockPercent = Lockup;
+	OutState.bIsLocking = Lockup > 0.05f;
+
+	// Smooth transition
+	OutState.LockPercent = FMath::FInterpTo(OutState.LockPercent, Lockup, DeltaTime, Config.LockResponseRate);
+	OutState.ActivePreloadTorque = Config.PreloadTorqueNm;
+
+	// Calculate torque distribution
+	CalculateTorqueDistribution(OutState, LeftWheelIdx, RightWheelIdx, InputTorque);
+}
+
+void UMGVehicleMovementComponent::SimulateTorsenDifferential(
+	float DeltaTime,
+	FMGDifferentialState& OutState,
+	const FMGLSDConfiguration& Config,
+	int32 LeftWheelIdx,
+	int32 RightWheelIdx,
+	float InputTorque)
+{
+	/**
+	 * Torsen (Torque-Sensing) Differential
+	 *
+	 * Uses worm gears instead of clutch packs:
+	 * - Smooth, progressive torque biasing
+	 * - Instant response (no clutch engagement delay)
+	 * - Limited by Torque Bias Ratio (TBR)
+	 * - Cannot transfer torque to wheel with zero traction
+	 */
+
+	OutState.InputTorque = InputTorque;
+	OutState.bUnderAcceleration = EngineState.ThrottlePosition > 0.1f;
+
+	// Get wheel speeds
+	const float LeftSpeed = WheelAngularVelocities[LeftWheelIdx];
+	const float RightSpeed = WheelAngularVelocities[RightWheelIdx];
+
+	OutState.LeftWheelAngularVelocity = LeftSpeed;
+	OutState.RightWheelAngularVelocity = RightSpeed;
+	OutState.WheelSpeedDifferential = LeftSpeed - RightSpeed;
+	OutState.NormalizedSpeedDiff = FMath::Clamp(OutState.WheelSpeedDifferential / 10.0f, -1.0f, 1.0f);
+
+	// Get grip for each wheel
+	const float LeftGrip = CalculateTireFriction(LeftWheelIdx) * WeightTransferState.GetWheelLoadMultiplier(LeftWheelIdx);
+	const float RightGrip = CalculateTireFriction(RightWheelIdx) * WeightTransferState.GetWheelLoadMultiplier(RightWheelIdx);
+
+	// Calculate grip ratio
+	const float MinGrip = FMath::Min(LeftGrip, RightGrip);
+	const float MaxGrip = FMath::Max(LeftGrip, RightGrip);
+	const float GripRatio = (MinGrip > KINDA_SMALL_NUMBER) ? MaxGrip / MinGrip : Config.TorsenBiasRatio;
+
+	// Torsen can only bias up to TBR
+	const float EffectiveBiasRatio = FMath::Min(GripRatio, Config.TorsenBiasRatio);
+	OutState.TorsenBiasRatio = EffectiveBiasRatio;
+
+	// Calculate effective lock based on speed difference and TBR
+	const float SpeedDiffMagnitude = FMath::Abs(OutState.WheelSpeedDifferential);
+	const float SpeedDiffFactor = FMath::Clamp(SpeedDiffMagnitude * Config.TorsenSensitivity, 0.0f, 1.0f);
+
+	// Torsen "lockup" is based on torque bias capability
+	const float TorsenLock = ((EffectiveBiasRatio - 1.0f) / (Config.TorsenBiasRatio - 1.0f)) * SpeedDiffFactor;
+	OutState.LockPercent = FMath::FInterpTo(OutState.LockPercent, TorsenLock, DeltaTime, Config.LockResponseRate * 2.0f);
+	OutState.AccelLockPercent = OutState.LockPercent;
+	OutState.DecelLockPercent = OutState.LockPercent;
+	OutState.bIsLocking = OutState.LockPercent > 0.1f;
+	OutState.ActivePreloadTorque = 0.0f; // Torsen has no preload
+
+	// Calculate torque distribution based on grip and TBR
+	if (LeftGrip < RightGrip && SpeedDiffMagnitude > Config.MinSpeedDiffThreshold)
+	{
+		// Left has less grip - bias torque to right (up to TBR limit)
+		const float BiasAmount = FMath::Min(EffectiveBiasRatio, Config.TorsenBiasRatio);
+		const float TotalRatio = 1.0f + BiasAmount;
+		OutState.LeftWheelTorqueRatio = 1.0f / TotalRatio;
+		OutState.RightWheelTorqueRatio = BiasAmount / TotalRatio;
+	}
+	else if (RightGrip < LeftGrip && SpeedDiffMagnitude > Config.MinSpeedDiffThreshold)
+	{
+		// Right has less grip - bias torque to left
+		const float BiasAmount = FMath::Min(EffectiveBiasRatio, Config.TorsenBiasRatio);
+		const float TotalRatio = 1.0f + BiasAmount;
+		OutState.RightWheelTorqueRatio = 1.0f / TotalRatio;
+		OutState.LeftWheelTorqueRatio = BiasAmount / TotalRatio;
+	}
+	else
+	{
+		// Equal grip or below threshold - equal torque split
+		OutState.LeftWheelTorqueRatio = 0.5f;
+		OutState.RightWheelTorqueRatio = 0.5f;
+	}
+
+	OutState.BiasTorque = InputTorque * FMath::Abs(OutState.LeftWheelTorqueRatio - OutState.RightWheelTorqueRatio);
+}
+
+void UMGVehicleMovementComponent::SimulateLockedDifferential(
+	float DeltaTime,
+	FMGDifferentialState& OutState,
+	int32 LeftWheelIdx,
+	int32 RightWheelIdx,
+	float InputTorque)
+{
+	/**
+	 * Locked/Welded Differential
+	 *
+	 * Both wheels ALWAYS rotate at same speed:
+	 * - Maximum traction for straight-line acceleration
+	 * - Very poor turning behavior (tire scrub)
+	 * - Both wheels spin together or not at all
+	 * - Common in drag racing, difficult for cornering
+	 */
+
+	OutState.InputTorque = InputTorque;
+	OutState.bUnderAcceleration = EngineState.ThrottlePosition > 0.1f;
+
+	// Get wheel speeds (should be nearly identical with locked diff)
+	const float LeftSpeed = WheelAngularVelocities[LeftWheelIdx];
+	const float RightSpeed = WheelAngularVelocities[RightWheelIdx];
+
+	OutState.LeftWheelAngularVelocity = LeftSpeed;
+	OutState.RightWheelAngularVelocity = RightSpeed;
+
+	// With a truly locked diff, any speed difference is from tire slip
+	OutState.WheelSpeedDifferential = LeftSpeed - RightSpeed;
+	OutState.NormalizedSpeedDiff = FMath::Clamp(OutState.WheelSpeedDifferential / 10.0f, -1.0f, 1.0f);
+
+	// Always 100% locked
+	OutState.LockPercent = 1.0f;
+	OutState.AccelLockPercent = 1.0f;
+	OutState.DecelLockPercent = 1.0f;
+	OutState.bIsLocking = true;
+	OutState.ActivePreloadTorque = 0.0f;
+	OutState.TorsenBiasRatio = FLT_MAX; // Infinite bias capability
+
+	// Equal torque split (locked means 50/50)
+	OutState.LeftWheelTorqueRatio = 0.5f;
+	OutState.RightWheelTorqueRatio = 0.5f;
+
+	// Calculate the bias torque needed to maintain equal speed (tire binding)
+	// This torque works against the tires and causes understeer
+	const float GripLeft = CalculateTireFriction(LeftWheelIdx) * WeightTransferState.GetWheelLoadMultiplier(LeftWheelIdx);
+	const float GripRight = CalculateTireFriction(RightWheelIdx) * WeightTransferState.GetWheelLoadMultiplier(RightWheelIdx);
+	OutState.BiasTorque = InputTorque * FMath::Abs(GripLeft - GripRight) / FMath::Max(GripLeft + GripRight, 0.001f);
+}
+
+void UMGVehicleMovementComponent::SimulateCenterDifferential(
+	float DeltaTime,
+	FMGDifferentialState& OutState,
+	float InputTorque,
+	bool bIsAccelerating)
+{
+	/**
+	 * Center Differential (AWD systems)
+	 *
+	 * Distributes torque between front and rear axles.
+	 * Uses the CenterLSDConfig for behavior.
+	 */
+
+	OutState.InputTorque = InputTorque;
+	OutState.bUnderAcceleration = bIsAccelerating;
+
+	// Calculate front/rear speed differential
+	const float FrontAxleSpeed = (WheelAngularVelocities[0] + WheelAngularVelocities[1]) * 0.5f;
+	const float RearAxleSpeed = (WheelAngularVelocities[2] + WheelAngularVelocities[3]) * 0.5f;
+
+	OutState.LeftWheelAngularVelocity = FrontAxleSpeed;  // "Left" = Front for center diff
+	OutState.RightWheelAngularVelocity = RearAxleSpeed;  // "Right" = Rear for center diff
+	OutState.WheelSpeedDifferential = FrontAxleSpeed - RearAxleSpeed;
+	OutState.NormalizedSpeedDiff = FMath::Clamp(OutState.WheelSpeedDifferential / 10.0f, -1.0f, 1.0f);
+
+	// Calculate lockup based on center diff settings
+	const float CenterLock = CalculateLSDLockup(
+		FMath::Abs(InputTorque),
+		CenterLSDConfig.AccelRampAngleDeg,
+		CenterLSDConfig.PreloadTorqueNm,
+		CenterLSDConfig.MaxLockPercent,
+		CenterLSDConfig.ClutchFrictionCoef,
+		CenterLSDConfig.ClutchPlateCount);
+
+	OutState.LockPercent = FMath::FInterpTo(OutState.LockPercent, CenterLock, DeltaTime, CenterLSDConfig.LockResponseRate);
+	OutState.bIsLocking = OutState.LockPercent > 0.1f;
+
+	// Front/rear torque split based on AWDFrontBias and lockup
+	// More lockup = closer to the base bias
+	// Less lockup = can deviate more based on grip
+	const float FrontGrip = (CalculateTireFriction(0) + CalculateTireFriction(1)) * 0.5f;
+	const float RearGrip = (CalculateTireFriction(2) + CalculateTireFriction(3)) * 0.5f;
+	const float TotalGrip = FrontGrip + RearGrip;
+
+	if (TotalGrip > KINDA_SMALL_NUMBER && OutState.LockPercent < 0.9f)
+	{
+		// Blend between grip-based distribution and fixed bias based on lockup
+		const float GripBasedFront = RearGrip / TotalGrip; // More rear grip = more front torque
+		const float FinalFrontRatio = FMath::Lerp(GripBasedFront, AWDFrontBias, OutState.LockPercent);
+		OutState.LeftWheelTorqueRatio = FinalFrontRatio;
+		OutState.RightWheelTorqueRatio = 1.0f - FinalFrontRatio;
+	}
+	else
+	{
+		// Fully locked or no grip data - use base bias
+		OutState.LeftWheelTorqueRatio = AWDFrontBias;
+		OutState.RightWheelTorqueRatio = 1.0f - AWDFrontBias;
+	}
+
+	OutState.BiasTorque = InputTorque * FMath::Abs(OutState.LeftWheelTorqueRatio - 0.5f);
+}
+
+float UMGVehicleMovementComponent::CalculateLSDLockup(
+	float InputTorque,
+	float RampAngleDeg,
+	float Preload,
+	float MaxLock,
+	float FrictionCoef,
+	int32 PlateCount) const
+{
+	/**
+	 * LSD Lockup Calculation using Ramp Angle
+	 *
+	 * The ramp angle determines how much the clutch plates are compressed
+	 * for a given input torque. Lower angles = more aggressive compression.
+	 *
+	 * LockForce = InputTorque / tan(RampAngle)
+	 * ClutchTorque = LockForce * FrictionCoef * PlateCount * MeanRadius
+	 */
+
+	if (InputTorque < Preload)
+	{
+		// Below preload - minimal lockup
+		return FMath::Clamp(InputTorque / FMath::Max(Preload, 1.0f) * 0.1f, 0.0f, 0.1f);
+	}
+
+	// Calculate ramp force (lower angle = more force)
+	const float RampAngleRad = FMath::DegreesToRadians(FMath::Clamp(RampAngleDeg, 20.0f, 89.0f));
+	const float TanRamp = FMath::Tan(RampAngleRad);
+
+	// Axial force from torque through ramp
+	const float EffectiveTorque = InputTorque - Preload;
+	const float AxialForce = EffectiveTorque / FMath::Max(TanRamp, 0.1f);
+
+	// Clutch torque capacity based on friction and plate count
+	const float MeanClutchRadius = 0.05f; // 5cm mean radius (typical for automotive)
+	const float ClutchTorqueCapacity = AxialForce * FrictionCoef * PlateCount * MeanClutchRadius;
+
+	// Lock percentage is ratio of clutch torque to input torque
+	const float RawLockPercent = ClutchTorqueCapacity / FMath::Max(InputTorque, 1.0f);
+
+	// Add preload contribution
+	const float PreloadLock = Preload / 500.0f; // Normalized preload contribution
+
+	// Final lock percentage
+	return FMath::Clamp(RawLockPercent + PreloadLock, 0.0f, MaxLock);
+}
+
+void UMGVehicleMovementComponent::CalculateTorqueDistribution(
+	FMGDifferentialState& OutState,
+	int32 LeftWheelIdx,
+	int32 RightWheelIdx,
+	float InputTorque)
+{
+	// Get grip for each wheel
+	const float LeftGrip = CalculateTireFriction(LeftWheelIdx) * WeightTransferState.GetWheelLoadMultiplier(LeftWheelIdx);
+	const float RightGrip = CalculateTireFriction(RightWheelIdx) * WeightTransferState.GetWheelLoadMultiplier(RightWheelIdx);
+	const float TotalGrip = LeftGrip + RightGrip;
+
+	if (TotalGrip < KINDA_SMALL_NUMBER)
+	{
+		// No grip - equal split
+		OutState.LeftWheelTorqueRatio = 0.5f;
+		OutState.RightWheelTorqueRatio = 0.5f;
+		OutState.BiasTorque = 0.0f;
+		return;
+	}
+
+	// Calculate ideal (grip-based) torque split
+	const float IdealLeftRatio = LeftGrip / TotalGrip;
+	const float IdealRightRatio = RightGrip / TotalGrip;
+
+	// Blend between open-diff behavior (follows grip) and locked behavior (50/50) based on lock percent
+	OutState.LeftWheelTorqueRatio = FMath::Lerp(IdealLeftRatio, 0.5f, OutState.LockPercent);
+	OutState.RightWheelTorqueRatio = FMath::Lerp(IdealRightRatio, 0.5f, OutState.LockPercent);
+
+	// Calculate bias torque (torque transferred by the LSD mechanism)
+	const float OpenDiffBias = FMath::Abs(IdealLeftRatio - 0.5f) * InputTorque;
+	OutState.BiasTorque = OpenDiffBias * OutState.LockPercent;
+}
+
+void UMGVehicleMovementComponent::ApplyDifferentialTorqueToWheels(
+	float DeltaTime,
+	const FMGDifferentialState& DiffState,
+	int32 LeftWheelIdx,
+	int32 RightWheelIdx)
+{
+	// Apply the torque distribution calculated by the differential simulation
+	// This affects wheel acceleration/deceleration
+
+	if (!GetOwner() || !PVehicleOutput)
+	{
+		return;
+	}
+
+	// For locked diff or high lock percentage, apply forces to equalize wheel speeds
+	if (DiffState.LockPercent > 0.1f)
+	{
+		if (UPrimitiveComponent* MeshPrimitive = Cast<UPrimitiveComponent>(UpdatedPrimitive))
+		{
+			const float SpeedDiff = DiffState.WheelSpeedDifferential;
+			const float CorrectionStrength = DiffState.LockPercent * DifferentialViscosity * FMath::Abs(SpeedDiff);
+
+			// Apply counter-torque to slow down the faster wheel
+			// This simulates the binding effect of the LSD
+			if (FMath::Abs(SpeedDiff) > 0.5f)
+			{
+				// Create a yaw moment from the differential binding
+				// This affects vehicle rotation during turns
+				const float YawCorrection = CorrectionStrength * FMath::Sign(SpeedDiff) * DeltaTime;
+
+				// Apply as torque (locked diff creates understeer)
+				const FVector TorqueVector = FVector(0.0f, 0.0f, YawCorrection * 100.0f);
+				MeshPrimitive->AddTorqueInRadians(TorqueVector, NAME_None, true);
+			}
+		}
+	}
+}
+
+void UMGVehicleMovementComponent::UpdatePowerDistributionData(float DeltaTime)
+{
+	const EMGDrivetrainType DriveType = CurrentConfiguration.Drivetrain.DrivetrainType;
+
+	// Copy differential states for UI
+	PowerDistributionData.RearDiffState = RearDiffState;
+	PowerDistributionData.FrontDiffState = FrontDiffState;
+	PowerDistributionData.CenterDiffState = CenterDiffState;
+
+	// Calculate per-wheel power percentages
+	switch (DriveType)
+	{
+		case EMGDrivetrainType::RWD:
+			PowerDistributionData.FrontLeftPower = 0.0f;
+			PowerDistributionData.FrontRightPower = 0.0f;
+			PowerDistributionData.RearLeftPower = RearDiffState.LeftWheelTorqueRatio * 100.0f;
+			PowerDistributionData.RearRightPower = RearDiffState.RightWheelTorqueRatio * 100.0f;
+			PowerDistributionData.FrontAxlePower = 0.0f;
+			PowerDistributionData.RearAxlePower = 100.0f;
+			PowerDistributionData.CenterDiffBias = 0.0f;
+			break;
+
+		case EMGDrivetrainType::FWD:
+			PowerDistributionData.FrontLeftPower = FrontDiffState.LeftWheelTorqueRatio * 100.0f;
+			PowerDistributionData.FrontRightPower = FrontDiffState.RightWheelTorqueRatio * 100.0f;
+			PowerDistributionData.RearLeftPower = 0.0f;
+			PowerDistributionData.RearRightPower = 0.0f;
+			PowerDistributionData.FrontAxlePower = 100.0f;
+			PowerDistributionData.RearAxlePower = 0.0f;
+			PowerDistributionData.CenterDiffBias = 1.0f;
+			break;
+
+		case EMGDrivetrainType::AWD:
+			{
+				const float FrontPower = CenterDiffState.LeftWheelTorqueRatio * 100.0f;
+				const float RearPower = CenterDiffState.RightWheelTorqueRatio * 100.0f;
+
+				PowerDistributionData.FrontLeftPower = FrontDiffState.LeftWheelTorqueRatio * FrontPower;
+				PowerDistributionData.FrontRightPower = FrontDiffState.RightWheelTorqueRatio * FrontPower;
+				PowerDistributionData.RearLeftPower = RearDiffState.LeftWheelTorqueRatio * RearPower;
+				PowerDistributionData.RearRightPower = RearDiffState.RightWheelTorqueRatio * RearPower;
+				PowerDistributionData.FrontAxlePower = FrontPower;
+				PowerDistributionData.RearAxlePower = RearPower;
+				PowerDistributionData.CenterDiffBias = AWDFrontBias;
+			}
+			break;
+	}
+
+	// Update wheel slip ratios and spin status
+	for (int32 i = 0; i < 4; ++i)
+	{
+		PowerDistributionData.WheelSlipRatios[i] = GetWheelSlipRatio(i);
+		PowerDistributionData.bWheelSpinning[i] = IsWheelSpinningExcessively(i);
+	}
+
+	// Calculate drivetrain loss
+	PowerDistributionData.DrivetrainLossPercent = (1.0f - PartWearEffects.DrivetrainEfficiency) * 100.0f;
+}
+
+void UMGVehicleMovementComponent::IntegrateDifferentialWithWeightTransfer(float DeltaTime)
+{
+	// Weight transfer affects differential behavior through grip changes
+	// This is already accounted for in CalculateTireFriction via GetWheelLoadMultiplier
+
+	// Additionally, under hard acceleration, weight transfer to rear
+	// increases rear tire grip, which affects LSD lockup behavior
+	if (EngineState.ThrottlePosition > 0.7f && WeightTransferState.LongitudinalTransfer < -0.3f)
+	{
+		// Hard acceleration - weight on rear
+		// This can reduce LSD lockup needs as both rear wheels have good grip
+	}
+
+	// Under hard braking, weight transfers forward
+	// This reduces rear grip and may cause one-wheel spin with open diff
+	if (GetBrakeInput() > 0.7f && WeightTransferState.LongitudinalTransfer > 0.3f)
+	{
+		// Weight on front - rear wheels light
+		// Open diff would have inside wheel spin on corner entry
+	}
+
+	// Lateral weight transfer affects inside/outside wheel grip
+	// LSD helps keep both wheels driving despite grip difference
+}
+
+// ==========================================
+// DIFFERENTIAL QUERY METHODS
+// ==========================================
+
+float UMGVehicleMovementComponent::GetAxleLockPercent(bool bFrontAxle) const
+{
+	return bFrontAxle ? FrontDiffState.LockPercent : RearDiffState.LockPercent;
+}
+
+float UMGVehicleMovementComponent::GetWheelAngularVelocity(int32 WheelIndex) const
+{
+	if (WheelIndex >= 0 && WheelIndex < 4)
+	{
+		return WheelAngularVelocities[WheelIndex];
+	}
+	return 0.0f;
+}
+
+float UMGVehicleMovementComponent::GetAxleSpeedDifferential(bool bFrontAxle) const
+{
+	if (bFrontAxle)
+	{
+		return WheelAngularVelocities[0] - WheelAngularVelocities[1];
+	}
+	else
+	{
+		return WheelAngularVelocities[2] - WheelAngularVelocities[3];
+	}
+}
+
+bool UMGVehicleMovementComponent::IsWheelSpinningExcessively(int32 WheelIndex) const
+{
+	const float SlipRatio = GetWheelSlipRatio(WheelIndex);
+	const float SlipThreshold = 0.3f; // 30% slip = significant wheelspin
+	return SlipRatio > SlipThreshold;
 }
 
 FMGTireTemperature UMGVehicleMovementComponent::GetTireTemperature(int32 WheelIndex) const
@@ -1984,4 +2810,208 @@ void UMGVehicleMovementComponent::UpdateClutchWear(float DeltaTime)
 
 	// Update clutch engagement efficiency in engine state
 	EngineState.ClutchEngagement = ClutchInput * ClutchWearState.GetTorqueTransferEfficiency();
+}
+
+// ==========================================
+// ECU MAP CONTROLS
+// ==========================================
+
+bool UMGVehicleMovementComponent::SwitchECUMap(EMGECUMapType NewMapType)
+{
+	// Check if map is available
+	if (!IsECUMapAvailable(NewMapType))
+	{
+		return false;
+	}
+
+	// Check if real-time switching is supported (if engine is running)
+	if (EngineState.CurrentRPM > 0.0f && !CurrentConfiguration.Engine.ECU.bSupportsRealTimeMapSwitch)
+	{
+		// Can only switch while engine is off
+		return false;
+	}
+
+	// Get the new map parameters
+	EMGECUMapType OldMapType = CurrentConfiguration.Engine.ECU.ActiveMapType;
+	CurrentConfiguration.Engine.ECU.ActiveMapType = NewMapType;
+
+	// Apply immediate effects
+	const FMGECUMapParameters& NewMap = CurrentConfiguration.Engine.ECU.GetActiveMap();
+
+	// Update rev limiter
+	if (NewMap.RevLimitRPM > 0)
+	{
+		// This would update the physics engine rev limiter
+		// Engine.Transmission.RevLimitRPM = NewMap.RevLimitRPM;
+	}
+
+	// Update launch control if available
+	if (NewMap.LaunchControlRPM > 0)
+	{
+		EngineState.LaunchControlRPM = static_cast<float>(NewMap.LaunchControlRPM);
+	}
+
+	// Update anti-lag state
+	EngineState.bAntiLagActive = NewMap.bAntiLagEnabled && CurrentConfiguration.Engine.ForcedInduction.Type != EMGForcedInductionType::None;
+
+	return true;
+}
+
+EMGECUMapType UMGVehicleMovementComponent::GetActiveECUMapType() const
+{
+	return CurrentConfiguration.Engine.ECU.ActiveMapType;
+}
+
+FMGECUMapParameters UMGVehicleMovementComponent::GetActiveECUMapParameters() const
+{
+	return CurrentConfiguration.Engine.ECU.GetActiveMap();
+}
+
+bool UMGVehicleMovementComponent::IsECUMapAvailable(EMGECUMapType MapType) const
+{
+	// Stock map is always available
+	if (MapType == EMGECUMapType::Stock)
+	{
+		return true;
+	}
+
+	// Check if map is in available list
+	const TArray<EMGECUMapType>& AvailableMaps = CurrentConfiguration.Engine.ECU.AvailableMaps;
+	return AvailableMaps.Contains(MapType);
+}
+
+TArray<EMGECUMapType> UMGVehicleMovementComponent::GetAvailableECUMaps() const
+{
+	TArray<EMGECUMapType> Result;
+	Result.Add(EMGECUMapType::Stock); // Always available
+
+	// Add other available maps
+	for (EMGECUMapType MapType : CurrentConfiguration.Engine.ECU.AvailableMaps)
+	{
+		if (MapType != EMGECUMapType::Stock)
+		{
+			Result.AddUnique(MapType);
+		}
+	}
+
+	return Result;
+}
+
+float UMGVehicleMovementComponent::GetECUPowerMultiplier() const
+{
+	const FMGECUMapParameters& ActiveMap = CurrentConfiguration.Engine.ECU.GetActiveMap();
+
+	float PowerMultiplier = ActiveMap.PowerMultiplier;
+
+	// Check fuel octane requirements
+	// If fuel octane is too low, reduce power to prevent knock
+	// This would check against actual fuel in tank
+	// For now, assume correct fuel is being used
+
+	// Apply knock protection if we don't have wideband AFR
+	if (!CurrentConfiguration.Engine.ECU.bHasWidebandAFR && ActiveMap.KnockProbability > 0.0f)
+	{
+		// Randomly detect "knock" and pull timing
+		if (FMath::FRand() < ActiveMap.KnockProbability * 0.01f) // Per-frame check
+		{
+			// This would trigger knock retard
+			PowerMultiplier *= 0.95f;
+		}
+	}
+
+	return PowerMultiplier;
+}
+
+// ==========================================
+// WEATHER EFFECTS INTEGRATION
+// ==========================================
+
+void UMGVehicleMovementComponent::SetWeatherGripMultiplier(float Multiplier)
+{
+	WeatherGripMultiplier = FMath::Clamp(Multiplier, 0.1f, 1.0f);
+}
+
+void UMGVehicleMovementComponent::ApplyAquaplaning(float Intensity, const TArray<float>& WheelFactors)
+{
+	bIsAquaplaning = Intensity > 0.1f;
+	AquaplaningIntensity = FMath::Clamp(Intensity, 0.0f, 1.0f);
+
+	// Store per-wheel factors
+	WheelAquaplaningFactors = WheelFactors;
+
+	// Ensure we have 4 wheel factors
+	while (WheelAquaplaningFactors.Num() < 4)
+	{
+		WheelAquaplaningFactors.Add(0.0f);
+	}
+
+	if (bIsAquaplaning)
+	{
+		// During aquaplaning, severely reduce grip on affected wheels
+		// This creates the characteristic loss of steering control
+		const float GripReduction = FMath::Lerp(1.0f, 0.1f, AquaplaningIntensity);
+
+		// Apply as additional multiplier through weather grip
+		SetWeatherGripMultiplier(GetWeatherGripMultiplier() * GripReduction);
+
+		// Add slight random steering drift during aquaplaning
+		if (AquaplaningIntensity > 0.5f)
+		{
+			const float DriftAmount = (FMath::FRand() - 0.5f) * 0.1f * AquaplaningIntensity;
+			TargetSteering += DriftAmount;
+		}
+	}
+}
+
+void UMGVehicleMovementComponent::ApplyWindForce(const FVector& WindForce)
+{
+	PendingWindForce = WindForce;
+
+	// Apply wind force to the vehicle mesh
+	if (UPrimitiveComponent* Mesh = Cast<UPrimitiveComponent>(UpdatedComponent))
+	{
+		// Apply at center of pressure (slightly above center of mass for realistic behavior)
+		const FVector ForceLocation = GetOwner()->GetActorLocation() + FVector(0, 0, 50.0f);
+		Mesh->AddForceAtLocation(WindForce, ForceLocation);
+
+		// Add slight torque for realistic yaw response to crosswind
+		const FVector ForwardDir = GetOwner()->GetActorForwardVector();
+		const FVector RightDir = GetOwner()->GetActorRightVector();
+		const float CrosswindComponent = FVector::DotProduct(WindForce.GetSafeNormal(), RightDir);
+
+		// Yaw torque - wind pushes the tail
+		const FVector YawTorque = FVector::UpVector * CrosswindComponent * WindForce.Size() * 0.01f;
+		Mesh->AddTorqueInDegrees(YawTorque);
+	}
+}
+
+TArray<FVector> UMGVehicleMovementComponent::GetWheelWorldLocations() const
+{
+	TArray<FVector> Locations;
+	Locations.SetNum(4);
+
+	// Get owner location and rotation
+	if (AActor* Owner = GetOwner())
+	{
+		const FVector OwnerLoc = Owner->GetActorLocation();
+		const FRotator OwnerRot = Owner->GetActorRotation();
+		const FVector Forward = Owner->GetActorForwardVector();
+		const FVector Right = Owner->GetActorRightVector();
+
+		// Estimate wheel positions based on typical vehicle dimensions
+		// These would ideally come from wheel components
+		const float Wheelbase = 270.0f; // cm
+		const float TrackWidth = 160.0f; // cm
+
+		// Front Left (FL)
+		Locations[0] = OwnerLoc + Forward * (Wheelbase * 0.5f) - Right * (TrackWidth * 0.5f);
+		// Front Right (FR)
+		Locations[1] = OwnerLoc + Forward * (Wheelbase * 0.5f) + Right * (TrackWidth * 0.5f);
+		// Rear Left (RL)
+		Locations[2] = OwnerLoc - Forward * (Wheelbase * 0.5f) - Right * (TrackWidth * 0.5f);
+		// Rear Right (RR)
+		Locations[3] = OwnerLoc - Forward * (Wheelbase * 0.5f) + Right * (TrackWidth * 0.5f);
+	}
+
+	return Locations;
 }

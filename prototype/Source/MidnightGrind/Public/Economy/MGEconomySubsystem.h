@@ -21,6 +21,7 @@ enum class EMGTransactionType : uint8
 	VehicleSale,
 	PartPurchase,
 	PartSale,
+	PartInstallLabor,    /**< Shop labor cost for part installation */
 	PaintJob,
 	RepairCost,
 	PinkSlipWin,
@@ -34,6 +35,9 @@ enum class EMGTransactionType : uint8
 	MarketplaceSale,
 	MarketplacePurchase,
 	Trade,
+	DynoRental,
+	ToolPurchase,        /**< Player purchased a mechanic tool */
+	GarageUpgrade,       /**< Player upgraded their garage (lift, etc.) */
 	Other
 };
 

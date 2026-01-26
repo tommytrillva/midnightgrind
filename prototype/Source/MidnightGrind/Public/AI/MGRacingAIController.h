@@ -140,6 +140,38 @@ struct FMGAIDriverProfile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float NOSAggression = 0.5f;
 
+	// ========================================
+	// WEATHER AWARENESS
+	// ========================================
+
+	/**
+	 * @brief Weather adaptation skill (0-1)
+	 * Higher values mean AI adjusts better to weather conditions
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float WeatherAdaptation = 0.7f;
+
+	/**
+	 * @brief Night vision capability (0-1)
+	 * Affects how well AI performs in low-light conditions
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float NightDrivingSkill = 0.7f;
+
+	/**
+	 * @brief Wet weather driving skill (0-1)
+	 * Affects performance in rain and on wet surfaces
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float WetWeatherSkill = 0.7f;
+
+	/**
+	 * @brief Perception range multiplier applied by weather system
+	 * Set by UMGWeatherRacingSubsystem based on conditions
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "Weather")
+	float WeatherPerceptionMultiplier = 1.0f;
+
 	/** Generate from difficulty preset */
 	void GenerateFromDifficulty(EMGAIDifficulty InDifficulty);
 };

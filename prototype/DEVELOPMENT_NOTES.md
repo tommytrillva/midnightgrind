@@ -325,6 +325,19 @@ Based on GDD alignment and mission priorities:
     - Chapter completion requirements
     - Integration with CareerSubsystem
 
+12. **Bounty Level Requirements** ✅
+    - Player level check via CareerSubsystem
+    - Career chapter-to-level mapping consistent with Showdown
+    - Prevents accepting bounties above player level
+
+13. **Shortcut Unlock Conditions** ✅
+    - Multi-format unlock requirement parsing
+    - CHAPTER_* - Career chapter requirements
+    - MILESTONE_* - Career milestone requirements
+    - REP_* - Reputation tier requirements
+    - SHORTCUT_* - Shortcut mastery requirements
+    - Integration with Career and Reputation subsystems
+
 **In Progress:**
 - Additional TODO resolution
 - Performance baseline establishment

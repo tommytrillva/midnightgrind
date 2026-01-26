@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 #include "MGVehicleData.h"
+#include "MGTirePressureTypes.h"
 #include "MGVehicleMovementComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGearChanged, int32, NewGear);
@@ -17,6 +18,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnClutchOverheating, float, Temper
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClutchBurnout);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoneyShift, float, OverRevAmount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDifferentialLockup, float, LockPercent, bool, bUnderAccel);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnTirePressureWarning, int32, WheelIndex, float, CurrentPressure, EMGPressureLossCause, Cause);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTireBlowout, int32, WheelIndex, EMGPressureLossCause, Cause);
 
 /**
  * @brief Differential lock state for detailed simulation
@@ -280,6 +283,190 @@ struct FMGPowerDistributionData
 };
 
 /**
+ * @brief Suspension geometry configuration for a single axle
+ *
+ * Models the effects of camber, toe, and caster angles on tire behavior.
+ * These settings significantly impact handling characteristics:
+ * - Camber: Affects contact patch shape during cornering
+ * - Toe: Affects straight-line stability and turn-in response
+ * - Caster: Affects steering feel and self-centering (front only)
+ */
+USTRUCT(BlueprintType)
+struct FMGSuspensionGeometry
+{
+	GENERATED_BODY()
+
+	/**
+	 * @brief Camber angle in degrees (negative = top of tire tilted inward)
+	 *
+	 * Typical street car range: -0.5 to -2.0 degrees
+	 * Typical race car range: -2.0 to -4.0 degrees
+	 * Extreme drift setup: -4.0 to -8.0 degrees
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Geometry", meta = (ClampMin = "-10.0", ClampMax = "5.0"))
+	float CamberAngleDeg = -1.0f;
+
+	/**
+	 * @brief Toe angle in degrees per side (positive = toe-in, negative = toe-out)
+	 *
+	 * Toe-in (positive): Improves straight-line stability, reduces turn-in
+	 * Toe-out (negative): Improves turn-in response, increases tire wear
+	 * Typical range: -0.5 to +0.5 degrees per side
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Geometry", meta = (ClampMin = "-2.0", ClampMax = "2.0"))
+	float ToeAngleDeg = 0.0f;
+
+	/**
+	 * @brief Caster angle in degrees (positive = top of steering axis tilted rearward)
+	 *
+	 * Higher caster: Better high-speed stability, stronger self-centering, heavier steering
+	 * Lower caster: Lighter steering, less self-centering, reduced stability
+	 * Typical street car range: 3.0 to 7.0 degrees
+	 * Typical race car range: 5.0 to 10.0 degrees
+	 *
+	 * Note: Only affects front wheels (steering axis)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Geometry", meta = (ClampMin = "0.0", ClampMax = "15.0"))
+	float CasterAngleDeg = 5.0f;
+};
+
+/**
+ * @brief Calculated tire contact patch effects from suspension geometry
+ *
+ * These values are computed from suspension geometry and vehicle state,
+ * and are used to modify grip and handling characteristics per wheel.
+ */
+USTRUCT(BlueprintType)
+struct FMGContactPatchState
+{
+	GENERATED_BODY()
+
+	/**
+	 * @brief Effective contact patch width ratio (0.5 to 1.2)
+	 *
+	 * Affected by camber: negative camber reduces contact patch width on straights
+	 * but increases it during cornering when body roll compresses the outside tire.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float EffectiveWidthRatio = 1.0f;
+
+	/**
+	 * @brief Lateral grip multiplier from camber effect (0.7 to 1.15)
+	 *
+	 * Negative camber improves lateral grip during cornering by keeping
+	 * the tire more perpendicular to the road surface under body roll.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float CamberLateralGripMultiplier = 1.0f;
+
+	/**
+	 * @brief Longitudinal (acceleration/braking) grip multiplier (0.8 to 1.05)
+	 *
+	 * Excessive camber reduces straight-line traction due to smaller contact patch.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float CamberLongitudinalGripMultiplier = 1.0f;
+
+	/**
+	 * @brief Turn-in response multiplier from toe setting (0.8 to 1.2)
+	 *
+	 * Toe-out improves initial turn-in response.
+	 * Toe-in reduces turn-in but improves stability.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float ToeTurnInMultiplier = 1.0f;
+
+	/**
+	 * @brief Straight-line stability multiplier from toe setting (0.8 to 1.2)
+	 *
+	 * Toe-in improves straight-line stability.
+	 * Toe-out reduces stability but improves agility.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float ToeStabilityMultiplier = 1.0f;
+
+	/**
+	 * @brief Tire wear rate multiplier from toe setting (1.0 to 2.0)
+	 *
+	 * Both toe-in and toe-out increase tire wear due to scrubbing.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float ToeWearMultiplier = 1.0f;
+
+	/**
+	 * @brief Steering self-centering force multiplier from caster (0.5 to 1.5)
+	 *
+	 * Higher caster increases the self-centering torque.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float CasterSelfCenteringMultiplier = 1.0f;
+
+	/**
+	 * @brief High-speed stability multiplier from caster (0.8 to 1.2)
+	 *
+	 * Higher caster improves directional stability at speed.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float CasterStabilityMultiplier = 1.0f;
+
+	/**
+	 * @brief Steering weight/feel multiplier from caster (0.7 to 1.5)
+	 *
+	 * Higher caster increases steering effort but improves feedback.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float CasterSteeringWeightMultiplier = 1.0f;
+
+	/**
+	 * @brief Combined geometry grip modifier for this wheel
+	 *
+	 * Final multiplier applied to base tire grip, combining all geometry effects.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "ContactPatch")
+	float CombinedGripModifier = 1.0f;
+};
+
+/**
+ * @brief Complete suspension geometry effects data for the entire vehicle
+ *
+ * Contains calculated contact patch states for all four wheels and
+ * aggregated handling modifiers derived from suspension geometry settings.
+ */
+USTRUCT(BlueprintType)
+struct FMGSuspensionGeometryEffects
+{
+	GENERATED_BODY()
+
+	/** Contact patch state for each wheel (FL, FR, RL, RR) */
+	UPROPERTY(BlueprintReadOnly, Category = "Geometry")
+	FMGContactPatchState WheelContactPatch[4];
+
+	/** Overall steering response modifier from geometry (affects turn-in speed) */
+	UPROPERTY(BlueprintReadOnly, Category = "Geometry|Handling")
+	float SteeringResponseModifier = 1.0f;
+
+	/** Overall straight-line stability modifier */
+	UPROPERTY(BlueprintReadOnly, Category = "Geometry|Handling")
+	float StraightLineStabilityModifier = 1.0f;
+
+	/** Overall cornering grip modifier */
+	UPROPERTY(BlueprintReadOnly, Category = "Geometry|Handling")
+	float CorneringGripModifier = 1.0f;
+
+	/** Tire wear rate modifier from geometry */
+	UPROPERTY(BlueprintReadOnly, Category = "Geometry|Wear")
+	float TireWearRateModifier = 1.0f;
+
+	/** Steering self-centering strength */
+	UPROPERTY(BlueprintReadOnly, Category = "Geometry|Steering")
+	float SelfCenteringStrength = 1.0f;
+
+	/** Steering weight/effort modifier */
+	UPROPERTY(BlueprintReadOnly, Category = "Geometry|Steering")
+	float SteeringWeightModifier = 1.0f;
+};
+
+/**
  * @brief Drift scoring tier thresholds for angle bonuses
  */
 UENUM(BlueprintType)
@@ -387,6 +574,170 @@ struct FMGTireTemperature
 		if (AvgTemp <= 100.0f) return 0.9f + ((AvgTemp - 50.0f) / 50.0f) * 0.15f; // Warming up
 		if (AvgTemp <= 120.0f) return 1.05f; // Optimal
 		return 1.05f - ((AvgTemp - 120.0f) / 50.0f) * 0.25f; // Overheating = degradation
+	}
+};
+
+/**
+ * @brief Tire pressure state for pressure-based grip and handling effects
+ *
+ * Simulates tire pressure dynamics including:
+ * - Cold pressure setting
+ * - Pressure increase from heat
+ * - Effects on grip, wear, and contact patch
+ */
+USTRUCT(BlueprintType)
+struct FMGTirePressureState
+{
+	GENERATED_BODY()
+
+	/** Cold pressure setting (PSI) - what the tire is set to when cold */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure", meta = (ClampMin = "20.0", ClampMax = "50.0"))
+	float ColdPressurePSI = 32.0f;
+
+	/** Current actual pressure (PSI) - changes with temperature */
+	UPROPERTY(BlueprintReadOnly, Category = "Pressure")
+	float CurrentPressurePSI = 32.0f;
+
+	/** Target/optimal hot pressure for this tire (PSI) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure", meta = (ClampMin = "25.0", ClampMax = "55.0"))
+	float OptimalHotPressurePSI = 36.0f;
+
+	/** Pressure change per degree Celsius */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure", meta = (ClampMin = "0.01", ClampMax = "0.1"))
+	float PressurePerDegree = 0.04f; // ~0.04 PSI per degree C is realistic
+
+	/** Whether tire has a slow leak */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	bool bHasSlowLeak = false;
+
+	/** Leak rate if leaking (PSI per second) */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	float LeakRatePSIPerSecond = 0.0f;
+
+	/** Whether tire is flat (undriveable) */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	bool bIsFlat = false;
+
+	/**
+	 * @brief Update pressure based on tire temperature
+	 * @param TireTemp Current tire temperature
+	 * @param AmbientTemp Ambient temperature
+	 */
+	void UpdatePressureFromTemperature(float TireTemp, float AmbientTemp)
+	{
+		if (bIsFlat) return;
+
+		// Pressure increases with temperature
+		float TempDelta = TireTemp - AmbientTemp;
+		CurrentPressurePSI = ColdPressurePSI + (TempDelta * PressurePerDegree);
+
+		// Clamp to prevent unrealistic values
+		CurrentPressurePSI = FMath::Clamp(CurrentPressurePSI, 5.0f, 60.0f);
+	}
+
+	/**
+	 * @brief Apply leak damage (if any)
+	 * @param DeltaTime Frame delta time
+	 */
+	void ApplyLeak(float DeltaTime)
+	{
+		if (bHasSlowLeak && !bIsFlat)
+		{
+			CurrentPressurePSI -= LeakRatePSIPerSecond * DeltaTime;
+			ColdPressurePSI -= LeakRatePSIPerSecond * DeltaTime;
+
+			if (CurrentPressurePSI <= 5.0f)
+			{
+				bIsFlat = true;
+				CurrentPressurePSI = 0.0f;
+			}
+		}
+	}
+
+	/**
+	 * @brief Get grip multiplier based on pressure
+	 * @return Grip multiplier (0.6 to 1.05)
+	 *
+	 * Tire grip varies with pressure:
+	 * - Too low: Contact patch too large, tire overheats, walls flex
+	 * - Optimal: Best balance of grip and wear
+	 * - Too high: Contact patch too small, less grip, harsh ride
+	 */
+	float GetGripMultiplier() const
+	{
+		if (bIsFlat) return 0.1f;
+
+		float PressureDiff = FMath::Abs(CurrentPressurePSI - OptimalHotPressurePSI);
+		float DiffPercent = PressureDiff / OptimalHotPressurePSI;
+
+		// Grip falls off with pressure deviation from optimal
+		// 0% diff = 1.0 grip
+		// 10% diff = 0.95 grip
+		// 20% diff = 0.85 grip
+		// 30%+ diff = 0.7 grip
+		if (DiffPercent < 0.05f) return 1.0f;
+		if (DiffPercent < 0.1f) return FMath::Lerp(1.0f, 0.95f, (DiffPercent - 0.05f) / 0.05f);
+		if (DiffPercent < 0.2f) return FMath::Lerp(0.95f, 0.85f, (DiffPercent - 0.1f) / 0.1f);
+		if (DiffPercent < 0.3f) return FMath::Lerp(0.85f, 0.7f, (DiffPercent - 0.2f) / 0.1f);
+		return 0.6f;
+	}
+
+	/**
+	 * @brief Get tire wear rate multiplier
+	 * @return Wear multiplier (1.0 to 3.0)
+	 *
+	 * Incorrect pressure increases wear:
+	 * - Under-inflated: Excessive shoulder wear
+	 * - Over-inflated: Center wear
+	 */
+	float GetWearRateMultiplier() const
+	{
+		if (bIsFlat) return 10.0f; // Severe damage if driven on flat
+
+		float PressureDiff = FMath::Abs(CurrentPressurePSI - OptimalHotPressurePSI);
+		float DiffPercent = PressureDiff / OptimalHotPressurePSI;
+
+		// Wear increases with deviation
+		if (DiffPercent < 0.05f) return 1.0f;
+		if (DiffPercent < 0.15f) return 1.0f + (DiffPercent - 0.05f) * 5.0f; // Up to 1.5x
+		if (DiffPercent < 0.25f) return 1.5f + (DiffPercent - 0.15f) * 10.0f; // Up to 2.5x
+		return 3.0f;
+	}
+
+	/**
+	 * @brief Get contact patch size multiplier
+	 * @return Contact patch multiplier (0.8 to 1.2)
+	 *
+	 * Lower pressure = larger contact patch (but not always better grip)
+	 * Higher pressure = smaller contact patch
+	 */
+	float GetContactPatchMultiplier() const
+	{
+		if (bIsFlat) return 0.3f;
+
+		// Reference optimal at 1.0
+		float PressureRatio = OptimalHotPressurePSI / FMath::Max(CurrentPressurePSI, 1.0f);
+
+		// Lower pressure = bigger patch (up to a point)
+		return FMath::Clamp(PressureRatio, 0.8f, 1.2f);
+	}
+
+	/**
+	 * @brief Check if tire is under-inflated
+	 * @return True if significantly under-inflated
+	 */
+	bool IsUnderInflated() const
+	{
+		return CurrentPressurePSI < (OptimalHotPressurePSI * 0.85f);
+	}
+
+	/**
+	 * @brief Check if tire is over-inflated
+	 * @return True if significantly over-inflated
+	 */
+	bool IsOverInflated() const
+	{
+		return CurrentPressurePSI > (OptimalHotPressurePSI * 1.15f);
 	}
 };
 
@@ -808,6 +1159,34 @@ public:
 	void ShiftDown();
 
 	// ==========================================
+	// ECU MAP CONTROLS
+	// ==========================================
+
+	/** Switch to a different ECU map */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|ECU")
+	bool SwitchECUMap(EMGECUMapType NewMapType);
+
+	/** Get the currently active ECU map type */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|ECU")
+	EMGECUMapType GetActiveECUMapType() const;
+
+	/** Get the current ECU map parameters */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|ECU")
+	FMGECUMapParameters GetActiveECUMapParameters() const;
+
+	/** Check if a specific ECU map is available */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|ECU")
+	bool IsECUMapAvailable(EMGECUMapType MapType) const;
+
+	/** Get all available ECU maps */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|ECU")
+	TArray<EMGECUMapType> GetAvailableECUMaps() const;
+
+	/** Get the power multiplier from current ECU map */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|ECU")
+	float GetECUPowerMultiplier() const;
+
+	// ==========================================
 	// DAMAGE EFFECTS
 	// ==========================================
 
@@ -832,6 +1211,61 @@ public:
 	/** Get current max speed multiplier */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
 	float GetMaxSpeedMultiplier() const { return MaxSpeedMultiplier; }
+
+	// ==========================================
+	// WEATHER EFFECTS INTEGRATION
+	// ==========================================
+
+	/**
+	 * @brief Set weather-based grip multiplier
+	 * @param Multiplier Grip multiplier from weather conditions (0.1-1.0)
+	 * @note This is separate from damage grip multiplier and stacks multiplicatively
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Weather")
+	void SetWeatherGripMultiplier(float Multiplier);
+
+	/**
+	 * @brief Get current weather grip multiplier
+	 * @return Weather-based grip modifier
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Weather")
+	float GetWeatherGripMultiplier() const { return WeatherGripMultiplier; }
+
+	/**
+	 * @brief Apply aquaplaning effect to vehicle
+	 * @param Intensity Aquaplaning intensity (0-1)
+	 * @param WheelFactors Per-wheel aquaplaning factors (FL, FR, RL, RR)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Weather")
+	void ApplyAquaplaning(float Intensity, const TArray<float>& WheelFactors);
+
+	/**
+	 * @brief Apply wind force to vehicle
+	 * @param WindForce Wind force vector in world space (Newtons)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Weather")
+	void ApplyWindForce(const FVector& WindForce);
+
+	/**
+	 * @brief Check if vehicle is currently aquaplaning
+	 * @return True if aquaplaning
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Weather")
+	bool IsAquaplaning() const { return bIsAquaplaning; }
+
+	/**
+	 * @brief Get current aquaplaning intensity
+	 * @return Aquaplaning intensity (0-1)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Weather")
+	float GetAquaplaningIntensity() const { return AquaplaningIntensity; }
+
+	/**
+	 * @brief Get wheel locations for weather system puddle checks
+	 * @return Array of wheel world locations (FL, FR, RL, RR)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Weather")
+	TArray<FVector> GetWheelWorldLocations() const;
 
 	// ==========================================
 	// STATE QUERIES
@@ -971,6 +1405,49 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Differential")
 	bool IsWheelSpinningExcessively(int32 WheelIndex) const;
+
+	// ==========================================
+	// SUSPENSION GEOMETRY STATE QUERIES
+	// ==========================================
+
+	/**
+	 * @brief Get current suspension geometry effects for all wheels
+	 * @return Complete geometry effects including per-wheel contact patch states
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|SuspensionGeometry")
+	FMGSuspensionGeometryEffects GetSuspensionGeometryEffects() const { return SuspensionGeometryEffects; }
+
+	/**
+	 * @brief Get contact patch state for a specific wheel
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @return Contact patch state for the specified wheel
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|SuspensionGeometry")
+	FMGContactPatchState GetWheelContactPatchState(int32 WheelIndex) const;
+
+	/**
+	 * @brief Get the effective camber angle for a wheel considering body roll
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @return Effective camber angle in degrees (includes dynamic camber from roll)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|SuspensionGeometry")
+	float GetEffectiveCamberAngle(int32 WheelIndex) const;
+
+	/**
+	 * @brief Get the current steering self-centering force multiplier
+	 * @return Self-centering force multiplier based on caster and speed
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|SuspensionGeometry")
+	float GetSteeringSelfCenteringForce() const;
+
+	/**
+	 * @brief Get geometry-based grip modifier for a specific wheel
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @param bForLateralGrip True for cornering grip, false for longitudinal
+	 * @return Grip multiplier from suspension geometry
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|SuspensionGeometry")
+	float GetGeometryGripModifier(int32 WheelIndex, bool bForLateralGrip) const;
 
 	/**
 	 * @brief Sample power curve at specific RPM
@@ -1456,6 +1933,73 @@ public:
 	float ClutchSlipDetectionThreshold = 0.1f;
 
 	// ==========================================
+	// TUNING PARAMETERS - SUSPENSION GEOMETRY
+	// ==========================================
+
+	/**
+	 * @brief Front axle suspension geometry settings
+	 *
+	 * Controls camber, toe, and caster for front wheels.
+	 * Caster only affects front wheels as they are steered.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|SuspensionGeometry")
+	FMGSuspensionGeometry FrontSuspensionGeometry;
+
+	/**
+	 * @brief Rear axle suspension geometry settings
+	 *
+	 * Controls camber and toe for rear wheels.
+	 * Caster has no effect on rear wheels.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|SuspensionGeometry")
+	FMGSuspensionGeometry RearSuspensionGeometry;
+
+	/**
+	 * @brief Enable dynamic camber calculation based on body roll
+	 *
+	 * When enabled, camber angle changes dynamically based on
+	 * suspension compression and body roll during cornering.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|SuspensionGeometry")
+	bool bEnableDynamicCamber = true;
+
+	/**
+	 * @brief Camber gain per degree of body roll
+	 *
+	 * How much the effective camber changes per degree of chassis roll.
+	 * Typical range: 0.3 to 0.8 degrees camber per degree roll.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|SuspensionGeometry", meta = (ClampMin = "0.0", ClampMax = "2.0"))
+	float CamberGainPerDegreeRoll = 0.5f;
+
+	/**
+	 * @brief Reference body roll angle for full geometry effects
+	 *
+	 * The body roll angle at which geometry effects reach their
+	 * maximum effectiveness during cornering.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|SuspensionGeometry", meta = (ClampMin = "1.0", ClampMax = "10.0"))
+	float ReferenceBodyRollDeg = 3.0f;
+
+	/**
+	 * @brief Base caster trail in centimeters
+	 *
+	 * The mechanical trail created by caster angle, affects
+	 * steering self-centering force. Higher values = stronger centering.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|SuspensionGeometry", meta = (ClampMin = "0.0", ClampMax = "20.0"))
+	float CasterTrailCm = 6.0f;
+
+	/**
+	 * @brief Suspension geometry influence on grip (0 = disabled, 1 = full effect)
+	 *
+	 * Master multiplier for how much suspension geometry affects
+	 * overall tire grip calculations.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|SuspensionGeometry", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float SuspensionGeometryInfluence = 1.0f;
+
+	// ==========================================
 	// EVENTS
 	// ==========================================
 
@@ -1541,6 +2085,22 @@ protected:
 	UPROPERTY()
 	float MaxSpeedMultiplier = 1.0f;
 
+	// Weather effect multipliers
+	UPROPERTY()
+	float WeatherGripMultiplier = 1.0f;
+
+	UPROPERTY()
+	bool bIsAquaplaning = false;
+
+	UPROPERTY()
+	float AquaplaningIntensity = 0.0f;
+
+	UPROPERTY()
+	TArray<float> WheelAquaplaningFactors;
+
+	UPROPERTY()
+	FVector PendingWindForce = FVector::ZeroVector;
+
 	// Tire temperature per wheel (FL, FR, RL, RR)
 	UPROPERTY()
 	FMGTireTemperature TireTemperatures[4];
@@ -1548,6 +2108,10 @@ protected:
 	/** Surface state per wheel (FL, FR, RL, RR) for dynamic grip calculation */
 	UPROPERTY()
 	FMGWheelSurfaceState WheelSurfaceStates[4];
+
+	/** Tire pressure state per wheel (FL, FR, RL, RR) */
+	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|Tires")
+	FMGTirePressureState TirePressures[4];
 
 	/** Current clutch wear state */
 	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|Clutch")
@@ -1607,6 +2171,20 @@ protected:
 
 	// Drift chain build timer
 	float DriftChainBuildTimer = 0.0f;
+
+	// ==========================================
+	// SUSPENSION GEOMETRY STATE
+	// ==========================================
+
+	/** Current suspension geometry effects for all wheels */
+	UPROPERTY()
+	FMGSuspensionGeometryEffects SuspensionGeometryEffects;
+
+	/** Current body roll angle in degrees (positive = rolling right) */
+	float CurrentBodyRollDeg = 0.0f;
+
+	/** Effective camber angles per wheel including dynamic camber from roll */
+	float EffectiveCamberAngles[4] = { -1.0f, -1.0f, -1.0f, -1.0f };
 
 	// ==========================================
 	// INTERNAL METHODS
@@ -1685,6 +2263,44 @@ protected:
 
 	/** Apply differential behavior based on type */
 	virtual void ApplyDifferentialBehavior(float DeltaTime);
+
+	/**
+	 * @brief Route to appropriate differential simulation based on type
+	 * @param DeltaTime Frame delta time
+	 * @param OutState Differential state to update
+	 * @param DiffType Type of differential to simulate
+	 * @param Config LSD configuration parameters
+	 * @param LeftWheelIdx Left wheel index
+	 * @param RightWheelIdx Right wheel index
+	 * @param InputTorque Input torque to differential
+	 * @param bIsAccelerating True if under acceleration
+	 */
+	void SimulateDifferentialByType(
+		float DeltaTime,
+		FMGDifferentialState& OutState,
+		EMGDifferentialType DiffType,
+		const FMGLSDConfiguration& Config,
+		int32 LeftWheelIdx,
+		int32 RightWheelIdx,
+		float InputTorque,
+		bool bIsAccelerating);
+
+	/**
+	 * @brief Simulate center differential for AWD vehicles
+	 *
+	 * Distributes torque between front and rear axles based on
+	 * center LSD configuration and grip conditions.
+	 *
+	 * @param DeltaTime Frame delta time
+	 * @param OutState Center differential state to update
+	 * @param InputTorque Input torque from transmission
+	 * @param bIsAccelerating True if under acceleration
+	 */
+	void SimulateCenterDifferential(
+		float DeltaTime,
+		FMGDifferentialState& OutState,
+		float InputTorque,
+		bool bIsAccelerating);
 
 	/**
 	 * @brief Update wheel angular velocities from physics simulation
@@ -1937,4 +2553,139 @@ protected:
 	 * @brief Apply part wear effects to handling parameters
 	 */
 	void ApplyPartWearToHandling();
+
+	// ==========================================
+	// SUSPENSION GEOMETRY METHODS
+	// ==========================================
+
+	/**
+	 * @brief Update suspension geometry effects based on current vehicle state
+	 *
+	 * Calculates contact patch modifications, grip multipliers, and steering
+	 * characteristics based on camber, toe, and caster settings.
+	 *
+	 * @param DeltaTime Frame delta time
+	 */
+	virtual void UpdateSuspensionGeometry(float DeltaTime);
+
+	/**
+	 * @brief Calculate contact patch state for a specific wheel
+	 *
+	 * Computes the effective contact patch width and grip multipliers
+	 * based on static geometry settings and dynamic body roll.
+	 *
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @param OutContactPatch Output contact patch state
+	 */
+	void CalculateContactPatchState(int32 WheelIndex, FMGContactPatchState& OutContactPatch) const;
+
+	/**
+	 * @brief Calculate camber effects on tire grip
+	 *
+	 * Negative camber improves cornering grip but reduces straight-line traction.
+	 * Effects are modulated by body roll to simulate real suspension behavior.
+	 *
+	 * @param CamberAngleDeg Static camber angle in degrees
+	 * @param BodyRollEffect Contribution from body roll (positive = outside wheel)
+	 * @param OutLateralGrip Output lateral grip multiplier
+	 * @param OutLongitudinalGrip Output longitudinal grip multiplier
+	 * @param OutContactPatchWidth Output contact patch width ratio
+	 */
+	void CalculateCamberEffects(
+		float CamberAngleDeg,
+		float BodyRollEffect,
+		float& OutLateralGrip,
+		float& OutLongitudinalGrip,
+		float& OutContactPatchWidth) const;
+
+	/**
+	 * @brief Calculate toe effects on handling
+	 *
+	 * Toe-out improves turn-in but increases tire wear.
+	 * Toe-in improves stability but reduces agility.
+	 *
+	 * @param ToeAngleDeg Toe angle in degrees (positive = toe-in)
+	 * @param OutTurnInResponse Output turn-in response multiplier
+	 * @param OutStability Output straight-line stability multiplier
+	 * @param OutTireWearRate Output tire wear rate multiplier
+	 */
+	void CalculateToeEffects(
+		float ToeAngleDeg,
+		float& OutTurnInResponse,
+		float& OutStability,
+		float& OutTireWearRate) const;
+
+	/**
+	 * @brief Calculate caster effects on steering
+	 *
+	 * Higher caster improves stability and self-centering but
+	 * increases steering effort.
+	 *
+	 * @param CasterAngleDeg Caster angle in degrees
+	 * @param VehicleSpeedMPH Current vehicle speed in MPH
+	 * @param OutSelfCentering Output self-centering force multiplier
+	 * @param OutStability Output high-speed stability multiplier
+	 * @param OutSteeringWeight Output steering weight multiplier
+	 */
+	void CalculateCasterEffects(
+		float CasterAngleDeg,
+		float VehicleSpeedMPH,
+		float& OutSelfCentering,
+		float& OutStability,
+		float& OutSteeringWeight) const;
+
+	/**
+	 * @brief Calculate body roll angle from lateral acceleration
+	 *
+	 * Estimates current body roll based on lateral G-forces and
+	 * suspension characteristics.
+	 *
+	 * @param LateralAcceleration Lateral acceleration in G
+	 * @return Body roll angle in degrees
+	 */
+	float CalculateBodyRollAngle(float LateralAcceleration) const;
+
+	/**
+	 * @brief Calculate dynamic camber change from suspension compression
+	 *
+	 * Models how camber changes as suspension compresses/extends,
+	 * which is crucial for realistic cornering grip simulation.
+	 *
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @param SuspensionCompressionRatio Current compression ratio (0-1)
+	 * @return Additional camber angle in degrees from suspension travel
+	 */
+	float CalculateDynamicCamberChange(int32 WheelIndex, float SuspensionCompressionRatio) const;
+
+	/**
+	 * @brief Apply steering self-centering force based on caster
+	 *
+	 * Applies a restoring torque to the steering based on caster angle
+	 * and vehicle speed, simulating real steering feel.
+	 *
+	 * @param DeltaTime Frame delta time
+	 */
+	void ApplySteeringSelfCentering(float DeltaTime);
+
+	/**
+	 * @brief Calculate combined geometry grip modifier for tire friction
+	 *
+	 * Combines all geometry effects (camber, toe, caster) into a single
+	 * grip multiplier for use in the tire friction calculation.
+	 *
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @param bIsCornering True if vehicle is cornering (uses lateral grip)
+	 * @return Combined grip modifier (typically 0.8 to 1.15)
+	 */
+	float CalculateCombinedGeometryGripModifier(int32 WheelIndex, bool bIsCornering) const;
+
+	/**
+	 * @brief Get geometry configuration for a specific wheel
+	 *
+	 * Returns the appropriate front or rear geometry based on wheel index.
+	 *
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @return Reference to the appropriate geometry configuration
+	 */
+	const FMGSuspensionGeometry& GetWheelGeometry(int32 WheelIndex) const;
 };

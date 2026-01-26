@@ -1,6 +1,7 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Data/MGPartsCatalog.h"
+#include "Data/MGPartQuality.h"
 
 // ==========================================
 // UMGPartDefinition Implementation
@@ -122,6 +123,70 @@ TArray<UMGPartDefinition*> UMGPartsCatalog::GetPartsByBrand(EMGPartBrand Brand) 
 			}
 		}
 	}
+
+	return Result;
+}
+
+TArray<UMGPartDefinition*> UMGPartsCatalog::GetPartsByQuality(EMGPartQuality Quality) const
+{
+	TArray<UMGPartDefinition*> Result;
+
+	for (const TSoftObjectPtr<UMGPartDefinition>& PartPtr : AllParts)
+	{
+		if (UMGPartDefinition* Part = PartPtr.LoadSynchronous())
+		{
+			if (Part->Quality == Quality)
+			{
+				Result.Add(Part);
+			}
+		}
+	}
+
+	// Sort by category then tier then price
+	Result.Sort([](const UMGPartDefinition& A, const UMGPartDefinition& B)
+	{
+		if (A.Category != B.Category)
+		{
+			return static_cast<uint8>(A.Category) < static_cast<uint8>(B.Category);
+		}
+		if (A.Tier != B.Tier)
+		{
+			return static_cast<uint8>(A.Tier) < static_cast<uint8>(B.Tier);
+		}
+		return A.PurchasePrice < B.PurchasePrice;
+	});
+
+	return Result;
+}
+
+TArray<UMGPartDefinition*> UMGPartsCatalog::GetPartsByReputation(EMGBrandReputation Reputation) const
+{
+	TArray<UMGPartDefinition*> Result;
+
+	for (const TSoftObjectPtr<UMGPartDefinition>& PartPtr : AllParts)
+	{
+		if (UMGPartDefinition* Part = PartPtr.LoadSynchronous())
+		{
+			if (Part->BrandReputation == Reputation)
+			{
+				Result.Add(Part);
+			}
+		}
+	}
+
+	// Sort by brand then category then price
+	Result.Sort([](const UMGPartDefinition& A, const UMGPartDefinition& B)
+	{
+		if (A.Brand != B.Brand)
+		{
+			return static_cast<uint8>(A.Brand) < static_cast<uint8>(B.Brand);
+		}
+		if (A.Category != B.Category)
+		{
+			return static_cast<uint8>(A.Category) < static_cast<uint8>(B.Category);
+		}
+		return A.PurchasePrice < B.PurchasePrice;
+	});
 
 	return Result;
 }

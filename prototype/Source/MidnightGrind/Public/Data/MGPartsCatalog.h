@@ -6,6 +6,8 @@
 #include "Engine/DataAsset.h"
 #include "Vehicle/MGVehicleData.h"
 #include "MGVehicleDatabase.h"
+#include "MGPartQuality.h"
+#include "Tuning/MGPartInstallation.h"
 #include "MGPartsCatalog.generated.h"
 
 /**
@@ -286,6 +288,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity")
 	EMGPartBrand Brand = EMGPartBrand::Generic;
 
+	/**
+	 * @brief Manufacturing quality tier of this part.
+	 *
+	 * Affects performance multipliers, durability, wear rate, weight,
+	 * cost, and failure chance. See EMGPartQuality for tier descriptions.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity")
+	EMGPartQuality Quality = EMGPartQuality::Aftermarket;
+
+	/**
+	 * @brief Brand reputation level for this manufacturer.
+	 *
+	 * Affects perceived quality, resale value, warranty coverage,
+	 * and failure chance modifiers. Higher reputation brands command
+	 * premium prices but offer better quality assurance.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity")
+	EMGBrandReputation BrandReputation = EMGBrandReputation::Standard;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity")
 	FString PartNumber; // Real-world part number reference
 
@@ -348,6 +369,145 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Economy")
 	int32 RequiredLevel = 1;
+
+	// ==========================================
+	// INSTALLATION
+	// ==========================================
+
+	/**
+	 * @brief Installation difficulty level for this part
+	 *
+	 * Determines base installation time, DIY success rates, and
+	 * whether the part can be installed by the player or requires
+	 * professional shop service.
+	 *
+	 * @see EMGInstallDifficulty for difficulty descriptions
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Installation")
+	EMGInstallDifficulty InstallDifficulty = EMGInstallDifficulty::Moderate;
+
+	/**
+	 * @brief Base installation time in minutes
+	 *
+	 * Time estimates by difficulty:
+	 * - Simple: 15 min (air filters, shift knobs)
+	 * - Moderate: 60 min (exhaust, brake pads)
+	 * - Complex: 240 min (turbo kits, big brakes)
+	 * - Expert: 480 min (engine builds, swaps)
+	 *
+	 * Actual time varies based on mechanic skill and method.
+	 * DIY may take longer; shop time is fixed.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Installation", meta = (ClampMin = "5", ClampMax = "2880", UIMin = "5", UIMax = "480"))
+	int32 InstallTimeMinutes = 60;
+
+	/**
+	 * @brief Whether installation requires vehicle to be on a lift
+	 *
+	 * Parts underneath the vehicle (exhaust, suspension, transmission)
+	 * typically require lift access. If player doesn't have a lift,
+	 * they must use shop installation for these parts.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Installation")
+	bool bRequiresLift = false;
+
+	/**
+	 * @brief Whether installation requires special tools
+	 *
+	 * Beyond basic hand tools - torque wrenches, spring compressors,
+	 * bearing pullers, etc. Affects DIY success rate if player
+	 * doesn't own the required tools.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Installation")
+	bool bRequiresSpecialTools = false;
+
+	/**
+	 * @brief List of specific tool IDs required for installation
+	 *
+	 * Used for checking player's tool inventory and displaying
+	 * requirements in the UI. Empty if no special tools needed.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Installation")
+	TArray<FName> RequiredToolIDs;
+
+	/**
+	 * @brief Whether engine removal is required for installation
+	 *
+	 * Significantly increases complexity and time. Examples:
+	 * rear main seal, clutch on longitudinal engines, some
+	 * turbo kit installations.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Installation")
+	bool bRequiresEngineRemoval = false;
+
+	/**
+	 * @brief Whether transmission removal is required
+	 *
+	 * Required for clutch replacements, flywheel swaps, some
+	 * drivetrain modifications.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Installation")
+	bool bRequiresTransmissionRemoval = false;
+
+	/**
+	 * @brief Whether dyno tuning is required after installation
+	 *
+	 * Performance parts affecting fuel/air mixture need tuning:
+	 * turbo kits, fuel injectors, ECU upgrades, etc.
+	 * Adds additional cost to shop installations.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Installation")
+	bool bRequiresDynoTuning = false;
+
+	/**
+	 * @brief Labor cost multiplier for this specific part
+	 *
+	 * Defaults to 1.0 (standard rate). Higher for parts that are
+	 * particularly difficult to access or require extra care.
+	 * Lower for simple bolt-on parts.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Installation", meta = (ClampMin = "0.5", ClampMax = "3.0", UIMin = "0.5", UIMax = "3.0"))
+	float LaborCostMultiplier = 1.0f;
+
+	/**
+	 * @brief Convert part installation settings to requirements struct
+	 *
+	 * Creates an FMGInstallationRequirements struct from this part's
+	 * installation properties, for use with the installation subsystem.
+	 *
+	 * @return Installation requirements for this part
+	 */
+	UFUNCTION(BlueprintPure, Category = "Installation")
+	FMGInstallationRequirements GetInstallationRequirements() const
+	{
+		FMGInstallationRequirements Requirements;
+		Requirements.Difficulty = InstallDifficulty;
+		Requirements.InstallTimeMinutes = InstallTimeMinutes;
+		Requirements.bRequiresLift = bRequiresLift;
+		Requirements.bRequiresSpecialTools = bRequiresSpecialTools;
+		Requirements.RequiredToolIDs = RequiredToolIDs;
+		Requirements.bRequiresEngineRemoval = bRequiresEngineRemoval;
+		Requirements.bRequiresTransmissionRemoval = bRequiresTransmissionRemoval;
+		Requirements.bRequiresDynoTuning = bRequiresDynoTuning;
+		Requirements.LaborCostMultiplier = LaborCostMultiplier;
+		return Requirements;
+	}
+
+	/**
+	 * @brief Get estimated shop labor cost for installation
+	 *
+	 * Calculates the labor cost based on install time and multiplier.
+	 * Does not include part purchase price or dyno tuning fees.
+	 *
+	 * @param HourlyRate Shop's hourly labor rate (default $75/hour)
+	 * @return Labor cost in credits
+	 */
+	UFUNCTION(BlueprintPure, Category = "Installation")
+	int64 GetEstimatedLaborCost(int64 HourlyRate = 75) const
+	{
+		const float Hours = InstallTimeMinutes / 60.0f;
+		return static_cast<int64>(Hours * HourlyRate * LaborCostMultiplier);
+	}
 
 	// ==========================================
 	// VISUALS
@@ -570,6 +730,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Catalog")
 	TArray<UMGPartDefinition*> GetPartsByBrand(EMGPartBrand Brand) const;
 
+	/**
+	 * @brief Gets all parts matching the specified quality tier.
+	 *
+	 * @param Quality The quality tier to filter by.
+	 * @return Array of parts with the specified quality.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Catalog")
+	TArray<UMGPartDefinition*> GetPartsByQuality(EMGPartQuality Quality) const;
+
+	/**
+	 * @brief Gets all parts matching the specified brand reputation.
+	 *
+	 * @param Reputation The brand reputation level to filter by.
+	 * @return Array of parts from brands with the specified reputation.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Catalog")
+	TArray<UMGPartDefinition*> GetPartsByReputation(EMGBrandReputation Reputation) const;
+
 	UFUNCTION(BlueprintCallable, Category = "Catalog")
 	TArray<UMGPartDefinition*> GetPartsForVehicle(const UMGVehicleDefinition* Vehicle) const;
 
@@ -591,38 +769,246 @@ public:
 };
 
 /**
- * Installed part instance (on a player's vehicle)
+ * @struct FMGInstalledPart
+ * @brief Represents an installed part instance on a player's vehicle.
+ *
+ * Contains both the part identification and instance-specific data
+ * such as wear level, quality tier, and tuning configuration.
  */
 USTRUCT(BlueprintType)
 struct FMGInstalledPart
 {
 	GENERATED_BODY()
 
+	// ==========================================
+	// IDENTIFICATION
+	// ==========================================
+
+	/** Unique identifier referencing the part definition. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	FName PartID;
 
+	/** Unique instance ID for this specific part. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
-	FGuid InstanceID; // Unique instance
+	FGuid InstanceID;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
-	float WearLevel = 0.0f; // 0-1, 1 = worn out
+	// ==========================================
+	// QUALITY
+	// ==========================================
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
+	/**
+	 * @brief Quality tier of this specific part instance.
+	 *
+	 * Cached from the part definition at install time.
+	 * Affects all quality-based calculations.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quality")
+	EMGPartQuality Quality = EMGPartQuality::Aftermarket;
+
+	/**
+	 * @brief Brand reputation at time of purchase.
+	 *
+	 * Cached for resale value and failure calculations.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quality")
+	EMGBrandReputation BrandReputation = EMGBrandReputation::Standard;
+
+	// ==========================================
+	// CONDITION
+	// ==========================================
+
+	/**
+	 * @brief Current wear level (0 = new, 1 = worn out).
+	 *
+	 * Increases over time based on usage and quality.
+	 * Affects performance and failure chance.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Condition",
+		meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float WearLevel = 0.0f;
+
+	/**
+	 * @brief Remaining durability points.
+	 *
+	 * Decreases with use. When depleted, part needs replacement.
+	 * Initial value determined by quality tier.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Condition")
+	float CurrentDurability = 100.0f;
+
+	/**
+	 * @brief Maximum durability for this part instance.
+	 *
+	 * Set at installation based on quality tier.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Condition")
+	float MaxDurability = 100.0f;
+
+	/**
+	 * @brief Whether this part has failed and needs repair.
+	 *
+	 * Failed parts impose performance penalties until repaired.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Condition")
+	bool bIsFailed = false;
+
+	/**
+	 * @brief Severity of current failure (if failed).
+	 *
+	 * 0 = minor, 1 = catastrophic. Affects repair cost.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Condition",
+		meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float FailureSeverity = 0.0f;
+
+	/**
+	 * @brief Accumulated stress from high-performance use.
+	 *
+	 * Increases during redline, nitrous use, etc.
+	 * Resets partially over time. Affects failure chance.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Condition",
+		meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float AccumulatedStress = 0.0f;
+
+	// ==========================================
+	// HISTORY
+	// ==========================================
+
+	/** When this part was installed. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "History")
 	FDateTime InstallDate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
-	int64 PurchasePrice = 0; // What player paid
+	/** Original purchase price paid by player. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "History")
+	int64 PurchasePrice = 0;
 
-	// Tuning values (key = option ID, value = setting)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
+	/** Total distance driven with this part (km). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "History")
+	float TotalDistanceKM = 0.0f;
+
+	/** Number of races completed with this part. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "History")
+	int32 RacesCompleted = 0;
+
+	/** Number of times this part has failed. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "History")
+	int32 FailureCount = 0;
+
+	/** Total repair costs spent on this part. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "History")
+	int64 TotalRepairCosts = 0;
+
+	// ==========================================
+	// TUNING
+	// ==========================================
+
+	/**
+	 * @brief Current tuning values (key = option ID, value = setting).
+	 *
+	 * Stores player-configured tuning for adjustable parts.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning")
 	TMap<FName, float> TuningValues;
 
-	// For visual parts
+	// ==========================================
+	// VISUAL
+	// ==========================================
+
+	/** Selected color variant index for visual parts. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
 	int32 ColorIndex = 0;
 
+	/** Custom color if applicable. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
 	FLinearColor CustomColor = FLinearColor::White;
+
+	// ==========================================
+	// CONSTRUCTORS AND METHODS
+	// ==========================================
+
+	FMGInstalledPart()
+		: Quality(EMGPartQuality::Aftermarket)
+		, BrandReputation(EMGBrandReputation::Standard)
+		, WearLevel(0.0f)
+		, CurrentDurability(100.0f)
+		, MaxDurability(100.0f)
+		, bIsFailed(false)
+		, FailureSeverity(0.0f)
+		, AccumulatedStress(0.0f)
+		, PurchasePrice(0)
+		, TotalDistanceKM(0.0f)
+		, RacesCompleted(0)
+		, FailureCount(0)
+		, TotalRepairCosts(0)
+		, ColorIndex(0)
+		, CustomColor(FLinearColor::White)
+	{
+		InstanceID = FGuid::NewGuid();
+		InstallDate = FDateTime::Now();
+	}
+
+	/**
+	 * @brief Initialize part with quality settings.
+	 *
+	 * Sets up durability based on quality tier.
+	 *
+	 * @param InQuality The quality tier of the part.
+	 * @param InReputation The brand reputation level.
+	 */
+	void InitializeWithQuality(EMGPartQuality InQuality, EMGBrandReputation InReputation)
+	{
+		Quality = InQuality;
+		BrandReputation = InReputation;
+
+		// Set durability based on quality
+		const FMGQualityEffects Effects = UMGPartQualityStatics::GetQualityEffects(Quality);
+		MaxDurability = Effects.BaseDurability;
+		CurrentDurability = MaxDurability;
+	}
+
+	/**
+	 * @brief Calculate current resale value of this part.
+	 *
+	 * @return Current resale value based on wear and quality.
+	 */
+	int64 GetCurrentResaleValue() const
+	{
+		return UMGPartQualityStatics::CalculateResaleValue(
+			PurchasePrice, Quality, BrandReputation, WearLevel);
+	}
+
+	/**
+	 * @brief Check if part needs replacement due to wear.
+	 *
+	 * @return True if wear level exceeds 90% or durability depleted.
+	 */
+	bool NeedsReplacement() const
+	{
+		return WearLevel >= 0.9f || CurrentDurability <= 0.0f;
+	}
+
+	/**
+	 * @brief Get the current performance multiplier accounting for wear and failure.
+	 *
+	 * @return Effective performance multiplier (0-1+).
+	 */
+	float GetEffectivePerformanceMultiplier() const
+	{
+		const FMGQualityEffects Effects = UMGPartQualityStatics::GetQualityEffects(Quality);
+		float Multiplier = Effects.PerformanceMultiplier;
+
+		// Reduce for wear (up to 15% loss at max wear)
+		Multiplier *= (1.0f - (WearLevel * 0.15f));
+
+		// Apply failure penalty if failed
+		if (bIsFailed)
+		{
+			Multiplier *= (1.0f - (0.1f + FailureSeverity * 0.6f));
+		}
+
+		return Multiplier;
+	}
 };
 
 /**
