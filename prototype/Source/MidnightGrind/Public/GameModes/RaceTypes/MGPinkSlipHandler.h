@@ -145,11 +145,52 @@ struct FMGPinkSlipTransfer
 /**
  * Delegate declarations
  */
+/**
+ * Pink slip dramatic moment types
+ */
+UENUM(BlueprintType)
+enum class EMGPinkSlipMoment : uint8
+{
+	/** Challenge issued */
+	ChallengeIssued,
+	/** Both confirmed - point of no return */
+	PointOfNoReturn,
+	/** Race about to start - final keys exchange */
+	KeysOnTheTable,
+	/** Close race - within 0.5 seconds */
+	PhotoFinish,
+	/** Winner takes keys */
+	KeysChange,
+	/** Loser walks away */
+	WalkOfShame
+};
+
+/**
+ * Spectator info for witnesses
+ */
+USTRUCT(BlueprintType)
+struct FMGPinkSlipWitness
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	FString PlayerID;
+
+	UPROPERTY(BlueprintReadOnly)
+	FString DisplayName;
+
+	UPROPERTY(BlueprintReadOnly)
+	FDateTime JoinedTime;
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPinkSlipStateChanged, EMGPinkSlipState, OldState, EMGPinkSlipState, NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPinkSlipVerified, int32, ParticipantIndex, EMGPinkSlipVerification, Status);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPinkSlipConfirmed, int32, ParticipantIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPinkSlipTransferComplete, const FMGPinkSlipTransfer&, Transfer);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPinkSlipDisconnect, int32, ParticipantIndex, bool, bIsLoss);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPinkSlipDramaticMoment, EMGPinkSlipMoment, Moment, int32, ParticipantIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPinkSlipWitnessJoined, const FMGPinkSlipWitness&, Witness);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPinkSlipPhotoFinish, float, TimeDifference, int32, WinnerIndex);
 
 /**
  * Pink Slip Race Handler
@@ -301,6 +342,84 @@ public:
 	void VoidRace(FText Reason);
 
 	// ==========================================
+	// WITNESS SYSTEM
+	// ==========================================
+
+	/**
+	 * Add a witness/spectator
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Pink Slip|Witness")
+	void AddWitness(const FString& PlayerID, const FString& DisplayName);
+
+	/**
+	 * Remove a witness
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Pink Slip|Witness")
+	void RemoveWitness(const FString& PlayerID);
+
+	/**
+	 * Get all witnesses
+	 */
+	UFUNCTION(BlueprintPure, Category = "Pink Slip|Witness")
+	TArray<FMGPinkSlipWitness> GetWitnesses() const { return Witnesses; }
+
+	/**
+	 * Get witness count
+	 */
+	UFUNCTION(BlueprintPure, Category = "Pink Slip|Witness")
+	int32 GetWitnessCount() const { return Witnesses.Num(); }
+
+	// ==========================================
+	// REMATCH SYSTEM
+	// ==========================================
+
+	/**
+	 * Check if rematch is available
+	 */
+	UFUNCTION(BlueprintPure, Category = "Pink Slip|Rematch")
+	bool IsRematchAvailable() const;
+
+	/**
+	 * Request rematch (loser only)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Pink Slip|Rematch")
+	void RequestRematch();
+
+	/**
+	 * Accept rematch request (winner only)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Pink Slip|Rematch")
+	void AcceptRematch();
+
+	/**
+	 * Decline rematch
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Pink Slip|Rematch")
+	void DeclineRematch();
+
+	// ==========================================
+	// DRAMA/PRESENTATION
+	// ==========================================
+
+	/**
+	 * Check if race was a photo finish
+	 */
+	UFUNCTION(BlueprintPure, Category = "Pink Slip|Drama")
+	bool WasPhotoFinish() const { return bWasPhotoFinish; }
+
+	/**
+	 * Get finish time difference
+	 */
+	UFUNCTION(BlueprintPure, Category = "Pink Slip|Drama")
+	float GetFinishTimeDifference() const { return FinishTimeDifference; }
+
+	/**
+	 * Get total value at stake
+	 */
+	UFUNCTION(BlueprintPure, Category = "Pink Slip|Drama")
+	int64 GetTotalValueAtStake() const;
+
+	// ==========================================
 	// CONFIGURATION
 	// ==========================================
 
@@ -319,6 +438,26 @@ public:
 	/** Trade lock duration for won vehicles (days) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
 	int32 WonVehicleTradeLockDays = 7;
+
+	/** Photo finish threshold (seconds) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	float PhotoFinishThreshold = 0.5f;
+
+	/** Rematch window (seconds after race) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	float RematchWindowSeconds = 120.0f;
+
+	/** Maximum witnesses allowed */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	int32 MaxWitnesses = 50;
+
+	/** Minimum REP tier for pink slip racing */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	int32 MinREPTier = 3;
+
+	/** Triple confirmation required */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	bool bRequireTripleConfirmation = true;
 
 	// ==========================================
 	// EVENTS
@@ -344,6 +483,18 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPinkSlipDisconnect OnDisconnect;
 
+	/** Dramatic moment occurred */
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnPinkSlipDramaticMoment OnDramaticMoment;
+
+	/** Witness joined */
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnPinkSlipWitnessJoined OnWitnessJoined;
+
+	/** Photo finish occurred */
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnPinkSlipPhotoFinish OnPhotoFinish;
+
 protected:
 	// ==========================================
 	// INTERNAL
@@ -366,6 +517,21 @@ protected:
 
 	/** Record transfer history */
 	void RecordTransfer();
+
+	/** Broadcast dramatic moment */
+	void BroadcastDramaticMoment(EMGPinkSlipMoment Moment, int32 ParticipantIndex = -1);
+
+	/** Check for photo finish */
+	void CheckPhotoFinish();
+
+	/** Fetch vehicle info from garage/database */
+	void FetchVehicleInfo(int32 ParticipantIndex);
+
+	/** Check REP requirements */
+	bool CheckREPRequirement(const FString& PlayerID) const;
+
+	/** Update confirmation count */
+	void UpdateConfirmationState();
 
 private:
 	/** Current state */
@@ -395,4 +561,28 @@ private:
 
 	/** Void reason */
 	FText VoidReason;
+
+	/** Witnesses watching the race */
+	TArray<FMGPinkSlipWitness> Witnesses;
+
+	/** Was this a photo finish */
+	bool bWasPhotoFinish = false;
+
+	/** Finish time difference in seconds */
+	float FinishTimeDifference = 0.0f;
+
+	/** Confirmation counts for triple confirmation */
+	int32 ChallengerConfirmations = 0;
+	int32 DefenderConfirmations = 0;
+
+	/** Rematch state */
+	bool bRematchRequested = false;
+	bool bRematchAccepted = false;
+	float RematchWindowRemaining = 0.0f;
+
+	/** Race start timestamp for timing */
+	FDateTime RaceStartTime;
+
+	/** Finish times for each participant */
+	float ParticipantFinishTimes[2] = { 0.0f, 0.0f };
 };

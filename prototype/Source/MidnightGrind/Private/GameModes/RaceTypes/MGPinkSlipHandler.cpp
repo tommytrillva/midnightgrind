@@ -31,8 +31,23 @@ void UMGPinkSlipHandler::StartRace()
 		return;
 	}
 
+	// Triple confirmation check
+	if (bRequireTripleConfirmation)
+	{
+		if (ChallengerConfirmations < 3 || DefenderConfirmations < 3)
+		{
+			return;
+		}
+	}
+
 	Super::StartRace();
 	SetState(EMGPinkSlipState::Racing);
+
+	// Record start time
+	RaceStartTime = FDateTime::UtcNow();
+
+	// Broadcast dramatic moment - keys on the table
+	BroadcastDramaticMoment(EMGPinkSlipMoment::KeysOnTheTable);
 
 	// Start inner race handler if set
 	if (InnerRaceHandler)
@@ -117,11 +132,13 @@ void UMGPinkSlipHandler::SetChallenger(const FString& PlayerID, FGuid VehicleID)
 	Participants[0].PlayerID = PlayerID;
 	Participants[0].VehicleID = VehicleID;
 	Participants[0].bIsChallenger = true;
+	ChallengerConfirmations = 0;
 
-	// Would fetch vehicle info here
-	Participants[0].VehicleName = NSLOCTEXT("MG", "UnknownVehicle", "Vehicle");
-	Participants[0].VehiclePI = 500; // Placeholder
-	Participants[0].EstimatedValue = 50000; // Placeholder
+	// Fetch actual vehicle info
+	FetchVehicleInfo(0);
+
+	// Broadcast challenge issued
+	BroadcastDramaticMoment(EMGPinkSlipMoment::ChallengeIssued, 0);
 }
 
 void UMGPinkSlipHandler::SetDefender(const FString& PlayerID, FGuid VehicleID)
@@ -129,11 +146,10 @@ void UMGPinkSlipHandler::SetDefender(const FString& PlayerID, FGuid VehicleID)
 	Participants[1].PlayerID = PlayerID;
 	Participants[1].VehicleID = VehicleID;
 	Participants[1].bIsChallenger = false;
+	DefenderConfirmations = 0;
 
-	// Would fetch vehicle info here
-	Participants[1].VehicleName = NSLOCTEXT("MG", "UnknownVehicle", "Vehicle");
-	Participants[1].VehiclePI = 500; // Placeholder
-	Participants[1].EstimatedValue = 50000; // Placeholder
+	// Fetch actual vehicle info
+	FetchVehicleInfo(1);
 }
 
 void UMGPinkSlipHandler::ConfirmWager(int32 ParticipantIndex)
@@ -149,14 +165,28 @@ void UMGPinkSlipHandler::ConfirmWager(int32 ParticipantIndex)
 		return;
 	}
 
-	Participants[ParticipantIndex].bConfirmed = true;
-	OnConfirmed.Broadcast(ParticipantIndex);
-
-	// Check if both confirmed - move to verification
-	if (AreBothConfirmed())
+	// Increment confirmation count for triple confirmation
+	if (ParticipantIndex == 0)
 	{
-		SetState(EMGPinkSlipState::Verification);
+		ChallengerConfirmations++;
 	}
+	else
+	{
+		DefenderConfirmations++;
+	}
+
+	// Check if this is their final confirmation
+	const int32 RequiredConfirmations = bRequireTripleConfirmation ? 3 : 1;
+	const int32 CurrentConfirmations = (ParticipantIndex == 0) ? ChallengerConfirmations : DefenderConfirmations;
+
+	if (CurrentConfirmations >= RequiredConfirmations)
+	{
+		Participants[ParticipantIndex].bConfirmed = true;
+		OnConfirmed.Broadcast(ParticipantIndex);
+	}
+
+	// Check if both have fully confirmed
+	UpdateConfirmationState();
 }
 
 EMGPinkSlipVerification UMGPinkSlipHandler::VerifyParticipant(int32 ParticipantIndex)
@@ -346,4 +376,181 @@ void UMGPinkSlipHandler::UpdateDisconnect(float DeltaTime)
 void UMGPinkSlipHandler::RecordTransfer()
 {
 	// Would save to persistent storage and send to server
+
+	// Notify witnesses
+	for (const FMGPinkSlipWitness& Witness : Witnesses)
+	{
+		// Would send notification to witness
+	}
+}
+
+// ==========================================
+// WITNESS SYSTEM
+// ==========================================
+
+void UMGPinkSlipHandler::AddWitness(const FString& PlayerID, const FString& DisplayName)
+{
+	// Check max witnesses
+	if (Witnesses.Num() >= MaxWitnesses)
+	{
+		return;
+	}
+
+	// Check if already a witness
+	for (const FMGPinkSlipWitness& Witness : Witnesses)
+	{
+		if (Witness.PlayerID == PlayerID)
+		{
+			return;
+		}
+	}
+
+	// Check if participant (can't witness own race)
+	if (PlayerID == Participants[0].PlayerID || PlayerID == Participants[1].PlayerID)
+	{
+		return;
+	}
+
+	FMGPinkSlipWitness NewWitness;
+	NewWitness.PlayerID = PlayerID;
+	NewWitness.DisplayName = DisplayName;
+	NewWitness.JoinedTime = FDateTime::UtcNow();
+
+	Witnesses.Add(NewWitness);
+	OnWitnessJoined.Broadcast(NewWitness);
+}
+
+void UMGPinkSlipHandler::RemoveWitness(const FString& PlayerID)
+{
+	Witnesses.RemoveAll([&PlayerID](const FMGPinkSlipWitness& Witness) {
+		return Witness.PlayerID == PlayerID;
+	});
+}
+
+// ==========================================
+// REMATCH SYSTEM
+// ==========================================
+
+bool UMGPinkSlipHandler::IsRematchAvailable() const
+{
+	// Rematch available only after completion, within window, and if loser still has cars
+	return CurrentState == EMGPinkSlipState::Complete &&
+		RematchWindowRemaining > 0.0f &&
+		WinnerIndex >= 0;
+}
+
+void UMGPinkSlipHandler::RequestRematch()
+{
+	if (!IsRematchAvailable())
+	{
+		return;
+	}
+
+	bRematchRequested = true;
+}
+
+void UMGPinkSlipHandler::AcceptRematch()
+{
+	if (!bRematchRequested || !IsRematchAvailable())
+	{
+		return;
+	}
+
+	bRematchAccepted = true;
+
+	// Would trigger rematch initialization
+	// Swap vehicles since winner now has loser's car
+}
+
+void UMGPinkSlipHandler::DeclineRematch()
+{
+	bRematchRequested = false;
+	RematchWindowRemaining = 0.0f;
+}
+
+// ==========================================
+// DRAMA/PRESENTATION
+// ==========================================
+
+int64 UMGPinkSlipHandler::GetTotalValueAtStake() const
+{
+	return Participants[0].EstimatedValue + Participants[1].EstimatedValue;
+}
+
+void UMGPinkSlipHandler::BroadcastDramaticMoment(EMGPinkSlipMoment Moment, int32 ParticipantIndex)
+{
+	OnDramaticMoment.Broadcast(Moment, ParticipantIndex);
+}
+
+void UMGPinkSlipHandler::CheckPhotoFinish()
+{
+	if (ParticipantFinishTimes[0] <= 0.0f || ParticipantFinishTimes[1] <= 0.0f)
+	{
+		return;
+	}
+
+	FinishTimeDifference = FMath::Abs(ParticipantFinishTimes[0] - ParticipantFinishTimes[1]);
+	bWasPhotoFinish = FinishTimeDifference <= PhotoFinishThreshold;
+
+	if (bWasPhotoFinish)
+	{
+		BroadcastDramaticMoment(EMGPinkSlipMoment::PhotoFinish, WinnerIndex);
+		OnPhotoFinish.Broadcast(FinishTimeDifference, WinnerIndex);
+	}
+}
+
+void UMGPinkSlipHandler::FetchVehicleInfo(int32 ParticipantIndex)
+{
+	if (ParticipantIndex < 0 || ParticipantIndex >= 2)
+	{
+		return;
+	}
+
+	FMGPinkSlipParticipant& Participant = Participants[ParticipantIndex];
+
+	// Would fetch from garage/database subsystem
+	// For now, use placeholder values
+	Participant.VehicleName = NSLOCTEXT("MG", "UnknownVehicle", "Vehicle");
+	Participant.VehiclePI = 500;
+	Participant.EstimatedValue = 50000;
+
+	// TODO: Integrate with MGGarageSubsystem to get actual vehicle data
+	// if (UMGGarageSubsystem* Garage = GetGarageSubsystem())
+	// {
+	//     FMGVehicleData VehicleData;
+	//     if (Garage->GetVehicleData(Participant.VehicleID, VehicleData))
+	//     {
+	//         Participant.VehicleName = FText::FromString(VehicleData.DisplayName);
+	//         Participant.VehiclePI = FMath::RoundToInt(VehicleData.Stats.PerformanceIndex);
+	//         Participant.EstimatedValue = FMath::RoundToInt64(VehicleData.Stats.EstimatedValue);
+	//     }
+	// }
+}
+
+bool UMGPinkSlipHandler::CheckREPRequirement(const FString& PlayerID) const
+{
+	// Would check player's REP tier against MinREPTier
+	// For now, return true
+
+	// TODO: Integrate with MGPlayerProgression
+	// if (UMGPlayerProgression* Progression = GetProgressionSubsystem())
+	// {
+	//     return Progression->GetREPTier(PlayerID) >= MinREPTier;
+	// }
+
+	return true;
+}
+
+void UMGPinkSlipHandler::UpdateConfirmationState()
+{
+	const int32 RequiredConfirmations = bRequireTripleConfirmation ? 3 : 1;
+
+	// Check if both have confirmed
+	if (ChallengerConfirmations >= RequiredConfirmations &&
+		DefenderConfirmations >= RequiredConfirmations)
+	{
+		// Both fully confirmed - point of no return
+		BroadcastDramaticMoment(EMGPinkSlipMoment::PointOfNoReturn);
+		SetState(EMGPinkSlipState::Verification);
+	}
 }

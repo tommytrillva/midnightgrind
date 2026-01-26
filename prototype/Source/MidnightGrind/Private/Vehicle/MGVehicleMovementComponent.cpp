@@ -26,7 +26,7 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// Update our custom systems
+	// Update core systems
 	UpdateEngineSimulation(DeltaTime);
 	UpdateBoostSimulation(DeltaTime);
 	UpdateDriftPhysics(DeltaTime);
@@ -34,13 +34,22 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	ApplyStabilityControl(DeltaTime);
 	ApplyAntiFlipForce(DeltaTime);
 
+	// Update advanced physics systems
+	UpdateTireTemperatures(DeltaTime);
+	UpdateWeightTransfer(DeltaTime);
+	UpdateAerodynamics(DeltaTime);
+	UpdateAntiLag(DeltaTime);
+	UpdateLaunchControl(DeltaTime);
+	UpdateBrakeSystem(DeltaTime);
+	ApplyDifferentialBehavior(DeltaTime);
+
 	// Update shift cooldown
 	if (ShiftCooldown > 0.0f)
 	{
 		ShiftCooldown -= DeltaTime;
 	}
 
-	// Smooth steering input
+	// Smooth steering input with speed-sensitive reduction
 	const float SteeringDelta = TargetSteering - CurrentSteering;
 	if (FMath::Abs(SteeringDelta) > KINDA_SMALL_NUMBER)
 	{
@@ -48,9 +57,7 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 		CurrentSteering = FMath::FInterpTo(CurrentSteering, TargetSteering, DeltaTime, SteerSpeed);
 
 		// Apply speed-sensitive steering
-		const float SpeedFactor = FMath::Clamp(GetSpeedMPH() / 100.0f, 0.0f, 1.0f);
-		const float SteerReduction = FMath::Lerp(1.0f, 1.0f - SpeedSensitiveSteeringFactor, SpeedFactor);
-
+		const float SteerReduction = CalculateSpeedSteeringFactor();
 		SetSteeringInput(CurrentSteering * SteerReduction);
 	}
 }
@@ -390,8 +397,82 @@ void UMGVehicleMovementComponent::UpdateEngineSimulation(float DeltaTime)
 	// Rev limiter
 	EngineState.bRevLimiterActive = EngineState.CurrentRPM >= CurrentConfiguration.Stats.Redline;
 
-	// Engine load
+	// Engine load calculation - considers throttle, RPM, and boost
 	EngineState.EngineLoad = EngineState.ThrottlePosition * (EngineState.CurrentRPM / CurrentConfiguration.Stats.Redline);
+
+	// Apply boost to engine load
+	if (EngineState.CurrentBoostPSI > 0.0f)
+	{
+		const float BoostLoadIncrease = EngineState.CurrentBoostPSI / 30.0f; // ~3.3% load increase per PSI
+		EngineState.EngineLoad = FMath::Min(EngineState.EngineLoad + BoostLoadIncrease, 1.5f);
+	}
+
+	// ==========================================
+	// ENGINE TEMPERATURE SIMULATION
+	// ==========================================
+
+	// Base heat generation from engine operation
+	// Heat generation factors: RPM, throttle position, boost, nitrous
+	const float RPMHeatFactor = EngineState.CurrentRPM / CurrentConfiguration.Stats.Redline;
+	const float LoadHeatFactor = EngineState.EngineLoad;
+
+	// Base heat generation rate (degrees per second at full load/RPM)
+	const float BaseHeatRate = 5.0f;
+	float HeatGenerated = BaseHeatRate * RPMHeatFactor * LoadHeatFactor * DeltaTime;
+
+	// Additional heat from forced induction
+	if (EngineState.CurrentBoostPSI > 0.0f)
+	{
+		const float BoostHeat = EngineState.CurrentBoostPSI * 0.15f * DeltaTime;
+		HeatGenerated += BoostHeat;
+	}
+
+	// Significant additional heat from nitrous (combustion temps spike)
+	if (EngineState.bNitrousActive)
+	{
+		HeatGenerated += 8.0f * DeltaTime;
+	}
+
+	// Rev limiter generates extra heat (fuel cut causes hot exhaust)
+	if (EngineState.bRevLimiterActive)
+	{
+		HeatGenerated += 3.0f * DeltaTime;
+	}
+
+	// Cooling from radiator/airflow
+	// Cooling is based on vehicle speed (airflow) and temperature delta
+	const float AirflowCooling = FMath::Clamp(Speed / 60.0f, 0.2f, 1.5f);
+	const float RadiatorEfficiency = 1.0f; // Could be modified by radiator upgrades
+	const float TargetTemp = 90.0f; // Optimal operating temperature
+	const float TempDelta = EngineState.EngineTemperature - AmbientTemperature;
+
+	// Cooling rate increases with temperature delta
+	const float CoolingRate = 3.0f * RadiatorEfficiency * AirflowCooling;
+	const float HeatDissipated = CoolingRate * (TempDelta / 100.0f) * DeltaTime;
+
+	// Apply temperature changes
+	EngineState.EngineTemperature += HeatGenerated - HeatDissipated;
+
+	// Clamp temperature to reasonable range
+	EngineState.EngineTemperature = FMath::Clamp(EngineState.EngineTemperature, AmbientTemperature, 150.0f);
+
+	// Update overheating status
+	const float OverheatThreshold = 115.0f;
+	const float CriticalTemp = 130.0f;
+	EngineState.bOverheating = EngineState.EngineTemperature >= OverheatThreshold;
+
+	// Apply power reduction when overheating
+	// Gradual power loss from 115C to 130C, with more severe loss above 130C
+	if (EngineState.bOverheating)
+	{
+		if (EngineState.EngineTemperature >= CriticalTemp)
+		{
+			// Critical temperature - severe power reduction to protect engine
+			// Would trigger limp mode in a real vehicle
+			UE_LOG(LogTemp, Warning, TEXT("Engine critical temperature: %.1fC - Power reduced"),
+				EngineState.EngineTemperature);
+		}
+	}
 }
 
 void UMGVehicleMovementComponent::UpdateBoostSimulation(float DeltaTime)
@@ -679,5 +760,407 @@ float UMGVehicleMovementComponent::GetTireCompoundGrip(EMGTireCompound Compound)
 		case EMGTireCompound::DragRadial:  return 1.10f;
 		case EMGTireCompound::Drift:       return 0.80f;
 		default:                           return 1.00f;
+	}
+}
+
+// ==========================================
+// ADVANCED PHYSICS SYSTEMS
+// ==========================================
+
+void UMGVehicleMovementComponent::UpdateTireTemperatures(float DeltaTime)
+{
+	const float SpeedMPH = GetSpeedMPH();
+
+	for (int32 i = 0; i < 4 && i < WheelSetups.Num(); ++i)
+	{
+		FMGTireTemperature& Temp = TireTemperatures[i];
+		const float SlipAmount = GetWheelSlipRatio(i) + FMath::Abs(GetWheelSlipAngle(i)) / 90.0f;
+
+		// Heat generation from slip
+		const float HeatGenerated = SlipAmount * TireHeatRate * DeltaTime;
+
+		// Cooling from ambient and airflow
+		const float AirflowCooling = (SpeedMPH / 100.0f) * TireCoolRate * 0.5f;
+		const float TotalCooling = (TireCoolRate + AirflowCooling) * DeltaTime;
+
+		// Calculate temperature differential across tire width
+		const float CamberEffect = (i < 2) ?
+			CurrentConfiguration.Suspension.FrontCamber :
+			CurrentConfiguration.Suspension.RearCamber;
+
+		// Apply temperature changes
+		const float AverageHeat = HeatGenerated / 3.0f;
+		Temp.InnerTemp += AverageHeat * (1.0f + CamberEffect * 0.1f);
+		Temp.MiddleTemp += AverageHeat;
+		Temp.OuterTemp += AverageHeat * (1.0f - CamberEffect * 0.1f);
+
+		// Cooling toward ambient
+		const float CoolFactor = TotalCooling / 3.0f;
+		Temp.InnerTemp -= (Temp.InnerTemp - AmbientTemperature) * CoolFactor * 0.01f;
+		Temp.MiddleTemp -= (Temp.MiddleTemp - AmbientTemperature) * CoolFactor * 0.01f;
+		Temp.OuterTemp -= (Temp.OuterTemp - AmbientTemperature) * CoolFactor * 0.01f;
+
+		// Clamp temperatures
+		Temp.InnerTemp = FMath::Clamp(Temp.InnerTemp, -20.0f, 200.0f);
+		Temp.MiddleTemp = FMath::Clamp(Temp.MiddleTemp, -20.0f, 200.0f);
+		Temp.OuterTemp = FMath::Clamp(Temp.OuterTemp, -20.0f, 200.0f);
+	}
+}
+
+void UMGVehicleMovementComponent::UpdateWeightTransfer(float DeltaTime)
+{
+	if (!GetOwner())
+	{
+		return;
+	}
+
+	// Get acceleration in local space
+	const FVector Velocity = GetOwner()->GetVelocity();
+	const FVector Acceleration = (Velocity - LastFrameVelocity) / FMath::Max(DeltaTime, 0.001f);
+	LastFrameVelocity = Velocity;
+
+	const FVector LocalAccel = GetOwner()->GetActorTransform().InverseTransformVector(Acceleration);
+
+	// Calculate target weight transfer
+	// Positive X = accelerating forward = weight shifts rear
+	// Positive Y = accelerating right = weight shifts left
+	const float TargetLongitudinal = -LocalAccel.X * LongitudinalTransferFactor * 0.0001f;
+	const float TargetLateral = -LocalAccel.Y * LateralTransferFactor * 0.0001f;
+
+	// Smooth interpolation
+	WeightTransferState.LongitudinalTransfer = FMath::FInterpTo(
+		WeightTransferState.LongitudinalTransfer,
+		FMath::Clamp(TargetLongitudinal, -1.0f, 1.0f),
+		DeltaTime,
+		WeightTransferRate
+	);
+
+	WeightTransferState.LateralTransfer = FMath::FInterpTo(
+		WeightTransferState.LateralTransfer,
+		FMath::Clamp(TargetLateral, -1.0f, 1.0f),
+		DeltaTime,
+		WeightTransferRate
+	);
+}
+
+void UMGVehicleMovementComponent::UpdateAerodynamics(float DeltaTime)
+{
+	const float SpeedMPS = GetSpeedMPH() * 0.44704f; // Convert to m/s
+	const float AirDensity = 1.225f; // kg/m³ at sea level
+
+	// Downforce = 0.5 * rho * v² * Cl * A
+	const float DynamicPressure = 0.5f * AirDensity * SpeedMPS * SpeedMPS;
+
+	// Base downforce from configuration
+	float TotalDownforceCoef = DownforceCoefficient;
+
+	// Add aero parts contribution
+	if (CurrentConfiguration.Aero.FrontSplitter.bInstalled)
+	{
+		TotalDownforceCoef += CurrentConfiguration.Aero.FrontSplitter.DownforceCoefficient *
+			(CurrentConfiguration.Aero.FrontSplitter.DownforceLevelPercent / 100.0f);
+	}
+
+	if (CurrentConfiguration.Aero.RearWing.bInstalled)
+	{
+		TotalDownforceCoef += CurrentConfiguration.Aero.RearWing.DownforceCoefficient *
+			(CurrentConfiguration.Aero.RearWing.DownforceLevelPercent / 100.0f);
+	}
+
+	TotalDownforceCoef += CurrentConfiguration.Aero.DiffuserDownforceCoefficient;
+
+	// Calculate total downforce in Newtons
+	CurrentDownforceN = DynamicPressure * TotalDownforceCoef * FrontalArea;
+
+	// Apply downforce to vehicle physics
+	// Increases grip at high speed but also increases tire wear
+	if (CurrentDownforceN > 100.0f && GetOwner())
+	{
+		if (UPrimitiveComponent* MeshPrimitive = Cast<UPrimitiveComponent>(UpdatedPrimitive))
+		{
+			// Apply force downward in world space
+			const FVector DownforceVector = FVector(0.0f, 0.0f, -CurrentDownforceN * DeltaTime * 50.0f);
+			MeshPrimitive->AddForce(DownforceVector, NAME_None, true);
+		}
+	}
+
+	// Calculate drag (reduces top speed)
+	const float DragForce = DynamicPressure * DragCoefficient * FrontalArea;
+	if (DragForce > 50.0f && GetOwner() && SpeedMPS > 10.0f)
+	{
+		if (UPrimitiveComponent* MeshPrimitive = Cast<UPrimitiveComponent>(UpdatedPrimitive))
+		{
+			const FVector VelocityDir = GetOwner()->GetVelocity().GetSafeNormal();
+			const FVector DragVector = -VelocityDir * DragForce * DeltaTime * 10.0f;
+			MeshPrimitive->AddForce(DragVector, NAME_None, true);
+		}
+	}
+}
+
+void UMGVehicleMovementComponent::UpdateAntiLag(float DeltaTime)
+{
+	const FMGForcedInductionConfig& FI = CurrentConfiguration.Engine.ForcedInduction;
+
+	// Only for turbo vehicles with anti-lag enabled
+	if (FI.Type != EMGForcedInductionType::Turbo_Single &&
+		FI.Type != EMGForcedInductionType::Turbo_Twin)
+	{
+		EngineState.bAntiLagActive = false;
+		return;
+	}
+
+	if (!bAntiLagEnabled)
+	{
+		EngineState.bAntiLagActive = false;
+		return;
+	}
+
+	// Anti-lag activates when off throttle but RPM is high enough
+	const bool bConditionsMet = EngineState.ThrottlePosition < 0.3f &&
+		EngineState.CurrentRPM >= AntiLagMinRPM &&
+		CurrentGear > 0;
+
+	EngineState.bAntiLagActive = bConditionsMet;
+
+	if (EngineState.bAntiLagActive)
+	{
+		// Maintain boost pressure when off throttle
+		EngineState.BoostBuildupPercent = FMath::FInterpTo(
+			EngineState.BoostBuildupPercent,
+			AntiLagBoostRetention,
+			DeltaTime,
+			BoostBuildupRate * 0.5f
+		);
+
+		EngineState.CurrentBoostPSI = FI.MaxBoostPSI * EngineState.BoostBuildupPercent;
+	}
+}
+
+void UMGVehicleMovementComponent::UpdateLaunchControl(float DeltaTime)
+{
+	if (!EngineState.bLaunchControlEngaged)
+	{
+		return;
+	}
+
+	// Launch control holds RPM at target with boost building
+	const float TargetRPM = EngineState.LaunchControlRPM;
+	EngineState.CurrentRPM = FMath::FInterpTo(EngineState.CurrentRPM, TargetRPM, DeltaTime, 15.0f);
+
+	// Build boost while stationary
+	const FMGForcedInductionConfig& FI = CurrentConfiguration.Engine.ForcedInduction;
+	if (FI.Type == EMGForcedInductionType::Turbo_Single ||
+		FI.Type == EMGForcedInductionType::Turbo_Twin)
+	{
+		EngineState.BoostBuildupPercent = FMath::FInterpTo(
+			EngineState.BoostBuildupPercent,
+			1.0f,
+			DeltaTime,
+			BoostBuildupRate * LaunchControlBoostBuild
+		);
+		EngineState.CurrentBoostPSI = FI.MaxBoostPSI * EngineState.BoostBuildupPercent;
+	}
+
+	LaunchControlTimer += DeltaTime;
+}
+
+void UMGVehicleMovementComponent::UpdateBrakeSystem(float DeltaTime)
+{
+	// Get brake input from parent class
+	const float BrakeInput = GetBrakeInput();
+
+	// Heat generation from braking
+	if (BrakeInput > 0.1f)
+	{
+		const float SpeedFactor = FMath::Clamp(GetSpeedMPH() / 60.0f, 0.0f, 1.5f);
+		const float HeatGen = BrakeHeatRate * BrakeInput * SpeedFactor * DeltaTime;
+		EngineState.BrakeTemperature += HeatGen;
+	}
+
+	// Cooling
+	const float SpeedCooling = (GetSpeedMPH() / 100.0f) * BrakeCoolRate * 0.3f;
+	const float TotalCooling = (BrakeCoolRate + SpeedCooling) * DeltaTime;
+	EngineState.BrakeTemperature -= (EngineState.BrakeTemperature - AmbientTemperature) * TotalCooling * 0.01f;
+
+	// Clamp temperature
+	EngineState.BrakeTemperature = FMath::Clamp(EngineState.BrakeTemperature, AmbientTemperature, 800.0f);
+
+	// Calculate brake fade
+	if (EngineState.BrakeTemperature <= BrakeFadeStartTemp)
+	{
+		EngineState.BrakeFadeMultiplier = 1.0f;
+	}
+	else if (EngineState.BrakeTemperature >= BrakeFadeMaxTemp)
+	{
+		EngineState.BrakeFadeMultiplier = BrakeFadeMinEfficiency;
+	}
+	else
+	{
+		// Linear interpolation between fade start and max
+		const float FadeProgress = (EngineState.BrakeTemperature - BrakeFadeStartTemp) /
+			(BrakeFadeMaxTemp - BrakeFadeStartTemp);
+		EngineState.BrakeFadeMultiplier = FMath::Lerp(1.0f, BrakeFadeMinEfficiency, FadeProgress);
+	}
+}
+
+void UMGVehicleMovementComponent::ApplyDifferentialBehavior(float DeltaTime)
+{
+	if (!IsGrounded() || WheelSetups.Num() < 4)
+	{
+		return;
+	}
+
+	const EMGDifferentialType DiffType = CurrentConfiguration.Drivetrain.DifferentialType;
+	const float LockFactor = GetDifferentialLockFactor();
+
+	// Apply differential behavior based on type
+	// This affects how power is distributed between driven wheels
+	switch (CurrentConfiguration.Drivetrain.DrivetrainType)
+	{
+		case EMGDrivetrainType::RWD:
+		{
+			// Rear wheel drive - differential affects wheels 2 and 3
+			const float LeftSlip = GetWheelSlipRatio(2);
+			const float RightSlip = GetWheelSlipRatio(3);
+
+			if (DiffType == EMGDifferentialType::LSD_2Way ||
+				DiffType == EMGDifferentialType::Locked)
+			{
+				// Locked diff tends to cause understeer on power
+				// but better for acceleration
+				if (DriftState.bIsDrifting)
+				{
+					// Help maintain drift angle
+					const float DriftCorrection = DriftState.DriftAngle * 0.01f * LockFactor;
+					// Would apply torque correction here
+				}
+			}
+			break;
+		}
+
+		case EMGDrivetrainType::FWD:
+		{
+			// Front wheel drive - torque steer simulation
+			if (EngineState.ThrottlePosition > 0.7f && GetSpeedMPH() < 40.0f)
+			{
+				// Torque steer pulls toward stronger grip side
+				// LSD reduces this effect
+				const float TorqueSteerAmount = (1.0f - LockFactor * 0.5f) * 0.05f;
+				TargetSteering += TorqueSteerAmount * FMath::Sign(TargetSteering + 0.001f);
+			}
+			break;
+		}
+
+		case EMGDrivetrainType::AWD:
+		{
+			// All wheel drive - power split behavior
+			// Center diff behavior would go here
+			break;
+		}
+	}
+}
+
+FMGTireTemperature UMGVehicleMovementComponent::GetTireTemperature(int32 WheelIndex) const
+{
+	if (WheelIndex >= 0 && WheelIndex < 4)
+	{
+		return TireTemperatures[WheelIndex];
+	}
+	return FMGTireTemperature();
+}
+
+float UMGVehicleMovementComponent::GetCurrentDownforce() const
+{
+	return CurrentDownforceN;
+}
+
+bool UMGVehicleMovementComponent::IsLaunchControlAvailable() const
+{
+	// Available when:
+	// - Stationary or very slow
+	// - In first gear
+	// - Brake held
+	return GetSpeedMPH() < 5.0f &&
+		CurrentGear == 1 &&
+		GetBrakeInput() > 0.8f;
+}
+
+void UMGVehicleMovementComponent::EngageLaunchControl()
+{
+	if (!IsLaunchControlAvailable())
+	{
+		return;
+	}
+
+	EngineState.bLaunchControlEngaged = true;
+	EngineState.LaunchControlRPM = LaunchControlDefaultRPM;
+	LaunchControlTimer = 0.0f;
+
+	UE_LOG(LogTemp, Log, TEXT("Launch control engaged at %d RPM"), FMath::RoundToInt(LaunchControlDefaultRPM));
+}
+
+void UMGVehicleMovementComponent::ReleaseLaunchControl()
+{
+	if (!EngineState.bLaunchControlEngaged)
+	{
+		return;
+	}
+
+	EngineState.bLaunchControlEngaged = false;
+
+	// Apply clutch slip for smooth launch
+	EngineState.ClutchEngagement = 1.0f - LaunchControlClutchSlip;
+
+	UE_LOG(LogTemp, Log, TEXT("Launch control released after %.2f seconds"), LaunchControlTimer);
+}
+
+void UMGVehicleMovementComponent::SetAntiLagEnabled(bool bEnabled)
+{
+	bAntiLagEnabled = bEnabled;
+
+	if (bEnabled)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Anti-lag system enabled"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Anti-lag system disabled"));
+	}
+}
+
+void UMGVehicleMovementComponent::SetClutchInput(float Value)
+{
+	ClutchInput = FMath::Clamp(Value, 0.0f, 1.0f);
+	EngineState.ClutchEngagement = ClutchInput;
+}
+
+float UMGVehicleMovementComponent::CalculateSpeedSteeringFactor() const
+{
+	const float SpeedFactor = FMath::Clamp(GetSpeedMPH() / 120.0f, 0.0f, 1.0f);
+
+	// Non-linear reduction - more sensitive at higher speeds
+	const float Reduction = FMath::Pow(SpeedFactor, 1.5f) * SpeedSensitiveSteeringFactor;
+
+	return 1.0f - Reduction;
+}
+
+float UMGVehicleMovementComponent::GetDifferentialLockFactor() const
+{
+	switch (CurrentConfiguration.Drivetrain.DifferentialType)
+	{
+		case EMGDifferentialType::Open:
+			return 0.0f;
+		case EMGDifferentialType::LSD_1Way:
+			return 0.3f;
+		case EMGDifferentialType::LSD_1_5Way:
+			return 0.5f;
+		case EMGDifferentialType::LSD_2Way:
+			return 0.7f;
+		case EMGDifferentialType::Torsen:
+			return 0.6f;
+		case EMGDifferentialType::Locked:
+			return 1.0f;
+		default:
+			return 0.0f;
 	}
 }
