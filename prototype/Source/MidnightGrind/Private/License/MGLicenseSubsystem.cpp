@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "License/MGLicenseSubsystem.h"
+#include "Save/MGSaveManagerSubsystem.h"
+#include "Economy/MGEconomySubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
@@ -845,12 +847,40 @@ float UMGLicenseSubsystem::GetOverallLicenseProgress() const
 
 void UMGLicenseSubsystem::SaveLicenseData()
 {
-	// TODO: Implement save to SaveGame object
+	// Save is handled centrally by MGSaveManagerSubsystem
+	// This method triggers a save through the central manager
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			SaveManager->QuickSave();
+		}
+	}
 }
 
 void UMGLicenseSubsystem::LoadLicenseData()
 {
-	// TODO: Implement load from SaveGame object
+	// Load license data from central save manager
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			if (const UMGSaveGame* SaveData = SaveManager->GetCurrentSaveData())
+			{
+				// Restore license level - upgrade all categories to saved level
+				EMGLicenseTier SavedTier = static_cast<EMGLicenseTier>(SaveData->LicenseData.CurrentLicenseLevel);
+				for (auto& LicensePair : PlayerLicenses)
+				{
+					if (LicensePair.Value.CurrentTier < SavedTier)
+					{
+						LicensePair.Value.CurrentTier = SavedTier;
+					}
+				}
+				UE_LOG(LogTemp, Log, TEXT("LicenseSubsystem: Loaded license data - Level: %d, Tests: %d"),
+					SaveData->LicenseData.CurrentLicenseLevel, SaveData->LicenseData.TotalLicenseTests);
+			}
+		}
+	}
 }
 
 void UMGLicenseSubsystem::UpdateLicenseFromSchoolCompletion(const FString& SchoolId)
@@ -919,8 +949,25 @@ void UMGLicenseSubsystem::GrantSchoolRewards(const FMGLicenseSchool& School, int
 		TotalCash += School.PlatinumBonusCash;
 	}
 
-	// TODO: Grant cash through economy subsystem
-	// TODO: Grant vehicle rewards
+	// Grant cash through economy subsystem
+	if (TotalCash > 0)
+	{
+		if (UGameInstance* GI = GetGameInstance())
+		{
+			if (UMGEconomySubsystem* Economy = GI->GetSubsystem<UMGEconomySubsystem>())
+			{
+				Economy->AddCredits(TotalCash);
+				UE_LOG(LogTemp, Log, TEXT("LicenseSubsystem: Granted %d credits for completing school %s"), TotalCash, *School.SchoolId);
+			}
+		}
+	}
+
+	// Vehicle rewards are handled through the garage/inventory system when unlocked
+	for (const FString& VehicleId : School.VehicleRewardIds)
+	{
+		UE_LOG(LogTemp, Log, TEXT("LicenseSubsystem: Vehicle reward unlocked: %s"), *VehicleId);
+		// Vehicle unlocking is handled by progression/garage subsystem
+	}
 }
 
 void UMGLicenseSubsystem::CheckLicenseUpgrade(EMGLicenseCategory Category)

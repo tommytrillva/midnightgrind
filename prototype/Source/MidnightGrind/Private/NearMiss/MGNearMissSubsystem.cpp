@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "NearMiss/MGNearMissSubsystem.h"
+#include "Save/MGSaveManagerSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
@@ -882,12 +883,35 @@ FLinearColor UMGNearMissSubsystem::GetQualityColor(EMGNearMissQuality Quality) c
 
 void UMGNearMissSubsystem::SaveNearMissData()
 {
-	// TODO: Implement save to SaveGame object
+	// Save is handled centrally by MGSaveManagerSubsystem
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			SaveManager->QuickSave();
+		}
+	}
 }
 
 void UMGNearMissSubsystem::LoadNearMissData()
 {
-	// TODO: Implement load from SaveGame object
+	// Load near miss data from central save manager
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			if (const UMGSaveGame* SaveData = SaveManager->GetCurrentSaveData())
+			{
+				// Restore career stats
+				SessionStats.TotalNearMisses = SaveData->NearMissData.TotalNearMisses;
+				SessionStats.TotalStylePoints = SaveData->NearMissData.TotalNearMissScore;
+				SessionStats.BestCombo = SaveData->NearMissData.NearMissChainMax;
+				SessionStats.ClosestDistance = SaveData->NearMissData.ClosestNearMissDistance;
+				UE_LOG(LogTemp, Log, TEXT("NearMissSubsystem: Loaded near miss data - Total: %d, Score: %lld"),
+					SaveData->NearMissData.TotalNearMisses, SaveData->NearMissData.TotalNearMissScore);
+			}
+		}
+	}
 }
 
 void UMGNearMissSubsystem::TickCombo(float DeltaTime)

@@ -3,6 +3,11 @@
 #include "Save/MGSaveManagerSubsystem.h"
 #include "Economy/MGEconomySubsystem.h"
 #include "Garage/MGGarageSubsystem.h"
+#include "License/MGLicenseSubsystem.h"
+#include "VehicleClass/MGVehicleClassSubsystem.h"
+#include "Stunt/MGStuntSubsystem.h"
+#include "Shortcut/MGShortcutSubsystem.h"
+#include "NearMiss/MGNearMissSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
@@ -310,8 +315,54 @@ void UMGSaveManagerSubsystem::GatherSubsystemData()
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("SaveManager: Gathered subsystem data - Cash: %lld, Vehicles: %d"),
-		CurrentSaveGame->PlayerCash, CurrentSaveGame->UnlockedVehicles.Num());
+	// Gather License data
+	if (UMGLicenseSubsystem* License = GI->GetSubsystem<UMGLicenseSubsystem>())
+	{
+		CurrentSaveGame->LicenseData.CurrentLicenseLevel = static_cast<int32>(License->GetHighestLicenseTier());
+		CurrentSaveGame->LicenseData.TotalLicenseTests = License->GetTotalTestsCompleted();
+		CurrentSaveGame->LicenseData.PerfectLicenseTests = License->GetTotalGoldMedals();
+	}
+
+	// Gather Stunt data
+	if (UMGStuntSubsystem* Stunt = GI->GetSubsystem<UMGStuntSubsystem>())
+	{
+		FMGStuntSessionStats StuntStats = Stunt->GetSessionStats();
+		CurrentSaveGame->StuntData.TotalStunts = StuntStats.TotalStunts;
+		CurrentSaveGame->StuntData.TotalStuntScore = StuntStats.TotalPoints;
+		CurrentSaveGame->StuntData.StuntComboMax = StuntStats.BestCombo;
+		CurrentSaveGame->StuntData.LongestJump = StuntStats.LongestJump;
+		CurrentSaveGame->StuntData.HighestAirTime = StuntStats.HighestAir;
+	}
+
+	// Gather Shortcut data
+	if (UMGShortcutSubsystem* Shortcut = GI->GetSubsystem<UMGShortcutSubsystem>())
+	{
+		FMGShortcutSessionStats ShortcutStats = Shortcut->GetSessionStats();
+		CurrentSaveGame->ShortcutData.TotalShortcutsUsed = ShortcutStats.TotalShortcutsUsed;
+		CurrentSaveGame->ShortcutData.TotalTimeSaved = Shortcut->GetTotalTimeSaved();
+		CurrentSaveGame->ShortcutData.SecretShortcutsFound = ShortcutStats.SecretShortcutsFound;
+		// Convert discovered shortcuts to FName array
+		TArray<FMGShortcutDefinition> DiscoveredShortcuts = Shortcut->GetDiscoveredShortcuts();
+		CurrentSaveGame->ShortcutData.DiscoveredShortcuts.Empty();
+		for (const FMGShortcutDefinition& ShortcutDef : DiscoveredShortcuts)
+		{
+			CurrentSaveGame->ShortcutData.DiscoveredShortcuts.Add(FName(*ShortcutDef.ShortcutId));
+		}
+	}
+
+	// Gather NearMiss data
+	if (UMGNearMissSubsystem* NearMiss = GI->GetSubsystem<UMGNearMissSubsystem>())
+	{
+		FMGStyleSessionStats NearMissStats = NearMiss->GetSessionStats();
+		CurrentSaveGame->NearMissData.TotalNearMisses = NearMissStats.TotalNearMisses;
+		CurrentSaveGame->NearMissData.TotalNearMissScore = NearMissStats.TotalStylePoints;
+		CurrentSaveGame->NearMissData.NearMissChainMax = NearMissStats.BestCombo;
+		CurrentSaveGame->NearMissData.ClosestNearMissDistance = NearMissStats.ClosestDistance;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("SaveManager: Gathered subsystem data - Cash: %lld, Vehicles: %d, Stunts: %d, NearMisses: %d"),
+		CurrentSaveGame->PlayerCash, CurrentSaveGame->UnlockedVehicles.Num(),
+		CurrentSaveGame->StuntData.TotalStunts, CurrentSaveGame->NearMissData.TotalNearMisses);
 }
 
 void UMGSaveManagerSubsystem::DistributeSubsystemData()
@@ -345,8 +396,13 @@ void UMGSaveManagerSubsystem::DistributeSubsystemData()
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("SaveManager: Distributed subsystem data - Cash: %lld, Vehicles: %d"),
-		CurrentSaveGame->PlayerCash, CurrentSaveGame->UnlockedVehicles.Num());
+	// Note: Subsystem stats are restored when sessions are started
+	// The save data acts as persistent storage accessed via GetSaveDataMutable()
+	// Individual subsystems can query save data when initializing their sessions
+
+	UE_LOG(LogTemp, Log, TEXT("SaveManager: Distributed subsystem data - Cash: %lld, Vehicles: %d, Stunts: %d, NearMisses: %d"),
+		CurrentSaveGame->PlayerCash, CurrentSaveGame->UnlockedVehicles.Num(),
+		CurrentSaveGame->StuntData.TotalStunts, CurrentSaveGame->NearMissData.TotalNearMisses);
 }
 
 bool UMGSaveManagerSubsystem::ValidateSaveData(const UMGSaveGame* SaveData) const

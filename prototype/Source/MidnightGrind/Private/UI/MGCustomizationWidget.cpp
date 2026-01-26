@@ -2,6 +2,8 @@
 
 #include "UI/MGCustomizationWidget.h"
 #include "Vehicle/MGStatCalculator.h"
+#include "Garage/MGGarageSubsystem.h"
+#include "Customization/MGCustomizationSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
 UMGCustomizationWidget::UMGCustomizationWidget(const FObjectInitializer& ObjectInitializer)
@@ -508,7 +510,15 @@ bool UMGCustomizationWidget::InstallPart()
 
 bool UMGCustomizationWidget::UninstallPart(EMGCustomizationCategory Category)
 {
-	// TODO: Revert to stock through vehicle management subsystem
+	// Revert to stock through customization subsystem
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+	{
+		if (UMGCustomizationSubsystem* Customization = GI->GetSubsystem<UMGCustomizationSubsystem>())
+		{
+			Customization->RevertToStock(CurrentVehicleID, Category);
+			UE_LOG(LogTemp, Log, TEXT("CustomizationWidget: Reverted category %d to stock"), static_cast<int32>(Category));
+		}
+	}
 
 	RefreshPartsList();
 	UpdateVehiclePreview();
@@ -718,21 +728,43 @@ TArray<FMGTuningSliderConfig> UMGCustomizationWidget::GetTuningSlidersForCategor
 
 void UMGCustomizationWidget::SetTuningValue(FName SliderID, float Value)
 {
-	// TODO: Apply tuning value to vehicle configuration
+	// Apply tuning value through customization subsystem
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+	{
+		if (UMGCustomizationSubsystem* Customization = GI->GetSubsystem<UMGCustomizationSubsystem>())
+		{
+			Customization->SetTuningParameter(CurrentVehicleID, SliderID, Value);
+		}
+	}
+	// Store locally for preview
+	TuningValues.Add(SliderID, Value);
 	OnStatsPreviewUpdated();
 	UpdateVehiclePreview();
 }
 
 void UMGCustomizationWidget::ResetTuningValue(FName SliderID)
 {
-	// TODO: Reset specific slider to default
+	// Reset specific tuning slider to default (0.5 = center)
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+	{
+		if (UMGCustomizationSubsystem* Customization = GI->GetSubsystem<UMGCustomizationSubsystem>())
+		{
+			Customization->SetTuningParameter(CurrentVehicleID, SliderID, 0.5f);
+		}
+	}
+	TuningValues.Add(SliderID, 0.5f);
 	OnStatsPreviewUpdated();
 	UpdateVehiclePreview();
 }
 
 void UMGCustomizationWidget::ResetCategoryTuning()
 {
-	// TODO: Reset all tuning in current category
+	// Reset all tuning in current category
+	TArray<FMGTuningSliderConfig> Sliders = GetTuningSlidersForCategory();
+	for (const FMGTuningSliderConfig& Slider : Sliders)
+	{
+		ResetTuningValue(Slider.SliderID);
+	}
 	OnStatsPreviewUpdated();
 	UpdateVehiclePreview();
 }
@@ -762,19 +794,38 @@ TArray<FMGPaintColorData> UMGCustomizationWidget::GetAvailablePaintColors() cons
 
 void UMGCustomizationWidget::SetPaintColor(int32 ZoneIndex, const FMGPaintColorData& ColorData)
 {
-	// TODO: Apply paint to vehicle material
+	// Apply paint color through customization subsystem
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+	{
+		if (UMGCustomizationSubsystem* Customization = GI->GetSubsystem<UMGCustomizationSubsystem>())
+		{
+			Customization->SetPaintColor(CurrentVehicleID, ZoneIndex, ColorData.Color, ColorData.Finish);
+		}
+	}
+	// Cache locally for display
+	PaintZoneColors.Add(ZoneIndex, ColorData);
 	UpdateVehiclePreview();
 }
 
 FMGPaintColorData UMGCustomizationWidget::GetPaintForZone(int32 ZoneIndex) const
 {
-	// TODO: Get current paint from vehicle configuration
-	return FMGPaintColorData();
+	// Return cached paint data or query from customization subsystem
+	if (const FMGPaintColorData* CachedColor = PaintZoneColors.Find(ZoneIndex))
+	{
+		return *CachedColor;
+	}
+	// Default white paint
+	FMGPaintColorData DefaultPaint;
+	DefaultPaint.Color = FLinearColor::White;
+	DefaultPaint.Finish = EMGPaintFinish::Gloss;
+	return DefaultPaint;
 }
 
 void UMGCustomizationWidget::OpenColorPicker(int32 ZoneIndex)
 {
-	// TODO: Open custom color picker widget
+	// Set state to indicate we're editing a paint zone
+	EditingPaintZone = ZoneIndex;
+	SetMenuState(EMGCustomizationMenuState::ColorPicker);
 }
 
 // ==========================================
@@ -783,40 +834,90 @@ void UMGCustomizationWidget::OpenColorPicker(int32 ZoneIndex)
 
 TArray<FMGVinylPlacement> UMGCustomizationWidget::GetVinylPlacements() const
 {
-	// TODO: Get from vehicle configuration
-	return TArray<FMGVinylPlacement>();
+	// Return cached vinyl placements
+	return VinylPlacements;
 }
 
 void UMGCustomizationWidget::AddVinyl(const FGuid& VinylAssetID)
 {
-	// TODO: Add vinyl to vehicle
+	// Add vinyl through customization subsystem
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+	{
+		if (UMGCustomizationSubsystem* Customization = GI->GetSubsystem<UMGCustomizationSubsystem>())
+		{
+			FMGVinylPlacement NewPlacement;
+			NewPlacement.VinylAssetID = VinylAssetID;
+			NewPlacement.Position = FVector2D(0.5f, 0.5f);
+			NewPlacement.Scale = FVector2D(1.0f, 1.0f);
+			NewPlacement.Rotation = 0.0f;
+			Customization->AddVinyl(CurrentVehicleID, NewPlacement);
+			VinylPlacements.Add(NewPlacement);
+		}
+	}
 	UpdateVehiclePreview();
 }
 
 void UMGCustomizationWidget::UpdateVinylPlacement(int32 VinylIndex, const FMGVinylPlacement& Placement)
 {
-	// TODO: Update vinyl placement
+	// Update vinyl placement through customization subsystem
+	if (VinylIndex >= 0 && VinylIndex < VinylPlacements.Num())
+	{
+		VinylPlacements[VinylIndex] = Placement;
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+		{
+			if (UMGCustomizationSubsystem* Customization = GI->GetSubsystem<UMGCustomizationSubsystem>())
+			{
+				Customization->UpdateVinyl(CurrentVehicleID, VinylIndex, Placement);
+			}
+		}
+	}
 	UpdateVehiclePreview();
 }
 
 void UMGCustomizationWidget::RemoveVinyl(int32 VinylIndex)
 {
-	// TODO: Remove vinyl from vehicle
+	// Remove vinyl through customization subsystem
+	if (VinylIndex >= 0 && VinylIndex < VinylPlacements.Num())
+	{
+		VinylPlacements.RemoveAt(VinylIndex);
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+		{
+			if (UMGCustomizationSubsystem* Customization = GI->GetSubsystem<UMGCustomizationSubsystem>())
+			{
+				Customization->RemoveVinyl(CurrentVehicleID, VinylIndex);
+			}
+		}
+	}
 	UpdateVehiclePreview();
 }
 
 void UMGCustomizationWidget::EnterVinylEditMode(int32 VinylIndex)
 {
+	EditingVinylIndex = VinylIndex;
+	// Cache current state for potential revert
+	if (VinylIndex >= 0 && VinylIndex < VinylPlacements.Num())
+	{
+		CachedVinylPlacement = VinylPlacements[VinylIndex];
+	}
 	SetMenuState(EMGCustomizationMenuState::VinylEditor);
 	SetCameraPreset(TEXT("VinylEdit"));
 }
 
 void UMGCustomizationWidget::ExitVinylEditMode(bool bSaveChanges)
 {
-	if (!bSaveChanges)
+	if (!bSaveChanges && EditingVinylIndex >= 0 && EditingVinylIndex < VinylPlacements.Num())
 	{
-		// TODO: Revert vinyl changes
+		// Revert vinyl changes
+		VinylPlacements[EditingVinylIndex] = CachedVinylPlacement;
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+		{
+			if (UMGCustomizationSubsystem* Customization = GI->GetSubsystem<UMGCustomizationSubsystem>())
+			{
+				Customization->UpdateVinyl(CurrentVehicleID, EditingVinylIndex, CachedVinylPlacement);
+			}
+		}
 	}
+	EditingVinylIndex = -1;
 	NavigateBack();
 }
 
@@ -1050,14 +1151,28 @@ FMGPartComparison UMGCustomizationWidget::CalculatePartComparison(const FGuid& P
 {
 	FMGPartComparison Comparison;
 
-	// TODO: Calculate full stat comparison between current and selected part
+	// Get current and preview stats for comparison
+	FMGVehicleStats CurrentStats = GetCurrentVehicleStats();
+	FMGVehicleStats PreviewStats = GetPreviewVehicleStats();
+
+	// Calculate stat deltas
+	Comparison.HorsepowerDelta = PreviewStats.Horsepower - CurrentStats.Horsepower;
+	Comparison.TorqueDelta = PreviewStats.Torque - CurrentStats.Torque;
+	Comparison.WeightDelta = PreviewStats.WeightKG - CurrentStats.WeightKG;
+	Comparison.HandlingDelta = PreviewStats.HandlingRating - CurrentStats.HandlingRating;
+	Comparison.BrakingDelta = PreviewStats.BrakingRating - CurrentStats.BrakingRating;
+	Comparison.GripDelta = (PreviewStats.GripFront + PreviewStats.GripRear) / 2.0f - (CurrentStats.GripFront + CurrentStats.GripRear) / 2.0f;
+	Comparison.TopSpeedDelta = PreviewStats.TopSpeedMPH - CurrentStats.TopSpeedMPH;
+	Comparison.AccelerationDelta = CurrentStats.ZeroTo60MPH - PreviewStats.ZeroTo60MPH; // Lower is better
+	Comparison.PIDelta = static_cast<int32>(PreviewStats.PerformanceIndex - CurrentStats.PerformanceIndex);
 
 	return Comparison;
 }
 
 void UMGCustomizationWidget::UpdateVehiclePreview()
 {
-	// TODO: Update 3D vehicle preview in garage scene
+	// Notify the garage/preview system to update the 3D vehicle display
+	OnVehiclePreviewRequested.Broadcast(CurrentVehicleID, SelectedPartData.PartID);
 }
 
 TArray<FMGCustomizationInputBinding> UMGCustomizationWidget::GetInputBindingsForState() const

@@ -272,8 +272,42 @@ void UMGRetroRenderingComponent::ConfigurePostProcess()
 		return;
 	}
 
-	// TODO: Find/create and configure post-process volume with retro material
-	// This would typically be done in Blueprint or through level design
+	// Find existing unbound post-process volume in the level
+	TArray<AActor*> FoundVolumes;
+	UGameplayStatics::GetAllActorsOfClass(World, APostProcessVolume::StaticClass(), FoundVolumes);
+
+	APostProcessVolume* PPVolume = nullptr;
+	for (AActor* Actor : FoundVolumes)
+	{
+		APostProcessVolume* Volume = Cast<APostProcessVolume>(Actor);
+		if (Volume && Volume->bUnbound)
+		{
+			PPVolume = Volume;
+			break;
+		}
+	}
+
+	if (PPVolume)
+	{
+		// Configure post-process settings for retro look
+		PPVolume->Settings.bOverride_FilmGrainIntensity = CurrentConfig.bEnableNoise;
+		PPVolume->Settings.FilmGrainIntensity = CurrentConfig.NoiseIntensity;
+
+		PPVolume->Settings.bOverride_VignetteIntensity = CurrentConfig.bEnableVignette;
+		PPVolume->Settings.VignetteIntensity = CurrentConfig.VignetteIntensity;
+
+		PPVolume->Settings.bOverride_ColorSaturation = true;
+		PPVolume->Settings.ColorSaturation = FVector4(1.1f, 1.1f, 1.1f, 1.0f); // Slightly boosted saturation
+
+		PPVolume->Settings.bOverride_ColorContrast = true;
+		PPVolume->Settings.ColorContrast = FVector4(1.05f, 1.05f, 1.05f, 1.0f); // Subtle contrast boost
+
+		UE_LOG(LogTemp, Log, TEXT("RetroRendering: Configured post-process volume for retro effects"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RetroRendering: No unbound post-process volume found. Effects applied via material parameter collection."));
+	}
 }
 
 // ==========================================

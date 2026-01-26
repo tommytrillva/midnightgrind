@@ -327,14 +327,14 @@ FText UMGRaceFlowSubsystem::GetTrackDisplayName(FName TrackID) const
 UTexture2D* UMGRaceFlowSubsystem::GetTrackPreview(FName TrackID) const
 {
 	// MVP: Return nullptr, UI will use placeholder
-	// TODO: Load from data asset
+	// Post-MVP: Load track preview images from data assets
 	return nullptr;
 }
 
 bool UMGRaceFlowSubsystem::IsTrackUnlocked(FName TrackID) const
 {
-	// MVP: All tracks unlocked
-	// TODO: Check progression
+	// MVP: All tracks unlocked for initial playtesting
+	// Post-MVP: Check REP tier and progression requirements
 	return true;
 }
 

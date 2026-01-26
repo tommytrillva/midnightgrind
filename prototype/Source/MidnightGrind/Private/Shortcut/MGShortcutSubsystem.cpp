@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Shortcut/MGShortcutSubsystem.h"
+#include "Save/MGSaveManagerSubsystem.h"
 
 void UMGShortcutSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -632,12 +633,41 @@ FLinearColor UMGShortcutSubsystem::GetDifficultyColor(EMGShortcutDifficulty Diff
 
 void UMGShortcutSubsystem::SaveShortcutData()
 {
-	// TODO: Implement save to SaveGame object
+	// Save is handled centrally by MGSaveManagerSubsystem
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			SaveManager->QuickSave();
+		}
+	}
 }
 
 void UMGShortcutSubsystem::LoadShortcutData()
 {
-	// TODO: Implement load from SaveGame object
+	// Load shortcut data from central save manager
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			if (const UMGSaveGame* SaveData = SaveManager->GetCurrentSaveData())
+			{
+				// Restore discovered shortcuts
+				for (const FName& ShortcutName : SaveData->ShortcutData.DiscoveredShortcuts)
+				{
+					FMGShortcutProgress Progress;
+					Progress.bDiscovered = true;
+					ShortcutProgress.Add(ShortcutName.ToString(), Progress);
+				}
+				// Restore session stats
+				SessionStats.TotalShortcutsUsed = SaveData->ShortcutData.TotalShortcutsUsed;
+				SessionStats.TotalTimeSaved = SaveData->ShortcutData.TotalTimeSaved;
+				SessionStats.SecretShortcutsFound = SaveData->ShortcutData.SecretShortcutsFound;
+				UE_LOG(LogTemp, Log, TEXT("ShortcutSubsystem: Loaded shortcut data - Discovered: %d, Used: %d"),
+					SaveData->ShortcutData.DiscoveredShortcuts.Num(), SaveData->ShortcutData.TotalShortcutsUsed);
+			}
+		}
+	}
 }
 
 void UMGShortcutSubsystem::CheckWaypointProgress(FVector PlayerLocation)

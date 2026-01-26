@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Stunt/MGStuntSubsystem.h"
+#include "Save/MGSaveManagerSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
@@ -949,12 +950,36 @@ FLinearColor UMGStuntSubsystem::GetQualityColor(EMGStuntQuality Quality) const
 
 void UMGStuntSubsystem::SaveStuntData()
 {
-	// TODO: Implement save to SaveGame object
+	// Save is handled centrally by MGSaveManagerSubsystem
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			SaveManager->QuickSave();
+		}
+	}
 }
 
 void UMGStuntSubsystem::LoadStuntData()
 {
-	// TODO: Implement load from SaveGame object
+	// Load stunt data from central save manager
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			if (const UMGSaveGame* SaveData = SaveManager->GetCurrentSaveData())
+			{
+				// Restore career stats from saved data
+				SessionStats.TotalStunts = SaveData->StuntData.TotalStunts;
+				SessionStats.TotalPoints = SaveData->StuntData.TotalStuntScore;
+				SessionStats.BestCombo = SaveData->StuntData.StuntComboMax;
+				SessionStats.LongestJump = SaveData->StuntData.LongestJump;
+				SessionStats.HighestAir = SaveData->StuntData.HighestAirTime;
+				UE_LOG(LogTemp, Log, TEXT("StuntSubsystem: Loaded stunt data - TotalStunts: %d, Score: %lld"),
+					SaveData->StuntData.TotalStunts, SaveData->StuntData.TotalStuntScore);
+			}
+		}
+	}
 }
 
 FMGStuntEvent UMGStuntSubsystem::FinalizeStunt()

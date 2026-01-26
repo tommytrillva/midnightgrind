@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "VehicleClass/MGVehicleClassSubsystem.h"
+#include "Save/MGSaveManagerSubsystem.h"
 
 void UMGVehicleClassSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -891,12 +892,34 @@ FText UMGVehicleClassSubsystem::GetEraDisplayName(EMGVehicleEra Era) const
 
 void UMGVehicleClassSubsystem::SaveVehicleClassData()
 {
-	// TODO: Implement save to SaveGame object
+	// Save is handled centrally by MGSaveManagerSubsystem
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			SaveManager->QuickSave();
+		}
+	}
 }
 
 void UMGVehicleClassSubsystem::LoadVehicleClassData()
 {
-	// TODO: Implement load from SaveGame object
+	// Load vehicle class data from central save manager
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			if (const UMGSaveGame* SaveData = SaveManager->GetCurrentSaveData())
+			{
+				// Restore unlocked classes
+				for (const FName& ClassName : SaveData->VehicleClassData.UnlockedClasses)
+				{
+					UnlockedClasses.AddUnique(ClassName);
+				}
+				UE_LOG(LogTemp, Log, TEXT("VehicleClassSubsystem: Loaded %d unlocked classes"), SaveData->VehicleClassData.UnlockedClasses.Num());
+			}
+		}
+	}
 }
 
 void UMGVehicleClassSubsystem::RecalculateVehicleClass(const FString& VehicleId)
