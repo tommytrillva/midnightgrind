@@ -4,7 +4,7 @@
 #include "Environment/MGWeatherRacingEffects.h"
 #include "Environment/MGWeatherSubsystem.h"
 #include "AI/MGRacingAIController.h"
-#include "Core/MGRaceGameMode.h"
+#include "GameModes/MGRaceGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
@@ -350,10 +350,13 @@ FText UMGWeatherRaceHandler::GetBonusDescription() const
 
 void UMGWeatherRaceHandler::InitializeSubsystems()
 {
-	if (const UWorld* World = GetWorld())
+	if (AMGRaceGameMode* GM = GetGameMode())
 	{
-		WeatherRacingSubsystem = World->GetSubsystem<UMGWeatherRacingSubsystem>();
-		WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>();
+		if (const UWorld* World = GM->GetWorld())
+		{
+			WeatherRacingSubsystem = World->GetSubsystem<UMGWeatherRacingSubsystem>();
+			WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>();
+		}
 	}
 }
 
@@ -374,20 +377,23 @@ void UMGWeatherRaceHandler::TrackAquaplaning(float DeltaTime)
 	}
 
 	// Get player vehicle
-	if (const UWorld* World = GetWorld())
+	if (AMGRaceGameMode* GM = GetGameMode())
 	{
-		if (const APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(World, 0))
+		if (const UWorld* World = GM->GetWorld())
 		{
-			// Check if player is aquaplaning (this would check the vehicle's state)
-			const FMGWeatherRacingEffects& Effects = WeatherRacingSubsystem->GetCurrentEffects();
-			const bool bIsAquaplaning = Effects.AquaplaningState.bIsAquaplaning;
-
-			if (bIsAquaplaning)
+			if (const APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(World, 0))
 			{
-				TotalAquaplaningTime += DeltaTime;
-			}
+				// Check if player is aquaplaning (this would check the vehicle's state)
+				const FMGWeatherRacingEffects& Effects = WeatherRacingSubsystem->GetCurrentEffects();
+				const bool bIsAquaplaning = Effects.AquaplaningState.bIsAquaplaning;
 
-			bWasAquaplaning = bIsAquaplaning;
+				if (bIsAquaplaning)
+				{
+					TotalAquaplaningTime += DeltaTime;
+				}
+
+				bWasAquaplaning = bIsAquaplaning;
+			}
 		}
 	}
 }
@@ -417,14 +423,17 @@ void UMGWeatherRaceHandler::UpdateAIForWeather()
 	}
 
 	// Get all AI controllers and update them with weather modifiers
-	if (const UWorld* World = GetWorld())
+	if (AMGRaceGameMode* GM = GetGameMode())
 	{
-		for (TActorIterator<AMGRacingAIController> It(World); It; ++It)
+		if (UWorld* World = GM->GetWorld())
 		{
-			AMGRacingAIController* AIController = *It;
-			if (AIController)
+			for (TActorIterator<AMGRacingAIController> It(World); It; ++It)
 			{
-				WeatherRacingSubsystem->UpdateAIForWeather(AIController);
+				AMGRacingAIController* AIController = *It;
+				if (AIController)
+				{
+					WeatherRacingSubsystem->UpdateAIForWeather(AIController);
+				}
 			}
 		}
 	}
@@ -433,15 +442,18 @@ void UMGWeatherRaceHandler::UpdateAIForWeather()
 void UMGWeatherRaceHandler::OnPuddleHit(AActor* Vehicle, const FMGPuddleInstance& Puddle)
 {
 	// Check if this is the player vehicle
-	if (const UWorld* World = GetWorld())
+	if (AMGRaceGameMode* GM = GetGameMode())
 	{
-		if (const APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(World, 0))
+		if (const UWorld* World = GM->GetWorld())
 		{
-			if (Vehicle == PlayerPawn || Vehicle == PlayerPawn->GetOwner())
+			if (const APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(World, 0))
 			{
-				PuddlesHit++;
+				if (Vehicle == PlayerPawn || Vehicle == PlayerPawn->GetOwner())
+				{
+					PuddlesHit++;
 
-				UE_LOG(LogTemp, Verbose, TEXT("MGWeatherRaceHandler: Player hit puddle #%d"), PuddlesHit);
+					UE_LOG(LogTemp, Verbose, TEXT("MGWeatherRaceHandler: Player hit puddle #%d"), PuddlesHit);
+				}
 			}
 		}
 	}

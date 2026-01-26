@@ -1,0 +1,252 @@
+{
+  "VehicleID": "TENSHI_240",
+  "DisplayName": "Tenshi 240",
+  "Manufacturer": "Tenshi Motors",
+  "Year": 1997,
+  "Country": "Japan",
+  "Class": "C",
+  "Category": "JDM",
+  "Description": "The Tenshi 240 is the definitive drift machine. Its front-engine, rear-wheel-drive layout and perfectly balanced chassis make it the weapon of choice for sideways specialists. The KA-series engine might not make headline-grabbing power, but it's torquey, reliable, and begging to be boosted. Whether you're learning to drift or competing for championships, the 240 will always have your back... sliding.",
+
+  "BaseStats": {
+    "Power": 155,
+    "PowerUnit": "HP",
+    "Torque": 160,
+    "TorqueUnit": "lb-ft",
+    "Weight": 2900,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 53,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 2400,
+    "DisplacementUnit": "cc",
+    "Cylinders": 4,
+    "Configuration": "Inline",
+    "Redline": 6800,
+    "IdleRPM": 800,
+    "TopSpeed": 135,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 7.4,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 500,
+    "Class": "C",
+    "MaxPotential": 850
+  },
+
+  "Engine": {
+    "Code": "KA24DE",
+    "Type": "Inline-4 DOHC",
+    "Block": {
+      "Material": "Cast Iron",
+      "BoostLimit": 22,
+      "MaxPowerPotential": 600
+    },
+    "Head": {
+      "Type": "DOHC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 16
+    },
+    "Turbo": null,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 30, "Torque": 95 },
+      { "RPM": 2000, "HP": 55, "Torque": 125 },
+      { "RPM": 3000, "HP": 85, "Torque": 150 },
+      { "RPM": 4000, "HP": 115, "Torque": 160 },
+      { "RPM": 5000, "HP": 140, "Torque": 155 },
+      { "RPM": 5800, "HP": 152, "Torque": 148 },
+      { "RPM": 6500, "HP": 155, "Torque": 138 },
+      { "RPM": 6800, "HP": 150, "Torque": 130 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 5,
+    "GearRatios": [3.321, 1.902, 1.308, 1.000, 0.759],
+    "FinalDrive": 4.083,
+    "ReverseRatio": 3.382
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 320,
+    "RearSpringRate": 280,
+    "FrontDamping": 0.55,
+    "RearDamping": 0.52,
+    "FrontAntiRollBar": 24,
+    "RearAntiRollBar": 16,
+    "RideHeight": 5.3,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 280,
+    "RearDiameter": 258,
+    "DiameterUnit": "mm",
+    "BrakeBias": 58,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 205,
+    "FrontAspectRatio": 55,
+    "FrontDiameter": 16,
+    "RearWidth": 225,
+    "RearAspectRatio": 50,
+    "RearDiameter": 16,
+    "Compound": "Street",
+    "GripMultiplier": 0.95
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.31,
+    "FrontalArea": 2.0,
+    "DownforceMultiplier": 0.85,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4520,
+    "Width": 1730,
+    "Height": 1295,
+    "Wheelbase": 2525,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#C0C0C0",
+      "Secondary": "#303030",
+      "Accent": "#FF6600"
+    },
+    "AvailableColors": [
+      { "Name": "Sonic Silver", "Hex": "#C0C0C0" },
+      { "Name": "Super Black", "Hex": "#0A0A0A" },
+      { "Name": "Brick Red", "Hex": "#A52A2A" },
+      { "Name": "Forest Green", "Hex": "#228B22" },
+      { "Name": "White Pearl", "Hex": "#F5F5F5" },
+      { "Name": "Kouki Blue", "Hex": "#4169E1" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineFour_NA",
+    "ExhaustProfile": "JDM_Drift",
+    "TurboWhine": false,
+    "BlowoffValve": false,
+    "BackfireOnShift": true,
+    "TireSqueal": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.5,
+    "TurnRadius": 5.1,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.2,
+    "OversteerTendency": 0.7,
+    "DriftCapability": 0.9,
+    "StabilityControl": false,
+    "TractionControl": false
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 60,
+    "PowerBoostUnit": "HP",
+    "Duration": 5.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 10,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 18000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "C",
+    "MaintenanceCostMultiplier": 0.8,
+    "PartsPriceMultiplier": 0.7,
+    "StreetValue": 22000,
+    "LegendaryValue": 65000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "ROOKIE",
+    "RequiredLevel": 5,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Cold Air", "ITB"],
+      "Exhaust": ["Stock", "Cat-Back", "Race", "Single Exit"],
+      "Turbo": ["None", "Small", "Medium", "Large"],
+      "Intercooler": ["None", "Front-Mount", "V-Mount"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Stage3"],
+      "FuelSystem": ["Stock", "HighFlow", "Racing"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Twin-Disc"],
+      "Transmission": ["Stock", "ShortThrow", "CD009"],
+      "FinalDrive": ["Stock", "4.3", "4.6"],
+      "LSD": ["Stock", "1.5Way", "2Way"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Drift Spec"],
+      "Dampers": ["Stock", "Adjustable", "Racing"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"],
+      "AngleKit": ["None", "Basic", "Pro"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track"],
+      "Rotors": ["Stock", "Slotted", "Drilled"],
+      "Lines": ["Stock", "Braided"],
+      "Calipers": ["Stock", "4Piston"],
+      "Hydro": ["None", "Hydraulic E-Brake"]
+    },
+    "Wheels": {
+      "Size": [16, 17, 18],
+      "Width": [7.0, 8.0, 9.0, 9.5]
+    },
+    "Tires": {
+      "Compound": ["Street", "Sport", "Semi-Slick", "Drift"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Kouki", "Origin", "BN Sports"],
+      "RearBumper": ["Stock", "Kouki", "Origin"],
+      "Spoiler": ["Stock", "Ducktail", "GT Wing", "Trunk Lip"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "OEM+", "RocketBunny", "Origin"],
+      "Mirrors": ["Stock", "Ganadors", "Aero"],
+      "Lights": ["Stock", "Kouki", "Aftermarket"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 600,
+    "MaxTorque": 500,
+    "MinWeight": 2600,
+    "MaxTopSpeed": 180,
+    "MaxPI": 850
+  },
+
+  "Tags": ["JDM", "RWD", "Drift", "S14", "Kouki", "Silvia", "240SX", "Balanced"],
+
+  "Lore": {
+    "Backstory": "The Tenshi 240 emerged from the golden age of Japanese sports coupes. While its American cousin carried a different name and engine, the Japanese market 'Silvia' variant became synonymous with the art of drifting. The car's near-perfect 53/47 weight distribution and willing chassis made it the canvas upon which drift pioneers painted their masterpieces. From D1 Grand Prix circuits to mountain touge, the 240 has proven that sometimes, getting sideways is faster than going straight.",
+    "FamousOwners": ["D1 Champion Tanaka", "Mountain Pass Master"],
+    "RivalVehicles": ["180SX", "AE86", "Skyline R32"]
+  }
+}

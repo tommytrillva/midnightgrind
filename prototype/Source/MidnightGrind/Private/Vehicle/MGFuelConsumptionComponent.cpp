@@ -227,7 +227,7 @@ bool UMGFuelConsumptionComponent::PurchaseFuel(float GallonsToAdd, bool bFullTan
 		FText::AsNumber(FMath::RoundToInt(ActualGallonsToAdd))
 	);
 
-	if (!EconomySubsystem->SpendCredits(Cost, EMGTransactionType::Other, Description))
+	if (!EconomySubsystem->SpendCredits(Cost, EMGTransactionType::FuelPurchase, Description))
 	{
 		return false;
 	}

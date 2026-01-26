@@ -580,21 +580,35 @@ struct FMGTireTemperature
 /**
  * @brief Tire pressure state for pressure-based grip and handling effects
  *
- * Simulates tire pressure dynamics including:
- * - Cold pressure setting
- * - Pressure increase from heat
- * - Effects on grip, wear, and contact patch
+ * Comprehensive tire pressure simulation including:
+ * - Cold pressure setting and hot pressure from temperature
+ * - Pressure effects on grip, wear, heat generation, and fuel economy
+ * - Multiple pressure loss scenarios (punctures, slow leaks, blowouts)
+ * - Contact patch size variation with pressure
+ * - Optimal pressure varies by tire compound
+ *
+ * Physical relationships modeled:
+ * - Lower pressure: More grip (larger patch), faster wear, more heat, worse economy
+ * - Higher pressure: Less grip, slower wear, less heat, better economy
+ * - Extremely low pressure: Grip loss from sidewall collapse
+ *
+ * @see EMGPressureLossCause for damage types
+ * @see FMGTirePressureConfig for simulation tuning
  */
 USTRUCT(BlueprintType)
 struct FMGTirePressureState
 {
 	GENERATED_BODY()
 
+	// ==========================================
+	// PRESSURE VALUES
+	// ==========================================
+
 	/** Cold pressure setting (PSI) - what the tire is set to when cold */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure", meta = (ClampMin = "20.0", ClampMax = "50.0"))
 	float ColdPressurePSI = 32.0f;
 
-	/** Current actual pressure (PSI) - changes with temperature */
+	/** Current actual pressure (PSI) - changes with temperature and leaks */
 	UPROPERTY(BlueprintReadOnly, Category = "Pressure")
 	float CurrentPressurePSI = 32.0f;
 
@@ -602,129 +616,388 @@ struct FMGTirePressureState
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure", meta = (ClampMin = "25.0", ClampMax = "55.0"))
 	float OptimalHotPressurePSI = 36.0f;
 
-	/** Pressure change per degree Celsius */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure", meta = (ClampMin = "0.01", ClampMax = "0.1"))
+	/** Pressure change per degree Celsius (ideal gas law coefficient) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pressure", meta = (ClampMin = "0.01", ClampMax = "0.2"))
 	float PressurePerDegree = 0.04f; // ~0.04 PSI per degree C is realistic
 
-	/** Whether tire has a slow leak */
+	// ==========================================
+	// DAMAGE STATE
+	// ==========================================
+
+	/** Whether tire has any active pressure loss */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	bool bHasSlowLeak = false;
+
+	/** Whether tire is flat (pressure below functional threshold) */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	bool bIsFlat = false;
+
+	/** Whether tire has suffered a catastrophic blowout */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	bool bIsBlownOut = false;
+
+	/** Current cause of pressure loss */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	EMGPressureLossCause LeakCause = EMGPressureLossCause::None;
 
 	/** Leak rate if leaking (PSI per second) */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	float LeakRatePSIPerSecond = 0.0f;
 
-	/** Whether tire is flat (undriveable) */
+	/** Time since leak started in seconds */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
-	bool bIsFlat = false;
+	float LeakDuration = 0.0f;
+
+	/** Total pressure lost to leaks this session in PSI */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	float TotalPressureLost = 0.0f;
+
+	/** Number of damage events this tire has sustained */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	int32 DamageEventCount = 0;
+
+	// ==========================================
+	// CACHED EFFECT MULTIPLIERS
+	// ==========================================
+
+	/** Contact patch size multiplier (cached for performance) */
+	UPROPERTY(BlueprintReadOnly, Category = "Effects")
+	float ContactPatchMultiplier = 1.0f;
+
+	/** Heat generation multiplier (lower pressure = more heat) */
+	UPROPERTY(BlueprintReadOnly, Category = "Effects")
+	float HeatGenerationMultiplier = 1.0f;
+
+	/** Rolling resistance multiplier (lower pressure = more resistance) */
+	UPROPERTY(BlueprintReadOnly, Category = "Effects")
+	float RollingResistanceMultiplier = 1.0f;
+
+	// ==========================================
+	// SIMULATION METHODS
+	// ==========================================
 
 	/**
 	 * @brief Update pressure based on tire temperature
-	 * @param TireTemp Current tire temperature
-	 * @param AmbientTemp Ambient temperature
+	 *
+	 * Uses ideal gas law approximation: P_hot = P_cold * (1 + k * deltaT)
+	 *
+	 * @param TireTemp Current tire temperature in Celsius
+	 * @param AmbientTemp Ambient temperature in Celsius
 	 */
 	void UpdatePressureFromTemperature(float TireTemp, float AmbientTemp)
 	{
-		if (bIsFlat) return;
+		if (bIsFlat || bIsBlownOut) return;
 
-		// Pressure increases with temperature
+		// Pressure increases with temperature (ideal gas law approximation)
 		float TempDelta = TireTemp - AmbientTemp;
 		CurrentPressurePSI = ColdPressurePSI + (TempDelta * PressurePerDegree);
 
 		// Clamp to prevent unrealistic values
 		CurrentPressurePSI = FMath::Clamp(CurrentPressurePSI, 5.0f, 60.0f);
+
+		// Update cached multipliers
+		UpdateCachedEffects();
 	}
 
 	/**
-	 * @brief Apply leak damage (if any)
-	 * @param DeltaTime Frame delta time
+	 * @brief Apply leak damage over time
+	 * @param DeltaTime Frame delta time in seconds
 	 */
 	void ApplyLeak(float DeltaTime)
 	{
-		if (bHasSlowLeak && !bIsFlat)
+		if (!bHasSlowLeak || bIsFlat || bIsBlownOut)
 		{
-			CurrentPressurePSI -= LeakRatePSIPerSecond * DeltaTime;
-			ColdPressurePSI -= LeakRatePSIPerSecond * DeltaTime;
+			return;
+		}
 
-			if (CurrentPressurePSI <= 5.0f)
-			{
-				bIsFlat = true;
-				CurrentPressurePSI = 0.0f;
-			}
+		// Track leak duration
+		LeakDuration += DeltaTime;
+
+		// Apply pressure loss
+		float PressureLoss = LeakRatePSIPerSecond * DeltaTime;
+		CurrentPressurePSI -= PressureLoss;
+		ColdPressurePSI -= PressureLoss;
+		TotalPressureLost += PressureLoss;
+
+		// Clamp cold pressure (can't go below leak destination)
+		ColdPressurePSI = FMath::Max(ColdPressurePSI, 0.0f);
+
+		// Check if tire is now flat
+		if (CurrentPressurePSI <= 5.0f)
+		{
+			bIsFlat = true;
+			CurrentPressurePSI = FMath::Max(CurrentPressurePSI, 0.0f);
+		}
+
+		UpdateCachedEffects();
+	}
+
+	/**
+	 * @brief Start a pressure leak with specified cause and severity
+	 * @param Cause The cause of the leak
+	 * @param LeakRate Pressure loss rate in PSI per second
+	 */
+	void StartLeak(EMGPressureLossCause Cause, float LeakRate)
+	{
+		if (bIsBlownOut) return; // Can't add leak to blown tire
+
+		bHasSlowLeak = true;
+		LeakCause = Cause;
+		LeakRatePSIPerSecond = FMath::Max(LeakRatePSIPerSecond, LeakRate); // Take worst leak
+		LeakDuration = 0.0f;
+		DamageEventCount++;
+	}
+
+	/**
+	 * @brief Cause immediate blowout
+	 * @param Cause The cause of the blowout
+	 */
+	void Blowout(EMGPressureLossCause Cause = EMGPressureLossCause::Blowout)
+	{
+		bIsBlownOut = true;
+		bIsFlat = true;
+		bHasSlowLeak = false;
+		LeakCause = Cause;
+		TotalPressureLost += CurrentPressurePSI;
+		CurrentPressurePSI = 0.0f;
+		ColdPressurePSI = 0.0f;
+		DamageEventCount++;
+		UpdateCachedEffects();
+	}
+
+	/**
+	 * @brief Repair the tire (pit stop)
+	 * @param NewColdPressure New cold pressure setting
+	 * @param OptimalPressure New optimal pressure
+	 */
+	void Repair(float NewColdPressure = 32.0f, float OptimalPressure = 36.0f)
+	{
+		ColdPressurePSI = NewColdPressure;
+		CurrentPressurePSI = NewColdPressure;
+		OptimalHotPressurePSI = OptimalPressure;
+		bHasSlowLeak = false;
+		bIsFlat = false;
+		bIsBlownOut = false;
+		LeakCause = EMGPressureLossCause::None;
+		LeakRatePSIPerSecond = 0.0f;
+		LeakDuration = 0.0f;
+		TotalPressureLost = 0.0f;
+		DamageEventCount = 0;
+		UpdateCachedEffects();
+	}
+
+	/**
+	 * @brief Update all cached effect multipliers
+	 * Call after pressure changes for performance
+	 */
+	void UpdateCachedEffects()
+	{
+		ContactPatchMultiplier = CalculateContactPatchMultiplier();
+		HeatGenerationMultiplier = CalculateHeatGenerationMultiplier();
+		RollingResistanceMultiplier = CalculateRollingResistanceMultiplier();
+	}
+
+	// ==========================================
+	// EFFECT CALCULATIONS
+	// ==========================================
+
+	/**
+	 * @brief Get grip multiplier based on pressure vs optimal
+	 * @return Grip multiplier (0.1 to 1.07)
+	 *
+	 * Grip curve:
+	 * - Optimal pressure: 1.0
+	 * - Slightly under-inflated (5-10%): 1.02-1.07 (larger contact patch)
+	 * - Significantly under-inflated: Drops due to sidewall flex
+	 * - Over-inflated: Reduces due to smaller contact patch
+	 * - Flat/Blowout: Minimal grip (0.1-0.15)
+	 */
+	float GetGripMultiplier() const
+	{
+		if (bIsBlownOut || bIsFlat)
+		{
+			return 0.1f; // Severely compromised grip
+		}
+
+		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalHotPressurePSI, 1.0f);
+
+		if (PressureRatio < 0.5f)
+		{
+			// Critically low - severe grip loss from sidewall collapse
+			return 0.3f + (PressureRatio * 0.4f);
+		}
+		else if (PressureRatio < 0.85f)
+		{
+			// Under-inflated but functional
+			const float UnderInflateRatio = (PressureRatio - 0.5f) / 0.35f;
+			return FMath::Lerp(0.5f, 1.05f, UnderInflateRatio);
+		}
+		else if (PressureRatio <= 0.95f)
+		{
+			// Slightly under-inflated - sweet spot for max grip
+			return 1.03f + (0.95f - PressureRatio) * 0.4f;
+		}
+		else if (PressureRatio <= 1.05f)
+		{
+			// Near optimal
+			return 1.0f;
+		}
+		else if (PressureRatio <= 1.15f)
+		{
+			// Slightly over-inflated
+			return 1.0f - ((PressureRatio - 1.05f) * 0.5f);
+		}
+		else
+		{
+			// Significantly over-inflated
+			return FMath::Max(0.7f, 0.95f - ((PressureRatio - 1.15f) * 1.5f));
 		}
 	}
 
 	/**
-	 * @brief Get grip multiplier based on pressure
-	 * @return Grip multiplier (0.6 to 1.05)
-	 *
-	 * Tire grip varies with pressure:
-	 * - Too low: Contact patch too large, tire overheats, walls flex
-	 * - Optimal: Best balance of grip and wear
-	 * - Too high: Contact patch too small, less grip, harsh ride
-	 */
-	float GetGripMultiplier() const
-	{
-		if (bIsFlat) return 0.1f;
-
-		float PressureDiff = FMath::Abs(CurrentPressurePSI - OptimalHotPressurePSI);
-		float DiffPercent = PressureDiff / OptimalHotPressurePSI;
-
-		// Grip falls off with pressure deviation from optimal
-		// 0% diff = 1.0 grip
-		// 10% diff = 0.95 grip
-		// 20% diff = 0.85 grip
-		// 30%+ diff = 0.7 grip
-		if (DiffPercent < 0.05f) return 1.0f;
-		if (DiffPercent < 0.1f) return FMath::Lerp(1.0f, 0.95f, (DiffPercent - 0.05f) / 0.05f);
-		if (DiffPercent < 0.2f) return FMath::Lerp(0.95f, 0.85f, (DiffPercent - 0.1f) / 0.1f);
-		if (DiffPercent < 0.3f) return FMath::Lerp(0.85f, 0.7f, (DiffPercent - 0.2f) / 0.1f);
-		return 0.6f;
-	}
-
-	/**
 	 * @brief Get tire wear rate multiplier
-	 * @return Wear multiplier (1.0 to 3.0)
+	 * @return Wear multiplier (1.0 to 10.0)
 	 *
-	 * Incorrect pressure increases wear:
-	 * - Under-inflated: Excessive shoulder wear
-	 * - Over-inflated: Center wear
+	 * Under-inflated: Excessive shoulder wear, more heat
+	 * Over-inflated: Center wear
+	 * Flat: Catastrophic wear
 	 */
 	float GetWearRateMultiplier() const
 	{
-		if (bIsFlat) return 10.0f; // Severe damage if driven on flat
+		if (bIsBlownOut || bIsFlat)
+		{
+			return 10.0f; // Catastrophic wear
+		}
 
-		float PressureDiff = FMath::Abs(CurrentPressurePSI - OptimalHotPressurePSI);
-		float DiffPercent = PressureDiff / OptimalHotPressurePSI;
+		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalHotPressurePSI, 1.0f);
 
-		// Wear increases with deviation
-		if (DiffPercent < 0.05f) return 1.0f;
-		if (DiffPercent < 0.15f) return 1.0f + (DiffPercent - 0.05f) * 5.0f; // Up to 1.5x
-		if (DiffPercent < 0.25f) return 1.5f + (DiffPercent - 0.15f) * 10.0f; // Up to 2.5x
-		return 3.0f;
+		if (PressureRatio < 0.7f)
+		{
+			// Severely under-inflated - rapid wear
+			return 3.0f - (PressureRatio * 2.0f);
+		}
+		else if (PressureRatio < 0.9f)
+		{
+			// Under-inflated - accelerated wear
+			return 1.0f + ((0.9f - PressureRatio) * 3.0f);
+		}
+		else if (PressureRatio <= 1.1f)
+		{
+			// Optimal range
+			return 1.0f;
+		}
+		else
+		{
+			// Over-inflated - moderate wear increase
+			return 1.0f + ((PressureRatio - 1.1f) * 1.5f);
+		}
 	}
 
 	/**
-	 * @brief Get contact patch size multiplier
-	 * @return Contact patch multiplier (0.8 to 1.2)
-	 *
-	 * Lower pressure = larger contact patch (but not always better grip)
-	 * Higher pressure = smaller contact patch
+	 * @brief Calculate contact patch size multiplier
+	 * @return Contact patch multiplier (0.3 to 1.4)
+	 */
+	float CalculateContactPatchMultiplier() const
+	{
+		if (bIsBlownOut || bIsFlat)
+		{
+			return 0.3f;
+		}
+
+		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalHotPressurePSI, 1.0f);
+
+		// Inverse relationship - lower pressure = larger patch
+		if (PressureRatio < 0.5f)
+		{
+			return 0.8f; // Collapsed sidewall
+		}
+
+		return FMath::Clamp(1.5f - (PressureRatio * 0.5f), 0.7f, 1.4f);
+	}
+
+	/**
+	 * @brief Get contact patch multiplier (cached value)
+	 * @return Contact patch multiplier
 	 */
 	float GetContactPatchMultiplier() const
 	{
-		if (bIsFlat) return 0.3f;
-
-		// Reference optimal at 1.0
-		float PressureRatio = OptimalHotPressurePSI / FMath::Max(CurrentPressurePSI, 1.0f);
-
-		// Lower pressure = bigger patch (up to a point)
-		return FMath::Clamp(PressureRatio, 0.8f, 1.2f);
+		return ContactPatchMultiplier;
 	}
 
 	/**
+	 * @brief Calculate heat generation multiplier
+	 * @return Heat multiplier (1.0 to 3.0)
+	 */
+	float CalculateHeatGenerationMultiplier() const
+	{
+		if (bIsBlownOut || bIsFlat)
+		{
+			return 3.0f;
+		}
+
+		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalHotPressurePSI, 1.0f);
+
+		if (PressureRatio < 0.7f)
+		{
+			return 2.5f - (PressureRatio * 1.5f);
+		}
+		else if (PressureRatio < 0.9f)
+		{
+			return 1.0f + ((0.9f - PressureRatio) * 2.5f);
+		}
+		else if (PressureRatio <= 1.1f)
+		{
+			return 1.0f;
+		}
+		else
+		{
+			return FMath::Max(0.85f, 1.0f - ((PressureRatio - 1.1f) * 0.5f));
+		}
+	}
+
+	/**
+	 * @brief Calculate rolling resistance multiplier
+	 * @return Rolling resistance multiplier (0.95 to 3.0)
+	 */
+	float CalculateRollingResistanceMultiplier() const
+	{
+		if (bIsBlownOut || bIsFlat)
+		{
+			return 3.0f;
+		}
+
+		const float PressureRatio = CurrentPressurePSI / FMath::Max(OptimalHotPressurePSI, 1.0f);
+
+		if (PressureRatio < 0.85f)
+		{
+			return 1.0f + ((0.85f - PressureRatio) * 2.0f);
+		}
+		else if (PressureRatio <= 1.1f)
+		{
+			return 1.0f;
+		}
+		else
+		{
+			return FMath::Max(0.95f, 1.0f - ((PressureRatio - 1.1f) * 0.3f));
+		}
+	}
+
+	/**
+	 * @brief Get fuel economy multiplier (inverse of rolling resistance)
+	 * @return Fuel economy multiplier
+	 */
+	float GetFuelEconomyMultiplier() const
+	{
+		return 1.0f / FMath::Max(RollingResistanceMultiplier, 0.1f);
+	}
+
+	// ==========================================
+	// STATUS QUERIES
+	// ==========================================
+
+	/**
 	 * @brief Check if tire is under-inflated
-	 * @return True if significantly under-inflated
+	 * @return True if significantly under-inflated (>15% below optimal)
 	 */
 	bool IsUnderInflated() const
 	{
@@ -733,11 +1006,44 @@ struct FMGTirePressureState
 
 	/**
 	 * @brief Check if tire is over-inflated
-	 * @return True if significantly over-inflated
+	 * @return True if significantly over-inflated (>15% above optimal)
 	 */
 	bool IsOverInflated() const
 	{
 		return CurrentPressurePSI > (OptimalHotPressurePSI * 1.15f);
+	}
+
+	/**
+	 * @brief Check if pressure needs driver attention
+	 * @return True if pressure is off by more than 10%
+	 */
+	bool NeedsAttention() const
+	{
+		if (bIsFlat || bIsBlownOut || bHasSlowLeak)
+		{
+			return true;
+		}
+
+		const float DeviationPercent = FMath::Abs(CurrentPressurePSI - OptimalHotPressurePSI) / FMath::Max(OptimalHotPressurePSI, 1.0f) * 100.0f;
+		return DeviationPercent > 10.0f;
+	}
+
+	/**
+	 * @brief Check if tire is in critical state
+	 * @return True if flat, blown out, or rapidly losing pressure
+	 */
+	bool IsCritical() const
+	{
+		return bIsFlat || bIsBlownOut || CurrentPressurePSI < 15.0f || LeakRatePSIPerSecond > 1.0f;
+	}
+
+	/**
+	 * @brief Get pressure as percentage of optimal
+	 * @return Pressure percentage (0-150+)
+	 */
+	float GetPressurePercent() const
+	{
+		return (CurrentPressurePSI / FMath::Max(OptimalHotPressurePSI, 1.0f)) * 100.0f;
 	}
 };
 
@@ -1213,6 +1519,53 @@ public:
 	float GetMaxSpeedMultiplier() const { return MaxSpeedMultiplier; }
 
 	// ==========================================
+	// FUEL SYSTEM INTEGRATION
+	// ==========================================
+
+	/**
+	 * @brief Set fuel starvation power multiplier
+	 *
+	 * Called by UMGFuelConsumptionComponent when fuel starvation occurs
+	 * due to low fuel and high lateral G-forces.
+	 *
+	 * @param Multiplier Power multiplier (0.0-1.0, where 0 = no fuel delivery)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Fuel")
+	void SetFuelStarvationMultiplier(float Multiplier);
+
+	/**
+	 * @brief Get current fuel starvation power multiplier
+	 * @return Fuel starvation power modifier (1.0 = normal, <1.0 = starving)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Fuel")
+	float GetFuelStarvationMultiplier() const { return FuelStarvationMultiplier; }
+
+	/**
+	 * @brief Check if vehicle is experiencing fuel starvation
+	 * @return True if fuel delivery is reduced
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Fuel")
+	bool IsFuelStarving() const { return FuelStarvationMultiplier < 0.99f; }
+
+	/**
+	 * @brief Set the vehicle's current fuel weight for mass calculations
+	 *
+	 * Fuel weight affects vehicle handling, acceleration, and braking.
+	 * Called by UMGFuelConsumptionComponent as fuel is consumed.
+	 *
+	 * @param WeightKg Current fuel weight in kilograms
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Fuel")
+	void SetCurrentFuelWeightKg(float WeightKg);
+
+	/**
+	 * @brief Get current fuel weight
+	 * @return Fuel weight in kilograms
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Fuel")
+	float GetCurrentFuelWeightKg() const { return CurrentFuelWeightKg; }
+
+	// ==========================================
 	// WEATHER EFFECTS INTEGRATION
 	// ==========================================
 
@@ -1457,6 +1810,141 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Dyno")
 	void SamplePowerCurve(float RPM, float& OutHorsepower, float& OutTorque) const;
+
+	// ==========================================
+	// TIRE PRESSURE STATE QUERIES
+	// ==========================================
+
+	/**
+	 * @brief Get tire pressure state for a specific wheel
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @return Current tire pressure state including all effects
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|TirePressure")
+	FMGTirePressureState GetTirePressureState(int32 WheelIndex) const;
+
+	/**
+	 * @brief Get current tire pressure in PSI for a wheel
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @return Current pressure in PSI
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|TirePressure")
+	float GetTirePressurePSI(int32 WheelIndex) const;
+
+	/**
+	 * @brief Get optimal tire pressure for current compound
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @return Optimal pressure in PSI for current compound
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|TirePressure")
+	float GetOptimalTirePressurePSI(int32 WheelIndex) const;
+
+	/**
+	 * @brief Check if any tire has a pressure warning
+	 * @return True if any tire needs attention
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|TirePressure")
+	bool HasTirePressureWarning() const;
+
+	/**
+	 * @brief Check if any tire is flat or blown out
+	 * @return True if any tire is critically damaged
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|TirePressure")
+	bool HasFlatTire() const;
+
+	/**
+	 * @brief Get average tire pressure across all wheels
+	 * @return Average pressure in PSI
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|TirePressure")
+	float GetAverageTirePressure() const;
+
+	/**
+	 * @brief Get total rolling resistance from tire pressure effects
+	 * @return Combined rolling resistance multiplier from all tires
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|TirePressure")
+	float GetTotalRollingResistanceFromPressure() const;
+
+	// ==========================================
+	// TIRE PRESSURE DAMAGE API
+	// ==========================================
+
+	/**
+	 * @brief Apply puncture damage to a specific tire
+	 *
+	 * Simulates tire damage from various sources:
+	 * - Spike strips (rapid deflation)
+	 * - Road debris (slow leak)
+	 * - Collision damage (moderate leak)
+	 *
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @param Cause The cause of the puncture
+	 * @param Severity Damage severity (0-1, affects leak rate)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|TirePressure")
+	void ApplyTirePuncture(int32 WheelIndex, EMGPressureLossCause Cause, float Severity = 1.0f);
+
+	/**
+	 * @brief Apply spike strip damage to tires
+	 *
+	 * Applies rapid pressure loss to specified tires, simulating
+	 * driving over a police spike strip.
+	 *
+	 * @param AffectedWheels Array of wheel indices to damage (0=FL, 1=FR, 2=RL, 3=RR)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|TirePressure")
+	void ApplySpikeStripDamage(const TArray<int32>& AffectedWheels);
+
+	/**
+	 * @brief Cause an immediate tire blowout
+	 *
+	 * Catastrophic tire failure - instant pressure loss and
+	 * severe handling degradation.
+	 *
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @param Cause The cause of the blowout
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|TirePressure")
+	void CauseTireBlowout(int32 WheelIndex, EMGPressureLossCause Cause = EMGPressureLossCause::Blowout);
+
+	/**
+	 * @brief Set tire cold pressure (pit stop adjustment)
+	 *
+	 * Adjusts the baseline pressure for a tire. Used during pit stops
+	 * or garage tuning sessions.
+	 *
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @param PressurePSI New cold pressure setting in PSI
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|TirePressure")
+	void SetTireColdPressure(int32 WheelIndex, float PressurePSI);
+
+	/**
+	 * @brief Set cold pressure for all tires
+	 * @param FrontPressurePSI Front tires pressure
+	 * @param RearPressurePSI Rear tires pressure
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|TirePressure")
+	void SetAllTiresColdPressure(float FrontPressurePSI, float RearPressurePSI);
+
+	/**
+	 * @brief Repair/replace a damaged tire
+	 *
+	 * Restores tire to optimal condition. Used in pit stops
+	 * or garage repairs.
+	 *
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|TirePressure")
+	void RepairTire(int32 WheelIndex);
+
+	/**
+	 * @brief Repair all tires
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|TirePressure")
+	void RepairAllTires();
 
 	// ==========================================
 	// ADVANCED INPUT

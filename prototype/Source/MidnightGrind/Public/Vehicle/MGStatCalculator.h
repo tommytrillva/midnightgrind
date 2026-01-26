@@ -298,25 +298,51 @@ public:
 	// ==========================================
 
 	/**
-	 * Calculate front grip coefficient
+	 * @brief Calculate front axle grip coefficient.
+	 *
+	 * Based on front tire compound, width, and suspension setup.
+	 * Higher values mean more front grip (less understeer).
+	 *
+	 * @param Vehicle Complete vehicle configuration data.
+	 * @return Front grip coefficient (typically 0.8 to 1.2).
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float CalculateFrontGrip(const FMGVehicleData& Vehicle);
 
 	/**
-	 * Calculate rear grip coefficient
+	 * @brief Calculate rear axle grip coefficient.
+	 *
+	 * Based on rear tire compound, width, and suspension setup.
+	 * Higher values mean more rear grip (less oversteer).
+	 *
+	 * @param Vehicle Complete vehicle configuration data.
+	 * @return Rear grip coefficient (typically 0.8 to 1.2).
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float CalculateRearGrip(const FMGVehicleData& Vehicle);
 
 	/**
-	 * Calculate overall handling rating (0-100)
+	 * @brief Calculate overall handling rating for display.
+	 *
+	 * Composite rating considering grip balance, weight distribution,
+	 * suspension tuning, and aerodynamics.
+	 *
+	 * @param Vehicle Complete vehicle configuration data.
+	 * @param BaseModel The base vehicle model data asset.
+	 * @return Handling rating from 0 (terrible) to 100 (race car).
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float CalculateHandlingRating(const FMGVehicleData& Vehicle, const UMGVehicleModelData* BaseModel);
 
 	/**
-	 * Calculate braking rating (0-100)
+	 * @brief Calculate braking performance rating for display.
+	 *
+	 * Based on brake rotor size, caliper piston count, pad compound,
+	 * and vehicle weight.
+	 *
+	 * @param Vehicle Complete vehicle configuration data.
+	 * @param BaseModel The base vehicle model data asset.
+	 * @return Braking rating from 0 (poor) to 100 (race brakes).
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float CalculateBrakingRating(const FMGVehicleData& Vehicle, const UMGVehicleModelData* BaseModel);
@@ -326,31 +352,66 @@ public:
 	// ==========================================
 
 	/**
-	 * Estimate 0-60 MPH time
+	 * @brief Estimate 0-60 MPH acceleration time.
+	 *
+	 * Uses power-to-weight ratio, drivetrain efficiency, and grip to
+	 * predict acceleration performance. AWD gets traction bonus.
+	 *
+	 * @param Stats Pre-calculated vehicle statistics.
+	 * @param Drivetrain Drivetrain configuration for efficiency/traction.
+	 * @return Estimated time in seconds (e.g., 4.5 seconds).
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float EstimateZeroTo60(const FMGVehicleStats& Stats, const FMGDrivetrainConfiguration& Drivetrain);
 
 	/**
-	 * Estimate 0-100 MPH time
+	 * @brief Estimate 0-100 MPH acceleration time.
+	 *
+	 * Similar to 0-60 but accounts for gearing and aerodynamic drag
+	 * at higher speeds.
+	 *
+	 * @param Stats Pre-calculated vehicle statistics.
+	 * @param Drivetrain Drivetrain configuration.
+	 * @return Estimated time in seconds.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float EstimateZeroTo100(const FMGVehicleStats& Stats, const FMGDrivetrainConfiguration& Drivetrain);
 
 	/**
-	 * Estimate quarter mile time
+	 * @brief Estimate quarter mile elapsed time.
+	 *
+	 * Classic drag racing metric. Accounts for launch traction,
+	 * power delivery, and gearing optimization.
+	 *
+	 * @param Stats Pre-calculated vehicle statistics.
+	 * @param Drivetrain Drivetrain configuration.
+	 * @return Estimated ET in seconds (e.g., 11.5 seconds).
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float EstimateQuarterMile(const FMGVehicleStats& Stats, const FMGDrivetrainConfiguration& Drivetrain);
 
 	/**
-	 * Estimate quarter mile trap speed
+	 * @brief Estimate quarter mile trap (finish line) speed.
+	 *
+	 * Speed achieved at the end of the 1/4 mile, indicates
+	 * sustained acceleration capability.
+	 *
+	 * @param Stats Pre-calculated vehicle statistics.
+	 * @return Estimated trap speed in MPH.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float EstimateQuarterMileTrap(const FMGVehicleStats& Stats);
 
 	/**
-	 * Estimate top speed
+	 * @brief Estimate theoretical top speed.
+	 *
+	 * Considers power output, aerodynamic drag, final drive ratio,
+	 * and tire diameter to find terminal velocity.
+	 *
+	 * @param Stats Pre-calculated vehicle statistics.
+	 * @param Drivetrain Drivetrain configuration for final drive ratio.
+	 * @param Aero Aerodynamic configuration for drag coefficient.
+	 * @return Estimated top speed in MPH.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float EstimateTopSpeed(const FMGVehicleStats& Stats, const FMGDrivetrainConfiguration& Drivetrain, const FMGAeroConfiguration& Aero);
@@ -360,13 +421,28 @@ public:
 	// ==========================================
 
 	/**
-	 * Calculate Performance Index (PI) from vehicle stats
+	 * @brief Calculate Performance Index (PI) from vehicle stats.
+	 *
+	 * PI is a composite score balancing power, weight, handling, and braking
+	 * into a single number for matchmaking and race class restrictions.
+	 * Higher PI = faster/more capable vehicle.
+	 *
+	 * @param Stats Pre-calculated vehicle statistics.
+	 * @return Performance Index value (typically 100-999).
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float CalculatePerformanceIndex(const FMGVehicleStats& Stats);
 
 	/**
-	 * Get performance class from PI value
+	 * @brief Determine performance class from PI value.
+	 *
+	 * Maps the numeric PI to a letter class (D through X) for
+	 * race categorization and UI display.
+	 *
+	 * @param PerformanceIndex The calculated PI value.
+	 * @return Performance class enumeration value.
+	 *
+	 * @see EMGPerformanceClass for class definitions and PI ranges.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static EMGPerformanceClass GetPerformanceClass(float PerformanceIndex);
@@ -376,13 +452,26 @@ public:
 	// ==========================================
 
 	/**
-	 * Calculate estimated vehicle value
+	 * @brief Calculate estimated total vehicle value.
+	 *
+	 * Combines base vehicle value (with depreciation), installed parts value,
+	 * condition modifiers, and race history prestige.
+	 *
+	 * @param Vehicle Complete vehicle configuration data.
+	 * @param BaseModel The base vehicle model data asset.
+	 * @return Estimated value in game currency.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float CalculateVehicleValue(const FMGVehicleData& Vehicle, const UMGVehicleModelData* BaseModel);
 
 	/**
-	 * Calculate total parts value
+	 * @brief Calculate total value of all installed aftermarket parts.
+	 *
+	 * Sums the base cost of all non-stock parts currently installed.
+	 * Does not include labor costs.
+	 *
+	 * @param Vehicle Complete vehicle configuration data.
+	 * @return Total parts value in game currency.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float CalculatePartsValue(const FMGVehicleData& Vehicle);
@@ -392,7 +481,20 @@ public:
 	// ==========================================
 
 	/**
-	 * Calculate all stats for a vehicle
+	 * @brief Calculate all statistics for a vehicle in one call.
+	 *
+	 * Comprehensive function that computes all performance metrics and
+	 * populates a complete FMGVehicleStats structure. This is the primary
+	 * entry point for stat calculation.
+	 *
+	 * Should be called when:
+	 * - Vehicle is first loaded/created
+	 * - After any modification is installed
+	 * - Before race matchmaking
+	 *
+	 * @param Vehicle Complete vehicle configuration data.
+	 * @param BaseModel The base vehicle model data asset.
+	 * @return Fully populated vehicle statistics structure.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Stats")
 	static FMGVehicleStats CalculateAllStats(const FMGVehicleData& Vehicle, const UMGVehicleModelData* BaseModel);
@@ -402,31 +504,67 @@ public:
 	// ==========================================
 
 	/**
-	 * Get part data by ID
+	 * @brief Retrieve part data asset by its unique ID.
+	 *
+	 * Looks up the UMGPartData asset from the asset registry using
+	 * the part's FName identifier.
+	 *
+	 * @param PartID Unique identifier of the part to find.
+	 * @return Pointer to the part data asset, or nullptr if not found.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Parts")
 	static UMGPartData* GetPartData(FName PartID);
 
 	/**
-	 * Get combined modifiers for all installed parts
+	 * @brief Aggregate modifiers from all parts in an engine configuration.
+	 *
+	 * Combines the modifiers from intake, exhaust, cams, internals, etc.
+	 * into a single FMGPartModifiers structure for calculation use.
+	 *
+	 * @param Engine The engine configuration containing part references.
+	 * @return Combined modifiers from all installed engine parts.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Parts")
 	static FMGPartModifiers GetCombinedModifiers(const FMGEngineConfiguration& Engine);
 
 	/**
-	 * Check if part is compatible with vehicle
+	 * @brief Check if a part can be installed on a specific vehicle.
+	 *
+	 * Validates vehicle compatibility, prerequisite parts, and
+	 * conflict checks against currently installed parts.
+	 *
+	 * @param Part The part data to check compatibility for.
+	 * @param VehicleModelID The vehicle model ID to check against.
+	 * @param Vehicle Current vehicle configuration (for prerequisite/conflict checks).
+	 * @return True if the part can be installed, false otherwise.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Parts")
 	static bool IsPartCompatible(const UMGPartData* Part, FName VehicleModelID, const FMGVehicleData& Vehicle);
 
 	/**
-	 * Get tire grip coefficient for compound
+	 * @brief Get base grip coefficient for a tire compound type.
+	 *
+	 * Returns the inherent grip multiplier for each compound,
+	 * used as a base for grip calculations.
+	 *
+	 * @param Compound The tire compound type to query.
+	 * @return Grip coefficient (typically 0.7 to 1.3).
+	 *
+	 * @note Higher values = more grip. Slicks have highest, Economy lowest.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float GetTireCompoundGrip(EMGTireCompound Compound);
 
 	/**
-	 * Get tire grip modifier for wet conditions
+	 * @brief Get grip reduction modifier for wet conditions.
+	 *
+	 * Returns how much grip is retained when driving on wet surfaces.
+	 * Treaded tires perform better in wet than slicks.
+	 *
+	 * @param Compound The tire compound type to query.
+	 * @return Wet grip multiplier (0.0 to 1.0, applied to base grip).
+	 *
+	 * @note Slicks have very low wet grip, All-Season has best wet performance.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float GetWetGripModifier(EMGTireCompound Compound);

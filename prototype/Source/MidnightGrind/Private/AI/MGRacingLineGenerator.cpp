@@ -985,6 +985,12 @@ FVector UMGRacingLineGenerator::GetPerpendicularVector(const FVector& Direction)
 
 float UMGRacingLineGenerator::SmoothClamp(float Value, float Min, float Max, float SmoothRange) const
 {
+	// Guard against division by zero and invalid parameters
+	if (SmoothRange < KINDA_SMALL_NUMBER || Min >= Max)
+	{
+		return FMath::Clamp(Value, Min, Max);
+	}
+
 	if (Value < Min + SmoothRange)
 	{
 		float T = (Value - Min) / SmoothRange;

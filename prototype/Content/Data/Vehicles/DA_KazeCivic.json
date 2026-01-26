@@ -1,0 +1,251 @@
+{
+  "VehicleID": "KAZE_CIVIC",
+  "DisplayName": "Kaze Civic",
+  "Manufacturer": "Kaze Motors",
+  "Year": 1998,
+  "Country": "Japan",
+  "Class": "D",
+  "Category": "JDM",
+  "Description": "The Kaze Civic is where legends begin. This lightweight hatchback with its high-revving VTEC engine proves that you don't need massive power to have fun. Perfect for learning the ropes, the Civic rewards smooth driving and momentum over brute force. Many champions started their careers in one of these.",
+
+  "BaseStats": {
+    "Power": 185,
+    "PowerUnit": "HP",
+    "Torque": 128,
+    "TorqueUnit": "lb-ft",
+    "Weight": 2400,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 63,
+    "Drivetrain": "FWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 1800,
+    "DisplacementUnit": "cc",
+    "Cylinders": 4,
+    "Configuration": "Inline",
+    "Redline": 8400,
+    "IdleRPM": 850,
+    "TopSpeed": 140,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 6.7,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 420,
+    "Class": "D",
+    "MaxPotential": 750
+  },
+
+  "Engine": {
+    "Code": "B18C",
+    "Type": "Inline-4 VTEC",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 18,
+      "MaxPowerPotential": 450
+    },
+    "Head": {
+      "Type": "DOHC VTEC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 16
+    },
+    "Turbo": null,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 35, "Torque": 75 },
+      { "RPM": 2000, "HP": 55, "Torque": 95 },
+      { "RPM": 3000, "HP": 80, "Torque": 105 },
+      { "RPM": 4000, "HP": 110, "Torque": 115 },
+      { "RPM": 5000, "HP": 130, "Torque": 120 },
+      { "RPM": 5800, "HP": 145, "Torque": 125 },
+      { "RPM": 6500, "HP": 165, "Torque": 128 },
+      { "RPM": 7500, "HP": 182, "Torque": 125 },
+      { "RPM": 8200, "HP": 185, "Torque": 118 },
+      { "RPM": 8400, "HP": 180, "Torque": 110 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 5,
+    "GearRatios": [3.230, 2.105, 1.458, 1.107, 0.848],
+    "FinalDrive": 4.400,
+    "ReverseRatio": 3.153
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "DoubleWishbone",
+    "FrontSpringRate": 280,
+    "RearSpringRate": 240,
+    "FrontDamping": 0.55,
+    "RearDamping": 0.50,
+    "FrontAntiRollBar": 22,
+    "RearAntiRollBar": 18,
+    "RideHeight": 5.0,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 282,
+    "RearDiameter": 260,
+    "DiameterUnit": "mm",
+    "BrakeBias": 62,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 195,
+    "FrontAspectRatio": 55,
+    "FrontDiameter": 15,
+    "RearWidth": 195,
+    "RearAspectRatio": 55,
+    "RearDiameter": 15,
+    "Compound": "Street",
+    "GripMultiplier": 0.9
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.32,
+    "FrontalArea": 1.9,
+    "DownforceMultiplier": 0.8,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4180,
+    "Width": 1695,
+    "Height": 1360,
+    "Wheelbase": 2620,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Hatchback",
+    "Doors": 3,
+    "DefaultColor": {
+      "Primary": "#FFFFFF",
+      "Secondary": "#000000",
+      "Accent": "#FF0000"
+    },
+    "AvailableColors": [
+      { "Name": "Championship White", "Hex": "#FFFFFF" },
+      { "Name": "Phoenix Yellow", "Hex": "#FFD700" },
+      { "Name": "Milano Red", "Hex": "#CC0000" },
+      { "Name": "Viper Blue", "Hex": "#0033CC" },
+      { "Name": "Granada Black", "Hex": "#0A0A0A" },
+      { "Name": "Electron Blue", "Hex": "#00CCFF" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineFour_VTEC",
+    "ExhaustProfile": "JDM_Hatch",
+    "TurboWhine": false,
+    "BlowoffValve": false,
+    "BackfireOnShift": false,
+    "VTECEngagement": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 14.0,
+    "TurnRadius": 5.2,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.4,
+    "OversteerTendency": 0.3,
+    "DriftCapability": 0.4,
+    "StabilityControl": false,
+    "TractionControl": false
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 50,
+    "PowerBoostUnit": "HP",
+    "Duration": 5.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 12,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 12000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "D",
+    "MaintenanceCostMultiplier": 0.7,
+    "PartsPriceMultiplier": 0.6,
+    "StreetValue": 15000,
+    "LegendaryValue": 45000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "UNKNOWN",
+    "RequiredLevel": 1,
+    "SpecialConditions": ["Tutorial Complete"]
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Cold Air", "Race"],
+      "Exhaust": ["Stock", "Cat-Back", "Race", "Turbo-Back"],
+      "Turbo": ["None", "Small", "Medium"],
+      "ECU": ["Stock", "Stage1", "Stage2"],
+      "FuelSystem": ["Stock", "HighFlow"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing"],
+      "Transmission": ["Stock", "ShortThrow", "LSD"],
+      "FinalDrive": ["Stock", "4.7", "4.9"],
+      "LSD": ["None", "Helical", "Plate"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover"],
+      "Dampers": ["Stock", "Adjustable"],
+      "Swaybars": ["Stock", "Sport"],
+      "Bushings": ["Stock", "Poly"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track"],
+      "Rotors": ["Stock", "Slotted"],
+      "Lines": ["Stock", "Braided"],
+      "Calipers": ["Stock", "4Piston"]
+    },
+    "Wheels": {
+      "Size": [15, 16, 17],
+      "Width": [6.0, 6.5, 7.0, 7.5]
+    },
+    "Tires": {
+      "Compound": ["Street", "Sport", "Semi-Slick"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Lip", "FullKit"],
+      "RearBumper": ["Stock", "FullKit"],
+      "Spoiler": ["Stock", "Hatch", "Wing"],
+      "Hood": ["Stock", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Fender Flares"],
+      "Mirrors": ["Stock", "Aero"],
+      "Lights": ["Stock", "JDM"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 450,
+    "MaxTorque": 350,
+    "MinWeight": 2200,
+    "MaxTopSpeed": 175,
+    "MaxPI": 750
+  },
+
+  "Tags": ["JDM", "FWD", "VTEC", "Starter", "Lightweight", "90s", "Civic", "Hatchback"],
+
+  "Lore": {
+    "Backstory": "The Kaze Civic represents the spirit of grassroots motorsport. While professional racers chased horsepower in expensive exotics, weekend warriors discovered that this unassuming hatchback could be transformed into a corner-carving weapon for a fraction of the cost. The legendary VTEC engine screams to nearly 9000 RPM, rewarding drivers who learn to keep it in the powerband. Light weight and perfect weight distribution make it a joy to hustle through tight corners where heavier cars struggle.",
+    "FamousOwners": ["Street Racing Prodigy", "Touge Runner"],
+    "RivalVehicles": ["Integra Type R", "Golf GTI", "Miata"]
+  }
+}

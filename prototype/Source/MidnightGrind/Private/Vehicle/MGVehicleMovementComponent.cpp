@@ -4,7 +4,7 @@
 #include "ChaosVehicleWheel.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 #include "SimpleVehicle/SimpleWheelSim.h"
-#include "Weather/MGWeatherSubsystem.h"
+#include "Environment/MGWeatherSubsystem.h"
 
 UMGVehicleMovementComponent::UMGVehicleMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -48,6 +48,7 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	ApplyDifferentialBehavior(DeltaTime);
 	UpdateClutchWear(DeltaTime); // Clutch wear and temperature simulation
 	UpdateSuspensionGeometry(DeltaTime); // Suspension geometry effects on handling
+	UpdateTirePressure(DeltaTime); // Tire pressure simulation
 
 	// Update shift cooldown
 	if (ShiftCooldown > 0.0f)
@@ -741,6 +742,13 @@ float UMGVehicleMovementComponent::CalculateTireFriction(int32 WheelIndex) const
 
 	// Apply suspension wear effects (worn suspension reduces effective grip)
 	BaseFriction *= PartWearEffects.SuspensionEfficiency;
+
+	// Apply suspension geometry effects (camber, toe, caster)
+	if (WheelIndex >= 0 && WheelIndex < 4)
+	{
+		const float GeometryGripModifier = SuspensionGeometryEffects.WheelContactPatch[WheelIndex].CombinedGripModifier;
+		BaseFriction *= GeometryGripModifier;
+	}
 
 	return BaseFriction;
 }
@@ -3111,4 +3119,385 @@ void UMGVehicleMovementComponent::InitializeTirePressures()
 		TirePressures[i].LeakRatePSIPerSecond = 0.0f;
 		TirePressures[i].bIsFlat = false;
 	}
+}
+
+// ==========================================
+// SUSPENSION GEOMETRY SYSTEM
+// ==========================================
+
+void UMGVehicleMovementComponent::UpdateSuspensionGeometry(float DeltaTime)
+{
+	// Calculate current body roll angle from lateral acceleration
+	const FVector Velocity = GetOwner()->GetVelocity();
+	const FVector RightVector = GetOwner()->GetActorRightVector();
+	const float LateralVelocity = FVector::DotProduct(Velocity, RightVector);
+
+	// Estimate lateral acceleration from velocity change (simplified)
+	// In a full implementation, this would come from physics simulation
+	const float Speed = GetSpeedMPH();
+	const float SteeringAngle = FMath::Abs(CurrentSteering) * 35.0f; // Assume 35 deg max steering
+
+	// Lateral acceleration approximation: v^2 / r, where r is based on steering angle
+	float LateralAccelG = 0.0f;
+	if (Speed > 5.0f && FMath::Abs(SteeringAngle) > 1.0f)
+	{
+		// Convert to lateral G-force estimate
+		const float TurningRadius = 500.0f / FMath::Tan(FMath::DegreesToRadians(SteeringAngle));
+		const float SpeedCmPerSec = Speed * 44.704f;
+		LateralAccelG = (SpeedCmPerSec * SpeedCmPerSec) / (TurningRadius * 980.665f);
+		LateralAccelG = FMath::Clamp(LateralAccelG, 0.0f, 2.0f);
+	}
+
+	// Calculate body roll from lateral acceleration
+	CurrentBodyRollDeg = CalculateBodyRollAngle(LateralAccelG);
+
+	// Determine if we're cornering (for grip modifier calculations)
+	const bool bIsCornering = FMath::Abs(CurrentSteering) > 0.1f || FMath::Abs(LateralAccelG) > 0.1f;
+
+	// Update contact patch state for each wheel
+	for (int32 WheelIndex = 0; WheelIndex < 4; ++WheelIndex)
+	{
+		// Calculate dynamic camber change from suspension compression and body roll
+		float SuspensionCompression = 0.0f;
+		if (PVehicleOutput && WheelIndex < PVehicleOutput->Wheels.Num())
+		{
+			// Get suspension compression ratio (0 = extended, 1 = fully compressed)
+			const Chaos::FSimpleWheelSim& WheelSim = PVehicleOutput->Wheels[WheelIndex];
+			SuspensionCompression = WheelSim.GetSuspensionOffset() / 20.0f; // Normalize to typical travel
+			SuspensionCompression = FMath::Clamp(SuspensionCompression, 0.0f, 1.0f);
+		}
+
+		// Calculate effective camber including dynamic changes
+		const float DynamicCamberChange = CalculateDynamicCamberChange(WheelIndex, SuspensionCompression);
+		const FMGSuspensionGeometry& Geometry = GetWheelGeometry(WheelIndex);
+		EffectiveCamberAngles[WheelIndex] = Geometry.CamberAngleDeg + DynamicCamberChange;
+
+		// Calculate complete contact patch state for this wheel
+		CalculateContactPatchState(WheelIndex, SuspensionGeometryEffects.WheelContactPatch[WheelIndex]);
+	}
+
+	// Calculate aggregate vehicle-level effects
+	// Steering response is primarily affected by front suspension geometry
+	const FMGContactPatchState& FLPatch = SuspensionGeometryEffects.WheelContactPatch[0];
+	const FMGContactPatchState& FRPatch = SuspensionGeometryEffects.WheelContactPatch[1];
+	SuspensionGeometryEffects.SteeringResponseModifier = (FLPatch.ToeTurnInMultiplier + FRPatch.ToeTurnInMultiplier) * 0.5f;
+
+	// Straight-line stability is affected by toe-in (rear primarily) and caster
+	const FMGContactPatchState& RLPatch = SuspensionGeometryEffects.WheelContactPatch[2];
+	const FMGContactPatchState& RRPatch = SuspensionGeometryEffects.WheelContactPatch[3];
+	SuspensionGeometryEffects.StraightLineStabilityModifier =
+		(FLPatch.ToeStabilityMultiplier + FRPatch.ToeStabilityMultiplier +
+		 RLPatch.ToeStabilityMultiplier + RRPatch.ToeStabilityMultiplier +
+		 FLPatch.CasterStabilityMultiplier + FRPatch.CasterStabilityMultiplier) / 6.0f;
+
+	// Cornering grip is primarily affected by camber
+	if (bIsCornering)
+	{
+		SuspensionGeometryEffects.CorneringGripModifier =
+			(FLPatch.CamberLateralGripMultiplier + FRPatch.CamberLateralGripMultiplier +
+			 RLPatch.CamberLateralGripMultiplier + RRPatch.CamberLateralGripMultiplier) / 4.0f;
+	}
+	else
+	{
+		SuspensionGeometryEffects.CorneringGripModifier = 1.0f;
+	}
+
+	// Tire wear rate is affected by excessive toe angles
+	SuspensionGeometryEffects.TireWearRateModifier =
+		(FLPatch.ToeWearMultiplier + FRPatch.ToeWearMultiplier +
+		 RLPatch.ToeWearMultiplier + RRPatch.ToeWearMultiplier) / 4.0f;
+
+	// Self-centering strength from caster
+	SuspensionGeometryEffects.SelfCenteringStrength =
+		(FLPatch.CasterSelfCenteringMultiplier + FRPatch.CasterSelfCenteringMultiplier) * 0.5f;
+
+	// Steering weight from caster
+	SuspensionGeometryEffects.SteeringWeightModifier =
+		(FLPatch.CasterSteeringWeightMultiplier + FRPatch.CasterSteeringWeightMultiplier) * 0.5f;
+
+	// Apply steering self-centering effect
+	ApplySteeringSelfCentering(DeltaTime);
+}
+
+void UMGVehicleMovementComponent::CalculateContactPatchState(int32 WheelIndex, FMGContactPatchState& OutContactPatch) const
+{
+	// Get geometry for this wheel
+	const FMGSuspensionGeometry& Geometry = GetWheelGeometry(WheelIndex);
+	const float EffectiveCamber = EffectiveCamberAngles[WheelIndex];
+
+	// Calculate camber effects
+	float LateralGrip, LongitudinalGrip, ContactPatchWidth;
+	CalculateCamberEffects(EffectiveCamber, CurrentBodyRollDeg, LateralGrip, LongitudinalGrip, ContactPatchWidth);
+
+	OutContactPatch.CamberLateralGripMultiplier = LateralGrip;
+	OutContactPatch.CamberLongitudinalGripMultiplier = LongitudinalGrip;
+	OutContactPatch.EffectiveWidthRatio = ContactPatchWidth;
+
+	// Calculate toe effects
+	float TurnInResponse, Stability, TireWearRate;
+	CalculateToeEffects(Geometry.ToeAngleDeg, TurnInResponse, Stability, TireWearRate);
+
+	OutContactPatch.ToeTurnInMultiplier = TurnInResponse;
+	OutContactPatch.ToeStabilityMultiplier = Stability;
+	OutContactPatch.ToeWearMultiplier = TireWearRate;
+
+	// Calculate caster effects (only applies to front wheels)
+	float SelfCentering, CasterStability, SteeringWeight;
+	const float SpeedMPH = GetSpeedMPH();
+
+	if (WheelIndex < 2) // Front wheels
+	{
+		CalculateCasterEffects(Geometry.CasterAngleDeg, SpeedMPH, SelfCentering, CasterStability, SteeringWeight);
+	}
+	else // Rear wheels don't have caster effects
+	{
+		SelfCentering = 1.0f;
+		CasterStability = 1.0f;
+		SteeringWeight = 1.0f;
+	}
+
+	OutContactPatch.CasterSelfCenteringMultiplier = SelfCentering;
+	OutContactPatch.CasterStabilityMultiplier = CasterStability;
+	OutContactPatch.CasterSteeringWeightMultiplier = SteeringWeight;
+
+	// Calculate combined grip modifier
+	const bool bIsCornering = FMath::Abs(CurrentSteering) > 0.1f;
+	OutContactPatch.CombinedGripModifier = CalculateCombinedGeometryGripModifier(WheelIndex, bIsCornering);
+}
+
+void UMGVehicleMovementComponent::CalculateCamberEffects(float CamberAngleDeg, float BodyRollEffect,
+	float& OutLateralGrip, float& OutLongitudinalGrip, float& OutContactPatchWidth) const
+{
+	// Camber effects on grip:
+	// - Negative camber: Improves cornering grip (tire leans into turn), reduces straight-line contact
+	// - Positive camber: Reduces overall grip (almost never used in performance applications)
+	// - Zero camber: Maximum straight-line contact patch, but wheel leans outward in corners
+
+	// Optimal camber for cornering is typically around -2 to -4 degrees (after body roll)
+	const float OptimalCorneringCamber = -3.0f;
+	const float EffectiveCamberWithRoll = CamberAngleDeg - BodyRollEffect;
+
+	// Lateral grip peaks at optimal negative camber
+	// Using a bell curve centered around optimal camber
+	const float CamberDifferenceFromOptimal = EffectiveCamberWithRoll - OptimalCorneringCamber;
+	const float LateralGripFactor = FMath::Exp(-0.1f * CamberDifferenceFromOptimal * CamberDifferenceFromOptimal);
+
+	// Scale the effect by SuspensionGeometryInfluence
+	OutLateralGrip = FMath::Lerp(1.0f, 0.85f + 0.25f * LateralGripFactor, SuspensionGeometryInfluence);
+
+	// Longitudinal grip (straight-line traction) is maximum at zero camber
+	// Negative camber reduces contact patch for straight-line grip
+	const float AbsCamber = FMath::Abs(CamberAngleDeg);
+	const float LongitudinalGripFactor = FMath::Clamp(1.0f - AbsCamber * 0.03f, 0.7f, 1.0f);
+	OutLongitudinalGrip = FMath::Lerp(1.0f, LongitudinalGripFactor, SuspensionGeometryInfluence);
+
+	// Contact patch width ratio - negative camber reduces effective width
+	// at rest, but maintains width better during cornering
+	OutContactPatchWidth = FMath::Clamp(1.0f - AbsCamber * 0.02f, 0.8f, 1.0f);
+}
+
+void UMGVehicleMovementComponent::CalculateToeEffects(float ToeAngleDeg,
+	float& OutTurnInResponse, float& OutStability, float& OutTireWearRate) const
+{
+	// Toe effects:
+	// - Toe-out (positive): Improves turn-in response, reduces stability, increases tire wear
+	// - Toe-in (negative): Improves stability, reduces turn-in response, moderate tire wear
+	// - Zero toe: Neutral handling, minimal tire wear
+
+	// Turn-in response improves with toe-out (positive toe)
+	// Toe-out points wheels outward, so when you turn, the inside wheel is already pointing into the turn
+	if (ToeAngleDeg > 0.0f)
+	{
+		// Toe-out: Better turn-in
+		OutTurnInResponse = FMath::Lerp(1.0f, 1.0f + ToeAngleDeg * 0.15f, SuspensionGeometryInfluence);
+	}
+	else
+	{
+		// Toe-in: Worse turn-in
+		OutTurnInResponse = FMath::Lerp(1.0f, 1.0f + ToeAngleDeg * 0.1f, SuspensionGeometryInfluence);
+	}
+	OutTurnInResponse = FMath::Clamp(OutTurnInResponse, 0.7f, 1.3f);
+
+	// Stability improves with toe-in (negative toe)
+	if (ToeAngleDeg < 0.0f)
+	{
+		// Toe-in: Better stability
+		OutStability = FMath::Lerp(1.0f, 1.0f - ToeAngleDeg * 0.1f, SuspensionGeometryInfluence);
+	}
+	else
+	{
+		// Toe-out: Worse stability
+		OutStability = FMath::Lerp(1.0f, 1.0f - ToeAngleDeg * 0.08f, SuspensionGeometryInfluence);
+	}
+	OutStability = FMath::Clamp(OutStability, 0.8f, 1.2f);
+
+	// Tire wear increases with any toe angle (tires scrubbing)
+	const float AbsToe = FMath::Abs(ToeAngleDeg);
+	OutTireWearRate = 1.0f + AbsToe * 0.25f; // 25% more wear per degree of toe
+	OutTireWearRate = FMath::Min(OutTireWearRate, 2.0f); // Cap at 2x wear rate
+}
+
+void UMGVehicleMovementComponent::CalculateCasterEffects(float CasterAngleDeg, float VehicleSpeedMPH,
+	float& OutSelfCentering, float& OutStability, float& OutSteeringWeight) const
+{
+	// Caster effects:
+	// - More caster: Stronger self-centering, better stability, heavier steering
+	// - Less caster: Lighter steering, reduced self-centering, less stability
+	// - Caster provides mechanical trail that creates self-centering torque
+
+	// Reference caster angle (typical street car: 3-5 deg, race car: 7-10 deg)
+	const float ReferenceCaster = 5.0f;
+	const float CasterRatio = CasterAngleDeg / ReferenceCaster;
+
+	// Self-centering force scales with caster and speed
+	// More caster = stronger self-centering, and it increases with speed
+	const float SpeedFactor = FMath::Clamp(VehicleSpeedMPH / 60.0f, 0.5f, 2.0f);
+	OutSelfCentering = FMath::Lerp(1.0f, CasterRatio * SpeedFactor, SuspensionGeometryInfluence);
+	OutSelfCentering = FMath::Clamp(OutSelfCentering, 0.3f, 2.5f);
+
+	// High-speed stability improves with more caster
+	OutStability = FMath::Lerp(1.0f, 0.9f + CasterRatio * 0.1f, SuspensionGeometryInfluence);
+	OutStability = FMath::Clamp(OutStability, 0.8f, 1.2f);
+
+	// Steering weight (effort) increases with caster due to mechanical trail
+	// Trail creates a moment arm that requires more force to turn
+	const float TrailEffect = CasterTrailCm * FMath::Sin(FMath::DegreesToRadians(CasterAngleDeg));
+	OutSteeringWeight = FMath::Lerp(1.0f, 1.0f + TrailEffect * 0.05f, SuspensionGeometryInfluence);
+	OutSteeringWeight = FMath::Clamp(OutSteeringWeight, 0.7f, 1.5f);
+}
+
+float UMGVehicleMovementComponent::CalculateBodyRollAngle(float LateralAcceleration) const
+{
+	// Calculate body roll based on lateral acceleration and suspension stiffness
+	// Stiffer suspension = less body roll
+	// More lateral G = more body roll
+
+	// Reference body roll at 1G lateral acceleration
+	const float RollPerG = ReferenceBodyRollDeg;
+
+	// Get effective roll stiffness from suspension configuration
+	// Stiffer springs and anti-roll bars reduce body roll
+	float RollStiffnessFactor = 1.0f;
+
+	// Front suspension stiffness effect
+	const float FrontStiffnessNormalized = CurrentConfiguration.Suspension.FrontSpringRate / 50000.0f;
+	const float RearStiffnessNormalized = CurrentConfiguration.Suspension.RearSpringRate / 50000.0f;
+	RollStiffnessFactor = FMath::Clamp((FrontStiffnessNormalized + RearStiffnessNormalized) * 0.5f, 0.5f, 2.0f);
+
+	// Calculate roll angle
+	const float RollAngle = (LateralAcceleration * RollPerG) / RollStiffnessFactor;
+
+	// Clamp to realistic values (typical street cars: 3-5 deg max, race cars: 1-2 deg max)
+	return FMath::Clamp(RollAngle, -8.0f, 8.0f);
+}
+
+float UMGVehicleMovementComponent::CalculateDynamicCamberChange(int32 WheelIndex, float SuspensionCompressionRatio) const
+{
+	if (!bEnableDynamicCamber)
+	{
+		return 0.0f;
+	}
+
+	float DynamicCamber = 0.0f;
+
+	// Camber change from body roll
+	// During cornering, the outside wheels gain positive camber (bad) and inside wheels gain negative (good)
+	// This is why static negative camber is used - to compensate for this gain
+	const bool bIsLeftWheel = (WheelIndex == 0 || WheelIndex == 2);
+	const float RollSign = bIsLeftWheel ? 1.0f : -1.0f;
+
+	// Roll-induced camber change (positive roll = turning right)
+	DynamicCamber += CurrentBodyRollDeg * CamberGainPerDegreeRoll * RollSign;
+
+	// Camber change from suspension compression (bump camber)
+	// Most suspension geometries gain negative camber in compression
+	// This is beneficial during cornering as the loaded wheel compresses
+	const float BumpCamberGain = -0.3f; // degrees per unit compression ratio
+	DynamicCamber += SuspensionCompressionRatio * BumpCamberGain;
+
+	return DynamicCamber;
+}
+
+void UMGVehicleMovementComponent::ApplySteeringSelfCentering(float DeltaTime)
+{
+	// Self-centering effect from caster
+	// When no steering input, the wheels naturally want to return to center
+
+	if (FMath::Abs(TargetSteering) < 0.05f && FMath::Abs(CurrentSteering) > 0.01f)
+	{
+		// No input but wheels are turned - apply self-centering
+		const float SelfCenteringStrength = SuspensionGeometryEffects.SelfCenteringStrength;
+		const float SpeedFactor = FMath::Clamp(GetSpeedMPH() / 30.0f, 0.5f, 2.0f);
+
+		// Stronger centering at higher speeds
+		const float CenteringRate = 3.0f * SelfCenteringStrength * SpeedFactor;
+		CurrentSteering = FMath::FInterpTo(CurrentSteering, 0.0f, DeltaTime, CenteringRate);
+	}
+}
+
+float UMGVehicleMovementComponent::CalculateCombinedGeometryGripModifier(int32 WheelIndex, bool bIsCornering) const
+{
+	const FMGContactPatchState& Patch = SuspensionGeometryEffects.WheelContactPatch[WheelIndex];
+
+	float GripModifier = 1.0f;
+
+	if (bIsCornering)
+	{
+		// During cornering, lateral grip is primary
+		GripModifier *= Patch.CamberLateralGripMultiplier;
+		GripModifier *= Patch.ToeStabilityMultiplier;
+	}
+	else
+	{
+		// Straight-line driving, longitudinal grip is primary
+		GripModifier *= Patch.CamberLongitudinalGripMultiplier;
+		GripModifier *= Patch.ToeStabilityMultiplier;
+	}
+
+	// Contact patch width always affects grip
+	GripModifier *= Patch.EffectiveWidthRatio;
+
+	return FMath::Clamp(GripModifier, 0.5f, 1.5f);
+}
+
+const FMGSuspensionGeometry& UMGVehicleMovementComponent::GetWheelGeometry(int32 WheelIndex) const
+{
+	// Front wheels (0, 1) use front geometry, rear wheels (2, 3) use rear geometry
+	if (WheelIndex < 2)
+	{
+		return FrontSuspensionGeometry;
+	}
+	return RearSuspensionGeometry;
+}
+
+FMGContactPatchState UMGVehicleMovementComponent::GetWheelContactPatchState(int32 WheelIndex) const
+{
+	if (WheelIndex >= 0 && WheelIndex < 4)
+	{
+		return SuspensionGeometryEffects.WheelContactPatch[WheelIndex];
+	}
+	return FMGContactPatchState();
+}
+
+float UMGVehicleMovementComponent::GetEffectiveCamberAngle(int32 WheelIndex) const
+{
+	if (WheelIndex >= 0 && WheelIndex < 4)
+	{
+		return EffectiveCamberAngles[WheelIndex];
+	}
+	return 0.0f;
+}
+
+float UMGVehicleMovementComponent::GetSteeringSelfCenteringForce() const
+{
+	return SuspensionGeometryEffects.SelfCenteringStrength;
+}
+
+float UMGVehicleMovementComponent::GetGeometryGripModifier(int32 WheelIndex) const
+{
+	if (WheelIndex >= 0 && WheelIndex < 4)
+	{
+		return SuspensionGeometryEffects.WheelContactPatch[WheelIndex].CombinedGripModifier;
+	}
+	return 1.0f;
 }

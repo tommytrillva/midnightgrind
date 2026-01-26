@@ -186,6 +186,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Environment")
 	bool bDynamicWeather = false;
 
+	/**
+	 * @brief Weather race type for special weather events
+	 * Standard = use WeatherPreset, others enable weather-specific bonuses
+	 * @see EMGWeatherRaceType
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Environment")
+	FName WeatherRaceType = TEXT("Standard");
+
+	/**
+	 * @brief Enable advanced weather racing effects
+	 * Activates puddles, aquaplaning, wind effects, and visibility systems
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Environment")
+	bool bEnableWeatherRacingEffects = false;
+
 	// ==========================================
 	// RESTRICTIONS
 	// ==========================================

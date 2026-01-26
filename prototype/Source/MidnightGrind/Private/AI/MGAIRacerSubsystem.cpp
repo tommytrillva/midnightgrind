@@ -431,11 +431,12 @@ TArray<UMGAIDriverProfile*> UMGAIRacerSubsystem::SelectDriversForRace(const FMGA
 		}
 	}
 
-	// If still not enough, create placeholder profiles
-	while (Selected.Num() < Config.RacerCount)
+	// If still not enough drivers, log warning and proceed with available count
+	// Don't add nullptrs as they would cause crashes downstream
+	if (Selected.Num() < Config.RacerCount)
 	{
-		// Would create default profiles here
-		Selected.Add(nullptr);
+		UE_LOG(LogTemp, Warning, TEXT("AI: Not enough drivers available. Requested %d, only %d available."),
+			Config.RacerCount, Selected.Num());
 	}
 
 	return Selected;
