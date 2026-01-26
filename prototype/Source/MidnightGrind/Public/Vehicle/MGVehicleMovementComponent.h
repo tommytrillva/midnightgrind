@@ -13,6 +13,271 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBoostChanged, float, CurrentBoos
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnDriftScoreAwarded, float, Score, int32, ChainMultiplier, float, AngleBonus);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDriftChainBroken, float, TotalChainScore);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPartWearWarning, FName, PartName, float, Condition);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnClutchOverheating, float, Temperature, float, WearLevel);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClutchBurnout);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoneyShift, float, OverRevAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDifferentialLockup, float, LockPercent, bool, bUnderAccel);
+
+/**
+ * @brief Differential lock state for detailed simulation
+ *
+ * Provides comprehensive differential behavior data including lock percentage,
+ * torque distribution, and tire speed differentials for realistic LSD simulation.
+ */
+USTRUCT(BlueprintType)
+struct FMGDifferentialState
+{
+	GENERATED_BODY()
+
+	/** Current lock percentage (0 = fully open, 1 = fully locked) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential")
+	float LockPercent = 0.0f;
+
+	/** Lock percentage from acceleration-side clutch pack */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential")
+	float AccelLockPercent = 0.0f;
+
+	/** Lock percentage from deceleration-side clutch pack */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential")
+	float DecelLockPercent = 0.0f;
+
+	/** Torque sent to left wheel (normalized 0-1, 0.5 = equal split) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|Distribution")
+	float LeftWheelTorqueRatio = 0.5f;
+
+	/** Torque sent to right wheel (normalized 0-1) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|Distribution")
+	float RightWheelTorqueRatio = 0.5f;
+
+	/** Left wheel angular velocity (rad/s) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|Speed")
+	float LeftWheelAngularVelocity = 0.0f;
+
+	/** Right wheel angular velocity (rad/s) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|Speed")
+	float RightWheelAngularVelocity = 0.0f;
+
+	/** Speed differential between wheels (rad/s, positive = left faster) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|Speed")
+	float WheelSpeedDifferential = 0.0f;
+
+	/** Normalized speed differential (-1 to 1, for UI) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|Speed")
+	float NormalizedSpeedDiff = 0.0f;
+
+	/** Input torque to differential (Nm) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|Torque")
+	float InputTorque = 0.0f;
+
+	/** Bias torque from LSD mechanism (Nm) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|Torque")
+	float BiasTorque = 0.0f;
+
+	/** Whether differential is currently transferring torque via LSD */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential")
+	bool bIsLocking = false;
+
+	/** Whether lockup is occurring under acceleration */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential")
+	bool bUnderAcceleration = false;
+
+	/** Current preload torque being applied (Nm) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|LSD")
+	float ActivePreloadTorque = 0.0f;
+
+	/** Torsen torque bias ratio currently active */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential|Torsen")
+	float TorsenBiasRatio = 1.0f;
+};
+
+/**
+ * @brief LSD configuration parameters for tuning differential behavior
+ *
+ * Provides detailed control over clutch-type LSD behavior including
+ * preload settings and ramp angles for acceleration/deceleration phases.
+ */
+USTRUCT(BlueprintType)
+struct FMGLSDConfiguration
+{
+	GENERATED_BODY()
+
+	/**
+	 * @brief Preload torque in Nm
+	 *
+	 * Minimum torque at which the differential begins to lock.
+	 * Higher values provide more initial lockup even at low torque,
+	 * making the diff more aggressive on corner entry/exit.
+	 * Typical range: 10-100 Nm
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Preload", meta = (ClampMin = "0.0", ClampMax = "200.0"))
+	float PreloadTorqueNm = 30.0f;
+
+	/**
+	 * @brief Acceleration ramp angle in degrees
+	 *
+	 * Controls how aggressively the diff locks under acceleration.
+	 * Lower angles = more aggressive lockup (steeper ramp).
+	 * Higher angles = smoother, more progressive lockup.
+	 *
+	 * Real-world typical values:
+	 * - 30-40 deg: Aggressive (drift/track)
+	 * - 45-55 deg: Balanced (street/sport)
+	 * - 60-80 deg: Mild (comfort/traction)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Ramp Angles", meta = (ClampMin = "20.0", ClampMax = "90.0"))
+	float AccelRampAngleDeg = 45.0f;
+
+	/**
+	 * @brief Deceleration ramp angle in degrees
+	 *
+	 * Controls lockup behavior during engine braking/coast.
+	 * 1-way LSD: Use 90 degrees (no decel lock)
+	 * 1.5-way LSD: Higher than accel angle (partial decel lock)
+	 * 2-way LSD: Equal to accel angle (symmetric lockup)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Ramp Angles", meta = (ClampMin = "20.0", ClampMax = "90.0"))
+	float DecelRampAngleDeg = 65.0f;
+
+	/**
+	 * @brief Maximum lock percentage achievable
+	 *
+	 * Limits how much the differential can lock up.
+	 * 1.0 = can fully lock (welded behavior at max)
+	 * Lower values = always some slip allowed
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Limits", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float MaxLockPercent = 0.85f;
+
+	/**
+	 * @brief Lock response speed (how fast lockup changes)
+	 *
+	 * Higher values = faster lockup response (more aggressive)
+	 * Lower values = smoother, more predictable transitions
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Response", meta = (ClampMin = "1.0", ClampMax = "50.0"))
+	float LockResponseRate = 15.0f;
+
+	/**
+	 * @brief Clutch pack friction coefficient
+	 *
+	 * Affects how much torque the clutch packs can transfer.
+	 * Higher = more aggressive lockup for given input torque.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Clutch", meta = (ClampMin = "0.1", ClampMax = "1.5"))
+	float ClutchFrictionCoef = 0.8f;
+
+	/**
+	 * @brief Number of clutch plates (affects lockup aggression)
+	 *
+	 * More plates = higher torque capacity and faster lockup.
+	 * Typical range: 4-12 plates for performance applications.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Clutch", meta = (ClampMin = "2", ClampMax = "16"))
+	int32 ClutchPlateCount = 6;
+
+	/**
+	 * @brief Torsen torque bias ratio (TBR)
+	 *
+	 * Only used for Torsen-type differentials.
+	 * Defines max torque split ratio (e.g., 3.0 = can send 3x torque to slower wheel).
+	 * Higher values = more aggressive torque transfer capability.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Torsen", meta = (ClampMin = "1.0", ClampMax = "6.0"))
+	float TorsenBiasRatio = 2.5f;
+
+	/**
+	 * @brief Torsen response sensitivity
+	 *
+	 * How quickly Torsen responds to speed differences.
+	 * Higher = more immediate torque vectoring.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Torsen", meta = (ClampMin = "0.1", ClampMax = "5.0"))
+	float TorsenSensitivity = 1.5f;
+
+	/**
+	 * @brief Minimum speed differential to trigger lockup (rad/s)
+	 *
+	 * Below this threshold, diff behaves more openly.
+	 * Prevents lockup during normal straight-line driving.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|Thresholds", meta = (ClampMin = "0.0", ClampMax = "5.0"))
+	float MinSpeedDiffThreshold = 0.5f;
+
+	/**
+	 * @brief Coast behavior factor for 1.5-way type
+	 *
+	 * Multiplier for decel-side lockup relative to accel-side.
+	 * 0.0 = pure 1-way (no decel lock)
+	 * 1.0 = pure 2-way (equal accel/decel)
+	 * 0.3-0.6 = typical 1.5-way range
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LSD|1.5-Way", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float CoastLockFactor = 0.4f;
+};
+
+/**
+ * @brief Power distribution visualization data for UI display
+ *
+ * Provides all data needed to render real-time power distribution
+ * and differential state in the vehicle HUD or telemetry overlay.
+ */
+USTRUCT(BlueprintType)
+struct FMGPowerDistributionData
+{
+	GENERATED_BODY()
+
+	/** Front-left wheel power percentage (0-100) */
+	UPROPERTY(BlueprintReadOnly, Category = "Distribution")
+	float FrontLeftPower = 0.0f;
+
+	/** Front-right wheel power percentage (0-100) */
+	UPROPERTY(BlueprintReadOnly, Category = "Distribution")
+	float FrontRightPower = 0.0f;
+
+	/** Rear-left wheel power percentage (0-100) */
+	UPROPERTY(BlueprintReadOnly, Category = "Distribution")
+	float RearLeftPower = 0.0f;
+
+	/** Rear-right wheel power percentage (0-100) */
+	UPROPERTY(BlueprintReadOnly, Category = "Distribution")
+	float RearRightPower = 0.0f;
+
+	/** Front axle total power percentage */
+	UPROPERTY(BlueprintReadOnly, Category = "Distribution")
+	float FrontAxlePower = 0.0f;
+
+	/** Rear axle total power percentage */
+	UPROPERTY(BlueprintReadOnly, Category = "Distribution")
+	float RearAxlePower = 0.0f;
+
+	/** Center differential bias (AWD only, 0 = rear, 1 = front) */
+	UPROPERTY(BlueprintReadOnly, Category = "Distribution")
+	float CenterDiffBias = 0.5f;
+
+	/** Front differential state */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential")
+	FMGDifferentialState FrontDiffState;
+
+	/** Rear differential state */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential")
+	FMGDifferentialState RearDiffState;
+
+	/** Center differential state (AWD only) */
+	UPROPERTY(BlueprintReadOnly, Category = "Differential")
+	FMGDifferentialState CenterDiffState;
+
+	/** Total drivetrain power loss percentage */
+	UPROPERTY(BlueprintReadOnly, Category = "Efficiency")
+	float DrivetrainLossPercent = 0.0f;
+
+	/** Per-wheel slip ratios for visualization */
+	UPROPERTY(BlueprintReadOnly, Category = "Slip")
+	float WheelSlipRatios[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+	/** Per-wheel spin status (true if significant wheelspin) */
+	UPROPERTY(BlueprintReadOnly, Category = "Slip")
+	bool bWheelSpinning[4] = { false, false, false, false };
+};
 
 /**
  * @brief Drift scoring tier thresholds for angle bonuses
@@ -293,6 +558,88 @@ struct FMGPartWearEffects
 };
 
 /**
+ * @brief Clutch wear state for realistic clutch simulation
+ */
+USTRUCT(BlueprintType)
+struct FMGClutchWearState
+{
+	GENERATED_BODY()
+
+	/** Current clutch temperature (Celsius) */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	float ClutchTemperature = 50.0f;
+
+	/** Clutch wear level (0 = new, 1 = completely worn) */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	float WearLevel = 0.0f;
+
+	/** Current friction coefficient (degrades with heat and wear) */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	float FrictionCoefficient = 1.0f;
+
+	/** Time spent slipping this engagement */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	float CurrentSlipDuration = 0.0f;
+
+	/** Accumulated slip damage this session */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	float SessionSlipDamage = 0.0f;
+
+	/** Is clutch currently slipping */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	bool bIsSlipping = false;
+
+	/** Is clutch overheating (smell of burning clutch!) */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	bool bIsOverheating = false;
+
+	/** Clutch burnt out (needs replacement) */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	bool bIsBurntOut = false;
+
+	/** Number of hard launches this session */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	int32 HardLaunchCount = 0;
+
+	/** Number of money shifts (missed downshift) */
+	UPROPERTY(BlueprintReadOnly, Category = "Clutch")
+	int32 MoneyShiftCount = 0;
+
+	/**
+	 * @brief Get torque transfer efficiency based on temperature and wear
+	 * @return Efficiency multiplier (0-1, lower when hot/worn)
+	 */
+	float GetTorqueTransferEfficiency() const
+	{
+		if (bIsBurntOut) return 0.1f; // Clutch barely works
+
+		float Efficiency = 1.0f;
+
+		// Wear reduces efficiency
+		Efficiency *= (1.0f - WearLevel * 0.3f);
+
+		// High temperature causes slip
+		if (ClutchTemperature > 200.0f)
+		{
+			float HeatPenalty = (ClutchTemperature - 200.0f) / 200.0f;
+			Efficiency *= FMath::Max(0.5f, 1.0f - HeatPenalty * 0.4f);
+		}
+
+		return FMath::Clamp(Efficiency, 0.0f, 1.0f);
+	}
+
+	/**
+	 * @brief Get maximum holdable torque
+	 * @param BaseClutchTorque The clutch's rated torque capacity
+	 * @return Actual holdable torque
+	 */
+	float GetMaxHoldableTorque(float BaseClutchTorque) const
+	{
+		return BaseClutchTorque * FrictionCoefficient * GetTorqueTransferEfficiency();
+	}
+};
+
+/**
  * @brief Engine state information with enhanced turbo modeling
  */
 USTRUCT(BlueprintType)
@@ -498,6 +845,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	FMGDriftState GetDriftState() const { return DriftState; }
 
+	/** Get current clutch wear state */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
+	FMGClutchWearState GetClutchWearState() const { return ClutchWearState; }
+
+	/** Get clutch temperature as percentage of burnout threshold */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
+	float GetClutchTemperaturePercent() const
+	{
+		return (ClutchWearState.ClutchTemperature - ClutchAmbientTemp) / (ClutchBurnoutTemp - ClutchAmbientTemp);
+	}
+
 	/** Get current gear (0 = neutral, -1 = reverse, 1+ = forward gears) */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	int32 GetCurrentGear() const { return CurrentGear; }
@@ -549,6 +907,70 @@ public:
 	/** Get current part wear effects */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	FMGPartWearEffects GetPartWearEffects() const { return PartWearEffects; }
+
+	// ==========================================
+	// DIFFERENTIAL STATE QUERIES
+	// ==========================================
+
+	/**
+	 * @brief Get current rear differential state
+	 * @return Rear differential state including lock percent and torque distribution
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Differential")
+	FMGDifferentialState GetRearDifferentialState() const { return RearDiffState; }
+
+	/**
+	 * @brief Get current front differential state (FWD/AWD)
+	 * @return Front differential state
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Differential")
+	FMGDifferentialState GetFrontDifferentialState() const { return FrontDiffState; }
+
+	/**
+	 * @brief Get current center differential state (AWD only)
+	 * @return Center differential state
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Differential")
+	FMGDifferentialState GetCenterDifferentialState() const { return CenterDiffState; }
+
+	/**
+	 * @brief Get complete power distribution data for UI visualization
+	 * @return Power distribution across all wheels and differentials
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Differential")
+	FMGPowerDistributionData GetPowerDistribution() const { return PowerDistributionData; }
+
+	/**
+	 * @brief Get effective differential lock percentage for a given axle
+	 * @param bFrontAxle True for front, false for rear
+	 * @return Lock percentage (0-1)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Differential")
+	float GetAxleLockPercent(bool bFrontAxle) const;
+
+	/**
+	 * @brief Get wheel angular velocity
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @return Angular velocity in rad/s
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Differential")
+	float GetWheelAngularVelocity(int32 WheelIndex) const;
+
+	/**
+	 * @brief Get tire speed differential between left and right wheels on an axle
+	 * @param bFrontAxle True for front axle, false for rear
+	 * @return Speed differential in rad/s (positive = left faster)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Differential")
+	float GetAxleSpeedDifferential(bool bFrontAxle) const;
+
+	/**
+	 * @brief Check if a wheel is spinning (excessive slip)
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @return True if wheel is experiencing significant wheelspin
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Differential")
+	bool IsWheelSpinningExcessively(int32 WheelIndex) const;
 
 	/**
 	 * @brief Sample power curve at specific RPM
@@ -889,6 +1311,83 @@ public:
 	float BrakeFadeMinEfficiency = 0.3f; // Minimum brake efficiency when fully faded
 
 	// ==========================================
+	// TUNING PARAMETERS - DIFFERENTIAL
+	// ==========================================
+
+	/**
+	 * @brief LSD configuration for rear differential
+	 *
+	 * Controls clutch-pack LSD behavior including preload,
+	 * ramp angles, and lockup characteristics.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Differential")
+	FMGLSDConfiguration RearLSDConfig;
+
+	/**
+	 * @brief LSD configuration for front differential (FWD/AWD)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Differential")
+	FMGLSDConfiguration FrontLSDConfig;
+
+	/**
+	 * @brief LSD configuration for center differential (AWD only)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Differential")
+	FMGLSDConfiguration CenterLSDConfig;
+
+	/**
+	 * @brief AWD front/rear torque split (0 = full rear, 1 = full front)
+	 *
+	 * Default bias for center differential torque distribution.
+	 * 0.5 = 50/50 split
+	 * 0.3 = 30% front, 70% rear (sporty RWD-biased AWD)
+	 * 0.6 = 60% front, 40% rear (FWD-biased AWD)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Differential", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float AWDFrontBias = 0.35f;
+
+	/**
+	 * @brief Whether to apply torque vectoring via differential
+	 *
+	 * When enabled, allows differential to actively redistribute
+	 * torque based on cornering conditions (for Torsen/eLSD behavior).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Differential")
+	bool bEnableTorqueVectoring = false;
+
+	/**
+	 * @brief Torque vectoring intensity (0 = off, 1 = maximum)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Differential", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float TorqueVectoringIntensity = 0.5f;
+
+	/**
+	 * @brief Differential viscosity for viscous LSD simulation
+	 *
+	 * Higher values = more resistance to speed differences.
+	 * Affects how "stiff" the diff feels during transitions.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Differential", meta = (ClampMin = "0.0", ClampMax = "100.0"))
+	float DifferentialViscosity = 25.0f;
+
+	/**
+	 * @brief Enable realistic differential coast behavior
+	 *
+	 * When true, simulates drivetrain backlash and coast behavior.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Differential")
+	bool bSimulateCoastBehavior = true;
+
+	/**
+	 * @brief Wheel speed differential threshold for open diff spin (rad/s)
+	 *
+	 * When exceeded, simulates inside wheel spinning freely
+	 * for open differential behavior.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Differential", meta = (ClampMin = "0.5", ClampMax = "10.0"))
+	float OpenDiffSpinThreshold = 2.0f;
+
+	// ==========================================
 	// TUNING PARAMETERS - PART WEAR
 	// ==========================================
 
@@ -907,6 +1406,54 @@ public:
 	/** How much worn steering affects precision */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|PartWear")
 	float SteeringWearPrecisionImpact = 0.2f;
+
+	// ==========================================
+	// TUNING PARAMETERS - CLUTCH WEAR
+	// ==========================================
+
+	/** Base clutch torque capacity (Nm) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float ClutchTorqueCapacity = 500.0f;
+
+	/** Clutch heat generation rate (degrees per second while slipping) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float ClutchHeatRate = 50.0f;
+
+	/** Clutch cooling rate (degrees per second when not slipping) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float ClutchCoolRate = 15.0f;
+
+	/** Ambient clutch temperature (Celsius) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float ClutchAmbientTemp = 50.0f;
+
+	/** Temperature where clutch starts to degrade (Celsius) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float ClutchDegradeTemp = 200.0f;
+
+	/** Temperature where clutch burns out (Celsius) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float ClutchBurnoutTemp = 400.0f;
+
+	/** Wear accumulation rate during slipping (per second) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float ClutchWearRate = 0.001f;
+
+	/** Extra wear multiplier when overheating */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float ClutchOverheatWearMultiplier = 3.0f;
+
+	/** RPM difference threshold for detecting "money shift" (over-rev) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float MoneyShiftRPMThreshold = 2000.0f;
+
+	/** Hard launch RPM threshold */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float HardLaunchRPMThreshold = 5000.0f;
+
+	/** Clutch slip threshold for detecting slip (0-1) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Clutch")
+	float ClutchSlipDetectionThreshold = 0.1f;
 
 	// ==========================================
 	// EVENTS
@@ -935,6 +1482,22 @@ public:
 	/** Called when a part's wear reaches warning threshold */
 	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
 	FOnPartWearWarning OnPartWearWarning;
+
+	/** Called when clutch starts overheating */
+	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
+	FOnClutchOverheating OnClutchOverheating;
+
+	/** Called when clutch burns out */
+	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
+	FOnClutchBurnout OnClutchBurnout;
+
+	/** Called when a money shift (over-rev downshift) occurs */
+	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
+	FOnMoneyShift OnMoneyShift;
+
+	/** Called when differential lockup changes significantly */
+	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
+	FOnDifferentialLockup OnDifferentialLockup;
 
 protected:
 	// ==========================================
@@ -986,6 +1549,10 @@ protected:
 	UPROPERTY()
 	FMGWheelSurfaceState WheelSurfaceStates[4];
 
+	/** Current clutch wear state */
+	UPROPERTY(BlueprintReadOnly, Category = "Vehicle|Clutch")
+	FMGClutchWearState ClutchWearState;
+
 	// Weight transfer state
 	UPROPERTY()
 	FMGWeightTransfer WeightTransferState;
@@ -1011,6 +1578,32 @@ protected:
 
 	// Last drift direction for direction change detection
 	float LastDriftDirection = 0.0f;
+
+	// ==========================================
+	// DIFFERENTIAL STATE
+	// ==========================================
+
+	/** Rear differential state */
+	UPROPERTY()
+	FMGDifferentialState RearDiffState;
+
+	/** Front differential state (FWD/AWD) */
+	UPROPERTY()
+	FMGDifferentialState FrontDiffState;
+
+	/** Center differential state (AWD) */
+	UPROPERTY()
+	FMGDifferentialState CenterDiffState;
+
+	/** Complete power distribution data for UI */
+	UPROPERTY()
+	FMGPowerDistributionData PowerDistributionData;
+
+	/** Cached wheel angular velocities (rad/s) */
+	float WheelAngularVelocities[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+	/** Last broadcast lock percent (for event hysteresis) */
+	float LastBroadcastLockPercent = 0.0f;
 
 	// Drift chain build timer
 	float DriftChainBuildTimer = 0.0f;
@@ -1075,6 +1668,9 @@ protected:
 	/** Update weight transfer based on acceleration */
 	virtual void UpdateWeightTransfer(float DeltaTime);
 
+	/** Update clutch wear and temperature simulation */
+	virtual void UpdateClutchWear(float DeltaTime);
+
 	/** Update aerodynamic forces */
 	virtual void UpdateAerodynamics(float DeltaTime);
 
@@ -1089,6 +1685,209 @@ protected:
 
 	/** Apply differential behavior based on type */
 	virtual void ApplyDifferentialBehavior(float DeltaTime);
+
+	/**
+	 * @brief Update wheel angular velocities from physics simulation
+	 * @param DeltaTime Frame delta time
+	 */
+	void UpdateWheelAngularVelocities(float DeltaTime);
+
+	/**
+	 * @brief Simulate open differential behavior (no lockup)
+	 *
+	 * Models classic open diff where torque goes to wheel with least
+	 * resistance, causing inside wheel to spin freely in corners.
+	 *
+	 * @param DeltaTime Frame delta time
+	 * @param OutState Differential state to update
+	 * @param LeftWheelIdx Left wheel index
+	 * @param RightWheelIdx Right wheel index
+	 * @param InputTorque Torque input to differential
+	 */
+	void SimulateOpenDifferential(
+		float DeltaTime,
+		FMGDifferentialState& OutState,
+		int32 LeftWheelIdx,
+		int32 RightWheelIdx,
+		float InputTorque);
+
+	/**
+	 * @brief Simulate 1-way LSD behavior (locks under acceleration only)
+	 *
+	 * Popular for drift applications - allows free spin on deceleration
+	 * for easy rotation initiation, locks under power for traction.
+	 *
+	 * @param DeltaTime Frame delta time
+	 * @param OutState Differential state to update
+	 * @param Config LSD configuration parameters
+	 * @param LeftWheelIdx Left wheel index
+	 * @param RightWheelIdx Right wheel index
+	 * @param InputTorque Torque input to differential
+	 * @param bIsAccelerating True if under acceleration
+	 */
+	void Simulate1WayLSD(
+		float DeltaTime,
+		FMGDifferentialState& OutState,
+		const FMGLSDConfiguration& Config,
+		int32 LeftWheelIdx,
+		int32 RightWheelIdx,
+		float InputTorque,
+		bool bIsAccelerating);
+
+	/**
+	 * @brief Simulate 1.5-way LSD behavior (full accel lock, partial decel)
+	 *
+	 * Compromise between 1-way and 2-way - good balance of drift
+	 * initiation and stability under braking.
+	 *
+	 * @param DeltaTime Frame delta time
+	 * @param OutState Differential state to update
+	 * @param Config LSD configuration parameters
+	 * @param LeftWheelIdx Left wheel index
+	 * @param RightWheelIdx Right wheel index
+	 * @param InputTorque Torque input to differential
+	 * @param bIsAccelerating True if under acceleration
+	 */
+	void Simulate1Point5WayLSD(
+		float DeltaTime,
+		FMGDifferentialState& OutState,
+		const FMGLSDConfiguration& Config,
+		int32 LeftWheelIdx,
+		int32 RightWheelIdx,
+		float InputTorque,
+		bool bIsAccelerating);
+
+	/**
+	 * @brief Simulate 2-way LSD behavior (equal lock both directions)
+	 *
+	 * Most aggressive LSD - locks equally under accel and decel.
+	 * Provides maximum stability but can cause push on corner entry.
+	 *
+	 * @param DeltaTime Frame delta time
+	 * @param OutState Differential state to update
+	 * @param Config LSD configuration parameters
+	 * @param LeftWheelIdx Left wheel index
+	 * @param RightWheelIdx Right wheel index
+	 * @param InputTorque Torque input to differential
+	 * @param bIsAccelerating True if under acceleration
+	 */
+	void Simulate2WayLSD(
+		float DeltaTime,
+		FMGDifferentialState& OutState,
+		const FMGLSDConfiguration& Config,
+		int32 LeftWheelIdx,
+		int32 RightWheelIdx,
+		float InputTorque,
+		bool bIsAccelerating);
+
+	/**
+	 * @brief Simulate Torsen differential behavior (torque-sensing)
+	 *
+	 * Gear-type differential that uses worm gears for smooth,
+	 * progressive torque biasing without clutch packs.
+	 *
+	 * @param DeltaTime Frame delta time
+	 * @param OutState Differential state to update
+	 * @param Config LSD configuration parameters
+	 * @param LeftWheelIdx Left wheel index
+	 * @param RightWheelIdx Right wheel index
+	 * @param InputTorque Torque input to differential
+	 */
+	void SimulateTorsenDifferential(
+		float DeltaTime,
+		FMGDifferentialState& OutState,
+		const FMGLSDConfiguration& Config,
+		int32 LeftWheelIdx,
+		int32 RightWheelIdx,
+		float InputTorque);
+
+	/**
+	 * @brief Simulate locked/welded differential behavior
+	 *
+	 * Both wheels always rotate at same speed - maximum traction
+	 * but poor turning behavior and tire scrub.
+	 *
+	 * @param DeltaTime Frame delta time
+	 * @param OutState Differential state to update
+	 * @param LeftWheelIdx Left wheel index
+	 * @param RightWheelIdx Right wheel index
+	 * @param InputTorque Torque input to differential
+	 */
+	void SimulateLockedDifferential(
+		float DeltaTime,
+		FMGDifferentialState& OutState,
+		int32 LeftWheelIdx,
+		int32 RightWheelIdx,
+		float InputTorque);
+
+	/**
+	 * @brief Calculate LSD lockup based on ramp angle and torque
+	 *
+	 * Uses the ramp angle formula: LockForce = InputTorque * tan(RampAngle)
+	 * Lower ramp angles produce more aggressive lockup.
+	 *
+	 * @param InputTorque Input torque to differential
+	 * @param RampAngleDeg Ramp angle in degrees
+	 * @param Preload Preload torque
+	 * @param MaxLock Maximum lock percentage
+	 * @param FrictionCoef Clutch friction coefficient
+	 * @param PlateCount Number of clutch plates
+	 * @return Calculated lock percentage (0-1)
+	 */
+	float CalculateLSDLockup(
+		float InputTorque,
+		float RampAngleDeg,
+		float Preload,
+		float MaxLock,
+		float FrictionCoef,
+		int32 PlateCount) const;
+
+	/**
+	 * @brief Calculate torque distribution based on lock state and slip
+	 *
+	 * @param OutState Differential state (modified)
+	 * @param LeftWheelIdx Left wheel index
+	 * @param RightWheelIdx Right wheel index
+	 * @param InputTorque Total input torque
+	 */
+	void CalculateTorqueDistribution(
+		FMGDifferentialState& OutState,
+		int32 LeftWheelIdx,
+		int32 RightWheelIdx,
+		float InputTorque);
+
+	/**
+	 * @brief Update power distribution visualization data
+	 * @param DeltaTime Frame delta time
+	 */
+	void UpdatePowerDistributionData(float DeltaTime);
+
+	/**
+	 * @brief Apply differential torque effects to wheels
+	 *
+	 * Applies calculated torque split to wheel physics.
+	 *
+	 * @param DeltaTime Frame delta time
+	 * @param DiffState Differential state with torque ratios
+	 * @param LeftWheelIdx Left wheel index
+	 * @param RightWheelIdx Right wheel index
+	 */
+	void ApplyDifferentialTorqueToWheels(
+		float DeltaTime,
+		const FMGDifferentialState& DiffState,
+		int32 LeftWheelIdx,
+		int32 RightWheelIdx);
+
+	/**
+	 * @brief Integrate differential with weight transfer system
+	 *
+	 * Adjusts differential behavior based on current weight distribution.
+	 * More weight on a side increases that wheel's traction and
+	 * affects lockup behavior.
+	 *
+	 * @param DeltaTime Frame delta time
+	 */
+	void IntegrateDifferentialWithWeightTransfer(float DeltaTime);
 
 	/** Calculate speed-dependent steering angle reduction */
 	float CalculateSpeedSteeringFactor() const;

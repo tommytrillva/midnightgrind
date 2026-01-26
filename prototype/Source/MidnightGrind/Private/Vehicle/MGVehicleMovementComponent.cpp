@@ -46,6 +46,7 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	UpdateBrakeSystem(DeltaTime);
 	UpdateSurfaceDetection(DeltaTime); // Surface grip detection with weather integration
 	ApplyDifferentialBehavior(DeltaTime);
+	UpdateClutchWear(DeltaTime); // Clutch wear and temperature simulation
 
 	// Update shift cooldown
 	if (ShiftCooldown > 0.0f)
@@ -1854,4 +1855,133 @@ void UMGVehicleMovementComponent::ApplyPartWearToHandling()
 			PartWearEffects.DrivetrainEfficiency * 100.0f,
 			PartWearEffects.BrakePadEfficiency * 100.0f);
 	}
+}
+
+// ==========================================
+// CLUTCH WEAR SIMULATION
+// ==========================================
+
+void UMGVehicleMovementComponent::UpdateClutchWear(float DeltaTime)
+{
+	// Early out if clutch is already burnt out
+	if (ClutchWearState.bIsBurntOut)
+	{
+		return;
+	}
+
+	// Calculate clutch slip amount
+	// Slip occurs when clutch is partially engaged while there's RPM difference
+	float ClutchSlip = 0.0f;
+	bool bWasSlipping = ClutchWearState.bIsSlipping;
+
+	if (ClutchInput < 1.0f && EngineState.CurrentRPM > 0.0f)
+	{
+		// Calculate expected wheel RPM based on gear and vehicle speed
+		const float SpeedMPS = GetSpeedMPH() * 0.44704f;
+		const float WheelRadius = 0.35f; // meters (typical)
+		const float WheelRPM = (SpeedMPS / WheelRadius) * 60.0f / (2.0f * PI);
+
+		// Get gear ratio (simplified - would normally come from transmission data)
+		float GearRatio = 3.5f; // Default first gear
+		if (CurrentGear > 0 && CurrentGear <= 6)
+		{
+			const float GearRatios[] = { 0.0f, 3.5f, 2.2f, 1.5f, 1.1f, 0.9f, 0.75f };
+			GearRatio = GearRatios[CurrentGear];
+		}
+
+		const float FinalDrive = 3.9f;
+		const float ExpectedEngineRPM = WheelRPM * GearRatio * FinalDrive;
+
+		// Slip is the difference between actual and expected RPM
+		const float RPMDifference = FMath::Abs(EngineState.CurrentRPM - ExpectedEngineRPM);
+		ClutchSlip = (1.0f - ClutchInput) * (RPMDifference / EngineState.CurrentRPM);
+		ClutchSlip = FMath::Clamp(ClutchSlip, 0.0f, 1.0f);
+	}
+
+	// Update slip state
+	ClutchWearState.bIsSlipping = ClutchSlip > ClutchSlipDetectionThreshold;
+
+	if (ClutchWearState.bIsSlipping)
+	{
+		ClutchWearState.CurrentSlipDuration += DeltaTime;
+		ClutchWearState.SessionSlipDamage += ClutchSlip * DeltaTime;
+
+		// Generate heat based on slip amount and engine torque
+		float HeatGenerated = ClutchSlip * ClutchHeatRate * DeltaTime;
+
+		// More heat if engine is producing high torque
+		HeatGenerated *= (1.0f + EngineState.ThrottlePosition * 0.5f);
+
+		// Engine RPM affects heat generation
+		if (EngineState.CurrentRPM > 4000.0f)
+		{
+			HeatGenerated *= (1.0f + (EngineState.CurrentRPM - 4000.0f) / 4000.0f);
+		}
+
+		ClutchWearState.ClutchTemperature += HeatGenerated;
+
+		// Accumulate wear
+		float WearAccumulated = ClutchWearRate * ClutchSlip * DeltaTime;
+
+		// Overheating accelerates wear
+		if (ClutchWearState.ClutchTemperature > ClutchDegradeTemp)
+		{
+			WearAccumulated *= ClutchOverheatWearMultiplier;
+		}
+
+		ClutchWearState.WearLevel = FMath::Min(ClutchWearState.WearLevel + WearAccumulated, 1.0f);
+	}
+	else
+	{
+		ClutchWearState.CurrentSlipDuration = 0.0f;
+
+		// Cool down when not slipping
+		const float CoolAmount = ClutchCoolRate * DeltaTime;
+		ClutchWearState.ClutchTemperature = FMath::Max(ClutchAmbientTemp, ClutchWearState.ClutchTemperature - CoolAmount);
+	}
+
+	// Update overheating state
+	bool bWasOverheating = ClutchWearState.bIsOverheating;
+	ClutchWearState.bIsOverheating = ClutchWearState.ClutchTemperature > ClutchDegradeTemp;
+
+	// Broadcast overheating event
+	if (ClutchWearState.bIsOverheating && !bWasOverheating)
+	{
+		OnClutchOverheating.Broadcast(ClutchWearState.ClutchTemperature, ClutchWearState.WearLevel);
+	}
+
+	// Check for burnout
+	if (ClutchWearState.ClutchTemperature >= ClutchBurnoutTemp || ClutchWearState.WearLevel >= 1.0f)
+	{
+		ClutchWearState.bIsBurntOut = true;
+		OnClutchBurnout.Broadcast();
+	}
+
+	// Update friction coefficient based on temperature and wear
+	ClutchWearState.FrictionCoefficient = 1.0f;
+
+	// Temperature reduces friction
+	if (ClutchWearState.ClutchTemperature > ClutchDegradeTemp)
+	{
+		float HeatFactor = (ClutchWearState.ClutchTemperature - ClutchDegradeTemp) / (ClutchBurnoutTemp - ClutchDegradeTemp);
+		ClutchWearState.FrictionCoefficient *= (1.0f - HeatFactor * 0.4f);
+	}
+
+	// Wear reduces friction
+	ClutchWearState.FrictionCoefficient *= (1.0f - ClutchWearState.WearLevel * 0.3f);
+
+	// Detect hard launches
+	if (CurrentGear == 1 && !bWasSlipping && ClutchWearState.bIsSlipping)
+	{
+		if (EngineState.CurrentRPM > HardLaunchRPMThreshold)
+		{
+			ClutchWearState.HardLaunchCount++;
+
+			// Hard launches cause extra wear
+			ClutchWearState.WearLevel += 0.005f;
+		}
+	}
+
+	// Update clutch engagement efficiency in engine state
+	EngineState.ClutchEngagement = ClutchInput * ClutchWearState.GetTorqueTransferEfficiency();
 }

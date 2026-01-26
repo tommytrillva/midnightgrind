@@ -1,5 +1,17 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehiclePawn.h
+ * @brief Main player-controlled vehicle pawn for the MIDNIGHT GRIND racing game.
+ *
+ * This file contains the core vehicle pawn class that integrates Chaos vehicle physics
+ * with arcade-tuned handling. It provides camera systems, input handling, race state
+ * management, and damage systems.
+ *
+ * @see UMGVehicleMovementComponent
+ * @see FMGVehicleData
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -16,12 +28,21 @@ class UInputAction;
 class UAudioComponent;
 class UNiagaraComponent;
 
+/** @brief Broadcast when the vehicle respawns at a checkpoint. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVehicleRespawn);
+
+/** @brief Broadcast when a lap is completed. @param LapNumber The lap that was just completed (1-indexed). */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLapCompleted, int32, LapNumber);
+
+/** @brief Broadcast when a checkpoint is passed. @param CheckpointIndex Zero-based checkpoint index. @param LapTime Current lap time when checkpoint was passed. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCheckpointPassed, int32, CheckpointIndex, float, LapTime);
 
 /**
- * Camera mode for vehicle
+ * @brief Camera mode enumeration for vehicle view options.
+ *
+ * Defines the available camera perspectives for the player vehicle.
+ * Each mode provides a different viewing experience suited for
+ * various gameplay situations.
  */
 UENUM(BlueprintType)
 enum class EMGCameraMode : uint8
@@ -34,83 +55,151 @@ enum class EMGCameraMode : uint8
 };
 
 /**
- * Runtime vehicle state for HUD and game systems
+ * @brief Runtime vehicle state structure for HUD and game systems.
+ *
+ * Contains all real-time telemetry data for the vehicle, including speed,
+ * engine state, boost/nitrous status, drift information, race progress,
+ * and vehicle health. This data is updated every frame and used by the
+ * HUD subsystem for display.
+ *
+ * @note All values are read-only and computed by the vehicle movement component.
  */
 USTRUCT(BlueprintType)
 struct FMGVehicleRuntimeState
 {
 	GENERATED_BODY()
 
-	// Speed
+	// ==========================================
+	// SPEED
+	// ==========================================
+
+	/** @brief Current speed in miles per hour. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float SpeedMPH = 0.0f;
 
+	/** @brief Current speed in kilometers per hour. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float SpeedKPH = 0.0f;
 
-	// Engine
+	// ==========================================
+	// ENGINE
+	// ==========================================
+
+	/** @brief Current engine RPM. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float RPM = 0.0f;
 
+	/** @brief Engine RPM as percentage of redline (0.0 to 1.0). */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
-	float RPMPercent = 0.0f; // 0-1
+	float RPMPercent = 0.0f;
 
+	/** @brief Current gear (0 = neutral, -1 = reverse, 1+ = forward gears). */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	int32 CurrentGear = 0;
 
+	/** @brief True if the rev limiter is currently active. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	bool bRevLimiter = false;
 
-	// Boost/Nitrous
+	// ==========================================
+	// BOOST/NITROUS
+	// ==========================================
+
+	/** @brief Current turbo boost pressure in PSI. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float BoostPSI = 0.0f;
 
+	/** @brief Remaining nitrous as percentage (0.0 to 100.0). */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float NitrousPercent = 100.0f;
 
+	/** @brief True if nitrous is currently being used. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	bool bNitrousActive = false;
 
-	// Drift
+	// ==========================================
+	// DRIFT
+	// ==========================================
+
+	/** @brief True if the vehicle is currently in a drift state. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	bool bIsDrifting = false;
 
+	/** @brief Current drift angle in degrees. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float DriftAngle = 0.0f;
 
+	/** @brief Accumulated drift score for current drift session. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float DriftScore = 0.0f;
 
-	// Race
+	// ==========================================
+	// RACE
+	// ==========================================
+
+	/** @brief Current lap number (1-indexed). */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	int32 CurrentLap = 0;
 
+	/** @brief Current position in the race (1 = first place). */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	int32 RacePosition = 0;
 
+	/** @brief Current lap elapsed time in seconds. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float CurrentLapTime = 0.0f;
 
+	/** @brief Best lap time achieved this race in seconds. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float BestLapTime = 0.0f;
 
+	/** @brief Total elapsed race time in seconds. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float TotalRaceTime = 0.0f;
 
-	// Vehicle Health
+	// ==========================================
+	// VEHICLE HEALTH
+	// ==========================================
+
+	/** @brief Engine health percentage (0.0 to 100.0). */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float EngineHealth = 100.0f;
 
+	/** @brief Body/chassis health percentage (0.0 to 100.0). */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float BodyHealth = 100.0f;
 
+	/** @brief True if the engine has stalled and needs restart. */
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	bool bEngineStalled = false;
 };
 
 /**
- * Main player-controlled vehicle pawn for MIDNIGHT GRIND
- * Integrates Chaos vehicle physics with arcade-tuned handling
+ * @brief Main player-controlled vehicle pawn for MIDNIGHT GRIND racing game.
+ *
+ * This class serves as the primary vehicle actor that players control during races.
+ * It integrates Unreal Engine's Chaos vehicle physics system with arcade-tuned
+ * handling characteristics to provide responsive and fun gameplay.
+ *
+ * Key features include:
+ * - Multiple camera modes (chase, hood, bumper, interior, cinematic)
+ * - Enhanced Input System integration for controller/keyboard support
+ * - Race state tracking (laps, checkpoints, position)
+ * - Visual and audio feedback systems
+ * - Damage and tire degradation systems
+ *
+ * @note This class is abstract and should be subclassed in Blueprints to
+ *       assign visual assets and configure vehicle-specific parameters.
+ *
+ * Example usage in Blueprint:
+ * @code
+ * // Create a new Blueprint child class of AMGVehiclePawn
+ * // Assign skeletal mesh, audio cues, and VFX
+ * // Configure camera distances and input mappings
+ * @endcode
+ *
+ * @see UMGVehicleMovementComponent For physics and handling configuration
+ * @see FMGVehicleData For vehicle specification data
  */
 UCLASS(Abstract, Blueprintable)
 class MIDNIGHTGRIND_API AMGVehiclePawn : public AWheeledVehiclePawn
@@ -118,6 +207,10 @@ class MIDNIGHTGRIND_API AMGVehiclePawn : public AWheeledVehiclePawn
 	GENERATED_BODY()
 
 public:
+	/**
+	 * @brief Constructs the vehicle pawn with custom movement component.
+	 * @param ObjectInitializer Unreal object initializer for component creation.
+	 */
 	AMGVehiclePawn(const FObjectInitializer& ObjectInitializer);
 
 	//~ Begin AActor Interface
@@ -168,19 +261,46 @@ public:
 	// VEHICLE CONFIGURATION
 	// ==========================================
 
-	/** Get the MG vehicle movement component */
+	/**
+	 * @brief Get the MIDNIGHT GRIND vehicle movement component.
+	 *
+	 * Provides access to the custom movement component that handles
+	 * vehicle physics, drift mechanics, and turbo simulation.
+	 *
+	 * @return Pointer to the UMGVehicleMovementComponent, or nullptr if not found.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle")
 	UMGVehicleMovementComponent* GetMGVehicleMovement() const;
 
-	/** Load and apply a vehicle configuration */
+	/**
+	 * @brief Load and apply a complete vehicle configuration.
+	 *
+	 * Applies all vehicle data including engine specs, drivetrain settings,
+	 * suspension tuning, and cosmetic configuration to this vehicle instance.
+	 *
+	 * @param Configuration The vehicle data structure containing all specs.
+	 *
+	 * @note This should typically be called once during initialization or
+	 *       when switching to a different vehicle build.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Configuration")
 	void LoadVehicleConfiguration(const FMGVehicleData& Configuration);
 
-	/** Get current vehicle configuration */
+	/**
+	 * @brief Get the current vehicle configuration data.
+	 * @return Const reference to the active vehicle configuration.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Configuration")
 	const FMGVehicleData& GetVehicleConfiguration() const { return VehicleConfiguration; }
 
-	/** Get current runtime state (for HUD) */
+	/**
+	 * @brief Get the current runtime state for HUD display.
+	 *
+	 * Returns a copy of the current vehicle telemetry including speed,
+	 * RPM, gear, boost, drift state, and race progress.
+	 *
+	 * @return Copy of the current runtime state structure.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	FMGVehicleRuntimeState GetRuntimeState() const { return RuntimeState; }
 
@@ -188,19 +308,43 @@ public:
 	// CAMERA
 	// ==========================================
 
-	/** Switch camera mode */
+	/**
+	 * @brief Switch to a specific camera mode.
+	 *
+	 * Transitions the camera to the specified view mode with smooth
+	 * interpolation. Different modes are suited for different gameplay situations.
+	 *
+	 * @param NewMode The camera mode to switch to.
+	 *
+	 * @see EMGCameraMode for available camera modes.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Camera")
 	void SetCameraMode(EMGCameraMode NewMode);
 
-	/** Get current camera mode */
+	/**
+	 * @brief Get the current camera mode.
+	 * @return The currently active camera mode.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Camera")
 	EMGCameraMode GetCameraMode() const { return CurrentCameraMode; }
 
-	/** Cycle to next camera mode */
+	/**
+	 * @brief Cycle to the next camera mode in sequence.
+	 *
+	 * Cycles through camera modes in order: Chase -> Hood -> Bumper ->
+	 * Interior -> Cinematic -> Chase. Called when player presses camera button.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Camera")
 	void CycleCamera();
 
-	/** Look behind */
+	/**
+	 * @brief Enable or disable the look-behind view.
+	 *
+	 * Temporarily rotates the camera 180 degrees to view behind the vehicle.
+	 * Used for checking opponent positions or reversing.
+	 *
+	 * @param bLookBehind True to look behind, false to return to forward view.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Camera")
 	void SetLookBehind(bool bLookBehind);
 
@@ -208,23 +352,52 @@ public:
 	// RACE STATE
 	// ==========================================
 
-	/** Set current lap */
+	/**
+	 * @brief Set the current lap number.
+	 *
+	 * Called by the race manager when the vehicle crosses the start/finish line.
+	 *
+	 * @param Lap The new lap number (1-indexed).
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Race")
 	void SetCurrentLap(int32 Lap);
 
-	/** Set race position */
+	/**
+	 * @brief Set the current race position.
+	 *
+	 * Called by the race manager to update this vehicle's position in the race.
+	 *
+	 * @param Position The current position (1 = first place).
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Race")
 	void SetRacePosition(int32 Position);
 
-	/** Record checkpoint pass */
+	/**
+	 * @brief Record passing through a checkpoint.
+	 *
+	 * Updates the last checkpoint transform for respawn purposes and
+	 * records split times. Broadcasts the OnCheckpointPassed event.
+	 *
+	 * @param CheckpointIndex Zero-based index of the checkpoint passed.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Race")
 	void RecordCheckpoint(int32 CheckpointIndex);
 
-	/** Reset lap timer */
+	/**
+	 * @brief Reset the lap timer to zero.
+	 *
+	 * Called at the start of each new lap to begin timing fresh.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Race")
 	void ResetLapTimer();
 
-	/** Respawn vehicle at last checkpoint */
+	/**
+	 * @brief Respawn the vehicle at the last passed checkpoint.
+	 *
+	 * Teleports the vehicle to the last recorded checkpoint transform,
+	 * resets velocity, and broadcasts the OnVehicleRespawn event.
+	 * Used when the vehicle is stuck or flipped.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Race")
 	void RespawnAtCheckpoint();
 
@@ -232,15 +405,30 @@ public:
 	// DAMAGE
 	// ==========================================
 
-	/** Apply tire damage (from spike strips, etc.) */
+	/**
+	 * @brief Apply damage to the vehicle's tires.
+	 *
+	 * Reduces tire health which affects grip and maximum speed.
+	 * Used by hazards like spike strips, curb impacts, and collisions.
+	 *
+	 * @param DamageAmount Amount of damage to apply (subtracted from health).
+	 *
+	 * @note Tire health is clamped to 0-100 range.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Vehicle|Damage")
 	void ApplyTireDamage(float DamageAmount);
 
-	/** Get current tire health (0-100) */
+	/**
+	 * @brief Get the current tire health percentage.
+	 * @return Tire health value (0.0 = destroyed, 100.0 = perfect condition).
+	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
 	float GetTireHealth() const { return TireHealth; }
 
-	/** Check if tires are flat */
+	/**
+	 * @brief Check if the tires are completely flat/destroyed.
+	 * @return True if tire health is zero or below, false otherwise.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
 	bool AreTiresFlat() const { return TireHealth <= 0.0f; }
 
@@ -248,45 +436,59 @@ public:
 	// INPUT CONFIGURATION
 	// ==========================================
 
-	/** Input mapping context */
+	/** @brief Enhanced Input mapping context for vehicle controls. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> VehicleMappingContext;
 
-	/** Input priority */
+	/** @brief Priority level for input mapping context (higher = takes precedence). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	int32 InputPriority = 0;
 
-	// Input Actions
+	// ==========================================
+	// INPUT ACTIONS
+	// ==========================================
+
+	/** @brief Throttle/accelerate input action (analog 0-1). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> ThrottleAction;
 
+	/** @brief Brake input action (analog 0-1). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> BrakeAction;
 
+	/** @brief Steering input action (analog -1 to 1). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> SteeringAction;
 
+	/** @brief Handbrake/e-brake input action (digital). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> HandbrakeAction;
 
+	/** @brief Nitrous activation input action (digital). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> NitrousAction;
 
+	/** @brief Manual upshift input action (digital). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> ShiftUpAction;
 
+	/** @brief Manual downshift input action (digital). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> ShiftDownAction;
 
+	/** @brief Camera view cycle input action (digital). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> CameraCycleAction;
 
+	/** @brief Look behind (rear view) input action (digital hold). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> LookBehindAction;
 
+	/** @brief Vehicle reset/respawn input action (digital). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> ResetVehicleAction;
 
+	/** @brief Pause menu input action (digital). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input|Actions")
 	TObjectPtr<UInputAction> PauseAction;
 
@@ -294,39 +496,43 @@ public:
 	// CAMERA SETTINGS
 	// ==========================================
 
-	/** Chase camera distance */
+	/** @brief Distance from vehicle to chase camera in Unreal units. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Chase")
 	float ChaseCameraDistance = 600.0f;
 
-	/** Chase camera height */
+	/** @brief Vertical offset for chase camera above vehicle. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Chase")
 	float ChaseCameraHeight = 200.0f;
 
-	/** Camera lag speed */
+	/** @brief Speed at which camera position follows vehicle movement. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Chase")
 	float CameraLagSpeed = 10.0f;
 
-	/** Camera rotation lag speed */
+	/** @brief Speed at which camera rotation follows vehicle rotation. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Chase")
 	float CameraRotationLagSpeed = 10.0f;
 
-	/** Speed-based FOV increase */
+	/**
+	 * @brief Multiplier for speed-based FOV increase.
+	 *
+	 * Higher values create more dramatic speed sensation at high velocities.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Chase")
 	float SpeedFOVMultiplier = 0.1f;
 
-	/** Base FOV */
+	/** @brief Base field of view angle in degrees when stationary. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Chase")
 	float BaseFOV = 90.0f;
 
-	/** Max FOV at high speed */
+	/** @brief Maximum field of view angle at top speed. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Chase")
 	float MaxFOV = 110.0f;
 
-	/** Camera shake when drifting */
+	/** @brief Camera shake intensity multiplier when drifting (0-1). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Effects")
 	float DriftCameraShakeIntensity = 0.5f;
 
-	/** Camera shake on nitrous */
+	/** @brief Camera shake intensity multiplier when nitrous is active (0-1). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Effects")
 	float NitrousCameraShakeIntensity = 1.0f;
 
@@ -334,15 +540,30 @@ public:
 	// EVENTS
 	// ==========================================
 
-	/** Called when vehicle respawns */
+	/**
+	 * @brief Event broadcast when the vehicle respawns at a checkpoint.
+	 *
+	 * Subscribe to this event in Blueprint to trigger respawn effects,
+	 * reset UI elements, or notify game systems.
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
 	FOnVehicleRespawn OnVehicleRespawn;
 
-	/** Called when lap is completed */
+	/**
+	 * @brief Event broadcast when a lap is completed.
+	 *
+	 * Subscribe to this event to update lap counters, trigger celebrations,
+	 * or determine race completion.
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
 	FOnLapCompleted OnLapCompleted;
 
-	/** Called when checkpoint is passed */
+	/**
+	 * @brief Event broadcast when a checkpoint is passed.
+	 *
+	 * Provides checkpoint index and current lap time for split time displays
+	 * and race progress tracking.
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
 	FOnCheckpointPassed OnCheckpointPassed;
 
@@ -351,57 +572,152 @@ protected:
 	// INPUT HANDLERS
 	// ==========================================
 
-	/** Handle throttle input */
+	/**
+	 * @brief Handle throttle input pressed/held.
+	 * @param Value Input action value containing analog throttle amount.
+	 */
 	void HandleThrottle(const FInputActionValue& Value);
+
+	/**
+	 * @brief Handle throttle input released.
+	 * @param Value Input action value (typically zero).
+	 */
 	void HandleThrottleReleased(const FInputActionValue& Value);
 
-	/** Handle brake input */
+	/**
+	 * @brief Handle brake input pressed/held.
+	 * @param Value Input action value containing analog brake amount.
+	 */
 	void HandleBrake(const FInputActionValue& Value);
+
+	/**
+	 * @brief Handle brake input released.
+	 * @param Value Input action value (typically zero).
+	 */
 	void HandleBrakeReleased(const FInputActionValue& Value);
 
-	/** Handle steering input */
+	/**
+	 * @brief Handle steering input.
+	 * @param Value Input action value containing steering axis (-1 to 1).
+	 */
 	void HandleSteering(const FInputActionValue& Value);
 
-	/** Handle handbrake */
+	/**
+	 * @brief Handle handbrake input engaged.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleHandbrake(const FInputActionValue& Value);
+
+	/**
+	 * @brief Handle handbrake input released.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleHandbrakeReleased(const FInputActionValue& Value);
 
-	/** Handle nitrous */
+	/**
+	 * @brief Handle nitrous activation.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleNitrous(const FInputActionValue& Value);
+
+	/**
+	 * @brief Handle nitrous deactivation.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleNitrousReleased(const FInputActionValue& Value);
 
-	/** Handle gear shifts */
+	/**
+	 * @brief Handle manual upshift request.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleShiftUp(const FInputActionValue& Value);
+
+	/**
+	 * @brief Handle manual downshift request.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleShiftDown(const FInputActionValue& Value);
 
-	/** Handle camera */
+	/**
+	 * @brief Handle camera mode cycle request.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleCameraCycle(const FInputActionValue& Value);
+
+	/**
+	 * @brief Handle look-behind activation.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleLookBehind(const FInputActionValue& Value);
+
+	/**
+	 * @brief Handle look-behind deactivation.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleLookBehindReleased(const FInputActionValue& Value);
 
-	/** Handle reset */
+	/**
+	 * @brief Handle vehicle reset/respawn request.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandleResetVehicle(const FInputActionValue& Value);
 
-	/** Handle pause */
+	/**
+	 * @brief Handle pause menu request.
+	 * @param Value Input action value (digital trigger).
+	 */
 	void HandlePause(const FInputActionValue& Value);
 
 	// ==========================================
 	// UPDATE METHODS
 	// ==========================================
 
-	/** Update runtime state from movement component */
+	/**
+	 * @brief Update runtime state from the movement component.
+	 *
+	 * Pulls current speed, RPM, gear, boost, and drift data from
+	 * the movement component and populates the RuntimeState structure.
+	 *
+	 * @param DeltaTime Frame delta time in seconds.
+	 */
 	virtual void UpdateRuntimeState(float DeltaTime);
 
-	/** Update camera based on speed and state */
+	/**
+	 * @brief Update camera position, rotation, and FOV.
+	 *
+	 * Handles speed-based FOV scaling, drift camera effects,
+	 * and smooth interpolation between camera modes.
+	 *
+	 * @param DeltaTime Frame delta time in seconds.
+	 */
 	virtual void UpdateCamera(float DeltaTime);
 
-	/** Update audio based on engine state */
+	/**
+	 * @brief Update engine audio based on current state.
+	 *
+	 * Modulates engine audio pitch and volume based on RPM,
+	 * throttle position, and special states (nitrous, rev limiter).
+	 *
+	 * @param DeltaTime Frame delta time in seconds.
+	 */
 	virtual void UpdateAudio(float DeltaTime);
 
-	/** Update VFX based on vehicle state */
+	/**
+	 * @brief Update visual effects based on vehicle state.
+	 *
+	 * Controls exhaust flames, tire smoke, nitrous flame effects,
+	 * and other Niagara particle systems.
+	 *
+	 * @param DeltaTime Frame delta time in seconds.
+	 */
 	virtual void UpdateVFX(float DeltaTime);
 
-	/** Update HUD subsystem with vehicle telemetry */
+	/**
+	 * @brief Send current vehicle telemetry to the HUD subsystem.
+	 *
+	 * Pushes the RuntimeState data to the HUD for display of
+	 * speed, RPM, gear, boost, and race information.
+	 */
 	void UpdateHUDTelemetry();
 
 	// ==========================================

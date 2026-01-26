@@ -426,6 +426,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRevengeAvailable, const FString&
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRevengeTakedown, const FString&, TargetId, int32, BonusPoints);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCrashCameraStarted, EMGCrashCameraMode, Mode, float, Duration);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCrashCameraEnded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAftertouchApplied, const FString&, VehicleId, FVector, Direction, float, Force);
 
 /**
  * Takedown Subsystem
@@ -470,6 +471,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Takedown|Events")
 	FOnCrashCameraEnded OnCrashCameraEnded;
+
+	/** Called when aftertouch force is applied during crash camera */
+	UPROPERTY(BlueprintAssignable, Category = "Takedown|Events")
+	FOnAftertouchApplied OnAftertouchApplied;
 
 	// Collision Processing
 	UFUNCTION(BlueprintCallable, Category = "Takedown|Collision")

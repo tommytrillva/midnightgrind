@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Vehicle/MGVehicleData.h"
 #include "MGVehicleDatabase.h"
 #include "MGPartsCatalog.generated.h"
 
@@ -89,20 +90,8 @@ enum class EMGPartCategory : uint8
 	Weight_StripInterior UMETA(DisplayName = "Interior Strip")
 };
 
-/**
- * Part quality/tier
- */
-UENUM(BlueprintType)
-enum class EMGPartTier : uint8
-{
-	Stock UMETA(DisplayName = "Stock"),
-	Street UMETA(DisplayName = "Street"),
-	Sport UMETA(DisplayName = "Sport"),
-	Race UMETA(DisplayName = "Race"),
-	Pro UMETA(DisplayName = "Pro"),
-	Elite UMETA(DisplayName = "Elite"),
-	Ultimate UMETA(DisplayName = "Ultimate")
-};
+// NOTE: EMGPartTier is defined in Vehicle/MGVehicleData.h
+// Values: Stock, Street, Sport, Race, Pro, Legendary
 
 /**
  * Part brand

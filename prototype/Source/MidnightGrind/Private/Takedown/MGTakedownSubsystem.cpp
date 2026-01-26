@@ -783,7 +783,25 @@ void UMGTakedownSubsystem::ApplyAftertouch(FVector Direction)
 		return;
 	}
 
-	// TODO: Apply force to crashed vehicle in specified direction
+	// Normalize direction and apply configured force
+	Direction.Normalize();
+	const float Force = CrashCameraConfig.AftertouchForce;
+
+	// Apply aftertouch to the victim vehicle from the current crash event
+	// The actual force application is handled by listeners (e.g., vehicle controller)
+	// which can look up the vehicle by ID and apply physics impulse
+
+	if (!CurrentCrashEvent.VictimId.IsEmpty())
+	{
+		// Broadcast event for vehicle controllers to handle
+		OnAftertouchApplied.Broadcast(CurrentCrashEvent.VictimId, Direction, Force);
+
+		// Log for debugging
+		UE_LOG(LogTemp, Verbose, TEXT("Aftertouch applied to %s: Direction=(%.2f, %.2f, %.2f), Force=%.0f"),
+			*CurrentCrashEvent.VictimId,
+			Direction.X, Direction.Y, Direction.Z,
+			Force);
+	}
 }
 
 void UMGTakedownSubsystem::StartSession()

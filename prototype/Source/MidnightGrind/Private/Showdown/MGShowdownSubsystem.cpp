@@ -1,8 +1,11 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Showdown/MGShowdownSubsystem.h"
+#include "Career/MGCareerSubsystem.h"
 #include "Engine/World.h"
+#include "Engine/GameInstance.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGShowdownSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -1000,8 +1003,97 @@ bool UMGShowdownSubsystem::CheckShowdownRequirements(const FString& PlayerId, co
 		}
 	}
 
-	// TODO: Check level requirements
-	// TODO: Check story progress requirements
+	// Check level requirements via Career subsystem
+	if (Showdown.RequiredLevel > 1)
+	{
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+		{
+			if (UMGCareerSubsystem* CareerSubsystem = GI->GetSubsystem<UMGCareerSubsystem>())
+			{
+				// Map career chapter to level (1-5 chapters = levels 1-50 in increments)
+				// Newcomer=1-10, Rising=11-20, Contender=21-30, Champion=31-40, Legend=41-50
+				const EMGCareerChapter CurrentChapter = CareerSubsystem->GetCurrentChapter();
+				const float ChapterProgress = CareerSubsystem->GetChapterProgressPercent();
+
+				int32 PlayerLevel = 1;
+				switch (CurrentChapter)
+				{
+					case EMGCareerChapter::Newcomer:
+						PlayerLevel = 1 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+					case EMGCareerChapter::Rising:
+						PlayerLevel = 11 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+					case EMGCareerChapter::Contender:
+						PlayerLevel = 21 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+					case EMGCareerChapter::Champion:
+						PlayerLevel = 31 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+					case EMGCareerChapter::Legend:
+						PlayerLevel = 41 + FMath::FloorToInt(ChapterProgress * 0.1f);
+						break;
+				}
+
+				if (PlayerLevel < Showdown.RequiredLevel)
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	// Check story progress requirements
+	if (!Showdown.RequiredStoryProgress.IsEmpty())
+	{
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+		{
+			if (UMGCareerSubsystem* CareerSubsystem = GI->GetSubsystem<UMGCareerSubsystem>())
+			{
+				// Check if the required story milestone/objective has been completed
+				// RequiredStoryProgress could be a milestone name like "DefeatedRival"
+				// or a specific objective ID
+
+				// Check milestones first
+				if (Showdown.RequiredStoryProgress.StartsWith(TEXT("MILESTONE_")))
+				{
+					FString MilestoneName = Showdown.RequiredStoryProgress.RightChop(10);
+
+					// Map string to milestone enum
+					EMGCareerMilestone RequiredMilestone = EMGCareerMilestone::FirstRace;
+					if (MilestoneName == TEXT("FirstWin")) RequiredMilestone = EMGCareerMilestone::FirstWin;
+					else if (MilestoneName == TEXT("FirstPodium")) RequiredMilestone = EMGCareerMilestone::FirstPodium;
+					else if (MilestoneName == TEXT("JoinedCrew")) RequiredMilestone = EMGCareerMilestone::JoinedCrew;
+					else if (MilestoneName == TEXT("DefeatedRival")) RequiredMilestone = EMGCareerMilestone::DefeatedRival;
+					else if (MilestoneName == TEXT("WonTournament")) RequiredMilestone = EMGCareerMilestone::WonTournament;
+					else if (MilestoneName == TEXT("ReachedContender")) RequiredMilestone = EMGCareerMilestone::ReachedContender;
+					else if (MilestoneName == TEXT("BecameChampion")) RequiredMilestone = EMGCareerMilestone::BecameChampion;
+					else if (MilestoneName == TEXT("EarnedLegendStatus")) RequiredMilestone = EMGCareerMilestone::EarnedLegendStatus;
+
+					if (!CareerSubsystem->HasCompletedMilestone(RequiredMilestone))
+					{
+						return false;
+					}
+				}
+				else if (Showdown.RequiredStoryProgress.StartsWith(TEXT("CHAPTER_")))
+				{
+					// Check chapter requirement
+					FString ChapterName = Showdown.RequiredStoryProgress.RightChop(8);
+					EMGCareerChapter RequiredChapter = EMGCareerChapter::Newcomer;
+
+					if (ChapterName == TEXT("Rising")) RequiredChapter = EMGCareerChapter::Rising;
+					else if (ChapterName == TEXT("Contender")) RequiredChapter = EMGCareerChapter::Contender;
+					else if (ChapterName == TEXT("Champion")) RequiredChapter = EMGCareerChapter::Champion;
+					else if (ChapterName == TEXT("Legend")) RequiredChapter = EMGCareerChapter::Legend;
+
+					if (static_cast<int32>(CareerSubsystem->GetCurrentChapter()) < static_cast<int32>(RequiredChapter))
+					{
+						return false;
+					}
+				}
+			}
+		}
+	}
 
 	return true;
 }
