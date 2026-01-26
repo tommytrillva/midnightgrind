@@ -1,0 +1,257 @@
+{
+  "VehicleID": "STALLION_GT",
+  "DisplayName": "Stallion GT",
+  "Manufacturer": "American Motors",
+  "Year": 2008,
+  "Country": "USA",
+  "Class": "C",
+  "Category": "Muscle",
+  "Description": "The Stallion GT is pure American muscle. That 4.6L V8 rumbles like thunder and puts down 300 horsepower to the rear wheels. It's not subtle, it's not sophisticated, but when you plant the throttle and feel that raw torque shove you back in the seat, none of that matters. Perfect for those who believe there's no replacement for displacement.",
+
+  "BaseStats": {
+    "Power": 300,
+    "PowerUnit": "HP",
+    "Torque": 320,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3500,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 54,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 4600,
+    "DisplacementUnit": "cc",
+    "Cylinders": 8,
+    "Configuration": "V",
+    "Redline": 6500,
+    "IdleRPM": 650,
+    "TopSpeed": 155,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 5.1,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 520,
+    "Class": "C",
+    "MaxPotential": 800
+  },
+
+  "Engine": {
+    "Code": "46_3V",
+    "Type": "V8 SOHC 3-Valve",
+    "Block": {
+      "Material": "Cast Iron",
+      "BoostLimit": 12,
+      "MaxPowerPotential": 550
+    },
+    "Head": {
+      "Type": "SOHC",
+      "ValvesPerCylinder": 3,
+      "TotalValves": 24
+    },
+    "Turbo": null,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 50, "Torque": 200 },
+      { "RPM": 1500, "HP": 85, "Torque": 260 },
+      { "RPM": 2000, "HP": 120, "Torque": 295 },
+      { "RPM": 2500, "HP": 155, "Torque": 315 },
+      { "RPM": 3000, "HP": 190, "Torque": 320 },
+      { "RPM": 3500, "HP": 225, "Torque": 318 },
+      { "RPM": 4000, "HP": 255, "Torque": 310 },
+      { "RPM": 4500, "HP": 280, "Torque": 298 },
+      { "RPM": 5000, "HP": 295, "Torque": 282 },
+      { "RPM": 5500, "HP": 300, "Torque": 265 },
+      { "RPM": 6000, "HP": 298, "Torque": 245 },
+      { "RPM": 6500, "HP": 285, "Torque": 220 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 5,
+    "GearRatios": [3.38, 2.00, 1.32, 1.00, 0.68],
+    "FinalDrive": 3.55,
+    "ReverseRatio": 3.99
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "SolidAxle",
+    "FrontSpringRate": 400,
+    "RearSpringRate": 360,
+    "FrontDamping": 0.50,
+    "RearDamping": 0.48,
+    "FrontAntiRollBar": 28,
+    "RearAntiRollBar": 22,
+    "RideHeight": 5.5,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 320,
+    "RearDiameter": 300,
+    "DiameterUnit": "mm",
+    "BrakeBias": 60,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 235,
+    "FrontAspectRatio": 55,
+    "FrontDiameter": 17,
+    "RearWidth": 255,
+    "RearAspectRatio": 50,
+    "RearDiameter": 17,
+    "Compound": "Street",
+    "GripMultiplier": 0.92
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.36,
+    "FrontalArea": 2.3,
+    "DownforceMultiplier": 0.75,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4775,
+    "Width": 1877,
+    "Height": 1415,
+    "Wheelbase": 2720,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#C41E3A",
+      "Secondary": "#1C1C1C",
+      "Accent": "#FFFFFF"
+    },
+    "AvailableColors": [
+      { "Name": "Torch Red", "Hex": "#C41E3A" },
+      { "Name": "Black", "Hex": "#0A0A0A" },
+      { "Name": "Grabber Blue", "Hex": "#00529B" },
+      { "Name": "Performance White", "Hex": "#F8F8F8" },
+      { "Name": "Vista Blue", "Hex": "#4682B4" },
+      { "Name": "Tungsten Grey", "Hex": "#4A4A4A" },
+      { "Name": "Grabber Orange", "Hex": "#FF6600" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V8_NA_American",
+    "ExhaustProfile": "Muscle_Deep",
+    "TurboWhine": false,
+    "BlowoffValve": false,
+    "BackfireOnShift": true,
+    "CamLope": true,
+    "ColdStartBurble": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 16.0,
+    "TurnRadius": 5.7,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.35,
+    "OversteerTendency": 0.55,
+    "DriftCapability": 0.75,
+    "StabilityControl": true,
+    "TractionControl": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 80,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 8,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 28000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "C",
+    "MaintenanceCostMultiplier": 0.85,
+    "PartsPriceMultiplier": 0.75,
+    "StreetValue": 32000,
+    "LegendaryValue": 75000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "ROOKIE",
+    "RequiredLevel": 8,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Cold Air", "Ram Air"],
+      "Exhaust": ["Stock", "Cat-Back", "Longtube Headers", "X-Pipe"],
+      "Supercharger": ["None", "Centrifugal", "Twin-Screw", "Roots"],
+      "Camshafts": ["Stock", "Stage1", "Stage2", "Drag"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Stage3"],
+      "FuelSystem": ["Stock", "HighFlow", "E85"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Multi-Disc"],
+      "Transmission": ["Stock", "ShortThrow", "TR6060"],
+      "FinalDrive": ["Stock", "3.73", "4.10"],
+      "LSD": ["Stock", "TrueTrac", "Solid"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Drag"],
+      "Dampers": ["Stock", "Adjustable", "Racing"],
+      "Swaybars": ["Stock", "Sport", "Track"],
+      "Bushings": ["Stock", "Poly", "Solid"],
+      "Subframe": ["Stock", "Braced", "Tubular"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track"],
+      "Rotors": ["Stock", "Slotted", "Drilled", "2-Piece"],
+      "Lines": ["Stock", "Braided"],
+      "Calipers": ["Stock", "Brembo", "6Piston"]
+    },
+    "Wheels": {
+      "Size": [17, 18, 19, 20],
+      "Width": [8.0, 9.0, 9.5, 10.0, 10.5]
+    },
+    "Tires": {
+      "Compound": ["Street", "Sport", "Semi-Slick", "Drag"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Chin Splitter", "GT500 Style"],
+      "RearBumper": ["Stock", "Diffuser"],
+      "Spoiler": ["Stock", "Pedestal", "GT Wing", "Cobra Wing"],
+      "Hood": ["Stock", "Ram Air", "Carbon", "Cowl"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Fender Flares", "Wide"],
+      "Mirrors": ["Stock", "GT500"],
+      "Lights": ["Stock", "HID", "Sequential"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 550,
+    "MaxTorque": 520,
+    "MinWeight": 3200,
+    "MaxTopSpeed": 185,
+    "MaxPI": 800
+  },
+
+  "Tags": ["American", "RWD", "Muscle", "V8", "Pony", "Affordable", "Torque"],
+
+  "Lore": {
+    "Backstory": "The Stallion GT represents everything the American muscle car stands for - accessible performance for the everyday driver. Born from a lineage of affordable power, the modern Stallion puts supercar-shaming straight-line speed within reach of working enthusiasts. The solid rear axle might seem old school, but it's predictable when you're lighting up the tires. The aftermarket support is legendary - you can build a 600hp monster in your garage with hand tools. From Friday night cruises to Saturday morning meets, the Stallion is the people's champion.",
+    "FamousOwners": ["Drag Strip Regular", "Burnout King"],
+    "RivalVehicles": ["Camaro SS", "Challenger R/T", "GTO"]
+  }
+}

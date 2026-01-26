@@ -31,7 +31,7 @@
         "Class": "D",
         "Category": "JDM",
         "Inspiration": "EK9 Civic Type R",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P1 - Starter Car",
         "Notes": "Entry level, affordable, fun to drive"
       },
@@ -41,7 +41,7 @@
         "Class": "C",
         "Category": "JDM",
         "Inspiration": "S14 240SX",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P1 - Drift Platform",
         "Notes": "The dedicated drift car, FR layout"
       },
@@ -51,7 +51,7 @@
         "Class": "C",
         "Category": "Muscle",
         "Inspiration": "S197 Mustang GT",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P1 - American Entry",
         "Notes": "V8 power, affordable muscle"
       },
@@ -61,7 +61,7 @@
         "Class": "D",
         "Category": "Economy",
         "Inspiration": "90s Economy Car",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P1 - Tutorial Car",
         "Notes": "The car you start with, can be surprisingly quick when built"
       }

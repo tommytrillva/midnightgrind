@@ -1,0 +1,261 @@
+{
+  "VehicleID": "BEATER_SEDAN",
+  "DisplayName": "Beater Sedan",
+  "Manufacturer": "Generic Motors",
+  "Year": 1994,
+  "Country": "Japan",
+  "Class": "D",
+  "Category": "Economy",
+  "Description": "Everyone starts somewhere. This tired 90s economy sedan has seen better days - the paint is faded, the interior smells like old memories, and that check engine light has been on for three owners. But under the hood beats the heart of a legend waiting to be built. With the right parts and enough determination, this humble beater has taken down cars worth ten times its value. Respect the sleeper.",
+
+  "BaseStats": {
+    "Power": 92,
+    "PowerUnit": "HP",
+    "Torque": 97,
+    "TorqueUnit": "lb-ft",
+    "Weight": 2200,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 60,
+    "Drivetrain": "FWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 1500,
+    "DisplacementUnit": "cc",
+    "Cylinders": 4,
+    "Configuration": "Inline",
+    "Redline": 6500,
+    "IdleRPM": 750,
+    "TopSpeed": 108,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 10.5,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 280,
+    "Class": "D",
+    "MaxPotential": 650
+  },
+
+  "Engine": {
+    "Code": "D15B",
+    "Type": "Inline-4 SOHC",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 15,
+      "MaxPowerPotential": 380
+    },
+    "Head": {
+      "Type": "SOHC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 16
+    },
+    "Turbo": null,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 18, "Torque": 55 },
+      { "RPM": 2000, "HP": 35, "Torque": 75 },
+      { "RPM": 3000, "HP": 52, "Torque": 88 },
+      { "RPM": 4000, "HP": 68, "Torque": 95 },
+      { "RPM": 4500, "HP": 78, "Torque": 97 },
+      { "RPM": 5000, "HP": 85, "Torque": 95 },
+      { "RPM": 5500, "HP": 90, "Torque": 92 },
+      { "RPM": 6000, "HP": 92, "Torque": 88 },
+      { "RPM": 6500, "HP": 88, "Torque": 82 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 5,
+    "GearRatios": [3.25, 1.90, 1.25, 0.91, 0.74],
+    "FinalDrive": 4.06,
+    "ReverseRatio": 3.15
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "TorsionBeam",
+    "FrontSpringRate": 200,
+    "RearSpringRate": 180,
+    "FrontDamping": 0.45,
+    "RearDamping": 0.42,
+    "FrontAntiRollBar": 18,
+    "RearAntiRollBar": 0,
+    "RideHeight": 5.8,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Drum",
+    "FrontDiameter": 240,
+    "RearDiameter": 180,
+    "DiameterUnit": "mm",
+    "BrakeBias": 70,
+    "ABSEquipped": false
+  },
+
+  "Tires": {
+    "FrontWidth": 175,
+    "FrontAspectRatio": 70,
+    "FrontDiameter": 13,
+    "RearWidth": 175,
+    "RearAspectRatio": 70,
+    "RearDiameter": 13,
+    "Compound": "Economy",
+    "GripMultiplier": 0.75
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.34,
+    "FrontalArea": 1.85,
+    "DownforceMultiplier": 0.65,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4380,
+    "Width": 1695,
+    "Height": 1395,
+    "Wheelbase": 2620,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Sedan",
+    "Doors": 4,
+    "DefaultColor": {
+      "Primary": "#8B8B83",
+      "Secondary": "#5C5C5C",
+      "Accent": "#B8860B"
+    },
+    "AvailableColors": [
+      { "Name": "Faded Silver", "Hex": "#8B8B83" },
+      { "Name": "Primer Grey", "Hex": "#5C5C5C" },
+      { "Name": "Oxidized Green", "Hex": "#556B2F" },
+      { "Name": "Rust Red", "Hex": "#8B4513" },
+      { "Name": "Beige Boring", "Hex": "#C4B7A6" },
+      { "Name": "White (Yellowed)", "Hex": "#E8E4D0" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineFour_Econobox",
+    "ExhaustProfile": "Stock_Raspy",
+    "TurboWhine": false,
+    "BlowoffValve": false,
+    "BackfireOnShift": false,
+    "RattleOnIdle": true,
+    "ExhaustLeak": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 18.0,
+    "TurnRadius": 5.0,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.55,
+    "OversteerTendency": 0.15,
+    "DriftCapability": 0.25,
+    "StabilityControl": false,
+    "TractionControl": false
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 40,
+    "PowerBoostUnit": "HP",
+    "Duration": 5.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 15,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 2500,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "D",
+    "MaintenanceCostMultiplier": 0.5,
+    "PartsPriceMultiplier": 0.4,
+    "StreetValue": 3000,
+    "LegendaryValue": 25000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "UNKNOWN",
+    "RequiredLevel": 1,
+    "SpecialConditions": ["Tutorial Car - Given Free"]
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "EngineSwap": ["Stock D15B", "B18C VTEC", "K20A", "Turbo D16"],
+      "Intake": ["Stock", "Cold Air", "Short Ram"],
+      "Exhaust": ["Stock", "Cat-Back", "Straight Pipe", "Custom"],
+      "Turbo": ["None", "Small", "Medium"],
+      "ECU": ["Stock", "Chipped", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Stage2"],
+      "Transmission": ["Stock", "ShortThrow"],
+      "FinalDrive": ["Stock", "4.25", "4.5"],
+      "LSD": ["None", "Helical"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover"],
+      "Dampers": ["Stock", "Adjustable"],
+      "Swaybars": ["None", "Rear Bar", "Full Set"],
+      "Bushings": ["Stock", "Poly"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track"],
+      "Rotors": ["Stock", "Slotted"],
+      "RearConversion": ["Drum", "Disc"],
+      "Lines": ["Stock", "Braided"]
+    },
+    "Wheels": {
+      "Size": [13, 14, 15, 16],
+      "Width": [5.5, 6.0, 6.5, 7.0]
+    },
+    "Tires": {
+      "Compound": ["Economy", "Street", "Sport", "Semi-Slick"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Lip", "JDM"],
+      "RearBumper": ["Stock", "JDM"],
+      "Spoiler": ["None", "Trunk Lip", "Type R Wing"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Fenders": ["Stock", "Rolled", "Wide"],
+      "Mirrors": ["Stock", "JDM"],
+      "Lights": ["Stock", "Clear", "JDM"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 380,
+    "MaxTorque": 280,
+    "MinWeight": 2000,
+    "MaxTopSpeed": 165,
+    "MaxPI": 650
+  },
+
+  "Tags": ["Economy", "FWD", "Sleeper", "Starter", "Budget", "Tutorial", "90s", "JDM"],
+
+  "Lore": {
+    "Backstory": "Nobody dreams of driving a beater sedan. It's the car you end up with - your first car bought with summer job money, a hand-me-down from parents who upgraded, or a $500 Craigslist special because you needed wheels NOW. But within the underground scene, beaters have earned a special respect. That moment when a clapped-out econobox pulls up next to a sports car at a light, and the driver has that knowing smirk... there's magic in proving that skill and knowledge trump checkbooks. Every legend has to start somewhere. This is where you start.",
+    "FamousOwners": ["Every Street Racer Ever", "The Kid Who Beat Your Cousin"],
+    "RivalVehicles": ["Other Beaters", "Overconfident Sports Cars"]
+  },
+
+  "SpecialFeatures": {
+    "TutorialCar": true,
+    "CannotBeSold": false,
+    "CannotBePinkSlipped": true,
+    "StarterVehicle": true,
+    "SleeperPotential": "High",
+    "EngineSwapViable": true
+  }
+}
