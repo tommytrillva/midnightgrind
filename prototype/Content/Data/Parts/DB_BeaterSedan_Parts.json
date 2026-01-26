@@ -1,0 +1,648 @@
+{
+  "VehicleID": "BEATER_SEDAN",
+  "Version": "1.0",
+  "TotalParts": 70,
+
+  "Categories": {
+    "Engine": {
+      "EngineSwap": [
+        {
+          "ID": "ENGINE_STOCK",
+          "Name": "Stock D15B",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPBase": 92,
+          "TorqueBase": 97,
+          "PIImpact": 0,
+          "Description": "Factory 1.5L SOHC",
+          "Installed": true
+        },
+        {
+          "ID": "ENGINE_B18C",
+          "Name": "B18C VTEC Swap",
+          "Tier": "Race",
+          "Price": 4500,
+          "HPBase": 185,
+          "TorqueBase": 128,
+          "PIImpact": 120,
+          "Redline": 8400,
+          "Description": "Integra Type R engine swap, VTEC yo"
+        },
+        {
+          "ID": "ENGINE_K20A",
+          "Name": "K20A Swap",
+          "Tier": "Elite",
+          "Price": 7500,
+          "HPBase": 220,
+          "TorqueBase": 159,
+          "PIImpact": 180,
+          "Redline": 8600,
+          "Description": "Modern K-series, more power potential"
+        },
+        {
+          "ID": "ENGINE_D16_TURBO",
+          "Name": "Turbo D16 Build",
+          "Tier": "Race",
+          "Price": 3500,
+          "HPBase": 180,
+          "TorqueBase": 160,
+          "PIImpact": 100,
+          "Description": "Turbo the D-series, budget boost"
+        }
+      ],
+
+      "Intake": [
+        {
+          "ID": "INTAKE_STOCK",
+          "Name": "Stock Intake",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPGain": 0,
+          "TorqueGain": 0,
+          "PIImpact": 0,
+          "Weight": 8,
+          "Description": "Factory air box, probably cracked",
+          "Installed": true
+        },
+        {
+          "ID": "INTAKE_SHORTRAM",
+          "Name": "Short Ram Intake",
+          "Tier": "Sport",
+          "Price": 150,
+          "HPGain": 4,
+          "TorqueGain": 3,
+          "PIImpact": 3,
+          "Weight": 4,
+          "Description": "Budget cone filter setup"
+        },
+        {
+          "ID": "INTAKE_COLD",
+          "Name": "Cold Air Intake",
+          "Tier": "Race",
+          "Price": 350,
+          "HPGain": 8,
+          "TorqueGain": 5,
+          "PIImpact": 6,
+          "Weight": 3,
+          "Description": "Proper cold air routing"
+        }
+      ],
+
+      "Exhaust": [
+        {
+          "ID": "EXHAUST_STOCK",
+          "Name": "Stock Exhaust",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPGain": 0,
+          "TorqueGain": 0,
+          "PIImpact": 0,
+          "Weight": 28,
+          "Description": "Rusty factory exhaust"
+        },
+        {
+          "ID": "EXHAUST_CATBACK",
+          "Name": "Cat-Back Exhaust",
+          "Tier": "Sport",
+          "Price": 400,
+          "HPGain": 6,
+          "TorqueGain": 4,
+          "PIImpact": 5,
+          "Weight": 18,
+          "Description": "Budget catback, fart can vibes"
+        },
+        {
+          "ID": "EXHAUST_STRAIGHTPIPE",
+          "Name": "Straight Pipe",
+          "Tier": "Sport",
+          "Price": 200,
+          "HPGain": 8,
+          "TorqueGain": 5,
+          "PIImpact": 6,
+          "Weight": 12,
+          "Loud": true,
+          "Description": "Delete everything, embrace the noise"
+        },
+        {
+          "ID": "EXHAUST_CUSTOM",
+          "Name": "Custom Exhaust",
+          "Tier": "Race",
+          "Price": 800,
+          "HPGain": 12,
+          "TorqueGain": 8,
+          "PIImpact": 10,
+          "Weight": 10,
+          "Description": "Properly bent custom system"
+        }
+      ],
+
+      "Turbo": [
+        {
+          "ID": "TURBO_NONE",
+          "Name": "Naturally Aspirated",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPGain": 0,
+          "Description": "Keep it simple"
+        },
+        {
+          "ID": "TURBO_SMALL",
+          "Name": "Small Turbo Kit",
+          "Tier": "Sport",
+          "Price": 2500,
+          "HPGain": 60,
+          "TorqueGain": 55,
+          "PIImpact": 45,
+          "MaxBoostPSI": 8,
+          "SpoolRPM": 3500,
+          "Description": "Budget turbo kit, junkyard special"
+        },
+        {
+          "ID": "TURBO_MEDIUM",
+          "Name": "Medium Turbo Kit",
+          "Tier": "Race",
+          "Price": 4000,
+          "HPGain": 110,
+          "TorqueGain": 90,
+          "PIImpact": 80,
+          "MaxBoostPSI": 14,
+          "SpoolRPM": 4000,
+          "Description": "Proper turbo setup"
+        }
+      ],
+
+      "ECU": [
+        {
+          "ID": "ECU_STOCK",
+          "Name": "Stock ECU",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPGain": 0,
+          "Description": "Factory ECU, check engine light always on"
+        },
+        {
+          "ID": "ECU_CHIPPED",
+          "Name": "Chipped ECU",
+          "Tier": "Sport",
+          "Price": 250,
+          "HPGain": 5,
+          "TorqueGain": 4,
+          "PIImpact": 4,
+          "Description": "Basic chip tune"
+        },
+        {
+          "ID": "ECU_STANDALONE",
+          "Name": "Standalone ECU",
+          "Tier": "Race",
+          "Price": 1800,
+          "HPGain": 20,
+          "TorqueGain": 15,
+          "PIImpact": 20,
+          "Description": "Budget standalone for turbo builds"
+        }
+      ]
+    },
+
+    "Drivetrain": {
+      "Clutch": [
+        {
+          "ID": "CLUTCH_STOCK",
+          "Name": "Stock Clutch",
+          "Tier": "Stock",
+          "Price": 0,
+          "PowerCapacity": 120,
+          "Description": "Factory clutch, probably slipping"
+        },
+        {
+          "ID": "CLUTCH_SPORT",
+          "Name": "Sport Clutch",
+          "Tier": "Sport",
+          "Price": 280,
+          "PowerCapacity": 200,
+          "PIImpact": 3,
+          "Description": "Budget performance clutch"
+        },
+        {
+          "ID": "CLUTCH_STAGE2",
+          "Name": "Stage 2 Clutch",
+          "Tier": "Race",
+          "Price": 600,
+          "PowerCapacity": 350,
+          "PIImpact": 8,
+          "Description": "Handles turbo power"
+        }
+      ],
+
+      "Transmission": [
+        {
+          "ID": "TRANS_STOCK",
+          "Name": "Stock 5-Speed",
+          "Tier": "Stock",
+          "Price": 0,
+          "Gears": 5,
+          "Description": "Factory transmission"
+        },
+        {
+          "ID": "TRANS_SHORTTHROW",
+          "Name": "Short Throw Shifter",
+          "Tier": "Sport",
+          "Price": 150,
+          "Gears": 5,
+          "ShiftTimeReduction": 0.06,
+          "PIImpact": 2,
+          "Description": "Budget short throw"
+        }
+      ],
+
+      "LSD": [
+        {
+          "ID": "LSD_NONE",
+          "Name": "Open Differential",
+          "Tier": "Stock",
+          "Price": 0,
+          "LockPercent": 0,
+          "Description": "One tire fire",
+          "Installed": true
+        },
+        {
+          "ID": "LSD_HELICAL",
+          "Name": "Helical LSD",
+          "Tier": "Race",
+          "Price": 700,
+          "LockPercent": 40,
+          "PIImpact": 10,
+          "Description": "Finally puts power down"
+        }
+      ]
+    },
+
+    "Suspension": {
+      "Springs": [
+        {
+          "ID": "SPRINGS_STOCK",
+          "Name": "Stock Springs",
+          "Tier": "Stock",
+          "Price": 0,
+          "RideHeightChange": 0,
+          "Description": "Saggy factory springs"
+        },
+        {
+          "ID": "SPRINGS_LOWERING",
+          "Name": "Lowering Springs",
+          "Tier": "Sport",
+          "Price": 200,
+          "RideHeightChange": -1.5,
+          "HandlingBonus": 0.04,
+          "PIImpact": 5,
+          "Description": "Budget drop, looks matter"
+        },
+        {
+          "ID": "SPRINGS_COILOVER",
+          "Name": "Coilovers",
+          "Tier": "Race",
+          "Price": 800,
+          "RideHeightChange": -2.0,
+          "HandlingBonus": 0.10,
+          "PIImpact": 14,
+          "Adjustable": true,
+          "Description": "Budget coilovers, still better than stock"
+        }
+      ],
+
+      "Swaybars": [
+        {
+          "ID": "SWAY_NONE",
+          "Name": "No Rear Sway",
+          "Tier": "Stock",
+          "Price": 0,
+          "Description": "Factory had no rear bar"
+        },
+        {
+          "ID": "SWAY_REAR",
+          "Name": "Rear Sway Bar",
+          "Tier": "Sport",
+          "Price": 120,
+          "HandlingBonus": 0.03,
+          "PIImpact": 4,
+          "Description": "Add a rear bar, huge difference"
+        },
+        {
+          "ID": "SWAY_SET",
+          "Name": "Full Set",
+          "Tier": "Race",
+          "Price": 280,
+          "HandlingBonus": 0.06,
+          "PIImpact": 8,
+          "Description": "Front and rear upgraded bars"
+        }
+      ]
+    },
+
+    "Brakes": {
+      "Pads": [
+        {
+          "ID": "PADS_STOCK",
+          "Name": "Stock Pads",
+          "Tier": "Stock",
+          "Price": 0,
+          "BrakingBonus": 0,
+          "Description": "Worn out pads"
+        },
+        {
+          "ID": "PADS_SPORT",
+          "Name": "Sport Pads",
+          "Tier": "Sport",
+          "Price": 100,
+          "BrakingBonus": 0.04,
+          "PIImpact": 2,
+          "Description": "Budget performance pads"
+        },
+        {
+          "ID": "PADS_TRACK",
+          "Name": "Track Pads",
+          "Tier": "Race",
+          "Price": 250,
+          "BrakingBonus": 0.10,
+          "PIImpact": 6,
+          "Description": "Aggressive compound"
+        }
+      ],
+
+      "RearConversion": [
+        {
+          "ID": "REAR_DRUM",
+          "Name": "Stock Drums",
+          "Tier": "Stock",
+          "Price": 0,
+          "Description": "Rear drum brakes, sad"
+        },
+        {
+          "ID": "REAR_DISC",
+          "Name": "Rear Disc Conversion",
+          "Tier": "Sport",
+          "Price": 400,
+          "BrakingBonus": 0.08,
+          "PIImpact": 6,
+          "Description": "Finally disc brakes all around"
+        }
+      ]
+    },
+
+    "Tires": {
+      "Compound": [
+        {
+          "ID": "TIRE_ECONOMY",
+          "Name": "Economy Tires",
+          "Tier": "Stock",
+          "Price": 0,
+          "GripMultiplier": 0.85,
+          "WearRate": 0.8,
+          "Description": "Cheapest tires money can buy",
+          "Installed": true
+        },
+        {
+          "ID": "TIRE_STREET",
+          "Name": "Street Tires",
+          "Tier": "Stock",
+          "Price": 200,
+          "GripMultiplier": 1.0,
+          "WearRate": 1.0,
+          "PIImpact": 8,
+          "Description": "Normal all-season tires"
+        },
+        {
+          "ID": "TIRE_SPORT",
+          "Name": "Sport Tires",
+          "Tier": "Sport",
+          "Price": 350,
+          "GripMultiplier": 1.06,
+          "WearRate": 1.2,
+          "PIImpact": 14,
+          "Description": "Summer performance tires"
+        },
+        {
+          "ID": "TIRE_SEMISLICK",
+          "Name": "Semi-Slick Tires",
+          "Tier": "Race",
+          "Price": 600,
+          "GripMultiplier": 1.14,
+          "WearRate": 1.8,
+          "PIImpact": 28,
+          "Description": "Competition compound"
+        }
+      ]
+    },
+
+    "Aero": {
+      "FrontBumper": [
+        {
+          "ID": "FRONT_STOCK",
+          "Name": "Stock Front",
+          "Tier": "Stock",
+          "Price": 0,
+          "Description": "Dented factory bumper"
+        },
+        {
+          "ID": "FRONT_LIP",
+          "Name": "Front Lip",
+          "Tier": "Sport",
+          "Price": 150,
+          "DownforceBonus": 0.02,
+          "PIImpact": 2,
+          "Description": "eBay special front lip"
+        },
+        {
+          "ID": "FRONT_JDM",
+          "Name": "JDM Front",
+          "Tier": "Race",
+          "Price": 500,
+          "DownforceBonus": 0.04,
+          "PIImpact": 4,
+          "Description": "JDM front end conversion"
+        }
+      ],
+
+      "Spoiler": [
+        {
+          "ID": "SPOILER_NONE",
+          "Name": "No Spoiler",
+          "Tier": "Stock",
+          "Price": 0,
+          "DownforceBonus": 0,
+          "Description": "Clean trunk"
+        },
+        {
+          "ID": "SPOILER_TRUNK",
+          "Name": "Trunk Lip",
+          "Tier": "Sport",
+          "Price": 100,
+          "DownforceBonus": 0.02,
+          "PIImpact": 2,
+          "Description": "Subtle trunk lip"
+        },
+        {
+          "ID": "SPOILER_WING",
+          "Name": "Type R Wing",
+          "Tier": "Race",
+          "Price": 350,
+          "DownforceBonus": 0.06,
+          "DragIncrease": 0.02,
+          "PIImpact": 6,
+          "Description": "Bolt-on wing, necessary"
+        }
+      ],
+
+      "Hood": [
+        {
+          "ID": "HOOD_STOCK",
+          "Name": "Stock Hood",
+          "Tier": "Stock",
+          "Price": 0,
+          "WeightReduction": 0,
+          "Description": "Faded paint factory hood"
+        },
+        {
+          "ID": "HOOD_VENTED",
+          "Name": "Vented Hood",
+          "Tier": "Sport",
+          "Price": 300,
+          "WeightReduction": 8,
+          "PIImpact": 3,
+          "Description": "Vented for heat extraction"
+        },
+        {
+          "ID": "HOOD_CARBON",
+          "Name": "Carbon Hood",
+          "Tier": "Race",
+          "Price": 600,
+          "WeightReduction": 18,
+          "PIImpact": 6,
+          "Description": "Lightweight carbon fiber"
+        }
+      ]
+    },
+
+    "Body": {
+      "Fenders": [
+        {
+          "ID": "FENDERS_STOCK",
+          "Name": "Stock Fenders",
+          "Tier": "Stock",
+          "Price": 0,
+          "Description": "Factory fenders, maybe rusted"
+        },
+        {
+          "ID": "FENDERS_ROLLED",
+          "Name": "Rolled Fenders",
+          "Tier": "Sport",
+          "Price": 100,
+          "PIImpact": 2,
+          "WheelFitment": 0.5,
+          "Description": "Roll those fenders for fitment"
+        },
+        {
+          "ID": "FENDERS_WIDE",
+          "Name": "Wide Fenders",
+          "Tier": "Race",
+          "Price": 600,
+          "PIImpact": 6,
+          "WheelFitment": 2.0,
+          "Description": "Bolt-on fender flares"
+        }
+      ]
+    },
+
+    "WeightReduction": {
+      "Interior": [
+        {
+          "ID": "INTERIOR_STOCK",
+          "Name": "Full Interior",
+          "Tier": "Stock",
+          "Price": 0,
+          "WeightReduction": 0,
+          "Description": "Everything's still there somehow"
+        },
+        {
+          "ID": "INTERIOR_STRIP",
+          "Name": "Stripped Interior",
+          "Tier": "Sport",
+          "Price": 0,
+          "WeightReduction": 80,
+          "PIImpact": 10,
+          "Description": "Remove rear seats, spare, carpet"
+        },
+        {
+          "ID": "INTERIOR_GUTTED",
+          "Name": "Gutted Interior",
+          "Tier": "Race",
+          "Price": 0,
+          "WeightReduction": 150,
+          "PIImpact": 18,
+          "Description": "Full gut, bucket seat, cage"
+        }
+      ]
+    }
+  },
+
+  "UpgradePackages": {
+    "Street": {
+      "Name": "Budget Build",
+      "Price": 1500,
+      "PITarget": 380,
+      "Parts": [
+        "INTAKE_SHORTRAM",
+        "EXHAUST_CATBACK",
+        "ECU_CHIPPED",
+        "SPRINGS_LOWERING",
+        "TIRE_STREET"
+      ],
+      "Description": "Basic bolt-ons on a budget"
+    },
+    "Weekend": {
+      "Name": "Sleeper Setup",
+      "Price": 8000,
+      "PITarget": 520,
+      "Parts": [
+        "INTAKE_COLD",
+        "EXHAUST_CUSTOM",
+        "TURBO_SMALL",
+        "ECU_STANDALONE",
+        "CLUTCH_STAGE2",
+        "SPRINGS_COILOVER",
+        "LSD_HELICAL",
+        "REAR_DISC",
+        "PADS_TRACK",
+        "TIRE_SPORT",
+        "SPOILER_TRUNK"
+      ],
+      "Description": "Surprise the sports cars"
+    },
+    "FullRace": {
+      "Name": "Full Send",
+      "Price": 18000,
+      "PITarget": 650,
+      "Parts": [
+        "ENGINE_B18C",
+        "INTAKE_COLD",
+        "EXHAUST_CUSTOM",
+        "ECU_STANDALONE",
+        "CLUTCH_STAGE2",
+        "SPRINGS_COILOVER",
+        "LSD_HELICAL",
+        "REAR_DISC",
+        "PADS_TRACK",
+        "TIRE_SEMISLICK",
+        "SPOILER_WING",
+        "HOOD_CARBON",
+        "INTERIOR_GUTTED"
+      ],
+      "Description": "Engine swapped sleeper killer"
+    }
+  },
+
+  "SpecialNotes": {
+    "SleeperPotential": "This car has massive sleeper potential. With the right engine swap and turbo setup, it can compete with cars costing 10x as much.",
+    "BudgetFriendly": "Parts are cheap and easy to find. Perfect for learning to wrench.",
+    "EngineSwapViable": "K-series and B-series swaps are straightforward and well-documented."
+  }
+}

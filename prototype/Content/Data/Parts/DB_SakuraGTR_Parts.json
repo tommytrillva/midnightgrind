@@ -1,0 +1,721 @@
+{
+  "VehicleID": "SAKURA_GTR",
+  "Version": "1.0",
+  "TotalParts": 85,
+
+  "Categories": {
+    "Engine": {
+      "Intake": [
+        {
+          "ID": "INTAKE_STOCK",
+          "Name": "Stock Intake",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPGain": 0,
+          "TorqueGain": 0,
+          "PIImpact": 0,
+          "Weight": 15,
+          "Description": "Factory air intake system",
+          "Installed": true
+        },
+        {
+          "ID": "INTAKE_SPORT",
+          "Name": "Sport Air Filter",
+          "Tier": "Sport",
+          "Price": 350,
+          "HPGain": 8,
+          "TorqueGain": 5,
+          "PIImpact": 5,
+          "Weight": 12,
+          "Description": "High-flow cotton air filter for improved breathing"
+        },
+        {
+          "ID": "INTAKE_RACE",
+          "Name": "Cold Air Intake",
+          "Tier": "Race",
+          "Price": 1200,
+          "HPGain": 18,
+          "TorqueGain": 12,
+          "PIImpact": 12,
+          "Weight": 8,
+          "Description": "Full cold air intake system with heat shield"
+        },
+        {
+          "ID": "INTAKE_ELITE",
+          "Name": "Carbon Fiber Intake",
+          "Tier": "Elite",
+          "Price": 3500,
+          "HPGain": 28,
+          "TorqueGain": 18,
+          "PIImpact": 20,
+          "Weight": 4,
+          "Description": "Competition carbon fiber intake with velocity stacks"
+        }
+      ],
+
+      "Exhaust": [
+        {
+          "ID": "EXHAUST_STOCK",
+          "Name": "Stock Exhaust",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPGain": 0,
+          "TorqueGain": 0,
+          "PIImpact": 0,
+          "Weight": 45,
+          "Description": "Factory exhaust system"
+        },
+        {
+          "ID": "EXHAUST_SPORT",
+          "Name": "Cat-Back Exhaust",
+          "Tier": "Sport",
+          "Price": 800,
+          "HPGain": 12,
+          "TorqueGain": 8,
+          "PIImpact": 8,
+          "Weight": 35,
+          "Description": "Stainless steel cat-back system with dual tips"
+        },
+        {
+          "ID": "EXHAUST_RACE",
+          "Name": "Turbo-Back Exhaust",
+          "Tier": "Race",
+          "Price": 2500,
+          "HPGain": 35,
+          "TorqueGain": 25,
+          "PIImpact": 22,
+          "Weight": 25,
+          "Description": "Full turbo-back with high-flow cats"
+        },
+        {
+          "ID": "EXHAUST_ELITE",
+          "Name": "Ti Racing Exhaust",
+          "Tier": "Elite",
+          "Price": 6000,
+          "HPGain": 50,
+          "TorqueGain": 35,
+          "PIImpact": 35,
+          "Weight": 12,
+          "Description": "Full titanium racing exhaust, straight pipe"
+        }
+      ],
+
+      "Turbo": [
+        {
+          "ID": "TURBO_STOCK",
+          "Name": "Stock Twin Turbos",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPGain": 0,
+          "TorqueGain": 0,
+          "PIImpact": 0,
+          "MaxBoostPSI": 14,
+          "SpoolRPM": 3500,
+          "Description": "Factory twin ceramic turbos"
+        },
+        {
+          "ID": "TURBO_UPGRADED",
+          "Name": "Ball Bearing Twins",
+          "Tier": "Sport",
+          "Price": 4500,
+          "HPGain": 45,
+          "TorqueGain": 35,
+          "PIImpact": 30,
+          "MaxBoostPSI": 18,
+          "SpoolRPM": 3200,
+          "Description": "Ball bearing twin turbos with better spool"
+        },
+        {
+          "ID": "TURBO_LARGE",
+          "Name": "Upgraded Single Turbo",
+          "Tier": "Race",
+          "Price": 8000,
+          "HPGain": 120,
+          "TorqueGain": 90,
+          "PIImpact": 75,
+          "MaxBoostPSI": 25,
+          "SpoolRPM": 4200,
+          "Description": "Large single turbo kit, more lag but massive power"
+        },
+        {
+          "ID": "TURBO_MASSIVE",
+          "Name": "GT42 Single Turbo",
+          "Tier": "Elite",
+          "Price": 15000,
+          "HPGain": 250,
+          "TorqueGain": 180,
+          "PIImpact": 150,
+          "MaxBoostPSI": 35,
+          "SpoolRPM": 5000,
+          "Description": "Competition single turbo, requires supporting mods"
+        }
+      ],
+
+      "Intercooler": [
+        {
+          "ID": "IC_STOCK",
+          "Name": "Stock Intercooler",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPGain": 0,
+          "Description": "Factory side-mount intercoolers"
+        },
+        {
+          "ID": "IC_FRONTMOUNT",
+          "Name": "Front Mount Intercooler",
+          "Tier": "Race",
+          "Price": 2000,
+          "HPGain": 20,
+          "TorqueGain": 15,
+          "PIImpact": 15,
+          "Description": "Large front-mount intercooler for consistent IATs"
+        },
+        {
+          "ID": "IC_VMOUNT",
+          "Name": "V-Mount Intercooler",
+          "Tier": "Elite",
+          "Price": 4500,
+          "HPGain": 30,
+          "TorqueGain": 20,
+          "PIImpact": 22,
+          "Description": "V-mount intercooler/radiator setup, ultimate cooling"
+        }
+      ],
+
+      "ECU": [
+        {
+          "ID": "ECU_STOCK",
+          "Name": "Stock ECU",
+          "Tier": "Stock",
+          "Price": 0,
+          "HPGain": 0,
+          "Description": "Factory engine management"
+        },
+        {
+          "ID": "ECU_STAGE1",
+          "Name": "Stage 1 Tune",
+          "Tier": "Sport",
+          "Price": 600,
+          "HPGain": 25,
+          "TorqueGain": 20,
+          "PIImpact": 18,
+          "Description": "Conservative tune for bolt-on mods"
+        },
+        {
+          "ID": "ECU_STAGE2",
+          "Name": "Stage 2 Tune",
+          "Tier": "Race",
+          "Price": 1500,
+          "HPGain": 45,
+          "TorqueGain": 35,
+          "PIImpact": 32,
+          "Description": "Aggressive tune, requires exhaust mods"
+        },
+        {
+          "ID": "ECU_STAGE3",
+          "Name": "Standalone ECU",
+          "Tier": "Elite",
+          "Price": 4000,
+          "HPGain": 75,
+          "TorqueGain": 55,
+          "PIImpact": 55,
+          "Description": "Full standalone engine management, unlimited tuning"
+        }
+      ]
+    },
+
+    "Drivetrain": {
+      "Clutch": [
+        {
+          "ID": "CLUTCH_STOCK",
+          "Name": "Stock Clutch",
+          "Tier": "Stock",
+          "Price": 0,
+          "PowerCapacity": 350,
+          "Description": "Factory clutch"
+        },
+        {
+          "ID": "CLUTCH_SPORT",
+          "Name": "Sport Clutch",
+          "Tier": "Sport",
+          "Price": 600,
+          "PowerCapacity": 450,
+          "PIImpact": 5,
+          "Description": "Upgraded organic clutch"
+        },
+        {
+          "ID": "CLUTCH_RACING",
+          "Name": "Racing Clutch",
+          "Tier": "Race",
+          "Price": 1500,
+          "PowerCapacity": 650,
+          "PIImpact": 10,
+          "Description": "6-puck ceramic clutch"
+        },
+        {
+          "ID": "CLUTCH_MULTIPLATE",
+          "Name": "Multi-Plate Clutch",
+          "Tier": "Elite",
+          "Price": 4000,
+          "PowerCapacity": 1200,
+          "PIImpact": 18,
+          "Description": "OS Giken style multi-plate clutch"
+        }
+      ],
+
+      "Transmission": [
+        {
+          "ID": "TRANS_STOCK",
+          "Name": "Stock 5-Speed",
+          "Tier": "Stock",
+          "Price": 0,
+          "Gears": 5,
+          "Description": "Factory Getrag transmission"
+        },
+        {
+          "ID": "TRANS_SHORTTHROW",
+          "Name": "Short Throw Shifter",
+          "Tier": "Sport",
+          "Price": 300,
+          "Gears": 5,
+          "ShiftTimeReduction": 0.1,
+          "PIImpact": 3,
+          "Description": "Reduced shift throw for faster shifts"
+        },
+        {
+          "ID": "TRANS_6SPEED",
+          "Name": "6-Speed Conversion",
+          "Tier": "Race",
+          "Price": 8000,
+          "Gears": 6,
+          "ShiftTimeReduction": 0.15,
+          "PIImpact": 25,
+          "Description": "6-speed transmission swap"
+        },
+        {
+          "ID": "TRANS_DOG",
+          "Name": "Dog Box",
+          "Tier": "Elite",
+          "Price": 18000,
+          "Gears": 6,
+          "ShiftTimeReduction": 0.4,
+          "PIImpact": 40,
+          "Description": "Sequential dog engagement transmission"
+        }
+      ],
+
+      "LSD": [
+        {
+          "ID": "LSD_STOCK",
+          "Name": "Stock LSD",
+          "Tier": "Stock",
+          "Price": 0,
+          "LockPercent": 40,
+          "Description": "Factory viscous LSD"
+        },
+        {
+          "ID": "LSD_1_5WAY",
+          "Name": "1.5-Way LSD",
+          "Tier": "Sport",
+          "Price": 1200,
+          "LockPercent": 60,
+          "PIImpact": 8,
+          "Description": "Mechanical 1.5-way limited slip"
+        },
+        {
+          "ID": "LSD_2WAY",
+          "Name": "2-Way LSD",
+          "Tier": "Race",
+          "Price": 2500,
+          "LockPercent": 80,
+          "PIImpact": 15,
+          "Description": "Full 2-way mechanical LSD, aggressive"
+        }
+      ]
+    },
+
+    "Suspension": {
+      "Springs": [
+        {
+          "ID": "SPRINGS_STOCK",
+          "Name": "Stock Springs",
+          "Tier": "Stock",
+          "Price": 0,
+          "RideHeightChange": 0,
+          "Description": "Factory springs"
+        },
+        {
+          "ID": "SPRINGS_LOWERING",
+          "Name": "Lowering Springs",
+          "Tier": "Sport",
+          "Price": 400,
+          "RideHeightChange": -1.5,
+          "HandlingBonus": 0.05,
+          "PIImpact": 8,
+          "Description": "1.5 inch drop, stiffer rate"
+        },
+        {
+          "ID": "SPRINGS_COILOVER",
+          "Name": "Street Coilovers",
+          "Tier": "Race",
+          "Price": 2000,
+          "RideHeightChange": -2.0,
+          "HandlingBonus": 0.12,
+          "PIImpact": 18,
+          "Adjustable": true,
+          "Description": "Height adjustable coilovers"
+        },
+        {
+          "ID": "SPRINGS_RACING",
+          "Name": "Racing Coilovers",
+          "Tier": "Elite",
+          "Price": 5500,
+          "RideHeightChange": -2.5,
+          "HandlingBonus": 0.22,
+          "PIImpact": 32,
+          "Adjustable": true,
+          "Description": "Fully adjustable racing suspension"
+        }
+      ],
+
+      "Swaybars": [
+        {
+          "ID": "SWAY_STOCK",
+          "Name": "Stock Sway Bars",
+          "Tier": "Stock",
+          "Price": 0,
+          "Description": "Factory anti-roll bars"
+        },
+        {
+          "ID": "SWAY_SPORT",
+          "Name": "Sport Sway Bars",
+          "Tier": "Sport",
+          "Price": 350,
+          "HandlingBonus": 0.04,
+          "PIImpact": 5,
+          "Description": "Thicker front and rear bars"
+        },
+        {
+          "ID": "SWAY_RACING",
+          "Name": "Adjustable Sway Bars",
+          "Tier": "Race",
+          "Price": 900,
+          "HandlingBonus": 0.08,
+          "PIImpact": 10,
+          "Adjustable": true,
+          "Description": "Multi-position adjustable bars"
+        }
+      ]
+    },
+
+    "Brakes": {
+      "Pads": [
+        {
+          "ID": "PADS_STOCK",
+          "Name": "Stock Pads",
+          "Tier": "Stock",
+          "Price": 0,
+          "BrakingBonus": 0,
+          "Description": "Factory brake pads"
+        },
+        {
+          "ID": "PADS_SPORT",
+          "Name": "Sport Pads",
+          "Tier": "Sport",
+          "Price": 200,
+          "BrakingBonus": 0.05,
+          "PIImpact": 3,
+          "Description": "Low-dust performance pads"
+        },
+        {
+          "ID": "PADS_TRACK",
+          "Name": "Track Pads",
+          "Tier": "Race",
+          "Price": 500,
+          "BrakingBonus": 0.12,
+          "PIImpact": 8,
+          "Description": "High-temp track compound"
+        },
+        {
+          "ID": "PADS_RACING",
+          "Name": "Racing Pads",
+          "Tier": "Elite",
+          "Price": 1200,
+          "BrakingBonus": 0.18,
+          "PIImpact": 12,
+          "Description": "Carbon-ceramic racing compound"
+        }
+      ],
+
+      "Calipers": [
+        {
+          "ID": "CALIPERS_STOCK",
+          "Name": "Stock Calipers",
+          "Tier": "Stock",
+          "Price": 0,
+          "Description": "Factory 4-piston front calipers"
+        },
+        {
+          "ID": "CALIPERS_4PISTON",
+          "Name": "4-Piston Big Brake Kit",
+          "Tier": "Race",
+          "Price": 2500,
+          "BrakingBonus": 0.15,
+          "PIImpact": 12,
+          "Description": "Larger 4-piston calipers with 340mm rotors"
+        },
+        {
+          "ID": "CALIPERS_6PISTON",
+          "Name": "6-Piston Big Brake Kit",
+          "Tier": "Elite",
+          "Price": 5500,
+          "BrakingBonus": 0.25,
+          "PIImpact": 20,
+          "Description": "6-piston front, 4-piston rear with 380mm rotors"
+        }
+      ]
+    },
+
+    "Tires": {
+      "Compound": [
+        {
+          "ID": "TIRE_STREET",
+          "Name": "Street Tires",
+          "Tier": "Stock",
+          "Price": 0,
+          "GripMultiplier": 1.0,
+          "WearRate": 1.0,
+          "Description": "All-season street tires"
+        },
+        {
+          "ID": "TIRE_SPORT",
+          "Name": "Sport Tires",
+          "Tier": "Sport",
+          "Price": 600,
+          "GripMultiplier": 1.08,
+          "WearRate": 1.2,
+          "PIImpact": 15,
+          "Description": "Summer performance tires"
+        },
+        {
+          "ID": "TIRE_SEMISLICK",
+          "Name": "Semi-Slick Tires",
+          "Tier": "Race",
+          "Price": 1200,
+          "GripMultiplier": 1.18,
+          "WearRate": 1.8,
+          "PIImpact": 35,
+          "Description": "DOT-legal competition tires"
+        },
+        {
+          "ID": "TIRE_SLICK",
+          "Name": "Racing Slicks",
+          "Tier": "Elite",
+          "Price": 2000,
+          "GripMultiplier": 1.30,
+          "WearRate": 2.5,
+          "PIImpact": 55,
+          "Description": "Full slick racing tires, track only"
+        },
+        {
+          "ID": "TIRE_DRAG",
+          "Name": "Drag Radials",
+          "Tier": "Elite",
+          "Price": 800,
+          "GripMultiplier": 1.40,
+          "WearRate": 3.0,
+          "PIImpact": 25,
+          "DragSpecialized": true,
+          "Description": "Drag racing tires, rear only"
+        }
+      ]
+    },
+
+    "Aero": {
+      "Spoiler": [
+        {
+          "ID": "SPOILER_STOCK",
+          "Name": "Stock Spoiler",
+          "Tier": "Stock",
+          "Price": 0,
+          "DownforceBonus": 0,
+          "Description": "Factory rear spoiler"
+        },
+        {
+          "ID": "SPOILER_DUCKTAIL",
+          "Name": "Ducktail Spoiler",
+          "Tier": "Sport",
+          "Price": 500,
+          "DownforceBonus": 0.05,
+          "DragIncrease": 0.01,
+          "PIImpact": 5,
+          "Description": "Subtle ducktail lip spoiler"
+        },
+        {
+          "ID": "SPOILER_GT",
+          "Name": "GT Wing",
+          "Tier": "Race",
+          "Price": 1500,
+          "DownforceBonus": 0.15,
+          "DragIncrease": 0.03,
+          "PIImpact": 15,
+          "Description": "Adjustable GT-style wing"
+        },
+        {
+          "ID": "SPOILER_HIGHMOUNT",
+          "Name": "High Mount Wing",
+          "Tier": "Elite",
+          "Price": 3500,
+          "DownforceBonus": 0.25,
+          "DragIncrease": 0.05,
+          "PIImpact": 25,
+          "Description": "Time attack style high mount wing"
+        }
+      ],
+
+      "FrontBumper": [
+        {
+          "ID": "FRONT_STOCK",
+          "Name": "Stock Front Bumper",
+          "Tier": "Stock",
+          "Price": 0,
+          "Description": "Factory front bumper"
+        },
+        {
+          "ID": "FRONT_LIP",
+          "Name": "Front Lip",
+          "Tier": "Sport",
+          "Price": 400,
+          "DownforceBonus": 0.03,
+          "PIImpact": 3,
+          "Description": "Add-on front lip spoiler"
+        },
+        {
+          "ID": "FRONT_SPLITTER",
+          "Name": "Front Splitter",
+          "Tier": "Race",
+          "Price": 1200,
+          "DownforceBonus": 0.08,
+          "PIImpact": 8,
+          "Description": "Extended front splitter with canards"
+        }
+      ]
+    },
+
+    "WeightReduction": {
+      "Interior": [
+        {
+          "ID": "INTERIOR_STOCK",
+          "Name": "Full Interior",
+          "Tier": "Stock",
+          "Price": 0,
+          "WeightReduction": 0,
+          "Description": "Factory interior"
+        },
+        {
+          "ID": "INTERIOR_STRIP",
+          "Name": "Rear Seat Delete",
+          "Tier": "Sport",
+          "Price": 0,
+          "WeightReduction": 50,
+          "PIImpact": 5,
+          "Description": "Remove rear seats"
+        },
+        {
+          "ID": "INTERIOR_RACE",
+          "Name": "Full Strip",
+          "Tier": "Race",
+          "Price": 0,
+          "WeightReduction": 150,
+          "PIImpact": 15,
+          "Description": "Full interior strip, add roll cage"
+        }
+      ],
+
+      "Body": [
+        {
+          "ID": "HOOD_STOCK",
+          "Name": "Stock Hood",
+          "Tier": "Stock",
+          "Price": 0,
+          "WeightReduction": 0,
+          "Description": "Factory steel hood"
+        },
+        {
+          "ID": "HOOD_CARBON",
+          "Name": "Carbon Fiber Hood",
+          "Tier": "Race",
+          "Price": 1500,
+          "WeightReduction": 25,
+          "PIImpact": 8,
+          "Description": "Lightweight carbon fiber hood"
+        },
+        {
+          "ID": "TRUNK_CARBON",
+          "Name": "Carbon Fiber Trunk",
+          "Tier": "Race",
+          "Price": 1200,
+          "WeightReduction": 20,
+          "PIImpact": 6,
+          "Description": "Lightweight carbon fiber trunk lid"
+        }
+      ]
+    }
+  },
+
+  "UpgradePackages": {
+    "Street": {
+      "Name": "Street Build",
+      "Price": 5000,
+      "PITarget": 700,
+      "Parts": [
+        "INTAKE_SPORT",
+        "EXHAUST_SPORT",
+        "ECU_STAGE1",
+        "SPRINGS_LOWERING",
+        "TIRE_SPORT"
+      ],
+      "Description": "Reliable daily driver setup"
+    },
+    "Weekend": {
+      "Name": "Weekend Warrior",
+      "Price": 18000,
+      "PITarget": 800,
+      "Parts": [
+        "INTAKE_RACE",
+        "EXHAUST_RACE",
+        "TURBO_UPGRADED",
+        "ECU_STAGE2",
+        "CLUTCH_SPORT",
+        "SPRINGS_COILOVER",
+        "PADS_TRACK",
+        "TIRE_SEMISLICK",
+        "SPOILER_GT"
+      ],
+      "Description": "Track-capable street car"
+    },
+    "FullRace": {
+      "Name": "Full Race Build",
+      "Price": 65000,
+      "PITarget": 950,
+      "Parts": [
+        "INTAKE_ELITE",
+        "EXHAUST_ELITE",
+        "TURBO_LARGE",
+        "IC_VMOUNT",
+        "ECU_STAGE3",
+        "CLUTCH_RACING",
+        "TRANS_6SPEED",
+        "LSD_2WAY",
+        "SPRINGS_RACING",
+        "CALIPERS_6PISTON",
+        "PADS_RACING",
+        "TIRE_SLICK",
+        "SPOILER_HIGHMOUNT",
+        "INTERIOR_RACE",
+        "HOOD_CARBON"
+      ],
+      "Description": "Competition-ready race car"
+    }
+  }
+}
