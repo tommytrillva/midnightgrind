@@ -47,6 +47,7 @@ void UMGVehicleMovementComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	UpdateSurfaceDetection(DeltaTime); // Surface grip detection with weather integration
 	ApplyDifferentialBehavior(DeltaTime);
 	UpdateClutchWear(DeltaTime); // Clutch wear and temperature simulation
+	UpdateSuspensionGeometry(DeltaTime); // Suspension geometry effects on handling
 
 	// Update shift cooldown
 	if (ShiftCooldown > 0.0f)
@@ -3014,4 +3015,100 @@ TArray<FVector> UMGVehicleMovementComponent::GetWheelWorldLocations() const
 	}
 
 	return Locations;
+}
+
+// ==========================================
+// TIRE PRESSURE SIMULATION
+// ==========================================
+
+void UMGVehicleMovementComponent::UpdateTirePressure(float DeltaTime)
+{
+	for (int32 i = 0; i < 4; ++i)
+	{
+		FMGTirePressureState& Pressure = TirePressures[i];
+		const FMGTireTemperature& Temp = TireTemperatures[i];
+
+		// Update pressure based on tire temperature
+		float AvgTireTemp = Temp.GetAverageTemp();
+		Pressure.UpdatePressureFromTemperature(AvgTireTemp, AmbientTemperature);
+
+		// Apply any leak damage
+		Pressure.ApplyLeak(DeltaTime);
+	}
+}
+
+float UMGVehicleMovementComponent::GetTirePressureGripMultiplier(int32 WheelIndex) const
+{
+	if (WheelIndex < 0 || WheelIndex >= 4)
+	{
+		return 1.0f;
+	}
+
+	const FMGTirePressureState& Pressure = TirePressures[WheelIndex];
+	float PressureGrip = Pressure.GetGripMultiplier();
+
+	// Scale by influence parameter
+	return FMath::Lerp(1.0f, PressureGrip, TirePressureGripInfluence);
+}
+
+float UMGVehicleMovementComponent::GetTirePressureWearMultiplier(int32 WheelIndex) const
+{
+	if (WheelIndex < 0 || WheelIndex >= 4)
+	{
+		return 1.0f;
+	}
+
+	const FMGTirePressureState& Pressure = TirePressures[WheelIndex];
+	float PressureWear = Pressure.GetWearRateMultiplier();
+
+	// Scale by influence parameter
+	return FMath::Lerp(1.0f, PressureWear, TirePressureWearInfluence);
+}
+
+void UMGVehicleMovementComponent::SetTirePressure(int32 WheelIndex, float ColdPressurePSI)
+{
+	if (WheelIndex < 0 || WheelIndex >= 4)
+	{
+		return;
+	}
+
+	TirePressures[WheelIndex].ColdPressurePSI = FMath::Clamp(ColdPressurePSI, 20.0f, 50.0f);
+	TirePressures[WheelIndex].CurrentPressurePSI = TirePressures[WheelIndex].ColdPressurePSI;
+}
+
+void UMGVehicleMovementComponent::SetAllTirePressures(float FrontPSI, float RearPSI)
+{
+	// Front tires
+	SetTirePressure(0, FrontPSI);
+	SetTirePressure(1, FrontPSI);
+
+	// Rear tires
+	SetTirePressure(2, RearPSI);
+	SetTirePressure(3, RearPSI);
+}
+
+bool UMGVehicleMovementComponent::IsTirePressureWarning(int32 WheelIndex) const
+{
+	if (WheelIndex < 0 || WheelIndex >= 4)
+	{
+		return false;
+	}
+
+	const FMGTirePressureState& Pressure = TirePressures[WheelIndex];
+	float Deviation = FMath::Abs(Pressure.CurrentPressurePSI - Pressure.OptimalHotPressurePSI);
+
+	return Deviation > PressureWarningThreshold;
+}
+
+void UMGVehicleMovementComponent::InitializeTirePressures()
+{
+	for (int32 i = 0; i < 4; ++i)
+	{
+		TirePressures[i].ColdPressurePSI = DefaultColdPressurePSI;
+		TirePressures[i].CurrentPressurePSI = DefaultColdPressurePSI;
+		TirePressures[i].OptimalHotPressurePSI = OptimalHotPressurePSI;
+		TirePressures[i].bHasSlowLeak = false;
+		TirePressures[i].LeakRatePSIPerSecond = 0.0f;
+		TirePressures[i].bIsFlat = false;
+	}
 }

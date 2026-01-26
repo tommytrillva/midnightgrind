@@ -1933,6 +1933,23 @@ public:
 	float ClutchSlipDetectionThreshold = 0.1f;
 
 	// ==========================================
+	// TUNING PARAMETERS - TIRE PRESSURE
+	// ==========================================
+
+	/**
+	 * @brief Tire pressure simulation configuration
+	 *
+	 * Contains all tunable parameters for tire pressure physics including:
+	 * - Pressure ranges and thresholds
+	 * - Temperature-pressure relationship
+	 * - Leak rates for various damage types
+	 * - Compound-specific optimal pressures
+	 * - Blowout conditions
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|TirePressure")
+	FMGTirePressureConfig TirePressureConfig;
+
+	// ==========================================
 	// TUNING PARAMETERS - SUSPENSION GEOMETRY
 	// ==========================================
 
@@ -2042,6 +2059,14 @@ public:
 	/** Called when differential lockup changes significantly */
 	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
 	FOnDifferentialLockup OnDifferentialLockup;
+
+	/** Called when a tire pressure warning threshold is reached */
+	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
+	FOnTirePressureWarning OnTirePressureWarning;
+
+	/** Called when a tire blows out */
+	UPROPERTY(BlueprintAssignable, Category = "Vehicle|Events")
+	FOnTireBlowout OnTireBlowout;
 
 protected:
 	// ==========================================
@@ -2242,6 +2267,66 @@ protected:
 
 	/** Update tire temperature simulation */
 	virtual void UpdateTireTemperatures(float DeltaTime);
+
+	/**
+	 * @brief Update tire pressure simulation for all wheels
+	 *
+	 * Handles:
+	 * - Temperature-pressure relationship (ideal gas law)
+	 * - Natural pressure loss over time
+	 * - Active leak simulation (punctures, damage)
+	 * - Blowout risk calculation
+	 * - Effect multiplier updates
+	 *
+	 * @param DeltaTime Frame delta time in seconds
+	 */
+	virtual void UpdateTirePressure(float DeltaTime);
+
+	/**
+	 * @brief Calculate hot pressure from cold pressure and temperature
+	 *
+	 * Uses ideal gas law approximation: P_hot = P_cold * (1 + k * deltaT)
+	 * where k is the pressure coefficient per degree Celsius.
+	 *
+	 * @param ColdPressure Cold tire pressure in PSI
+	 * @param TireTemp Current tire temperature in Celsius
+	 * @return Hot pressure in PSI
+	 */
+	float CalculateHotPressure(float ColdPressure, float TireTemp) const;
+
+	/**
+	 * @brief Get optimal pressure for a tire compound
+	 * @param Compound The tire compound type
+	 * @return Optimal pressure in PSI for the compound
+	 */
+	float GetOptimalPressureForCompound(EMGTireCompound Compound) const;
+
+	/**
+	 * @brief Check and apply blowout risk for a tire
+	 *
+	 * Evaluates blowout conditions based on:
+	 * - Temperature exceeding threshold
+	 * - Pressure below critical ratio
+	 * - Vehicle speed
+	 *
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @param DeltaTime Frame delta time for probability calculation
+	 * @return True if a blowout occurred
+	 */
+	bool CheckAndApplyBlowoutRisk(int32 WheelIndex, float DeltaTime);
+
+	/**
+	 * @brief Apply leak to a tire based on leak cause
+	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
+	 * @param Cause The cause of the leak
+	 * @param Severity Severity multiplier (0-1)
+	 */
+	void ApplyLeak(int32 WheelIndex, EMGPressureLossCause Cause, float Severity);
+
+	/**
+	 * @brief Initialize tire pressure states based on current compound
+	 */
+	void InitializeTirePressures();
 
 	/** Update weight transfer based on acceleration */
 	virtual void UpdateWeightTransfer(float DeltaTime);

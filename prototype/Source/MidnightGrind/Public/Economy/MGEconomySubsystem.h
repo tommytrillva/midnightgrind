@@ -38,6 +38,7 @@ enum class EMGTransactionType : uint8
 	DynoRental,
 	ToolPurchase,        /**< Player purchased a mechanic tool */
 	GarageUpgrade,       /**< Player upgraded their garage (lift, etc.) */
+	FuelPurchase,        /**< Player purchased fuel for vehicle */
 	Other
 };
 

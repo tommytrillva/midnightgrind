@@ -1917,7 +1917,7 @@ float AMGAIRacerController::CalculateBrakingDistance(float CurrentSpeed, float T
 		{
 			// Grip affects braking effectiveness
 			// Dry = 1.0x, Wet = 0.7x grip means 1/0.7 = 1.43x braking distance
-			const float GripMultiplier = WeatherSubsystem->GetRoadGripMultiplier();
+			const float GripMultiplier = WeatherSubsystem->GetGripMultiplier();
 			if (GripMultiplier > 0.01f)
 			{
 				Deceleration *= GripMultiplier;
@@ -1926,7 +1926,7 @@ float AMGAIRacerController::CalculateBrakingDistance(float CurrentSpeed, float T
 			// Skilled drivers start braking earlier in bad conditions
 			const EMGRoadCondition RoadCondition = WeatherSubsystem->GetRoadCondition();
 			if (RoadCondition == EMGRoadCondition::Wet ||
-				RoadCondition == EMGRoadCondition::StandingWater ||
+				RoadCondition == EMGRoadCondition::Flooded ||
 				RoadCondition == EMGRoadCondition::Icy)
 			{
 				// Add safety margin for reduced grip - more skilled = smaller margin needed

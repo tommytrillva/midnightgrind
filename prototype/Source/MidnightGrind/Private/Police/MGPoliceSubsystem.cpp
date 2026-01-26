@@ -170,7 +170,7 @@ void UMGPoliceSubsystem::SetHeatLevel(EMGHeatLevel NewLevel)
 
 float UMGPoliceSubsystem::GetHeatDecayProgress() const
 {
-	if (!bInCooldown)
+	if (!bInCooldown || CooldownDuration <= 0.0f)
 	{
 		return 0.0f;
 	}

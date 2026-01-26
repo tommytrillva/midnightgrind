@@ -879,6 +879,19 @@ struct FMGEngineConfiguration
 	FMGNitrousConfig Nitrous;
 
 	// ==========================================
+	// FUEL SYSTEM
+	// ==========================================
+
+	/**
+	 * @brief Fuel tank configuration for consumption simulation
+	 *
+	 * Defines tank capacity, current fuel level, and consumption parameters.
+	 * Used by UMGFuelConsumptionComponent for realistic fuel simulation.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
+	FMGFuelTankConfig FuelTank;
+
+	// ==========================================
 	// PART TIERS (for stat calculation)
 	// ==========================================
 
