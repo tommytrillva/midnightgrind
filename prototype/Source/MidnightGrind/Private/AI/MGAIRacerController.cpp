@@ -15,7 +15,7 @@
 #include "AI/MGAIDriverProfile.h"
 #include "Track/MGTrackSubsystem.h"
 #include "Core/MGRaceGameMode.h"
-#include "Weather/MGWeatherSubsystem.h"
+#include "Environment/MGWeatherSubsystem.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
@@ -1424,20 +1424,20 @@ bool AMGAIRacerController::ShouldAttemptOvertake() const
 			{
 				OvertakeChance *= 0.7f; // 30% less likely to overtake in wet
 			}
-			else if (RoadCondition == EMGRoadCondition::StandingWater)
+			else if (RoadCondition == EMGRoadCondition::Flooded)
 			{
-				OvertakeChance *= 0.5f; // 50% less likely in standing water
+				OvertakeChance *= 0.5f; // 50% less likely in flooded conditions
 			}
-			else if (RoadCondition == EMGRoadCondition::Icy || RoadCondition == EMGRoadCondition::Snowy)
+			else if (RoadCondition == EMGRoadCondition::Icy)
 			{
-				OvertakeChance *= 0.3f; // 70% less likely on ice/snow
+				OvertakeChance *= 0.3f; // 70% less likely on ice
 			}
 
 			// Poor visibility also reduces overtaking attempts
-			const EMGWeatherType WeatherType = WeatherSubsystem->GetCurrentWeatherType();
-			if (WeatherType == EMGWeatherType::HeavyFog ||
+			const EMGWeatherType WeatherType = WeatherSubsystem->GetWeatherType();
+			if (WeatherType == EMGWeatherType::Fog ||
 				WeatherType == EMGWeatherType::Thunderstorm ||
-				WeatherType == EMGWeatherType::Blizzard)
+				WeatherType == EMGWeatherType::Snow)
 			{
 				OvertakeChance *= 0.6f; // 40% less likely in poor visibility
 			}
