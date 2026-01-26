@@ -481,6 +481,29 @@ void AMGAIRacerController::UpdateTactics(float DeltaTime)
 		}
 		TacticalData.SimulatedTireWear = FMath::Min(1.0f, TacticalData.SimulatedTireWear + WearRate * DeltaTime);
 	}
+
+	// Update aggression state based on racing situation
+	if (DriverProfile)
+	{
+		bool bUnderPressure = false;
+		bool bApplyingPressure = false;
+
+		// Check if we're under pressure (someone close behind)
+		FMGAIVehiclePerception Behind = GetVehicleBehind();
+		if (Behind.Vehicle && Behind.Distance < 15.0f * AIConstants::MetersToUnits)
+		{
+			bUnderPressure = true;
+		}
+
+		// Check if we're applying pressure (close to someone ahead)
+		FMGAIVehiclePerception Ahead = GetVehicleAhead();
+		if (Ahead.Vehicle && Ahead.Distance < 15.0f * AIConstants::MetersToUnits)
+		{
+			bApplyingPressure = true;
+		}
+
+		DriverProfile->UpdateAggressionState(DeltaTime, CurrentRacePosition, bUnderPressure, bApplyingPressure);
+	}
 }
 
 void AMGAIRacerController::UpdateStateMachine(float DeltaTime)
@@ -564,6 +587,7 @@ void AMGAIRacerController::CalculateSteering(float DeltaTime)
 	if (DriverProfile)
 	{
 		ApplyProfileModifiers(CurrentSteering);
+		ApplyAggressionModifiers(CurrentSteering);
 	}
 
 	// Apply slipstream bonus (this is physics-valid - real drafting effect)
@@ -1368,6 +1392,26 @@ bool AMGAIRacerController::ShouldAttemptOvertake() const
 	if (Ahead.bIsPlayer)
 	{
 		OvertakeChance *= 0.8f;
+	}
+
+	// Aggression escalation increases overtake likelihood
+	if (DriverProfile)
+	{
+		float EscalatedAggression = DriverProfile->GetEscalatedAggression();
+		OvertakeChance *= (1.0f + EscalatedAggression * 0.3f);
+
+		// Grudge against target increases overtake urgency
+		if (DriverProfile->HasGrudgeAgainst(Ahead.Vehicle))
+		{
+			float GrudgeIntensity = DriverProfile->GetGrudgeIntensity(Ahead.Vehicle);
+			OvertakeChance += GrudgeIntensity * 0.3f;
+		}
+
+		// Battle mode increases aggressiveness
+		if (DriverProfile->bInBattleMode && DriverProfile->BattleOpponent.Get() == Ahead.Vehicle)
+		{
+			OvertakeChance += 0.25f;
+		}
 	}
 
 	// Weather caution - less likely to attempt risky overtakes in poor conditions

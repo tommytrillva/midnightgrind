@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "GameFramework/SaveGame.h"
 #include "Data/MGPartsCatalog.h"
 #include "Racing/MGRaceModeSubsystem.h"
 #include "MGSaveSubsystem.generated.h"
@@ -322,6 +323,46 @@ struct FMGSaveGameData
 	// Settings (stored in save for cloud sync)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	TMap<FString, FString> GameSettings;
+
+	// ==========================================
+	// PINK SLIP DATA
+	// ==========================================
+
+	/** Pink slip cooldown state */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PinkSlip")
+	FDateTime PinkSlipCooldownExpires;
+
+	/** Lost vehicle that triggered cooldown */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PinkSlip")
+	FGuid PinkSlipCooldownTransferID;
+
+	/** Name of vehicle lost (for UI display) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PinkSlip")
+	FText PinkSlipCooldownVehicleName;
+
+	/** Trade lock vehicle IDs */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PinkSlip")
+	TArray<FGuid> TradeLockVehicleIDs;
+
+	/** Trade lock expiration times (parallel to TradeLockVehicleIDs) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PinkSlip")
+	TArray<FDateTime> TradeLockExpirations;
+
+	/** Pink slip wins count */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PinkSlip")
+	int32 PinkSlipWins = 0;
+
+	/** Pink slip losses count */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PinkSlip")
+	int32 PinkSlipLosses = 0;
+
+	/** Total value of vehicles won */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PinkSlip")
+	int64 PinkSlipValueWon = 0;
+
+	/** Total value of vehicles lost */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PinkSlip")
+	int64 PinkSlipValueLost = 0;
 };
 
 /**
@@ -333,6 +374,20 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoadStarted, int32, SlotIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLoadCompleted, int32, SlotIndex, bool, bSuccess);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAutoSave, int32, SlotIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSaveSlotDeleted, int32, SlotIndex, bool, bSuccess);
+
+/**
+ * Save game object wrapper for UE serialization
+ * Contains all save data in a USaveGame-compatible format
+ */
+UCLASS()
+class MIDNIGHTGRIND_API UMGSaveGameObject : public USaveGame
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	FMGSaveGameData SaveData;
+};
 
 /**
  * Save/Load System Subsystem

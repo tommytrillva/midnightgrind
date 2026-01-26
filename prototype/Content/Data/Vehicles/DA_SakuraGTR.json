@@ -1,0 +1,256 @@
+{
+  "VehicleID": "SAKURA_GTR",
+  "DisplayName": "Sakura GTR",
+  "Manufacturer": "Sakura Motors",
+  "Year": 1999,
+  "Country": "Japan",
+  "Class": "B",
+  "Category": "JDM",
+  "Description": "The legendary Sakura GTR - a twin-turbo inline-6 monster that dominated the streets of Tokyo in the late 90s. Known for its bulletproof RB-series engine and all-wheel-drive system, the GTR is the perfect platform for everything from daily driving to 1000+ horsepower builds.",
+
+  "BaseStats": {
+    "Power": 280,
+    "PowerUnit": "HP",
+    "Torque": 293,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3500,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 55,
+    "Drivetrain": "AWD",
+    "EnginePosition": "Front",
+    "Aspiration": "TwinTurbo",
+    "Displacement": 2600,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "Inline",
+    "Redline": 8000,
+    "IdleRPM": 850,
+    "TopSpeed": 156,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 4.9,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 650,
+    "Class": "B",
+    "MaxPotential": 999
+  },
+
+  "Engine": {
+    "Code": "RB26DETT",
+    "Type": "Inline-6 Twin Turbo",
+    "Block": {
+      "Material": "Cast Iron",
+      "BoostLimit": 25,
+      "MaxPowerPotential": 800
+    },
+    "Head": {
+      "Type": "DOHC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24
+    },
+    "Turbo": {
+      "Type": "Twin",
+      "Size": "Stock",
+      "MaxBoostPSI": 14,
+      "SpoolRPM": 3500,
+      "PeakBoostRPM": 5500
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 45, "Torque": 120 },
+      { "RPM": 2000, "HP": 95, "Torque": 180 },
+      { "RPM": 3000, "HP": 150, "Torque": 230 },
+      { "RPM": 4000, "HP": 210, "Torque": 270 },
+      { "RPM": 5000, "HP": 255, "Torque": 290 },
+      { "RPM": 6000, "HP": 275, "Torque": 285 },
+      { "RPM": 6800, "HP": 280, "Torque": 275 },
+      { "RPM": 7500, "HP": 270, "Torque": 250 },
+      { "RPM": 8000, "HP": 250, "Torque": 220 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 5,
+    "GearRatios": [3.214, 1.925, 1.302, 1.000, 0.752],
+    "FinalDrive": 3.545,
+    "ReverseRatio": 2.714
+  },
+
+  "Suspension": {
+    "FrontType": "MultiLink",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 450,
+    "RearSpringRate": 400,
+    "FrontDamping": 0.65,
+    "RearDamping": 0.60,
+    "FrontAntiRollBar": 28,
+    "RearAntiRollBar": 22,
+    "RideHeight": 5.5,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 324,
+    "RearDiameter": 300,
+    "DiameterUnit": "mm",
+    "BrakeBias": 60,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 245,
+    "FrontAspectRatio": 40,
+    "FrontDiameter": 18,
+    "RearWidth": 245,
+    "RearAspectRatio": 40,
+    "RearDiameter": 18,
+    "Compound": "Street",
+    "GripMultiplier": 1.0
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.34,
+    "FrontalArea": 2.2,
+    "DownforceMultiplier": 1.0,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4675,
+    "Width": 1780,
+    "Height": 1360,
+    "Wheelbase": 2720,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#1A1A2E",
+      "Secondary": "#16213E",
+      "Accent": "#E94560"
+    },
+    "AvailableColors": [
+      { "Name": "Midnight Purple", "Hex": "#1A1A2E" },
+      { "Name": "Bayside Blue", "Hex": "#0066CC" },
+      { "Name": "Pearl White", "Hex": "#F5F5F5" },
+      { "Name": "Sonic Silver", "Hex": "#757575" },
+      { "Name": "Championship Red", "Hex": "#CC0000" },
+      { "Name": "Black Pearl", "Hex": "#0A0A0A" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineSix_Turbo",
+    "ExhaustProfile": "JDM_Sports",
+    "TurboWhine": true,
+    "BlowoffValve": true,
+    "BackfireOnShift": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.0,
+    "TurnRadius": 5.4,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.3,
+    "OversteerTendency": 0.5,
+    "DriftCapability": 0.7,
+    "StabilityControl": true,
+    "TractionControl": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 75,
+    "PowerBoostUnit": "HP",
+    "Duration": 5.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 10,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 45000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "B",
+    "MaintenanceCostMultiplier": 1.2,
+    "PartsPriceMultiplier": 1.1,
+    "StreetValue": 55000,
+    "LegendaryValue": 150000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "KNOWN",
+    "RequiredLevel": 15,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Sport", "Race", "Elite"],
+      "Exhaust": ["Stock", "Sport", "Race", "Elite"],
+      "Turbo": ["Stock", "Upgraded", "Large", "Massive"],
+      "Intercooler": ["Stock", "Front-Mount", "V-Mount"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Stage3"],
+      "FuelSystem": ["Stock", "HighFlow", "Racing"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "MultiPlate"],
+      "Transmission": ["Stock", "ShortThrow", "Sequential", "Dog"],
+      "FinalDrive": ["Stock", "Sport", "Race"],
+      "LSD": ["Stock", "1.5Way", "2Way"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Racing"],
+      "Dampers": ["Stock", "Adjustable", "Racing"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "Drilled", "Carbon"],
+      "Lines": ["Stock", "Braided"],
+      "Calipers": ["Stock", "4Piston", "6Piston"]
+    },
+    "Wheels": {
+      "Size": [17, 18, 19],
+      "Width": [8.0, 8.5, 9.0, 9.5, 10.0]
+    },
+    "Tires": {
+      "Compound": ["Street", "Sport", "Semi-Slick", "Slick", "Drag"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Lip", "Splitter", "FullKit"],
+      "RearBumper": ["Stock", "Diffuser", "FullKit"],
+      "Spoiler": ["Stock", "Ducktail", "GT", "HighMount"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Street", "GT", "TimesAttack"],
+      "Mirrors": ["Stock", "Aero", "Carbon"],
+      "Lights": ["Stock", "Projector", "LED"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 1200,
+    "MaxTorque": 950,
+    "MinWeight": 3100,
+    "MaxTopSpeed": 220,
+    "MaxPI": 999
+  },
+
+  "Tags": ["JDM", "AWD", "Turbo", "Legend", "Tuner", "90s", "Skyline", "GTR"],
+
+  "Lore": {
+    "Backstory": "Born from Sakura Motors' Group A racing program, the GTR earned its nickname 'Godzilla' by dominating Japanese touring car racing in the early 1990s. The ATTESA E-TS all-wheel-drive system and twin-turbocharged RB26 engine made it nearly unbeatable on track, leading to a 29-race winning streak that forced regulations changes. On the streets, it became the weapon of choice for midnight highway racers, its sophisticated AWD system and massive power potential making it the benchmark all others were measured against.",
+    "FamousOwners": ["Drift King Kenji", "Wangan Midnight Legend"],
+    "RivalVehicles": ["Supra MK4", "RX-7 FD", "NSX-R"]
+  }
+}

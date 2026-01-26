@@ -1,0 +1,351 @@
+{
+  "Version": "1.0",
+  "Description": "Default input mappings for MIDNIGHT GRIND",
+
+  "InputActions": {
+    "Vehicle": {
+      "IA_Throttle": {
+        "Description": "Accelerate the vehicle",
+        "ValueType": "Axis1D",
+        "Triggers": ["Down"],
+        "DefaultBindings": {
+          "Keyboard": "W",
+          "Gamepad": "RightTrigger"
+        }
+      },
+      "IA_Brake": {
+        "Description": "Brake/Reverse the vehicle",
+        "ValueType": "Axis1D",
+        "Triggers": ["Down"],
+        "DefaultBindings": {
+          "Keyboard": "S",
+          "Gamepad": "LeftTrigger"
+        }
+      },
+      "IA_Steering": {
+        "Description": "Steer left/right",
+        "ValueType": "Axis1D",
+        "Triggers": ["None"],
+        "DefaultBindings": {
+          "Keyboard": {
+            "Left": "A",
+            "Right": "D"
+          },
+          "Gamepad": "LeftStick_X"
+        }
+      },
+      "IA_Handbrake": {
+        "Description": "Engage handbrake for drifting",
+        "ValueType": "Digital",
+        "Triggers": ["Down", "Released"],
+        "DefaultBindings": {
+          "Keyboard": "Space",
+          "Gamepad": "FaceButton_Bottom"
+        }
+      },
+      "IA_Nitrous": {
+        "Description": "Activate nitrous boost",
+        "ValueType": "Digital",
+        "Triggers": ["Down", "Released"],
+        "DefaultBindings": {
+          "Keyboard": "LeftShift",
+          "Gamepad": "FaceButton_Right"
+        }
+      },
+      "IA_ShiftUp": {
+        "Description": "Shift to higher gear (manual mode)",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "E",
+          "Gamepad": "RightShoulder"
+        }
+      },
+      "IA_ShiftDown": {
+        "Description": "Shift to lower gear (manual mode)",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "Q",
+          "Gamepad": "LeftShoulder"
+        }
+      },
+      "IA_Horn": {
+        "Description": "Honk the horn",
+        "ValueType": "Digital",
+        "Triggers": ["Down"],
+        "DefaultBindings": {
+          "Keyboard": "H",
+          "Gamepad": "LeftStick_Button"
+        }
+      }
+    },
+
+    "Camera": {
+      "IA_CameraCycle": {
+        "Description": "Cycle through camera views",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "C",
+          "Gamepad": "FaceButton_Top"
+        }
+      },
+      "IA_LookBehind": {
+        "Description": "Look behind the vehicle",
+        "ValueType": "Digital",
+        "Triggers": ["Down", "Released"],
+        "DefaultBindings": {
+          "Keyboard": "LeftControl",
+          "Gamepad": "FaceButton_Left"
+        }
+      },
+      "IA_FreeLook": {
+        "Description": "Free look camera control",
+        "ValueType": "Axis2D",
+        "Triggers": ["None"],
+        "DefaultBindings": {
+          "Keyboard": "Mouse_XY",
+          "Gamepad": "RightStick"
+        }
+      }
+    },
+
+    "Race": {
+      "IA_ResetVehicle": {
+        "Description": "Reset vehicle to last checkpoint",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "R",
+          "Gamepad": "Special_Right"
+        }
+      },
+      "IA_Pause": {
+        "Description": "Pause the game",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "Escape",
+          "Gamepad": "Special_Right"
+        }
+      },
+      "IA_Map": {
+        "Description": "Toggle minimap/full map",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "M",
+          "Gamepad": "DPad_Up"
+        }
+      }
+    },
+
+    "Menu": {
+      "IA_Navigate": {
+        "Description": "Navigate menu items",
+        "ValueType": "Axis2D",
+        "Triggers": ["None"],
+        "DefaultBindings": {
+          "Keyboard": {
+            "Up": "W",
+            "Down": "S",
+            "Left": "A",
+            "Right": "D"
+          },
+          "Gamepad": "LeftStick"
+        }
+      },
+      "IA_Confirm": {
+        "Description": "Confirm selection",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "Enter",
+          "Gamepad": "FaceButton_Bottom"
+        }
+      },
+      "IA_Cancel": {
+        "Description": "Cancel/Go back",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "Escape",
+          "Gamepad": "FaceButton_Right"
+        }
+      },
+      "IA_TabLeft": {
+        "Description": "Switch to previous tab",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "Q",
+          "Gamepad": "LeftShoulder"
+        }
+      },
+      "IA_TabRight": {
+        "Description": "Switch to next tab",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "E",
+          "Gamepad": "RightShoulder"
+        }
+      }
+    },
+
+    "Debug": {
+      "IA_ToggleDebugHUD": {
+        "Description": "Toggle debug information display",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "F1",
+          "Gamepad": null
+        }
+      },
+      "IA_TogglePhysicsDebug": {
+        "Description": "Toggle physics debug visualization",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "F2",
+          "Gamepad": null
+        }
+      },
+      "IA_SpawnTestVehicle": {
+        "Description": "Spawn a test vehicle",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "F5",
+          "Gamepad": null
+        }
+      },
+      "IA_TeleportForward": {
+        "Description": "Teleport vehicle forward",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "F6",
+          "Gamepad": null
+        }
+      },
+      "IA_GodMode": {
+        "Description": "Toggle invincibility",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "F9",
+          "Gamepad": null
+        }
+      },
+      "IA_UnlimitedNitrous": {
+        "Description": "Toggle unlimited nitrous",
+        "ValueType": "Digital",
+        "Triggers": ["Started"],
+        "DefaultBindings": {
+          "Keyboard": "F10",
+          "Gamepad": null
+        }
+      }
+    }
+  },
+
+  "MappingContexts": {
+    "IMC_Vehicle": {
+      "Description": "Input context for driving vehicles",
+      "Priority": 0,
+      "Actions": [
+        "IA_Throttle",
+        "IA_Brake",
+        "IA_Steering",
+        "IA_Handbrake",
+        "IA_Nitrous",
+        "IA_ShiftUp",
+        "IA_ShiftDown",
+        "IA_Horn",
+        "IA_CameraCycle",
+        "IA_LookBehind",
+        "IA_FreeLook",
+        "IA_ResetVehicle",
+        "IA_Pause",
+        "IA_Map"
+      ]
+    },
+    "IMC_Menu": {
+      "Description": "Input context for menu navigation",
+      "Priority": 1,
+      "Actions": [
+        "IA_Navigate",
+        "IA_Confirm",
+        "IA_Cancel",
+        "IA_TabLeft",
+        "IA_TabRight"
+      ]
+    },
+    "IMC_Debug": {
+      "Description": "Input context for debug commands (Development only)",
+      "Priority": 2,
+      "Actions": [
+        "IA_ToggleDebugHUD",
+        "IA_TogglePhysicsDebug",
+        "IA_SpawnTestVehicle",
+        "IA_TeleportForward",
+        "IA_GodMode",
+        "IA_UnlimitedNitrous"
+      ]
+    }
+  },
+
+  "ControllerProfiles": {
+    "Xbox": {
+      "DisplayName": "Xbox Controller",
+      "Icons": "Xbox",
+      "Mappings": "Default"
+    },
+    "PlayStation": {
+      "DisplayName": "PlayStation Controller",
+      "Icons": "PlayStation",
+      "Mappings": "Default",
+      "ButtonNameOverrides": {
+        "FaceButton_Bottom": "Cross",
+        "FaceButton_Right": "Circle",
+        "FaceButton_Left": "Square",
+        "FaceButton_Top": "Triangle"
+      }
+    },
+    "Wheel": {
+      "DisplayName": "Racing Wheel",
+      "Icons": "Wheel",
+      "Mappings": {
+        "IA_Throttle": "Pedal_Throttle",
+        "IA_Brake": "Pedal_Brake",
+        "IA_Steering": "Wheel_Rotation",
+        "IA_Handbrake": "Button_1",
+        "IA_ShiftUp": "Paddle_Right",
+        "IA_ShiftDown": "Paddle_Left"
+      },
+      "ForceFeeback": {
+        "Enabled": true,
+        "Strength": 0.8,
+        "Effects": ["SurfaceRumble", "CollisionImpact", "EngineVibration"]
+      }
+    }
+  },
+
+  "Settings": {
+    "DeadZone": {
+      "LeftStick": 0.15,
+      "RightStick": 0.15,
+      "Triggers": 0.05
+    },
+    "Sensitivity": {
+      "Steering": 1.0,
+      "Camera": 1.0
+    },
+    "InvertY": false,
+    "Vibration": true,
+    "VibrationIntensity": 1.0
+  }
+}

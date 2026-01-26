@@ -3,6 +3,7 @@
 // Last Updated: Economy System Balance Pass
 
 #include "Economy/MGEconomySubsystem.h"
+#include "Vehicle/MGVehicleData.h"
 #include "Balancing/MGBalancingSubsystem.h"
 
 namespace MGEconomyBalance

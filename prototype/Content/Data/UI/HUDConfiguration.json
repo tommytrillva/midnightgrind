@@ -1,0 +1,317 @@
+{
+  "Version": "1.0",
+  "Description": "HUD layout and style configurations for MIDNIGHT GRIND",
+
+  "HUDStyles": {
+    "Modern": {
+      "ID": "MODERN",
+      "DisplayName": "Modern",
+      "Description": "Clean, minimal racing HUD",
+      "SpeedometerStyle": "Digital",
+      "TachometerStyle": "Bar",
+      "ColorScheme": "Cyan",
+      "Opacity": 0.9
+    },
+    "Classic": {
+      "ID": "CLASSIC",
+      "DisplayName": "Classic",
+      "Description": "Traditional analog gauges",
+      "SpeedometerStyle": "Analog",
+      "TachometerStyle": "Analog",
+      "ColorScheme": "White",
+      "Opacity": 1.0
+    },
+    "Retro": {
+      "ID": "RETRO",
+      "DisplayName": "Retro",
+      "Description": "90s arcade racing style",
+      "SpeedometerStyle": "Digital",
+      "TachometerStyle": "Segmented",
+      "ColorScheme": "NeonPink",
+      "Opacity": 1.0
+    },
+    "Minimal": {
+      "ID": "MINIMAL",
+      "DisplayName": "Minimal",
+      "Description": "Speed only, maximum immersion",
+      "SpeedometerStyle": "TextOnly",
+      "TachometerStyle": "Hidden",
+      "ColorScheme": "White",
+      "Opacity": 0.7
+    }
+  },
+
+  "HUDElements": {
+    "Speedometer": {
+      "Position": { "X": 0.9, "Y": 0.85 },
+      "Anchor": "BottomRight",
+      "Size": { "Width": 200, "Height": 200 },
+      "Styles": {
+        "Digital": {
+          "FontSize": 72,
+          "UnitFontSize": 24,
+          "ShowUnit": true,
+          "Unit": "MPH"
+        },
+        "Analog": {
+          "NeedleColor": "#FF4444",
+          "DialColor": "#FFFFFF",
+          "MaxSpeed": 200,
+          "MajorTicks": 20,
+          "MinorTicks": 10
+        },
+        "Bar": {
+          "Orientation": "Horizontal",
+          "FillColor": "#00FFFF",
+          "BackgroundColor": "#222222"
+        },
+        "TextOnly": {
+          "FontSize": 48,
+          "ShowUnit": false
+        }
+      }
+    },
+
+    "Tachometer": {
+      "Position": { "X": 0.1, "Y": 0.85 },
+      "Anchor": "BottomLeft",
+      "Size": { "Width": 250, "Height": 60 },
+      "Styles": {
+        "Bar": {
+          "Orientation": "Horizontal",
+          "Segments": 1,
+          "FillColor": "#00FF00",
+          "RedlineColor": "#FF0000",
+          "RedlinePercent": 0.85,
+          "BackgroundColor": "#222222"
+        },
+        "Analog": {
+          "NeedleColor": "#FF4444",
+          "RedlineStart": 7000,
+          "MaxRPM": 9000
+        },
+        "Segmented": {
+          "Segments": 8,
+          "SegmentColors": ["#00FF00", "#00FF00", "#FFFF00", "#FFFF00", "#FF8800", "#FF8800", "#FF0000", "#FF0000"]
+        },
+        "Hidden": {
+          "Visible": false
+        }
+      }
+    },
+
+    "GearIndicator": {
+      "Position": { "X": 0.5, "Y": 0.9 },
+      "Anchor": "BottomCenter",
+      "Size": { "Width": 80, "Height": 80 },
+      "FontSize": 64,
+      "ShowNeutral": true,
+      "ShowReverse": true,
+      "NeutralText": "N",
+      "ReverseText": "R"
+    },
+
+    "NitrousBar": {
+      "Position": { "X": 0.5, "Y": 0.95 },
+      "Anchor": "BottomCenter",
+      "Size": { "Width": 200, "Height": 15 },
+      "FillColor": "#00AAFF",
+      "ActiveColor": "#00FFFF",
+      "BackgroundColor": "#333333",
+      "ShowPercentText": false,
+      "PulseWhenLow": true,
+      "LowThreshold": 0.2
+    },
+
+    "BoostGauge": {
+      "Position": { "X": 0.15, "Y": 0.75 },
+      "Anchor": "BottomLeft",
+      "Size": { "Width": 100, "Height": 100 },
+      "Style": "Circular",
+      "MaxPSI": 30,
+      "FillColor": "#FF6600",
+      "OverboostColor": "#FF0000"
+    },
+
+    "LapCounter": {
+      "Position": { "X": 0.5, "Y": 0.05 },
+      "Anchor": "TopCenter",
+      "Format": "Lap {current}/{total}",
+      "FontSize": 32
+    },
+
+    "LapTimer": {
+      "Position": { "X": 0.95, "Y": 0.05 },
+      "Anchor": "TopRight",
+      "ShowCurrentLap": true,
+      "ShowBestLap": true,
+      "ShowDelta": true,
+      "DeltaPositiveColor": "#FF4444",
+      "DeltaNegativeColor": "#44FF44",
+      "FontSize": 28,
+      "Format": "mm:ss.fff"
+    },
+
+    "Position": {
+      "Position": { "X": 0.05, "Y": 0.05 },
+      "Anchor": "TopLeft",
+      "Format": "{position}/{total}",
+      "FontSize": 48,
+      "OrdinalSuffix": true
+    },
+
+    "Minimap": {
+      "Position": { "X": 0.05, "Y": 0.75 },
+      "Anchor": "BottomLeft",
+      "Size": { "Width": 150, "Height": 150 },
+      "Style": "Circular",
+      "Rotation": "PlayerUp",
+      "ZoomLevel": 1.0,
+      "ShowCheckpoints": true,
+      "ShowOpponents": true,
+      "ShowPolice": true,
+      "PlayerColor": "#00FFFF",
+      "OpponentColor": "#FF8800",
+      "PoliceColor": "#FF0000",
+      "CheckpointColor": "#FFFF00"
+    },
+
+    "DriftScore": {
+      "Position": { "X": 0.5, "Y": 0.3 },
+      "Anchor": "Center",
+      "Visible": "OnlyWhenDrifting",
+      "FontSize": 48,
+      "MultiplierFontSize": 24,
+      "ScoreColor": "#FF00FF",
+      "MultiplierColor": "#FFFF00",
+      "AnimateOnScore": true
+    },
+
+    "SpeedTrap": {
+      "Position": { "X": 0.5, "Y": 0.4 },
+      "Anchor": "Center",
+      "Visible": "OnTrigger",
+      "Duration": 3.0,
+      "FontSize": 64,
+      "ShowRecord": true
+    },
+
+    "WrongWay": {
+      "Position": { "X": 0.5, "Y": 0.5 },
+      "Anchor": "Center",
+      "Visible": "OnWrongWay",
+      "Text": "WRONG WAY",
+      "FontSize": 72,
+      "Color": "#FF0000",
+      "Pulse": true
+    },
+
+    "Countdown": {
+      "Position": { "X": 0.5, "Y": 0.5 },
+      "Anchor": "Center",
+      "FontSize": 120,
+      "Colors": {
+        "3": "#FF0000",
+        "2": "#FFFF00",
+        "1": "#00FF00",
+        "GO": "#00FFFF"
+      },
+      "ScaleAnimation": true
+    }
+  },
+
+  "ColorSchemes": {
+    "Cyan": {
+      "Primary": "#00FFFF",
+      "Secondary": "#008888",
+      "Accent": "#FFFFFF",
+      "Background": "#000000",
+      "Warning": "#FFFF00",
+      "Danger": "#FF0000"
+    },
+    "NeonPink": {
+      "Primary": "#FF00FF",
+      "Secondary": "#880088",
+      "Accent": "#00FFFF",
+      "Background": "#1A0A1A",
+      "Warning": "#FFFF00",
+      "Danger": "#FF0000"
+    },
+    "White": {
+      "Primary": "#FFFFFF",
+      "Secondary": "#888888",
+      "Accent": "#FF4444",
+      "Background": "#000000",
+      "Warning": "#FFFF00",
+      "Danger": "#FF0000"
+    },
+    "Orange": {
+      "Primary": "#FF8800",
+      "Secondary": "#884400",
+      "Accent": "#FFFFFF",
+      "Background": "#1A0A00",
+      "Warning": "#FFFF00",
+      "Danger": "#FF0000"
+    }
+  },
+
+  "RaceHUDPresets": {
+    "Sprint": {
+      "Elements": ["Speedometer", "Tachometer", "GearIndicator", "NitrousBar", "Position", "Minimap"],
+      "HideTimer": false
+    },
+    "Circuit": {
+      "Elements": ["Speedometer", "Tachometer", "GearIndicator", "NitrousBar", "LapCounter", "LapTimer", "Position", "Minimap"],
+      "ShowBestLap": true
+    },
+    "Drag": {
+      "Elements": ["Speedometer", "Tachometer", "GearIndicator", "NitrousBar"],
+      "ShowReactionTime": true,
+      "ShowET": true
+    },
+    "Drift": {
+      "Elements": ["Speedometer", "Tachometer", "GearIndicator", "DriftScore"],
+      "ShowAngle": true,
+      "ShowCombo": true
+    },
+    "TimeAttack": {
+      "Elements": ["Speedometer", "Tachometer", "GearIndicator", "NitrousBar", "LapTimer", "Minimap"],
+      "ShowGhost": true,
+      "ShowDelta": true
+    },
+    "FreeRoam": {
+      "Elements": ["Speedometer", "GearIndicator", "NitrousBar", "Minimap"],
+      "ShowPoliceHeat": true,
+      "ShowPOI": true
+    }
+  },
+
+  "Accessibility": {
+    "HighContrast": {
+      "Enabled": false,
+      "BackgroundOpacity": 0.8,
+      "TextOutline": true
+    },
+    "Colorblind": {
+      "Mode": "None",
+      "Options": ["None", "Protanopia", "Deuteranopia", "Tritanopia"]
+    },
+    "TextScale": {
+      "Min": 0.75,
+      "Max": 1.5,
+      "Default": 1.0
+    },
+    "ReducedMotion": {
+      "Enabled": false,
+      "DisableAnimations": true,
+      "DisablePulse": true
+    }
+  },
+
+  "Performance": {
+    "UpdateRate": 60,
+    "MinimapUpdateRate": 30,
+    "AnimationQuality": "High",
+    "Options": ["Low", "Medium", "High"]
+  }
+}

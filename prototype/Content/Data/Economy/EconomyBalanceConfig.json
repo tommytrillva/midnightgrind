@@ -1,0 +1,379 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND Economy Balance Configuration",
+
+  "Currency": {
+    "Primary": {
+      "Name": "Cash",
+      "Symbol": "$",
+      "ID": "MG_CASH",
+      "StartingAmount": 15000
+    },
+    "Premium": {
+      "Name": "Credits",
+      "Symbol": "CR",
+      "ID": "MG_CREDITS",
+      "StartingAmount": 0,
+      "Note": "Premium currency - not used in MVP"
+    }
+  },
+
+  "REPSystem": {
+    "Tiers": [
+      {
+        "ID": "UNKNOWN",
+        "Name": "Unknown",
+        "MinREP": 0,
+        "MaxREP": 99,
+        "RacePayoutMultiplier": 1.0,
+        "UnlockDescription": "Starting tier"
+      },
+      {
+        "ID": "NEWCOMER",
+        "Name": "Newcomer",
+        "MinREP": 100,
+        "MaxREP": 499,
+        "RacePayoutMultiplier": 1.1,
+        "UnlockDescription": "Complete your first race"
+      },
+      {
+        "ID": "KNOWN",
+        "Name": "Known",
+        "MinREP": 500,
+        "MaxREP": 1999,
+        "RacePayoutMultiplier": 1.25,
+        "UnlockDescription": "Win 10 races"
+      },
+      {
+        "ID": "RESPECTED",
+        "Name": "Respected",
+        "MinREP": 2000,
+        "MaxREP": 4999,
+        "RacePayoutMultiplier": 1.4,
+        "UnlockDescription": "Win a Pink Slip race"
+      },
+      {
+        "ID": "FEARED",
+        "Name": "Feared",
+        "MinREP": 5000,
+        "MaxREP": 14999,
+        "RacePayoutMultiplier": 1.6,
+        "UnlockDescription": "Defeat a Rival boss"
+      },
+      {
+        "ID": "LEGENDARY",
+        "Name": "Legendary",
+        "MinREP": 15000,
+        "MaxREP": 999999,
+        "RacePayoutMultiplier": 2.0,
+        "UnlockDescription": "Become the Midnight King"
+      }
+    ],
+
+    "REPGains": {
+      "RaceWin": 25,
+      "RacePlace2nd": 15,
+      "RacePlace3rd": 10,
+      "RaceFinish": 5,
+      "PinkSlipWin": 100,
+      "PinkSlipLoss": -50,
+      "RivalDefeated": 150,
+      "DriftEvent1st": 30,
+      "DriftEventParticipation": 10,
+      "TimeAttackRecord": 50,
+      "PoliceEscape": 20,
+      "PoliceArrested": -30,
+      "CrashOut": -5,
+      "Disconnect": -25
+    }
+  },
+
+  "RacePayouts": {
+    "StreetSprint": {
+      "BaseEntryFee": 0,
+      "BasePayout": {
+        "1st": 2000,
+        "2nd": 1200,
+        "3rd": 800,
+        "4th": 500,
+        "5th-8th": 250,
+        "DNF": 0
+      },
+      "ParticipantMultiplier": 1.0,
+      "PIClassMultiplier": {
+        "D": 0.8,
+        "C": 1.0,
+        "B": 1.2,
+        "A": 1.5,
+        "S": 2.0
+      }
+    },
+
+    "CircuitRace": {
+      "BaseEntryFee": 500,
+      "BasePayout": {
+        "1st": 3500,
+        "2nd": 2000,
+        "3rd": 1200,
+        "4th": 800,
+        "5th-12th": 400,
+        "DNF": 0
+      },
+      "LapBonus": 100,
+      "Note": "Longer races = higher payouts"
+    },
+
+    "DragRace": {
+      "BaseEntryFee": 1000,
+      "BasePayout": {
+        "Win": 2500,
+        "Lose": 0
+      },
+      "PerfectReactionBonus": 500,
+      "BracketBonus": {
+        "1stRound": 0,
+        "Quarterfinal": 500,
+        "Semifinal": 1000,
+        "Final": 2000
+      }
+    },
+
+    "DriftEvent": {
+      "BaseEntryFee": 0,
+      "BasePayout": {
+        "1st": 2500,
+        "2nd": 1500,
+        "3rd": 1000,
+        "Participation": 200
+      },
+      "ScoreBonus": {
+        "Per1000Points": 50,
+        "PerfectRun": 500
+      }
+    },
+
+    "TimeAttack": {
+      "BaseEntryFee": 200,
+      "BasePayout": {
+        "NewRecord": 5000,
+        "TopTen": 1000,
+        "Completion": 300
+      }
+    },
+
+    "HighwayBattle": {
+      "BaseEntryFee": 0,
+      "WagerRange": {
+        "Min": 1000,
+        "Max": 50000
+      },
+      "BasePayout": {
+        "Win": "WagerAmount * 2",
+        "Lose": 0
+      }
+    },
+
+    "TougeDuel": {
+      "BaseEntryFee": 0,
+      "WagerRange": {
+        "Min": 500,
+        "Max": 25000
+      },
+      "BasePayout": {
+        "Win": "WagerAmount * 2",
+        "Lose": 0
+      }
+    },
+
+    "PinkSlip": {
+      "BaseEntryFee": 0,
+      "Payout": {
+        "Win": "OpponentVehicleValue",
+        "Lose": "PlayerVehicleValue"
+      },
+      "MinVehicleValue": 10000,
+      "Note": "Winner takes loser's car"
+    }
+  },
+
+  "PartsPricing": {
+    "TierMultipliers": {
+      "Stock": 0,
+      "Sport": 1.0,
+      "Race": 2.5,
+      "Elite": 5.0
+    },
+    "CategoryBase": {
+      "Engine": 500,
+      "Drivetrain": 400,
+      "Suspension": 300,
+      "Brakes": 200,
+      "Tires": 150,
+      "Aero": 300,
+      "Body": 400,
+      "WeightReduction": 0
+    },
+    "InstallationCost": {
+      "Simple": 50,
+      "Moderate": 150,
+      "Complex": 500,
+      "Expert": 1000
+    }
+  },
+
+  "VehiclePricing": {
+    "Classes": {
+      "D": {
+        "PriceRange": { "Min": 5000, "Max": 20000 },
+        "InsuranceRate": 0.01,
+        "MaintenanceCost": 50
+      },
+      "C": {
+        "PriceRange": { "Min": 15000, "Max": 45000 },
+        "InsuranceRate": 0.015,
+        "MaintenanceCost": 100
+      },
+      "B": {
+        "PriceRange": { "Min": 35000, "Max": 80000 },
+        "InsuranceRate": 0.02,
+        "MaintenanceCost": 200
+      },
+      "A": {
+        "PriceRange": { "Min": 60000, "Max": 150000 },
+        "InsuranceRate": 0.025,
+        "MaintenanceCost": 400
+      },
+      "S": {
+        "PriceRange": { "Min": 100000, "Max": 500000 },
+        "InsuranceRate": 0.03,
+        "MaintenanceCost": 800
+      }
+    },
+    "UsedCarDiscount": 0.15,
+    "RareCarPremium": 1.5
+  },
+
+  "Maintenance": {
+    "WearCategories": {
+      "Engine": {
+        "WearPerRace": 0.5,
+        "RepairCostPer1Percent": 10,
+        "PerformanceLossAt50Percent": 0.05,
+        "PerformanceLossAt25Percent": 0.15,
+        "FailureAt0Percent": true
+      },
+      "Tires": {
+        "WearPerRace": 2.0,
+        "WearPerDriftMinute": 5.0,
+        "RepairCostPer1Percent": 2,
+        "GripLossAt50Percent": 0.10,
+        "GripLossAt25Percent": 0.25,
+        "FailureAt0Percent": true
+      },
+      "Brakes": {
+        "WearPerRace": 1.0,
+        "RepairCostPer1Percent": 3,
+        "PerformanceLossAt50Percent": 0.05,
+        "FadeAt25Percent": true
+      },
+      "Transmission": {
+        "WearPerRace": 0.2,
+        "RepairCostPer1Percent": 15,
+        "PerformanceLossAt50Percent": 0.02
+      }
+    },
+    "FullServiceCost": "SumOfRepairs * 1.2",
+    "QuickRepairCost": "SumOfRepairs * 1.5"
+  },
+
+  "ProgressionUnlocks": {
+    "Level": {
+      "XPPerLevel": 1000,
+      "XPPerRaceWin": 100,
+      "XPPerRaceComplete": 50,
+      "MaxLevel": 100
+    },
+    "ContentUnlocks": {
+      "Level5": ["Class C Vehicles", "Drag Racing"],
+      "Level10": ["Class B Vehicles", "Drift Events"],
+      "Level15": ["Sakura GTR", "Highway Battle"],
+      "Level20": ["Class A Vehicles", "Pink Slip Racing"],
+      "Level30": ["Class S Vehicles", "Touge Duels"],
+      "Level50": ["Legendary Vehicles", "Rival Challenges"]
+    }
+  },
+
+  "DailyRewards": {
+    "Day1": { "Cash": 500, "REP": 10 },
+    "Day2": { "Cash": 750, "REP": 15 },
+    "Day3": { "Cash": 1000, "REP": 20 },
+    "Day4": { "Cash": 1500, "REP": 25 },
+    "Day5": { "Cash": 2000, "REP": 30 },
+    "Day6": { "Cash": 2500, "REP": 40 },
+    "Day7": { "Cash": 5000, "REP": 100, "Special": "Mystery Part" }
+  },
+
+  "Bonuses": {
+    "FirstWinOfDay": 1.5,
+    "WinStreak": {
+      "3Wins": 1.1,
+      "5Wins": 1.2,
+      "10Wins": 1.5
+    },
+    "CleanRace": 1.1,
+    "Underdog": 1.3,
+    "Note": "Underdog = winning against higher PI opponents"
+  },
+
+  "Penalties": {
+    "Collision": {
+      "WallHit": -50,
+      "VehicleHit": -100,
+      "PedestrianArea": -200
+    },
+    "RaceAbandon": {
+      "CashPenalty": -500,
+      "REPPenalty": -25
+    },
+    "PoliceImpound": {
+      "BaseFine": 2000,
+      "PerHeatLevel": 1000,
+      "VehicleReleaseFee": 500
+    }
+  },
+
+  "MarketEconomy": {
+    "PlayerTrading": {
+      "Enabled": false,
+      "TransactionFee": 0.05,
+      "Note": "5% fee on all trades"
+    },
+    "AuctionHouse": {
+      "Enabled": false,
+      "MinListingFee": 100,
+      "ListingFeePercent": 0.02
+    },
+    "NPCShop": {
+      "RefreshInterval": "24hours",
+      "FeaturedDiscount": 0.15,
+      "RareItemChance": 0.05
+    }
+  },
+
+  "BalanceNotes": {
+    "DesignGoals": [
+      "Average player earns first upgrade within 3 races",
+      "New car purchase possible within 2-3 hours",
+      "Top tier parts require dedicated grinding",
+      "Pink slip risk/reward should feel significant",
+      "Maintenance costs should not be punishing"
+    ],
+    "TargetHourlyEarning": {
+      "Beginner": 3000,
+      "Intermediate": 6000,
+      "Expert": 12000
+    },
+    "TimeToFirstCar": "2-3 hours",
+    "TimeToFullBuild": "15-20 hours"
+  }
+}

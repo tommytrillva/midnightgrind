@@ -1,0 +1,141 @@
+🏁 MIDNIGHT GRIND - 500 ITERATION AUTONOMOUS DEVELOPMENT SESSION
+
+Read design docs in ../docs/design/ (GDD.md, VehicleSystems.md, MultiplayerSystems.md)
+Current Status: Stage 59 MVP Complete - 183 subsystems in Source/MidnightGrind/, 292 .cpp files, 293 .h files
+
+PROJECT: Unreal Engine 5 street racing game - PS1/PS2 retro aesthetic, deep car culture simulation
+
+MISSION: Systematically enhance existing systems and implement missing features from GDD specifications
+
+DEVELOPMENT PHASES:
+
+PHASE 1 (Iterations 1-100): EXPLORATION & PLANNING
+- Read all design documentation thoroughly
+- Explore Source/MidnightGrind/ subsystem architecture
+- Map current implementation vs GDD vision
+- Identify high-priority gaps and enhancements
+- Document findings in DEVELOPMENT_NOTES.md
+- Create prioritized task list
+
+PHASE 2 (Iterations 101-250): CORE SYSTEM ENHANCEMENTS
+- Vehicle physics refinement (handling model, drift mechanics, grip simulation)
+- Customization system depth (ensure 200+ parts interact correctly)
+- Pink slip race mechanics (implement permanent loss system properly)
+- Economy balancing (cash flow, part pricing, progression curve)
+- AI racing intelligence (racing lines, overtaking behavior, difficulty scaling)
+- Police/heat system polish (escalation mechanics, escape dynamics)
+
+PHASE 3 (Iterations 251-400): FEATURE IMPLEMENTATION
+- Crew system (formation, management, benefits)
+- Meet spot social features (gathering, challenges, reputation)
+- Player-driven marketplace (buying/selling parts, cars)
+- Tournament system (brackets, rewards, ranking)
+- Career mode depth (story progression, boss races)
+- Weather effects on physics (rain handling, visibility)
+- Traffic AI improvements (realistic behaviors, interactions)
+
+PHASE 4 (Iterations 401-500): POLISH & OPTIMIZATION
+- Performance profiling (identify bottlenecks)
+- Memory optimization (reduce allocations, fix leaks)
+- Code cleanup and refactoring (remove duplication, improve structure)
+- Comprehensive inline documentation (Doxygen comments)
+- Unit test coverage (critical systems)
+- Build validation (ensure everything compiles)
+- Integration testing (subsystem interactions)
+
+TECHNICAL REQUIREMENTS:
+
+Coding Standards:
+- Follow Unreal Engine 5 C++ coding conventions
+- Use UPROPERTY/UFUNCTION macros appropriately
+- Maintain const correctness throughout
+- Use smart pointers (TSharedPtr, TWeakPtr, TWeakObjectPtr)
+- Add UE_LOG statements for important events
+- Include null checks before all pointer dereferences
+- Add FORCEINLINE for performance-critical functions
+- Use proper Unreal naming conventions (U/A/F/E prefixes)
+
+Documentation Requirements:
+- /** Doxygen-style */ comments for all public functions
+- Explain WHY not just WHAT in complex logic
+- Document assumptions and constraints
+- Note performance considerations
+- Add usage examples for complex APIs
+- Update header comments when changing interfaces
+
+Git Commit Standards:
+- Clear, descriptive commit messages
+- Format: "feat: description" / "fix: description" / "perf: description" / "docs: description"
+- Atomic commits (one logical change per commit)
+- Reference GDD sections when implementing specified features
+- Include before/after context in commit messages
+
+SUCCESS METRICS (All Required):
+
+✓ 50+ meaningful code enhancements across subsystems
+✓ All changes compile without errors or warnings
+✓ Comprehensive inline documentation added
+✓ Performance maintained or improved (no regressions)
+✓ 20+ clean git commits with clear messages
+✓ No functional regressions in existing features
+✓ Features align with GDD specifications
+✓ Code follows UE5 best practices
+
+PRIORITY RANKING (High to Low):
+
+1. Vehicle physics (core gameplay foundation)
+2. Pink slip race mechanics (unique selling point)
+3. 200+ parts customization system (depth feature)
+4. AI racing intelligence (player experience quality)
+5. Economy balance (progression feel)
+6. Police/heat system polish (tension and stakes)
+7. Crew/social features (community building)
+8. Meet spot implementation (social hub)
+9. Weather physics effects (environmental depth)
+10. Traffic AI behaviors (world immersion)
+
+CHECKPOINT PROTOCOL:
+
+Every 50 iterations, create PROGRESS_ITERATION_[N].md containing:
+- Summary of work completed
+- Key accomplishments and improvements
+- Current focus area
+- Next priorities
+- Any blockers or concerns
+- Performance notes
+
+PROBLEM RESOLUTION:
+
+If you encounter build errors:
+- Document the specific error clearly
+- Propose multiple solution approaches
+- Add TODO comments for complex issues requiring manual review
+- Continue with other improvements while blocked
+
+If unclear about design intent:
+- Reference GDD for vision alignment
+- Default to "authentic PS1/PS2 arcade racer" aesthetic
+- Prioritize "meaningful stakes" and "real ownership" pillars
+- Consult VehicleSystems.md for technical depth questions
+
+If performance concerns arise:
+- Profile before optimizing (use UE Insights, stat commands)
+- Document performance-critical code paths
+- Add profiling markers (SCOPE_CYCLE_COUNTER)
+- Measure before and after optimization
+
+COMPLETION CRITERIA:
+
+Output the phrase: MIDNIGHT_GRIND_LEGENDARY
+
+When all of the following are true:
+- All success metrics have been met
+- Code is production-quality and well-documented
+- Comprehensive documentation is in place
+- No critical bugs or blockers remain
+- Ready for senior developer code review
+- You've created something truly legendary
+
+GO ABSOLUTELY CRAZY. MAKE MAGIC HAPPEN. THE RACING COMMUNITY IS COUNTING ON THIS.
+
+This is your chance to contribute to something special. Let's build a legendary racing game. 🏎️💨🌃✨

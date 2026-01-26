@@ -1,0 +1,275 @@
+{
+  "TrackID": "TEST_TRACK_01",
+  "DisplayName": "Development Test Track",
+  "Description": "A simple test track for vehicle physics development and tuning. Features various surface types and a basic circuit layout.",
+  "Type": "Circuit",
+  "Environment": "Industrial",
+  "TimeOfDay": "Night",
+  "Weather": "Clear",
+
+  "Dimensions": {
+    "Length": 2500,
+    "LengthUnit": "meters",
+    "Width": 12,
+    "WidthUnit": "meters",
+    "Elevation": "Flat",
+    "MaxElevationChange": 0
+  },
+
+  "Layout": {
+    "Type": "Oval-Rectangle Hybrid",
+    "Sections": [
+      {
+        "ID": "S01_MainStraight",
+        "Type": "Straight",
+        "Length": 500,
+        "Width": 12,
+        "Surface": "Asphalt",
+        "StartPosition": { "X": 0, "Y": 0, "Z": 0 },
+        "EndPosition": { "X": 500, "Y": 0, "Z": 0 },
+        "Features": ["StartFinishLine", "PitLaneEntry"]
+      },
+      {
+        "ID": "S02_Turn1",
+        "Type": "Corner",
+        "Radius": 75,
+        "Angle": 90,
+        "Direction": "Right",
+        "Width": 12,
+        "Surface": "Asphalt",
+        "Banking": 0,
+        "Features": ["Apex"]
+      },
+      {
+        "ID": "S03_BackStraight1",
+        "Type": "Straight",
+        "Length": 300,
+        "Width": 12,
+        "Surface": "Asphalt",
+        "Features": []
+      },
+      {
+        "ID": "S04_Turn2",
+        "Type": "Corner",
+        "Radius": 50,
+        "Angle": 90,
+        "Direction": "Right",
+        "Width": 12,
+        "Surface": "Asphalt",
+        "Banking": 0,
+        "Features": ["Apex", "DriftZone"]
+      },
+      {
+        "ID": "S05_TechnicalSection",
+        "Type": "Straight",
+        "Length": 200,
+        "Width": 10,
+        "Surface": "Asphalt",
+        "Features": ["Chicane"]
+      },
+      {
+        "ID": "S06_Turn3",
+        "Type": "Corner",
+        "Radius": 60,
+        "Angle": 90,
+        "Direction": "Right",
+        "Width": 12,
+        "Surface": "Asphalt",
+        "Banking": 0,
+        "Features": ["Apex"]
+      },
+      {
+        "ID": "S07_BackStraight2",
+        "Type": "Straight",
+        "Length": 400,
+        "Width": 14,
+        "Surface": "Asphalt",
+        "Features": ["SpeedTrap"]
+      },
+      {
+        "ID": "S08_Turn4",
+        "Type": "Corner",
+        "Radius": 100,
+        "Angle": 90,
+        "Direction": "Right",
+        "Width": 12,
+        "Surface": "Asphalt",
+        "Banking": 5,
+        "Features": ["Apex", "BankingTest"]
+      }
+    ],
+    "TotalCorners": 4,
+    "LongestStraight": 500
+  },
+
+  "Checkpoints": [
+    {
+      "ID": "CP_StartFinish",
+      "Position": { "X": 250, "Y": 0, "Z": 0 },
+      "Type": "StartFinish",
+      "Width": 14,
+      "Index": 0
+    },
+    {
+      "ID": "CP_Sector1",
+      "Position": { "X": 575, "Y": 75, "Z": 0 },
+      "Type": "Sector",
+      "Width": 14,
+      "Index": 1
+    },
+    {
+      "ID": "CP_Sector2",
+      "Position": { "X": 575, "Y": 425, "Z": 0 },
+      "Type": "Sector",
+      "Width": 14,
+      "Index": 2
+    },
+    {
+      "ID": "CP_Sector3",
+      "Position": { "X": 0, "Y": 425, "Z": 0 },
+      "Type": "Sector",
+      "Width": 14,
+      "Index": 3
+    }
+  ],
+
+  "StartGrid": {
+    "Positions": [
+      { "Position": { "X": 0, "Y": 0, "Z": 0 }, "Rotation": 0, "GridSlot": 1 },
+      { "Position": { "X": -10, "Y": 3, "Z": 0 }, "Rotation": 0, "GridSlot": 2 },
+      { "Position": { "X": -20, "Y": 0, "Z": 0 }, "Rotation": 0, "GridSlot": 3 },
+      { "Position": { "X": -30, "Y": 3, "Z": 0 }, "Rotation": 0, "GridSlot": 4 },
+      { "Position": { "X": -40, "Y": 0, "Z": 0 }, "Rotation": 0, "GridSlot": 5 },
+      { "Position": { "X": -50, "Y": 3, "Z": 0 }, "Rotation": 0, "GridSlot": 6 },
+      { "Position": { "X": -60, "Y": 0, "Z": 0 }, "Rotation": 0, "GridSlot": 7 },
+      { "Position": { "X": -70, "Y": 3, "Z": 0 }, "Rotation": 0, "GridSlot": 8 }
+    ],
+    "MaxParticipants": 8,
+    "FormationType": "Staggered"
+  },
+
+  "Environment": {
+    "Lighting": {
+      "TimeOfDay": "Night",
+      "MoonPhase": "Full",
+      "AmbientIntensity": 0.15,
+      "DirectionalIntensity": 0.3,
+      "DirectionalColor": "#E6E6FF"
+    },
+    "Atmosphere": {
+      "FogDensity": 0.02,
+      "FogColor": "#1A1A2E",
+      "FogStartDistance": 500,
+      "FogEndDistance": 5000
+    },
+    "TrackLighting": [
+      {
+        "Type": "FloodLight",
+        "Positions": "EveryCorner",
+        "Color": "#FFFFFF",
+        "Intensity": 50000,
+        "Height": 20
+      },
+      {
+        "Type": "StreetLight",
+        "Positions": "Along Straights",
+        "Spacing": 50,
+        "Color": "#FFB366",
+        "Intensity": 20000,
+        "Height": 8
+      }
+    ],
+    "Props": [
+      { "Type": "TireBale", "Placement": "CornerExits" },
+      { "Type": "Barrier", "Placement": "TrackEdges" },
+      { "Type": "Cone", "Placement": "Chicane" },
+      { "Type": "Billboard", "Placement": "MainStraight", "Count": 2 },
+      { "Type": "Container", "Placement": "Background", "Count": 20 }
+    ]
+  },
+
+  "TestingFeatures": {
+    "SurfaceTypes": [
+      {
+        "ID": "ASPHALT_DRY",
+        "Location": "Main Track",
+        "GripMultiplier": 1.0
+      },
+      {
+        "ID": "ASPHALT_PAINTED",
+        "Location": "StartFinish Line",
+        "GripMultiplier": 0.9
+      },
+      {
+        "ID": "CONCRETE_RUNOFF",
+        "Location": "Corner Runoffs",
+        "GripMultiplier": 0.85
+      }
+    ],
+    "SpeedTrap": {
+      "Location": "BackStraight2",
+      "Position": { "X": 200, "Y": 425, "Z": 0 }
+    },
+    "DriftZones": [
+      {
+        "ID": "DRIFT_TURN2",
+        "StartPosition": { "X": 575, "Y": 200, "Z": 0 },
+        "EndPosition": { "X": 500, "Y": 425, "Z": 0 }
+      }
+    ],
+    "DragStrip": {
+      "Enabled": false,
+      "Length": 0
+    }
+  },
+
+  "Records": {
+    "LapRecord": {
+      "Time": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    },
+    "TopSpeed": {
+      "Speed": 0,
+      "Holder": "None",
+      "Vehicle": "None"
+    }
+  },
+
+  "RaceConfigurations": [
+    {
+      "Name": "Quick Race",
+      "Laps": 3,
+      "Participants": 4,
+      "AIEnabled": true
+    },
+    {
+      "Name": "Time Attack",
+      "Laps": 5,
+      "Participants": 1,
+      "AIEnabled": false
+    },
+    {
+      "Name": "Development Test",
+      "Laps": 1,
+      "Participants": 1,
+      "AIEnabled": false,
+      "GhostCar": true
+    }
+  ],
+
+  "DeveloperNotes": {
+    "Purpose": "Primary test track for vehicle physics, handling, and systems development",
+    "PriorityFeatures": [
+      "Flat surface for baseline handling tests",
+      "90-degree corners for drift testing",
+      "Long straight for top speed verification",
+      "Banked corner for AWD/physics testing"
+    ],
+    "FutureAdditions": [
+      "Wet surface area",
+      "Gravel runoff area",
+      "Jump/airtime section"
+    ]
+  }
+}

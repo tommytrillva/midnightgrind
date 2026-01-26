@@ -2,20 +2,8 @@
 
 #include "Core/MGSaveSubsystem.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/SaveGame.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
-
-// Simple save game object wrapper
-UCLASS()
-class UMGSaveGameObject : public USaveGame
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	FMGSaveGameData SaveData;
-};
 
 void UMGSaveSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {

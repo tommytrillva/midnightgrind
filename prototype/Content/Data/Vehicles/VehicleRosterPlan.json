@@ -1,0 +1,252 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND Vehicle Roster - MVP and Full Launch Plan",
+  "TotalPlanned": 30,
+
+  "Phase1_MVP": {
+    "Count": 1,
+    "Vehicles": [
+      {
+        "ID": "SAKURA_GTR",
+        "Name": "Sakura GTR",
+        "Class": "B",
+        "Category": "JDM",
+        "Inspiration": "R34 Skyline GT-R",
+        "Status": "Spec Complete",
+        "Priority": "P0 - Hero Vehicle"
+      }
+    ]
+  },
+
+  "Phase2_VerticalSlice": {
+    "Count": 5,
+    "Vehicles": [
+      {
+        "ID": "SAKURA_GTR",
+        "Status": "From Phase 1"
+      },
+      {
+        "ID": "KAZE_CIVIC",
+        "Name": "Kaze Civic",
+        "Class": "D",
+        "Category": "JDM",
+        "Inspiration": "EK9 Civic Type R",
+        "Status": "Planned",
+        "Priority": "P1 - Starter Car",
+        "Notes": "Entry level, affordable, fun to drive"
+      },
+      {
+        "ID": "TENSHI_240",
+        "Name": "Tenshi 240",
+        "Class": "C",
+        "Category": "JDM",
+        "Inspiration": "S14 240SX",
+        "Status": "Planned",
+        "Priority": "P1 - Drift Platform",
+        "Notes": "The dedicated drift car, FR layout"
+      },
+      {
+        "ID": "STALLION_GT",
+        "Name": "Stallion GT",
+        "Class": "C",
+        "Category": "Muscle",
+        "Inspiration": "S197 Mustang GT",
+        "Status": "Planned",
+        "Priority": "P1 - American Entry",
+        "Notes": "V8 power, affordable muscle"
+      },
+      {
+        "ID": "BEATER_SEDAN",
+        "Name": "Beater Sedan",
+        "Class": "D",
+        "Category": "Economy",
+        "Inspiration": "90s Economy Car",
+        "Status": "Planned",
+        "Priority": "P1 - Tutorial Car",
+        "Notes": "The car you start with, can be surprisingly quick when built"
+      }
+    ]
+  },
+
+  "Phase3_HorizontalExpansion": {
+    "Count": 10,
+    "Vehicles": [
+      {
+        "ID": "RAIJIN_SUPRA",
+        "Name": "Raijin Supra",
+        "Class": "A",
+        "Category": "JDM",
+        "Inspiration": "MK4 Supra",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "2JZ power, top tier JDM"
+      },
+      {
+        "ID": "KARASU_RX7",
+        "Name": "Karasu RX-7",
+        "Class": "B",
+        "Category": "JDM",
+        "Inspiration": "FD RX-7",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "Rotary engine, unique sound and feel"
+      },
+      {
+        "ID": "RONIN_EVO",
+        "Name": "Ronin Evo",
+        "Class": "B",
+        "Category": "JDM",
+        "Inspiration": "Evo IX",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "AWD rally-bred, GTR rival"
+      },
+      {
+        "ID": "PHANTOM_CAMARO",
+        "Name": "Phantom Camaro",
+        "Class": "B",
+        "Category": "Muscle",
+        "Inspiration": "5th Gen Camaro SS",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "Modern muscle power"
+      },
+      {
+        "ID": "DEMON_CHALLENGER",
+        "Name": "Demon Challenger",
+        "Class": "A",
+        "Category": "Muscle",
+        "Inspiration": "Challenger Hellcat",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "Maximum American power"
+      },
+      {
+        "ID": "VIPER_CORVETTE",
+        "Name": "Viper Corvette",
+        "Class": "S",
+        "Category": "Sports",
+        "Inspiration": "C7 Corvette Z06",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "American supercar performance"
+      },
+      {
+        "ID": "KUMO_350Z",
+        "Name": "Kumo 350Z",
+        "Class": "C",
+        "Category": "JDM",
+        "Inspiration": "350Z",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "VQ power, drift capable"
+      },
+      {
+        "ID": "HAYATE_WRX",
+        "Name": "Hayate WRX",
+        "Class": "C",
+        "Category": "JDM",
+        "Inspiration": "GD WRX STI",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "Boxer AWD, rally heritage"
+      },
+      {
+        "ID": "COBRA_S2000",
+        "Name": "Cobra S2000",
+        "Class": "C",
+        "Category": "JDM",
+        "Inspiration": "S2000 AP2",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "VTEC screamer, momentum car"
+      },
+      {
+        "ID": "GHOST_E46",
+        "Name": "Ghost M3",
+        "Class": "B",
+        "Category": "Euro",
+        "Inspiration": "E46 M3",
+        "Status": "Planned",
+        "Priority": "P2",
+        "Notes": "European precision, S54 inline-6"
+      }
+    ]
+  },
+
+  "Phase4_ContentScale": {
+    "Count": 20,
+    "AdditionalVehicles": [
+      { "ID": "SHOGUN_NSX", "Class": "A", "Category": "JDM", "Inspiration": "NA1 NSX" },
+      { "ID": "LIGHTNING_86", "Class": "D", "Category": "JDM", "Inspiration": "AE86" },
+      { "ID": "DRIFT_KING_SILVIA", "Class": "C", "Category": "JDM", "Inspiration": "S15 Silvia" },
+      { "ID": "THUNDER_370Z", "Class": "B", "Category": "JDM", "Inspiration": "370Z Nismo" },
+      { "ID": "STORM_GTI", "Class": "D", "Category": "Euro", "Inspiration": "MK7 GTI" },
+      { "ID": "BLITZ_M4", "Class": "A", "Category": "Euro", "Inspiration": "F82 M4" },
+      { "ID": "APEX_CAYMAN", "Class": "B", "Category": "Euro", "Inspiration": "981 Cayman GT4" },
+      { "ID": "INFERNO_FOCUS", "Class": "C", "Category": "Euro", "Inspiration": "Focus RS" },
+      { "ID": "TITAN_CTS", "Class": "A", "Category": "Muscle", "Inspiration": "CTS-V" },
+      { "ID": "RAMPAGE_CHARGER", "Class": "B", "Category": "Muscle", "Inspiration": "Charger R/T" }
+    ]
+  },
+
+  "Phase5_Launch": {
+    "Count": 30,
+    "FinalAdditions": [
+      { "ID": "LEGEND_R35", "Class": "S", "Category": "JDM", "Inspiration": "R35 GT-R" },
+      { "ID": "SHADOW_LFA", "Class": "S", "Category": "JDM", "Inspiration": "Lexus LFA" },
+      { "ID": "SPECTER_911", "Class": "S", "Category": "Euro", "Inspiration": "992 GT3" },
+      { "ID": "FLASH_AMG", "Class": "S", "Category": "Euro", "Inspiration": "AMG GT Black Series" },
+      { "ID": "NOVA_GT500", "Class": "S", "Category": "Muscle", "Inspiration": "GT500" }
+    ]
+  },
+
+  "ClassDistribution": {
+    "D_Entry": 4,
+    "C_Street": 8,
+    "B_Performance": 8,
+    "A_Super": 5,
+    "S_Hyper": 5
+  },
+
+  "CategoryDistribution": {
+    "JDM": 14,
+    "Muscle": 7,
+    "Euro": 6,
+    "Economy": 1,
+    "Sports": 2
+  },
+
+  "DrivetrainDistribution": {
+    "RWD": 15,
+    "AWD": 10,
+    "FWD": 5
+  },
+
+  "EngineTypeDistribution": {
+    "Inline4_Turbo": 8,
+    "Inline6_Turbo": 4,
+    "V6": 3,
+    "V8_NA": 6,
+    "V8_Supercharged": 4,
+    "Flat4_Turbo": 2,
+    "Rotary": 1,
+    "V10": 1,
+    "V12": 1
+  },
+
+  "PricingTiers": {
+    "Budget": { "Range": "5,000 - 15,000", "Count": 4 },
+    "Affordable": { "Range": "15,000 - 35,000", "Count": 6 },
+    "MidRange": { "Range": "35,000 - 60,000", "Count": 8 },
+    "Premium": { "Range": "60,000 - 100,000", "Count": 7 },
+    "Exotic": { "Range": "100,000 - 300,000", "Count": 5 }
+  },
+
+  "Notes": {
+    "NamingConvention": "Japanese-inspired names for JDM, aggressive names for Muscle, weather/precision for Euro",
+    "BalanceGoal": "Each class should have viable options from different categories",
+    "TuningPotential": "All vehicles should be buildable to at least one class higher than stock",
+    "Signature": "Each vehicle should have a distinct character - not just stat differences"
+  }
+}
