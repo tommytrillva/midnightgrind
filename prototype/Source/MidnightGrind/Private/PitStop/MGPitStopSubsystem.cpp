@@ -954,10 +954,202 @@ void UMGPitStopSubsystem::ResetRaceStats()
 
 void UMGPitStopSubsystem::SavePitStopData()
 {
-	// Placeholder for save implementation
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("PitStop");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+
+	FString FilePath = SaveDir / TEXT("pitstop_stats.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Save version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save vehicle stats
+	int32 StatsCount = VehicleStats.Num();
+	SaveArchive << StatsCount;
+
+	for (auto& Pair : VehicleStats)
+	{
+		FString VehicleIDStr = Pair.Key.ToString();
+		SaveArchive << VehicleIDStr;
+
+		FMGPitStopStats& Stats = Pair.Value;
+		SaveArchive << Stats.TotalPitStops;
+		SaveArchive << Stats.FastestPitStop;
+		SaveArchive << Stats.AveragePitStop;
+		SaveArchive << Stats.PitStopErrors;
+		SaveArchive << Stats.SpeedingViolations;
+		SaveArchive << Stats.TotalTimeLostToPenalties;
+
+		// Save history (limited to last 50 pit stops)
+		int32 HistoryCount = FMath::Min(Stats.PitStopHistory.Num(), 50);
+		SaveArchive << HistoryCount;
+
+		for (int32 i = Stats.PitStopHistory.Num() - HistoryCount; i < Stats.PitStopHistory.Num(); i++)
+		{
+			const FMGPitStopResult& Result = Stats.PitStopHistory[i];
+			SaveArchive << Result.TotalTime;
+			SaveArchive << Result.StationaryTime;
+			SaveArchive << Result.PitLaneTime;
+			SaveArchive << Result.FuelAdded;
+			SaveArchive << Result.TiresChanged;
+			SaveArchive << Result.DamageRepaired;
+			SaveArchive << Result.bHadError;
+			SaveArchive << Result.TimePenalty;
+			SaveArchive << Result.LapNumber;
+
+			int32 ViolationType = static_cast<int32>(Result.Violation);
+			SaveArchive << ViolationType;
+		}
+	}
+
+	// Save strategies
+	int32 StrategyCount = VehicleStrategies.Num();
+	SaveArchive << StrategyCount;
+
+	for (auto& Pair : VehicleStrategies)
+	{
+		FString VehicleIDStr = Pair.Key.ToString();
+		SaveArchive << VehicleIDStr;
+
+		FMGPitStrategy& Strategy = Pair.Value;
+		FString StrategyName = Strategy.StrategyName.ToString();
+		SaveArchive << StrategyName;
+		SaveArchive << Strategy.PlannedStops;
+		SaveArchive << Strategy.bOptimizeForPosition;
+		SaveArchive << Strategy.bReactToWeather;
+		SaveArchive << Strategy.MinLapsOnTire;
+		SaveArchive << Strategy.TireWearThreshold;
+		SaveArchive << Strategy.FuelReserveTarget;
+
+		int32 StopLapCount = Strategy.PlannedStopLaps.Num();
+		SaveArchive << StopLapCount;
+		for (int32 Lap : Strategy.PlannedStopLaps)
+		{
+			SaveArchive << Lap;
+		}
+	}
+
+	// Save fastest pit stop record
+	SaveArchive << FastestPitStopTime;
+	FString FastestVehicleStr = FastestPitStopVehicle.ToString();
+	SaveArchive << FastestVehicleStr;
+
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	SaveArchive.FlushCache();
+	SaveArchive.Empty();
 }
 
 void UMGPitStopSubsystem::LoadPitStopData()
 {
-	// Placeholder for load implementation
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("PitStop") / TEXT("pitstop_stats.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		return;
+	}
+
+	// Load vehicle stats
+	int32 StatsCount;
+	LoadArchive << StatsCount;
+
+	for (int32 i = 0; i < StatsCount; i++)
+	{
+		FString VehicleIDStr;
+		LoadArchive << VehicleIDStr;
+		FName VehicleID(*VehicleIDStr);
+
+		FMGPitStopStats Stats;
+		Stats.VehicleID = VehicleID;
+		LoadArchive << Stats.TotalPitStops;
+		LoadArchive << Stats.FastestPitStop;
+		LoadArchive << Stats.AveragePitStop;
+		LoadArchive << Stats.PitStopErrors;
+		LoadArchive << Stats.SpeedingViolations;
+		LoadArchive << Stats.TotalTimeLostToPenalties;
+
+		int32 HistoryCount;
+		LoadArchive << HistoryCount;
+
+		for (int32 h = 0; h < HistoryCount; h++)
+		{
+			FMGPitStopResult Result;
+			Result.VehicleID = VehicleID;
+			LoadArchive << Result.TotalTime;
+			LoadArchive << Result.StationaryTime;
+			LoadArchive << Result.PitLaneTime;
+			LoadArchive << Result.FuelAdded;
+			LoadArchive << Result.TiresChanged;
+			LoadArchive << Result.DamageRepaired;
+			LoadArchive << Result.bHadError;
+			LoadArchive << Result.TimePenalty;
+			LoadArchive << Result.LapNumber;
+
+			int32 ViolationType;
+			LoadArchive << ViolationType;
+			Result.Violation = static_cast<EMGPitLaneViolation>(ViolationType);
+
+			Stats.PitStopHistory.Add(Result);
+		}
+
+		VehicleStats.Add(VehicleID, Stats);
+	}
+
+	// Load strategies
+	int32 StrategyCount;
+	LoadArchive << StrategyCount;
+
+	for (int32 i = 0; i < StrategyCount; i++)
+	{
+		FString VehicleIDStr;
+		LoadArchive << VehicleIDStr;
+		FName VehicleID(*VehicleIDStr);
+
+		FMGPitStrategy Strategy;
+		FString StrategyName;
+		LoadArchive << StrategyName;
+		Strategy.StrategyName = FName(*StrategyName);
+		LoadArchive << Strategy.PlannedStops;
+		LoadArchive << Strategy.bOptimizeForPosition;
+		LoadArchive << Strategy.bReactToWeather;
+		LoadArchive << Strategy.MinLapsOnTire;
+		LoadArchive << Strategy.TireWearThreshold;
+		LoadArchive << Strategy.FuelReserveTarget;
+
+		int32 StopLapCount;
+		LoadArchive << StopLapCount;
+		for (int32 s = 0; s < StopLapCount; s++)
+		{
+			int32 Lap;
+			LoadArchive << Lap;
+			Strategy.PlannedStopLaps.Add(Lap);
+		}
+
+		VehicleStrategies.Add(VehicleID, Strategy);
+	}
+
+	// Load fastest pit stop record
+	LoadArchive << FastestPitStopTime;
+	FString FastestVehicleStr;
+	LoadArchive << FastestVehicleStr;
+	FastestPitStopVehicle = FName(*FastestVehicleStr);
+
+	LoadArchive.FlushCache();
+	LoadArchive.Close();
 }

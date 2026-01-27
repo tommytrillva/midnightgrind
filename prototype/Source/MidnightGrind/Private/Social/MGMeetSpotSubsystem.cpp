@@ -1029,12 +1029,27 @@ bool UMGMeetSpotSubsystem::LaunchChallengeRace(FGuid ChallengerID, FGuid Challen
 				{
 					// Build race config from challenge parameters
 					FMGRaceConfig RaceConfig;
-					RaceConfig.RaceType = Challenge.RaceType;
-					RaceConfig.TrackID = Challenge.TrackID;
-					RaceConfig.MaxParticipants = Challenge.MaxParticipants;
-					RaceConfig.PILimit = Challenge.PILimit;
-					RaceConfig.bIsPinkSlip = (Challenge.ChallengeType == EMGRaceChallengeType::PinkSlip);
-					RaceConfig.WagerAmount = Challenge.WagerAmount;
+					RaceConfig.TrackName = Challenge.TrackID;
+					RaceConfig.MaxRacers = Challenge.MaxParticipants;
+					RaceConfig.bPinkSlipRace = (Challenge.ChallengeType == EMGRaceChallengeType::PinkSlip);
+
+					// Map race type name to enum
+					if (Challenge.RaceType == TEXT("Sprint"))
+					{
+						RaceConfig.RaceType = EMGRaceType::Sprint;
+					}
+					else if (Challenge.RaceType == TEXT("Drag"))
+					{
+						RaceConfig.RaceType = EMGRaceType::Drag;
+					}
+					else if (Challenge.RaceType == TEXT("Drift"))
+					{
+						RaceConfig.RaceType = EMGRaceType::Drift;
+					}
+					else
+					{
+						RaceConfig.RaceType = EMGRaceType::Circuit;
+					}
 
 					// Get track map path (would be looked up from track registry in production)
 					FSoftObjectPath TrackMapPath;
@@ -1344,7 +1359,22 @@ void UMGMeetSpotSubsystem::RevEngine(FGuid PlayerID)
 		return;
 	}
 
-	// Broadcast engine rev audio event for audio system to handle
+	// Get player's vehicle to trigger engine rev audio
+	const FMGMeetSpotPlayer* Player = FindPlayerConst(InstanceID, PlayerID);
+	if (Player && Player->VehicleID.IsValid())
+	{
+		// Trigger engine rev audio via engine audio subsystem
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGEngineAudioSubsystem* EngineAudio = World->GetSubsystem<UMGEngineAudioSubsystem>())
+			{
+				FName VehicleID = *Player->VehicleID.ToString();
+				EngineAudio->Rev(VehicleID, 1.0f);
+			}
+		}
+	}
+
+	// Also broadcast event for any other listeners
 	OnEngineRevAudio.Broadcast(InstanceID, PlayerID);
 
 	// Award tiny social reputation for engagement

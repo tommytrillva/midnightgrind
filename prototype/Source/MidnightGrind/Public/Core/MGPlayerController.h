@@ -15,6 +15,8 @@ class UMGChatSubsystem;
 class AMGVehiclePawn;
 struct FMGNearMissEvent;
 struct FMGDriftResult;
+struct FMGJumpResult;
+enum class EMGTrickType : uint8;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -419,4 +421,12 @@ protected:
 	/** Handle drift end events from drift subsystem */
 	UFUNCTION()
 	void OnDriftEnded(const FMGDriftResult& Result);
+
+	/** Handle jump end events from airtime subsystem */
+	UFUNCTION()
+	void OnJumpEnded(const FString& PlayerId, const FMGJumpResult& Result);
+
+	/** Handle trick completed events from airtime subsystem */
+	UFUNCTION()
+	void OnTrickCompleted(const FString& PlayerId, EMGTrickType Trick, int32 Score);
 };

@@ -1009,10 +1009,180 @@ int32 UMGRacingLineSubsystem::FindNearestPointIndex(float Distance) const
 
 void UMGRacingLineSubsystem::SaveLineData()
 {
-	// Placeholder for save implementation
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("RacingLine");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+
+	FString FilePath = SaveDir / TEXT("racing_lines.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Save version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save custom track lines
+	int32 TrackCount = TrackLines.Num();
+	SaveArchive << TrackCount;
+
+	for (auto& TrackPair : TrackLines)
+	{
+		FString TrackIDStr = TrackPair.Key.ToString();
+		SaveArchive << TrackIDStr;
+
+		int32 LineCount = TrackPair.Value.Num();
+		SaveArchive << LineCount;
+
+		for (const FMGRacingLine& Line : TrackPair.Value)
+		{
+			int32 LineType = static_cast<int32>(Line.LineType);
+			SaveArchive << LineType;
+
+			FString VehicleClassStr = Line.VehicleClass.ToString();
+			SaveArchive << VehicleClassStr;
+
+			SaveArchive << Line.TotalDistance;
+
+			// Save points (limited to avoid huge files)
+			int32 PointCount = FMath::Min(Line.Points.Num(), 1000);
+			SaveArchive << PointCount;
+
+			for (int32 i = 0; i < PointCount; i++)
+			{
+				const FMGRacingLinePoint& Point = Line.Points[i];
+				SaveArchive << Point.WorldPosition;
+				SaveArchive << Point.Direction;
+				SaveArchive << Point.DistanceAlongTrack;
+				SaveArchive << Point.OptimalSpeed;
+				SaveArchive << Point.Curvature;
+				SaveArchive << Point.ThrottlePercent;
+				SaveArchive << Point.BrakePercent;
+				SaveArchive << Point.GearSuggestion;
+			}
+		}
+	}
+
+	// Save performance data
+	int32 PerfCount = VehiclePerformances.Num();
+	SaveArchive << PerfCount;
+
+	for (auto& PerfPair : VehiclePerformances)
+	{
+		FString VehicleIDStr = PerfPair.Key.ToString();
+		SaveArchive << VehicleIDStr;
+
+		FMGLinePerformance& Perf = PerfPair.Value;
+		SaveArchive << Perf.AverageDeviation;
+		SaveArchive << Perf.ApexHitPercentage;
+		SaveArchive << Perf.BrakingEfficiency;
+		SaveArchive << Perf.ConsistencyScore;
+		SaveArchive << Perf.TotalCornersTaken;
+		SaveArchive << Perf.PerfectApexes;
+	}
+
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	SaveArchive.FlushCache();
+	SaveArchive.Empty();
 }
 
 void UMGRacingLineSubsystem::LoadLineData()
 {
-	// Placeholder for load implementation
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("RacingLine") / TEXT("racing_lines.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		return;
+	}
+
+	// Load custom track lines
+	int32 TrackCount;
+	LoadArchive << TrackCount;
+
+	for (int32 t = 0; t < TrackCount; t++)
+	{
+		FString TrackIDStr;
+		LoadArchive << TrackIDStr;
+		FName TrackID(*TrackIDStr);
+
+		int32 LineCount;
+		LoadArchive << LineCount;
+
+		TArray<FMGRacingLine> Lines;
+
+		for (int32 l = 0; l < LineCount; l++)
+		{
+			FMGRacingLine Line;
+			Line.TrackID = TrackID;
+
+			int32 LineType;
+			LoadArchive << LineType;
+			Line.LineType = static_cast<EMGRacingLineType>(LineType);
+
+			FString VehicleClassStr;
+			LoadArchive << VehicleClassStr;
+			Line.VehicleClass = FName(*VehicleClassStr);
+
+			LoadArchive << Line.TotalDistance;
+
+			int32 PointCount;
+			LoadArchive << PointCount;
+
+			for (int32 p = 0; p < PointCount; p++)
+			{
+				FMGRacingLinePoint Point;
+				LoadArchive << Point.WorldPosition;
+				LoadArchive << Point.Direction;
+				LoadArchive << Point.DistanceAlongTrack;
+				LoadArchive << Point.OptimalSpeed;
+				LoadArchive << Point.Curvature;
+				LoadArchive << Point.ThrottlePercent;
+				LoadArchive << Point.BrakePercent;
+				LoadArchive << Point.GearSuggestion;
+				Line.Points.Add(Point);
+			}
+
+			Lines.Add(Line);
+		}
+
+		TrackLines.Add(TrackID, Lines);
+	}
+
+	// Load performance data
+	int32 PerfCount;
+	LoadArchive << PerfCount;
+
+	for (int32 i = 0; i < PerfCount; i++)
+	{
+		FString VehicleIDStr;
+		LoadArchive << VehicleIDStr;
+		FName VehicleID(*VehicleIDStr);
+
+		FMGLinePerformance Perf;
+		Perf.VehicleID = VehicleID;
+		LoadArchive << Perf.AverageDeviation;
+		LoadArchive << Perf.ApexHitPercentage;
+		LoadArchive << Perf.BrakingEfficiency;
+		LoadArchive << Perf.ConsistencyScore;
+		LoadArchive << Perf.TotalCornersTaken;
+		LoadArchive << Perf.PerfectApexes;
+
+		VehiclePerformances.Add(VehicleID, Perf);
+	}
+
+	LoadArchive.FlushCache();
+	LoadArchive.Close();
 }

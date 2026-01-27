@@ -1084,10 +1084,112 @@ bool UMGTireSubsystem::ShouldChangeTires(FName VehicleID, int32 RemainingLaps) c
 
 void UMGTireSubsystem::SaveTireData()
 {
-	// Placeholder for save implementation
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Tire");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+
+	FString FilePath = SaveDir / TEXT("tire_telemetry.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Save version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save telemetry data
+	int32 TelemetryCount = VehicleTelemetry.Num();
+	SaveArchive << TelemetryCount;
+
+	for (auto& Pair : VehicleTelemetry)
+	{
+		FString VehicleIDStr = Pair.Key.ToString();
+		SaveArchive << VehicleIDStr;
+
+		FMGTireTelemetry& Telemetry = Pair.Value;
+		SaveArchive << Telemetry.PeakFrontLeftTemp;
+		SaveArchive << Telemetry.PeakFrontRightTemp;
+		SaveArchive << Telemetry.PeakRearLeftTemp;
+		SaveArchive << Telemetry.PeakRearRightTemp;
+		SaveArchive << Telemetry.Lockups;
+		SaveArchive << Telemetry.Wheelspin;
+		SaveArchive << Telemetry.TireChanges;
+		SaveArchive << Telemetry.DistanceOnCurrentSet;
+		SaveArchive << Telemetry.TotalLapsOnTires;
+	}
+
+	// Save aggregate stats
+	int32 TotalLockups = 0;
+	int32 TotalWheelspin = 0;
+	int32 TotalTireChanges = 0;
+	for (auto& Pair : VehicleTelemetry)
+	{
+		TotalLockups += Pair.Value.Lockups;
+		TotalWheelspin += Pair.Value.Wheelspin;
+		TotalTireChanges += Pair.Value.TireChanges;
+	}
+	SaveArchive << TotalLockups;
+	SaveArchive << TotalWheelspin;
+	SaveArchive << TotalTireChanges;
+
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	SaveArchive.FlushCache();
+	SaveArchive.Empty();
 }
 
 void UMGTireSubsystem::LoadTireData()
 {
-	// Placeholder for load implementation
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Tire") / TEXT("tire_telemetry.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		return;
+	}
+
+	// Load telemetry data
+	int32 TelemetryCount;
+	LoadArchive << TelemetryCount;
+
+	for (int32 i = 0; i < TelemetryCount; i++)
+	{
+		FString VehicleIDStr;
+		LoadArchive << VehicleIDStr;
+		FName VehicleID(*VehicleIDStr);
+
+		FMGTireTelemetry Telemetry;
+		Telemetry.VehicleID = VehicleID;
+		LoadArchive << Telemetry.PeakFrontLeftTemp;
+		LoadArchive << Telemetry.PeakFrontRightTemp;
+		LoadArchive << Telemetry.PeakRearLeftTemp;
+		LoadArchive << Telemetry.PeakRearRightTemp;
+		LoadArchive << Telemetry.Lockups;
+		LoadArchive << Telemetry.Wheelspin;
+		LoadArchive << Telemetry.TireChanges;
+		LoadArchive << Telemetry.DistanceOnCurrentSet;
+		LoadArchive << Telemetry.TotalLapsOnTires;
+
+		VehicleTelemetry.Add(VehicleID, Telemetry);
+	}
+
+	// Load aggregate stats (just verify file integrity)
+	int32 TotalLockups, TotalWheelspin, TotalTireChanges;
+	LoadArchive << TotalLockups;
+	LoadArchive << TotalWheelspin;
+	LoadArchive << TotalTireChanges;
+
+	LoadArchive.FlushCache();
+	LoadArchive.Close();
 }

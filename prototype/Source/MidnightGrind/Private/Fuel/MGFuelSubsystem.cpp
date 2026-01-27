@@ -927,10 +927,170 @@ void UMGFuelSubsystem::SetFuelSettings(const FMGFuelSettings& NewSettings)
 
 void UMGFuelSubsystem::SaveFuelData()
 {
-	// Placeholder for save implementation
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Fuel");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+
+	FString FilePath = SaveDir / TEXT("fuel_stats.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Save version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save telemetry data
+	int32 TelemetryCount = VehicleTelemetry.Num();
+	SaveArchive << TelemetryCount;
+
+	for (auto& Pair : VehicleTelemetry)
+	{
+		FString VehicleIDStr = Pair.Key.ToString();
+		SaveArchive << VehicleIDStr;
+
+		FMGFuelTelemetry& Telemetry = Pair.Value;
+		SaveArchive << Telemetry.TotalFuelConsumed;
+		SaveArchive << Telemetry.TotalDistanceCovered;
+		SaveArchive << Telemetry.BestEconomy;
+		SaveArchive << Telemetry.PeakConsumption;
+		SaveArchive << Telemetry.TotalRefuels;
+		SaveArchive << Telemetry.TotalFuelAdded;
+
+		// Save lap consumption history (limited)
+		int32 LapCount = FMath::Min(Telemetry.LapConsumption.Num(), 100);
+		SaveArchive << LapCount;
+		for (int32 i = 0; i < LapCount; i++)
+		{
+			SaveArchive << Telemetry.LapConsumption[i];
+		}
+	}
+
+	// Save strategies
+	int32 StrategyCount = VehicleStrategies.Num();
+	SaveArchive << StrategyCount;
+
+	for (auto& Pair : VehicleStrategies)
+	{
+		FString VehicleIDStr = Pair.Key.ToString();
+		SaveArchive << VehicleIDStr;
+
+		FMGFuelStrategy& Strategy = Pair.Value;
+		SaveArchive << Strategy.StrategyName;
+		SaveArchive << Strategy.StartingFuel;
+		SaveArchive << Strategy.TargetFuelAtFinish;
+		SaveArchive << Strategy.EstimatedConsumptionPerLap;
+
+		int32 PitLapCount = Strategy.PlannedPitLaps.Num();
+		SaveArchive << PitLapCount;
+		for (int32 Lap : Strategy.PlannedPitLaps)
+		{
+			SaveArchive << Lap;
+		}
+
+		int32 FuelLoadCount = Strategy.PlannedFuelLoads.Num();
+		SaveArchive << FuelLoadCount;
+		for (float Load : Strategy.PlannedFuelLoads)
+		{
+			SaveArchive << Load;
+		}
+	}
+
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	SaveArchive.FlushCache();
+	SaveArchive.Empty();
 }
 
 void UMGFuelSubsystem::LoadFuelData()
 {
-	// Placeholder for load implementation
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Fuel") / TEXT("fuel_stats.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		return;
+	}
+
+	// Load telemetry data
+	int32 TelemetryCount;
+	LoadArchive << TelemetryCount;
+
+	for (int32 i = 0; i < TelemetryCount; i++)
+	{
+		FString VehicleIDStr;
+		LoadArchive << VehicleIDStr;
+		FName VehicleID(*VehicleIDStr);
+
+		FMGFuelTelemetry Telemetry;
+		Telemetry.VehicleID = VehicleID;
+		LoadArchive << Telemetry.TotalFuelConsumed;
+		LoadArchive << Telemetry.TotalDistanceCovered;
+		LoadArchive << Telemetry.BestEconomy;
+		LoadArchive << Telemetry.PeakConsumption;
+		LoadArchive << Telemetry.TotalRefuels;
+		LoadArchive << Telemetry.TotalFuelAdded;
+
+		int32 LapCount;
+		LoadArchive << LapCount;
+		for (int32 l = 0; l < LapCount; l++)
+		{
+			float LapConsumption;
+			LoadArchive << LapConsumption;
+			Telemetry.LapConsumption.Add(LapConsumption);
+		}
+
+		VehicleTelemetry.Add(VehicleID, Telemetry);
+	}
+
+	// Load strategies
+	int32 StrategyCount;
+	LoadArchive << StrategyCount;
+
+	for (int32 i = 0; i < StrategyCount; i++)
+	{
+		FString VehicleIDStr;
+		LoadArchive << VehicleIDStr;
+		FName VehicleID(*VehicleIDStr);
+
+		FMGFuelStrategy Strategy;
+		LoadArchive << Strategy.StrategyName;
+		LoadArchive << Strategy.StartingFuel;
+		LoadArchive << Strategy.TargetFuelAtFinish;
+		LoadArchive << Strategy.EstimatedConsumptionPerLap;
+
+		int32 PitLapCount;
+		LoadArchive << PitLapCount;
+		for (int32 p = 0; p < PitLapCount; p++)
+		{
+			int32 Lap;
+			LoadArchive << Lap;
+			Strategy.PlannedPitLaps.Add(Lap);
+		}
+
+		int32 FuelLoadCount;
+		LoadArchive << FuelLoadCount;
+		for (int32 f = 0; f < FuelLoadCount; f++)
+		{
+			float Load;
+			LoadArchive << Load;
+			Strategy.PlannedFuelLoads.Add(Load);
+		}
+
+		VehicleStrategies.Add(VehicleID, Strategy);
+	}
+
+	LoadArchive.FlushCache();
+	LoadArchive.Close();
 }

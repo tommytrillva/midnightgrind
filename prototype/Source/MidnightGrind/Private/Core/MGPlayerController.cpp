@@ -10,6 +10,8 @@
 #include "NearMiss/MGNearMissSubsystem.h"
 #include "Drift/MGDriftSubsystem.h"
 #include "Airtime/MGAirtimeSubsystem.h"
+#include "Fuel/MGFuelSubsystem.h"
+#include "Tire/MGTireSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -71,6 +73,20 @@ void AMGPlayerController::BeginPlay()
 			{
 				AirtimeSubsystem->OnJumpEnded.AddDynamic(this, &AMGPlayerController::OnJumpEnded);
 				AirtimeSubsystem->OnTrickCompleted.AddDynamic(this, &AMGPlayerController::OnTrickCompleted);
+			}
+
+			// Bind to fuel subsystem for low fuel warnings
+			if (UMGFuelSubsystem* FuelSubsystem = GI->GetSubsystem<UMGFuelSubsystem>())
+			{
+				FuelSubsystem->OnFuelAlert.AddDynamic(this, &AMGPlayerController::OnFuelAlert);
+				FuelSubsystem->OnFuelEmpty.AddDynamic(this, &AMGPlayerController::OnFuelEmpty);
+			}
+
+			// Bind to tire subsystem for puncture warnings
+			if (UMGTireSubsystem* TireSubsystem = GI->GetSubsystem<UMGTireSubsystem>())
+			{
+				TireSubsystem->OnTirePunctured.AddDynamic(this, &AMGPlayerController::OnTirePunctured);
+				TireSubsystem->OnTireConditionChanged.AddDynamic(this, &AMGPlayerController::OnTireConditionChanged);
 			}
 		}
 	}
