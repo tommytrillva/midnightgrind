@@ -17,6 +17,9 @@ struct FMGNearMissEvent;
 struct FMGDriftResult;
 struct FMGJumpResult;
 enum class EMGTrickType : uint8;
+enum class EMGFuelAlert : uint8;
+enum class EMGTirePosition : uint8;
+enum class EMGTireCondition : uint8;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -429,4 +432,20 @@ protected:
 	/** Handle trick completed events from airtime subsystem */
 	UFUNCTION()
 	void OnTrickCompleted(const FString& PlayerId, EMGTrickType Trick, int32 Score);
+
+	/** Handle fuel alert from fuel subsystem */
+	UFUNCTION()
+	void OnFuelAlert(FName VehicleID, EMGFuelAlert Alert);
+
+	/** Handle fuel empty from fuel subsystem */
+	UFUNCTION()
+	void OnFuelEmpty(FName VehicleID);
+
+	/** Handle tire puncture from tire subsystem */
+	UFUNCTION()
+	void OnTirePunctured(FName VehicleID, EMGTirePosition Position);
+
+	/** Handle tire condition change from tire subsystem */
+	UFUNCTION()
+	void OnTireConditionChanged(FName VehicleID, EMGTirePosition Position, EMGTireCondition NewCondition);
 };

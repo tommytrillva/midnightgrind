@@ -120,6 +120,18 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			AirtimeSubsystem->OnJumpEnded.RemoveDynamic(this, &AMGPlayerController::OnJumpEnded);
 			AirtimeSubsystem->OnTrickCompleted.RemoveDynamic(this, &AMGPlayerController::OnTrickCompleted);
 		}
+
+		if (UMGFuelSubsystem* FuelSubsystem = GI->GetSubsystem<UMGFuelSubsystem>())
+		{
+			FuelSubsystem->OnFuelAlert.RemoveDynamic(this, &AMGPlayerController::OnFuelAlert);
+			FuelSubsystem->OnFuelEmpty.RemoveDynamic(this, &AMGPlayerController::OnFuelEmpty);
+		}
+
+		if (UMGTireSubsystem* TireSubsystem = GI->GetSubsystem<UMGTireSubsystem>())
+		{
+			TireSubsystem->OnTirePunctured.RemoveDynamic(this, &AMGPlayerController::OnTirePunctured);
+			TireSubsystem->OnTireConditionChanged.RemoveDynamic(this, &AMGPlayerController::OnTireConditionChanged);
+		}
 	}
 
 	Super::EndPlay(EndPlayReason);
@@ -724,6 +736,113 @@ void AMGPlayerController::OnTrickCompleted(const FString& PlayerId, EMGTrickType
 				}
 				HUDSubsystem->ShowTrickPopup(TrickName, Score);
 			}
+		}
+	}
+}
+
+void AMGPlayerController::OnFuelAlert(FName VehicleID, EMGFuelAlert Alert)
+{
+	// Only show alerts for the player's own vehicle
+	if (!ControlledVehicle || VehicleID != FName(*ControlledVehicle->GetName()))
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText AlertMessage;
+			FLinearColor AlertColor;
+
+			switch (Alert)
+			{
+				case EMGFuelAlert::LowFuel:
+					AlertMessage = FText::FromString(TEXT("LOW FUEL"));
+					AlertColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.0f); // Yellow
+					break;
+				case EMGFuelAlert::CriticalFuel:
+					AlertMessage = FText::FromString(TEXT("CRITICAL FUEL!"));
+					AlertColor = FLinearColor(1.0f, 0.2f, 0.0f, 1.0f); // Red
+					break;
+				default:
+					return;
+			}
+
+			HUDSubsystem->ShowNotification(AlertMessage, 3.0f, AlertColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnFuelEmpty(FName VehicleID)
+{
+	// Only show alerts for the player's own vehicle
+	if (!ControlledVehicle || VehicleID != FName(*ControlledVehicle->GetName()))
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText AlertMessage = FText::FromString(TEXT("OUT OF FUEL!"));
+			FLinearColor AlertColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f);
+			HUDSubsystem->ShowNotification(AlertMessage, 5.0f, AlertColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnTirePunctured(FName VehicleID, EMGTirePosition Position)
+{
+	// Only show alerts for the player's own vehicle
+	if (!ControlledVehicle || VehicleID != FName(*ControlledVehicle->GetName()))
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString PositionStr;
+			switch (Position)
+			{
+				case EMGTirePosition::FrontLeft: PositionStr = TEXT("FRONT LEFT"); break;
+				case EMGTirePosition::FrontRight: PositionStr = TEXT("FRONT RIGHT"); break;
+				case EMGTirePosition::RearLeft: PositionStr = TEXT("REAR LEFT"); break;
+				case EMGTirePosition::RearRight: PositionStr = TEXT("REAR RIGHT"); break;
+				default: PositionStr = TEXT(""); break;
+			}
+
+			FText AlertMessage = FText::FromString(FString::Printf(TEXT("PUNCTURE! %s TIRE"), *PositionStr));
+			FLinearColor AlertColor = FLinearColor(1.0f, 0.2f, 0.0f, 1.0f);
+			HUDSubsystem->ShowNotification(AlertMessage, 4.0f, AlertColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnTireConditionChanged(FName VehicleID, EMGTirePosition Position, EMGTireCondition NewCondition)
+{
+	// Only show alerts for the player's own vehicle
+	if (!ControlledVehicle || VehicleID != FName(*ControlledVehicle->GetName()))
+	{
+		return;
+	}
+
+	// Only warn on critical condition
+	if (NewCondition != EMGTireCondition::Critical)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText AlertMessage = FText::FromString(TEXT("TIRE WEAR CRITICAL!"));
+			FLinearColor AlertColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+			HUDSubsystem->ShowNotification(AlertMessage, 3.0f, AlertColor);
 		}
 	}
 }

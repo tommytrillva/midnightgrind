@@ -1,0 +1,384 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Leaderboard Configuration",
+
+  "GlobalLeaderboards": {
+    "Racing": [
+      {
+        "ID": "LB_TOTAL_WINS",
+        "Name": "Total Race Wins",
+        "Description": "Cumulative race victories",
+        "Type": "Cumulative",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value} Wins",
+        "Icon": "ICO_Trophy"
+      },
+      {
+        "ID": "LB_WIN_STREAK",
+        "Name": "Longest Win Streak",
+        "Description": "Consecutive race wins",
+        "Type": "HighScore",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value} in a row",
+        "Icon": "ICO_Fire"
+      },
+      {
+        "ID": "LB_PERFECT_RACES",
+        "Name": "Perfect Races",
+        "Description": "Races won with flawless victory",
+        "Type": "Cumulative",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value}",
+        "Icon": "ICO_Star"
+      },
+      {
+        "ID": "LB_TOTAL_DISTANCE",
+        "Name": "Distance Traveled",
+        "Description": "Total miles raced",
+        "Type": "Cumulative",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value} mi",
+        "Icon": "ICO_Road"
+      }
+    ],
+    "Drift": [
+      {
+        "ID": "LB_HIGHEST_SINGLE_DRIFT",
+        "Name": "Highest Single Drift",
+        "Description": "Best single drift score",
+        "Type": "HighScore",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value:,}",
+        "Icon": "ICO_Drift"
+      },
+      {
+        "ID": "LB_HIGHEST_COMBO",
+        "Name": "Highest Combo",
+        "Description": "Best drift combo score",
+        "Type": "HighScore",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value:,}",
+        "Icon": "ICO_Chain"
+      },
+      {
+        "ID": "LB_TOTAL_DRIFT_SCORE",
+        "Name": "Total Drift Score",
+        "Description": "Lifetime drift points",
+        "Type": "Cumulative",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value:,}",
+        "Icon": "ICO_Smoke"
+      },
+      {
+        "ID": "LB_SSS_DRIFTS",
+        "Name": "SSS Grade Drifts",
+        "Description": "Number of SSS grade drifts",
+        "Type": "Cumulative",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value}",
+        "Icon": "ICO_SSS"
+      }
+    ],
+    "Speed": [
+      {
+        "ID": "LB_TOP_SPEED",
+        "Name": "Top Speed Record",
+        "Description": "Highest speed achieved",
+        "Type": "HighScore",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value} MPH",
+        "Icon": "ICO_Speed"
+      },
+      {
+        "ID": "LB_QUARTER_MILE",
+        "Name": "Fastest Quarter Mile",
+        "Description": "Best 1/4 mile time",
+        "Type": "LowScore",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value}s",
+        "Icon": "ICO_Drag"
+      },
+      {
+        "ID": "LB_HALF_MILE",
+        "Name": "Fastest Half Mile",
+        "Description": "Best 1/2 mile time",
+        "Type": "LowScore",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value}s",
+        "Icon": "ICO_Drag"
+      },
+      {
+        "ID": "LB_ZERO_TO_SIXTY",
+        "Name": "0-60 MPH",
+        "Description": "Fastest acceleration",
+        "Type": "LowScore",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value}s",
+        "Icon": "ICO_Launch"
+      }
+    ],
+    "Reputation": [
+      {
+        "ID": "LB_TOTAL_REP",
+        "Name": "Total REP",
+        "Description": "Lifetime reputation earned",
+        "Type": "Cumulative",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value:,}",
+        "Icon": "ICO_REP"
+      },
+      {
+        "ID": "LB_WEEKLY_REP",
+        "Name": "Weekly REP",
+        "Description": "REP earned this week",
+        "Type": "Cumulative",
+        "ResetPeriod": "Weekly",
+        "DisplayFormat": "{value:,}",
+        "Icon": "ICO_REP"
+      }
+    ],
+    "Economy": [
+      {
+        "ID": "LB_TOTAL_EARNINGS",
+        "Name": "Total Earnings",
+        "Description": "Lifetime cash earned",
+        "Type": "Cumulative",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "${value:,}",
+        "Icon": "ICO_Cash"
+      },
+      {
+        "ID": "LB_BIGGEST_WAGER",
+        "Name": "Biggest Wager Won",
+        "Description": "Largest single wager victory",
+        "Type": "HighScore",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "${value:,}",
+        "Icon": "ICO_Dice"
+      },
+      {
+        "ID": "LB_PINK_SLIPS_WON",
+        "Name": "Pink Slips Won",
+        "Description": "Vehicles won in pink slip races",
+        "Type": "Cumulative",
+        "ResetPeriod": "Never",
+        "DisplayFormat": "{value}",
+        "Icon": "ICO_PinkSlip"
+      }
+    ],
+    "Ranked": [
+      {
+        "ID": "LB_RANKED_MMR",
+        "Name": "Ranked Rating",
+        "Description": "Current ranked MMR",
+        "Type": "Rating",
+        "ResetPeriod": "Season",
+        "DisplayFormat": "{value}",
+        "Icon": "ICO_Ranked"
+      },
+      {
+        "ID": "LB_RANKED_WINS",
+        "Name": "Ranked Wins",
+        "Description": "Ranked race victories this season",
+        "Type": "Cumulative",
+        "ResetPeriod": "Season",
+        "DisplayFormat": "{value}",
+        "Icon": "ICO_Trophy"
+      }
+    ]
+  },
+
+  "TrackLeaderboards": {
+    "PerTrack": true,
+    "Categories": [
+      {
+        "ID": "TLB_LAP_TIME",
+        "Name": "Fastest Lap",
+        "Type": "LowScore",
+        "DisplayFormat": "{value}",
+        "PerClass": true
+      },
+      {
+        "ID": "TLB_RACE_TIME",
+        "Name": "Fastest Race",
+        "Type": "LowScore",
+        "DisplayFormat": "{value}",
+        "PerClass": true
+      },
+      {
+        "ID": "TLB_DRIFT_SCORE",
+        "Name": "Highest Drift Score",
+        "Type": "HighScore",
+        "DisplayFormat": "{value:,}",
+        "PerClass": false
+      },
+      {
+        "ID": "TLB_SPEED_TRAP",
+        "Name": "Speed Trap",
+        "Type": "HighScore",
+        "DisplayFormat": "{value} MPH",
+        "PerClass": true
+      }
+    ],
+    "Tracks": [
+      "HARUNA_PASS",
+      "WANGAN_HIGHWAY",
+      "INDUSTRIAL_DOCKS",
+      "TEST_TRACK",
+      "NEO_CITY_CIRCUIT",
+      "RED_ROCK_CANYON",
+      "SKY_GARAGE",
+      "ABANDONED_AIRFIELD"
+    ]
+  },
+
+  "VehicleLeaderboards": {
+    "PerVehicle": true,
+    "Categories": [
+      {
+        "ID": "VLB_BEST_LAP",
+        "Name": "Best Lap",
+        "Type": "LowScore",
+        "DisplayFormat": "{value}"
+      },
+      {
+        "ID": "VLB_QUARTER_MILE",
+        "Name": "Quarter Mile",
+        "Type": "LowScore",
+        "DisplayFormat": "{value}s"
+      },
+      {
+        "ID": "VLB_TOP_SPEED",
+        "Name": "Top Speed",
+        "Type": "HighScore",
+        "DisplayFormat": "{value} MPH"
+      },
+      {
+        "ID": "VLB_DRIFT_SCORE",
+        "Name": "Best Drift",
+        "Type": "HighScore",
+        "DisplayFormat": "{value:,}"
+      }
+    ]
+  },
+
+  "WeeklyLeaderboards": {
+    "Enabled": true,
+    "ResetDay": "Monday",
+    "ResetTime": "04:00:00",
+    "Categories": [
+      {
+        "ID": "WLB_WINS",
+        "Name": "Weekly Wins",
+        "Type": "Cumulative"
+      },
+      {
+        "ID": "WLB_REP",
+        "Name": "Weekly REP",
+        "Type": "Cumulative"
+      },
+      {
+        "ID": "WLB_DRIFT",
+        "Name": "Weekly Drift Score",
+        "Type": "Cumulative"
+      },
+      {
+        "ID": "WLB_DISTANCE",
+        "Name": "Weekly Distance",
+        "Type": "Cumulative"
+      }
+    ],
+    "Rewards": {
+      "Top1": { "Cash": 100000, "REP": 5000, "Title": "TITLE_WEEKLY_CHAMPION" },
+      "Top3": { "Cash": 50000, "REP": 2500 },
+      "Top10": { "Cash": 25000, "REP": 1000 },
+      "Top50": { "Cash": 10000, "REP": 500 },
+      "Top100": { "Cash": 5000, "REP": 250 }
+    }
+  },
+
+  "CrewLeaderboards": {
+    "Enabled": true,
+    "Categories": [
+      {
+        "ID": "CLB_CREW_REP",
+        "Name": "Crew REP",
+        "Type": "Cumulative",
+        "ResetPeriod": "Never"
+      },
+      {
+        "ID": "CLB_WEEKLY_CREW_REP",
+        "Name": "Weekly Crew REP",
+        "Type": "Cumulative",
+        "ResetPeriod": "Weekly"
+      },
+      {
+        "ID": "CLB_TERRITORY_CONTROL",
+        "Name": "Territory Control",
+        "Type": "Snapshot",
+        "ResetPeriod": "Never"
+      },
+      {
+        "ID": "CLB_CREW_WINS",
+        "Name": "Crew Battle Wins",
+        "Type": "Cumulative",
+        "ResetPeriod": "Season"
+      }
+    ],
+    "SeasonRewards": {
+      "Top1": { "CrewCash": 1000000, "CrewXP": 50000, "ExclusiveBanner": true },
+      "Top3": { "CrewCash": 500000, "CrewXP": 25000 },
+      "Top10": { "CrewCash": 250000, "CrewXP": 10000 }
+    }
+  },
+
+  "FriendsLeaderboards": {
+    "Enabled": true,
+    "CompareWith": "Friends",
+    "Categories": ["All"],
+    "GhostRacing": {
+      "Enabled": true,
+      "AutoDownload": true
+    },
+    "Notifications": {
+      "BeatFriend": true,
+      "FriendBeatYou": true
+    }
+  },
+
+  "Display": {
+    "TopPlayersShown": 100,
+    "NearbyPlayersShown": 5,
+    "FriendsHighlighted": true,
+    "PlayerHighlighted": true,
+    "RefreshInterval": 60,
+    "CacheExpiry": 300,
+    "ShowRankChange": true,
+    "ShowTimeDifference": true
+  },
+
+  "Privacy": {
+    "OptOut": false,
+    "AnonymousMode": {
+      "Enabled": true,
+      "DisplayName": "Anonymous Racer"
+    },
+    "HideFromFriends": false,
+    "HideFromGlobal": false
+  },
+
+  "AntiCheat": {
+    "ValidationRequired": true,
+    "ManualReview": {
+      "TopN": 10,
+      "SuspiciousThreshold": 2.0
+    },
+    "ReplayRequired": {
+      "TopN": 100
+    },
+    "Penalties": {
+      "InvalidEntry": "Remove",
+      "Cheating": "Ban"
+    }
+  }
+}
