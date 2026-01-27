@@ -1166,12 +1166,173 @@ FString UMGAirtimeSubsystem::GenerateResultId() const
 // Save/Load
 void UMGAirtimeSubsystem::SaveAirtimeData()
 {
-	// Save implementation would persist records, stats, and discovered ramps
-	// Using platform-specific save system or cloud saves
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Airtime");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("airtime_data.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save player stats
+	int32 NumStats = PlayerStats.Num();
+	SaveArchive << NumStats;
+
+	for (const auto& StatPair : PlayerStats)
+	{
+		FString PlayerId = StatPair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGAirtimePlayerStats& Stats = StatPair.Value;
+		int32 TotalJumps = Stats.TotalJumps;
+		float TotalAirtime = Stats.TotalAirtime;
+		float LongestAirtime = Stats.LongestAirtime;
+		float HighestJump = Stats.HighestJump;
+		float LongestDistance = Stats.LongestDistance;
+		int32 TotalTricks = Stats.TotalTricks;
+		int32 PerfectLandings = Stats.PerfectLandings;
+		int32 CrashLandings = Stats.CrashLandings;
+		int32 TotalPoints = Stats.TotalPoints;
+		int32 HighestScore = Stats.HighestSingleJumpScore;
+		int32 SecretRamps = Stats.SecretRampsFound;
+
+		SaveArchive << TotalJumps;
+		SaveArchive << TotalAirtime;
+		SaveArchive << LongestAirtime;
+		SaveArchive << HighestJump;
+		SaveArchive << LongestDistance;
+		SaveArchive << TotalTricks;
+		SaveArchive << PerfectLandings;
+		SaveArchive << CrashLandings;
+		SaveArchive << TotalPoints;
+		SaveArchive << HighestScore;
+		SaveArchive << SecretRamps;
+
+		// Save trick counts
+		int32 NumTricks = Stats.TrickCounts.Num();
+		SaveArchive << NumTricks;
+		for (const auto& TrickPair : Stats.TrickCounts)
+		{
+			int32 TrickInt = static_cast<int32>(TrickPair.Key);
+			int32 Count = TrickPair.Value;
+			SaveArchive << TrickInt;
+			SaveArchive << Count;
+		}
+
+		// Save ramp best distances
+		int32 NumRamps = Stats.RampBestDistances.Num();
+		SaveArchive << NumRamps;
+		for (const auto& RampPair : Stats.RampBestDistances)
+		{
+			FString RampId = RampPair.Key;
+			float Distance = RampPair.Value;
+			SaveArchive << RampId;
+			SaveArchive << Distance;
+		}
+	}
+
+	// Save discovered ramps
+	int32 NumDiscovered = DiscoveredRamps.Num();
+	SaveArchive << NumDiscovered;
+	for (const FString& RampId : DiscoveredRamps)
+	{
+		FString Id = RampId;
+		SaveArchive << Id;
+	}
+
+	// Write to file
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGAirtimeSubsystem: Saved airtime data for %d players, %d discovered ramps"), NumStats, NumDiscovered);
 }
 
 void UMGAirtimeSubsystem::LoadAirtimeData()
 {
-	// Load implementation would restore records, stats, and discovered ramps
-	// From platform-specific save system or cloud saves
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Airtime") / TEXT("airtime_data.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("MGAirtimeSubsystem: No saved airtime data found"));
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGAirtimeSubsystem: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Load player stats
+	int32 NumStats;
+	LoadArchive << NumStats;
+
+	for (int32 i = 0; i < NumStats; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGAirtimePlayerStats Stats;
+		Stats.PlayerId = PlayerId;
+
+		LoadArchive << Stats.TotalJumps;
+		LoadArchive << Stats.TotalAirtime;
+		LoadArchive << Stats.LongestAirtime;
+		LoadArchive << Stats.HighestJump;
+		LoadArchive << Stats.LongestDistance;
+		LoadArchive << Stats.TotalTricks;
+		LoadArchive << Stats.PerfectLandings;
+		LoadArchive << Stats.CrashLandings;
+		LoadArchive << Stats.TotalPoints;
+		LoadArchive << Stats.HighestSingleJumpScore;
+		LoadArchive << Stats.SecretRampsFound;
+
+		// Load trick counts
+		int32 NumTricks;
+		LoadArchive << NumTricks;
+		for (int32 j = 0; j < NumTricks; ++j)
+		{
+			int32 TrickInt;
+			int32 Count;
+			LoadArchive << TrickInt;
+			LoadArchive << Count;
+			Stats.TrickCounts.Add(static_cast<EMGAirtimeTrick>(TrickInt), Count);
+		}
+
+		// Load ramp best distances
+		int32 NumRamps;
+		LoadArchive << NumRamps;
+		for (int32 j = 0; j < NumRamps; ++j)
+		{
+			FString RampId;
+			float Distance;
+			LoadArchive << RampId;
+			LoadArchive << Distance;
+			Stats.RampBestDistances.Add(RampId, Distance);
+		}
+
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	// Load discovered ramps
+	int32 NumDiscovered;
+	LoadArchive << NumDiscovered;
+	for (int32 i = 0; i < NumDiscovered; ++i)
+	{
+		FString RampId;
+		LoadArchive << RampId;
+		DiscoveredRamps.Add(RampId);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGAirtimeSubsystem: Loaded airtime data for %d players, %d discovered ramps"), NumStats, NumDiscovered);
 }
