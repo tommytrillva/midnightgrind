@@ -1,0 +1,332 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Pink Slip Racing and High Stakes Wagers",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "PermanentLoss": true,
+    "NoUndos": true,
+    "InsuranceAllowed": true,
+    "CooldownAfterLoss": 3600,
+    "WarningConfirmations": 3
+  },
+
+  "PinkSlipTypes": {
+    "VehicleVsVehicle": {
+      "ID": "PINKSLIP_VVV",
+      "Name": "Title for Title",
+      "Description": "Winner takes the loser's vehicle",
+      "Stakes": "Vehicles",
+      "Matching": {
+        "PIRange": 50,
+        "ClassMatch": true,
+        "ValueDifferenceMax": 0.25
+      },
+      "Requirements": {
+        "MinLevel": 15,
+        "MinREP": "TIER_KNOWN",
+        "VehicleOwned": true,
+        "NoFinancing": true
+      }
+    },
+    "VehicleVsCash": {
+      "ID": "PINKSLIP_VVC",
+      "Name": "Cash Buyout",
+      "Description": "Bet your car against cash equivalent",
+      "Stakes": "VehicleOrCash",
+      "Matching": {
+        "CashValue": "75% of Vehicle Value",
+        "Negotiable": false
+      },
+      "Requirements": {
+        "MinLevel": 10,
+        "MinCash": "Stake Amount",
+        "VehicleValuation": true
+      }
+    },
+    "HighRoller": {
+      "ID": "PINKSLIP_HIGH",
+      "Name": "High Roller",
+      "Description": "Premium vehicles only, highest stakes",
+      "Stakes": "PremiumVehicles",
+      "Matching": {
+        "MinVehicleValue": 500000,
+        "PIRange": 30
+      },
+      "Requirements": {
+        "MinLevel": 40,
+        "MinREP": "TIER_ELITE",
+        "ExclusiveAccess": true
+      },
+      "Multipliers": {
+        "REP": 2.5,
+        "Achievement": true
+      }
+    },
+    "CrewBattle": {
+      "ID": "PINKSLIP_CREW",
+      "Name": "Crew War Stakes",
+      "Description": "Crew-backed vehicle stakes",
+      "Stakes": "CrewVehicles",
+      "Matching": {
+        "CrewApproval": true,
+        "LeaderOnly": false
+      },
+      "Requirements": {
+        "InCrew": true,
+        "CrewLevel": 5,
+        "CrewVote": true
+      }
+    }
+  },
+
+  "RaceFormats": {
+    "HeadToHead": {
+      "ID": "FORMAT_1V1",
+      "Participants": 2,
+      "Tracks": ["Sprint", "Circuit", "Drag"],
+      "Default": true
+    },
+    "BestOf3": {
+      "ID": "FORMAT_BO3",
+      "Participants": 2,
+      "Rounds": 3,
+      "WinsRequired": 2,
+      "TracksRotate": true
+    },
+    "BestOf5": {
+      "ID": "FORMAT_BO5",
+      "Participants": 2,
+      "Rounds": 5,
+      "WinsRequired": 3,
+      "TracksRotate": true,
+      "Requirements": {
+        "MinVehicleValue": 100000
+      }
+    },
+    "Gauntlet": {
+      "ID": "FORMAT_GAUNTLET",
+      "Participants": 4,
+      "Elimination": true,
+      "StakesEscalate": true,
+      "FinalStakes": "AllVehicles"
+    }
+  },
+
+  "VehicleValuation": {
+    "Factors": {
+      "BaseValue": { "Weight": 0.4 },
+      "Modifications": { "Weight": 0.25 },
+      "Rarity": { "Weight": 0.15 },
+      "Condition": { "Weight": 0.1 },
+      "History": { "Weight": 0.1 }
+    },
+    "ModificationValue": {
+      "Performance": "FullValue",
+      "Cosmetic": "70% Value",
+      "Exclusive": "150% Value"
+    },
+    "RarityMultipliers": {
+      "Common": 1.0,
+      "Uncommon": 1.15,
+      "Rare": 1.35,
+      "Epic": 1.6,
+      "Legendary": 2.0,
+      "Exclusive": 3.0
+    },
+    "ConditionFactors": {
+      "Perfect": 1.0,
+      "Excellent": 0.95,
+      "Good": 0.85,
+      "Fair": 0.7,
+      "Poor": 0.5
+    }
+  },
+
+  "MatchingSystem": {
+    "PITolerance": {
+      "Strict": 25,
+      "Normal": 50,
+      "Loose": 100
+    },
+    "ValueTolerance": {
+      "Strict": 0.1,
+      "Normal": 0.25,
+      "Loose": 0.5
+    },
+    "PreferredMatching": {
+      "SameClass": true,
+      "SimilarPI": true,
+      "SimilarValue": true
+    },
+    "WaitTime": {
+      "Min": 30,
+      "Max": 300,
+      "ExpansionRate": 60
+    }
+  },
+
+  "Insurance": {
+    "Enabled": true,
+    "Types": {
+      "Basic": {
+        "ID": "INS_BASIC",
+        "Name": "Basic Coverage",
+        "Cost": "10% of Vehicle Value",
+        "Recovery": "50% Value as Cash",
+        "UnlockMethod": "Default"
+      },
+      "Standard": {
+        "ID": "INS_STANDARD",
+        "Name": "Standard Coverage",
+        "Cost": "20% of Vehicle Value",
+        "Recovery": "75% Value as Cash",
+        "UnlockLevel": 20
+      },
+      "Premium": {
+        "ID": "INS_PREMIUM",
+        "Name": "Premium Coverage",
+        "Cost": "35% of Vehicle Value",
+        "Recovery": "Same Vehicle (Stock)",
+        "UnlockLevel": 35
+      },
+      "Platinum": {
+        "ID": "INS_PLATINUM",
+        "Name": "Platinum Coverage",
+        "Cost": "50% of Vehicle Value",
+        "Recovery": "Same Vehicle (Full Mods)",
+        "UnlockLevel": 50,
+        "SingleUse": true
+      }
+    },
+    "Restrictions": {
+      "PurchaseBefore": true,
+      "NoPurchaseAfterMatch": true,
+      "Cooldown": 604800,
+      "MaxClaims": 3
+    }
+  },
+
+  "ChallengeFlow": {
+    "Initiation": {
+      "DirectChallenge": true,
+      "MatchmakingQueue": true,
+      "LocationBased": true
+    },
+    "Confirmation": {
+      "Steps": [
+        "ViewOpponentVehicle",
+        "ConfirmStakes",
+        "FinalWarning"
+      ],
+      "TimeLimit": 120,
+      "BackOut": {
+        "Allowed": true,
+        "Penalty": { "REP": -500 }
+      }
+    },
+    "PreRace": {
+      "Inspection": {
+        "ViewVehicle": true,
+        "ViewMods": true,
+        "ViewStats": true
+      },
+      "LastChance": {
+        "InsurancePurchase": true,
+        "QuickTune": true
+      }
+    }
+  },
+
+  "Aftermath": {
+    "VictoryFlow": {
+      "ClaimVehicle": true,
+      "InspectWin": true,
+      "VictoryScreen": true,
+      "REPBonus": 2.5
+    },
+    "LossFlow": {
+      "Surrender": true,
+      "InsuranceClaim": true,
+      "DefeatedScreen": true,
+      "Cooldown": 3600
+    },
+    "Transfer": {
+      "Immediate": true,
+      "ModsIncluded": true,
+      "HistoryPreserved": true
+    }
+  },
+
+  "Protections": {
+    "StarterCar": {
+      "CannotWager": true,
+      "Reason": "Starter vehicles are protected"
+    },
+    "GiftedVehicles": {
+      "CooldownDays": 7,
+      "CannotWagerUntil": true
+    },
+    "RecentPurchase": {
+      "CooldownHours": 24,
+      "PreventFlipping": true
+    },
+    "LowBalance": {
+      "Warning": true,
+      "MinRemainingVehicles": 1
+    }
+  },
+
+  "Moderation": {
+    "CollisionDetection": true,
+    "SuspectedManipulation": {
+      "FlaggedMatches": true,
+      "ReviewRequired": true
+    },
+    "Appeals": {
+      "AllowAppeals": true,
+      "TimeLimit": 86400,
+      "ReviewProcess": true
+    },
+    "Penalties": {
+      "Manipulation": "Ban",
+      "DisconnectAbuse": "TempBan"
+    }
+  },
+
+  "UI": {
+    "Warnings": {
+      "FirstTimeWarning": true,
+      "ValueWarning": true,
+      "FinalConfirmation": true,
+      "Typography": "Bold"
+    },
+    "VehicleDisplay": {
+      "3DPreview": true,
+      "StatsComparison": true,
+      "ValueDisplay": true
+    },
+    "PostRace": {
+      "TransferAnimation": true,
+      "HistoryUpdate": true
+    }
+  },
+
+  "Statistics": {
+    "TrackWins": true,
+    "TrackLosses": true,
+    "VehiclesWon": true,
+    "VehiclesLost": true,
+    "ValueWon": true,
+    "ValueLost": true,
+    "WinStreak": true
+  },
+
+  "Achievements": {
+    "FirstPinkSlipWin": { "REP": 2500, "Title": "Risk Taker" },
+    "FiveWins": { "REP": 10000, "Title": "High Stakes Hunter" },
+    "WinHighRoller": { "REP": 25000, "Title": "High Roller Champion" },
+    "WinStreak5": { "REP": 15000, "Title": "Unstoppable" },
+    "Win1Million": { "REP": 50000, "Title": "Millionaire Stakes" }
+  }
+}

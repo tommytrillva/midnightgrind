@@ -464,7 +464,7 @@ void UMGDefaultRaceOverlay::UpdateNotificationAnimations(float DeltaTime)
 		}
 
 		float Age = CurrentTime - Entry.SpawnTime;
-		float NormalizedAge = Age / Entry.Duration;
+		float NormalizedAge = (Entry.Duration > 0.0f) ? (Age / Entry.Duration) : 1.0f;
 
 		// Fade in/out
 		float Alpha = 1.0f;

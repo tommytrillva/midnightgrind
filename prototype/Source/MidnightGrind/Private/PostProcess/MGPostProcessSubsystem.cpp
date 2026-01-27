@@ -608,12 +608,16 @@ void UMGPostProcessSubsystem::PulseVignette(float Intensity, float Duration)
         CurrentProfile.Vignette.Intensity = FMath::Min(1.0f, OriginalIntensity + Intensity);
         ApplyEffectsToPostProcessVolume();
 
+        TWeakObjectPtr<UMGPostProcessSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             TemporaryEffectHandle,
-            [this, OriginalIntensity]()
+            [WeakThis, OriginalIntensity]()
             {
-                CurrentProfile.Vignette.Intensity = OriginalIntensity;
-                ApplyEffectsToPostProcessVolume();
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->CurrentProfile.Vignette.Intensity = OriginalIntensity;
+                    WeakThis->ApplyEffectsToPostProcessVolume();
+                }
             },
             Duration,
             false

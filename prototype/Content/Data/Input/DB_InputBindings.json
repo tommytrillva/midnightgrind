@@ -1,0 +1,333 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Input Bindings and Control Schemes",
+
+  "InputSystem": {
+    "Framework": "EnhancedInput",
+    "RemappingEnabled": true,
+    "MultipleBindingsPerAction": true,
+    "ConflictResolution": "Prompt"
+  },
+
+  "ControlSchemes": {
+    "Gamepad_Default": {
+      "ID": "SCHEME_PAD_DEFAULT",
+      "Name": "Standard",
+      "Description": "Traditional racing game controls",
+      "Platform": ["PlayStation", "Xbox", "Generic"],
+      "Bindings": {
+        "Driving": {
+          "Accelerate": { "Input": "RightTrigger", "Type": "Axis" },
+          "Brake": { "Input": "LeftTrigger", "Type": "Axis" },
+          "Steer": { "Input": "LeftStick_X", "Type": "Axis" },
+          "Handbrake": { "Input": "A/Cross", "Type": "Button" },
+          "Nitrous": { "Input": "B/Circle", "Type": "Button", "Hold": true },
+          "ShiftUp": { "Input": "RightBumper", "Type": "Button" },
+          "ShiftDown": { "Input": "LeftBumper", "Type": "Button" },
+          "LookBehind": { "Input": "RightStick_Click", "Type": "Button", "Hold": true },
+          "LookAround": { "Input": "RightStick", "Type": "Axis" },
+          "Horn": { "Input": "LeftStick_Click", "Type": "Button" },
+          "Rewind": { "Input": "Y/Triangle", "Type": "Button" },
+          "ResetCar": { "Input": "Y/Triangle", "Type": "Button", "Hold": true, "HoldTime": 2.0 }
+        },
+        "Camera": {
+          "ChangeView": { "Input": "D-Pad_Down", "Type": "Button" },
+          "ZoomIn": { "Input": "D-Pad_Up", "Type": "Button" },
+          "PhotoMode": { "Input": "D-Pad_Left", "Type": "Button", "Hold": true }
+        },
+        "Menu": {
+          "Pause": { "Input": "Start/Options", "Type": "Button" },
+          "Map": { "Input": "Select/Touchpad", "Type": "Button" },
+          "QuickChat": { "Input": "D-Pad_Right", "Type": "Button" }
+        }
+      }
+    },
+    "Gamepad_Alternate": {
+      "ID": "SCHEME_PAD_ALT",
+      "Name": "Alternate",
+      "Description": "Face buttons for throttle/brake",
+      "Platform": ["PlayStation", "Xbox", "Generic"],
+      "Bindings": {
+        "Driving": {
+          "Accelerate": { "Input": "A/Cross", "Type": "Button" },
+          "Brake": { "Input": "X/Square", "Type": "Button" },
+          "Steer": { "Input": "LeftStick_X", "Type": "Axis" },
+          "Handbrake": { "Input": "B/Circle", "Type": "Button" },
+          "Nitrous": { "Input": "RightBumper", "Type": "Button", "Hold": true },
+          "ShiftUp": { "Input": "RightTrigger", "Type": "Button" },
+          "ShiftDown": { "Input": "LeftTrigger", "Type": "Button" },
+          "LookBehind": { "Input": "Y/Triangle", "Type": "Button", "Hold": true },
+          "LookAround": { "Input": "RightStick", "Type": "Axis" }
+        }
+      }
+    },
+    "Gamepad_Simulation": {
+      "ID": "SCHEME_PAD_SIM",
+      "Name": "Simulation",
+      "Description": "For sim racing enthusiasts",
+      "Platform": ["PlayStation", "Xbox", "Generic"],
+      "Bindings": {
+        "Driving": {
+          "Accelerate": { "Input": "RightTrigger", "Type": "Axis" },
+          "Brake": { "Input": "LeftTrigger", "Type": "Axis" },
+          "Clutch": { "Input": "A/Cross", "Type": "Button", "Hold": true },
+          "Steer": { "Input": "LeftStick_X", "Type": "Axis" },
+          "Handbrake": { "Input": "B/Circle", "Type": "Button" },
+          "ShiftUp": { "Input": "RightBumper", "Type": "Button" },
+          "ShiftDown": { "Input": "LeftBumper", "Type": "Button" },
+          "LookLeft": { "Input": "D-Pad_Left", "Type": "Button" },
+          "LookRight": { "Input": "D-Pad_Right", "Type": "Button" }
+        }
+      }
+    },
+    "Keyboard_Default": {
+      "ID": "SCHEME_KB_DEFAULT",
+      "Name": "Keyboard Default",
+      "Description": "Standard keyboard controls",
+      "Platform": ["PC"],
+      "Bindings": {
+        "Driving": {
+          "Accelerate": { "Input": "W", "Type": "Button" },
+          "Brake": { "Input": "S", "Type": "Button" },
+          "SteerLeft": { "Input": "A", "Type": "Button" },
+          "SteerRight": { "Input": "D", "Type": "Button" },
+          "Handbrake": { "Input": "Space", "Type": "Button" },
+          "Nitrous": { "Input": "LeftShift", "Type": "Button", "Hold": true },
+          "ShiftUp": { "Input": "E", "Type": "Button" },
+          "ShiftDown": { "Input": "Q", "Type": "Button" },
+          "LookBehind": { "Input": "C", "Type": "Button", "Hold": true },
+          "Horn": { "Input": "H", "Type": "Button" },
+          "Rewind": { "Input": "R", "Type": "Button" },
+          "ResetCar": { "Input": "R", "Type": "Button", "Hold": true, "HoldTime": 2.0 }
+        },
+        "Camera": {
+          "ChangeView": { "Input": "V", "Type": "Button" },
+          "PhotoMode": { "Input": "P", "Type": "Button" },
+          "LookAround": { "Input": "Mouse", "Type": "Axis", "Hold": "MiddleMouse" }
+        },
+        "Menu": {
+          "Pause": { "Input": "Escape", "Type": "Button" },
+          "Map": { "Input": "M", "Type": "Button" },
+          "QuickChat": { "Input": "T", "Type": "Button" }
+        }
+      }
+    },
+    "Keyboard_Arrows": {
+      "ID": "SCHEME_KB_ARROWS",
+      "Name": "Arrow Keys",
+      "Description": "Arrow key steering",
+      "Platform": ["PC"],
+      "Bindings": {
+        "Driving": {
+          "Accelerate": { "Input": "UpArrow", "Type": "Button" },
+          "Brake": { "Input": "DownArrow", "Type": "Button" },
+          "SteerLeft": { "Input": "LeftArrow", "Type": "Button" },
+          "SteerRight": { "Input": "RightArrow", "Type": "Button" },
+          "Handbrake": { "Input": "Space", "Type": "Button" },
+          "Nitrous": { "Input": "RightCtrl", "Type": "Button", "Hold": true },
+          "ShiftUp": { "Input": "A", "Type": "Button" },
+          "ShiftDown": { "Input": "Z", "Type": "Button" }
+        }
+      }
+    },
+    "Wheel_Default": {
+      "ID": "SCHEME_WHEEL",
+      "Name": "Racing Wheel",
+      "Description": "For steering wheel peripherals",
+      "Platform": ["PC", "Console"],
+      "RequiresWheel": true,
+      "Bindings": {
+        "Driving": {
+          "Steer": { "Input": "Wheel_Axis", "Type": "Axis", "DeadZone": 0.02 },
+          "Accelerate": { "Input": "Pedal_Throttle", "Type": "Axis" },
+          "Brake": { "Input": "Pedal_Brake", "Type": "Axis" },
+          "Clutch": { "Input": "Pedal_Clutch", "Type": "Axis" },
+          "ShiftUp": { "Input": "Paddle_Right", "Type": "Button" },
+          "ShiftDown": { "Input": "Paddle_Left", "Type": "Button" },
+          "Handbrake": { "Input": "Button_1", "Type": "Button" },
+          "Nitrous": { "Input": "Button_2", "Type": "Button" }
+        },
+        "FFB": {
+          "Enabled": true,
+          "Strength": 0.8,
+          "SelfCentering": true
+        }
+      }
+    }
+  },
+
+  "InputProcessing": {
+    "Steering": {
+      "Keyboard": {
+        "CounterSteerAssist": { "Enabled": true, "Strength": 0.5 },
+        "RampUpTime": 0.15,
+        "RampDownTime": 0.1,
+        "Sensitivity": { "Default": 1.0, "Min": 0.5, "Max": 2.0 }
+      },
+      "Gamepad": {
+        "DeadZone": { "Default": 0.15, "Min": 0.0, "Max": 0.5 },
+        "Linearity": { "Default": 1.0, "Min": 0.5, "Max": 2.5 },
+        "Sensitivity": { "Default": 1.0, "Min": 0.5, "Max": 2.0 },
+        "SpeedSensitivity": { "Enabled": true, "Reduction": 0.3 }
+      },
+      "Wheel": {
+        "DeadZone": { "Default": 0.02, "Min": 0.0, "Max": 0.1 },
+        "Rotation": { "Options": [180, 270, 360, 540, 720, 900], "Default": 540 },
+        "Linearity": { "Default": 1.0, "Min": 0.5, "Max": 2.0 }
+      }
+    },
+    "Throttle": {
+      "Gamepad": {
+        "DeadZone": { "Default": 0.05, "Min": 0.0, "Max": 0.2 },
+        "Sensitivity": { "Default": 1.0, "Min": 0.5, "Max": 2.0 }
+      },
+      "Keyboard": {
+        "RampUpTime": 0.1,
+        "RampDownTime": 0.05
+      }
+    },
+    "Brake": {
+      "Gamepad": {
+        "DeadZone": { "Default": 0.05, "Min": 0.0, "Max": 0.2 },
+        "Sensitivity": { "Default": 1.0, "Min": 0.5, "Max": 2.0 }
+      },
+      "Keyboard": {
+        "RampUpTime": 0.08,
+        "RampDownTime": 0.05
+      }
+    }
+  },
+
+  "ForceFeedback": {
+    "Enabled": true,
+    "GlobalStrength": { "Default": 0.7, "Min": 0.0, "Max": 1.0 },
+    "Effects": {
+      "SelfCentering": { "Enabled": true, "Strength": 0.5 },
+      "TireSlip": { "Enabled": true, "Strength": 0.6 },
+      "Collision": { "Enabled": true, "Strength": 0.8 },
+      "RoadSurface": { "Enabled": true, "Strength": 0.4 },
+      "Kerbs": { "Enabled": true, "Strength": 0.7 },
+      "Engine": { "Enabled": true, "Strength": 0.2 },
+      "ABS": { "Enabled": true, "Strength": 0.5 },
+      "TractionLoss": { "Enabled": true, "Strength": 0.7 },
+      "Understeer": { "Enabled": true, "Strength": 0.5 },
+      "Oversteer": { "Enabled": true, "Strength": 0.6 }
+    },
+    "WheelProfiles": {
+      "Logitech": { "OverallGain": 1.0, "DamperStrength": 0.3 },
+      "Thrustmaster": { "OverallGain": 0.9, "DamperStrength": 0.25 },
+      "Fanatec": { "OverallGain": 0.85, "DamperStrength": 0.2 }
+    }
+  },
+
+  "AdaptiveTriggers": {
+    "Enabled": true,
+    "Platform": "PlayStation5",
+    "Effects": {
+      "Throttle": {
+        "Type": "Resistance",
+        "StartPosition": 0.0,
+        "EndPosition": 1.0,
+        "Strength": { "Min": 0.0, "Max": 1.0 },
+        "Modifiers": {
+          "Wheelspin": { "Effect": "Vibrate", "Intensity": "Dynamic" },
+          "TractionControl": { "Effect": "Pulse", "Frequency": "Dynamic" }
+        }
+      },
+      "Brake": {
+        "Type": "Resistance",
+        "StartPosition": 0.1,
+        "EndPosition": 0.9,
+        "Strength": { "Min": 0.3, "Max": 1.0 },
+        "Modifiers": {
+          "ABS": { "Effect": "Vibrate", "Intensity": "Dynamic" },
+          "LockUp": { "Effect": "Pulse", "Intensity": "High" },
+          "BrakeFade": { "Effect": "SoftenResistance", "Amount": "Dynamic" }
+        }
+      }
+    }
+  },
+
+  "GyroAiming": {
+    "Enabled": false,
+    "Platform": ["PlayStation", "Switch"],
+    "UseForSteering": true,
+    "Sensitivity": { "Default": 1.0, "Min": 0.1, "Max": 3.0 },
+    "DeadZone": { "Default": 0.05, "Min": 0.0, "Max": 0.2 },
+    "Calibration": "Auto"
+  },
+
+  "TouchControls": {
+    "Enabled": false,
+    "Platform": "Mobile",
+    "Layouts": {
+      "Default": {
+        "SteeringMethod": "Tilt",
+        "ThrottlePosition": "Right",
+        "BrakePosition": "Left",
+        "NitrousButton": true,
+        "HandbrakeButton": true
+      },
+      "Buttons": {
+        "SteeringMethod": "Buttons",
+        "LeftRightButtons": true,
+        "ThrottlePosition": "Right",
+        "BrakePosition": "Left"
+      },
+      "Wheel": {
+        "SteeringMethod": "VirtualWheel",
+        "WheelPosition": "Left",
+        "WheelSize": "Medium"
+      }
+    },
+    "Sensitivity": {
+      "Tilt": { "Default": 1.0, "Min": 0.5, "Max": 2.0 },
+      "Touch": { "Default": 1.0, "Min": 0.5, "Max": 2.0 }
+    }
+  },
+
+  "QuickActions": {
+    "DoubleTap": {
+      "Enabled": true,
+      "Threshold": 0.3,
+      "Actions": {
+        "Accelerate_DoubleTap": "Nitrous_Burst",
+        "Handbrake_DoubleTap": "Quick180"
+      }
+    },
+    "HoldActions": {
+      "Enabled": true,
+      "Actions": {
+        "Map_Hold": "Set_Waypoint",
+        "Pause_Hold": "Quick_Restart"
+      }
+    }
+  },
+
+  "Accessibility": {
+    "OneHandedMode": {
+      "Left": {
+        "Accelerate": "LeftTrigger",
+        "Brake": "LeftBumper",
+        "Steer": "LeftStick",
+        "AutoAccelerate": true
+      },
+      "Right": {
+        "Accelerate": "RightTrigger",
+        "Brake": "RightBumper",
+        "Steer": "RightStick",
+        "AutoAccelerate": true
+      }
+    },
+    "SimplifiedControls": {
+      "AutoAccelerate": true,
+      "AssistSteering": "High",
+      "AutoShift": true,
+      "AutoBrake": { "Corners": true, "Obstacles": true }
+    },
+    "HoldVsToggle": {
+      "AllActionsToggleable": true,
+      "Default": "Hold"
+    }
+  }
+}

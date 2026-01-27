@@ -98,15 +98,20 @@ void UMGSaveSubsystem::SaveGameAsync(int32 SlotIndex)
 
 	// Async save
 	FString SlotName = GetSaveSlotName(SlotIndex);
+	TWeakObjectPtr<UMGSaveSubsystem> WeakThis(this);
 	UGameplayStatics::AsyncSaveGameToSlot(SaveGameObject, SlotName, 0,
-		FAsyncSaveGameToSlotDelegate::CreateLambda([this, SlotIndex](const FString& SlotName, const int32 UserIndex, bool bSuccess)
+		FAsyncSaveGameToSlotDelegate::CreateLambda([WeakThis, SlotIndex](const FString& SlotName, const int32 UserIndex, bool bSuccess)
 		{
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
 			if (bSuccess)
 			{
-				CurrentSlotIndex = SlotIndex;
-				bHasUnsavedChanges = false;
+				WeakThis->CurrentSlotIndex = SlotIndex;
+				WeakThis->bHasUnsavedChanges = false;
 			}
-			OnSaveCompleted.Broadcast(SlotIndex, bSuccess);
+			WeakThis->OnSaveCompleted.Broadcast(SlotIndex, bSuccess);
 		})
 	);
 }
@@ -187,24 +192,29 @@ void UMGSaveSubsystem::LoadGameAsync(int32 SlotIndex)
 
 	OnLoadStarted.Broadcast(SlotIndex);
 
+	TWeakObjectPtr<UMGSaveSubsystem> WeakThis(this);
 	UGameplayStatics::AsyncLoadGameFromSlot(SlotName, 0,
-		FAsyncLoadGameFromSlotDelegate::CreateLambda([this, SlotIndex](const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGame)
+		FAsyncLoadGameFromSlotDelegate::CreateLambda([WeakThis, SlotIndex](const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGame)
 		{
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
 			UMGSaveGameObject* SaveGameObject = Cast<UMGSaveGameObject>(LoadedGame);
 
 			if (!SaveGameObject)
 			{
-				OnLoadCompleted.Broadcast(SlotIndex, false);
+				WeakThis->OnLoadCompleted.Broadcast(SlotIndex, false);
 				return;
 			}
 
-			CurrentSaveData = SaveGameObject->SaveData;
-			CurrentSlotIndex = SlotIndex;
-			bHasUnsavedChanges = false;
+			WeakThis->CurrentSaveData = SaveGameObject->SaveData;
+			WeakThis->CurrentSlotIndex = SlotIndex;
+			WeakThis->bHasUnsavedChanges = false;
 
-			ApplyLoadedGameState(CurrentSaveData);
+			WeakThis->ApplyLoadedGameState(WeakThis->CurrentSaveData);
 
-			OnLoadCompleted.Broadcast(SlotIndex, true);
+			WeakThis->OnLoadCompleted.Broadcast(SlotIndex, true);
 		})
 	);
 }

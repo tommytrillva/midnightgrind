@@ -519,11 +519,16 @@ void UMGSocialShareSubsystem::SimulateUpload(const FString& RequestID)
 	if (UWorld* World = GetWorld())
 	{
 		FTimerHandle ProgressHandle;
+		TWeakObjectPtr<UMGSocialShareSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			ProgressHandle,
-			[this, RequestID]()
+			[WeakThis, RequestID]()
 			{
-				FMGShareRequest* R = ActiveRequests.FindByPredicate([&RequestID](const FMGShareRequest& Req)
+				if (!WeakThis.IsValid())
+				{
+					return;
+				}
+				FMGShareRequest* R = WeakThis->ActiveRequests.FindByPredicate([&RequestID](const FMGShareRequest& Req)
 				{
 					return Req.RequestID == RequestID;
 				});
@@ -531,7 +536,7 @@ void UMGSocialShareSubsystem::SimulateUpload(const FString& RequestID)
 				if (R && R->Status == EMGShareStatus::Uploading)
 				{
 					R->UploadProgress = FMath::Min(1.0f, R->UploadProgress + 0.25f);
-					OnShareProgressUpdated.Broadcast(RequestID, R->UploadProgress);
+					WeakThis->OnShareProgressUpdated.Broadcast(RequestID, R->UploadProgress);
 
 					if (R->UploadProgress >= 1.0f)
 					{
@@ -542,16 +547,16 @@ void UMGSocialShareSubsystem::SimulateUpload(const FString& RequestID)
 						for (EMGSharePlatform Platform : R->TargetPlatforms)
 						{
 							FString URL = FString::Printf(TEXT("https://%s.com/post/%s"),
-								*GetPlatformName(Platform).ToLower(),
+								*WeakThis->GetPlatformName(Platform).ToLower(),
 								*R->RequestID.Left(8));
 							R->PostURLs.Add(Platform, URL);
 							URLs.Add(URL);
 						}
 
-						Stats.TotalShares++;
-						Stats.LastShareTime = FDateTime::Now();
+						WeakThis->Stats.TotalShares++;
+						WeakThis->Stats.LastShareTime = FDateTime::Now();
 
-						OnShareCompleted.Broadcast(RequestID, URLs);
+						WeakThis->OnShareCompleted.Broadcast(RequestID, URLs);
 					}
 				}
 			},

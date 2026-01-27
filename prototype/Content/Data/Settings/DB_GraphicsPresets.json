@@ -1,0 +1,363 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Graphics Quality Presets and Settings",
+
+  "GraphicsSystem": {
+    "AutoDetect": true,
+    "BenchmarkOnFirstRun": true,
+    "DynamicScaling": true,
+    "TargetFrameRate": [30, 60, 120, "Unlimited"]
+  },
+
+  "QualityPresets": {
+    "Low": {
+      "ID": "PRESET_LOW",
+      "Description": "For older hardware",
+      "TargetGPU": "GTX 1050 / RX 560",
+      "Settings": {
+        "Resolution": "1280x720",
+        "ResolutionScale": 0.85,
+        "TextureQuality": "Low",
+        "ShadowQuality": "Low",
+        "AntiAliasing": "FXAA",
+        "AmbientOcclusion": "Off",
+        "ReflectionQuality": "Off",
+        "VolumetricLighting": "Off",
+        "ParticleQuality": "Low",
+        "DrawDistance": "Low",
+        "FoliageQuality": "Low",
+        "PostProcessQuality": "Low",
+        "VehicleDetail": "Low",
+        "TrafficDensity": 0.5,
+        "PS1Filter": { "Enabled": true, "Resolution": "240p", "Dithering": "Heavy" }
+      }
+    },
+    "Medium": {
+      "ID": "PRESET_MEDIUM",
+      "Description": "Balanced quality and performance",
+      "TargetGPU": "GTX 1660 / RX 5600",
+      "Settings": {
+        "Resolution": "1920x1080",
+        "ResolutionScale": 1.0,
+        "TextureQuality": "Medium",
+        "ShadowQuality": "Medium",
+        "AntiAliasing": "TAA",
+        "AmbientOcclusion": "SSAO",
+        "ReflectionQuality": "SSR_Low",
+        "VolumetricLighting": "Low",
+        "ParticleQuality": "Medium",
+        "DrawDistance": "Medium",
+        "FoliageQuality": "Medium",
+        "PostProcessQuality": "Medium",
+        "VehicleDetail": "Medium",
+        "TrafficDensity": 0.75,
+        "PS1Filter": { "Enabled": true, "Resolution": "480p", "Dithering": "Medium" }
+      }
+    },
+    "High": {
+      "ID": "PRESET_HIGH",
+      "Description": "High quality visuals",
+      "TargetGPU": "RTX 3060 / RX 6700 XT",
+      "Settings": {
+        "Resolution": "1920x1080",
+        "ResolutionScale": 1.0,
+        "TextureQuality": "High",
+        "ShadowQuality": "High",
+        "AntiAliasing": "TAA_High",
+        "AmbientOcclusion": "HBAO",
+        "ReflectionQuality": "SSR_High",
+        "VolumetricLighting": "High",
+        "ParticleQuality": "High",
+        "DrawDistance": "High",
+        "FoliageQuality": "High",
+        "PostProcessQuality": "High",
+        "VehicleDetail": "High",
+        "TrafficDensity": 1.0,
+        "PS1Filter": { "Enabled": true, "Resolution": "720p", "Dithering": "Light" }
+      }
+    },
+    "Ultra": {
+      "ID": "PRESET_ULTRA",
+      "Description": "Maximum quality",
+      "TargetGPU": "RTX 3080 / RX 6800 XT",
+      "Settings": {
+        "Resolution": "2560x1440",
+        "ResolutionScale": 1.0,
+        "TextureQuality": "Ultra",
+        "ShadowQuality": "Ultra",
+        "AntiAliasing": "TAA_Ultra",
+        "AmbientOcclusion": "RTAO",
+        "ReflectionQuality": "RTX_Reflections",
+        "VolumetricLighting": "Ultra",
+        "ParticleQuality": "Ultra",
+        "DrawDistance": "Ultra",
+        "FoliageQuality": "Ultra",
+        "PostProcessQuality": "Ultra",
+        "VehicleDetail": "Ultra",
+        "TrafficDensity": 1.0,
+        "PS1Filter": { "Enabled": true, "Resolution": "1080p", "Dithering": "Subtle" }
+      }
+    },
+    "Cinematic": {
+      "ID": "PRESET_CINEMATIC",
+      "Description": "Photo mode and replay quality",
+      "TargetGPU": "RTX 4080+",
+      "Settings": {
+        "Resolution": "3840x2160",
+        "ResolutionScale": 1.0,
+        "TextureQuality": "Ultra",
+        "ShadowQuality": "Cinematic",
+        "AntiAliasing": "TAA_Ultra",
+        "AmbientOcclusion": "RTAO",
+        "ReflectionQuality": "RTX_Reflections_Max",
+        "VolumetricLighting": "Cinematic",
+        "ParticleQuality": "Cinematic",
+        "DrawDistance": "Maximum",
+        "FoliageQuality": "Cinematic",
+        "PostProcessQuality": "Cinematic",
+        "VehicleDetail": "Maximum",
+        "MotionBlur": "Cinematic",
+        "PS1Filter": { "Enabled": false }
+      }
+    }
+  },
+
+  "IndividualSettings": {
+    "Resolution": {
+      "Options": ["1280x720", "1600x900", "1920x1080", "2560x1440", "3840x2160", "Custom"],
+      "CustomMin": { "Width": 640, "Height": 480 },
+      "Ultrawide": ["2560x1080", "3440x1440", "5120x2160"]
+    },
+    "WindowMode": {
+      "Options": ["Fullscreen", "Borderless", "Windowed"],
+      "Default": "Fullscreen"
+    },
+    "VSync": {
+      "Options": ["Off", "On", "Adaptive"],
+      "Default": "Adaptive"
+    },
+    "FrameRateLimit": {
+      "Options": [30, 60, 120, 144, 165, 240, "Unlimited"],
+      "Default": 60
+    },
+    "ResolutionScale": {
+      "Min": 0.5,
+      "Max": 2.0,
+      "Default": 1.0,
+      "Step": 0.05
+    },
+    "DynamicResolution": {
+      "Enabled": false,
+      "TargetFPS": 60,
+      "MinScale": 0.7,
+      "MaxScale": 1.0
+    }
+  },
+
+  "TextureSettings": {
+    "Quality": {
+      "Options": ["Low", "Medium", "High", "Ultra"],
+      "VRAMRequirements": {
+        "Low": "2GB",
+        "Medium": "4GB",
+        "High": "6GB",
+        "Ultra": "8GB+"
+      }
+    },
+    "Filtering": {
+      "Options": ["Bilinear", "Trilinear", "Anisotropic_2x", "Anisotropic_4x", "Anisotropic_8x", "Anisotropic_16x"],
+      "Default": "Anisotropic_8x"
+    },
+    "Streaming": {
+      "Enabled": true,
+      "PoolSize": ["1GB", "2GB", "4GB", "6GB", "Auto"]
+    }
+  },
+
+  "LightingSettings": {
+    "GlobalIllumination": {
+      "Options": ["Off", "Lumen_Low", "Lumen_Medium", "Lumen_High", "Lumen_Ultra"],
+      "Default": "Lumen_Medium"
+    },
+    "Shadows": {
+      "Quality": ["Off", "Low", "Medium", "High", "Ultra", "Cinematic"],
+      "Resolution": [512, 1024, 2048, 4096],
+      "Distance": { "Min": 50, "Max": 500, "Default": 200 },
+      "RayTracedShadows": { "Enabled": false, "RequiresRTX": true }
+    },
+    "VolumetricLighting": {
+      "Options": ["Off", "Low", "Medium", "High", "Ultra"],
+      "GodraysQuality": ["Off", "Low", "High"],
+      "FogQuality": ["Low", "Medium", "High"]
+    },
+    "AmbientOcclusion": {
+      "Options": ["Off", "SSAO", "HBAO", "GTAO", "RTAO"],
+      "Radius": { "Min": 0.5, "Max": 3.0, "Default": 1.5 },
+      "Intensity": { "Min": 0.0, "Max": 2.0, "Default": 1.0 }
+    }
+  },
+
+  "ReflectionSettings": {
+    "Quality": {
+      "Options": ["Off", "SSR_Low", "SSR_Medium", "SSR_High", "RTX_Reflections", "RTX_Reflections_Max"],
+      "VehicleReflections": { "Enabled": true, "Quality": "Linked" },
+      "WaterReflections": { "Enabled": true, "PlanarQuality": ["Low", "Medium", "High"] }
+    },
+    "CubemapResolution": {
+      "Options": [128, 256, 512, 1024],
+      "Default": 256
+    }
+  },
+
+  "PostProcessSettings": {
+    "MotionBlur": {
+      "Enabled": true,
+      "Quality": ["Off", "Low", "Medium", "High", "Cinematic"],
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.5 },
+      "PerObjectBlur": true
+    },
+    "DepthOfField": {
+      "Enabled": true,
+      "Quality": ["Off", "Gaussian", "Bokeh", "Cinematic"],
+      "BokehShape": ["Circle", "Hexagon", "Octagon"]
+    },
+    "Bloom": {
+      "Enabled": true,
+      "Intensity": { "Min": 0.0, "Max": 2.0, "Default": 1.0 },
+      "Quality": ["Low", "Medium", "High"]
+    },
+    "LensFlare": {
+      "Enabled": true,
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.5 }
+    },
+    "ChromaticAberration": {
+      "Enabled": true,
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.2 }
+    },
+    "FilmGrain": {
+      "Enabled": true,
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.15 }
+    },
+    "Vignette": {
+      "Enabled": true,
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.3 }
+    },
+    "ColorGrading": {
+      "Enabled": true,
+      "LUTSupport": true,
+      "Presets": ["Default", "Cinematic", "Vibrant", "Muted", "PS1_Authentic", "VHS"]
+    }
+  },
+
+  "PS1FilterSettings": {
+    "Enabled": true,
+    "RenderResolution": {
+      "Options": ["240p", "360p", "480p", "720p", "1080p", "Native"],
+      "Default": "480p"
+    },
+    "VertexSnapping": {
+      "Enabled": true,
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.6 }
+    },
+    "TextureWarping": {
+      "Enabled": true,
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.4 }
+    },
+    "Dithering": {
+      "Enabled": true,
+      "Pattern": ["Ordered", "Bayer", "BlueNoise"],
+      "Intensity": ["Off", "Subtle", "Light", "Medium", "Heavy", "Extreme"]
+    },
+    "ColorDepth": {
+      "Options": ["32bit", "16bit", "PS1_15bit"],
+      "Default": "PS1_15bit"
+    },
+    "Scanlines": {
+      "Enabled": false,
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.3 }
+    },
+    "CRTCurvature": {
+      "Enabled": false,
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.2 }
+    }
+  },
+
+  "VehicleGraphics": {
+    "DetailLevel": {
+      "Options": ["Low", "Medium", "High", "Ultra", "Maximum"],
+      "LODBias": [-2, -1, 0, 1, 2]
+    },
+    "InteriorDetail": {
+      "Enabled": true,
+      "Quality": ["Off", "Low", "Medium", "High"]
+    },
+    "DamageVisualization": {
+      "Enabled": true,
+      "Quality": ["Decals", "Deformation_Low", "Deformation_High", "Full"]
+    },
+    "TireMarks": {
+      "Enabled": true,
+      "Quality": ["Low", "Medium", "High"],
+      "Persistence": { "Min": 30, "Max": 300, "Default": 120 }
+    },
+    "ExhaustEffects": {
+      "Enabled": true,
+      "Quality": ["Low", "Medium", "High"],
+      "Backfire": true
+    }
+  },
+
+  "EnvironmentGraphics": {
+    "DrawDistance": {
+      "Options": ["Low", "Medium", "High", "Ultra", "Maximum"],
+      "LODDistances": {
+        "Low": 500,
+        "Medium": 1000,
+        "High": 2000,
+        "Ultra": 4000,
+        "Maximum": 8000
+      }
+    },
+    "FoliageQuality": {
+      "Options": ["Off", "Low", "Medium", "High", "Ultra"],
+      "Density": { "Min": 0.0, "Max": 1.0, "Default": 1.0 }
+    },
+    "TrafficDensity": {
+      "Options": [0.0, 0.25, 0.5, 0.75, 1.0],
+      "Default": 0.75
+    },
+    "PedestrianDensity": {
+      "Options": [0.0, 0.25, 0.5, 0.75, 1.0],
+      "Default": 0.5
+    },
+    "WeatherEffects": {
+      "Rain": { "Quality": ["Low", "Medium", "High", "Ultra"], "Puddles": true, "Wetness": true },
+      "Snow": { "Quality": ["Low", "Medium", "High", "Ultra"], "Accumulation": true },
+      "Fog": { "Quality": ["Low", "Medium", "High"], "VolumetricFog": true }
+    }
+  },
+
+  "PerformanceFeatures": {
+    "DLSS": {
+      "Supported": true,
+      "Modes": ["Off", "Quality", "Balanced", "Performance", "UltraPerformance"],
+      "FrameGeneration": true
+    },
+    "FSR": {
+      "Supported": true,
+      "Modes": ["Off", "Quality", "Balanced", "Performance", "UltraPerformance"],
+      "Version": "3.0"
+    },
+    "XeSS": {
+      "Supported": true,
+      "Modes": ["Off", "Quality", "Balanced", "Performance"]
+    },
+    "VariableRateShading": {
+      "Supported": true,
+      "Enabled": false
+    },
+    "AsyncCompute": {
+      "Enabled": true
+    }
+  }
+}

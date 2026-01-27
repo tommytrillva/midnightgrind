@@ -1,0 +1,339 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Crew System and Team Features",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxCrewSize": 50,
+    "MaxCrewsPerPlayer": 1,
+    "CrewCreationCost": 25000,
+    "MinimumNameLength": 3,
+    "MaximumNameLength": 24
+  },
+
+  "CrewCreation": {
+    "Requirements": {
+      "MinLevel": 10,
+      "MinREP": "TIER_KNOWN",
+      "CreationFee": 25000
+    },
+    "Settings": {
+      "Name": { "Min": 3, "Max": 24, "ProfanityFilter": true },
+      "Tag": { "Min": 2, "Max": 5, "ProfanityFilter": true },
+      "Description": { "Max": 500 },
+      "Motto": { "Max": 100 },
+      "Color": { "Primary": true, "Secondary": true },
+      "Emblem": { "Editor": true, "Presets": 50 }
+    },
+    "Privacy": {
+      "Open": { "Description": "Anyone can join" },
+      "ApplyToJoin": { "Description": "Requires application approval" },
+      "InviteOnly": { "Description": "Invitation required" },
+      "Closed": { "Description": "No new members" }
+    }
+  },
+
+  "CrewRanks": {
+    "Leader": {
+      "ID": "RANK_LEADER",
+      "Name": "Leader",
+      "Limit": 1,
+      "Permissions": {
+        "ManageMembers": true,
+        "ManageRanks": true,
+        "ManageSettings": true,
+        "ManageAlliances": true,
+        "DisbandCrew": true,
+        "TransferLeadership": true,
+        "ManageBank": true,
+        "StartCrewWars": true
+      }
+    },
+    "Officer": {
+      "ID": "RANK_OFFICER",
+      "Name": "Officer",
+      "Limit": 5,
+      "Permissions": {
+        "ManageMembers": true,
+        "InvitePlayers": true,
+        "KickMembers": true,
+        "ModerateChat": true,
+        "StartEvents": true,
+        "ManageBank": "Limited"
+      }
+    },
+    "Veteran": {
+      "ID": "RANK_VETERAN",
+      "Name": "Veteran",
+      "AutoPromote": { "DaysInCrew": 30, "Contribution": 10000 },
+      "Permissions": {
+        "InvitePlayers": true,
+        "StartEvents": true,
+        "ViewBank": true
+      }
+    },
+    "Member": {
+      "ID": "RANK_MEMBER",
+      "Name": "Member",
+      "Default": true,
+      "Permissions": {
+        "ParticipateEvents": true,
+        "UsePerks": true,
+        "Chat": true
+      }
+    },
+    "Recruit": {
+      "ID": "RANK_RECRUIT",
+      "Name": "Recruit",
+      "TrialPeriod": 7,
+      "Permissions": {
+        "ParticipateEvents": true,
+        "Chat": true
+      }
+    }
+  },
+
+  "CrewProgression": {
+    "Levels": {
+      "Max": 50,
+      "XPSources": {
+        "MemberRaces": 10,
+        "MemberWins": 50,
+        "CrewRaces": 100,
+        "CrewWins": 500,
+        "WeeklyChallenges": 1000,
+        "CrewWars": 2000
+      }
+    },
+    "LevelRewards": {
+      "5": { "MemberSlots": 5, "BankIncrease": 50000 },
+      "10": { "CustomRank": 1, "GarageSpace": 5, "Perk": "XPBoost" },
+      "15": { "MemberSlots": 5, "EmblemLayers": 2 },
+      "20": { "TerritorySlot": 1, "Perk": "CashBoost" },
+      "25": { "MemberSlots": 5, "ExclusivePaint": true },
+      "30": { "CustomRank": 1, "BankIncrease": 100000 },
+      "40": { "MemberSlots": 10, "ExclusiveVinyl": true },
+      "50": { "Title": "Legendary Crew", "ExclusiveVehicle": true }
+    }
+  },
+
+  "CrewPerks": {
+    "Active": {
+      "XPBoost": {
+        "ID": "PERK_XP",
+        "Effect": "10% XP Bonus",
+        "UnlockLevel": 10
+      },
+      "CashBoost": {
+        "ID": "PERK_CASH",
+        "Effect": "10% Cash Bonus",
+        "UnlockLevel": 20
+      },
+      "REPBoost": {
+        "ID": "PERK_REP",
+        "Effect": "10% REP Bonus",
+        "UnlockLevel": 30
+      },
+      "DiscountParts": {
+        "ID": "PERK_DISCOUNT",
+        "Effect": "5% Parts Discount",
+        "UnlockLevel": 25
+      }
+    },
+    "Passive": {
+      "SharedGarage": {
+        "ID": "PERK_GARAGE",
+        "Effect": "Share vehicles with crew",
+        "UnlockLevel": 15
+      },
+      "CrewLivery": {
+        "ID": "PERK_LIVERY",
+        "Effect": "Apply crew livery to any vehicle",
+        "UnlockLevel": 5
+      },
+      "GroupFinder": {
+        "ID": "PERK_GROUP",
+        "Effect": "Priority matchmaking with crew",
+        "UnlockLevel": 1
+      }
+    }
+  },
+
+  "CrewBank": {
+    "Enabled": true,
+    "MaxBalance": {
+      "Level1": 100000,
+      "Level25": 500000,
+      "Level50": 2000000
+    },
+    "Contributions": {
+      "Voluntary": true,
+      "AutoContribute": { "Enabled": false, "Percentage": 5 }
+    },
+    "Withdrawals": {
+      "LeaderOnly": true,
+      "OfficerLimit": 10000,
+      "LogAll": true
+    },
+    "Uses": {
+      "CrewEvents": true,
+      "UpgradeHQ": true,
+      "BuyPerks": true,
+      "CrewWars": true
+    }
+  },
+
+  "CrewActivities": {
+    "CrewRaces": {
+      "MinPlayers": 2,
+      "PointsEarned": true,
+      "XPMultiplier": 1.5
+    },
+    "CrewChallenges": {
+      "Daily": 3,
+      "Weekly": 5,
+      "Rewards": "Shared"
+    },
+    "CrewMeets": {
+      "ScheduleEvents": true,
+      "LocationChoice": true,
+      "ActivitiesBonus": 1.25
+    },
+    "CrewWars": {
+      "Enabled": true,
+      "MinCrewLevel": 10,
+      "Duration": 604800,
+      "Rounds": 7,
+      "Stakes": { "REP": true, "Territory": true }
+    }
+  },
+
+  "Territories": {
+    "Enabled": true,
+    "Types": {
+      "MeetSpot": {
+        "Bonus": "REP +15%",
+        "Control": "Weekly"
+      },
+      "RaceRoute": {
+        "Bonus": "XP +10%",
+        "Control": "Weekly"
+      },
+      "Garage": {
+        "Bonus": "Repair -20%",
+        "Control": "Weekly"
+      }
+    },
+    "Capture": {
+      "Method": "CrewWar",
+      "DefenseBonus": true
+    }
+  },
+
+  "Alliances": {
+    "Enabled": true,
+    "MaxAllies": 3,
+    "Benefits": {
+      "SharedMatchmaking": true,
+      "NonAggression": true,
+      "SharedTerritoryBonus": true
+    },
+    "Formation": {
+      "RequiresBothLeaders": true,
+      "Cooldown": 86400
+    }
+  },
+
+  "CrewChat": {
+    "Channels": {
+      "General": { "AllMembers": true },
+      "Officers": { "OfficersPlus": true },
+      "Racing": { "AllMembers": true },
+      "Announcements": { "OfficersPost": true }
+    },
+    "Features": {
+      "Text": true,
+      "Voice": true,
+      "Emotes": true,
+      "Pings": true
+    }
+  },
+
+  "CrewLeaderboard": {
+    "Categories": {
+      "TotalREP": true,
+      "TotalWins": true,
+      "WeeklyXP": true,
+      "WarWins": true,
+      "Territories": true
+    },
+    "Display": {
+      "Top100": true,
+      "NearRank": true,
+      "Friends": true
+    }
+  },
+
+  "MemberManagement": {
+    "Application": {
+      "ReviewPeriod": 7,
+      "RequireReason": false,
+      "AutoApprove": { "ByREP": false, "ByLevel": false }
+    },
+    "Removal": {
+      "KickReason": true,
+      "CooldownToRejoin": 86400,
+      "AppealProcess": false
+    },
+    "Inactivity": {
+      "TrackDays": true,
+      "AutoKick": { "Enabled": false, "Days": 30 },
+      "WarningBefore": 7
+    }
+  },
+
+  "CrewCustomization": {
+    "Emblem": {
+      "Layers": { "Base": 5, "Max": 15 },
+      "Shapes": 100,
+      "Symbols": 200,
+      "Colors": "Full"
+    },
+    "Tag": {
+      "Display": "BeforeName",
+      "Color": "CrewPrimary"
+    },
+    "Livery": {
+      "CrewColors": true,
+      "CrewLogo": true,
+      "Templates": 10
+    }
+  },
+
+  "UI": {
+    "CrewHub": {
+      "Dashboard": true,
+      "MemberList": true,
+      "ActivityFeed": true,
+      "Calendar": true,
+      "Bank": true,
+      "Settings": true
+    },
+    "Notifications": {
+      "NewMember": true,
+      "MemberLeft": true,
+      "EventStarting": true,
+      "WarUpdate": true,
+      "Achievement": true
+    }
+  },
+
+  "Achievements": {
+    "JoinCrew": { "REP": 500 },
+    "CreateCrew": { "REP": 2500, "Title": "Crew Founder" },
+    "CrewLevel25": { "REP": 15000 },
+    "CrewLevel50": { "REP": 50000, "Title": "Legendary Crew" },
+    "WinCrewWar": { "REP": 10000 },
+    "Dominate": { "REP": 25000, "Title": "Dominant Force" }
+  }
+}

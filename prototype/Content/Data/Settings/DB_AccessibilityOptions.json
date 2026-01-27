@@ -1,0 +1,337 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Accessibility Options Configuration",
+
+  "AccessibilitySystem": {
+    "Enabled": true,
+    "ShowOnFirstBoot": true,
+    "QuickAccessMenu": true,
+    "PresetProfiles": ["Default", "VisualAssist", "AudioAssist", "MotorAssist", "CognitiveAssist"]
+  },
+
+  "VisualAccessibility": {
+    "ColorBlindModes": {
+      "Enabled": true,
+      "Types": {
+        "Protanopia": {
+          "ID": "CB_PROTAN",
+          "Description": "Red-green color blindness (red weak)",
+          "UIColorShift": true,
+          "MapMarkerSymbols": true,
+          "RacingLineAlt": "Yellow-Blue"
+        },
+        "Deuteranopia": {
+          "ID": "CB_DEUTAN",
+          "Description": "Red-green color blindness (green weak)",
+          "UIColorShift": true,
+          "MapMarkerSymbols": true,
+          "RacingLineAlt": "Yellow-Blue"
+        },
+        "Tritanopia": {
+          "ID": "CB_TRITAN",
+          "Description": "Blue-yellow color blindness",
+          "UIColorShift": true,
+          "MapMarkerSymbols": true,
+          "RacingLineAlt": "Red-Cyan"
+        },
+        "Achromatopsia": {
+          "ID": "CB_ACHROM",
+          "Description": "Complete color blindness",
+          "UIColorShift": true,
+          "MapMarkerSymbols": true,
+          "HighContrastMode": true
+        }
+      },
+      "Intensity": { "Min": 0.0, "Max": 1.0, "Default": 0.8 }
+    },
+    "HighContrast": {
+      "Enabled": false,
+      "Modes": {
+        "Standard": { "Background": "#000000", "Text": "#FFFFFF", "Accent": "#FFFF00" },
+        "YellowOnBlack": { "Background": "#000000", "Text": "#FFFF00", "Accent": "#00FFFF" },
+        "WhiteOnBlack": { "Background": "#000000", "Text": "#FFFFFF", "Accent": "#FF6600" },
+        "BlackOnWhite": { "Background": "#FFFFFF", "Text": "#000000", "Accent": "#0066FF" }
+      }
+    },
+    "TextSize": {
+      "Enabled": true,
+      "Scales": {
+        "Small": 0.85,
+        "Default": 1.0,
+        "Large": 1.25,
+        "ExtraLarge": 1.5,
+        "Huge": 2.0
+      },
+      "AppliesTo": ["Subtitles", "Menus", "HUD", "Notifications"]
+    },
+    "ScreenShake": {
+      "Enabled": true,
+      "Default": 1.0,
+      "ReducedOption": true,
+      "DisableOption": true
+    },
+    "MotionBlur": {
+      "Default": true,
+      "DisableOption": true,
+      "WarningForEpilepsy": true
+    },
+    "FlashingEffects": {
+      "Enabled": true,
+      "ReduceIntensity": true,
+      "DisableOption": true,
+      "AffectedEffects": ["Nitrous", "Camera Flash", "Lightning", "Police Lights", "Neon Signs"]
+    },
+    "SpeedLines": {
+      "Enabled": true,
+      "DisableOption": true,
+      "ReduceOption": true
+    },
+    "CameraSettings": {
+      "FieldOfView": { "Min": 60, "Max": 120, "Default": 90 },
+      "CameraSway": { "Enabled": true, "DisableOption": true },
+      "HeadBob": { "Enabled": false, "Default": false }
+    }
+  },
+
+  "AudioAccessibility": {
+    "Subtitles": {
+      "Enabled": true,
+      "Default": true,
+      "Options": {
+        "DialogueOnly": { "Dialogue": true, "SoundEffects": false, "Music": false },
+        "Full": { "Dialogue": true, "SoundEffects": true, "Music": true },
+        "ClosedCaptions": { "Dialogue": true, "SoundEffects": true, "Music": true, "Descriptions": true }
+      },
+      "Styling": {
+        "Background": { "Enabled": true, "Opacity": { "Min": 0.0, "Max": 1.0, "Default": 0.75 } },
+        "SpeakerNames": { "Enabled": true, "ColorCoded": true },
+        "Position": ["Bottom", "Top", "Left", "Right"],
+        "MaxLines": { "Min": 1, "Max": 4, "Default": 2 }
+      }
+    },
+    "VisualSoundIndicators": {
+      "Enabled": false,
+      "Description": "Visual indicators for important audio cues",
+      "Indicators": {
+        "EngineRPM": { "Type": "Bar", "Position": "HUD" },
+        "PoliceSiren": { "Type": "Directional", "Position": "ScreenEdge", "Color": "#FF0000" },
+        "OpponentApproach": { "Type": "Directional", "Position": "ScreenEdge", "Color": "#FFFF00" },
+        "CollisionWarning": { "Type": "Flash", "Position": "ScreenEdge", "Color": "#FF6600" },
+        "NitrousReady": { "Type": "Icon", "Position": "HUD", "Color": "#00FFFF" }
+      }
+    },
+    "MonoAudio": {
+      "Enabled": false,
+      "Description": "Combine stereo audio into mono for single-ear listening"
+    },
+    "AudioBalance": {
+      "LeftRight": { "Min": -1.0, "Max": 1.0, "Default": 0.0 }
+    },
+    "SpeechToText": {
+      "Enabled": false,
+      "VoiceChat": true,
+      "DisplayPosition": "Chat"
+    }
+  },
+
+  "MotorAccessibility": {
+    "ControlRemapping": {
+      "Enabled": true,
+      "FullyCustomizable": true,
+      "PresetLayouts": ["Default", "OneHanded_Left", "OneHanded_Right", "Simplified"]
+    },
+    "HoldVsToggle": {
+      "Nitrous": { "Default": "Hold", "ToggleOption": true },
+      "Handbrake": { "Default": "Hold", "ToggleOption": true },
+      "Accelerate": { "Default": "Hold", "ToggleOption": true },
+      "Brake": { "Default": "Hold", "ToggleOption": true },
+      "LookBehind": { "Default": "Hold", "ToggleOption": true }
+    },
+    "AutoAccelerate": {
+      "Enabled": false,
+      "Description": "Car automatically accelerates, player only steers and brakes",
+      "SpeedCap": { "Enabled": true, "Default": 0.8 }
+    },
+    "SteeringAssist": {
+      "Enabled": true,
+      "Levels": {
+        "Off": { "Assist": 0.0 },
+        "Low": { "Assist": 0.25, "LaneKeeping": false },
+        "Medium": { "Assist": 0.5, "LaneKeeping": true },
+        "High": { "Assist": 0.75, "LaneKeeping": true, "CollisionAvoidance": true },
+        "Full": { "Assist": 1.0, "LaneKeeping": true, "CollisionAvoidance": true, "AutoSteer": true }
+      }
+    },
+    "InputSensitivity": {
+      "Steering": { "Min": 0.1, "Max": 3.0, "Default": 1.0 },
+      "Throttle": { "Min": 0.1, "Max": 3.0, "Default": 1.0 },
+      "Brake": { "Min": 0.1, "Max": 3.0, "Default": 1.0 },
+      "Camera": { "Min": 0.1, "Max": 3.0, "Default": 1.0 }
+    },
+    "DeadZones": {
+      "LeftStick": { "Min": 0.0, "Max": 0.5, "Default": 0.15 },
+      "RightStick": { "Min": 0.0, "Max": 0.5, "Default": 0.15 },
+      "Triggers": { "Min": 0.0, "Max": 0.3, "Default": 0.05 }
+    },
+    "SlowMotionMode": {
+      "Enabled": false,
+      "Description": "Reduces game speed for easier control",
+      "SpeedMultiplier": { "Min": 0.25, "Max": 1.0, "Default": 0.5 },
+      "ActivationMethod": ["Always", "Toggle", "Hold"]
+    },
+    "AdaptiveTriggers": {
+      "Enabled": true,
+      "DisableOption": true,
+      "IntensityScale": { "Min": 0.0, "Max": 1.0, "Default": 1.0 }
+    },
+    "Vibration": {
+      "Enabled": true,
+      "DisableOption": true,
+      "IntensityScale": { "Min": 0.0, "Max": 1.0, "Default": 1.0 }
+    }
+  },
+
+  "CognitiveAccessibility": {
+    "SimplifiedUI": {
+      "Enabled": false,
+      "Description": "Reduces UI complexity and information density",
+      "HideOptionalElements": true,
+      "LargerButtons": true,
+      "ReducedAnimations": true
+    },
+    "NavigationAssist": {
+      "Enabled": true,
+      "Default": true,
+      "GPS_Arrow": true,
+      "Minimap_Route": true,
+      "FullScreen_Waypoint": true,
+      "AudioCues": true
+    },
+    "RacingLine": {
+      "Enabled": true,
+      "Default": true,
+      "BrakingIndicator": true,
+      "OptimalSpeedColors": true
+    },
+    "GameSpeed": {
+      "Enabled": false,
+      "Multipliers": [0.5, 0.75, 1.0],
+      "Description": "Slow down overall game speed"
+    },
+    "PauseAnytime": {
+      "Enabled": true,
+      "DuringCutscenes": true,
+      "DuringRaces": true,
+      "OnlinePenalty": "TimeLimit"
+    },
+    "TutorialReplay": {
+      "Enabled": true,
+      "AccessFromMenu": true,
+      "ContextualReminders": true
+    },
+    "ObjectiveReminders": {
+      "Enabled": true,
+      "Frequency": ["Never", "Occasional", "Frequent", "Constant"],
+      "Default": "Occasional"
+    },
+    "SkipChallenges": {
+      "Enabled": false,
+      "Description": "Skip difficult challenges after multiple failures",
+      "FailuresRequired": 5,
+      "RewardsReduced": true
+    }
+  },
+
+  "DifficultyModifiers": {
+    "EnemyDifficulty": {
+      "Options": ["Very Easy", "Easy", "Normal", "Hard", "Expert"],
+      "Default": "Normal",
+      "AffectsAI": true,
+      "AffectsRubberBanding": true
+    },
+    "DamageReceived": {
+      "Multiplier": { "Min": 0.0, "Max": 2.0, "Default": 1.0 },
+      "Invincibility": false
+    },
+    "CollisionForgiving": {
+      "Enabled": false,
+      "Description": "Reduce penalties from minor collisions",
+      "SpeedLossReduction": 0.5,
+      "SpinoutReduction": true
+    },
+    "TimeLimitsExtended": {
+      "Enabled": false,
+      "Extension": 1.5,
+      "Description": "Extend time limits on timed events"
+    },
+    "UnlimitedRewinds": {
+      "Enabled": false,
+      "Description": "Remove rewind limit in races"
+    }
+  },
+
+  "CommunicationPreferences": {
+    "TextChat": {
+      "Enabled": true,
+      "Filter": true,
+      "BlockOption": true
+    },
+    "VoiceChat": {
+      "Enabled": true,
+      "MuteAll": false,
+      "PushToTalk": { "Default": false, "Option": true }
+    },
+    "QuickChat": {
+      "Enabled": true,
+      "CustomPhrases": true,
+      "MaxPhrases": 20
+    },
+    "Emotes": {
+      "Enabled": true,
+      "DisableOption": true
+    }
+  },
+
+  "PresetProfiles": {
+    "Default": {
+      "Description": "Standard settings",
+      "Settings": {}
+    },
+    "VisualAssist": {
+      "Description": "Optimized for visual impairments",
+      "Settings": {
+        "TextSize": "Large",
+        "HighContrast": true,
+        "ReducedMotion": true,
+        "FlashingEffects": false,
+        "Subtitles": "ClosedCaptions"
+      }
+    },
+    "AudioAssist": {
+      "Description": "Optimized for hearing impairments",
+      "Settings": {
+        "Subtitles": "ClosedCaptions",
+        "VisualSoundIndicators": true,
+        "SpeakerNames": true
+      }
+    },
+    "MotorAssist": {
+      "Description": "Optimized for motor impairments",
+      "Settings": {
+        "SteeringAssist": "High",
+        "HoldVsToggle": "AllToggle",
+        "SlowMotionMode": true,
+        "AdaptiveTriggers": false
+      }
+    },
+    "CognitiveAssist": {
+      "Description": "Optimized for cognitive accessibility",
+      "Settings": {
+        "SimplifiedUI": true,
+        "NavigationAssist": true,
+        "ObjectiveReminders": "Frequent",
+        "GameSpeed": 0.75
+      }
+    }
+  }
+}

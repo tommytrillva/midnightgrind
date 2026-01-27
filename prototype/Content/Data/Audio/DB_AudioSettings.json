@@ -1,0 +1,309 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Audio System Configuration",
+
+  "AudioSystem": {
+    "Engine": "MetaSounds",
+    "SampleRate": 48000,
+    "MaxChannels": 128,
+    "SpatializationMethod": "HRTF",
+    "OcclusionEnabled": true,
+    "ReverbEnabled": true
+  },
+
+  "MasterMix": {
+    "Volumes": {
+      "Master": { "Default": 0.8, "Min": 0.0, "Max": 1.0 },
+      "Music": { "Default": 0.7, "Min": 0.0, "Max": 1.0 },
+      "SFX": { "Default": 0.8, "Min": 0.0, "Max": 1.0 },
+      "Engine": { "Default": 0.8, "Min": 0.0, "Max": 1.0 },
+      "Voice": { "Default": 0.9, "Min": 0.0, "Max": 1.0 },
+      "Ambient": { "Default": 0.6, "Min": 0.0, "Max": 1.0 },
+      "UI": { "Default": 0.7, "Min": 0.0, "Max": 1.0 }
+    },
+    "DynamicMixing": {
+      "Enabled": true,
+      "DuckMusicDuringDialogue": true,
+      "DuckAmount": 0.4,
+      "FadeTime": 0.3
+    }
+  },
+
+  "EngineAudio": {
+    "Simulation": {
+      "Layers": ["Idle", "Low_RPM", "Mid_RPM", "High_RPM", "Limiter", "Decel"],
+      "RPMSmoothing": 0.15,
+      "LoadInfluence": true,
+      "GearChangeBlend": 0.1
+    },
+    "EngineTypes": {
+      "Inline4": {
+        "BasePitch": 1.0,
+        "Character": "Buzzy",
+        "Samples": ["ENG_I4_Idle", "ENG_I4_Onload", "ENG_I4_Offload"]
+      },
+      "Inline6": {
+        "BasePitch": 0.9,
+        "Character": "Smooth",
+        "Samples": ["ENG_I6_Idle", "ENG_I6_Onload", "ENG_I6_Offload"]
+      },
+      "V6": {
+        "BasePitch": 0.95,
+        "Character": "Raspy",
+        "Samples": ["ENG_V6_Idle", "ENG_V6_Onload", "ENG_V6_Offload"]
+      },
+      "V8_American": {
+        "BasePitch": 0.8,
+        "Character": "Burble",
+        "Samples": ["ENG_V8A_Idle", "ENG_V8A_Onload", "ENG_V8A_Offload"]
+      },
+      "V8_Euro": {
+        "BasePitch": 0.85,
+        "Character": "Refined",
+        "Samples": ["ENG_V8E_Idle", "ENG_V8E_Onload", "ENG_V8E_Offload"]
+      },
+      "V10": {
+        "BasePitch": 0.9,
+        "Character": "Screaming",
+        "Samples": ["ENG_V10_Idle", "ENG_V10_Onload", "ENG_V10_Offload"]
+      },
+      "V12": {
+        "BasePitch": 0.85,
+        "Character": "Operatic",
+        "Samples": ["ENG_V12_Idle", "ENG_V12_Onload", "ENG_V12_Offload"]
+      },
+      "Flat4": {
+        "BasePitch": 1.0,
+        "Character": "Boxer_Rumble",
+        "Samples": ["ENG_F4_Idle", "ENG_F4_Onload", "ENG_F4_Offload"]
+      },
+      "Flat6": {
+        "BasePitch": 0.9,
+        "Character": "Boxer_Howl",
+        "Samples": ["ENG_F6_Idle", "ENG_F6_Onload", "ENG_F6_Offload"]
+      },
+      "Rotary": {
+        "BasePitch": 1.1,
+        "Character": "Brap",
+        "Samples": ["ENG_ROT_Idle", "ENG_ROT_Onload", "ENG_ROT_Offload"]
+      }
+    },
+    "ExhaustTypes": {
+      "Stock": { "Volume": 0.6, "Reverb": 0.3, "Crackle": false },
+      "Sport": { "Volume": 0.75, "Reverb": 0.4, "Crackle": true, "CrackleAmount": 0.3 },
+      "Race": { "Volume": 0.9, "Reverb": 0.5, "Crackle": true, "CrackleAmount": 0.6 },
+      "StraightPipe": { "Volume": 1.0, "Reverb": 0.6, "Crackle": true, "CrackleAmount": 0.8 }
+    },
+    "ForcedInduction": {
+      "Turbo": {
+        "SpoolUp": true,
+        "BlowOffValve": true,
+        "WastegateChatter": true,
+        "WhineVolume": 0.4
+      },
+      "Supercharger": {
+        "WhineEnabled": true,
+        "WhineVolume": 0.5,
+        "PitchRange": { "Min": 0.5, "Max": 2.0 }
+      }
+    },
+    "Transmission": {
+      "GearWhine": { "Enabled": true, "Volume": 0.2 },
+      "ShiftClunk": { "Enabled": true, "Volume": 0.4 },
+      "Differential": { "Enabled": true, "Volume": 0.15 }
+    }
+  },
+
+  "VehicleSFX": {
+    "TireAudio": {
+      "Surfaces": {
+        "Asphalt": { "Roll": "SFX_Tire_Asphalt", "Skid": "SFX_Skid_Asphalt" },
+        "Concrete": { "Roll": "SFX_Tire_Concrete", "Skid": "SFX_Skid_Concrete" },
+        "Gravel": { "Roll": "SFX_Tire_Gravel", "Skid": "SFX_Skid_Gravel" },
+        "Dirt": { "Roll": "SFX_Tire_Dirt", "Skid": "SFX_Skid_Dirt" },
+        "Grass": { "Roll": "SFX_Tire_Grass", "Skid": "SFX_Skid_Grass" },
+        "WetAsphalt": { "Roll": "SFX_Tire_Wet", "Skid": "SFX_Skid_Wet", "Splash": true }
+      },
+      "SpeedInfluence": true,
+      "SlipAngleInfluence": true
+    },
+    "Suspension": {
+      "Bump": { "Enabled": true, "Samples": ["SFX_Susp_Bump_L", "SFX_Susp_Bump_M", "SFX_Susp_Bump_H"] },
+      "BottomOut": { "Enabled": true, "Sample": "SFX_Susp_BottomOut" },
+      "Creaks": { "Enabled": true, "Volume": 0.2 }
+    },
+    "Collision": {
+      "Impacts": {
+        "Light": ["SFX_Impact_L1", "SFX_Impact_L2", "SFX_Impact_L3"],
+        "Medium": ["SFX_Impact_M1", "SFX_Impact_M2", "SFX_Impact_M3"],
+        "Heavy": ["SFX_Impact_H1", "SFX_Impact_H2", "SFX_Impact_H3"]
+      },
+      "Scrapes": {
+        "Metal": "SFX_Scrape_Metal",
+        "Concrete": "SFX_Scrape_Concrete",
+        "Barrier": "SFX_Scrape_Barrier"
+      },
+      "Glass": {
+        "Crack": "SFX_Glass_Crack",
+        "Shatter": "SFX_Glass_Shatter"
+      }
+    },
+    "Aerodynamics": {
+      "WindNoise": { "Enabled": true, "SpeedThreshold": 60, "MaxVolume": 0.3 },
+      "Buffeting": { "Enabled": true, "OpenWindowInfluence": true }
+    },
+    "Nitrous": {
+      "Engage": "SFX_NOS_Engage",
+      "Sustain": "SFX_NOS_Sustain",
+      "Release": "SFX_NOS_Release",
+      "Backfire": "SFX_NOS_Backfire"
+    },
+    "Miscellaneous": {
+      "Horn": { "Enabled": true, "Types": ["Standard", "Air", "Musical", "Classic"] },
+      "Handbrake": "SFX_Handbrake",
+      "EngineStart": { "Enabled": true, "CrankingVariation": true },
+      "EngineStop": "SFX_Engine_Stop"
+    }
+  },
+
+  "EnvironmentAudio": {
+    "Ambience": {
+      "Zones": {
+        "Urban_Day": { "Loop": "AMB_Urban_Day", "Volume": 0.5 },
+        "Urban_Night": { "Loop": "AMB_Urban_Night", "Volume": 0.4 },
+        "Industrial": { "Loop": "AMB_Industrial", "Volume": 0.45 },
+        "Coastal": { "Loop": "AMB_Coastal", "Volume": 0.5 },
+        "Mountain": { "Loop": "AMB_Mountain", "Volume": 0.35 },
+        "Tunnel": { "Loop": "AMB_Tunnel", "Volume": 0.3, "Reverb": "TunnelPreset" },
+        "Underground": { "Loop": "AMB_Underground", "Volume": 0.25 }
+      },
+      "Crossfade": 2.0
+    },
+    "Weather": {
+      "Rain": {
+        "Light": { "Loop": "WTH_Rain_Light", "InteriorDamping": 0.4 },
+        "Heavy": { "Loop": "WTH_Rain_Heavy", "InteriorDamping": 0.3, "Thunder": true },
+        "OnRoof": { "Enabled": true, "SpeedInfluence": true }
+      },
+      "Wind": {
+        "Light": { "Loop": "WTH_Wind_Light" },
+        "Strong": { "Loop": "WTH_Wind_Strong" }
+      },
+      "Thunder": {
+        "Samples": ["WTH_Thunder_1", "WTH_Thunder_2", "WTH_Thunder_3"],
+        "Distance": { "Near": 3.0, "Far": 0.5 }
+      }
+    },
+    "Traffic": {
+      "PassBy": { "Enabled": true, "Doppler": true },
+      "Horns": { "Enabled": true, "Random": true, "Chance": 0.02 },
+      "Sirens": { "Enabled": true }
+    },
+    "Reverb": {
+      "Presets": {
+        "Outdoor": { "Decay": 0.8, "Wetness": 0.2 },
+        "Tunnel": { "Decay": 2.5, "Wetness": 0.6 },
+        "Parking_Garage": { "Decay": 1.8, "Wetness": 0.5 },
+        "Indoor": { "Decay": 1.2, "Wetness": 0.4 },
+        "Underpass": { "Decay": 1.5, "Wetness": 0.45 }
+      },
+      "DynamicReverb": true,
+      "BlendSpeed": 1.0
+    },
+    "Occlusion": {
+      "Enabled": true,
+      "MaxAttenuation": 0.7,
+      "FrequencyCutoff": true
+    }
+  },
+
+  "MusicSystem": {
+    "Radio": {
+      "Enabled": true,
+      "StationCount": 8,
+      "CrossfadeTime": 1.5,
+      "RememberStation": true,
+      "SyncOnline": false
+    },
+    "AdaptiveMusic": {
+      "Enabled": true,
+      "Layers": ["Base", "Tension", "Action", "Victory"],
+      "TransitionSmoothing": 2.0,
+      "ContextTriggers": {
+        "Pursuit_Start": "Tension",
+        "Pursuit_High": "Action",
+        "Pursuit_Escaped": "Base",
+        "Race_Final_Lap": "Tension",
+        "Race_Close_Finish": "Action",
+        "Race_Win": "Victory"
+      }
+    },
+    "MusicDucking": {
+      "DuringDialogue": { "Amount": 0.4, "FadeTime": 0.3 },
+      "DuringMenus": { "Amount": 0.2, "FadeTime": 0.5 },
+      "DuringPause": { "Amount": 0.5, "FadeTime": 0.2, "LowPass": true }
+    }
+  },
+
+  "UIAudio": {
+    "Navigation": {
+      "Move": "UI_Move",
+      "Select": "UI_Select",
+      "Back": "UI_Back",
+      "Error": "UI_Error"
+    },
+    "Notifications": {
+      "Achievement": "UI_Achievement",
+      "LevelUp": "UI_LevelUp",
+      "REPGain": "UI_REP",
+      "CashGain": "UI_Cash",
+      "Message": "UI_Message"
+    },
+    "Menus": {
+      "Open": "UI_Menu_Open",
+      "Close": "UI_Menu_Close",
+      "TabSwitch": "UI_Tab_Switch"
+    },
+    "Garage": {
+      "PartInstall": "UI_Part_Install",
+      "Purchase": "UI_Purchase",
+      "Upgrade": "UI_Upgrade"
+    }
+  },
+
+  "VoiceChat": {
+    "Enabled": true,
+    "Codec": "Opus",
+    "Quality": "High",
+    "NoiseGate": { "Enabled": true, "Threshold": -40 },
+    "Spatialized": { "Enabled": true, "MaxDistance": 50, "Falloff": "Linear" }
+  },
+
+  "AudioOutput": {
+    "SpeakerModes": ["Stereo", "Surround_5_1", "Surround_7_1", "Headphones"],
+    "Default": "Stereo",
+    "HeadphonesMode": {
+      "HRTF": true,
+      "VirtualSurround": true,
+      "BassBoost": { "Enabled": false, "Amount": 0.2 }
+    },
+    "DynamicRange": {
+      "Options": ["Full", "Night_Mode", "Compressed"],
+      "NightMode": { "Compression": 0.6, "MaxVolume": 0.7 }
+    },
+    "LFE": {
+      "Enabled": true,
+      "Crossover": 120,
+      "Boost": 0.0
+    }
+  },
+
+  "PS1AudioFilter": {
+    "Enabled": false,
+    "SampleRate": 22050,
+    "BitDepth": 16,
+    "Compression": true,
+    "Reverb": "PS1_Preset",
+    "Note": "Applies retro audio aesthetic to match PS1 visual filter"
+  }
+}

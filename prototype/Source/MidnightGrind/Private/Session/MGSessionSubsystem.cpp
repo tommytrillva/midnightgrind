@@ -3,6 +3,7 @@
 #include "Session/MGSessionSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Race/MGRaceFlowSubsystem.h"
 
 void UMGSessionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -252,8 +253,22 @@ void UMGSessionSubsystem::RandomizeTrack()
 	if (!bIsHost)
 		return;
 
-	// Would pick random track from available tracks
-	// For now, just set a placeholder
+	// Get available tracks from RaceFlowSubsystem and pick a random one
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGRaceFlowSubsystem* RaceFlowSubsystem = GI->GetSubsystem<UMGRaceFlowSubsystem>())
+		{
+			TArray<FName> AvailableTracks = RaceFlowSubsystem->GetAvailableTracks();
+			if (AvailableTracks.Num() > 0)
+			{
+				int32 RandomIndex = FMath::RandRange(0, AvailableTracks.Num() - 1);
+				CurrentSession.CurrentTrackID = AvailableTracks[RandomIndex];
+				return;
+			}
+		}
+	}
+
+	// Fallback to default track
 	CurrentSession.CurrentTrackID = FName(TEXT("Track_Downtown"));
 }
 

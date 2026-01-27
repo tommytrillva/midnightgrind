@@ -155,24 +155,29 @@ bool UMGSessionManagerSubsystem::JoinSession(const FString& SessionID, const FSt
 	if (UWorld* World = GetWorld())
 	{
 		FTimerHandle TempHandle;
+		TWeakObjectPtr<UMGSessionManagerSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			TempHandle,
-			[this, SessionID]()
+			[WeakThis, SessionID]()
 			{
-				if (CurrentState == EMGSessionState::Joining)
+				if (!WeakThis.IsValid())
+				{
+					return;
+				}
+				if (WeakThis->CurrentState == EMGSessionState::Joining)
 				{
 					// Create simulated session
-					CurrentSession.SessionID = SessionID;
-					CurrentSession.SessionName = TEXT("Joined Session");
-					CurrentSession.Type = EMGSessionType::OnlinePublic;
-					CurrentSession.State = EMGSessionState::InLobby;
-					CurrentSession.HostPlayerID = TEXT("RemoteHost");
-					CurrentSession.MaxPlayers = 8;
-					CurrentSession.CreatedTime = FDateTime::Now();
+					WeakThis->CurrentSession.SessionID = SessionID;
+					WeakThis->CurrentSession.SessionName = TEXT("Joined Session");
+					WeakThis->CurrentSession.Type = EMGSessionType::OnlinePublic;
+					WeakThis->CurrentSession.State = EMGSessionState::InLobby;
+					WeakThis->CurrentSession.HostPlayerID = TEXT("RemoteHost");
+					WeakThis->CurrentSession.MaxPlayers = 8;
+					WeakThis->CurrentSession.CreatedTime = FDateTime::Now();
 
-					AddLocalPlayerToSession();
-					SetSessionState(EMGSessionState::InLobby);
-					OnSessionJoined.Broadcast(CurrentSession);
+					WeakThis->AddLocalPlayerToSession();
+					WeakThis->SetSessionState(EMGSessionState::InLobby);
+					WeakThis->OnSessionJoined.Broadcast(WeakThis->CurrentSession);
 				}
 			},
 			2.0f,

@@ -347,6 +347,19 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
 	static float CalculateBrakingRating(const FMGVehicleData& Vehicle, const UMGVehicleModelData* BaseModel);
 
+	/**
+	 * @brief Calculate vehicle reliability rating based on part quality tiers.
+	 *
+	 * Higher performance parts (Race, Pro, Legendary) are less reliable than
+	 * OEM or Street tier parts. Based on the principle that more extreme
+	 * builds require more maintenance.
+	 *
+	 * @param Vehicle Complete vehicle configuration data.
+	 * @return Reliability rating from 0 (unreliable) to 100 (stock reliability).
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Stats")
+	static float CalculateReliability(const FMGVehicleData& Vehicle);
+
 	// ==========================================
 	// PERFORMANCE PREDICTIONS
 	// ==========================================

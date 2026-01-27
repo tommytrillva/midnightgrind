@@ -1,0 +1,419 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Barn Find Discovery System",
+
+  "BarnFindSystem": {
+    "Enabled": true,
+    "TotalBarnFinds": 15,
+    "DiscoveryMethod": "Exploration",
+    "HintSystem": true,
+    "RestoreRequired": true
+  },
+
+  "BarnFindLocations": [
+    {
+      "ID": "BARN_FIND_01",
+      "Name": "Old Farm Barn",
+      "Location": { "X": 6500, "Y": 4000, "Z": 80 },
+      "Region": "Countryside",
+      "Description": "An old red barn on the outskirts of the county",
+      "Environment": "Rural",
+      "Clue": "They say the old farmer used to race back in his day...",
+      "UnlockCondition": "LEVEL_10",
+      "Vehicle": {
+        "ID": "VEH_BARN_MUSTANG_69",
+        "Name": "1969 Stallion Boss",
+        "Description": "A classic muscle car with a legendary V8",
+        "Condition": "Rusted",
+        "BaseValue": 45000,
+        "RestoredValue": 125000,
+        "Rarity": "Rare"
+      },
+      "DiscoveryReward": { "REP": 500, "Achievement": "ACH_FIRST_BARN" }
+    },
+    {
+      "ID": "BARN_FIND_02",
+      "Name": "Abandoned Warehouse",
+      "Location": { "X": 3200, "Y": -1500, "Z": 8 },
+      "Region": "Industrial",
+      "Description": "A forgotten warehouse in the industrial district",
+      "Environment": "Urban",
+      "Clue": "The docks hold more than just shipping containers...",
+      "UnlockCondition": "REP_TIER_STREET",
+      "Vehicle": {
+        "ID": "VEH_BARN_SKYLINE_R32",
+        "Name": "1991 Sakura R32",
+        "Description": "Godzilla awakens from slumber",
+        "Condition": "Dusty",
+        "BaseValue": 55000,
+        "RestoredValue": 180000,
+        "Rarity": "Epic"
+      },
+      "DiscoveryReward": { "REP": 750 }
+    },
+    {
+      "ID": "BARN_FIND_03",
+      "Name": "Mountain Cabin Garage",
+      "Location": { "X": 5200, "Y": 3800, "Z": 450 },
+      "Region": "Mountains",
+      "Description": "A cabin with an attached garage, hidden in the woods",
+      "Environment": "Forest",
+      "Clue": "Follow the winding roads up the mountain, look for smoke",
+      "UnlockCondition": "LEVEL_15",
+      "Vehicle": {
+        "ID": "VEH_BARN_PORSCHE_930",
+        "Name": "1986 Stuttgart Turbo",
+        "Description": "The widowmaker waits for a new owner",
+        "Condition": "Covered",
+        "BaseValue": 75000,
+        "RestoredValue": 250000,
+        "Rarity": "Epic"
+      },
+      "DiscoveryReward": { "REP": 750 }
+    },
+    {
+      "ID": "BARN_FIND_04",
+      "Name": "Beach House Storage",
+      "Location": { "X": -4500, "Y": 2800, "Z": 12 },
+      "Region": "Coastal",
+      "Description": "An old storage unit behind a beach house",
+      "Environment": "Coastal",
+      "Clue": "Where the sand meets the sunset, treasures lie forgotten",
+      "UnlockCondition": "LEVEL_12",
+      "Vehicle": {
+        "ID": "VEH_BARN_CORVETTE_C3",
+        "Name": "1972 Venomstrike Stingray",
+        "Description": "America's sports car in its purest form",
+        "Condition": "Faded",
+        "BaseValue": 35000,
+        "RestoredValue": 95000,
+        "Rarity": "Rare"
+      },
+      "DiscoveryReward": { "REP": 500 }
+    },
+    {
+      "ID": "BARN_FIND_05",
+      "Name": "Underground Parking - Sealed Section",
+      "Location": { "X": -200, "Y": 800, "Z": -25 },
+      "Region": "Downtown",
+      "Description": "A sealed-off section of an underground parking structure",
+      "Environment": "Urban",
+      "Clue": "The city has layers, and some haven't seen light in decades",
+      "UnlockCondition": "REP_TIER_PRO",
+      "Vehicle": {
+        "ID": "VEH_BARN_SUPRA_MK4",
+        "Name": "1994 Toronado MK4",
+        "Description": "The 2JZ legend, preserved in time",
+        "Condition": "Dusty",
+        "BaseValue": 65000,
+        "RestoredValue": 200000,
+        "Rarity": "Epic"
+      },
+      "DiscoveryReward": { "REP": 1000 }
+    },
+    {
+      "ID": "BARN_FIND_06",
+      "Name": "Old Race Track Shed",
+      "Location": { "X": 7200, "Y": -600, "Z": 15 },
+      "Region": "Outskirts",
+      "Description": "A maintenance shed at an abandoned race track",
+      "Environment": "Track",
+      "Clue": "The old speedway closed years ago, but not everything left",
+      "UnlockCondition": "LEVEL_20",
+      "Vehicle": {
+        "ID": "VEH_BARN_FERRARI_308",
+        "Name": "1984 Cavallino 308",
+        "Description": "Italian excellence in red",
+        "Condition": "Covered",
+        "BaseValue": 85000,
+        "RestoredValue": 275000,
+        "Rarity": "Legendary"
+      },
+      "DiscoveryReward": { "REP": 1000 }
+    },
+    {
+      "ID": "BARN_FIND_07",
+      "Name": "Junkyard Office",
+      "Location": { "X": 4100, "Y": -2800, "Z": 8 },
+      "Region": "Industrial",
+      "Description": "Hidden behind stacks of crushed cars",
+      "Environment": "Junkyard",
+      "Clue": "One man's trash is another man's treasure",
+      "UnlockCondition": "LEVEL_8",
+      "Vehicle": {
+        "ID": "VEH_BARN_DATSUN_240Z",
+        "Name": "1972 Fairlady Z",
+        "Description": "Japan's first true sports car icon",
+        "Condition": "Rusted",
+        "BaseValue": 25000,
+        "RestoredValue": 75000,
+        "Rarity": "Rare"
+      },
+      "DiscoveryReward": { "REP": 500 }
+    },
+    {
+      "ID": "BARN_FIND_08",
+      "Name": "Shipping Container",
+      "Location": { "X": -3200, "Y": 1100, "Z": 5 },
+      "Region": "Harbor",
+      "Description": "A sealed shipping container at the docks",
+      "Environment": "Harbor",
+      "Clue": "Some imports never made it through customs...",
+      "UnlockCondition": "REP_TIER_STREET",
+      "Vehicle": {
+        "ID": "VEH_BARN_NSX_NA1",
+        "Name": "1992 Katana NSX",
+        "Description": "Senna's choice, forgotten on the docks",
+        "Condition": "Mint_Dirty",
+        "BaseValue": 70000,
+        "RestoredValue": 190000,
+        "Rarity": "Epic"
+      },
+      "DiscoveryReward": { "REP": 750 }
+    },
+    {
+      "ID": "BARN_FIND_09",
+      "Name": "Mansion Garage",
+      "Location": { "X": -1500, "Y": 4200, "Z": 95 },
+      "Region": "Hills",
+      "Description": "The garage of an abandoned hillside mansion",
+      "Environment": "Residential",
+      "Clue": "The rich abandon the most interesting things",
+      "UnlockCondition": "REP_TIER_PRO",
+      "Vehicle": {
+        "ID": "VEH_BARN_COUNTACH",
+        "Name": "1988 Toro Countach",
+        "Description": "The poster car of a generation",
+        "Condition": "Covered",
+        "BaseValue": 150000,
+        "RestoredValue": 450000,
+        "Rarity": "Legendary"
+      },
+      "DiscoveryReward": { "REP": 1500 }
+    },
+    {
+      "ID": "BARN_FIND_10",
+      "Name": "Temple Storage House",
+      "Location": { "X": 3400, "Y": 4700, "Z": 130 },
+      "Region": "Mountains",
+      "Description": "A small storage building near the temple",
+      "Environment": "Cultural",
+      "Clue": "Even monks appreciated fine machinery",
+      "UnlockCondition": "LEVEL_25",
+      "Vehicle": {
+        "ID": "VEH_BARN_AE86",
+        "Name": "1985 Haruna AE86",
+        "Description": "The legend of the mountain pass",
+        "Condition": "Worn",
+        "BaseValue": 20000,
+        "RestoredValue": 65000,
+        "Rarity": "Rare",
+        "SpecialLivery": "FujiwaraTofuShop"
+      },
+      "DiscoveryReward": { "REP": 750, "Achievement": "ACH_TOFU_DELIVERY" }
+    },
+    {
+      "ID": "BARN_FIND_11",
+      "Name": "Drive-In Theater",
+      "Location": { "X": 5800, "Y": 1200, "Z": 20 },
+      "Region": "Suburbs",
+      "Description": "Behind the screen of an abandoned drive-in",
+      "Environment": "Nostalgic",
+      "Clue": "The final showing was decades ago",
+      "UnlockCondition": "LEVEL_18",
+      "Vehicle": {
+        "ID": "VEH_BARN_CAMARO_Z28",
+        "Name": "1970 Brawler Z28",
+        "Description": "Pure American muscle, split-bumper style",
+        "Condition": "Faded",
+        "BaseValue": 40000,
+        "RestoredValue": 110000,
+        "Rarity": "Rare"
+      },
+      "DiscoveryReward": { "REP": 500 }
+    },
+    {
+      "ID": "BARN_FIND_12",
+      "Name": "Coastal Cave",
+      "Location": { "X": -5000, "Y": 3500, "Z": 5 },
+      "Region": "Coast",
+      "Description": "A sea cave accessible only at low tide",
+      "Environment": "Cave",
+      "Clue": "The tide reveals what the sea hides",
+      "UnlockCondition": "REP_TIER_ELITE",
+      "TimeRestriction": "LowTide",
+      "Vehicle": {
+        "ID": "VEH_BARN_LANCIA_037",
+        "Name": "1983 Stratos Rally",
+        "Description": "Group B legend, hidden from time",
+        "Condition": "Covered",
+        "BaseValue": 200000,
+        "RestoredValue": 550000,
+        "Rarity": "Legendary"
+      },
+      "DiscoveryReward": { "REP": 2000 }
+    },
+    {
+      "ID": "BARN_FIND_13",
+      "Name": "Police Impound - Forgotten Section",
+      "Location": { "X": 2200, "Y": -800, "Z": 5 },
+      "Region": "Downtown",
+      "Description": "A locked section of the old police impound lot",
+      "Environment": "Urban",
+      "Clue": "Not everything in impound gets claimed...",
+      "UnlockCondition": "COMPLETE_STORY_CH3",
+      "Vehicle": {
+        "ID": "VEH_BARN_CUDA_440",
+        "Name": "1971 Barracuda 440",
+        "Description": "Seized and forgotten, a criminal's prized possession",
+        "Condition": "Evidence_Tags",
+        "BaseValue": 60000,
+        "RestoredValue": 175000,
+        "Rarity": "Epic"
+      },
+      "DiscoveryReward": { "REP": 1000 }
+    },
+    {
+      "ID": "BARN_FIND_14",
+      "Name": "Tunnel Construction Site",
+      "Location": { "X": -1800, "Y": 2500, "Z": -40 },
+      "Region": "Underground",
+      "Description": "An unfinished tunnel section, sealed years ago",
+      "Environment": "Construction",
+      "Clue": "The city planned expansions that never happened",
+      "UnlockCondition": "REP_TIER_PRO",
+      "Vehicle": {
+        "ID": "VEH_BARN_BMW_E30",
+        "Name": "1988 Bavaria M3",
+        "Description": "The original pocket rocket",
+        "Condition": "Dusty",
+        "BaseValue": 45000,
+        "RestoredValue": 140000,
+        "Rarity": "Epic"
+      },
+      "DiscoveryReward": { "REP": 750 }
+    },
+    {
+      "ID": "BARN_FIND_15",
+      "Name": "Legendary Racer's Estate",
+      "Location": { "X": 4800, "Y": 5200, "Z": 280 },
+      "Region": "Mountains",
+      "Description": "The private collection of a racing legend",
+      "Environment": "Estate",
+      "Clue": "The greatest kept one final secret",
+      "UnlockCondition": "100_PERCENT_COMPLETION",
+      "Vehicle": {
+        "ID": "VEH_BARN_F40",
+        "Name": "1990 Cavallino F40",
+        "Description": "The last car personally approved by Enzo",
+        "Condition": "Mint",
+        "BaseValue": 800000,
+        "RestoredValue": 1500000,
+        "Rarity": "Legendary",
+        "OneOfAKind": true
+      },
+      "DiscoveryReward": { "REP": 5000, "Achievement": "ACH_ULTIMATE_BARN", "Title": "TITLE_COLLECTOR" }
+    }
+  ],
+
+  "RestorationSystem": {
+    "Enabled": true,
+    "Stages": [
+      {
+        "ID": "RESTORE_INSPECT",
+        "Name": "Initial Inspection",
+        "Description": "Assess the vehicle's condition",
+        "Duration": 0,
+        "Cost": 0,
+        "CinematicReveal": true
+      },
+      {
+        "ID": "RESTORE_MECHANICAL",
+        "Name": "Mechanical Restoration",
+        "Description": "Rebuild the engine, transmission, and drivetrain",
+        "Duration": "1-3 days",
+        "CostMultiplier": 0.15,
+        "Unlocks": "BasicDriving"
+      },
+      {
+        "ID": "RESTORE_BODY",
+        "Name": "Body Restoration",
+        "Description": "Fix rust, dents, and structural damage",
+        "Duration": "2-4 days",
+        "CostMultiplier": 0.25
+      },
+      {
+        "ID": "RESTORE_PAINT",
+        "Name": "Paint and Finish",
+        "Description": "Restore original paint or apply new finish",
+        "Duration": "1-2 days",
+        "CostMultiplier": 0.20,
+        "Options": ["OriginalColor", "NewColor", "Custom"]
+      },
+      {
+        "ID": "RESTORE_INTERIOR",
+        "Name": "Interior Restoration",
+        "Description": "Restore seats, dashboard, and trim",
+        "Duration": "1-2 days",
+        "CostMultiplier": 0.15
+      },
+      {
+        "ID": "RESTORE_FINAL",
+        "Name": "Final Details",
+        "Description": "Chrome, glass, and finishing touches",
+        "Duration": "1 day",
+        "CostMultiplier": 0.10,
+        "Unlocks": "FullCustomization"
+      }
+    ],
+    "SpeedUpOptions": {
+      "Cash": { "CostMultiplier": 2.0, "TimeReduction": 0.5 },
+      "Premium": { "Instant": true }
+    }
+  },
+
+  "HintSystem": {
+    "Enabled": true,
+    "RevealMethods": {
+      "REPMilestone": "Unlock hints at REP tier increases",
+      "NPCConversation": "Certain NPCs mention barn find locations",
+      "MapExploration": "Get close enough and a marker appears",
+      "RumorBoard": "Check the garage rumor board for clues"
+    },
+    "HintLevels": [
+      { "Level": 1, "Description": "Region hint", "Cost": 1000 },
+      { "Level": 2, "Description": "Area hint with radius", "Cost": 2500 },
+      { "Level": 3, "Description": "Exact location revealed", "Cost": 5000 }
+    ]
+  },
+
+  "Rewards": {
+    "Discovery": {
+      "BaseREP": 500,
+      "RarityMultiplier": { "Rare": 1.0, "Epic": 1.5, "Legendary": 2.0 },
+      "FirstDiscoveryBonus": { "REP": 250 }
+    },
+    "Restoration": {
+      "PerStage": { "REP": 100 },
+      "FullRestoration": { "REP": 500, "Achievement": "Varies" }
+    },
+    "Collection": {
+      "5_Barns": { "Cash": 50000, "REP": 2500, "Title": "TITLE_TREASURE_HUNTER" },
+      "10_Barns": { "Cash": 150000, "REP": 7500, "Vehicle": "VEH_BONUS_FLATBED" },
+      "15_Barns": { "Cash": 500000, "REP": 25000, "Achievement": "ACH_MASTER_COLLECTOR", "GarageExpansion": true }
+    }
+  },
+
+  "PhotoOpportunities": {
+    "DiscoveryPhoto": {
+      "Enabled": true,
+      "AutoPrompt": true,
+      "BonusREP": 50
+    },
+    "BeforeAfter": {
+      "Enabled": true,
+      "ComparisonMode": true,
+      "ShareBonus": { "REP": 100 }
+    }
+  }
+}

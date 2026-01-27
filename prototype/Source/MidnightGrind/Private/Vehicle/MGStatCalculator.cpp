@@ -257,6 +257,67 @@ float UMGStatCalculator::CalculateBrakingRating(const FMGVehicleData& Vehicle, c
 	return FMath::Clamp(Rating, 0.0f, 100.0f);
 }
 
+float UMGStatCalculator::CalculateReliability(const FMGVehicleData& Vehicle)
+{
+	// Helper to convert part tier to reliability impact
+	// OEM/Stock = 100%, Street = 98%, Sport = 95%, Race = 90%, Pro = 85%, Legendary = 80%
+	auto GetTierReliability = [](EMGPartTier Tier) -> float
+	{
+		switch (Tier)
+		{
+		case EMGPartTier::OEM:
+		case EMGPartTier::Stock:
+			return 100.0f;
+		case EMGPartTier::Street:
+			return 98.0f;
+		case EMGPartTier::Sport:
+			return 95.0f;
+		case EMGPartTier::Race:
+			return 90.0f;
+		case EMGPartTier::Pro:
+			return 85.0f;
+		case EMGPartTier::Legendary:
+			return 80.0f;
+		default:
+			return 100.0f;
+		}
+	};
+
+	// Collect reliability ratings from major engine components
+	TArray<float> PartReliabilities;
+
+	// Engine internals
+	PartReliabilities.Add(GetTierReliability(Vehicle.Engine.AirFilterTier));
+	PartReliabilities.Add(GetTierReliability(Vehicle.Engine.ExhaustTier));
+	PartReliabilities.Add(GetTierReliability(Vehicle.Engine.CamshaftTier));
+	PartReliabilities.Add(GetTierReliability(Vehicle.Engine.ValvesTier));
+	PartReliabilities.Add(GetTierReliability(Vehicle.Engine.PistonsTier));
+	PartReliabilities.Add(GetTierReliability(Vehicle.Engine.FuelSystemTier));
+
+	// Forced induction (if equipped) - turbos/superchargers need more maintenance
+	if (Vehicle.Engine.ForcedInduction.Type != EMGForcedInductionType::None)
+	{
+		// Forced induction adds reliability penalty based on boost level
+		float BoostPenalty = FMath::GetMappedRangeValueClamped(
+			FVector2D(5.0f, 25.0f), FVector2D(0.0f, 10.0f), Vehicle.Engine.ForcedInduction.MaxBoostPSI);
+		PartReliabilities.Add(90.0f - BoostPenalty);
+	}
+
+	// Calculate average reliability
+	if (PartReliabilities.Num() == 0)
+	{
+		return 100.0f;
+	}
+
+	float TotalReliability = 0.0f;
+	for (float Reliability : PartReliabilities)
+	{
+		TotalReliability += Reliability;
+	}
+
+	return FMath::Clamp(TotalReliability / PartReliabilities.Num(), 0.0f, 100.0f);
+}
+
 float UMGStatCalculator::EstimateZeroTo60(const FMGVehicleStats& Stats, const FMGDrivetrainConfiguration& Drivetrain)
 {
 	// Simple estimation formula
@@ -496,8 +557,8 @@ FMGVehicleStats UMGStatCalculator::CalculateAllStats(const FMGVehicleData& Vehic
 	// Value
 	Stats.EstimatedValue = CalculateVehicleValue(Vehicle, BaseModel);
 
-	// Reliability (placeholder)
-	Stats.ReliabilityRating = 100.0f;
+	// Reliability based on part quality tiers
+	Stats.ReliabilityRating = CalculateReliability(Vehicle);
 
 	return Stats;
 }

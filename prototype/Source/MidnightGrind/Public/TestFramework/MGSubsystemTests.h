@@ -17,7 +17,7 @@ class UMGSaveGame;
 /**
  * Subsystem Unit Tests
  * Provides actual test implementations for core subsystems
- * Total Tests: 46
+ * Total Tests: 50
  *
  * Test Categories:
  * - Currency (6): Earning, spending, balance tracking, multipliers
@@ -28,10 +28,11 @@ class UMGSaveGame;
  * - Performance (4): Tick time, memory, delegates, data access
  * - Save/Load (5): Save game creation, data structures, slot naming
  * - Physics (9): Tire grip, wet modifiers, weight transfer, handling modes, surface, geometry, differential, wear
+ * - Stress (4): High object count, sustained operation, memory stability, rapid state changes
  * - Integration (2): Cross-system verification
  *
  * Console Commands:
- * - MG.RunAllTests - Run all 46 tests
+ * - MG.RunAllTests - Run all 50 tests
  * - MG.RunCurrencyTests - Run 6 currency subsystem tests
  * - MG.RunWeatherTests - Run 6 weather subsystem tests
  * - MG.RunEconomyTests - Run 3 economy tests
@@ -40,6 +41,7 @@ class UMGSaveGame;
  * - MG.RunPerformanceTests - Run 4 performance tests
  * - MG.RunSaveTests - Run 5 save/load tests
  * - MG.RunPhysicsTests - Run 9 physics tests
+ * - MG.RunStressTests - Run 4 stress tests
  * - MG.RunSmokeTests - Run quick smoke tests
  * - MG.PrintTestReport - Print last test report
  */
@@ -280,6 +282,26 @@ public:
 	FMGTestResult TestPhysics_WearConstants();
 
 	// ==========================================
+	// STRESS TESTS
+	// ==========================================
+
+	/** Test high object allocation stress */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Stress")
+	FMGTestResult TestStress_HighObjectCount();
+
+	/** Test sustained operation over time */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Stress")
+	FMGTestResult TestStress_SustainedOperation();
+
+	/** Test memory stability under repeated allocations */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Stress")
+	FMGTestResult TestStress_MemoryStability();
+
+	/** Test rapid state changes */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Stress")
+	FMGTestResult TestStress_RapidStateChanges();
+
+	// ==========================================
 	// CONSOLE COMMANDS
 	// ==========================================
 
@@ -318,6 +340,10 @@ public:
 	/** Run physics tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunPhysicsTests();
+
+	/** Run stress tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunStressTests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")

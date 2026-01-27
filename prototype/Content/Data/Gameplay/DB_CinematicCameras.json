@@ -1,0 +1,361 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Cinematic Camera System Configuration",
+
+  "CameraSystem": {
+    "Enabled": true,
+    "BlendTime": 0.5,
+    "ShakeEnabled": true,
+    "MotionBlurDuringTransitions": true
+  },
+
+  "RaceCameras": {
+    "StartSequence": {
+      "Cameras": [
+        {
+          "ID": "CAM_START_GRID",
+          "Name": "Grid Overview",
+          "Position": "High",
+          "Movement": "Crane_Down",
+          "Duration": 3.0,
+          "FocusOn": "Grid"
+        },
+        {
+          "ID": "CAM_START_OPPONENTS",
+          "Name": "Opponent Showcase",
+          "Position": "Medium",
+          "Movement": "Dolly_Along_Grid",
+          "Duration": 4.0,
+          "FocusOn": "Each_Opponent",
+          "ShowNames": true
+        },
+        {
+          "ID": "CAM_START_PLAYER",
+          "Name": "Player Ready",
+          "Position": "Low_Front",
+          "Movement": "Push_In",
+          "Duration": 2.0,
+          "FocusOn": "PlayerVehicle",
+          "ShowVehicleStats": true
+        },
+        {
+          "ID": "CAM_START_LIGHTS",
+          "Name": "Starting Lights",
+          "Position": "Close_Lights",
+          "Movement": "Static",
+          "Duration": 3.0,
+          "FocusOn": "StartLights"
+        }
+      ]
+    },
+    "FinishSequence": {
+      "Winner": [
+        {
+          "ID": "CAM_FINISH_WINNER",
+          "Name": "Victory Celebration",
+          "Position": "Chase_Wide",
+          "Movement": "Orbit_Slow",
+          "Duration": 4.0,
+          "Effects": ["Confetti", "SlowMotion"],
+          "ShowStats": true
+        }
+      ],
+      "CloseFinish": [
+        {
+          "ID": "CAM_FINISH_CLOSE",
+          "Name": "Photo Finish",
+          "Position": "Finish_Line_Side",
+          "Movement": "Static_SlowMo",
+          "Duration": 3.0,
+          "Effects": ["SlowMotion_Extreme"],
+          "ShowGapTime": true
+        }
+      ],
+      "Loss": [
+        {
+          "ID": "CAM_FINISH_LOSS",
+          "Name": "Better Luck",
+          "Position": "Rear_Chase",
+          "Movement": "Pull_Back",
+          "Duration": 2.5,
+          "Effects": ["Subtle_Vignette"]
+        }
+      ]
+    },
+    "MidRace": {
+      "OvertakeCam": {
+        "Enabled": true,
+        "TriggerDistance": 5.0,
+        "Cameras": [
+          { "ID": "CAM_OVERTAKE_SIDE", "Position": "Side_Track", "Movement": "Pan" },
+          { "ID": "CAM_OVERTAKE_CHASE", "Position": "Close_Chase", "Movement": "Follow" }
+        ],
+        "Duration": 2.0,
+        "SlowMotion": 0.75
+      },
+      "CollisionCam": {
+        "Enabled": true,
+        "TriggerForce": "Significant",
+        "Duration": 1.5,
+        "SlowMotion": 0.5,
+        "ShakeIntensity": "Heavy"
+      },
+      "NitroActivation": {
+        "Enabled": true,
+        "Duration": 1.0,
+        "Effects": ["SpeedLines", "ChromaticAberration"],
+        "CameraShake": "Light"
+      }
+    }
+  },
+
+  "ReplayCameras": {
+    "AutoDirector": {
+      "Enabled": true,
+      "CameraChangeFrequency": { "Min": 3.0, "Max": 8.0 },
+      "PreferDramaticAngles": true,
+      "AvoidRepetition": true
+    },
+    "CameraTypes": [
+      {
+        "ID": "REPLAY_CHASE",
+        "Name": "Chase Camera",
+        "Position": "Behind_Vehicle",
+        "Distance": { "Min": 5, "Max": 15 },
+        "Height": { "Min": 1, "Max": 3 },
+        "FOV": { "Min": 60, "Max": 90 }
+      },
+      {
+        "ID": "REPLAY_HELICOPTER",
+        "Name": "Helicopter Shot",
+        "Position": "High_Above",
+        "Distance": { "Min": 30, "Max": 100 },
+        "Movement": "Follow_Smooth",
+        "FOV": 45
+      },
+      {
+        "ID": "REPLAY_TRACKSIDE",
+        "Name": "Trackside Camera",
+        "Position": "Fixed_Roadside",
+        "Movement": "Pan_Follow",
+        "FOV": 35,
+        "UseTrackCameras": true
+      },
+      {
+        "ID": "REPLAY_BUMPER",
+        "Name": "Bumper Cam",
+        "Position": "Front_Bumper",
+        "FOV": 90,
+        "ShakeIntensity": "High",
+        "SpeedEffects": true
+      },
+      {
+        "ID": "REPLAY_WHEEL",
+        "Name": "Wheel Cam",
+        "Position": "Near_Wheel",
+        "FocusOn": "Wheel_Spin",
+        "FOV": 60,
+        "DramaticFor": ["Drifts", "Burnouts"]
+      },
+      {
+        "ID": "REPLAY_DRONE",
+        "Name": "Drone Shot",
+        "Position": "Orbiting",
+        "Movement": "Smooth_Orbit",
+        "Distance": { "Min": 10, "Max": 40 },
+        "OrbitsPerSecond": 0.1
+      },
+      {
+        "ID": "REPLAY_HOOD",
+        "Name": "Hood Camera",
+        "Position": "Hood_Center",
+        "FOV": 75,
+        "ShowDriverView": false
+      },
+      {
+        "ID": "REPLAY_COCKPIT",
+        "Name": "Cockpit Replay",
+        "Position": "Driver_Seat",
+        "FOV": 70,
+        "ShowHands": true,
+        "ShowMirrors": true
+      },
+      {
+        "ID": "REPLAY_CINEMATIC",
+        "Name": "Cinematic Wide",
+        "Position": "Dynamic",
+        "FOV": 24,
+        "AspectRatio": "2.39:1",
+        "FilmGrain": true,
+        "Letterbox": true
+      }
+    ],
+    "TransitionTypes": [
+      { "ID": "TRANS_CUT", "Name": "Hard Cut", "Duration": 0 },
+      { "ID": "TRANS_FADE", "Name": "Fade", "Duration": 0.5 },
+      { "ID": "TRANS_BLEND", "Name": "Smooth Blend", "Duration": 0.75 },
+      { "ID": "TRANS_WIPE", "Name": "Speed Wipe", "Duration": 0.3, "Direction": "Horizontal" }
+    ]
+  },
+
+  "FreeroamCameras": {
+    "DefaultCamera": "FREEROAM_CHASE",
+    "Cameras": [
+      {
+        "ID": "FREEROAM_CHASE",
+        "Name": "Chase",
+        "Position": { "Distance": 8, "Height": 2.5 },
+        "FOV": 75,
+        "InputKey": "D-Pad_Down"
+      },
+      {
+        "ID": "FREEROAM_FAR_CHASE",
+        "Name": "Far Chase",
+        "Position": { "Distance": 15, "Height": 4 },
+        "FOV": 60,
+        "InputKey": "D-Pad_Down"
+      },
+      {
+        "ID": "FREEROAM_HOOD",
+        "Name": "Hood View",
+        "Position": "Hood",
+        "FOV": 80,
+        "InputKey": "D-Pad_Down"
+      },
+      {
+        "ID": "FREEROAM_BUMPER",
+        "Name": "Bumper View",
+        "Position": "Bumper",
+        "FOV": 90,
+        "InputKey": "D-Pad_Down"
+      },
+      {
+        "ID": "FREEROAM_COCKPIT",
+        "Name": "Cockpit",
+        "Position": "Interior",
+        "FOV": 70,
+        "ShowInterior": true,
+        "InputKey": "D-Pad_Down"
+      },
+      {
+        "ID": "FREEROAM_DRONE",
+        "Name": "Drone",
+        "Position": "Free",
+        "ControlScheme": "Free_Flight",
+        "MaxDistance": 50,
+        "InputKey": "D-Pad_Down"
+      }
+    ],
+    "CameraAdjustments": {
+      "HeightOffset": { "Min": -2, "Max": 5 },
+      "DistanceOffset": { "Min": -5, "Max": 10 },
+      "FOVOffset": { "Min": -20, "Max": 30 }
+    }
+  },
+
+  "GarageCameras": {
+    "Showcase": {
+      "OrbitSpeed": 0.02,
+      "AutoRotate": true,
+      "ManualControl": true,
+      "ZoomRange": { "Min": 3, "Max": 20 },
+      "HeightRange": { "Min": 0.5, "Max": 5 }
+    },
+    "DetailViews": [
+      { "ID": "CAM_GARAGE_FRONT", "Name": "Front View", "Angle": 0 },
+      { "ID": "CAM_GARAGE_REAR", "Name": "Rear View", "Angle": 180 },
+      { "ID": "CAM_GARAGE_SIDE_L", "Name": "Left Side", "Angle": 90 },
+      { "ID": "CAM_GARAGE_SIDE_R", "Name": "Right Side", "Angle": 270 },
+      { "ID": "CAM_GARAGE_ENGINE", "Name": "Engine Bay", "Position": "Hood_Open" },
+      { "ID": "CAM_GARAGE_WHEEL", "Name": "Wheel Detail", "Position": "Close_Wheel" },
+      { "ID": "CAM_GARAGE_INTERIOR", "Name": "Interior", "Position": "Through_Window" }
+    ],
+    "CustomizationCameras": {
+      "Paint": { "Position": "Side_Wide", "ShowFullBody": true },
+      "Wheels": { "Position": "Corner_Low", "FocusWheel": true },
+      "BodyKit": { "Position": "Front_Corner", "ShowSilhouette": true },
+      "Interior": { "Position": "Inside", "FOV": 90 },
+      "Exhaust": { "Position": "Rear_Low", "ShowExhaustTips": true }
+    }
+  },
+
+  "CutsceneCameras": {
+    "DialogueCamera": {
+      "SpeakerFocus": true,
+      "DepthOfField": true,
+      "BackgroundBlur": 0.3,
+      "ShotTypes": ["CloseUp", "MediumShot", "TwoShot", "OverShoulder"]
+    },
+    "VehicleReveal": {
+      "BuildUp": {
+        "Cameras": [
+          { "Position": "Detail_Wheel", "Duration": 1.5 },
+          { "Position": "Detail_Badge", "Duration": 1.5 },
+          { "Position": "Rising_Full", "Duration": 3.0 }
+        ],
+        "Lighting": "Dramatic",
+        "Audio": "Reveal_Sting"
+      }
+    },
+    "PursuitCinematic": {
+      "ChaseSequences": [
+        { "Type": "Helicopter_News", "Duration": 5.0 },
+        { "Type": "Police_POV", "Duration": 3.0 },
+        { "Type": "Player_Escape", "Duration": 4.0 }
+      ]
+    }
+  },
+
+  "SpecialEffects": {
+    "SlowMotion": {
+      "Scales": {
+        "Subtle": 0.75,
+        "Normal": 0.5,
+        "Dramatic": 0.25,
+        "Extreme": 0.1,
+        "Freeze": 0.0
+      },
+      "TransitionIn": 0.2,
+      "TransitionOut": 0.3
+    },
+    "SpeedLines": {
+      "Enabled": true,
+      "SpeedThreshold": 100,
+      "Intensity": { "Min": 0.0, "Max": 1.0 }
+    },
+    "CameraShake": {
+      "Presets": {
+        "Light": { "Amplitude": 0.1, "Frequency": 15 },
+        "Medium": { "Amplitude": 0.3, "Frequency": 20 },
+        "Heavy": { "Amplitude": 0.6, "Frequency": 25 },
+        "Extreme": { "Amplitude": 1.0, "Frequency": 30 }
+      }
+    },
+    "DepthOfField": {
+      "FocusDistance": "Auto",
+      "Aperture": { "Min": 1.4, "Max": 22 },
+      "BokehShape": "Hexagon"
+    },
+    "MotionBlur": {
+      "PerObject": true,
+      "CameraMotion": true,
+      "Intensity": { "Min": 0.0, "Max": 1.0 }
+    }
+  },
+
+  "TrackCameras": {
+    "Placement": "AutoGenerated",
+    "Types": {
+      "CornerEntry": { "Position": "Outside_Apex", "Movement": "Pan" },
+      "CornerExit": { "Position": "Track_Out", "Movement": "Follow" },
+      "Straight": { "Position": "Trackside", "Movement": "Pan" },
+      "Overhead": { "Position": "High_Gantry", "Movement": "Static" },
+      "Tunnel": { "Position": "Inside_Tunnel", "Movement": "Pan" }
+    },
+    "DynamicSelection": {
+      "Enabled": true,
+      "PrioritizeAction": true,
+      "AvoidObstructions": true
+    }
+  }
+}

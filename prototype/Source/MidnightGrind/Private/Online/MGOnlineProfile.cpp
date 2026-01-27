@@ -106,32 +106,37 @@ void UMGOnlineProfileSubsystem::RequestFullSync()
 
 	FString Endpoint = FString::Printf(TEXT("/profile/%s"), *PlayerId);
 
+	TWeakObjectPtr<UMGOnlineProfileSubsystem> WeakThis(this);
 	SendRequest(Endpoint, TEXT("GET"), TEXT(""),
-		[this](bool bSuccess, const FString& Response)
+		[WeakThis](bool bSuccess, const FString& Response)
 		{
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
 			if (bSuccess)
 			{
-				if (DeserializeProfileFromJson(Response, EMGProfileDataFlags::All))
+				if (WeakThis->DeserializeProfileFromJson(Response, EMGProfileDataFlags::All))
 				{
-					bProfileLoaded = true;
-					CachedProfile.LastServerSync = FDateTime::UtcNow();
-					ApplyProfileToSubsystems();
-					SetSyncStatus(EMGSyncStatus::Synced);
-					OnProfileSyncComplete.Broadcast(true, TEXT(""));
-					OnProfileDataUpdated.Broadcast();
+					WeakThis->bProfileLoaded = true;
+					WeakThis->CachedProfile.LastServerSync = FDateTime::UtcNow();
+					WeakThis->ApplyProfileToSubsystems();
+					WeakThis->SetSyncStatus(EMGSyncStatus::Synced);
+					WeakThis->OnProfileSyncComplete.Broadcast(true, TEXT(""));
+					WeakThis->OnProfileDataUpdated.Broadcast();
 
-					UE_LOG(LogTemp, Log, TEXT("MGOnlineProfile: Full sync completed for %s"), *PlayerId);
+					UE_LOG(LogTemp, Log, TEXT("MGOnlineProfile: Full sync completed for %s"), *WeakThis->PlayerId);
 				}
 				else
 				{
-					SetSyncStatus(EMGSyncStatus::SyncFailed);
-					OnProfileSyncComplete.Broadcast(false, TEXT("Failed to parse profile data"));
+					WeakThis->SetSyncStatus(EMGSyncStatus::SyncFailed);
+					WeakThis->OnProfileSyncComplete.Broadcast(false, TEXT("Failed to parse profile data"));
 				}
 			}
 			else
 			{
-				SetSyncStatus(EMGSyncStatus::SyncFailed);
-				OnProfileSyncComplete.Broadcast(false, Response);
+				WeakThis->SetSyncStatus(EMGSyncStatus::SyncFailed);
+				WeakThis->OnProfileSyncComplete.Broadcast(false, Response);
 			}
 		});
 }
@@ -166,25 +171,30 @@ void UMGOnlineProfileSubsystem::RequestPartialSync(EMGProfileDataFlags DataFlags
 
 	SetSyncStatus(EMGSyncStatus::Syncing);
 
+	TWeakObjectPtr<UMGOnlineProfileSubsystem> WeakThis(this);
 	SendRequest(Endpoint, TEXT("GET"), TEXT(""),
-		[this, DataFlags](bool bSuccess, const FString& Response)
+		[WeakThis, DataFlags](bool bSuccess, const FString& Response)
 		{
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
 			if (bSuccess)
 			{
-				if (DeserializeProfileFromJson(Response, DataFlags))
+				if (WeakThis->DeserializeProfileFromJson(Response, DataFlags))
 				{
-					ApplyProfileToSubsystems();
-					SetSyncStatus(EMGSyncStatus::Synced);
-					OnProfileDataUpdated.Broadcast();
+					WeakThis->ApplyProfileToSubsystems();
+					WeakThis->SetSyncStatus(EMGSyncStatus::Synced);
+					WeakThis->OnProfileDataUpdated.Broadcast();
 				}
 				else
 				{
-					SetSyncStatus(EMGSyncStatus::SyncFailed);
+					WeakThis->SetSyncStatus(EMGSyncStatus::SyncFailed);
 				}
 			}
 			else
 			{
-				SetSyncStatus(EMGSyncStatus::SyncFailed);
+				WeakThis->SetSyncStatus(EMGSyncStatus::SyncFailed);
 			}
 		});
 }

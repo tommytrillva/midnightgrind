@@ -562,16 +562,21 @@ void UMGNetworkDiagnosticsSubsystem::RunDiagnosticTest(EMGDiagnosticTest TestTyp
     // Complete test after simulated duration
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGNetworkDiagnosticsSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             DiagnosticHandle,
-            [this, Result]() mutable
+            [WeakThis, Result]() mutable
             {
+                if (!WeakThis.IsValid())
+                {
+                    return;
+                }
                 Result.TestDurationSeconds = (FDateTime::Now() - Result.TestTime).GetTotalSeconds();
-                DiagnosticHistory.Add(Result);
-                bDiagnosticRunning = false;
+                WeakThis->DiagnosticHistory.Add(Result);
+                WeakThis->bDiagnosticRunning = false;
 
-                OnDiagnosticComplete.Broadcast(Result);
-                ProcessDiagnosticQueue();
+                WeakThis->OnDiagnosticComplete.Broadcast(Result);
+                WeakThis->ProcessDiagnosticQueue();
             },
             TestDuration,
             false

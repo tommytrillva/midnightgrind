@@ -289,11 +289,16 @@ void UMGModdingSubsystem::DownloadMod(const FString& ModId)
     if (UWorld* World = GetWorld())
     {
         FTimerHandle DownloadTimer;
+        TWeakObjectPtr<UMGModdingSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             DownloadTimer,
-            [this, ModId]()
+            [WeakThis, ModId]()
             {
-                FMGModDownloadProgress* Progress = ActiveDownloads.Find(ModId);
+                if (!WeakThis.IsValid())
+                {
+                    return;
+                }
+                FMGModDownloadProgress* Progress = WeakThis->ActiveDownloads.Find(ModId);
                 if (Progress)
                 {
                     // Simulate progress
@@ -301,13 +306,13 @@ void UMGModdingSubsystem::DownloadMod(const FString& ModId)
                     Progress->DownloadSpeedBps = 5 * 1024 * 1024; // 5 MB/s
                     Progress->EstimatedTimeRemaining = (Progress->TotalBytes - Progress->BytesDownloaded) / Progress->DownloadSpeedBps;
 
-                    OnModDownloadProgress.Broadcast(*Progress);
+                    WeakThis->OnModDownloadProgress.Broadcast(*Progress);
 
                     if (Progress->BytesDownloaded >= Progress->TotalBytes)
                     {
-                        ActiveDownloads.Remove(ModId);
-                        InstallMod(ModId);
-                        OnModDownloadComplete.Broadcast(ModId, true);
+                        WeakThis->ActiveDownloads.Remove(ModId);
+                        WeakThis->InstallMod(ModId);
+                        WeakThis->OnModDownloadComplete.Broadcast(ModId, true);
                     }
                 }
             },

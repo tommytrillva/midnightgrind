@@ -647,7 +647,8 @@ void UMGEngineAudioSubsystem::PlayEngineLayer(FMGVehicleAudioInstance& Instance,
 
 float UMGEngineAudioSubsystem::CalculatePitchFromRPM(float RPM, const FMGEngineSoundLayer& Layer) const
 {
-	float NormalizedRPM = (RPM - Layer.MinRPM) / (Layer.MaxRPM - Layer.MinRPM);
+	float RPMRange = Layer.MaxRPM - Layer.MinRPM;
+	float NormalizedRPM = (RPMRange > 0.0f) ? (RPM - Layer.MinRPM) / RPMRange : 0.0f;
 	float Pitch = FMath::Lerp(Layer.MinPitch, Layer.MaxPitch, NormalizedRPM);
 	return FMath::Clamp(Pitch * Layer.PitchMultiplier, 0.1f, 4.0f);
 }
@@ -658,6 +659,11 @@ float UMGEngineAudioSubsystem::CalculateLayerVolume(float RPM, const FMGEngineSo
 	float LayerWidth = (Layer.MaxRPM - Layer.MinRPM) * 0.5f;
 
 	// Calculate fade based on distance from layer boundaries
+	if (Layer.CrossfadeWidth <= 0.0f)
+	{
+		// No crossfade - full volume if within range
+		return (RPM >= Layer.MinRPM && RPM <= Layer.MaxRPM) ? 1.0f : 0.0f;
+	}
 	float FadeIn = FMath::Clamp((RPM - Layer.MinRPM) / Layer.CrossfadeWidth, 0.0f, 1.0f);
 	float FadeOut = FMath::Clamp((Layer.MaxRPM - RPM) / Layer.CrossfadeWidth, 0.0f, 1.0f);
 

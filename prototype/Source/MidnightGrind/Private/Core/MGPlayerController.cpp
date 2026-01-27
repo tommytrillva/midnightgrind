@@ -30,6 +30,7 @@
 #include "Vehicle/MGVehicleWearSubsystem.h"
 #include "Weather/MGWeatherSubsystem.h"
 #include "Caution/MGCautionSubsystem.h"
+#include "Penalty/MGPenaltySubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -239,6 +240,13 @@ void AMGPlayerController::BeginPlay()
 				CautionSubsystem->OnSafetyCarDeployed.AddDynamic(this, &AMGPlayerController::OnSafetyCarDeployed);
 				CautionSubsystem->OnSafetyCarIn.AddDynamic(this, &AMGPlayerController::OnSafetyCarIn);
 			}
+
+			// Bind to penalty subsystem for race penalties
+			if (UMGPenaltySubsystem* PenaltySubsystem = GI->GetSubsystem<UMGPenaltySubsystem>())
+			{
+				PenaltySubsystem->OnPenaltyIssued.AddDynamic(this, &AMGPlayerController::OnPenaltyIssued);
+				PenaltySubsystem->OnPenaltyServed.AddDynamic(this, &AMGPlayerController::OnPenaltyServed);
+			}
 		}
 	}
 }
@@ -397,6 +405,12 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			CautionSubsystem->OnCautionEnded.RemoveDynamic(this, &AMGPlayerController::OnCautionEnded);
 			CautionSubsystem->OnSafetyCarDeployed.RemoveDynamic(this, &AMGPlayerController::OnSafetyCarDeployed);
 			CautionSubsystem->OnSafetyCarIn.RemoveDynamic(this, &AMGPlayerController::OnSafetyCarIn);
+		}
+
+		if (UMGPenaltySubsystem* PenaltySubsystem = GI->GetSubsystem<UMGPenaltySubsystem>())
+		{
+			PenaltySubsystem->OnPenaltyIssued.RemoveDynamic(this, &AMGPlayerController::OnPenaltyIssued);
+			PenaltySubsystem->OnPenaltyServed.RemoveDynamic(this, &AMGPlayerController::OnPenaltyServed);
 		}
 	}
 
