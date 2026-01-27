@@ -1,0 +1,263 @@
+{
+  "VehicleID": "SPECTER_911",
+  "DisplayName": "Specter 911 GT3",
+  "Manufacturer": "Specter Motors",
+  "Year": 2022,
+  "Country": "Germany",
+  "Class": "S",
+  "Category": "Euro",
+  "Description": "The Specter 911 GT3 is the track day monster with a manual option. That 4.0L flat-six revs to 9000 RPM naturally aspirated while producing 502 horsepower - numbers that seem impossible until you hear it scream. The rear-engine layout that everyone said couldn't work has been perfected over 50 years. It'll demolish lap times, then drive home in comfort. This is German engineering at its absolute finest.",
+
+  "BaseStats": {
+    "Power": 502,
+    "PowerUnit": "HP",
+    "Torque": 346,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3126,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 39,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Rear",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 4000,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "Flat",
+    "Redline": 9000,
+    "IdleRPM": 850,
+    "TopSpeed": 198,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 3.2,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 900,
+    "Class": "S",
+    "MaxPotential": 1000
+  },
+
+  "Engine": {
+    "Code": "4.0_GT3",
+    "Type": "Flat-6 NA",
+    "Block": {
+      "Material": "Aluminum",
+      "MaxPowerPotential": 600
+    },
+    "Head": {
+      "Type": "DOHC 24V VVT",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24
+    },
+    "IndividualThrottleBodies": true,
+    "DrySum": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 75, "Torque": 180 },
+      { "RPM": 2000, "HP": 160, "Torque": 270 },
+      { "RPM": 3000, "HP": 250, "Torque": 315 },
+      { "RPM": 4000, "HP": 340, "Torque": 340 },
+      { "RPM": 5000, "HP": 420, "Torque": 346 },
+      { "RPM": 6000, "HP": 470, "Torque": 342 },
+      { "RPM": 6500, "HP": 490, "Torque": 335 },
+      { "RPM": 7000, "HP": 500, "Torque": 325 },
+      { "RPM": 7500, "HP": 502, "Torque": 310 },
+      { "RPM": 8000, "HP": 498, "Torque": 292 },
+      { "RPM": 8500, "HP": 485, "Torque": 272 },
+      { "RPM": 9000, "HP": 465, "Torque": 250 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [3.91, 2.32, 1.61, 1.28, 1.08, 0.88],
+    "FinalDrive": 3.74,
+    "ReverseRatio": 3.55,
+    "ManualOption": true
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 420,
+    "RearSpringRate": 480,
+    "FrontDamping": 0.72,
+    "RearDamping": 0.75,
+    "FrontAntiRollBar": 28,
+    "RearAntiRollBar": 32,
+    "RideHeight": 3.9,
+    "RideHeightUnit": "inches",
+    "RearAxleSteering": true
+  },
+
+  "Brakes": {
+    "FrontType": "Carbon Ceramic",
+    "RearType": "Carbon Ceramic",
+    "FrontDiameter": 408,
+    "RearDiameter": 380,
+    "DiameterUnit": "mm",
+    "BrakeBias": 54,
+    "ABSEquipped": true,
+    "PCCB": true
+  },
+
+  "Tires": {
+    "FrontWidth": 255,
+    "FrontAspectRatio": 35,
+    "FrontDiameter": 20,
+    "RearWidth": 315,
+    "RearAspectRatio": 30,
+    "RearDiameter": 21,
+    "Compound": "Sport",
+    "GripMultiplier": 1.2
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.34,
+    "FrontalArea": 2.0,
+    "DownforceMultiplier": 1.45,
+    "HasActiveSpoiler": false,
+    "SwanNeckWing": true
+  },
+
+  "Dimensions": {
+    "Length": 4573,
+    "Width": 1852,
+    "Height": 1279,
+    "Wheelbase": 2457,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#FFD700",
+      "Secondary": "#000000",
+      "Accent": "#C0C0C0"
+    },
+    "AvailableColors": [
+      { "Name": "Racing Yellow", "Hex": "#FFD700" },
+      { "Name": "GT Silver", "Hex": "#C0C0C0" },
+      { "Name": "Jet Black", "Hex": "#0A0A0A" },
+      { "Name": "Guards Red", "Hex": "#CC0000" },
+      { "Name": "Miami Blue", "Hex": "#00BFFF" },
+      { "Name": "Chalk", "Hex": "#D3D3D3" },
+      { "Name": "Python Green", "Hex": "#228B22" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "Flat6_NA_GT3_Scream",
+    "ExhaustProfile": "Euro_Porsche_Track",
+    "NaturallyAspiratedHowl": true,
+    "BackfireOnShift": true,
+    "HighRevScream": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 13.2,
+    "TurnRadius": 5.5,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.12,
+    "OversteerTendency": 0.55,
+    "DriftCapability": 0.65,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "RearAxleSteering": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 125,
+    "PowerBoostUnit": "HP",
+    "Duration": 3.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 4,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 185000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "S",
+    "MaintenanceCostMultiplier": 2.2,
+    "PartsPriceMultiplier": 2.0,
+    "StreetValue": 230000,
+    "LegendaryValue": 450000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "FEARED",
+    "RequiredLevel": 40,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Fabspeed", "Full Race"],
+      "Exhaust": ["Stock", "Akrapovic", "Fabspeed", "Race"],
+      "ECU": ["Stock", "GIAC", "Cobb", "Race"],
+      "Cams": ["Stock", "Sport", "Race"],
+      "Internals": ["Stock", "Balanced", "Full Build"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing"],
+      "Transmission": ["Stock 6MT", "PDK Swap", "Sequential"],
+      "FinalDrive": ["Stock", "3.89", "4.00"],
+      "LSD": ["Stock eLSD", "Guard", "Wavetrac"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Manthey", "Race"],
+      "Dampers": ["Stock", "Ohlins", "MCS"],
+      "Swaybars": ["Stock", "Manthey", "Racing"],
+      "Bushings": ["Stock", "Solid", "Spherical"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock PCCB"],
+      "Calipers": ["Stock", "Manthey"]
+    },
+    "Wheels": {
+      "Size": [20, 21],
+      "Width": [9.0, 9.5, 10.0, 11.0, 12.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Cup 2", "Cup 2 R", "Slick"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Manthey", "Cup"],
+      "Spoiler": ["Stock Swan Neck", "Manthey", "Adjustable"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock"],
+      "WeightReduction": ["Stock", "Interior Delete", "Race Spec"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 600,
+    "MaxTorque": 400,
+    "MinWeight": 2900,
+    "MaxTopSpeed": 210,
+    "MaxPI": 1000
+  },
+
+  "Tags": ["Euro", "RWD", "RearEngine", "NA", "Flat6", "GT3", "Manual", "Track"],
+
+  "Lore": {
+    "Backstory": "The Specter 911 GT3 is 50 years of rear-engine perfection distilled into one machine. What everyone said couldn't work - putting the engine behind the rear wheels - has become the most successful race car platform in history. This 4.0L flat-six revs to 9000 RPM with individual throttle bodies and a dry sump, producing a sound that haunts racetracks worldwide. The swan-neck rear wing provides serious downforce. The rear-axle steering makes it handle like a smaller car. And the 6-speed manual transmission proves that Porsche still believes drivers deserve to row their own gears. On any track, on any day, in any conditions - this is the benchmark.",
+    "FamousOwners": ["Nurburgring Record Holder", "Track Day Elite", "The Purist"],
+    "RivalVehicles": ["R35 GT-R", "AMG GT", "M4 GTS"]
+  },
+
+  "SpecialFeatures": {
+    "Flat6_9000RPM": true,
+    "ManualTransmission": true,
+    "RearAxleSteering": true,
+    "SwanNeckWing": true,
+    "PCCB": true
+  }
+}

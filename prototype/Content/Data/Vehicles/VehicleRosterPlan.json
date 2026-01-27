@@ -193,11 +193,11 @@
   "Phase5_Launch": {
     "Count": 30,
     "FinalAdditions": [
-      { "ID": "LEGEND_R35", "Class": "S", "Category": "JDM", "Inspiration": "R35 GT-R" },
-      { "ID": "SHADOW_LFA", "Class": "S", "Category": "JDM", "Inspiration": "Lexus LFA" },
-      { "ID": "SPECTER_911", "Class": "S", "Category": "Euro", "Inspiration": "992 GT3" },
-      { "ID": "FLASH_AMG", "Class": "S", "Category": "Euro", "Inspiration": "AMG GT Black Series" },
-      { "ID": "NOVA_GT500", "Class": "S", "Category": "Muscle", "Inspiration": "GT500" }
+      { "ID": "LEGEND_R35", "Class": "S", "Category": "JDM", "Inspiration": "R35 GT-R", "Status": "Spec Complete" },
+      { "ID": "SHADOW_LFA", "Class": "S", "Category": "JDM", "Inspiration": "Lexus LFA", "Status": "Spec Complete" },
+      { "ID": "SPECTER_911", "Class": "S", "Category": "Euro", "Inspiration": "992 GT3", "Status": "Spec Complete" },
+      { "ID": "FLASH_AMG", "Class": "S", "Category": "Euro", "Inspiration": "AMG GT Black Series", "Status": "Spec Complete" },
+      { "ID": "NOVA_GT500", "Class": "S", "Category": "Muscle", "Inspiration": "GT500", "Status": "Spec Complete" }
     ]
   },
 

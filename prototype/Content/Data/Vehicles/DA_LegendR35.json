@@ -1,0 +1,286 @@
+{
+  "VehicleID": "LEGEND_R35",
+  "DisplayName": "Legend R35",
+  "Manufacturer": "Legend Motors",
+  "Year": 2020,
+  "Country": "Japan",
+  "Class": "S",
+  "Category": "JDM",
+  "Description": "The Legend R35 is the supercar killer that embarrassed the establishment. Twin-turbo V6 making 565 horsepower through all four wheels with a dual-clutch transmission that shifts faster than thought. The ATTESA system decides exactly how much power goes to each wheel every millisecond. It's a PlayStation controller made real - clinical, surgical, and absolutely devastating on any surface. This is Japan's answer to everything else.",
+
+  "BaseStats": {
+    "Power": 565,
+    "PowerUnit": "HP",
+    "Torque": 467,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3900,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 54,
+    "Drivetrain": "AWD",
+    "EnginePosition": "Front",
+    "Aspiration": "TwinTurbo",
+    "Displacement": 3800,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "V",
+    "Redline": 7000,
+    "IdleRPM": 750,
+    "TopSpeed": 196,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 2.9,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 920,
+    "Class": "S",
+    "MaxPotential": 1100
+  },
+
+  "Engine": {
+    "Code": "VR38DETT",
+    "Type": "V6 Twin Turbo",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 35,
+      "MaxPowerPotential": 2000
+    },
+    "Head": {
+      "Type": "DOHC 24V",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24
+    },
+    "Turbo": {
+      "Type": "IHI Twin",
+      "SpoolRPM": 2500,
+      "MaxBoost": 14.7
+    },
+    "HandBuilt": true,
+    "PlaquedByMaster": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 95, "Torque": 220 },
+      { "RPM": 2000, "HP": 220, "Torque": 380 },
+      { "RPM": 2500, "HP": 320, "Torque": 445 },
+      { "RPM": 3000, "HP": 410, "Torque": 467 },
+      { "RPM": 3500, "HP": 480, "Torque": 465 },
+      { "RPM": 4000, "HP": 530, "Torque": 455 },
+      { "RPM": 4500, "HP": 555, "Torque": 440 },
+      { "RPM": 5000, "HP": 565, "Torque": 420 },
+      { "RPM": 5500, "HP": 560, "Torque": 395 },
+      { "RPM": 6000, "HP": 545, "Torque": 365 },
+      { "RPM": 6500, "HP": 520, "Torque": 335 },
+      { "RPM": 7000, "HP": 490, "Torque": 300 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "DCT",
+    "Gears": 6,
+    "GearRatios": [3.79, 2.32, 1.62, 1.27, 1.00, 0.79],
+    "FinalDrive": 3.70,
+    "ReverseRatio": 3.34,
+    "LaunchControl": true,
+    "ShiftSpeed": 0.15
+  },
+
+  "AWDSystem": {
+    "Type": "ATTESA_E-TS",
+    "FrontTorque_Min": 0,
+    "FrontTorque_Max": 50,
+    "TorqueVectoring": true,
+    "ElectronicCenterDiff": true
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 500,
+    "RearSpringRate": 520,
+    "FrontDamping": 0.78,
+    "RearDamping": 0.80,
+    "FrontAntiRollBar": 34,
+    "RearAntiRollBar": 30,
+    "RideHeight": 4.3,
+    "RideHeightUnit": "inches",
+    "Bilstein_DampTronic": true
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 390,
+    "RearDiameter": 380,
+    "DiameterUnit": "mm",
+    "BrakeBias": 56,
+    "ABSEquipped": true,
+    "Brembo": true,
+    "CarbonCeramic_Available": true
+  },
+
+  "Tires": {
+    "FrontWidth": 255,
+    "FrontAspectRatio": 40,
+    "FrontDiameter": 20,
+    "RearWidth": 285,
+    "RearAspectRatio": 35,
+    "RearDiameter": 20,
+    "Compound": "Sport",
+    "GripMultiplier": 1.15
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.26,
+    "FrontalArea": 2.25,
+    "DownforceMultiplier": 1.35,
+    "HasActiveSpoiler": true,
+    "ActiveAero": true
+  },
+
+  "Dimensions": {
+    "Length": 4710,
+    "Width": 1895,
+    "Height": 1370,
+    "Wheelbase": 2780,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#C0C0C0",
+      "Secondary": "#000000",
+      "Accent": "#CC0000"
+    },
+    "AvailableColors": [
+      { "Name": "Ultimate Metal Silver", "Hex": "#C0C0C0" },
+      { "Name": "Jet Black", "Hex": "#0A0A0A" },
+      { "Name": "Vibrant Red", "Hex": "#CC0000" },
+      { "Name": "Pearl White", "Hex": "#FFFFFF" },
+      { "Name": "Midnight Opal", "Hex": "#1A1A2E" },
+      { "Name": "Bayside Blue", "Hex": "#2E5CA8" },
+      { "Name": "Katsura Orange", "Hex": "#FF6600" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V6_TwinTurbo_VR38",
+    "ExhaustProfile": "JDM_GTR",
+    "TurboWhine": true,
+    "BlowoffValve": true,
+    "BackfireOnShift": true,
+    "LaunchControlCrackle": true,
+    "TitaniumExhaust": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.0,
+    "TurnRadius": 5.7,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.15,
+    "OversteerTendency": 0.35,
+    "DriftCapability": 0.55,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "LaunchControl": true,
+    "ATTESA_ETS": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 150,
+    "PowerBoostUnit": "HP",
+    "Duration": 3.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 4,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 125000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "S",
+    "MaintenanceCostMultiplier": 1.8,
+    "PartsPriceMultiplier": 1.6,
+    "StreetValue": 165000,
+    "LegendaryValue": 350000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "FEARED",
+    "RequiredLevel": 38,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "HKS", "AMS", "Full Race"],
+      "Exhaust": ["Stock", "HKS", "Tomei", "Titanium"],
+      "Turbo": ["Stock", "HKS GT800", "AMS Alpha 9", "Alpha 16"],
+      "Intercooler": ["Stock", "AMS", "ETS"],
+      "ECU": ["Stock", "Cobb", "EcuTek", "Standalone"],
+      "FuelSystem": ["Stock", "ID1050", "E85", "Flex"],
+      "Internals": ["Stock", "Rods", "Full Build", "4.1L Stroker"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock DCT", "Dodson", "ShepTrans"],
+      "Transmission": ["Stock", "Built Trans", "TCM Tune"],
+      "FinalDrive": ["Stock", "3.90", "4.11"],
+      "AWD": ["Stock ATTESA", "Stage 2 ATTESA", "Full Lock Diff"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Ohlins", "KW Clubsport"],
+      "Dampers": ["Stock DampTronic", "Ohlins TTX", "MCS"],
+      "Swaybars": ["Stock", "Whiteline", "Racing"],
+      "Bushings": ["Stock", "Solid", "Spherical"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock", "2-Piece", "Carbon Ceramic"],
+      "Calipers": ["Stock Brembo", "Alcon", "StopTech"]
+    },
+    "Wheels": {
+      "Size": [20],
+      "Width": [9.5, 10.0, 10.5, 11.0, 12.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Cup 2", "Slick", "Drag Radial"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Nismo", "C-West", "Wide"],
+      "RearBumper": ["Stock", "Nismo", "C-West"],
+      "Spoiler": ["Stock", "Nismo", "GT Wing", "Top Secret"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Nismo", "LB Works", "Top Secret"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "LED", "Smoked"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 2000,
+    "MaxTorque": 1200,
+    "MinWeight": 3600,
+    "MaxTopSpeed": 235,
+    "MaxPI": 1100
+  },
+
+  "Tags": ["JDM", "AWD", "TwinTurbo", "GTR", "Supercar", "Alpha", "VR38", "Tech"],
+
+  "Lore": {
+    "Backstory": "The Legend R35 was built to embarrass everything. It arrives at the supercar fight with numbers that shouldn't be possible for its price. The VR38DETT is hand-assembled by a single master craftsman who signs the engine plaque - and responds to tuning like nothing else on four wheels. 1000, 1500, 2000 horsepower - the only limit is courage and wallet. The ATTESA system puts every horsepower where it needs to be. It's not a driver's car - it's a weapon system with a PlayStation controller. Point and shoot.",
+    "FamousOwners": ["Alpha Record Holder", "Time Attack Dominator", "Highway King"],
+    "RivalVehicles": ["911 GT3", "AMG GT", "Supra"]
+  },
+
+  "SpecialFeatures": {
+    "VR38DETT": true,
+    "ATTESA_ETS": true,
+    "HandBuiltEngine": true,
+    "LaunchControl": true,
+    "ActiveAero": true
+  }
+}

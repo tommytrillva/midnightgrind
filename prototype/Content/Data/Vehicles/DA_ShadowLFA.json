@@ -1,0 +1,266 @@
+{
+  "VehicleID": "SHADOW_LFA",
+  "DisplayName": "Shadow LFA",
+  "Manufacturer": "Shadow Motors",
+  "Year": 2012,
+  "Country": "Japan",
+  "Class": "S",
+  "Category": "JDM",
+  "Description": "The Shadow LFA is Japan's supercar masterpiece - a 4.8L V10 that screams to 9000 RPM in a carbon fiber chassis that weighs nothing. It took 10 years to develop because Yamaha had to create an entirely new engine just to achieve this sound. It's not the fastest, not the most powerful, but it might be the most special car ever built. This is pure automotive art.",
+
+  "BaseStats": {
+    "Power": 552,
+    "PowerUnit": "HP",
+    "Torque": 354,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3263,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 48,
+    "Drivetrain": "RWD",
+    "EnginePosition": "FrontMid",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 4800,
+    "DisplacementUnit": "cc",
+    "Cylinders": 10,
+    "Configuration": "V",
+    "Redline": 9000,
+    "IdleRPM": 900,
+    "TopSpeed": 202,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 3.6,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 890,
+    "Class": "S",
+    "MaxPotential": 980
+  },
+
+  "Engine": {
+    "Code": "1LR-GUE",
+    "Type": "V10 NA",
+    "Block": {
+      "Material": "Aluminum",
+      "MaxPowerPotential": 620
+    },
+    "Head": {
+      "Type": "DOHC 40V VVT-i",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 40
+    },
+    "Yamaha_Designed": true,
+    "TitaniumRods": true,
+    "TitaniumValves": true,
+    "DrySum": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 80, "Torque": 180 },
+      { "RPM": 2000, "HP": 160, "Torque": 260 },
+      { "RPM": 3000, "HP": 250, "Torque": 310 },
+      { "RPM": 4000, "HP": 340, "Torque": 340 },
+      { "RPM": 5000, "HP": 420, "Torque": 350 },
+      { "RPM": 6000, "HP": 490, "Torque": 354 },
+      { "RPM": 6500, "HP": 520, "Torque": 352 },
+      { "RPM": 7000, "HP": 540, "Torque": 345 },
+      { "RPM": 7500, "HP": 550, "Torque": 335 },
+      { "RPM": 8000, "HP": 552, "Torque": 318 },
+      { "RPM": 8500, "HP": 545, "Torque": 295 },
+      { "RPM": 9000, "HP": 530, "Torque": 270 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "ASG",
+    "Gears": 6,
+    "GearRatios": [3.23, 2.19, 1.63, 1.28, 1.03, 0.82],
+    "FinalDrive": 3.42,
+    "ReverseRatio": 2.97,
+    "PaddleShift": true,
+    "AutoBlip": true,
+    "ShiftSpeed": 0.2
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 430,
+    "RearSpringRate": 450,
+    "FrontDamping": 0.72,
+    "RearDamping": 0.74,
+    "FrontAntiRollBar": 30,
+    "RearAntiRollBar": 28,
+    "RideHeight": 4.2,
+    "RideHeightUnit": "inches",
+    "ElectronicDamping": true
+  },
+
+  "Brakes": {
+    "FrontType": "Carbon Ceramic",
+    "RearType": "Carbon Ceramic",
+    "FrontDiameter": 390,
+    "RearDiameter": 360,
+    "DiameterUnit": "mm",
+    "BrakeBias": 56,
+    "ABSEquipped": true,
+    "Brembo": true
+  },
+
+  "Tires": {
+    "FrontWidth": 265,
+    "FrontAspectRatio": 35,
+    "FrontDiameter": 20,
+    "RearWidth": 305,
+    "RearAspectRatio": 30,
+    "RearDiameter": 20,
+    "Compound": "Sport",
+    "GripMultiplier": 1.18
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.31,
+    "FrontalArea": 2.0,
+    "DownforceMultiplier": 1.25,
+    "HasActiveSpoiler": true,
+    "ActiveRearWing": true
+  },
+
+  "Dimensions": {
+    "Length": 4505,
+    "Width": 1895,
+    "Height": 1220,
+    "Wheelbase": 2605,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#FFFFFF",
+      "Secondary": "#000000",
+      "Accent": "#FFD700"
+    },
+    "AvailableColors": [
+      { "Name": "Pearl White", "Hex": "#FFFFFF" },
+      { "Name": "Obsidian Black", "Hex": "#0A0A0A" },
+      { "Name": "Mars Orange", "Hex": "#FF6600" },
+      { "Name": "Pearl Yellow", "Hex": "#FFD700" },
+      { "Name": "Blue Crystal", "Hex": "#003366" },
+      { "Name": "Red Mica", "Hex": "#8B0000" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V10_NA_F1_Scream",
+    "ExhaustProfile": "JDM_Supercar_NA",
+    "NaturallyAspiratedWail": true,
+    "F1_Howl": true,
+    "BackfireOnShift": true,
+    "Yamaha_Tuned": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 13.5,
+    "TurnRadius": 5.4,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.18,
+    "OversteerTendency": 0.55,
+    "DriftCapability": 0.68,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "CarbonChassis": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 130,
+    "PowerBoostUnit": "HP",
+    "Duration": 3.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 4,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 400000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "S",
+    "MaintenanceCostMultiplier": 3.0,
+    "PartsPriceMultiplier": 2.5,
+    "StreetValue": 550000,
+    "LegendaryValue": 1200000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "LEGEND",
+    "RequiredLevel": 45,
+    "SpecialConditions": ["Must own 10 vehicles"]
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Performance Filter", "Full Race"],
+      "Exhaust": ["Stock", "Titanium", "Race Exhaust"],
+      "ECU": ["Stock", "Stage 1", "Stage 2"],
+      "Internals": ["Stock", "Balanced", "Full Build"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing"],
+      "Transmission": ["Stock ASG", "Built Trans"],
+      "FinalDrive": ["Stock", "3.55", "3.73"],
+      "LSD": ["Stock Torsen", "Cusco 2Way"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Track", "Race"],
+      "Dampers": ["Stock Electronic", "Ohlins", "MCS"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Solid", "Spherical"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock Carbon Ceramic"],
+      "Calipers": ["Stock Brembo"]
+    },
+    "Wheels": {
+      "Size": [20],
+      "Width": [9.5, 10.0, 10.5, 11.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Cup 2", "Slick"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Nurburgring Package"],
+      "Spoiler": ["Stock", "Fixed High", "Nurburgring"],
+      "Hood": ["Stock", "Vented"]
+    },
+    "Body": {
+      "WeightReduction": ["Stock", "Interior Strip", "Race Spec"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 620,
+    "MaxTorque": 400,
+    "MinWeight": 3000,
+    "MaxTopSpeed": 212,
+    "MaxPI": 980
+  },
+
+  "Tags": ["JDM", "RWD", "NA", "V10", "Supercar", "LFA", "Rare", "Collector"],
+
+  "Lore": {
+    "Backstory": "The Shadow LFA is the car that shouldn't exist. Ten years of development. A partnership with Yamaha to design an engine worthy of the vision. Carbon fiber body that weighs less than aluminum. An instrument cluster that moves with the tachometer because no LCD could keep up with that 9000 RPM redline. It costs half a million dollars and makes less power than cars that cost a quarter of that. None of that matters when you hear it. The 1LR-GUE howls like an F1 car, screaming through ten individual throttle bodies with Yamaha's acoustic engineering making it sing. Only 500 were ever made. This isn't transportation - it's art.",
+    "FamousOwners": ["The Collector", "Nurburgring Record Holder", "Automotive Poet"],
+    "RivalVehicles": ["Ferrari 458", "GT3 RS", "Aventador"]
+  },
+
+  "SpecialFeatures": {
+    "V10_9000RPM": true,
+    "Yamaha_Engine": true,
+    "CarbonFiberChassis": true,
+    "CarbonCeramicBrakes": true,
+    "MovingInstrumentCluster": true,
+    "Only500Made": true
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "VehicleID": "FLASH_AMG",
+  "DisplayName": "Flash AMG GT Black Series",
+  "Manufacturer": "Flash Motors",
+  "Year": 2021,
+  "Country": "Germany",
+  "Class": "S",
+  "Category": "Euro",
+  "Description": "The Flash AMG GT Black Series is what happens when Mercedes-AMG removes all pretense of civility. That hand-built 4.0L twin-turbo V8 makes 720 horsepower with a flat-plane crank that makes it scream like an Italian. The bodywork is pure function - every vent, scoop, and wing exists only to generate speed. It's brutal, uncompromising, and absolutely devastating. This is German muscle at its most extreme.",
+
+  "BaseStats": {
+    "Power": 720,
+    "PowerUnit": "HP",
+    "Torque": 590,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3461,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 48,
+    "Drivetrain": "RWD",
+    "EnginePosition": "FrontMid",
+    "Aspiration": "TwinTurbo",
+    "Displacement": 4000,
+    "DisplacementUnit": "cc",
+    "Cylinders": 8,
+    "Configuration": "V",
+    "Redline": 7200,
+    "IdleRPM": 850,
+    "TopSpeed": 202,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 3.1,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 950,
+    "Class": "S",
+    "MaxPotential": 1050
+  },
+
+  "Engine": {
+    "Code": "M178_LS2",
+    "Type": "V8 Twin Turbo",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 28,
+      "MaxPowerPotential": 950
+    },
+    "Head": {
+      "Type": "DOHC 32V",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 32
+    },
+    "Turbo": {
+      "Type": "Twin Turbo",
+      "SpoolRPM": 2200,
+      "MaxBoost": 22
+    },
+    "FlatPlaneCrank": true,
+    "HandBuilt": true,
+    "OneManOneEngine": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 120, "Torque": 280 },
+      { "RPM": 2000, "HP": 280, "Torque": 480 },
+      { "RPM": 2500, "HP": 400, "Torque": 565 },
+      { "RPM": 3000, "HP": 520, "Torque": 590 },
+      { "RPM": 3500, "HP": 600, "Torque": 585 },
+      { "RPM": 4000, "HP": 660, "Torque": 570 },
+      { "RPM": 4500, "HP": 700, "Torque": 550 },
+      { "RPM": 5000, "HP": 720, "Torque": 525 },
+      { "RPM": 5500, "HP": 715, "Torque": 495 },
+      { "RPM": 6000, "HP": 700, "Torque": 460 },
+      { "RPM": 6500, "HP": 675, "Torque": 420 },
+      { "RPM": 7200, "HP": 640, "Torque": 380 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "DCT",
+    "Gears": 7,
+    "GearRatios": [4.38, 2.86, 2.00, 1.52, 1.19, 0.95, 0.78],
+    "FinalDrive": 3.55,
+    "ReverseRatio": 3.18,
+    "LaunchControl": true,
+    "RaceStart": true
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 520,
+    "RearSpringRate": 560,
+    "FrontDamping": 0.82,
+    "RearDamping": 0.85,
+    "FrontAntiRollBar": 35,
+    "RearAntiRollBar": 32,
+    "RideHeight": 3.7,
+    "RideHeightUnit": "inches",
+    "RaceOptimized": true
+  },
+
+  "Brakes": {
+    "FrontType": "Carbon Ceramic",
+    "RearType": "Carbon Ceramic",
+    "FrontDiameter": 402,
+    "RearDiameter": 360,
+    "DiameterUnit": "mm",
+    "BrakeBias": 55,
+    "ABSEquipped": true,
+    "AMG_Racing": true
+  },
+
+  "Tires": {
+    "FrontWidth": 285,
+    "FrontAspectRatio": 35,
+    "FrontDiameter": 19,
+    "RearWidth": 335,
+    "RearAspectRatio": 30,
+    "RearDiameter": 20,
+    "Compound": "Sport",
+    "GripMultiplier": 1.22
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.36,
+    "FrontalArea": 2.1,
+    "DownforceMultiplier": 1.8,
+    "HasActiveSpoiler": false,
+    "MassiveRearWing": true,
+    "DownforceKG": 400
+  },
+
+  "Dimensions": {
+    "Length": 4577,
+    "Width": 2058,
+    "Height": 1262,
+    "Wheelbase": 2630,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#0A0A0A",
+      "Secondary": "#FF6600",
+      "Accent": "#FFFFFF"
+    },
+    "AvailableColors": [
+      { "Name": "Obsidian Black", "Hex": "#0A0A0A" },
+      { "Name": "AMG Solarbeam", "Hex": "#FFD700" },
+      { "Name": "Brilliant Blue", "Hex": "#003366" },
+      { "Name": "Designo Diamond White", "Hex": "#FFFFFF" },
+      { "Name": "Magma Beam Orange", "Hex": "#FF6600" },
+      { "Name": "AMG Green Hell Magno", "Hex": "#228B22" },
+      { "Name": "China Grey", "Hex": "#808080" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V8_TwinTurbo_FlatPlane",
+    "ExhaustProfile": "Euro_AMG_BlackSeries",
+    "FlatPlaneCrankle": true,
+    "TurboWhine": true,
+    "BackfireOnShift": true,
+    "LaunchControlCrackle": true,
+    "TitaniumExhaust": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 14.0,
+    "TurnRadius": 5.6,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.15,
+    "OversteerTendency": 0.58,
+    "DriftCapability": 0.72,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "LaunchControl": true,
+    "NineModeTraction": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 180,
+    "PowerBoostUnit": "HP",
+    "Duration": 2.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 4,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 335000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "S",
+    "MaintenanceCostMultiplier": 2.5,
+    "PartsPriceMultiplier": 2.2,
+    "StreetValue": 425000,
+    "LegendaryValue": 800000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "FEARED",
+    "RequiredLevel": 42,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Weistec", "Full Race"],
+      "Exhaust": ["Stock", "Weistec", "IPE", "Race"],
+      "Turbo": ["Stock", "Weistec Stage 1", "Weistec Stage 2"],
+      "Intercooler": ["Stock", "Upgraded", "Race"],
+      "ECU": ["Stock", "Weistec", "RENNtech", "Standalone"],
+      "Internals": ["Stock", "Rods", "Full Build"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock DCT", "Racing Clutch Pack"],
+      "Transmission": ["Stock", "Built Trans"],
+      "FinalDrive": ["Stock", "3.73", "3.91"],
+      "LSD": ["Stock eLSD", "Performance"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "KW", "Ohlins"],
+      "Dampers": ["Stock", "KW Clubsport", "MCS"],
+      "Swaybars": ["Stock", "Racing"],
+      "Bushings": ["Stock", "Solid", "Spherical"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock Carbon Ceramic"],
+      "Calipers": ["Stock AMG"]
+    },
+    "Wheels": {
+      "Size": [19, 20],
+      "Width": [10.0, 10.5, 11.0, 12.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Cup 2", "Slick"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "GT3"],
+      "Spoiler": ["Stock Massive Wing", "Adjustable", "GT3 Wing"],
+      "Hood": ["Stock", "Vented"]
+    },
+    "Body": {
+      "WeightReduction": ["Stock", "Interior Delete", "Race Spec"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 950,
+    "MaxTorque": 750,
+    "MinWeight": 3200,
+    "MaxTopSpeed": 218,
+    "MaxPI": 1050
+  },
+
+  "Tags": ["Euro", "RWD", "TwinTurbo", "V8", "AMG", "BlackSeries", "FlatPlane", "Track"],
+
+  "Lore": {
+    "Backstory": "The Flash AMG GT Black Series is Mercedes-AMG at their most unhinged. They took the already extreme AMG GT and turned everything to 11. The hand-built 4.0L twin-turbo V8 now features a flat-plane crankshaft, making it rev higher and scream louder than any Mercedes has a right to. 720 horsepower through the rear wheels alone. That massive wing generates 400kg of downforce at speed. The wide body exists purely to accommodate the massive tires needed to put all that power down. It set the production car lap record at the Nurburgring because of course it did. This isn't a road car with track potential - it's a GT3 race car with license plates.",
+    "FamousOwners": ["Nurburgring Record Holder", "Track Day Monster", "The Brute"],
+    "RivalVehicles": ["911 GT3 RS", "R35 GT-R", "720S"]
+  },
+
+  "SpecialFeatures": {
+    "FlatPlaneCrank": true,
+    "HandBuiltEngine": true,
+    "CarbonCeramicBrakes": true,
+    "400KG_Downforce": true,
+    "NineModeTraction": true
+  }
+}

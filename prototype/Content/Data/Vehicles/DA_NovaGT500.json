@@ -1,0 +1,278 @@
+{
+  "VehicleID": "NOVA_GT500",
+  "DisplayName": "Nova GT500",
+  "Manufacturer": "Nova Motors",
+  "Year": 2022,
+  "Country": "USA",
+  "Class": "S",
+  "Category": "Muscle",
+  "Description": "The Nova GT500 is American muscle's final form. That hand-built 5.2L supercharged V8 makes 760 horsepower - the most powerful production Mustang ever made. The carbon fiber track pack adds serious downforce. The MagneRide suspension adapts in real-time. It'll embarrass supercars costing twice as much, then rumble home with that classic V8 burble. This is Detroit's answer to everything.",
+
+  "BaseStats": {
+    "Power": 760,
+    "PowerUnit": "HP",
+    "Torque": 625,
+    "TorqueUnit": "lb-ft",
+    "Weight": 4171,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 55,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "Supercharged",
+    "Displacement": 5200,
+    "DisplacementUnit": "cc",
+    "Cylinders": 8,
+    "Configuration": "V",
+    "Redline": 7500,
+    "IdleRPM": 700,
+    "TopSpeed": 180,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 3.3,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 920,
+    "Class": "S",
+    "MaxPotential": 1080
+  },
+
+  "Engine": {
+    "Code": "Predator_5.2SC",
+    "Type": "V8 Supercharged",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 18,
+      "MaxPowerPotential": 1200
+    },
+    "Head": {
+      "Type": "DOHC 32V",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 32
+    },
+    "Supercharger": {
+      "Type": "Eaton Roots 2.65L",
+      "MaxBoost": 12
+    },
+    "CrossPlaneCrank": true,
+    "HandBuilt": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 130, "Torque": 350 },
+      { "RPM": 2000, "HP": 320, "Torque": 540 },
+      { "RPM": 2500, "HP": 450, "Torque": 605 },
+      { "RPM": 3000, "HP": 550, "Torque": 625 },
+      { "RPM": 3500, "HP": 630, "Torque": 620 },
+      { "RPM": 4000, "HP": 700, "Torque": 605 },
+      { "RPM": 4500, "HP": 745, "Torque": 585 },
+      { "RPM": 5000, "HP": 760, "Torque": 560 },
+      { "RPM": 5500, "HP": 755, "Torque": 525 },
+      { "RPM": 6000, "HP": 735, "Torque": 485 },
+      { "RPM": 6500, "HP": 700, "Torque": 440 },
+      { "RPM": 7500, "HP": 650, "Torque": 380 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "DCT",
+    "Gears": 7,
+    "GearRatios": [4.17, 2.71, 1.88, 1.39, 1.00, 0.74, 0.63],
+    "FinalDrive": 3.73,
+    "ReverseRatio": 3.68,
+    "LaunchControl": true,
+    "LineLock": true
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "Integral Link",
+    "FrontSpringRate": 480,
+    "RearSpringRate": 520,
+    "FrontDamping": 0.78,
+    "RearDamping": 0.80,
+    "FrontAntiRollBar": 34,
+    "RearAntiRollBar": 30,
+    "RideHeight": 4.4,
+    "RideHeightUnit": "inches",
+    "MagneRide": true
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 420,
+    "RearDiameter": 381,
+    "DiameterUnit": "mm",
+    "BrakeBias": 58,
+    "ABSEquipped": true,
+    "Brembo_6Piston": true,
+    "CarbonCeramic_Available": true
+  },
+
+  "Tires": {
+    "FrontWidth": 305,
+    "FrontAspectRatio": 30,
+    "FrontDiameter": 20,
+    "RearWidth": 315,
+    "RearAspectRatio": 30,
+    "RearDiameter": 20,
+    "Compound": "Sport",
+    "GripMultiplier": 1.12
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.33,
+    "FrontalArea": 2.35,
+    "DownforceMultiplier": 1.4,
+    "HasActiveSpoiler": false,
+    "CarbonFiberTrackPack": true
+  },
+
+  "Dimensions": {
+    "Length": 4840,
+    "Width": 1970,
+    "Height": 1384,
+    "Wheelbase": 2720,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#00BFFF",
+      "Secondary": "#FFFFFF",
+      "Accent": "#000000"
+    },
+    "AvailableColors": [
+      { "Name": "Grabber Blue", "Hex": "#00BFFF" },
+      { "Name": "Rapid Red", "Hex": "#8B0000" },
+      { "Name": "Oxford White", "Hex": "#FFFFFF" },
+      { "Name": "Shadow Black", "Hex": "#0A0A0A" },
+      { "Name": "Antimatter Blue", "Hex": "#003366" },
+      { "Name": "Twister Orange", "Hex": "#FF6600" },
+      { "Name": "Iconic Silver", "Hex": "#C0C0C0" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V8_Supercharged_Predator",
+    "ExhaustProfile": "American_TrackPack",
+    "SuperchargerWhine": true,
+    "BackfireOnShift": true,
+    "Burble": true,
+    "ActiveExhaust": true,
+    "QuietMode": true,
+    "TrackMode": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.5,
+    "TurnRadius": 6.0,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.22,
+    "OversteerTendency": 0.55,
+    "DriftCapability": 0.78,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "LaunchControl": true,
+    "LineLock": true,
+    "DriftMode": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 190,
+    "PowerBoostUnit": "HP",
+    "Duration": 2.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 4,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 80000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "S",
+    "MaintenanceCostMultiplier": 1.5,
+    "PartsPriceMultiplier": 1.3,
+    "StreetValue": 105000,
+    "LegendaryValue": 250000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "FEARED",
+    "RequiredLevel": 35,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "JLT", "VMP", "Full Race"],
+      "Exhaust": ["Stock", "Borla", "Corsa", "Long Tube Headers"],
+      "Supercharger": ["Stock 2.65L", "VMP 3.0L", "Whipple 3.8L"],
+      "Intercooler": ["Stock", "Double HX", "VMP"],
+      "ECU": ["Stock", "Lund", "Palm Beach Dyno", "Standalone"],
+      "Internals": ["Stock", "Rods", "Forged", "Full Build"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock DCT", "Racing Clutch Pack"],
+      "Transmission": ["Stock Tremec 7DCL", "Built Trans"],
+      "FinalDrive": ["Stock", "3.91", "4.09"],
+      "LSD": ["Stock Torsen", "Wavetrac", "OS Giken"]
+    },
+    "Suspension": {
+      "Springs": ["Stock MagRide", "Ford Performance", "Ohlins"],
+      "Dampers": ["Stock MagRide", "KW", "MCS"],
+      "Swaybars": ["Stock", "Ford Performance", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock", "2-Piece", "Carbon Ceramic"],
+      "Calipers": ["Stock Brembo 6P", "StopTech"]
+    },
+    "Wheels": {
+      "Size": [20],
+      "Width": [10.5, 11.0, 11.5, 12.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Cup 2", "Slick", "Drag Radial"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "GT500KR", "Wide"],
+      "RearBumper": ["Stock"],
+      "Spoiler": ["Stock", "Carbon Track Pack", "GT Wing"],
+      "Hood": ["Stock", "Carbon", "Vented Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock"],
+      "WeightReduction": ["Stock", "Carbon Panels", "Race Spec"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 1200,
+    "MaxTorque": 950,
+    "MinWeight": 3800,
+    "MaxTopSpeed": 215,
+    "MaxPI": 1080
+  },
+
+  "Tags": ["American", "RWD", "Supercharged", "V8", "GT500", "Mustang", "Muscle", "Track"],
+
+  "Lore": {
+    "Backstory": "The Nova GT500 is Ford's statement that American muscle isn't dead - it's just getting started. The hand-built 5.2L Predator V8 uses a 2.65L Eaton supercharger to produce 760 horsepower - making it the most powerful Mustang ever produced. The DCT transmission shifts in 80 milliseconds. The carbon fiber track pack adds a massive front splitter and rear wing for serious downforce. MagneRide dampers adjust 1000 times per second. But it's still a Mustang - it rumbles at idle, it burnouts on command, and it'll put a smile on your face every single time. This is American muscle refined into a precision weapon.",
+    "FamousOwners": ["Drag Strip Dominator", "Track Day American", "The Patriot"],
+    "RivalVehicles": ["Challenger Hellcat Redeye", "Camaro ZL1 1LE", "Corvette Z06"]
+  },
+
+  "SpecialFeatures": {
+    "Predator_Engine": true,
+    "HandBuilt": true,
+    "MagneRide": true,
+    "CarbonTrackPack": true,
+    "LineLock": true,
+    "DriftMode": true
+  }
+}
