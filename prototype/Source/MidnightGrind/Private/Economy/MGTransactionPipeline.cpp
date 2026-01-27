@@ -208,10 +208,42 @@ EMGTransactionResult UMGTransactionPipeline::SellVehicle(FName VehicleID, int64 
 int64 UMGTransactionPipeline::GetSaleValue(EMGTransactionItemType ItemType, FName ItemID) const
 {
 	// Sale value is typically 50-60% of purchase price
-	// Would look up base value from data table
+	const float SaleMultiplier = 0.55f;
 
-	// Placeholder
-	return 5000; // Base sale value
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		switch (ItemType)
+		{
+		case EMGTransactionItemType::Vehicle:
+			if (UMGVehicleCatalogSubsystem* VehicleCatalog = GI->GetSubsystem<UMGVehicleCatalogSubsystem>())
+			{
+				FMGVehiclePricingInfo Pricing = VehicleCatalog->GetVehiclePricing(ItemID);
+				if (Pricing.BasePrice > 0)
+				{
+					return static_cast<int64>(Pricing.StreetValue * SaleMultiplier);
+				}
+			}
+			break;
+
+		case EMGTransactionItemType::Part:
+			if (UMGPartsCatalogSubsystem* PartsCatalog = GI->GetSubsystem<UMGPartsCatalogSubsystem>())
+			{
+				int32 BasePrice = PartsCatalog->GetPartBasePrice(ItemID);
+				if (BasePrice > 0)
+				{
+					return static_cast<int64>(BasePrice * SaleMultiplier);
+				}
+			}
+			break;
+
+		default:
+			// For other item types, use a default value
+			break;
+		}
+	}
+
+	// Fallback: default sale value
+	return 5000;
 }
 
 // ==========================================
@@ -484,18 +516,56 @@ bool UMGTransactionPipeline::DeductCredits(int64 Amount)
 {
 	if (EconomySubsystem.IsValid())
 	{
-		// return EconomySubsystem->DeductCredits(Amount);
+		return EconomySubsystem->SpendCredits(
+			Amount,
+			EMGTransactionType::ShopPurchase,
+			NSLOCTEXT("MG", "PurchaseDeduction", "Purchase"),
+			NAME_None
+		);
 	}
 
-	// Placeholder - assume success
-	return true;
+	// Fallback: check credits manually if possible
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGEconomySubsystem* Economy = GI->GetSubsystem<UMGEconomySubsystem>())
+		{
+			return Economy->SpendCredits(
+				Amount,
+				EMGTransactionType::ShopPurchase,
+				NSLOCTEXT("MG", "PurchaseDeduction", "Purchase"),
+				NAME_None
+			);
+		}
+	}
+
+	return false;
 }
 
 void UMGTransactionPipeline::AddCredits(int64 Amount)
 {
 	if (EconomySubsystem.IsValid())
 	{
-		// EconomySubsystem->AddCredits(Amount);
+		EconomySubsystem->AddCredits(
+			Amount,
+			EMGTransactionType::RaceReward,
+			NSLOCTEXT("MG", "CreditsReceived", "Credits received"),
+			NAME_None
+		);
+		return;
+	}
+
+	// Fallback
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGEconomySubsystem* Economy = GI->GetSubsystem<UMGEconomySubsystem>())
+		{
+			Economy->AddCredits(
+				Amount,
+				EMGTransactionType::RaceReward,
+				NSLOCTEXT("MG", "CreditsReceived", "Credits received"),
+				NAME_None
+			);
+		}
 	}
 }
 

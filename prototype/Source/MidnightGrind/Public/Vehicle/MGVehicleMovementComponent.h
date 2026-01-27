@@ -1067,24 +1067,33 @@ struct FMGWeightTransfer
 
 	/**
 	 * @brief Get weight multiplier for specific wheel
+	 *
+	 * Calculates dynamic wheel load based on weight transfer state.
+	 * See MGPhysicsConstants.h for detailed documentation of the physics constants.
+	 *
 	 * @param WheelIndex Wheel index (0=FL, 1=FR, 2=RL, 3=RR)
-	 * @return Load multiplier for the specified wheel
+	 * @return Load multiplier for the specified wheel (typically 0.3 to 1.8)
 	 */
 	float GetWheelLoadMultiplier(int32 WheelIndex) const
 	{
+		using namespace MGPhysicsConstants::WeightTransfer;
+
 		float BaseLoad = 1.0f;
-		bool bFront = WheelIndex < 2;
-		bool bRight = (WheelIndex == 1 || WheelIndex == 3);
+		const bool bFront = WheelIndex < 2;
+		const bool bRight = (WheelIndex == 1 || WheelIndex == 3);
 
-		// Longitudinal transfer
-		if (bFront) BaseLoad += LongitudinalTransfer * 0.15f;
-		else BaseLoad -= LongitudinalTransfer * 0.15f;
+		// Longitudinal transfer (front-rear)
+		// Under braking: front wheels gain load, rear wheels lose load
+		// Under acceleration: rear wheels gain load, front wheels lose load
+		if (bFront) BaseLoad += LongitudinalTransfer * LONGITUDINAL_RATIO;
+		else BaseLoad -= LongitudinalTransfer * LONGITUDINAL_RATIO;
 
-		// Lateral transfer
-		if (bRight) BaseLoad += LateralTransfer * 0.12f;
-		else BaseLoad -= LateralTransfer * 0.12f;
+		// Lateral transfer (left-right)
+		// In right turn: left wheels gain load, right wheels lose load
+		if (bRight) BaseLoad += LateralTransfer * LATERAL_RATIO;
+		else BaseLoad -= LateralTransfer * LATERAL_RATIO;
 
-		return FMath::Clamp(BaseLoad, 0.3f, 1.8f);
+		return FMath::Clamp(BaseLoad, LOAD_MIN, LOAD_MAX);
 	}
 };
 

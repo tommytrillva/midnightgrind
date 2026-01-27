@@ -1227,3 +1227,83 @@ void AMGPlayerController::OnRoadblockEvaded(const FString& PlayerId, const FStri
 		}
 	}
 }
+
+void AMGPlayerController::OnSpeedtrapRecorded(const FString& SpeedtrapId, float RecordedValue, EMGSpeedtrapRating Rating)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			// Format speed (assume KPH)
+			int32 SpeedInt = FMath::RoundToInt(RecordedValue);
+
+			FString RatingStr;
+			FLinearColor RatingColor;
+
+			switch (Rating)
+			{
+				case EMGSpeedtrapRating::Bronze:
+					RatingStr = TEXT("BRONZE");
+					RatingColor = FLinearColor(0.8f, 0.5f, 0.2f, 1.0f);
+					break;
+				case EMGSpeedtrapRating::Silver:
+					RatingStr = TEXT("SILVER");
+					RatingColor = FLinearColor(0.75f, 0.75f, 0.75f, 1.0f);
+					break;
+				case EMGSpeedtrapRating::Gold:
+					RatingStr = TEXT("GOLD");
+					RatingColor = FLinearColor(1.0f, 0.85f, 0.0f, 1.0f);
+					break;
+				case EMGSpeedtrapRating::Platinum:
+					RatingStr = TEXT("PLATINUM");
+					RatingColor = FLinearColor(0.9f, 0.95f, 1.0f, 1.0f);
+					break;
+				default:
+					RatingStr = TEXT("");
+					RatingColor = FLinearColor::White;
+					break;
+			}
+
+			FText SpeedMessage;
+			if (!RatingStr.IsEmpty())
+			{
+				SpeedMessage = FText::FromString(FString::Printf(TEXT("SPEED: %d KPH - %s"), SpeedInt, *RatingStr));
+			}
+			else
+			{
+				SpeedMessage = FText::FromString(FString::Printf(TEXT("SPEED: %d KPH"), SpeedInt));
+			}
+
+			HUDSubsystem->ShowNotification(SpeedMessage, 3.0f, RatingColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSpeedtrapNewPersonalBest(const FString& SpeedtrapId, float OldBest, float NewBest)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			int32 NewBestInt = FMath::RoundToInt(NewBest);
+			int32 ImprovementInt = FMath::RoundToInt(NewBest - OldBest);
+
+			FText PBMessage = FText::FromString(FString::Printf(TEXT("NEW PERSONAL BEST! %d KPH (+%d)"), NewBestInt, ImprovementInt));
+			FLinearColor PBColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green
+			HUDSubsystem->ShowNotification(PBMessage, 4.0f, PBColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSpeedtrapDiscovered(const FString& SpeedtrapId, int32 TotalDiscovered)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText DiscoveredMessage = FText::FromString(FString::Printf(TEXT("SPEEDTRAP DISCOVERED! (%d found)"), TotalDiscovered));
+			FLinearColor DiscoveredColor = FLinearColor(0.5f, 0.8f, 1.0f, 1.0f); // Light blue
+			HUDSubsystem->ShowNotification(DiscoveredMessage, 3.0f, DiscoveredColor);
+		}
+	}
+}

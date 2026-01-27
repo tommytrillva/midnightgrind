@@ -303,7 +303,10 @@ void UMGVehicleVFXComponent::TriggerBackfire()
 	// Notify VFX subsystem
 	if (UMGVFXSubsystem* VFXSub = GetVFXSubsystem())
 	{
-		VFXSub->TriggerVFXEvent(EMGVFXEvent::ExhaustBackfire, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation(), GetOwner());
+		if (AActor* Owner = GetOwner())
+		{
+			VFXSub->TriggerVFXEvent(EMGVFXEvent::ExhaustBackfire, Owner->GetActorLocation(), Owner->GetActorRotation(), Owner);
+		}
 	}
 }
 
@@ -351,7 +354,10 @@ void UMGVehicleVFXComponent::ActivateNOS()
 	// Notify VFX subsystem for screen effects
 	if (UMGVFXSubsystem* VFXSub = GetVFXSubsystem())
 	{
-		VFXSub->TriggerVFXEvent(EMGVFXEvent::NOSActivate, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation(), GetOwner());
+		if (AActor* Owner = GetOwner())
+		{
+			VFXSub->TriggerVFXEvent(EMGVFXEvent::NOSActivate, Owner->GetActorLocation(), Owner->GetActorRotation(), Owner);
+		}
 	}
 }
 
@@ -388,7 +394,10 @@ void UMGVehicleVFXComponent::DeactivateNOS()
 	// Notify VFX subsystem
 	if (UMGVFXSubsystem* VFXSub = GetVFXSubsystem())
 	{
-		VFXSub->TriggerVFXEvent(EMGVFXEvent::NOSDeactivate, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation(), GetOwner());
+		if (AActor* Owner = GetOwner())
+		{
+			VFXSub->TriggerVFXEvent(EMGVFXEvent::NOSDeactivate, Owner->GetActorLocation(), Owner->GetActorRotation(), Owner);
+		}
 	}
 }
 

@@ -3204,16 +3204,22 @@ void UMGVehicleMovementComponent::ApplyWindForce(const FVector& WindForce)
 {
 	PendingWindForce = WindForce;
 
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return;
+	}
+
 	// Apply wind force to the vehicle mesh
 	if (UPrimitiveComponent* Mesh = Cast<UPrimitiveComponent>(UpdatedComponent))
 	{
 		// Apply at center of pressure (slightly above center of mass for realistic behavior)
-		const FVector ForceLocation = GetOwner()->GetActorLocation() + FVector(0, 0, 50.0f);
+		const FVector ForceLocation = Owner->GetActorLocation() + FVector(0, 0, 50.0f);
 		Mesh->AddForceAtLocation(WindForce, ForceLocation);
 
 		// Add slight torque for realistic yaw response to crosswind
-		const FVector ForwardDir = GetOwner()->GetActorForwardVector();
-		const FVector RightDir = GetOwner()->GetActorRightVector();
+		const FVector ForwardDir = Owner->GetActorForwardVector();
+		const FVector RightDir = Owner->GetActorRightVector();
 		const float CrosswindComponent = FVector::DotProduct(WindForce.GetSafeNormal(), RightDir);
 
 		// Yaw torque - wind pushes the tail
@@ -3355,9 +3361,14 @@ void UMGVehicleMovementComponent::InitializeTirePressures()
 
 void UMGVehicleMovementComponent::UpdateSuspensionGeometry(float DeltaTime)
 {
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return;
+	}
 	// Calculate current body roll angle from lateral acceleration
-	const FVector Velocity = GetOwner()->GetVelocity();
-	const FVector RightVector = GetOwner()->GetActorRightVector();
+	const FVector Velocity = Owner->GetVelocity();
+	const FVector RightVector = Owner->GetActorRightVector();
 	const float LateralVelocity = FVector::DotProduct(Velocity, RightVector);
 
 	// Estimate lateral acceleration from velocity change (simplified)
