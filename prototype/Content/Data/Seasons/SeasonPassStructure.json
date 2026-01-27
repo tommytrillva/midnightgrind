@@ -1,0 +1,242 @@
+{
+  "Version": "1.0",
+
+  "SeasonConfig": {
+    "SeasonDuration": 90,
+    "DurationUnit": "days",
+    "MaxTier": 100,
+    "FreeTrackTiers": 100,
+    "PremiumTrackTiers": 100,
+    "XPPerTier": 10000,
+    "BonusXPWeekend": 0.25
+  },
+
+  "CurrentSeason": {
+    "ID": "SEASON_01",
+    "Name": "Midnight Origins",
+    "Theme": "Classic JDM",
+    "Description": "The streets come alive. Celebrate the golden era of Japanese tuner culture.",
+    "StartDate": "2026-03-01",
+    "EndDate": "2026-05-30",
+    "KeyArt": "Season01_KeyArt",
+    "FeaturedVehicle": "SAKURA_GTR"
+  },
+
+  "XPSources": {
+    "Race": {
+      "Complete": 100,
+      "Win": 250,
+      "Podium": 150,
+      "BonusPerOpponent": 25
+    },
+    "Drift": {
+      "Per1000Points": 50,
+      "SSSGrade": 500,
+      "TandemBonus": 200
+    },
+    "Challenge": {
+      "Daily": 300,
+      "Weekly": 1500,
+      "Seasonal": 5000
+    },
+    "Other": {
+      "PursuitEscape": 200,
+      "PinkSlipWin": 1000,
+      "TerritoryCapture": 750,
+      "FirstPlayOfDay": 500
+    }
+  },
+
+  "RewardTracks": {
+    "FreeTier": [
+      { "Tier": 1, "Reward": { "Type": "Cash", "Amount": 5000 } },
+      { "Tier": 2, "Reward": { "Type": "REP", "Amount": 100 } },
+      { "Tier": 3, "Reward": { "Type": "Part", "ID": "EXHAUST_SPORT", "Vehicle": "Universal" } },
+      { "Tier": 4, "Reward": { "Type": "Cash", "Amount": 5000 } },
+      { "Tier": 5, "Reward": { "Type": "Decal", "ID": "DECAL_SEASON01_FREE_01" } },
+      { "Tier": 6, "Reward": { "Type": "Cash", "Amount": 7500 } },
+      { "Tier": 7, "Reward": { "Type": "REP", "Amount": 150 } },
+      { "Tier": 8, "Reward": { "Type": "Nitrous", "Amount": 5 } },
+      { "Tier": 9, "Reward": { "Type": "Cash", "Amount": 7500 } },
+      { "Tier": 10, "Reward": { "Type": "Wheel", "ID": "WHEEL_SEASON01_01" } },
+      { "Tier": 15, "Reward": { "Type": "Cash", "Amount": 10000 } },
+      { "Tier": 20, "Reward": { "Type": "Paint", "ID": "PAINT_MIDNIGHT_BLUE" } },
+      { "Tier": 25, "Reward": { "Type": "Cash", "Amount": 15000 } },
+      { "Tier": 30, "Reward": { "Type": "Horn", "ID": "HORN_CLASSIC" } },
+      { "Tier": 35, "Reward": { "Type": "Cash", "Amount": 15000 } },
+      { "Tier": 40, "Reward": { "Type": "Vinyl", "ID": "VINYL_RACING_STRIPES" } },
+      { "Tier": 45, "Reward": { "Type": "Cash", "Amount": 20000 } },
+      { "Tier": 50, "Reward": { "Type": "Part", "ID": "SPRINGS_COILOVER", "Vehicle": "Universal" } },
+      { "Tier": 55, "Reward": { "Type": "Cash", "Amount": 20000 } },
+      { "Tier": 60, "Reward": { "Type": "REP", "Amount": 500 } },
+      { "Tier": 65, "Reward": { "Type": "Cash", "Amount": 25000 } },
+      { "Tier": 70, "Reward": { "Type": "Neon", "ID": "NEON_BLUE" } },
+      { "Tier": 75, "Reward": { "Type": "Cash", "Amount": 25000 } },
+      { "Tier": 80, "Reward": { "Type": "Plate", "ID": "PLATE_SEASON01" } },
+      { "Tier": 85, "Reward": { "Type": "Cash", "Amount": 30000 } },
+      { "Tier": 90, "Reward": { "Type": "REP", "Amount": 750 } },
+      { "Tier": 95, "Reward": { "Type": "Cash", "Amount": 35000 } },
+      { "Tier": 100, "Reward": { "Type": "Title", "ID": "TITLE_MIDNIGHT_RUNNER" } }
+    ],
+    "PremiumTier": [
+      { "Tier": 1, "Reward": { "Type": "Cash", "Amount": 10000 } },
+      { "Tier": 2, "Reward": { "Type": "REP", "Amount": 200 } },
+      { "Tier": 3, "Reward": { "Type": "Part", "ID": "TURBO_SMALL", "Vehicle": "Universal" } },
+      { "Tier": 4, "Reward": { "Type": "Cash", "Amount": 10000 } },
+      { "Tier": 5, "Reward": { "Type": "Livery", "ID": "LIVERY_SEASON01_01" } },
+      { "Tier": 6, "Reward": { "Type": "Cash", "Amount": 15000 } },
+      { "Tier": 7, "Reward": { "Type": "REP", "Amount": 300 } },
+      { "Tier": 8, "Reward": { "Type": "Emote", "ID": "EMOTE_REV" } },
+      { "Tier": 9, "Reward": { "Type": "Cash", "Amount": 15000 } },
+      { "Tier": 10, "Reward": { "Type": "Wheel", "ID": "WHEEL_SEASON01_PREMIUM_01" } },
+      { "Tier": 15, "Reward": { "Type": "Cash", "Amount": 20000 } },
+      { "Tier": 20, "Reward": { "Type": "Bodykit", "ID": "BODYKIT_SEASON01_01" } },
+      { "Tier": 25, "Reward": { "Type": "Cash", "Amount": 25000 } },
+      { "Tier": 30, "Reward": { "Type": "ExhaustTip", "ID": "TIP_TITANIUM" } },
+      { "Tier": 35, "Reward": { "Type": "Cash", "Amount": 25000 } },
+      { "Tier": 40, "Reward": { "Type": "Livery", "ID": "LIVERY_SEASON01_02" } },
+      { "Tier": 45, "Reward": { "Type": "Cash", "Amount": 30000 } },
+      { "Tier": 50, "Reward": { "Type": "Part", "ID": "LSD_2WAY", "Vehicle": "Universal" } },
+      { "Tier": 55, "Reward": { "Type": "Cash", "Amount": 30000 } },
+      { "Tier": 60, "Reward": { "Type": "REP", "Amount": 1000 } },
+      { "Tier": 65, "Reward": { "Type": "Cash", "Amount": 35000 } },
+      { "Tier": 70, "Reward": { "Type": "Underglow", "ID": "GLOW_ANIMATED_01" } },
+      { "Tier": 75, "Reward": { "Type": "Cash", "Amount": 40000 } },
+      { "Tier": 80, "Reward": { "Type": "Horn", "ID": "HORN_MIDNIGHT" } },
+      { "Tier": 85, "Reward": { "Type": "Cash", "Amount": 45000 } },
+      { "Tier": 90, "Reward": { "Type": "Livery", "ID": "LIVERY_SEASON01_FINAL" } },
+      { "Tier": 95, "Reward": { "Type": "Cash", "Amount": 50000 } },
+      { "Tier": 100, "Reward": { "Type": "Vehicle", "ID": "VEHICLE_SEASON01_EXCLUSIVE" } }
+    ]
+  },
+
+  "SeasonalChallenges": [
+    {
+      "ID": "SC_01_RACE",
+      "Name": "Road Warrior",
+      "Description": "Complete 100 races this season",
+      "Objective": { "Type": "CompleteRace", "Count": 100 },
+      "Reward": { "Type": "XP", "Amount": 25000 },
+      "Tier": "Bronze"
+    },
+    {
+      "ID": "SC_02_WIN",
+      "Name": "Champion",
+      "Description": "Win 50 races this season",
+      "Objective": { "Type": "WinRace", "Count": 50 },
+      "Reward": { "Type": "XP", "Amount": 35000 },
+      "Tier": "Silver"
+    },
+    {
+      "ID": "SC_03_DRIFT",
+      "Name": "Drift Master",
+      "Description": "Score 1,000,000 total drift points",
+      "Objective": { "Type": "DriftScore", "Score": 1000000 },
+      "Reward": { "Type": "XP", "Amount": 30000 },
+      "Tier": "Silver"
+    },
+    {
+      "ID": "SC_04_REP",
+      "Name": "Rising Star",
+      "Description": "Earn 10,000 REP this season",
+      "Objective": { "Type": "EarnREP", "Amount": 10000 },
+      "Reward": { "Type": "XP", "Amount": 40000 },
+      "Tier": "Gold"
+    },
+    {
+      "ID": "SC_05_CASH",
+      "Name": "High Roller",
+      "Description": "Earn $500,000 from races",
+      "Objective": { "Type": "EarnCash", "Amount": 500000 },
+      "Reward": { "Type": "XP", "Amount": 35000 },
+      "Tier": "Gold"
+    },
+    {
+      "ID": "SC_06_TOUGE",
+      "Name": "Mountain King",
+      "Description": "Win 25 touge battles",
+      "Objective": { "Type": "WinRace", "Count": 25, "Track": "HARUNA_PASS_01" },
+      "Reward": { "Type": "XP", "Amount": 30000 },
+      "Tier": "Silver"
+    },
+    {
+      "ID": "SC_07_HIGHWAY",
+      "Name": "Wangan Legend",
+      "Description": "Win 25 highway battles",
+      "Objective": { "Type": "WinRace", "Count": 25, "Track": "WANGAN_HIGHWAY_01" },
+      "Reward": { "Type": "XP", "Amount": 30000 },
+      "Tier": "Silver"
+    },
+    {
+      "ID": "SC_08_SPEED",
+      "Name": "Speed Demon",
+      "Description": "Reach 200 MPH",
+      "Objective": { "Type": "ReachSpeed", "Speed": 200 },
+      "Reward": { "Type": "XP", "Amount": 20000 },
+      "Tier": "Gold"
+    },
+    {
+      "ID": "SC_09_ESCAPE",
+      "Name": "Ghost",
+      "Description": "Escape 25 police pursuits",
+      "Objective": { "Type": "EscapePursuit", "Count": 25 },
+      "Reward": { "Type": "XP", "Amount": 25000 },
+      "Tier": "Silver"
+    },
+    {
+      "ID": "SC_10_PINK",
+      "Name": "High Stakes",
+      "Description": "Win 10 pink slip races",
+      "Objective": { "Type": "WinPinkSlip", "Count": 10 },
+      "Reward": { "Type": "XP", "Amount": 50000 },
+      "Tier": "Platinum"
+    }
+  ],
+
+  "Milestones": {
+    "Tier25": {
+      "Name": "Quarter Way",
+      "Bonus": { "Type": "XPBoost", "Amount": 0.10, "Duration": 72 }
+    },
+    "Tier50": {
+      "Name": "Halfway There",
+      "Bonus": { "Type": "CashBoost", "Amount": 0.15, "Duration": 72 }
+    },
+    "Tier75": {
+      "Name": "Final Stretch",
+      "Bonus": { "Type": "REPBoost", "Amount": 0.20, "Duration": 72 }
+    },
+    "Tier100": {
+      "Name": "Season Complete",
+      "Bonus": { "Type": "AllBoost", "Amount": 0.10, "Duration": "Season End" }
+    }
+  },
+
+  "PremiumPassPrice": {
+    "Currency": "Premium",
+    "Amount": 950,
+    "BundleWithLevels": {
+      "Levels": 25,
+      "Price": 2500
+    }
+  },
+
+  "LevelPurchase": {
+    "Enabled": true,
+    "PricePerLevel": 150,
+    "MaxPurchasable": 100,
+    "AvailableAfter": "Tier 10"
+  },
+
+  "EndOfSeasonRewards": {
+    "TopPlayers": {
+      "Top100": { "Type": "Title", "ID": "TITLE_SEASON01_TOP100" },
+      "Top10": { "Type": "Exclusive", "ID": "ITEM_SEASON01_TOP10" },
+      "Top1": { "Type": "Legendary", "ID": "ITEM_SEASON01_CHAMPION" }
+    },
+    "CompletionBonus": {
+      "FreeTier100": { "Type": "Cash", "Amount": 50000 },
+      "PremiumTier100": { "Type": "Cash", "Amount": 100000 }
+    }
+  }
+}

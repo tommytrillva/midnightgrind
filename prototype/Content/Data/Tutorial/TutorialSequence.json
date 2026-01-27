@@ -1,0 +1,389 @@
+{
+  "Version": "1.0",
+
+  "TutorialFlow": {
+    "TotalSteps": 15,
+    "EstimatedDuration": "15-20 minutes",
+    "SkipOption": true,
+    "SkipUnlocks": ["Basic Controls Only"]
+  },
+
+  "Sequences": [
+    {
+      "ID": "TUT_01_INTRO",
+      "Name": "Welcome to the Streets",
+      "Type": "Cinematic",
+      "Duration": 30,
+      "Content": {
+        "Narration": "Every legend starts somewhere. This city has seen racers come and go, but tonight... tonight is your beginning.",
+        "Visuals": ["CityNightPan", "StreetRacingMontage", "PlayerCarReveal"],
+        "Music": "Intro_Theme"
+      },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_02_CONTROLS",
+      "Name": "Basic Controls",
+      "Type": "Interactive",
+      "Location": "Parking Lot",
+      "Objectives": [
+        {
+          "ID": "TUT_02_A",
+          "Instruction": "Press [Accelerate] to move forward",
+          "Input": "Accelerate",
+          "Highlight": "Throttle",
+          "CompletionTrigger": "Speed > 10 MPH"
+        },
+        {
+          "ID": "TUT_02_B",
+          "Instruction": "Press [Brake] to slow down",
+          "Input": "Brake",
+          "Highlight": "Brake",
+          "CompletionTrigger": "Speed < 5 MPH from > 20 MPH"
+        },
+        {
+          "ID": "TUT_02_C",
+          "Instruction": "Use [Steering] to turn",
+          "Input": "Steering",
+          "Highlight": "Wheel",
+          "CompletionTrigger": "Complete 360 degree turn"
+        }
+      ],
+      "Reward": { "REP": 10 },
+      "Skippable": false
+    },
+    {
+      "ID": "TUT_03_SHIFTING",
+      "Name": "Transmission",
+      "Type": "Interactive",
+      "Location": "Parking Lot",
+      "Objectives": [
+        {
+          "ID": "TUT_03_A",
+          "Instruction": "Accelerate and watch the tachometer rise",
+          "Highlight": "Tachometer",
+          "CompletionTrigger": "RPM > 5000"
+        },
+        {
+          "ID": "TUT_03_B",
+          "Instruction": "Press [Upshift] to shift up when near redline",
+          "Input": "Upshift",
+          "Highlight": "GearIndicator",
+          "CompletionTrigger": "Gear >= 3"
+        },
+        {
+          "ID": "TUT_03_C",
+          "Instruction": "Press [Downshift] to shift down before corners",
+          "Input": "Downshift",
+          "Highlight": "GearIndicator",
+          "CompletionTrigger": "Downshift while Speed > 30 MPH"
+        }
+      ],
+      "Note": "If using automatic transmission, this step is simplified",
+      "Reward": { "REP": 10 },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_04_CIRCUIT",
+      "Name": "Your First Lap",
+      "Type": "Race",
+      "Location": "TEST_TRACK_01",
+      "Objectives": [
+        {
+          "ID": "TUT_04_A",
+          "Instruction": "Complete one lap of the test track",
+          "CompletionTrigger": "Lap Complete"
+        }
+      ],
+      "Tips": [
+        "Follow the racing line shown on track",
+        "Brake before corners, accelerate out",
+        "Don't worry about time - just finish"
+      ],
+      "Reward": { "Cash": 500, "REP": 25 },
+      "Skippable": false
+    },
+    {
+      "ID": "TUT_05_RACING_LINE",
+      "Name": "The Racing Line",
+      "Type": "Guided",
+      "Location": "TEST_TRACK_01",
+      "Objectives": [
+        {
+          "ID": "TUT_05_A",
+          "Instruction": "Follow the optimal racing line through the corner",
+          "Visual": "RacingLineOverlay",
+          "CompletionTrigger": "Corner completed with 80%+ line accuracy"
+        },
+        {
+          "ID": "TUT_05_B",
+          "Instruction": "Practice late apex technique",
+          "Visual": "ApexHighlight",
+          "CompletionTrigger": "Hit apex marker within 2m"
+        }
+      ],
+      "Tips": [
+        "Outside-Inside-Outside: Wide entry, tight apex, wide exit",
+        "Late apex = earlier throttle = faster exit"
+      ],
+      "Reward": { "REP": 20 },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_06_FIRST_RACE",
+      "Name": "Your First Race",
+      "Type": "Race",
+      "Location": "TEST_TRACK_01",
+      "Objectives": [
+        {
+          "ID": "TUT_06_A",
+          "Instruction": "Race against an opponent and finish in the top 2",
+          "Opponents": ["AI_ROOKIE_01"],
+          "Laps": 2,
+          "CompletionTrigger": "Position <= 2"
+        }
+      ],
+      "Tips": [
+        "Watch your opponent's line",
+        "Don't panic if they pass you",
+        "Focus on clean driving"
+      ],
+      "Reward": { "Cash": 1000, "REP": 50 },
+      "Skippable": false
+    },
+    {
+      "ID": "TUT_07_NITROUS",
+      "Name": "Nitrous Boost",
+      "Type": "Interactive",
+      "Location": "TEST_TRACK_01",
+      "Objectives": [
+        {
+          "ID": "TUT_07_A",
+          "Instruction": "Press [Nitrous] to activate boost on the straight",
+          "Input": "Nitrous",
+          "Highlight": "NitrousGauge",
+          "CompletionTrigger": "Nitrous activated"
+        },
+        {
+          "ID": "TUT_07_B",
+          "Instruction": "Notice how nitrous recharges during the race",
+          "Highlight": "NitrousGauge",
+          "CompletionTrigger": "Nitrous recharged to 50%"
+        }
+      ],
+      "Tips": [
+        "Best used on straights for maximum speed gain",
+        "Recharges slowly during normal driving",
+        "Save it for when you need it most"
+      ],
+      "Reward": { "REP": 15 },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_08_GARAGE",
+      "Name": "The Garage",
+      "Type": "Menu",
+      "Location": "Garage",
+      "Objectives": [
+        {
+          "ID": "TUT_08_A",
+          "Instruction": "Open the garage menu",
+          "Highlight": "GarageButton",
+          "CompletionTrigger": "Garage menu opened"
+        },
+        {
+          "ID": "TUT_08_B",
+          "Instruction": "View your car's stats",
+          "Highlight": "StatsPanel",
+          "CompletionTrigger": "Stats panel viewed"
+        },
+        {
+          "ID": "TUT_08_C",
+          "Instruction": "Browse the upgrades menu",
+          "Highlight": "UpgradesTab",
+          "CompletionTrigger": "Upgrades tab opened"
+        }
+      ],
+      "Reward": { "REP": 10 },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_09_UPGRADE",
+      "Name": "First Upgrade",
+      "Type": "Menu",
+      "Location": "Garage",
+      "PreRequisite": { "Cash": 500 },
+      "FreeUpgrade": "INTAKE_SPORT",
+      "Objectives": [
+        {
+          "ID": "TUT_09_A",
+          "Instruction": "Install your first upgrade (free intake provided)",
+          "Highlight": "InstallButton",
+          "CompletionTrigger": "Part installed"
+        },
+        {
+          "ID": "TUT_09_B",
+          "Instruction": "Notice how your stats changed",
+          "Highlight": "StatsComparison",
+          "CompletionTrigger": "Stats comparison viewed"
+        }
+      ],
+      "Tips": [
+        "Every upgrade affects your Performance Index (PI)",
+        "Higher PI = faster car = tougher competition",
+        "Some races have PI limits"
+      ],
+      "Reward": { "Cash": 500, "REP": 25 },
+      "Skippable": false
+    },
+    {
+      "ID": "TUT_10_DRIFT_INTRO",
+      "Name": "Introduction to Drifting",
+      "Type": "Interactive",
+      "Location": "INDUSTRIAL_DOCKS_01",
+      "Objectives": [
+        {
+          "ID": "TUT_10_A",
+          "Instruction": "Initiate a drift using [Handbrake] in a corner",
+          "Input": "Handbrake",
+          "CompletionTrigger": "Drift angle > 15 degrees"
+        },
+        {
+          "ID": "TUT_10_B",
+          "Instruction": "Maintain the drift and score points",
+          "Highlight": "DriftScore",
+          "CompletionTrigger": "Single drift > 500 points"
+        },
+        {
+          "ID": "TUT_10_C",
+          "Instruction": "Chain multiple drifts for combos",
+          "Highlight": "ComboMeter",
+          "CompletionTrigger": "2x combo achieved"
+        }
+      ],
+      "Tips": [
+        "Countersteer to control the angle",
+        "Throttle control is key",
+        "Different cars drift differently"
+      ],
+      "Reward": { "Cash": 750, "REP": 35 },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_11_REPUTATION",
+      "Name": "Building Reputation",
+      "Type": "Explanation",
+      "Content": {
+        "Title": "Your REP Is Everything",
+        "Points": [
+          "REP (Reputation) unlocks new content and opportunities",
+          "Win races, complete challenges, and show off your build to earn REP",
+          "Higher REP tiers unlock: new events, cars, parts, and areas",
+          "Some crews and racers won't even talk to you until you've proven yourself"
+        ],
+        "Visual": "REP_Progression_Infographic"
+      },
+      "Reward": { "REP": 20 },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_12_MEETSPOT",
+      "Name": "The Social Scene",
+      "Type": "Interactive",
+      "Location": "INDUSTRIAL_DOCKS_01",
+      "Objectives": [
+        {
+          "ID": "TUT_12_A",
+          "Instruction": "Drive to the meet spot icon on your map",
+          "Highlight": "MeetSpotMarker",
+          "CompletionTrigger": "Arrived at meet spot"
+        },
+        {
+          "ID": "TUT_12_B",
+          "Instruction": "Park your car and interact with other racers",
+          "Highlight": "SocialMenu",
+          "CompletionTrigger": "Social interaction completed"
+        }
+      ],
+      "Tips": [
+        "Meet spots are where racers gather",
+        "Challenge others, show off your car, join crews",
+        "Stay longer for passive REP gains"
+      ],
+      "Reward": { "REP": 30 },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_13_POLICE",
+      "Name": "Heat",
+      "Type": "Interactive",
+      "Location": "Downtown",
+      "Objectives": [
+        {
+          "ID": "TUT_13_A",
+          "Instruction": "Attract police attention by speeding",
+          "Highlight": "HeatMeter",
+          "CompletionTrigger": "Heat level >= 1"
+        },
+        {
+          "ID": "TUT_13_B",
+          "Instruction": "Escape the pursuit",
+          "Highlight": "PursuitStatus",
+          "CompletionTrigger": "Pursuit escaped"
+        }
+      ],
+      "Tips": [
+        "Higher heat = more aggressive police",
+        "Heat 5 brings helicopters and roadblocks",
+        "Getting busted costs you cash and REP"
+      ],
+      "Reward": { "Cash": 1000, "REP": 50 },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_14_PINK_SLIP",
+      "Name": "Pink Slip Racing",
+      "Type": "Explanation",
+      "Content": {
+        "Title": "Risk It All",
+        "Points": [
+          "Pink slip races let you wager your car",
+          "Win and you get their car. Lose and they get yours.",
+          "THIS IS PERMANENT. No take-backs.",
+          "Only race pink slips when you're confident",
+          "Minimum REP required to participate"
+        ],
+        "Visual": "PinkSlip_Warning",
+        "WarningLevel": "High"
+      },
+      "Reward": { "REP": 25 },
+      "Skippable": true
+    },
+    {
+      "ID": "TUT_15_COMPLETE",
+      "Name": "Ready to Race",
+      "Type": "Cinematic",
+      "Duration": 20,
+      "Content": {
+        "Narration": "You've got the basics. Now get out there and make a name for yourself. The streets are waiting.",
+        "Visuals": ["PlayerCarDriveOff", "CityLights", "RaceStartMontage"],
+        "Music": "Tutorial_Complete_Theme"
+      },
+      "Reward": { "Cash": 2500, "REP": 100, "Unlock": "Full Game" },
+      "Skippable": true
+    }
+  ],
+
+  "TotalTutorialRewards": {
+    "Cash": 6750,
+    "REP": 425,
+    "FreePart": "INTAKE_SPORT"
+  },
+
+  "QuickStartOption": {
+    "Enabled": true,
+    "SkipsTo": "TUT_06_FIRST_RACE",
+    "GivesRewards": ["TUT_02", "TUT_03", "TUT_04", "TUT_05"],
+    "Note": "For experienced players who just want to race"
+  }
+}

@@ -1,0 +1,392 @@
+{
+  "Version": "1.0",
+  "TotalTerritories": 12,
+
+  "Territories": [
+    {
+      "ID": "TERR_DOWNTOWN",
+      "Name": "Downtown",
+      "Description": "The heart of the city. Prime real estate for any crew looking to make a statement.",
+      "Type": "Urban",
+      "Size": "Large",
+      "Location": { "X": 0, "Y": 0 },
+      "Bounds": { "Width": 2000, "Height": 2000 },
+      "ControlPoints": 5,
+      "Bonuses": {
+        "CashBonus": 0.15,
+        "REPBonus": 0.20,
+        "MeetSpotCapacity": 100
+      },
+      "Features": [
+        { "Type": "MeetSpot", "Name": "City Square", "Capacity": 50 },
+        { "Type": "Shop", "Name": "Downtown Customs", "Discount": 0.10 }
+      ],
+      "ContestRules": {
+        "RaceType": "Circuit",
+        "MinParticipants": 4,
+        "TimeWindow": "22:00-04:00"
+      },
+      "Difficulty": "Hard",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_DOCKS",
+      "Name": "Port District",
+      "Description": "Industrial shipping area. Great for drift meets and late-night races.",
+      "Type": "Industrial",
+      "Size": "Large",
+      "Location": { "X": 3000, "Y": 1000 },
+      "Bounds": { "Width": 2500, "Height": 1800 },
+      "ControlPoints": 4,
+      "Bonuses": {
+        "CashBonus": 0.12,
+        "REPBonus": 0.15,
+        "DriftScoreBonus": 0.25
+      },
+      "Features": [
+        { "Type": "MeetSpot", "Name": "Container Yard", "Capacity": 60 },
+        { "Type": "DriftZone", "Name": "Dock Slide" },
+        { "Type": "DragStrip", "Name": "Pier 7" }
+      ],
+      "ContestRules": {
+        "RaceType": "Drift",
+        "MinParticipants": 2,
+        "TimeWindow": "20:00-06:00"
+      },
+      "Difficulty": "Medium",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_HIGHWAY_EAST",
+      "Name": "East Highway",
+      "Description": "Eastern section of the Bayshore Highway. Speed is king here.",
+      "Type": "Highway",
+      "Size": "Medium",
+      "Location": { "X": 5000, "Y": 0 },
+      "Bounds": { "Width": 4000, "Height": 500 },
+      "ControlPoints": 3,
+      "Bonuses": {
+        "CashBonus": 0.18,
+        "REPBonus": 0.12,
+        "TopSpeedBonus": 0.10
+      },
+      "Features": [
+        { "Type": "SpeedTrap", "Name": "Bridge Run" },
+        { "Type": "RollingStart", "Name": "Highway Merge" }
+      ],
+      "ContestRules": {
+        "RaceType": "Highway",
+        "MinParticipants": 2,
+        "TimeWindow": "00:00-05:00"
+      },
+      "Difficulty": "Hard",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_HIGHWAY_WEST",
+      "Name": "West Highway",
+      "Description": "Western section including the tunnel. Tight and fast.",
+      "Type": "Highway",
+      "Size": "Medium",
+      "Location": { "X": -4000, "Y": 0 },
+      "Bounds": { "Width": 4000, "Height": 500 },
+      "ControlPoints": 3,
+      "Bonuses": {
+        "CashBonus": 0.18,
+        "REPBonus": 0.12,
+        "TopSpeedBonus": 0.10
+      },
+      "Features": [
+        { "Type": "Tunnel", "Name": "West Tunnel" },
+        { "Type": "SpeedTrap", "Name": "Tunnel Exit" }
+      ],
+      "ContestRules": {
+        "RaceType": "Highway",
+        "MinParticipants": 2,
+        "TimeWindow": "00:00-05:00"
+      },
+      "Difficulty": "Hard",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_MOUNTAIN",
+      "Name": "Mt. Haruna",
+      "Description": "The legendary mountain pass. Only the skilled can claim this territory.",
+      "Type": "Mountain",
+      "Size": "Large",
+      "Location": { "X": -2000, "Y": 4000 },
+      "Bounds": { "Width": 3000, "Height": 5000 },
+      "ControlPoints": 4,
+      "Bonuses": {
+        "CashBonus": 0.20,
+        "REPBonus": 0.25,
+        "TougeBonus": 0.30
+      },
+      "Features": [
+        { "Type": "Touge", "Name": "Summit Run" },
+        { "Type": "MeetSpot", "Name": "Summit Overlook", "Capacity": 30 },
+        { "Type": "Shrine", "Name": "Haruna Shrine" }
+      ],
+      "ContestRules": {
+        "RaceType": "Touge",
+        "MinParticipants": 2,
+        "TimeWindow": "21:00-05:00"
+      },
+      "Difficulty": "Expert",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_SUBURB_NORTH",
+      "Name": "North Suburbs",
+      "Description": "Residential area with winding streets. Perfect for street racing.",
+      "Type": "Suburban",
+      "Size": "Medium",
+      "Location": { "X": 0, "Y": 3000 },
+      "Bounds": { "Width": 2500, "Height": 2000 },
+      "ControlPoints": 3,
+      "Bonuses": {
+        "CashBonus": 0.10,
+        "REPBonus": 0.10,
+        "PoliceAvoidance": 0.20
+      },
+      "Features": [
+        { "Type": "MeetSpot", "Name": "Park & Ride", "Capacity": 40 },
+        { "Type": "CircuitRoute", "Name": "Neighborhood Loop" }
+      ],
+      "ContestRules": {
+        "RaceType": "Sprint",
+        "MinParticipants": 4,
+        "TimeWindow": "23:00-04:00"
+      },
+      "Difficulty": "Easy",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_SUBURB_SOUTH",
+      "Name": "South Suburbs",
+      "Description": "Industrial-residential mix. Good variety of racing opportunities.",
+      "Type": "Suburban",
+      "Size": "Medium",
+      "Location": { "X": 0, "Y": -2500 },
+      "Bounds": { "Width": 2500, "Height": 2000 },
+      "ControlPoints": 3,
+      "Bonuses": {
+        "CashBonus": 0.10,
+        "REPBonus": 0.10,
+        "PartDiscount": 0.05
+      },
+      "Features": [
+        { "Type": "Shop", "Name": "South Side Garage", "Discount": 0.08 },
+        { "Type": "MeetSpot", "Name": "Shopping Center Lot", "Capacity": 35 }
+      ],
+      "ContestRules": {
+        "RaceType": "Sprint",
+        "MinParticipants": 4,
+        "TimeWindow": "22:00-04:00"
+      },
+      "Difficulty": "Easy",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_INDUSTRIAL",
+      "Name": "Industrial Zone",
+      "Description": "Factories and warehouses. Wide streets, few witnesses.",
+      "Type": "Industrial",
+      "Size": "Medium",
+      "Location": { "X": 2500, "Y": -1500 },
+      "Bounds": { "Width": 2000, "Height": 1500 },
+      "ControlPoints": 3,
+      "Bonuses": {
+        "CashBonus": 0.12,
+        "REPBonus": 0.08,
+        "DragBonus": 0.20
+      },
+      "Features": [
+        { "Type": "DragStrip", "Name": "Factory Row" },
+        { "Type": "BurnoutZone", "Name": "Loading Bay" }
+      ],
+      "ContestRules": {
+        "RaceType": "Drag",
+        "MinParticipants": 2,
+        "TimeWindow": "20:00-06:00"
+      },
+      "Difficulty": "Medium",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_WATERFRONT",
+      "Name": "Waterfront",
+      "Description": "Scenic coastal road. Popular with car enthusiasts.",
+      "Type": "Coastal",
+      "Size": "Medium",
+      "Location": { "X": 4000, "Y": 2000 },
+      "Bounds": { "Width": 3000, "Height": 1000 },
+      "ControlPoints": 3,
+      "Bonuses": {
+        "CashBonus": 0.10,
+        "REPBonus": 0.15,
+        "ShowcaseBonus": 0.25
+      },
+      "Features": [
+        { "Type": "MeetSpot", "Name": "Beach Parking", "Capacity": 80 },
+        { "Type": "PhotoSpot", "Name": "Sunset Point" }
+      ],
+      "ContestRules": {
+        "RaceType": "Showcase",
+        "MinParticipants": 6,
+        "TimeWindow": "18:00-02:00"
+      },
+      "Difficulty": "Easy",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_AIRPORT",
+      "Name": "Airport District",
+      "Description": "Airport access roads. Long straights and wide corners.",
+      "Type": "Commercial",
+      "Size": "Large",
+      "Location": { "X": -3500, "Y": -2000 },
+      "Bounds": { "Width": 3000, "Height": 2500 },
+      "ControlPoints": 4,
+      "Bonuses": {
+        "CashBonus": 0.15,
+        "REPBonus": 0.12,
+        "TopSpeedBonus": 0.15
+      },
+      "Features": [
+        { "Type": "CircuitRoute", "Name": "Runway Loop" },
+        { "Type": "SpeedTrap", "Name": "Terminal Straight" }
+      ],
+      "ContestRules": {
+        "RaceType": "Circuit",
+        "MinParticipants": 6,
+        "TimeWindow": "01:00-05:00"
+      },
+      "Difficulty": "Medium",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_OLDTOWN",
+      "Name": "Old Town",
+      "Description": "Historic district with narrow streets. Technical driving required.",
+      "Type": "Urban",
+      "Size": "Small",
+      "Location": { "X": -1500, "Y": 1000 },
+      "Bounds": { "Width": 1200, "Height": 1200 },
+      "ControlPoints": 2,
+      "Bonuses": {
+        "CashBonus": 0.08,
+        "REPBonus": 0.18,
+        "SkillBonus": 0.15
+      },
+      "Features": [
+        { "Type": "TechnicalRoute", "Name": "Alley Run" },
+        { "Type": "MeetSpot", "Name": "Town Square", "Capacity": 25 }
+      ],
+      "ContestRules": {
+        "RaceType": "Sprint",
+        "MinParticipants": 2,
+        "TimeWindow": "23:00-04:00"
+      },
+      "Difficulty": "Hard",
+      "DefaultController": null
+    },
+    {
+      "ID": "TERR_OUTSKIRTS",
+      "Name": "City Outskirts",
+      "Description": "The edge of town. Long country roads with minimal traffic.",
+      "Type": "Rural",
+      "Size": "Large",
+      "Location": { "X": -5000, "Y": 2000 },
+      "Bounds": { "Width": 4000, "Height": 3000 },
+      "ControlPoints": 3,
+      "Bonuses": {
+        "CashBonus": 0.08,
+        "REPBonus": 0.05,
+        "PoliceAvoidance": 0.40
+      },
+      "Features": [
+        { "Type": "CountryRoad", "Name": "Farm Run" },
+        { "Type": "HiddenSpot", "Name": "Barn Meet", "Capacity": 20 }
+      ],
+      "ContestRules": {
+        "RaceType": "Point-to-Point",
+        "MinParticipants": 2,
+        "TimeWindow": "Any"
+      },
+      "Difficulty": "Easy",
+      "DefaultController": null
+    }
+  ],
+
+  "ControlMechanics": {
+    "CaptureRequirements": {
+      "WinRaces": 3,
+      "TimeLimit": "24 hours",
+      "DefenderAdvantage": true
+    },
+    "DefenseRequirements": {
+      "MinimumPresence": "1 crew member online",
+      "ResponseWindow": "15 minutes"
+    },
+    "ContestSchedule": {
+      "ChallengeWindow": "48 hours",
+      "CooldownAfterLoss": "24 hours",
+      "CooldownAfterWin": "12 hours"
+    },
+    "Benefits": {
+      "ControlBonus": "Territory bonuses apply to all crew members",
+      "PassiveIncome": "Small hourly cash based on territory size",
+      "ExclusiveAccess": "Some features only available to controlling crew"
+    }
+  },
+
+  "AllianceSystem": {
+    "MaxAlliances": 2,
+    "AllianceBenefits": {
+      "SharedTerritoryBonus": 0.5,
+      "JointDefense": true,
+      "TradeDiscount": 0.05
+    },
+    "RivalryEffects": {
+      "ContestPriority": true,
+      "REPBonusVsRival": 0.25,
+      "NoTrade": true
+    }
+  },
+
+  "NPCCrews": [
+    {
+      "ID": "CREW_SPEED_STARS",
+      "Name": "Haruna Speed Stars",
+      "Territory": "TERR_MOUNTAIN",
+      "Specialty": "Touge",
+      "Difficulty": "Expert",
+      "Leader": "AI_RACER_03"
+    },
+    {
+      "ID": "CREW_MIDNIGHT_CLUB",
+      "Name": "Midnight Club",
+      "Territory": "TERR_HIGHWAY_EAST",
+      "Specialty": "Highway",
+      "Difficulty": "Hard",
+      "Leader": "AI_RACER_02"
+    },
+    {
+      "ID": "CREW_DOCK_WORKERS",
+      "Name": "Dock Workers",
+      "Territory": "TERR_DOCKS",
+      "Specialty": "Drift",
+      "Difficulty": "Medium",
+      "Leader": "AI_STREET_01"
+    },
+    {
+      "ID": "CREW_DOWNTOWN_KINGS",
+      "Name": "Downtown Kings",
+      "Territory": "TERR_DOWNTOWN",
+      "Specialty": "All-around",
+      "Difficulty": "Hard",
+      "Leader": "AI_PRO_01"
+    }
+  ]
+}
