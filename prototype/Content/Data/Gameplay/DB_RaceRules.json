@@ -1,0 +1,338 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Race Rules and Regulations Configuration",
+
+  "GlobalRules": {
+    "CollisionEnabled": true,
+    "GhostingOnRespawn": true,
+    "GhostDuration": 3.0,
+    "WrongWayPenalty": true,
+    "CuttingPenalty": true,
+    "RespawnEnabled": true,
+    "MaxRespawns": -1,
+    "DNFEnabled": true
+  },
+
+  "RaceFormats": {
+    "Circuit": {
+      "ID": "FORMAT_CIRCUIT",
+      "Name": "Circuit Race",
+      "Description": "Multiple laps around a closed track",
+      "Settings": {
+        "LapCount": { "Min": 1, "Max": 99, "Default": 3 },
+        "GridSize": { "Min": 2, "Max": 12, "Default": 8 },
+        "RollingStart": false,
+        "GridOrder": "Qualifying",
+        "DNFCondition": {
+          "LapsBehind": 2,
+          "TimeLimit": null
+        }
+      },
+      "Scoring": "Position",
+      "WinCondition": "FirstToFinish"
+    },
+    "Sprint": {
+      "ID": "FORMAT_SPRINT",
+      "Name": "Sprint Race",
+      "Description": "Point-to-point race",
+      "Settings": {
+        "GridSize": { "Min": 2, "Max": 8, "Default": 4 },
+        "RollingStart": true,
+        "GridOrder": "Random",
+        "Checkpoints": true
+      },
+      "Scoring": "Position",
+      "WinCondition": "FirstToFinish"
+    },
+    "TimeAttack": {
+      "ID": "FORMAT_TIMEATTACK",
+      "Name": "Time Attack",
+      "Description": "Race against the clock",
+      "Settings": {
+        "LapCount": { "Min": 1, "Max": 10, "Default": 3 },
+        "SoloOnly": true,
+        "GhostEnabled": true,
+        "CleanLapRequired": false
+      },
+      "Scoring": "BestLapTime",
+      "WinCondition": "FastestTime"
+    },
+    "Elimination": {
+      "ID": "FORMAT_ELIMINATION",
+      "Name": "Elimination",
+      "Description": "Last place eliminated each lap",
+      "Settings": {
+        "StartingGridSize": 12,
+        "EliminationInterval": "PerLap",
+        "EliminationCount": 1,
+        "FinalLapCount": 3
+      },
+      "Scoring": "Survival",
+      "WinCondition": "LastRemaining"
+    },
+    "Drag": {
+      "ID": "FORMAT_DRAG",
+      "Name": "Drag Race",
+      "Description": "1/4 mile straight line",
+      "Settings": {
+        "Distance": { "Options": ["1/8 Mile", "1/4 Mile", "1/2 Mile"], "Default": "1/4 Mile" },
+        "Lanes": 2,
+        "BracketStyle": true,
+        "StagingRequired": true,
+        "ChristmasTree": true,
+        "ReactionTimeCounts": true
+      },
+      "Scoring": "ElapsedTime",
+      "WinCondition": "FirstAcrossLine"
+    },
+    "Drift": {
+      "ID": "FORMAT_DRIFT",
+      "Name": "Drift Event",
+      "Description": "Score-based drifting competition",
+      "Settings": {
+        "Zones": true,
+        "ScoringMethod": "Points",
+        "Rounds": 3,
+        "BestOf": 2,
+        "TandemEnabled": true
+      },
+      "Scoring": "DriftScore",
+      "WinCondition": "HighestScore"
+    },
+    "Touge": {
+      "ID": "FORMAT_TOUGE",
+      "Name": "Touge Battle",
+      "Description": "Mountain pass head-to-head",
+      "Settings": {
+        "Format": "ChaseTag",
+        "Rounds": 2,
+        "LeaderSwap": true,
+        "GapMeasurement": true,
+        "WinByGap": 5.0
+      },
+      "Scoring": "Gap",
+      "WinCondition": "LargestGap"
+    },
+    "Checkpoint": {
+      "ID": "FORMAT_CHECKPOINT",
+      "Name": "Checkpoint Race",
+      "Description": "Reach checkpoints before time runs out",
+      "Settings": {
+        "InitialTime": 30,
+        "TimePerCheckpoint": 15,
+        "CheckpointCount": "TrackBased",
+        "FreeRoam": true
+      },
+      "Scoring": "CheckpointsReached",
+      "WinCondition": "AllCheckpoints"
+    }
+  },
+
+  "StartProcedures": {
+    "StandingStart": {
+      "ID": "START_STANDING",
+      "Countdown": ["3", "2", "1", "GO"],
+      "CountdownTime": 4.0,
+      "LaunchControlAllowed": true,
+      "FalseStartPenalty": {
+        "Enabled": true,
+        "Penalty": "TimeAddition",
+        "Amount": 5.0
+      }
+    },
+    "RollingStart": {
+      "ID": "START_ROLLING",
+      "FormationLap": true,
+      "FormationSpeed": 80,
+      "GreenFlagZone": true,
+      "AccelerationBeforeGreen": false
+    },
+    "DragStart": {
+      "ID": "START_DRAG",
+      "StagingLights": true,
+      "ChristmasTree": {
+        "ProTree": false,
+        "Delay": 0.4
+      },
+      "RedLightPenalty": "DisqualifyRun",
+      "BurnoutArea": true
+    },
+    "FlyingStart": {
+      "ID": "START_FLYING",
+      "RequiredSpeed": 100,
+      "StartLine": "Trigger"
+    }
+  },
+
+  "Penalties": {
+    "CuttingCorner": {
+      "Detection": "TrackLimits",
+      "GainThreshold": 0.3,
+      "Warnings": 3,
+      "Penalty": {
+        "Type": "TimeAddition",
+        "Amount": 2.0,
+        "Cumulative": true
+      }
+    },
+    "WrongWay": {
+      "Detection": "Direction",
+      "GracePeriod": 3.0,
+      "Penalty": {
+        "Type": "Respawn",
+        "TimeAddition": 5.0
+      }
+    },
+    "Collision": {
+      "Intentional": {
+        "Detection": "ForceAndAngle",
+        "Threshold": 0.8,
+        "Penalty": {
+          "Type": "TimeAddition",
+          "Amount": 3.0
+        }
+      },
+      "ExcessiveContact": {
+        "ContactCount": 5,
+        "TimeWindow": 30,
+        "Penalty": {
+          "Type": "Warning",
+          "Escalate": true
+        }
+      }
+    },
+    "Blocking": {
+      "Detection": "DefensiveMoves",
+      "Warnings": 2,
+      "Penalty": {
+        "Type": "TimeAddition",
+        "Amount": 2.0
+      }
+    },
+    "Disqualification": {
+      "Conditions": [
+        "ExcessivePenalties",
+        "IntentionalCrashing",
+        "CheatDetected",
+        "InactivityTimeout"
+      ],
+      "NoRewards": true,
+      "REPPenalty": -100
+    }
+  },
+
+  "TrackLimits": {
+    "Detection": {
+      "Method": "FourWheels",
+      "Tolerance": 0.5
+    },
+    "Enforcement": {
+      "Career": "Strict",
+      "QuickRace": "Normal",
+      "FreeRoam": "None"
+    },
+    "VisualIndicator": {
+      "Enabled": true,
+      "Color": "#FF4444",
+      "Duration": 1.0
+    }
+  },
+
+  "SafetyRules": {
+    "YellowFlag": {
+      "Enabled": true,
+      "Trigger": "HeavyCrash",
+      "NoOvertaking": true,
+      "SpeedLimit": 100,
+      "Duration": "UntilClear"
+    },
+    "SafetyCar": {
+      "Enabled": false,
+      "Trigger": "MultiCarIncident",
+      "Bunching": true
+    },
+    "Ghosting": {
+      "OnRespawn": { "Enabled": true, "Duration": 3.0 },
+      "OnHeavyLag": { "Enabled": true, "Duration": 2.0 },
+      "InPits": { "Enabled": true }
+    }
+  },
+
+  "MatchmakingRules": {
+    "PIMatching": {
+      "Enabled": true,
+      "Tolerance": 50,
+      "StrictMode": { "Tolerance": 25 }
+    },
+    "SkillMatching": {
+      "Enabled": true,
+      "EloSystem": true,
+      "NewPlayerProtection": {
+        "Matches": 10,
+        "SeparatePool": true
+      }
+    },
+    "RegionMatching": {
+      "PreferSameRegion": true,
+      "MaxLatency": 150
+    }
+  },
+
+  "RaceOptions": {
+    "Host": {
+      "LapCount": true,
+      "TrafficEnabled": true,
+      "WeatherSelection": true,
+      "TimeOfDay": true,
+      "CatchupEnabled": true,
+      "CollisionType": ["Full", "GhostBackmarkers", "AlwaysGhost"],
+      "PIRestriction": true,
+      "ClassRestriction": true,
+      "DrivetrainRestriction": true
+    },
+    "Ranked": {
+      "FixedSettings": true,
+      "NoHostControl": true,
+      "StandardRules": true
+    }
+  },
+
+  "Catchup": {
+    "Enabled": true,
+    "Default": false,
+    "Method": "SpeedBoost",
+    "MaxBoost": 0.05,
+    "DistanceThreshold": 200,
+    "AffectsRewards": {
+      "Enabled": false,
+      "Multiplier": 0.9
+    },
+    "RankedDisabled": true
+  },
+
+  "Tiebreakers": {
+    "SameLapTime": "PhotoFinish",
+    "PhotoFinish": {
+      "Precision": 0.001,
+      "ShowReplay": true
+    },
+    "SamePosition": "HighestTopSpeed",
+    "Tournament": "HeadToHead"
+  },
+
+  "EndConditions": {
+    "RaceComplete": {
+      "AllFinished": true,
+      "TimeLimit": 300,
+      "AutoFinish": true
+    },
+    "TimeTrialComplete": {
+      "LapsComplete": true,
+      "ImprovementWindow": false
+    },
+    "DriftComplete": {
+      "AllRunsComplete": true,
+      "TimeLimit": 180
+    }
+  }
+}

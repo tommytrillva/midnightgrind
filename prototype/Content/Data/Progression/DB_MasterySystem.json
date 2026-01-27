@@ -1,0 +1,214 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle and Track Mastery System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxMasteryLevel": 50,
+    "XPPerLevel": "Exponential",
+    "BaseXP": 1000,
+    "GrowthRate": 1.1,
+    "RewardsEnabled": true
+  },
+
+  "VehicleMastery": {
+    "Description": "Gain mastery by using each vehicle",
+    "XPSources": {
+      "RaceComplete": {
+        "BaseXP": 100,
+        "WinBonus": 150,
+        "PositionMultiplier": {
+          "1st": 1.5,
+          "2nd": 1.25,
+          "3rd": 1.1,
+          "Other": 1.0
+        }
+      },
+      "DistanceDriven": {
+        "XPPerKM": 10,
+        "MaxPerSession": 1000
+      },
+      "DriftScore": {
+        "XPPer10000Points": 50
+      },
+      "SkillChains": {
+        "XPPerChain": 25
+      },
+      "TimeAttack": {
+        "PersonalBest": 200,
+        "TrackRecord": 500
+      }
+    },
+    "MasteryLevels": {
+      "1": { "Title": "Novice", "Reward": { "Cash": 1000 } },
+      "5": { "Title": "Familiar", "Reward": { "Cash": 5000, "Decal": "DECAL_MASTERY_5" } },
+      "10": { "Title": "Practiced", "Reward": { "Cash": 10000, "Livery": "LIVERY_MASTERY_10" } },
+      "15": { "Title": "Skilled", "Reward": { "Cash": 15000, "Badge": "BADGE_MASTERY_15" } },
+      "20": { "Title": "Expert", "Reward": { "Cash": 25000, "Title": "Expert Driver" } },
+      "25": { "Title": "Master", "Reward": { "Cash": 35000, "Livery": "LIVERY_MASTERY_25" } },
+      "30": { "Title": "Elite", "Reward": { "Cash": 50000, "Banner": "BANNER_MASTERY_30" } },
+      "35": { "Title": "Legendary", "Reward": { "Cash": 75000, "Title": "Legendary Driver" } },
+      "40": { "Title": "Mythic", "Reward": { "Cash": 100000, "ExclusiveLivery": true } },
+      "45": { "Title": "Transcendent", "Reward": { "Cash": 150000, "UniqueHorn": true } },
+      "50": { "Title": "Absolute", "Reward": { "Cash": 250000, "GoldenVariant": true, "Title": "Absolute Master" } }
+    },
+    "Bonuses": {
+      "PerLevel": {
+        "CashBonus": 0.01,
+        "REPBonus": 0.01,
+        "XPBonus": 0.005
+      },
+      "MaxBonus": {
+        "CashBonus": 0.5,
+        "REPBonus": 0.5,
+        "XPBonus": 0.25
+      }
+    },
+    "Showcase": {
+      "DisplayInGarage": true,
+      "DisplayInRace": true,
+      "MasteryBadge": true,
+      "LeaderboardTracking": true
+    }
+  },
+
+  "TrackMastery": {
+    "Description": "Gain mastery by racing on each track",
+    "XPSources": {
+      "RaceComplete": {
+        "BaseXP": 150,
+        "CleanLapBonus": 50,
+        "FastestLapBonus": 100
+      },
+      "LapsCompleted": {
+        "XPPerLap": 25,
+        "MaxPerSession": 500
+      },
+      "SectorMastery": {
+        "PurpleSector": 30,
+        "AllPurple": 100
+      },
+      "TimeAttack": {
+        "PersonalBest": 300,
+        "TrackRecord": 1000
+      },
+      "RaceTypes": {
+        "Circuit": 1.0,
+        "Sprint": 0.8,
+        "Drift": 0.9,
+        "TimeAttack": 1.2
+      }
+    },
+    "MasteryLevels": {
+      "1": { "Title": "Newcomer", "Reward": { "Cash": 1500 } },
+      "5": { "Title": "Regular", "Reward": { "Cash": 7500, "Shortcut": "Unlock hidden route" } },
+      "10": { "Title": "Experienced", "Reward": { "Cash": 15000, "TrackVariant": true } },
+      "15": { "Title": "Veteran", "Reward": { "Cash": 25000, "Badge": "BADGE_TRACK_15" } },
+      "20": { "Title": "Ace", "Reward": { "Cash": 40000, "Title": "Track Ace" } },
+      "25": { "Title": "Master", "Reward": { "Cash": 60000, "TimeOfDayVariant": true } },
+      "30": { "Title": "Legend", "Reward": { "Cash": 80000, "WeatherVariant": true } },
+      "35": { "Title": "Champion", "Reward": { "Cash": 100000, "Title": "Track Champion" } },
+      "40": { "Title": "Icon", "Reward": { "Cash": 150000, "ReverseLayout": true } },
+      "45": { "Title": "Immortal", "Reward": { "Cash": 200000 } },
+      "50": { "Title": "Track God", "Reward": { "Cash": 300000, "Title": "Track God", "GoldenStart": true } }
+    },
+    "Bonuses": {
+      "PerLevel": {
+        "LapTimeBonus": 0.001,
+        "GhostAccuracy": 0.002
+      }
+    },
+    "Knowledge": {
+      "OptimalLine": { "UnlockLevel": 5, "Description": "See optimal racing line" },
+      "BrakingZones": { "UnlockLevel": 10, "Description": "Precise braking indicators" },
+      "SectorTargets": { "UnlockLevel": 15, "Description": "Sector time targets" },
+      "WeatherAdaptation": { "UnlockLevel": 20, "Description": "Weather-adjusted line" }
+    }
+  },
+
+  "ClassMastery": {
+    "Description": "Gain mastery across vehicle classes",
+    "Classes": ["D", "C", "B", "A", "S"],
+    "XPSources": {
+      "RacesInClass": { "XPPerRace": 50 },
+      "WinsInClass": { "XPPerWin": 150 },
+      "VehiclesMastered": { "XPPerVehicle": 500 }
+    },
+    "MasteryLevels": {
+      "10": { "Title": "Class Specialist", "Reward": { "Cash": 25000 } },
+      "25": { "Title": "Class Expert", "Reward": { "Cash": 75000, "ClassBadge": true } },
+      "50": { "Title": "Class Master", "Reward": { "Cash": 200000, "ExclusiveVehicle": true } }
+    }
+  },
+
+  "DisciplineMastery": {
+    "Racing": {
+      "XPSources": ["CircuitRaces", "SprintRaces", "Wins", "Podiums"],
+      "Milestones": {
+        "100Races": { "Title": "Racer", "REP": 5000 },
+        "500Races": { "Title": "Veteran Racer", "REP": 25000 },
+        "1000Races": { "Title": "Racing Legend", "REP": 100000 }
+      }
+    },
+    "Drifting": {
+      "XPSources": ["DriftEvents", "DriftScore", "TandemDrifts"],
+      "Milestones": {
+        "1000000Score": { "Title": "Drifter", "REP": 5000 },
+        "10000000Score": { "Title": "Drift King", "REP": 25000 },
+        "100000000Score": { "Title": "Drift God", "REP": 100000 }
+      }
+    },
+    "Speed": {
+      "XPSources": ["TopSpeedRuns", "SpeedTraps", "HighwayRaces"],
+      "Milestones": {
+        "300kmh": { "Title": "Speed Demon", "REP": 5000 },
+        "350kmh": { "Title": "Speed Freak", "REP": 25000 },
+        "400kmh": { "Title": "Speed Legend", "REP": 100000 }
+      }
+    },
+    "Pursuit": {
+      "XPSources": ["Escapes", "PursuitTime", "HeatLevel"],
+      "Milestones": {
+        "50Escapes": { "Title": "Fugitive", "REP": 5000 },
+        "200Escapes": { "Title": "Most Wanted", "REP": 25000 },
+        "500Escapes": { "Title": "Untouchable", "REP": 100000 }
+      }
+    }
+  },
+
+  "MasteryRewards": {
+    "CumulativeRewards": {
+      "10VehiclesMastered": { "Cash": 100000, "Title": "Collector" },
+      "AllVehiclesMastered": { "Cash": 1000000, "Title": "Ultimate Collector", "ExclusiveVehicle": true },
+      "5TracksMastered": { "Cash": 75000, "Title": "Road Scholar" },
+      "AllTracksMastered": { "Cash": 500000, "Title": "Track Master", "GoldenGhost": true }
+    }
+  },
+
+  "UI": {
+    "MasteryPage": {
+      "ShowProgress": true,
+      "ShowNextReward": true,
+      "ShowLeaderboard": true,
+      "FilterByClass": true,
+      "FilterByOrigin": true
+    },
+    "InRaceDisplay": {
+      "ShowMasteryProgress": true,
+      "ShowLevelUp": true,
+      "Animation": "Celebration"
+    },
+    "GarageDisplay": {
+      "ShowMasteryBadge": true,
+      "ShowMasteryLevel": true,
+      "SortByMastery": true
+    }
+  },
+
+  "LeaderboardIntegration": {
+    "MostMasteredVehicles": true,
+    "HighestVehicleMastery": true,
+    "TotalMasteryXP": true,
+    "MasterySpeed": true
+  }
+}
