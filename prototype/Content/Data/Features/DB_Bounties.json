@@ -1,0 +1,249 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Bounty and Wanted System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxActiveBounties": 5,
+    "BountyDuration": 86400,
+    "DecayEnabled": true,
+    "DecayRate": 0.1,
+    "TransferOnDefeat": true
+  },
+
+  "BountyTypes": {
+    "PlayerBounty": {
+      "ID": "BOUNTY_PLAYER",
+      "Name": "Player Bounty",
+      "Description": "Bounty placed on a player by another player",
+      "MinAmount": 1000,
+      "MaxAmount": 100000,
+      "SourceFee": 0.1,
+      "ClaimCondition": "DefeatInRace",
+      "Transferable": true
+    },
+    "SystemBounty": {
+      "ID": "BOUNTY_SYSTEM",
+      "Name": "Most Wanted",
+      "Description": "System-generated bounty for top performers",
+      "AutoGenerate": true,
+      "GenerationCriteria": {
+        "WinStreak": 5,
+        "TopLeaderboard": true,
+        "HighREP": true
+      },
+      "Amount": "Calculated",
+      "Duration": 604800
+    },
+    "CrewBounty": {
+      "ID": "BOUNTY_CREW",
+      "Name": "Crew Bounty",
+      "Description": "Bounty placed by a crew on rival crew members",
+      "PooledFunding": true,
+      "MaxContributors": 10,
+      "ClaimSplit": "Winner",
+      "TargetType": "CrewMember"
+    },
+    "EventBounty": {
+      "ID": "BOUNTY_EVENT",
+      "Name": "Event Bounty",
+      "Description": "Limited time event bounties",
+      "LimitedTime": true,
+      "SpecialRewards": true,
+      "SystemFunded": true
+    }
+  },
+
+  "BountyGeneration": {
+    "MostWanted": {
+      "RefreshPeriod": 86400,
+      "TargetCount": 10,
+      "Criteria": {
+        "TopWinners": 3,
+        "TopREPEarners": 3,
+        "LongestWinStreak": 2,
+        "TopDrifters": 2
+      },
+      "BaseAmount": {
+        "Rank1": 50000,
+        "Rank2-3": 30000,
+        "Rank4-10": 15000
+      },
+      "Multipliers": {
+        "WinStreak": { "Per5Wins": 0.1, "Max": 0.5 },
+        "Level": { "Per10Levels": 0.05, "Max": 0.25 }
+      }
+    },
+    "RegionalBounties": {
+      "Enabled": true,
+      "PerRegion": 5,
+      "Criteria": "TopInRegion"
+    }
+  },
+
+  "BountyClaiming": {
+    "ClaimConditions": {
+      "Race": {
+        "MustFinishAhead": true,
+        "MinimumPlacement": "Top3",
+        "ValidRaceTypes": ["QuickRace", "Ranked", "Crew"]
+      },
+      "Drift": {
+        "MustOutscore": true,
+        "MinimumMargin": 1000
+      },
+      "PinkSlip": {
+        "AlwaysValid": true,
+        "BonusMultiplier": 2.0
+      }
+    },
+    "PayoutDistribution": {
+      "SoloClaim": {
+        "Winner": 1.0
+      },
+      "TeamClaim": {
+        "TopContributor": 0.5,
+        "OtherMembers": "Split"
+      }
+    },
+    "Notifications": {
+      "BountyPlaced": true,
+      "BountyIncreased": true,
+      "BountyClaimed": true,
+      "BountyExpired": true
+    }
+  },
+
+  "Rewards": {
+    "Cash": {
+      "FullAmount": true,
+      "TaxRate": 0.0
+    },
+    "REP": {
+      "BaseBonusPerClaim": 500,
+      "HighValueBonus": {
+        "Threshold": 50000,
+        "BonusREP": 1000
+      }
+    },
+    "Titles": {
+      "FirstBountyClaim": "Bounty Hunter",
+      "10BountiesClaimed": "Head Hunter",
+      "50BountiesClaimed": "Legendary Hunter",
+      "HighestBountyClaimed": "Big Game Hunter"
+    },
+    "Achievements": {
+      "ClaimFirstBounty": { "REP": 1000, "Achievement": "First Blood" },
+      "Claim100kBounty": { "REP": 5000, "Achievement": "High Roller" },
+      "SurviveBounty": { "REP": 2000, "Achievement": "Survivor" }
+    }
+  },
+
+  "BountyBoard": {
+    "UI": {
+      "ShowTop10": true,
+      "ShowNearby": true,
+      "ShowFriends": true,
+      "ShowCrew": true,
+      "FilterOptions": ["Amount", "Expiration", "Region", "Type"]
+    },
+    "BountyDetails": {
+      "ShowTarget": true,
+      "ShowAmount": true,
+      "ShowTimeRemaining": true,
+      "ShowVehicle": true,
+      "ShowLastSeen": true,
+      "ShowClaimConditions": true
+    },
+    "QuickActions": {
+      "PlaceBounty": true,
+      "IncreaseBounty": true,
+      "ChallengeTarget": true,
+      "TrackTarget": true
+    }
+  },
+
+  "PlacingBounties": {
+    "Requirements": {
+      "MinLevel": 10,
+      "MinCash": 5000,
+      "CooldownAfterPlace": 3600
+    },
+    "Restrictions": {
+      "CannotTargetSelf": true,
+      "CannotTargetCrewmates": true,
+      "CannotTargetFriends": false,
+      "MaxBountiesOnSamePlayer": 3
+    },
+    "Pricing": {
+      "MinBounty": 1000,
+      "MaxBounty": 100000,
+      "IncrementStep": 1000,
+      "PlacementFee": 0.1
+    }
+  },
+
+  "DefenseOptions": {
+    "BountyShield": {
+      "Enabled": true,
+      "Cost": "25% of bounty",
+      "Duration": 86400,
+      "MaxUses": 3
+    },
+    "LowProfile": {
+      "Enabled": true,
+      "HideFromBoard": true,
+      "Duration": 3600,
+      "Cooldown": 86400
+    },
+    "SettleBounty": {
+      "Enabled": true,
+      "PayPercent": 0.5,
+      "CooldownAfter": 604800
+    }
+  },
+
+  "MostWantedPerks": {
+    "HighBounty": {
+      "Threshold": 50000,
+      "Perks": {
+        "REPMultiplier": 1.25,
+        "CashMultiplier": 1.1,
+        "SpecialIndicator": true
+      }
+    },
+    "TopMostWanted": {
+      "Rank": 1,
+      "Perks": {
+        "UniqueTitle": "Public Enemy #1",
+        "SpecialAura": true,
+        "REPMultiplier": 1.5
+      }
+    }
+  },
+
+  "History": {
+    "TrackBountiesPlaced": true,
+    "TrackBountiesClaimed": true,
+    "TrackBountiesEvaded": true,
+    "TrackTotalEarnings": true,
+    "TrackTotalLosses": true,
+    "Leaderboards": {
+      "MostBountiesClaimed": true,
+      "HighestBountyClaimed": true,
+      "LongestSurvival": true,
+      "MostBountiesPlaced": true
+    }
+  },
+
+  "Moderation": {
+    "PreventAbuse": {
+      "FriendBountyLimit": 1,
+      "RecentOpponentCooldown": 3600,
+      "SuspiciousActivityDetection": true
+    },
+    "Appeals": {
+      "BountyDispute": false
+    }
+  }
+}

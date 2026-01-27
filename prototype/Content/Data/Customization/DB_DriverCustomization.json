@@ -1,0 +1,279 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Driver Avatar and Character Customization",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "ShowInCockpit": true,
+    "ShowInCutscenes": true,
+    "ShowInPhotoMode": true,
+    "ShowInGarage": true
+  },
+
+  "BaseCharacter": {
+    "Gender": {
+      "Options": ["Male", "Female", "NonBinary"],
+      "Default": "Male",
+      "Changeable": true
+    },
+    "BodyType": {
+      "Options": ["Athletic", "Average", "Slim", "Heavy"],
+      "Default": "Athletic"
+    }
+  },
+
+  "FaceCustomization": {
+    "Presets": {
+      "Count": 20,
+      "ByGender": true,
+      "Randomize": true
+    },
+    "DetailedCustomization": {
+      "Enabled": true,
+      "UnlockCondition": "LEVEL_5",
+      "Features": {
+        "FaceShape": {
+          "Options": 10,
+          "Sliders": ["Width", "Length", "Jawline"]
+        },
+        "Eyes": {
+          "Shapes": 15,
+          "Colors": ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber", "Heterochromia"],
+          "Sliders": ["Size", "Spacing", "Angle"]
+        },
+        "Eyebrows": {
+          "Styles": 12,
+          "Colors": "HairColors",
+          "Sliders": ["Thickness", "Arch"]
+        },
+        "Nose": {
+          "Shapes": 10,
+          "Sliders": ["Width", "Length", "Bridge"]
+        },
+        "Mouth": {
+          "Shapes": 8,
+          "Sliders": ["Width", "Fullness"]
+        },
+        "Ears": {
+          "Shapes": 6,
+          "Sliders": ["Size", "Angle"]
+        },
+        "Chin": {
+          "Sliders": ["Prominence", "Width", "Cleft"]
+        }
+      }
+    },
+    "SkinTone": {
+      "Presets": 24,
+      "CustomSlider": true,
+      "Range": "Full"
+    },
+    "FacialHair": {
+      "Styles": ["None", "Stubble", "Goatee", "FullBeard", "Mustache", "SoulPatch", "Sideburns"],
+      "Colors": "HairColors",
+      "Density": ["Light", "Medium", "Full"]
+    },
+    "Makeup": {
+      "Enabled": true,
+      "Types": {
+        "Foundation": { "Coverage": [0, 1] },
+        "Eyeshadow": { "Colors": 20, "Styles": 8 },
+        "Eyeliner": { "Colors": 10, "Styles": 5, "Thickness": [0, 1] },
+        "Lipstick": { "Colors": 25, "Finish": ["Matte", "Gloss", "Satin"] },
+        "Blush": { "Colors": 10, "Intensity": [0, 1] }
+      }
+    },
+    "FacialFeatures": {
+      "Scars": { "Types": 8, "Placement": "Free" },
+      "Freckles": { "Density": [0, 1] },
+      "Moles": { "Count": [0, 3], "Placement": "Free" },
+      "Wrinkles": { "Intensity": [0, 1] }
+    }
+  },
+
+  "HairCustomization": {
+    "Styles": {
+      "Male": {
+        "Short": ["Buzz", "Crew", "Fade", "Undercut", "Pompadour", "Slicked"],
+        "Medium": ["Messy", "Swept", "Quiff", "Mohawk"],
+        "Long": ["Ponytail", "ManBun", "Flowing"]
+      },
+      "Female": {
+        "Short": ["Pixie", "Bob", "Undercut", "Asymmetric"],
+        "Medium": ["Wavy", "Straight", "Curly", "Braided"],
+        "Long": ["Ponytail", "Bun", "Flowing", "Braids", "Dreads"]
+      },
+      "Unisex": ["Bald", "Shaved", "Afro", "Cornrows", "Dreadlocks"]
+    },
+    "Colors": {
+      "Natural": ["Black", "DarkBrown", "Brown", "LightBrown", "Auburn", "Ginger", "Blonde", "Platinum", "Gray", "White"],
+      "Unnatural": ["Red", "Blue", "Green", "Purple", "Pink", "Orange", "Teal", "Silver"],
+      "Gradient": { "Enabled": true, "Styles": ["Tips", "Roots", "Ombre", "Highlights"] }
+    },
+    "Accessories": {
+      "Headbands": 5,
+      "HairTies": 8,
+      "Clips": 6
+    }
+  },
+
+  "RacingGear": {
+    "Helmets": {
+      "Categories": {
+        "OpenFace": {
+          "Styles": 8,
+          "Visors": ["Clear", "Tinted", "Iridium", "Gold"],
+          "UnlockMethod": "Default"
+        },
+        "FullFace": {
+          "Styles": 12,
+          "Visors": ["Clear", "Tinted", "Iridium", "Mirror"],
+          "UnlockMethod": "LEVEL_10"
+        },
+        "Racing": {
+          "Styles": 10,
+          "Visors": ["Clear", "Tinted", "Tear-Off"],
+          "HANS": true,
+          "UnlockMethod": "LEVEL_25"
+        },
+        "Novelty": {
+          "Styles": ["Skull", "Samurai", "Alien", "Robot"],
+          "UnlockMethod": "Achievement"
+        }
+      },
+      "Customization": {
+        "BaseColor": true,
+        "Decals": true,
+        "Patterns": ["Stripes", "Flames", "Carbon", "Racing"],
+        "CustomDecals": { "Enabled": true, "MaxLayers": 10 }
+      }
+    },
+    "RacingSuits": {
+      "Styles": {
+        "Casual": {
+          "Options": ["TShirt", "Hoodie", "Jacket"],
+          "Colors": "Full",
+          "UnlockMethod": "Default"
+        },
+        "Racing": {
+          "Options": ["OnePiece", "TwoPiece"],
+          "Brands": ["Generic", "Sponsor1", "Sponsor2"],
+          "Colors": "Full",
+          "UnlockMethod": "LEVEL_15"
+        },
+        "Fireproof": {
+          "Options": ["FIARated"],
+          "Colors": "Limited",
+          "UnlockMethod": "LEVEL_30"
+        }
+      },
+      "Customization": {
+        "Colors": true,
+        "Patches": true,
+        "Sponsors": true,
+        "NameBadge": true
+      }
+    },
+    "Gloves": {
+      "Types": ["Fingerless", "Full", "Racing"],
+      "Colors": "Full",
+      "Materials": ["Leather", "Synthetic", "Nomex"]
+    },
+    "Shoes": {
+      "Types": ["Sneakers", "DrivingShoes", "RacingBoots"],
+      "Styles": 15,
+      "Colors": "Full"
+    }
+  },
+
+  "Accessories": {
+    "Eyewear": {
+      "Sunglasses": {
+        "Styles": 20,
+        "LensColors": ["Dark", "Mirror", "Gradient", "Clear"],
+        "FrameColors": "Full"
+      },
+      "Glasses": {
+        "Styles": 10,
+        "FrameColors": "Full"
+      }
+    },
+    "Jewelry": {
+      "Necklaces": { "Styles": 12, "Materials": ["Silver", "Gold", "Leather"] },
+      "Earrings": { "Styles": 15, "Materials": ["Silver", "Gold", "Diamond"] },
+      "Watches": { "Styles": 10, "Types": ["Digital", "Analog", "Smart"] },
+      "Rings": { "Styles": 8, "Materials": ["Silver", "Gold", "Titanium"] }
+    },
+    "Headwear": {
+      "Caps": { "Styles": 15, "Orientation": ["Forward", "Backward", "Sideways"] },
+      "Beanies": { "Styles": 8 },
+      "Bandanas": { "Styles": 10 }
+    }
+  },
+
+  "DriverPoses": {
+    "VictoryPoses": {
+      "Default": "Fist Pump",
+      "Options": ["Fist Pump", "Peace Sign", "Wave", "Point", "Flex", "Bow", "Dance"],
+      "Unlocks": {
+        "Dance": "LEVEL_20",
+        "Flex": "LEVEL_15"
+      }
+    },
+    "PhotoPoses": {
+      "Options": ["Casual", "Lean", "Crossed Arms", "Thumbs Up", "Cool", "Mysterious"],
+      "Count": 15
+    },
+    "GaragePoses": {
+      "Options": ["Standing", "Leaning", "Sitting", "Working"],
+      "Interactive": true
+    }
+  },
+
+  "Expressions": {
+    "Default": "Neutral",
+    "Options": ["Neutral", "Happy", "Serious", "Determined", "Cocky", "Angry"],
+    "Automatic": {
+      "OnWin": "Happy",
+      "OnLose": "Serious",
+      "DuringRace": "Determined"
+    }
+  },
+
+  "Unlocks": {
+    "ByLevel": {
+      "5": ["DetailedFaceCustomization"],
+      "10": ["FullFaceHelmets", "MoreHairStyles"],
+      "15": ["RacingSuits", "MoreAccessories"],
+      "20": ["VictoryDance", "NoveltyHelmets"],
+      "25": ["RacingHelmets", "PremiumGear"],
+      "30": ["FireproofSuits", "ExclusiveItems"]
+    },
+    "ByAchievement": {
+      "FirstWin": "ChampionCap",
+      "DriftMaster": "DriftKingHelmet",
+      "SpeedDemon": "AeroHelmet"
+    },
+    "ByPurchase": {
+      "TokenItems": true,
+      "SeasonPassItems": true
+    }
+  },
+
+  "Presets": {
+    "SavePresets": true,
+    "MaxPresets": 10,
+    "SharePresets": true,
+    "ImportPresets": true
+  },
+
+  "Visibility": {
+    "ShowToOthers": true,
+    "ShowInReplays": true,
+    "ShowInLeaderboards": true,
+    "PrivacyOptions": {
+      "HideFace": false,
+      "UseGeneric": false
+    }
+  }
+}
