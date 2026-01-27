@@ -1,0 +1,307 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Chat and Communication System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultChannel": "Global",
+    "MaxMessageLength": 256,
+    "MessageRateLimit": { "Messages": 5, "Seconds": 10 },
+    "HistoryLength": 100,
+    "ProfanityFilter": true,
+    "SpamFilter": true
+  },
+
+  "Channels": {
+    "Global": {
+      "ID": "CHAT_GLOBAL",
+      "Name": "Global",
+      "Description": "All players in the same region",
+      "Icon": "ICO_Chat_Global",
+      "Color": "#FFFFFF",
+      "DefaultEnabled": true,
+      "Moderated": true
+    },
+    "Lobby": {
+      "ID": "CHAT_LOBBY",
+      "Name": "Lobby",
+      "Description": "Players in current lobby",
+      "Icon": "ICO_Chat_Lobby",
+      "Color": "#88CCFF",
+      "ContextBased": true,
+      "DefaultEnabled": true
+    },
+    "Race": {
+      "ID": "CHAT_RACE",
+      "Name": "Race",
+      "Description": "Players in current race",
+      "Icon": "ICO_Chat_Race",
+      "Color": "#FF8844",
+      "ContextBased": true,
+      "DefaultEnabled": true,
+      "DisabledDuringRace": true
+    },
+    "Team": {
+      "ID": "CHAT_TEAM",
+      "Name": "Team",
+      "Description": "Your team members only",
+      "Icon": "ICO_Chat_Team",
+      "Color": "#44FF44",
+      "ContextBased": true,
+      "TeamOnly": true
+    },
+    "Crew": {
+      "ID": "CHAT_CREW",
+      "Name": "Crew",
+      "Description": "Your crew members",
+      "Icon": "ICO_Chat_Crew",
+      "Color": "#AA44FF",
+      "CrewOnly": true,
+      "Persistent": true
+    },
+    "Party": {
+      "ID": "CHAT_PARTY",
+      "Name": "Party",
+      "Description": "Your party members",
+      "Icon": "ICO_Chat_Party",
+      "Color": "#FFAA44",
+      "PartyOnly": true
+    },
+    "Whisper": {
+      "ID": "CHAT_WHISPER",
+      "Name": "Whisper",
+      "Description": "Private messages",
+      "Icon": "ICO_Chat_Whisper",
+      "Color": "#FF88CC",
+      "Private": true,
+      "OneToOne": true
+    }
+  },
+
+  "QuickChat": {
+    "Enabled": true,
+    "OpenKey": "DPadDown_Hold",
+    "Categories": {
+      "General": {
+        "Messages": [
+          { "ID": "QC_HELLO", "Text": "Hello!", "Emote": "Wave" },
+          { "ID": "QC_GG", "Text": "Good game!", "Emote": "Thumbsup" },
+          { "ID": "QC_THANKS", "Text": "Thanks!", "Emote": "ThumbsUp" },
+          { "ID": "QC_SORRY", "Text": "Sorry!", "Emote": "Bow" },
+          { "ID": "QC_NO_PROBLEM", "Text": "No problem!", "Emote": null },
+          { "ID": "QC_BYE", "Text": "See you!", "Emote": "Wave" }
+        ]
+      },
+      "Racing": {
+        "Messages": [
+          { "ID": "QC_GL", "Text": "Good luck!", "Emote": null },
+          { "ID": "QC_NICE_RACE", "Text": "Nice race!", "Emote": "Clap" },
+          { "ID": "QC_NICE_MOVE", "Text": "Nice move!", "Emote": "PointUp" },
+          { "ID": "QC_CLOSE_ONE", "Text": "That was close!", "Emote": "Sweat" },
+          { "ID": "QC_MY_BAD", "Text": "My bad!", "Emote": "FacePalm" },
+          { "ID": "QC_REMATCH", "Text": "Rematch?", "Emote": null }
+        ]
+      },
+      "Tactical": {
+        "Messages": [
+          { "ID": "QC_WAIT", "Text": "Wait for me!", "Emote": null },
+          { "ID": "QC_GO", "Text": "Let's go!", "Emote": "RacingFlag" },
+          { "ID": "QC_FOLLOW", "Text": "Follow me!", "Emote": "Point" },
+          { "ID": "QC_NEED_HELP", "Text": "Need help!", "Emote": null },
+          { "ID": "QC_ON_MY_WAY", "Text": "On my way!", "Emote": null },
+          { "ID": "QC_READY", "Text": "Ready!", "Emote": "ThumbsUp" }
+        ]
+      },
+      "Social": {
+        "Messages": [
+          { "ID": "QC_NICE_CAR", "Text": "Nice car!", "Emote": "Heart" },
+          { "ID": "QC_COOL_LIVERY", "Text": "Cool livery!", "Emote": "Fire" },
+          { "ID": "QC_ADD_ME", "Text": "Add me!", "Emote": null },
+          { "ID": "QC_JOIN_CREW", "Text": "Join my crew!", "Emote": null },
+          { "ID": "QC_PARTY_UP", "Text": "Want to party up?", "Emote": null }
+        ]
+      }
+    },
+    "Cooldown": 3.0,
+    "MaxPerMinute": 10
+  },
+
+  "VoiceChat": {
+    "Enabled": true,
+    "DefaultEnabled": false,
+    "PushToTalk": {
+      "Default": true,
+      "Key": "V"
+    },
+    "OpenMic": {
+      "Available": true,
+      "VoiceActivationThreshold": 0.02
+    },
+    "Channels": {
+      "Lobby": { "Enabled": true, "Proximity": false },
+      "Race": { "Enabled": true, "Proximity": false },
+      "Team": { "Enabled": true, "TeamOnly": true },
+      "Party": { "Enabled": true, "PartyOnly": true }
+    },
+    "Settings": {
+      "InputVolume": { "Default": 1.0, "Min": 0.0, "Max": 2.0 },
+      "OutputVolume": { "Default": 1.0, "Min": 0.0, "Max": 2.0 },
+      "NoiseSupression": { "Default": true },
+      "EchoCancellation": { "Default": true }
+    },
+    "Indicators": {
+      "ShowSpeaking": true,
+      "ShowMuted": true,
+      "Position": "TopRight"
+    }
+  },
+
+  "Emotes": {
+    "Enabled": true,
+    "Categories": {
+      "Basic": {
+        "Unlocked": true,
+        "Emotes": [
+          { "ID": "EMOTE_WAVE", "Name": "Wave", "Animation": "Wave" },
+          { "ID": "EMOTE_THUMBSUP", "Name": "Thumbs Up", "Animation": "ThumbsUp" },
+          { "ID": "EMOTE_CLAP", "Name": "Clap", "Animation": "Clap" },
+          { "ID": "EMOTE_BOW", "Name": "Bow", "Animation": "Bow" }
+        ]
+      },
+      "Racing": {
+        "UnlockCondition": "LEVEL_10",
+        "Emotes": [
+          { "ID": "EMOTE_FIST_PUMP", "Name": "Fist Pump", "Animation": "FistPump" },
+          { "ID": "EMOTE_VICTORY", "Name": "Victory", "Animation": "Victory" },
+          { "ID": "EMOTE_DISAPPOINTMENT", "Name": "Disappointment", "Animation": "HeadShake" }
+        ]
+      },
+      "Premium": {
+        "UnlockCondition": "PURCHASE",
+        "Emotes": [
+          { "ID": "EMOTE_DANCE", "Name": "Dance", "Animation": "Dance" },
+          { "ID": "EMOTE_FLEX", "Name": "Flex", "Animation": "Flex" }
+        ]
+      }
+    },
+    "Wheel": {
+      "MaxSlots": 8,
+      "Customizable": true
+    }
+  },
+
+  "Moderation": {
+    "ProfanityFilter": {
+      "Enabled": true,
+      "Mode": "Replace",
+      "ReplacementChar": "*",
+      "Languages": ["EN", "ES", "FR", "DE", "JA", "KO", "ZH"],
+      "CustomWords": "ServerSide"
+    },
+    "SpamFilter": {
+      "Enabled": true,
+      "DuplicateWindow": 30,
+      "MaxDuplicates": 3,
+      "AllCapsThreshold": 0.8
+    },
+    "Reporting": {
+      "Enabled": true,
+      "Categories": [
+        "Offensive_Language",
+        "Harassment",
+        "Spam",
+        "Cheating_Accusation",
+        "Other"
+      ],
+      "MaxReportsPerDay": 10,
+      "CooldownBetweenReports": 60
+    },
+    "Muting": {
+      "MutePlayer": true,
+      "MuteDuration": "Session",
+      "PersistentMute": true,
+      "MaxMutedPlayers": 100
+    },
+    "Blocking": {
+      "BlockPlayer": true,
+      "BlockEffects": [
+        "NoDirectMessages",
+        "NoPartyInvites",
+        "NoMatchmaking"
+      ]
+    },
+    "Penalties": {
+      "Warning": { "Duration": 0, "Effect": "Message" },
+      "ChatBan": { "Duration": [1, 7, 30], "Effect": "NoChatAccess" },
+      "VoiceBan": { "Duration": [1, 7, 30], "Effect": "NoVoiceAccess" },
+      "CommunicationBan": { "Duration": [7, 30, -1], "Effect": "NoAllComms" }
+    }
+  },
+
+  "Notifications": {
+    "NewMessage": {
+      "Sound": "SFX_Chat_Message",
+      "Visual": "ChatBubble",
+      "Duration": 5.0
+    },
+    "WhisperReceived": {
+      "Sound": "SFX_Chat_Whisper",
+      "Visual": "PrivateIndicator",
+      "Duration": 10.0
+    },
+    "MentionReceived": {
+      "Sound": "SFX_Chat_Mention",
+      "Visual": "Highlight",
+      "Duration": 10.0
+    },
+    "SystemMessage": {
+      "Sound": "SFX_Chat_System",
+      "Visual": "SystemIcon",
+      "Duration": 8.0
+    }
+  },
+
+  "UI": {
+    "ChatBox": {
+      "Position": "BottomLeft",
+      "Width": 400,
+      "Height": 250,
+      "Transparency": 0.7,
+      "FadeWhenInactive": true,
+      "FadeTime": 5.0
+    },
+    "Input": {
+      "OpenKey": "Enter",
+      "SendKey": "Enter",
+      "CloseKey": "Escape",
+      "ChannelPrefix": {
+        "/g": "Global",
+        "/l": "Lobby",
+        "/t": "Team",
+        "/c": "Crew",
+        "/p": "Party",
+        "/w": "Whisper"
+      }
+    },
+    "Timestamps": {
+      "Enabled": true,
+      "Format": "HH:mm"
+    },
+    "PlayerNames": {
+      "Clickable": true,
+      "Options": ["Whisper", "ViewProfile", "AddFriend", "Mute", "Report"]
+    }
+  },
+
+  "Settings": {
+    "ChatEnabled": { "Default": true },
+    "VoiceChatEnabled": { "Default": false },
+    "PushToTalk": { "Default": true },
+    "ShowTimestamps": { "Default": true },
+    "ProfanityFilter": { "Default": true },
+    "ReceiveWhispers": { "Default": "FriendsOnly", "Options": ["Everyone", "FriendsOnly", "Nobody"] },
+    "ChatOpacity": { "Default": 0.7, "Min": 0.3, "Max": 1.0 },
+    "FontSize": { "Default": "Medium", "Options": ["Small", "Medium", "Large"] },
+    "QuickChatOnly": { "Default": false, "Description": "Only allow quick chat messages" }
+  }
+}

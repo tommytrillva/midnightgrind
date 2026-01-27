@@ -13,9 +13,10 @@ void UMGAmbientLifeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGAmbientLifeSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			UpdateTimerHandle,
-			[this]() { UpdateAmbientLife(0.5f); },
+			[WeakThis]() { if (WeakThis.IsValid()) WeakThis->UpdateAmbientLife(0.5f); },
 			0.5f,
 			true
 		);

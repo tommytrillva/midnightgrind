@@ -22,9 +22,10 @@ void UMGNavigationSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
 
+	TWeakObjectPtr<UMGNavigationSubsystem> WeakThis(this);
 	InWorld.GetTimerManager().SetTimer(
 		UpdateTimerHandle,
-		[this]() { UpdateNavigation(); },
+		[WeakThis]() { if (WeakThis.IsValid()) WeakThis->UpdateNavigation(); },
 		0.1f,
 		true
 	);

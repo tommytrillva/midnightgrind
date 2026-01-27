@@ -12,9 +12,10 @@ void UMGWorldEventsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGWorldEventsSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			EventUpdateHandle,
-			[this]() { UpdateEvents(1.0f); },
+			[WeakThis]() { if (WeakThis.IsValid()) WeakThis->UpdateEvents(1.0f); },
 			1.0f,
 			true
 		);

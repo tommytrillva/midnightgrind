@@ -90,9 +90,10 @@ void UMGSessionSubsystem::StartMatchmaking(const FMGMatchmakingSettings& Setting
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGSessionSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			MatchmakingTimerHandle,
-			[this]() { UpdateMatchmaking(1.0f); },
+			[WeakThis]() { if (WeakThis.IsValid()) WeakThis->UpdateMatchmaking(1.0f); },
 			1.0f,
 			true
 		);

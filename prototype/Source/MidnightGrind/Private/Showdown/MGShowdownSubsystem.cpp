@@ -215,6 +215,9 @@ void UMGShowdownSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			}
 		}, 0.1f, true);
 	}
+
+	// Load saved data
+	LoadShowdownData();
 }
 
 void UMGShowdownSubsystem::Deinitialize()
@@ -1123,10 +1126,225 @@ FString UMGShowdownSubsystem::GenerateInstanceId() const
 // Persistence
 void UMGShowdownSubsystem::SaveShowdownData()
 {
-	// Save implementation would persist showdown progress, records, and stats
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Showdown");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("showdown_data.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save player stats
+	int32 NumStats = PlayerStats.Num();
+	SaveArchive << NumStats;
+
+	for (const auto& StatPair : PlayerStats)
+	{
+		FString PlayerId = StatPair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGShowdownPlayerStats& Stats = StatPair.Value;
+		int32 Attempted = Stats.TotalShowdownsAttempted;
+		int32 Completed = Stats.TotalShowdownsCompleted;
+		int32 Failed = Stats.TotalShowdownsFailed;
+		int32 PerfectRuns = Stats.PerfectRuns;
+		int32 BossesDefeated = Stats.BossesDefeated;
+		float FastestBoss = Stats.FastestBossDefeat;
+		int32 Retries = Stats.TotalRetries;
+		int64 Currency = Stats.TotalCurrencyEarned;
+
+		SaveArchive << Attempted;
+		SaveArchive << Completed;
+		SaveArchive << Failed;
+		SaveArchive << PerfectRuns;
+		SaveArchive << BossesDefeated;
+		SaveArchive << FastestBoss;
+		SaveArchive << Retries;
+		SaveArchive << Currency;
+
+		// Save best times
+		int32 NumTimes = Stats.BestTimesByShowdown.Num();
+		SaveArchive << NumTimes;
+		for (const auto& TimePair : Stats.BestTimesByShowdown)
+		{
+			FString ShowdownId = TimePair.Key;
+			float Time = TimePair.Value;
+			SaveArchive << ShowdownId;
+			SaveArchive << Time;
+		}
+
+		// Save unlocked bosses
+		int32 NumBosses = Stats.UnlockedBosses.Num();
+		SaveArchive << NumBosses;
+		for (const FString& BossId : Stats.UnlockedBosses)
+		{
+			FString Id = BossId;
+			SaveArchive << Id;
+		}
+	}
+
+	// Save unlocked showdowns per player
+	int32 NumUnlocked = UnlockedShowdowns.Num();
+	SaveArchive << NumUnlocked;
+
+	for (const auto& UnlockedPair : UnlockedShowdowns)
+	{
+		FString PlayerId = UnlockedPair.Key;
+		SaveArchive << PlayerId;
+
+		int32 NumShowdowns = UnlockedPair.Value.Num();
+		SaveArchive << NumShowdowns;
+
+		for (const FString& ShowdownId : UnlockedPair.Value)
+		{
+			FString Id = ShowdownId;
+			SaveArchive << Id;
+		}
+	}
+
+	// Save completed showdowns per player
+	int32 NumCompleted = CompletedShowdowns.Num();
+	SaveArchive << NumCompleted;
+
+	for (const auto& CompletedPair : CompletedShowdowns)
+	{
+		FString PlayerId = CompletedPair.Key;
+		SaveArchive << PlayerId;
+
+		int32 NumShowdowns = CompletedPair.Value.Num();
+		SaveArchive << NumShowdowns;
+
+		for (const FString& ShowdownId : CompletedPair.Value)
+		{
+			FString Id = ShowdownId;
+			SaveArchive << Id;
+		}
+	}
+
+	// Write to file
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGShowdownSubsystem: Saved showdown data for %d players"), NumStats);
 }
 
 void UMGShowdownSubsystem::LoadShowdownData()
 {
-	// Load implementation would restore showdown progress, records, and stats
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Showdown") / TEXT("showdown_data.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("MGShowdownSubsystem: No saved showdown data found"));
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGShowdownSubsystem: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Load player stats
+	int32 NumStats;
+	LoadArchive << NumStats;
+
+	for (int32 i = 0; i < NumStats; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGShowdownPlayerStats Stats;
+		Stats.PlayerId = PlayerId;
+
+		LoadArchive << Stats.TotalShowdownsAttempted;
+		LoadArchive << Stats.TotalShowdownsCompleted;
+		LoadArchive << Stats.TotalShowdownsFailed;
+		LoadArchive << Stats.PerfectRuns;
+		LoadArchive << Stats.BossesDefeated;
+		LoadArchive << Stats.FastestBossDefeat;
+		LoadArchive << Stats.TotalRetries;
+		LoadArchive << Stats.TotalCurrencyEarned;
+
+		// Load best times
+		int32 NumTimes;
+		LoadArchive << NumTimes;
+		for (int32 j = 0; j < NumTimes; ++j)
+		{
+			FString ShowdownId;
+			float Time;
+			LoadArchive << ShowdownId;
+			LoadArchive << Time;
+			Stats.BestTimesByShowdown.Add(ShowdownId, Time);
+		}
+
+		// Load unlocked bosses
+		int32 NumBosses;
+		LoadArchive << NumBosses;
+		for (int32 j = 0; j < NumBosses; ++j)
+		{
+			FString BossId;
+			LoadArchive << BossId;
+			Stats.UnlockedBosses.Add(BossId);
+		}
+
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	// Load unlocked showdowns per player
+	int32 NumUnlocked;
+	LoadArchive << NumUnlocked;
+
+	for (int32 i = 0; i < NumUnlocked; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		int32 NumShowdowns;
+		LoadArchive << NumShowdowns;
+
+		TSet<FString> UnlockedSet;
+		for (int32 j = 0; j < NumShowdowns; ++j)
+		{
+			FString ShowdownId;
+			LoadArchive << ShowdownId;
+			UnlockedSet.Add(ShowdownId);
+		}
+
+		UnlockedShowdowns.Add(PlayerId, UnlockedSet);
+	}
+
+	// Load completed showdowns per player
+	int32 NumCompleted;
+	LoadArchive << NumCompleted;
+
+	for (int32 i = 0; i < NumCompleted; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		int32 NumShowdowns;
+		LoadArchive << NumShowdowns;
+
+		TSet<FString> CompletedSet;
+		for (int32 j = 0; j < NumShowdowns; ++j)
+		{
+			FString ShowdownId;
+			LoadArchive << ShowdownId;
+			CompletedSet.Add(ShowdownId);
+		}
+
+		CompletedShowdowns.Add(PlayerId, CompletedSet);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGShowdownSubsystem: Loaded showdown data for %d players"), NumStats);
 }

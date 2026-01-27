@@ -904,3 +904,236 @@ void UMGWeatherSubsystem::UpdateMaterialParameters()
 	// - RainIntensity
 	// etc.
 }
+
+// ==========================================
+// UNIFIED WEATHER API
+// ==========================================
+
+UMGWeatherRacingSubsystem* UMGWeatherSubsystem::GetRacingSubsystem() const
+{
+	// Lazy initialization of racing subsystem reference
+	if (!bRacingSubsystemSearched)
+	{
+		bRacingSubsystemSearched = true;
+
+		if (UWorld* World = GetWorld())
+		{
+			CachedRacingSubsystem = World->GetSubsystem<UMGWeatherRacingSubsystem>();
+		}
+	}
+
+	return CachedRacingSubsystem.Get();
+}
+
+float UMGWeatherSubsystem::GetUnifiedGripMultiplier(const FVector& VehicleLocation, float VehicleSpeedKPH) const
+{
+	// Start with base road condition grip
+	float BaseGrip = GetRoadGripMultiplier();
+
+	// Check for racing subsystem enhancements
+	if (UMGWeatherRacingSubsystem* RacingSubsystem = GetRacingSubsystem())
+	{
+		const FMGWeatherRacingEffects& Effects = RacingSubsystem->GetCurrentEffects();
+
+		// Apply aquaplaning effects if vehicle is moving through puddles
+		if (Effects.bHasPuddles && VehicleSpeedKPH > 80.0f)
+		{
+			// Aquaplaning reduces grip significantly at speed
+			BaseGrip *= Effects.AquaplaningState.GetGripMultiplier();
+		}
+
+		// Apply any additional racing-specific grip modifiers
+		BaseGrip *= Effects.EffectiveGripMultiplier;
+	}
+
+	// Apply precipitation intensity modifier (heavier rain = less grip)
+	if (IsPrecipitationWeather(CurrentWeather.Type))
+	{
+		const float PrecipitationPenalty = CurrentWeather.Intensity.Precipitation * 0.15f;
+		BaseGrip -= PrecipitationPenalty;
+	}
+
+	// Temperature affects grip (cold tires, icy conditions)
+	if (CurrentWeather.Temperature < 5.0f)
+	{
+		const float ColdPenalty = FMath::Clamp((5.0f - CurrentWeather.Temperature) / 20.0f, 0.0f, 0.2f);
+		BaseGrip -= ColdPenalty;
+	}
+
+	return FMath::Clamp(BaseGrip, 0.1f, 1.0f);
+}
+
+float UMGWeatherSubsystem::GetUnifiedVisibilityDistance(const FVector& Location) const
+{
+	// Start with base weather visibility
+	float Visibility = CurrentWeather.Visibility;
+
+	// Check for racing subsystem enhancements
+	if (UMGWeatherRacingSubsystem* RacingSubsystem = GetRacingSubsystem())
+	{
+		// Racing subsystem may have more detailed visibility calculations
+		// (night effects, headlights, local fog patches)
+		const float RacingVisibility = RacingSubsystem->GetEffectiveVisibility(Location);
+
+		// Use the more restrictive visibility
+		Visibility = FMath::Min(Visibility, RacingVisibility);
+	}
+
+	// Apply time-of-day visibility reduction for night
+	if (CurrentTimeOfDay == EMGTimeOfDay::Night || CurrentTimeOfDay == EMGTimeOfDay::Evening)
+	{
+		// Night significantly reduces visibility
+		const float NightMultiplier = (CurrentTimeOfDay == EMGTimeOfDay::Night) ? 0.15f : 0.4f;
+		Visibility *= NightMultiplier;
+
+		// But not below minimum headlight range
+		Visibility = FMath::Max(Visibility, 150.0f);
+	}
+
+	return FMath::Max(30.0f, Visibility);
+}
+
+float UMGWeatherSubsystem::GetUnifiedAIPerceptionMultiplier() const
+{
+	float Perception = 1.0f;
+
+	// Fog reduces perception
+	if (CurrentWeather.Intensity.FogDensity > 0.1f)
+	{
+		Perception *= (1.0f - CurrentWeather.Intensity.FogDensity * 0.7f);
+	}
+
+	// Rain reduces perception
+	if (IsPrecipitationWeather(CurrentWeather.Type))
+	{
+		Perception *= (1.0f - CurrentWeather.Intensity.Precipitation * 0.3f);
+	}
+
+	// Night reduces perception
+	if (CurrentTimeOfDay == EMGTimeOfDay::Night)
+	{
+		Perception *= 0.5f;
+	}
+	else if (CurrentTimeOfDay == EMGTimeOfDay::Evening)
+	{
+		Perception *= 0.7f;
+	}
+
+	// Check racing subsystem for additional modifiers
+	if (UMGWeatherRacingSubsystem* RacingSubsystem = GetRacingSubsystem())
+	{
+		// Use the more restrictive of the two calculations
+		const float RacingPerception = RacingSubsystem->GetAIPerceptionMultiplier();
+		Perception = FMath::Min(Perception, RacingPerception);
+	}
+
+	return FMath::Clamp(Perception, 0.1f, 1.0f);
+}
+
+bool UMGWeatherSubsystem::AreConditionsHazardous() const
+{
+	// Check road condition
+	if (CurrentWeather.RoadCondition == EMGRoadCondition::StandingWater ||
+		CurrentWeather.RoadCondition == EMGRoadCondition::Icy)
+	{
+		return true;
+	}
+
+	// Check visibility
+	if (CurrentWeather.Visibility < 500.0f)
+	{
+		return true;
+	}
+
+	// Check severe weather types
+	switch (CurrentWeather.Type)
+	{
+	case EMGWeatherType::Thunderstorm:
+	case EMGWeatherType::Blizzard:
+	case EMGWeatherType::HeavyFog:
+	case EMGWeatherType::DustStorm:
+		return true;
+	default:
+		break;
+	}
+
+	// Check high wind
+	if (CurrentWeather.WindSpeed > 25.0f)
+	{
+		return true;
+	}
+
+	// Check racing subsystem for additional hazards
+	if (UMGWeatherRacingSubsystem* RacingSubsystem = GetRacingSubsystem())
+	{
+		const FMGWeatherRacingEffects& Effects = RacingSubsystem->GetCurrentEffects();
+
+		// Aquaplaning is hazardous
+		if (Effects.AquaplaningState.bIsAquaplaning && Effects.AquaplaningState.AquaplaningIntensity > 0.5f)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int32 UMGWeatherSubsystem::GetWeatherDifficultyRating() const
+{
+	int32 Rating = 1; // Base rating for clear conditions
+
+	// Road condition
+	switch (CurrentWeather.RoadCondition)
+	{
+	case EMGRoadCondition::Damp:
+		Rating += 1;
+		break;
+	case EMGRoadCondition::Wet:
+	case EMGRoadCondition::Snowy:
+		Rating += 1;
+		break;
+	case EMGRoadCondition::StandingWater:
+		Rating += 2;
+		break;
+	case EMGRoadCondition::Icy:
+		Rating += 2;
+		break;
+	default:
+		break;
+	}
+
+	// Visibility
+	if (CurrentWeather.Visibility < 1000.0f)
+	{
+		Rating += 1;
+	}
+	if (CurrentWeather.Visibility < 300.0f)
+	{
+		Rating += 1;
+	}
+
+	// Time of day
+	if (CurrentTimeOfDay == EMGTimeOfDay::Night)
+	{
+		Rating += 1;
+	}
+
+	// Wind
+	if (CurrentWeather.WindSpeed > 30.0f)
+	{
+		Rating += 1;
+	}
+
+	// Check racing subsystem for additional difficulty
+	if (UMGWeatherRacingSubsystem* RacingSubsystem = GetRacingSubsystem())
+	{
+		// Use the racing subsystem's difficulty calculation if available
+		const FMGWeatherRacingEffects& Effects = RacingSubsystem->GetCurrentEffects();
+		const int32 RacingDifficulty = Effects.GetDifficultyRating();
+
+		// Take the higher of the two ratings
+		Rating = FMath::Max(Rating, RacingDifficulty);
+	}
+
+	return FMath::Clamp(Rating, 1, 5);
+}
