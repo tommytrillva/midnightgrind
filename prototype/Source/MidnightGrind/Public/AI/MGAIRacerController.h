@@ -690,6 +690,9 @@ protected:
 	/** Last known race position (for mood/learning delta tracking) */
 	int32 LastKnownPosition = 0;
 
+	/** Last known damage percentage (0-1, for mood delta tracking) */
+	float LastKnownDamage = 0.0f;
+
 	/** Total racers in current race */
 	int32 TotalRacersInRace = 0;
 

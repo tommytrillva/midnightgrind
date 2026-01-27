@@ -16,6 +16,9 @@
 #include "Track/MGTrackSubsystem.h"
 #include "GameModes/MGRaceGameMode.h"
 #include "Weather/MGWeatherSubsystem.h"
+#include "Vehicle/MGVehiclePawn.h"
+#include "Vehicle/MGVehicleDamageSystem.h"
+#include "Vehicle/MGVehicleMovementComponent.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
@@ -1958,8 +1961,20 @@ void AMGAIRacerController::UpdateMoodAndLearning(float DeltaTime)
 	// Track position changes for mood updates
 	float PositionDelta = static_cast<float>(LastKnownPosition - CurrentRacePosition);
 
-	// TODO: Track damage (needs vehicle damage system integration)
+	// Track damage from vehicle damage system
 	float DamageReceived = 0.0f;
+	if (AMGVehiclePawn* MGVehicle = Cast<AMGVehiclePawn>(VehiclePawn))
+	{
+		if (UMGVehicleDamageSystem* DamageSystem = MGVehicle->VehicleDamageSystem)
+		{
+			// Get current damage percentage (0-100) and convert to 0-1
+			float CurrentDamage = DamageSystem->GetOverallDamagePercent() / 100.0f;
+
+			// Calculate damage received this frame (positive if damage increased)
+			DamageReceived = FMath::Max(0.0f, CurrentDamage - LastKnownDamage);
+			LastKnownDamage = CurrentDamage;
+		}
+	}
 
 	// Track if we were overtaken this frame
 	bool bWasOvertakenThisFrame = (CurrentState == EMGAIDrivingState::Defending && TimeInState < 0.5f);
@@ -2002,8 +2017,16 @@ void AMGAIRacerController::UpdateMoodAndLearning(float DeltaTime)
 				ObservedAggression += 0.2f; // Fast closing = aggressive
 			}
 
-			// Observe braking (TODO: needs actual braking detection)
-			float ObservedBraking = 0.5f; // Placeholder
+			// Observe braking from player vehicle input
+			float ObservedBraking = 0.5f;
+			if (AMGVehiclePawn* PlayerMGVehicle = Cast<AMGVehiclePawn>(PlayerVehicle))
+			{
+				if (UMGVehicleMovementComponent* Movement = PlayerMGVehicle->GetMGVehicleMovement())
+				{
+					// GetBrakeInput returns 0-1, use directly as braking intensity
+					ObservedBraking = Movement->GetBrakeInput();
+				}
+			}
 
 			// Observe overtake side preference
 			float OvertakeSide = PlayerPerception.bIsOnLeft ? -1.0f : 1.0f;
