@@ -1,0 +1,230 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Save System Configuration",
+
+  "AutoSave": {
+    "Enabled": true,
+    "Interval": 300,
+    "IntervalUnit": "seconds",
+    "TriggerEvents": [
+      "RaceComplete",
+      "VehiclePurchased",
+      "VehicleSold",
+      "PartInstalled",
+      "PartRemoved",
+      "AchievementUnlocked",
+      "LevelUp",
+      "REPTierUp",
+      "ChallengeComplete",
+      "ChapterComplete",
+      "CrewJoined",
+      "CrewLeft",
+      "SettingsChanged",
+      "TuningChanged",
+      "VinylApplied",
+      "PaintChanged"
+    ],
+    "Debounce": 5,
+    "BackgroundSave": true,
+    "NotifyPlayer": false
+  },
+
+  "ManualSave": {
+    "Enabled": true,
+    "Locations": ["MainMenu", "Garage", "PauseMenu"],
+    "Confirmation": false,
+    "OverwriteWarning": true
+  },
+
+  "CloudSync": {
+    "Enabled": true,
+    "Platform": "Auto",
+    "Platforms": ["Steam", "Epic", "PlayStation", "Xbox"],
+    "AutoSync": {
+      "OnStartup": true,
+      "OnShutdown": true,
+      "Periodic": true,
+      "PeriodicInterval": 600
+    },
+    "ConflictResolution": {
+      "Strategy": "PromptUser",
+      "Options": ["UseLocal", "UseCloud", "UseMostRecent", "Merge"],
+      "Default": "UseMostRecent"
+    },
+    "MaxCloudSaves": 3
+  },
+
+  "SaveSlots": {
+    "MaxSlots": 5,
+    "ActiveSlot": 1,
+    "SlotInfo": {
+      "ShowPlayTime": true,
+      "ShowLevel": true,
+      "ShowVehicleCount": true,
+      "ShowCash": true,
+      "ShowREP": true,
+      "ShowChapterProgress": true,
+      "ShowLastPlayed": true,
+      "ShowThumbnail": true
+    },
+    "NewGamePlus": {
+      "Enabled": true,
+      "UnlockCondition": "COMPLETE_ALL_CHAPTERS",
+      "CarryOver": ["Vehicles", "Parts", "Vinyls", "Paints", "Titles", "Achievements"],
+      "Reset": ["Cash", "REP", "CareerProgress", "Challenges"]
+    }
+  },
+
+  "DataCategories": {
+    "Player": {
+      "ProfileInfo": true,
+      "Settings": true,
+      "Statistics": true,
+      "Achievements": true,
+      "Titles": true,
+      "Banners": true,
+      "Avatars": true
+    },
+    "Progression": {
+      "Level": true,
+      "REP": true,
+      "REPTier": true,
+      "CareerProgress": true,
+      "ChapterProgress": true,
+      "TutorialProgress": true,
+      "Challenges": true,
+      "SeasonPass": true,
+      "LoginStreak": true
+    },
+    "Economy": {
+      "Cash": true,
+      "TransactionHistory": true,
+      "WagerHistory": true,
+      "MarketplaceHistory": true
+    },
+    "Garage": {
+      "OwnedVehicles": true,
+      "VehicleConfigurations": true,
+      "InstalledParts": true,
+      "StoredParts": true,
+      "Builds": true,
+      "TuningPresets": true
+    },
+    "Customization": {
+      "Vinyls": true,
+      "Paints": true,
+      "Wheels": true,
+      "Liveries": true,
+      "LicensePlates": true
+    },
+    "Social": {
+      "CrewMembership": true,
+      "FriendsList": true,
+      "BlockList": true,
+      "RecentPlayers": true,
+      "Rivalries": true
+    },
+    "Records": {
+      "BestLapTimes": true,
+      "DriftHighScores": true,
+      "DragTimes": true,
+      "TopSpeeds": true,
+      "RaceHistory": true
+    }
+  },
+
+  "Backup": {
+    "Enabled": true,
+    "MaxBackups": 10,
+    "BackupInterval": 3600,
+    "BackupOnUpdate": true,
+    "BackupLocation": "SaveGames/Backups/",
+    "Compression": true,
+    "Encryption": true
+  },
+
+  "Recovery": {
+    "CorruptionDetection": true,
+    "AutoRecovery": {
+      "Enabled": true,
+      "UseBackup": true,
+      "UseCloud": true,
+      "NotifyPlayer": true
+    },
+    "ManualRecovery": {
+      "Enabled": true,
+      "ShowBackupList": true,
+      "AllowCloudRestore": true
+    }
+  },
+
+  "Import": {
+    "Enabled": false,
+    "AllowCrossPlatform": false,
+    "LegacySaves": {
+      "Enabled": false,
+      "Versions": []
+    }
+  },
+
+  "Export": {
+    "Enabled": true,
+    "Format": "Encrypted",
+    "IncludeStats": true,
+    "IncludeSettings": true,
+    "AllowSharing": false
+  },
+
+  "Validation": {
+    "Enabled": true,
+    "ChecksumVerification": true,
+    "IntegrityCheck": true,
+    "AntiTamper": {
+      "Enabled": true,
+      "Action": "RevertToBackup"
+    }
+  },
+
+  "Storage": {
+    "LocalPath": "SaveGames/",
+    "FileExtension": ".mgsav",
+    "Compression": {
+      "Enabled": true,
+      "Algorithm": "LZ4"
+    },
+    "Encryption": {
+      "Enabled": true,
+      "Algorithm": "AES256"
+    },
+    "MaxFileSize": 50,
+    "MaxFileSizeUnit": "MB"
+  },
+
+  "Notifications": {
+    "SaveComplete": {
+      "Show": false,
+      "Duration": 2.0
+    },
+    "CloudSyncComplete": {
+      "Show": true,
+      "Duration": 3.0
+    },
+    "SaveFailed": {
+      "Show": true,
+      "Duration": 5.0,
+      "Retry": true
+    },
+    "CorruptionDetected": {
+      "Show": true,
+      "Duration": 0,
+      "Modal": true
+    }
+  },
+
+  "Debug": {
+    "VerboseLogging": false,
+    "SaveTimingStats": false,
+    "AllowSaveReset": false,
+    "TestMode": false
+  }
+}
