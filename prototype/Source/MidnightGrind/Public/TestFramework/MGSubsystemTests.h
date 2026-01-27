@@ -17,7 +17,7 @@ class UMGSaveGame;
 /**
  * Subsystem Unit Tests
  * Provides actual test implementations for core subsystems
- * Total Tests: 42
+ * Total Tests: 46
  *
  * Test Categories:
  * - Currency (6): Earning, spending, balance tracking, multipliers
@@ -27,11 +27,11 @@ class UMGSaveGame;
  * - AI (5): Driving states, skills, personality, strategies
  * - Performance (4): Tick time, memory, delegates, data access
  * - Save/Load (5): Save game creation, data structures, slot naming
- * - Physics (5): Tire grip, wet modifiers, weight transfer, handling modes
+ * - Physics (9): Tire grip, wet modifiers, weight transfer, handling modes, surface, geometry, differential, wear
  * - Integration (2): Cross-system verification
  *
  * Console Commands:
- * - MG.RunAllTests - Run all 42 tests
+ * - MG.RunAllTests - Run all 46 tests
  * - MG.RunCurrencyTests - Run 6 currency subsystem tests
  * - MG.RunWeatherTests - Run 6 weather subsystem tests
  * - MG.RunEconomyTests - Run 3 economy tests
@@ -39,7 +39,7 @@ class UMGSaveGame;
  * - MG.RunAITests - Run 5 AI tests
  * - MG.RunPerformanceTests - Run 4 performance tests
  * - MG.RunSaveTests - Run 5 save/load tests
- * - MG.RunPhysicsTests - Run 5 physics tests
+ * - MG.RunPhysicsTests - Run 9 physics tests
  * - MG.RunSmokeTests - Run quick smoke tests
  * - MG.PrintTestReport - Print last test report
  */
@@ -262,6 +262,22 @@ public:
 	/** Test physics handling mode settings */
 	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
 	FMGTestResult TestPhysics_HandlingModeSettings();
+
+	/** Test surface detection constants */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
+	FMGTestResult TestPhysics_SurfaceConstants();
+
+	/** Test suspension geometry constants */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
+	FMGTestResult TestPhysics_GeometryConstants();
+
+	/** Test differential constants */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
+	FMGTestResult TestPhysics_DifferentialConstants();
+
+	/** Test wear degradation constants */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
+	FMGTestResult TestPhysics_WearConstants();
 
 	// ==========================================
 	// CONSOLE COMMANDS

@@ -392,8 +392,44 @@ void UMGSubsystemTests::RegisterAllTests()
 		Test.Tags.Add(FName(TEXT("Physics")));
 		TestFramework->RegisterTest(Test);
 	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Physics_SurfaceConstants"));
+		Test.TestName = FText::FromString(TEXT("Physics - Surface Constants"));
+		Test.Description = FText::FromString(TEXT("Verify surface detection constants"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Physics")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Physics_GeometryConstants"));
+		Test.TestName = FText::FromString(TEXT("Physics - Geometry Constants"));
+		Test.Description = FText::FromString(TEXT("Verify suspension geometry constants"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Physics")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Physics_DifferentialConstants"));
+		Test.TestName = FText::FromString(TEXT("Physics - Differential Constants"));
+		Test.Description = FText::FromString(TEXT("Verify differential physics constants"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Physics")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Physics_WearConstants"));
+		Test.TestName = FText::FromString(TEXT("Physics - Wear Constants"));
+		Test.Description = FText::FromString(TEXT("Verify wear degradation constants"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Physics")));
+		TestFramework->RegisterTest(Test);
+	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 42);
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 46);
 }
 
 // ==========================================
@@ -2830,6 +2866,197 @@ FMGTestResult UMGSubsystemTests::TestPhysics_HandlingModeSettings()
 	);
 }
 
+FMGTestResult UMGSubsystemTests::TestPhysics_SurfaceConstants()
+{
+	LogTestStart(TEXT("TestPhysics_SurfaceConstants"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	using namespace MGPhysicsConstants::Surface;
+
+	Logs.Add(FString::Printf(TEXT("Ice friction threshold: %.2f"), ICE_FRICTION_THRESHOLD));
+	Logs.Add(FString::Printf(TEXT("Traces per frame: %d"), TRACES_PER_FRAME));
+
+	// Ice friction threshold should be low but positive
+	if (ICE_FRICTION_THRESHOLD <= 0.0f || ICE_FRICTION_THRESHOLD > 0.5f)
+	{
+		Logs.Add(TEXT("FAIL: Ice friction threshold should be in range (0-0.5)"));
+		bAllPassed = false;
+	}
+
+	// Traces per frame should be at least 1 (typically 4 for 4 wheels)
+	if (TRACES_PER_FRAME < 1 || TRACES_PER_FRAME > 16)
+	{
+		Logs.Add(TEXT("FAIL: Traces per frame should be in range (1-16)"));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Physics_SurfaceConstants")),
+			TEXT("Surface constants have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Physics_SurfaceConstants")),
+		TEXT("All surface constants are valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPhysics_GeometryConstants()
+{
+	LogTestStart(TEXT("TestPhysics_GeometryConstants"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	using namespace MGPhysicsConstants::Geometry;
+
+	Logs.Add(FString::Printf(TEXT("Toe effect factor: %.3f"), TOE_EFFECT_FACTOR));
+	Logs.Add(FString::Printf(TEXT("Camber grip per degree: %.3f"), CAMBER_GRIP_PER_DEG));
+	Logs.Add(FString::Printf(TEXT("Optimal camber (degrees): %.1f"), OPTIMAL_CAMBER_DEG));
+
+	// Toe effect factor should be small positive
+	if (TOE_EFFECT_FACTOR < 0.0f || TOE_EFFECT_FACTOR > 0.5f)
+	{
+		Logs.Add(TEXT("FAIL: Toe effect factor should be in range (0-0.5)"));
+		bAllPassed = false;
+	}
+
+	// Camber grip per degree should be small positive
+	if (CAMBER_GRIP_PER_DEG < 0.0f || CAMBER_GRIP_PER_DEG > 0.1f)
+	{
+		Logs.Add(TEXT("FAIL: Camber grip per degree should be in range (0-0.1)"));
+		bAllPassed = false;
+	}
+
+	// Optimal camber should be negative (for negative camber benefit)
+	if (OPTIMAL_CAMBER_DEG > 0.0f || OPTIMAL_CAMBER_DEG < -10.0f)
+	{
+		Logs.Add(TEXT("FAIL: Optimal camber should be in range (-10 to 0 degrees)"));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Physics_GeometryConstants")),
+			TEXT("Geometry constants have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Physics_GeometryConstants")),
+		TEXT("All suspension geometry constants are valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPhysics_DifferentialConstants()
+{
+	LogTestStart(TEXT("TestPhysics_DifferentialConstants"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	using namespace MGPhysicsConstants::Differential;
+
+	Logs.Add(FString::Printf(TEXT("1.5-way coast factor: %.2f"), ONE_POINT_FIVE_WAY_COAST_FACTOR));
+	Logs.Add(FString::Printf(TEXT("Min speed diff threshold: %.2f rad/s"), MIN_SPEED_DIFF_THRESHOLD));
+
+	// Coast factor should be in range 0-1
+	if (ONE_POINT_FIVE_WAY_COAST_FACTOR < 0.0f || ONE_POINT_FIVE_WAY_COAST_FACTOR > 1.0f)
+	{
+		Logs.Add(TEXT("FAIL: Coast factor should be in range (0-1)"));
+		bAllPassed = false;
+	}
+
+	// For 1.5-way, coast factor should be around 0.3-0.6
+	if (ONE_POINT_FIVE_WAY_COAST_FACTOR < 0.2f || ONE_POINT_FIVE_WAY_COAST_FACTOR > 0.7f)
+	{
+		Logs.Add(FString::Printf(TEXT("WARNING: 1.5-way coast factor %.2f is outside typical range (0.3-0.6)"), ONE_POINT_FIVE_WAY_COAST_FACTOR));
+	}
+
+	// Min speed diff should be positive and small
+	if (MIN_SPEED_DIFF_THRESHOLD <= 0.0f || MIN_SPEED_DIFF_THRESHOLD > 5.0f)
+	{
+		Logs.Add(TEXT("FAIL: Min speed diff threshold should be in range (0-5 rad/s)"));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Physics_DifferentialConstants")),
+			TEXT("Differential constants have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Physics_DifferentialConstants")),
+		TEXT("All differential constants are valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPhysics_WearConstants()
+{
+	LogTestStart(TEXT("TestPhysics_WearConstants"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	using namespace MGPhysicsConstants::Wear;
+
+	Logs.Add(FString::Printf(TEXT("Suspension damping degradation: %.2f"), SUSPENSION_DAMPING_DEGRADATION));
+	Logs.Add(FString::Printf(TEXT("Tire grip degradation: %.2f"), TIRE_GRIP_DEGRADATION));
+
+	// Suspension damping degradation should be in range 0-1
+	if (SUSPENSION_DAMPING_DEGRADATION < 0.0f || SUSPENSION_DAMPING_DEGRADATION > 1.0f)
+	{
+		Logs.Add(TEXT("FAIL: Suspension damping degradation should be in range (0-1)"));
+		bAllPassed = false;
+	}
+
+	// Tire grip degradation should be in range 0-1
+	if (TIRE_GRIP_DEGRADATION < 0.0f || TIRE_GRIP_DEGRADATION > 1.0f)
+	{
+		Logs.Add(TEXT("FAIL: Tire grip degradation should be in range (0-1)"));
+		bAllPassed = false;
+	}
+
+	// At 100% wear, we should still have some functionality
+	// Suspension should have at least 50% effectiveness
+	if (SUSPENSION_DAMPING_DEGRADATION > 0.5f)
+	{
+		Logs.Add(TEXT("WARNING: Suspension degradation > 50% may feel too punishing"));
+	}
+
+	// Tires should have at least 50% grip at max wear
+	if (TIRE_GRIP_DEGRADATION > 0.5f)
+	{
+		Logs.Add(TEXT("WARNING: Tire grip degradation > 50% may feel too punishing"));
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Physics_WearConstants")),
+			TEXT("Wear constants have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Physics_WearConstants")),
+		TEXT("All wear degradation constants are valid")
+	);
+}
+
 // ==========================================
 // CONSOLE COMMANDS
 // ==========================================
@@ -2902,6 +3129,10 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestPhysics_WeightTransferConstants());
 	TestResults.Add(TestPhysics_TireTemperatureConstants());
 	TestResults.Add(TestPhysics_HandlingModeSettings());
+	TestResults.Add(TestPhysics_SurfaceConstants());
+	TestResults.Add(TestPhysics_GeometryConstants());
+	TestResults.Add(TestPhysics_DifferentialConstants());
+	TestResults.Add(TestPhysics_WearConstants());
 
 	// Count results
 	for (const FMGTestResult& Result : TestResults)
@@ -3123,6 +3354,10 @@ void UMGSubsystemTests::RunPhysicsTests()
 	TestResults.Add(TestPhysics_WeightTransferConstants());
 	TestResults.Add(TestPhysics_TireTemperatureConstants());
 	TestResults.Add(TestPhysics_HandlingModeSettings());
+	TestResults.Add(TestPhysics_SurfaceConstants());
+	TestResults.Add(TestPhysics_GeometryConstants());
+	TestResults.Add(TestPhysics_DifferentialConstants());
+	TestResults.Add(TestPhysics_WearConstants());
 
 	for (const FMGTestResult& Result : TestResults)
 	{
