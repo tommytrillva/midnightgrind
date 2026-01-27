@@ -5,6 +5,8 @@
 #include "JsonObjectConverter.h"
 #include "Misc/SecureHash.h"
 #include "HAL/FileManager.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
 
 UMGProfileManagerSubsystem::UMGProfileManagerSubsystem()
     : bHasLoadedProfile(false)
@@ -55,21 +57,38 @@ void UMGProfileManagerSubsystem::Deinitialize()
 
 bool UMGProfileManagerSubsystem::LoadProfile(const FString& PlayerId)
 {
-    // In a real implementation, this would load from cloud or local storage
-    // For now, create a new profile or load cached data
+    FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Profiles");
+    FString FilePath = SaveDir / FString::Printf(TEXT("%s.json"), *PlayerId);
 
+    FString JsonContent;
+    if (FFileHelper::LoadFileToString(JsonContent, *FilePath))
+    {
+        // Try to load existing profile from JSON
+        if (ImportProfileFromJson(JsonContent))
+        {
+            CurrentProfile.LastLoginDate = FDateTime::Now();
+            bHasLoadedProfile = true;
+            bIsDirty = true; // Mark dirty to save updated login date
+            OnProfileLoaded.Broadcast(CurrentProfile);
+            UE_LOG(LogTemp, Log, TEXT("ProfileManager: Loaded existing profile for player %s"), *PlayerId);
+            return true;
+        }
+    }
+
+    // Create new profile if no saved profile exists
     CurrentProfile = FMGPlayerProfile();
     CurrentProfile.PlayerId = PlayerId;
     CurrentProfile.LastLoginDate = FDateTime::Now();
+    CurrentProfile.CreatedDate = FDateTime::Now();
 
     InitializeDefaultProfile();
 
     bHasLoadedProfile = true;
-    bIsDirty = false;
+    bIsDirty = true; // Mark dirty to trigger initial save
 
     OnProfileLoaded.Broadcast(CurrentProfile);
 
-    UE_LOG(LogTemp, Log, TEXT("ProfileManager: Loaded profile for player %s"), *PlayerId);
+    UE_LOG(LogTemp, Log, TEXT("ProfileManager: Created new profile for player %s"), *PlayerId);
     return true;
 }
 
@@ -80,14 +99,24 @@ bool UMGProfileManagerSubsystem::SaveProfile()
         return false;
     }
 
-    // In a real implementation, this would save to cloud or local storage
-    // For now, just mark as saved
+    FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Profiles");
+    IFileManager::Get().MakeDirectory(*SaveDir, true);
+    FString FilePath = SaveDir / FString::Printf(TEXT("%s.json"), *CurrentProfile.PlayerId);
 
-    bIsDirty = false;
-    OnProfileSaved.Broadcast(true);
+    // Export profile to JSON
+    FString JsonContent = ExportProfileToJson();
 
-    UE_LOG(LogTemp, Log, TEXT("ProfileManager: Profile saved successfully"));
-    return true;
+    if (FFileHelper::SaveStringToFile(JsonContent, *FilePath))
+    {
+        bIsDirty = false;
+        OnProfileSaved.Broadcast(true);
+        UE_LOG(LogTemp, Log, TEXT("ProfileManager: Profile saved successfully to %s"), *FilePath);
+        return true;
+    }
+
+    UE_LOG(LogTemp, Error, TEXT("ProfileManager: Failed to save profile to %s"), *FilePath);
+    OnProfileSaved.Broadcast(false);
+    return false;
 }
 
 bool UMGProfileManagerSubsystem::CreateNewProfile(const FString& PlayerId, const FString& DisplayName)

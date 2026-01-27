@@ -1,0 +1,313 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Dynamometer Tuning System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "UnlockLevel": 10,
+    "BaseCost": 500,
+    "AccuracyVariance": 0.02,
+    "RealTimeGraphs": true
+  },
+
+  "DynoTypes": {
+    "Chassis": {
+      "ID": "DYNO_CHASSIS",
+      "Name": "Chassis Dyno",
+      "Description": "Measures wheel horsepower and torque",
+      "Measures": ["WHP", "WTQ", "AFR", "BoostPressure"],
+      "Cost": 500,
+      "Availability": "Common"
+    },
+    "Engine": {
+      "ID": "DYNO_ENGINE",
+      "Name": "Engine Dyno",
+      "Description": "Measures crank horsepower directly",
+      "Measures": ["BHP", "BTQ", "RPM", "OilTemp"],
+      "Cost": 1500,
+      "Availability": "PerformanceShops"
+    },
+    "AWD": {
+      "ID": "DYNO_AWD",
+      "Name": "AWD Dyno",
+      "Description": "Measures all-wheel drive power distribution",
+      "Measures": ["FrontWHP", "RearWHP", "Split", "TotalWHP"],
+      "Cost": 2000,
+      "Availability": "SpecialistShops"
+    },
+    "Rolling": {
+      "ID": "DYNO_ROLLING",
+      "Name": "Rolling Road",
+      "Description": "Simulates real driving conditions",
+      "Measures": ["WHP", "WTQ", "Speed", "Acceleration"],
+      "Cost": 2500,
+      "Availability": "RareShops"
+    }
+  },
+
+  "TestModes": {
+    "PowerRun": {
+      "ID": "TEST_POWER",
+      "Name": "Power Run",
+      "Description": "Full throttle acceleration test",
+      "Duration": 30,
+      "StartRPM": "Idle",
+      "EndRPM": "Redline",
+      "Output": ["PeakHP", "PeakTQ", "PowerCurve"]
+    },
+    "StepTest": {
+      "ID": "TEST_STEP",
+      "Name": "Step Test",
+      "Description": "Measure at specific RPM points",
+      "RPMSteps": [2000, 3000, 4000, 5000, 6000, 7000, 8000],
+      "HoldTime": 5,
+      "Output": ["HPPerStep", "TQPerStep", "AFRPerStep"]
+    },
+    "BoostSweep": {
+      "ID": "TEST_BOOST",
+      "Name": "Boost Sweep",
+      "Description": "Test various boost levels",
+      "Requirements": ["TurboEquipped"],
+      "BoostLevels": [0.5, 0.75, 1.0, 1.25, 1.5],
+      "Output": ["PowerPerBoost", "SafeBoostLimit"]
+    },
+    "TimedRun": {
+      "ID": "TEST_TIMED",
+      "Name": "Timed Run",
+      "Description": "Measure time to specific speed",
+      "Targets": [60, 100, 150, 200],
+      "Output": ["0-60", "0-100", "QuarterMile"]
+    },
+    "Endurance": {
+      "ID": "TEST_ENDURANCE",
+      "Name": "Endurance Test",
+      "Description": "Extended run to check reliability",
+      "Duration": 300,
+      "Load": "High",
+      "Monitors": ["Temps", "Pressures", "Knock"],
+      "Cost": 5000
+    }
+  },
+
+  "TuningParameters": {
+    "FuelMapping": {
+      "ID": "TUNE_FUEL",
+      "Name": "Fuel Map",
+      "Description": "Air/fuel ratio tuning",
+      "Adjustable": true,
+      "Range": { "Min": 10, "Max": 16 },
+      "IdealPower": 12.5,
+      "IdealEconomy": 14.7,
+      "Grid": { "RPM": 16, "Load": 16 }
+    },
+    "IgnitionTiming": {
+      "ID": "TUNE_TIMING",
+      "Name": "Ignition Timing",
+      "Description": "Spark advance tuning",
+      "Adjustable": true,
+      "Range": { "Min": -10, "Max": 40 },
+      "KnockLimit": true,
+      "Grid": { "RPM": 16, "Load": 16 }
+    },
+    "BoostControl": {
+      "ID": "TUNE_BOOST",
+      "Name": "Boost Control",
+      "Description": "Turbo boost pressure tuning",
+      "Requirements": ["TurboEquipped"],
+      "Range": { "Min": 0, "Max": 2.5 },
+      "WastegateControl": true,
+      "AntiLag": true
+    },
+    "RevLimit": {
+      "ID": "TUNE_REVLIMIT",
+      "Name": "Rev Limiter",
+      "Description": "Maximum RPM setting",
+      "Range": { "Stock": 1.0, "Max": 1.15 },
+      "SoftLimit": true,
+      "HardLimit": true
+    },
+    "LaunchControl": {
+      "ID": "TUNE_LAUNCH",
+      "Name": "Launch Control",
+      "Description": "Launch RPM and settings",
+      "RPMRange": { "Min": 2000, "Max": 6000 },
+      "TwoStep": true,
+      "AntiLag": true
+    },
+    "TractionControl": {
+      "ID": "TUNE_TRACTION",
+      "Name": "Traction Control",
+      "Description": "Electronic traction settings",
+      "Levels": ["Off", "Sport", "Track", "Full"],
+      "Sensitivity": { "Min": 0, "Max": 100 }
+    },
+    "VTEC": {
+      "ID": "TUNE_VTEC",
+      "Name": "VTEC Crossover",
+      "Description": "Variable valve timing point",
+      "Requirements": ["VTECEquipped"],
+      "Range": { "Min": 3500, "Max": 7000 }
+    },
+    "TransmissionTuning": {
+      "ID": "TUNE_TRANS",
+      "Name": "Transmission",
+      "Description": "Shift points and behavior",
+      "ShiftRPM": { "Min": 4000, "Max": "Redline" },
+      "ShiftSpeed": ["Normal", "Fast", "Instant"],
+      "AutoBlip": true
+    }
+  },
+
+  "SafetyLimits": {
+    "KnockDetection": {
+      "Enabled": true,
+      "Threshold": 5,
+      "Action": "RetardTiming",
+      "Warning": true
+    },
+    "TemperatureLimits": {
+      "Coolant": { "Warning": 105, "Critical": 115 },
+      "Oil": { "Warning": 130, "Critical": 150 },
+      "EGT": { "Warning": 900, "Critical": 1000 }
+    },
+    "BoostLimits": {
+      "StockMax": 1.0,
+      "TunedMax": 2.5,
+      "Overboost": "CutFuel"
+    },
+    "AFRSafety": {
+      "Lean": { "Threshold": 14.0, "Action": "AddFuel" },
+      "Rich": { "Threshold": 10.0, "Action": "Warning" }
+    }
+  },
+
+  "TunePresets": {
+    "Stock": {
+      "ID": "PRESET_STOCK",
+      "Description": "Factory default tune",
+      "PowerMod": 1.0,
+      "Reliability": 1.0
+    },
+    "Stage1": {
+      "ID": "PRESET_STAGE1",
+      "Description": "Safe power increase",
+      "PowerMod": 1.1,
+      "Reliability": 0.98,
+      "Cost": 5000
+    },
+    "Stage2": {
+      "ID": "PRESET_STAGE2",
+      "Description": "Moderate power increase",
+      "PowerMod": 1.2,
+      "Reliability": 0.95,
+      "Requirements": ["Intake", "Exhaust"],
+      "Cost": 10000
+    },
+    "Stage3": {
+      "ID": "PRESET_STAGE3",
+      "Description": "Aggressive power increase",
+      "PowerMod": 1.35,
+      "Reliability": 0.9,
+      "Requirements": ["FullBolt-ons", "FuelSystem"],
+      "Cost": 20000
+    },
+    "Race": {
+      "ID": "PRESET_RACE",
+      "Description": "Maximum power tune",
+      "PowerMod": 1.5,
+      "Reliability": 0.8,
+      "Requirements": ["ForgedInternals", "RaceFuel"],
+      "Cost": 50000
+    },
+    "Economy": {
+      "ID": "PRESET_ECO",
+      "Description": "Fuel efficiency tune",
+      "PowerMod": 0.95,
+      "Reliability": 1.0,
+      "FuelEfficiency": 1.15,
+      "Cost": 3000
+    },
+    "AntiLag": {
+      "ID": "PRESET_ANTILAG",
+      "Description": "Rally-style anti-lag",
+      "Requirements": ["TurboEquipped"],
+      "SpoolTime": 0.5,
+      "Reliability": 0.85,
+      "Cost": 15000
+    }
+  },
+
+  "DataLogging": {
+    "Enabled": true,
+    "Channels": {
+      "Engine": ["RPM", "Throttle", "MAP", "MAF", "AFR", "EGT"],
+      "Power": ["WHP", "WTQ", "BoostPSI"],
+      "Temps": ["Coolant", "Oil", "Intake", "Ambient"],
+      "Timing": ["Advance", "Knock", "VTEC"],
+      "Speed": ["WheelSpeed", "GroundSpeed", "SlipRatio"]
+    },
+    "SampleRate": 100,
+    "Storage": "Unlimited",
+    "Export": ["CSV", "JSON"],
+    "Overlay": true
+  },
+
+  "ComparisonTools": {
+    "RunComparison": {
+      "Enabled": true,
+      "MaxRuns": 10,
+      "OverlayGraphs": true,
+      "DeltaDisplay": true
+    },
+    "BeforeAfter": {
+      "Enabled": true,
+      "SaveBaseline": true,
+      "GainCalculation": true
+    },
+    "Leaderboards": {
+      "PerVehicle": true,
+      "PerClass": true,
+      "Global": true
+    }
+  },
+
+  "Visualization": {
+    "Graphs": {
+      "PowerCurve": { "Type": "Line", "Axis": ["RPM", "HP/TQ"] },
+      "AFRMap": { "Type": "Heatmap", "Axis": ["RPM", "Load"] },
+      "BoostCurve": { "Type": "Line", "Axis": ["RPM", "PSI"] },
+      "TimingMap": { "Type": "Heatmap", "Axis": ["RPM", "Load"] }
+    },
+    "RealTime": {
+      "Gauges": ["RPM", "Boost", "AFR", "WHP"],
+      "UpdateRate": 60
+    },
+    "PrintReport": {
+      "Enabled": true,
+      "Format": "PDF",
+      "Includes": ["Specs", "Graphs", "Results"]
+    }
+  },
+
+  "Achievements": {
+    "FirstDyno": { "Reward": { "REP": 100 } },
+    "1000WHP": { "Reward": { "REP": 5000, "Title": "Four Digit Club" } },
+    "PerfectTune": { "Reward": { "REP": 2500 } },
+    "TuningMaster": { "Requirement": "100 Tunes", "Reward": { "Title": "Dyno King" } }
+  },
+
+  "UI": {
+    "DynoScreen": {
+      "LiveGraphs": true,
+      "GaugeCluster": true,
+      "TuneSliders": true,
+      "QuickCompare": true
+    },
+    "ResultsScreen": {
+      "Summary": true,
+      "DetailedGraphs": true,
+      "ShareResults": true,
+      "SaveRun": true
+    }
+  }
+}

@@ -1,0 +1,467 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Performance Parts Manufacturers and Brands",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "BrandLoyalty": true,
+    "QualityTiers": 5,
+    "WarrantySystem": true,
+    "CounterfeitParts": true
+  },
+
+  "BrandCategories": {
+    "Premium": {
+      "QualityMultiplier": 1.2,
+      "PriceMultiplier": 1.5,
+      "ReliabilityBonus": 0.1,
+      "Warranty": 365
+    },
+    "Performance": {
+      "QualityMultiplier": 1.1,
+      "PriceMultiplier": 1.25,
+      "ReliabilityBonus": 0.05,
+      "Warranty": 180
+    },
+    "Standard": {
+      "QualityMultiplier": 1.0,
+      "PriceMultiplier": 1.0,
+      "ReliabilityBonus": 0,
+      "Warranty": 90
+    },
+    "Budget": {
+      "QualityMultiplier": 0.9,
+      "PriceMultiplier": 0.7,
+      "ReliabilityBonus": -0.1,
+      "Warranty": 30
+    },
+    "Counterfeit": {
+      "QualityMultiplier": 0.6,
+      "PriceMultiplier": 0.3,
+      "ReliabilityBonus": -0.3,
+      "Warranty": 0,
+      "FailureRisk": 0.2
+    }
+  },
+
+  "Turbochargers": {
+    "GarrettMotion": {
+      "ID": "BRAND_GARRETT",
+      "Name": "Garrett Motion",
+      "Category": "Premium",
+      "Specialty": "TwinScroll",
+      "Products": {
+        "GTX3071R": { "Power": 550, "Price": 2500, "SpoolTime": 1.2 },
+        "GTX3576R": { "Power": 750, "Price": 3500, "SpoolTime": 1.5 },
+        "GTX4508R": { "Power": 1000, "Price": 5500, "SpoolTime": 2.0 }
+      },
+      "Reputation": "IndustryLeader"
+    },
+    "BorgWarner": {
+      "ID": "BRAND_BORGWARNER",
+      "Name": "BorgWarner",
+      "Category": "Premium",
+      "Specialty": "OEMQuality",
+      "Products": {
+        "EFR6758": { "Power": 450, "Price": 2200, "SpoolTime": 1.0 },
+        "EFR7670": { "Power": 600, "Price": 3000, "SpoolTime": 1.3 },
+        "EFR9180": { "Power": 850, "Price": 4500, "SpoolTime": 1.8 }
+      },
+      "Reputation": "OEMPartner"
+    },
+    "Precision": {
+      "ID": "BRAND_PRECISION",
+      "Name": "Precision Turbo",
+      "Category": "Performance",
+      "Specialty": "DragRacing",
+      "Products": {
+        "PT5858": { "Power": 500, "Price": 1800, "SpoolTime": 1.1 },
+        "PT6466": { "Power": 700, "Price": 2500, "SpoolTime": 1.4 },
+        "PT7675": { "Power": 1100, "Price": 4000, "SpoolTime": 2.2 }
+      },
+      "Reputation": "DragSpecialist"
+    },
+    "HKS": {
+      "ID": "BRAND_HKS_TURBO",
+      "Name": "HKS",
+      "Category": "Premium",
+      "Specialty": "JDMFocused",
+      "Products": {
+        "GT2530": { "Power": 350, "Price": 1500, "SpoolTime": 0.9 },
+        "GT3037S": { "Power": 500, "Price": 2800, "SpoolTime": 1.2 },
+        "T51RKAI": { "Power": 800, "Price": 5000, "SpoolTime": 1.6 }
+      },
+      "Reputation": "JDMLegend"
+    }
+  },
+
+  "Superchargers": {
+    "Whipple": {
+      "ID": "BRAND_WHIPPLE",
+      "Name": "Whipple Superchargers",
+      "Category": "Premium",
+      "Specialty": "TwinScrew",
+      "Products": {
+        "W140AX": { "PowerGain": 200, "Price": 6500 },
+        "W175AX": { "PowerGain": 300, "Price": 8500 },
+        "W185RF": { "PowerGain": 400, "Price": 10500 }
+      }
+    },
+    "Vortech": {
+      "ID": "BRAND_VORTECH",
+      "Name": "Vortech",
+      "Category": "Performance",
+      "Specialty": "Centrifugal",
+      "Products": {
+        "V3Si": { "PowerGain": 150, "Price": 3500 },
+        "YSiTrim": { "PowerGain": 250, "Price": 5000 },
+        "JTTrim": { "PowerGain": 350, "Price": 7000 }
+      }
+    },
+    "Kenne Bell": {
+      "ID": "BRAND_KENNEBELL",
+      "Name": "Kenne Bell",
+      "Category": "Premium",
+      "Specialty": "TwinScrew",
+      "Products": {
+        "Mammoth2.8": { "PowerGain": 275, "Price": 7000 },
+        "Mammoth3.6": { "PowerGain": 400, "Price": 9500 }
+      }
+    }
+  },
+
+  "Exhausts": {
+    "Borla": {
+      "ID": "BRAND_BORLA",
+      "Name": "Borla",
+      "Category": "Premium",
+      "Specialty": "Sound",
+      "SoundType": "Aggressive",
+      "Products": {
+        "Touring": { "FlowGain": 10, "Price": 1200, "Sound": "Moderate" },
+        "ATAK": { "FlowGain": 15, "Price": 1500, "Sound": "Loud" },
+        "S-Type": { "FlowGain": 12, "Price": 1400, "Sound": "Balanced" }
+      }
+    },
+    "Akrapovic": {
+      "ID": "BRAND_AKRAPOVIC",
+      "Name": "Akrapovic",
+      "Category": "Premium",
+      "Specialty": "Titanium",
+      "Material": "Titanium",
+      "Products": {
+        "Evolution": { "FlowGain": 20, "Price": 5000, "WeightSave": 15 },
+        "SlipOn": { "FlowGain": 12, "Price": 2500, "WeightSave": 8 }
+      }
+    },
+    "Tomei": {
+      "ID": "BRAND_TOMEI",
+      "Name": "Tomei",
+      "Category": "Performance",
+      "Specialty": "JDM",
+      "Products": {
+        "ExpremeTi": { "FlowGain": 18, "Price": 2000, "WeightSave": 10 },
+        "Type80": { "FlowGain": 15, "Price": 1500 }
+      }
+    },
+    "Flowmaster": {
+      "ID": "BRAND_FLOWMASTER",
+      "Name": "Flowmaster",
+      "Category": "Standard",
+      "Specialty": "American",
+      "Products": {
+        "Super10": { "FlowGain": 12, "Price": 400, "Sound": "VeryLoud" },
+        "Super44": { "FlowGain": 10, "Price": 300, "Sound": "Loud" },
+        "FlowFX": { "FlowGain": 8, "Price": 250, "Sound": "Moderate" }
+      }
+    },
+    "MagnaFlow": {
+      "ID": "BRAND_MAGNAFLOW",
+      "Name": "MagnaFlow",
+      "Category": "Standard",
+      "Specialty": "StainlessSteel",
+      "Products": {
+        "Competition": { "FlowGain": 14, "Price": 1000, "Sound": "Moderate" },
+        "Street": { "FlowGain": 10, "Price": 700, "Sound": "Mild" }
+      }
+    }
+  },
+
+  "Suspension": {
+    "Ohlins": {
+      "ID": "BRAND_OHLINS",
+      "Name": "Ohlins",
+      "Category": "Premium",
+      "Specialty": "RaceGrade",
+      "Products": {
+        "RoadTrack": { "HandlingBonus": 15, "Price": 4500 },
+        "DFV": { "HandlingBonus": 20, "Price": 6000 },
+        "TTX": { "HandlingBonus": 25, "Price": 8000 }
+      }
+    },
+    "KW": {
+      "ID": "BRAND_KW",
+      "Name": "KW Suspension",
+      "Category": "Premium",
+      "Specialty": "German",
+      "Products": {
+        "V1": { "HandlingBonus": 10, "Price": 1800 },
+        "V2": { "HandlingBonus": 15, "Price": 2500 },
+        "V3": { "HandlingBonus": 20, "Price": 3500 },
+        "Clubsport": { "HandlingBonus": 22, "Price": 4500 }
+      }
+    },
+    "Tein": {
+      "ID": "BRAND_TEIN",
+      "Name": "Tein",
+      "Category": "Performance",
+      "Specialty": "JDM",
+      "Products": {
+        "StreetBasis": { "HandlingBonus": 8, "Price": 800 },
+        "FlexZ": { "HandlingBonus": 12, "Price": 1200 },
+        "MonoSport": { "HandlingBonus": 18, "Price": 2800 }
+      }
+    },
+    "BC Racing": {
+      "ID": "BRAND_BCRACING",
+      "Name": "BC Racing",
+      "Category": "Standard",
+      "Specialty": "ValueCoilovers",
+      "Products": {
+        "BR": { "HandlingBonus": 10, "Price": 1000 },
+        "ER": { "HandlingBonus": 14, "Price": 1600 },
+        "DS": { "HandlingBonus": 8, "Price": 750 }
+      }
+    }
+  },
+
+  "Brakes": {
+    "Brembo": {
+      "ID": "BRAND_BREMBO",
+      "Name": "Brembo",
+      "Category": "Premium",
+      "Specialty": "RaceBrakes",
+      "Products": {
+        "GT": { "StoppingPower": 20, "Price": 4000 },
+        "GTR": { "StoppingPower": 30, "Price": 8000 },
+        "CCM": { "StoppingPower": 35, "Price": 15000, "Material": "CarbonCeramic" }
+      }
+    },
+    "StopTech": {
+      "ID": "BRAND_STOPTECH",
+      "Name": "StopTech",
+      "Category": "Performance",
+      "Specialty": "BigBrakeKits",
+      "Products": {
+        "Street": { "StoppingPower": 12, "Price": 1500 },
+        "Sport": { "StoppingPower": 18, "Price": 2500 },
+        "Trophy": { "StoppingPower": 25, "Price": 5000 }
+      }
+    },
+    "Wilwood": {
+      "ID": "BRAND_WILWOOD",
+      "Name": "Wilwood",
+      "Category": "Performance",
+      "Specialty": "Lightweight",
+      "Products": {
+        "StreetPerformance": { "StoppingPower": 15, "Price": 2000 },
+        "AERO6": { "StoppingPower": 22, "Price": 4000 }
+      }
+    },
+    "APRacing": {
+      "ID": "BRAND_APRACING",
+      "Name": "AP Racing",
+      "Category": "Premium",
+      "Specialty": "Motorsport",
+      "Products": {
+        "Radi-CAL": { "StoppingPower": 28, "Price": 6500 },
+        "ProMax": { "StoppingPower": 35, "Price": 10000 }
+      }
+    }
+  },
+
+  "Internals": {
+    "CP_Carrillo": {
+      "ID": "BRAND_CP",
+      "Name": "CP-Carrillo",
+      "Category": "Premium",
+      "Specialty": "ForgedComponents",
+      "Products": {
+        "ForgedPistons": { "StrengthBonus": 50, "Price": 1500 },
+        "ProRods": { "StrengthBonus": 60, "Price": 2000 }
+      }
+    },
+    "Wiseco": {
+      "ID": "BRAND_WISECO",
+      "Name": "Wiseco",
+      "Category": "Performance",
+      "Specialty": "Pistons",
+      "Products": {
+        "SportCompact": { "StrengthBonus": 40, "Price": 800 },
+        "ProTru": { "StrengthBonus": 50, "Price": 1200 }
+      }
+    },
+    "BrianCrower": {
+      "ID": "BRAND_BRIANCROWER",
+      "Name": "Brian Crower",
+      "Category": "Premium",
+      "Specialty": "JDMInternals",
+      "Products": {
+        "StageCams": { "PowerBonus": 25, "Price": 600 },
+        "Valvetrain": { "RevLimit": 1000, "Price": 1500 }
+      }
+    },
+    "Kelford": {
+      "ID": "BRAND_KELFORD",
+      "Name": "Kelford Cams",
+      "Category": "Premium",
+      "Specialty": "Camshafts",
+      "Products": {
+        "Stage1": { "PowerBonus": 15, "Price": 500 },
+        "Stage2": { "PowerBonus": 30, "Price": 800 },
+        "Stage3": { "PowerBonus": 50, "Price": 1200 }
+      }
+    }
+  },
+
+  "Intakes": {
+    "K&N": {
+      "ID": "BRAND_KN",
+      "Name": "K&N",
+      "Category": "Standard",
+      "Specialty": "FiltersTested",
+      "Products": {
+        "DropIn": { "FlowGain": 5, "Price": 80 },
+        "FIPK": { "FlowGain": 10, "Price": 300 },
+        "Typhoon": { "FlowGain": 12, "Price": 400 }
+      }
+    },
+    "AEM": {
+      "ID": "BRAND_AEM",
+      "Name": "AEM",
+      "Category": "Performance",
+      "Specialty": "ColdAir",
+      "Products": {
+        "DryFlow": { "FlowGain": 8, "Price": 250 },
+        "ColdAir": { "FlowGain": 15, "Price": 400 }
+      }
+    },
+    "Injen": {
+      "ID": "BRAND_INJEN",
+      "Name": "Injen",
+      "Category": "Performance",
+      "Specialty": "PoweredIntakes",
+      "Products": {
+        "SP": { "FlowGain": 12, "Price": 350 },
+        "EVO": { "FlowGain": 18, "Price": 500 }
+      }
+    }
+  },
+
+  "Wheels": {
+    "Volk": {
+      "ID": "BRAND_VOLK",
+      "Name": "Volk Racing",
+      "Category": "Premium",
+      "Specialty": "JDMIconic",
+      "Products": {
+        "TE37": { "WeightSave": 8, "Price": 4000 },
+        "CE28N": { "WeightSave": 10, "Price": 5000 },
+        "ZE40": { "WeightSave": 7, "Price": 3500 }
+      }
+    },
+    "BBS": {
+      "ID": "BRAND_BBS",
+      "Name": "BBS",
+      "Category": "Premium",
+      "Specialty": "German",
+      "Products": {
+        "LM": { "WeightSave": 5, "Price": 3000 },
+        "RS": { "WeightSave": 6, "Price": 3500 },
+        "FI-R": { "WeightSave": 10, "Price": 6000 }
+      }
+    },
+    "Work": {
+      "ID": "BRAND_WORK",
+      "Name": "Work Wheels",
+      "Category": "Premium",
+      "Specialty": "3Piece",
+      "Products": {
+        "Meister": { "WeightSave": 4, "Price": 3500 },
+        "Emotion": { "WeightSave": 6, "Price": 2500 },
+        "VS": { "WeightSave": 5, "Price": 4000 }
+      }
+    },
+    "Enkei": {
+      "ID": "BRAND_ENKEI",
+      "Name": "Enkei",
+      "Category": "Performance",
+      "Specialty": "MAT",
+      "Products": {
+        "RPF1": { "WeightSave": 8, "Price": 1200 },
+        "NT03": { "WeightSave": 7, "Price": 1500 },
+        "PF01": { "WeightSave": 6, "Price": 1000 }
+      }
+    }
+  },
+
+  "Electronics": {
+    "Haltech": {
+      "ID": "BRAND_HALTECH",
+      "Name": "Haltech",
+      "Category": "Premium",
+      "Specialty": "StandaloneECU",
+      "Products": {
+        "Elite750": { "Features": "Entry", "Price": 1200 },
+        "Elite1500": { "Features": "Mid", "Price": 2000 },
+        "Elite2500": { "Features": "Full", "Price": 3500 }
+      }
+    },
+    "AEM": {
+      "ID": "BRAND_AEM_ECU",
+      "Name": "AEM Electronics",
+      "Category": "Performance",
+      "Specialty": "InfinityECU",
+      "Products": {
+        "Infinity506": { "Features": "Entry", "Price": 1500 },
+        "Infinity508": { "Features": "Full", "Price": 2500 }
+      }
+    },
+    "COBB": {
+      "ID": "BRAND_COBB",
+      "Name": "COBB Tuning",
+      "Category": "Performance",
+      "Specialty": "Accessport",
+      "Products": {
+        "Accessport": { "Features": "FlashTune", "Price": 650 }
+      }
+    }
+  },
+
+  "BrandLoyalty": {
+    "Enabled": true,
+    "Tiers": {
+      "None": { "Purchases": 0, "Discount": 0 },
+      "Bronze": { "Purchases": 5, "Discount": 0.05 },
+      "Silver": { "Purchases": 15, "Discount": 0.1 },
+      "Gold": { "Purchases": 30, "Discount": 0.15 },
+      "Platinum": { "Purchases": 50, "Discount": 0.2 }
+    },
+    "ExclusiveItems": true,
+    "EarlyAccess": true
+  },
+
+  "UI": {
+    "BrandBrowser": {
+      "CategoryFilter": true,
+      "QualityFilter": true,
+      "CompareProducts": true,
+      "Reviews": true
+    },
+    "LoyaltyScreen": {
+      "ProgressTracking": true,
+      "RewardsPreview": true,
+      "BrandHistory": true
+    }
+  }
+}

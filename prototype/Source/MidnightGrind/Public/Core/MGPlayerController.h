@@ -55,6 +55,11 @@ enum class EMGTestGrade : uint8;
 struct FMGContract;
 struct FMGContractObjective;
 struct FMGChallenge;
+enum class EMGCurrencyType : uint8;
+struct FMGEarningMultiplier;
+struct FMGRewardClaimResult;
+enum class EMGStreakMilestone : uint8;
+struct FMGDailyReward;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -726,4 +731,20 @@ protected:
 	/** Handle challenge completed from challenge subsystem */
 	UFUNCTION()
 	void OnChallengeCompleted(const FMGChallenge& Challenge);
+
+	/** Handle currency changed from currency subsystem */
+	UFUNCTION()
+	void OnCurrencyChanged(EMGCurrencyType Type, int64 NewBalance, int64 Delta);
+
+	/** Handle multiplier activated from currency subsystem */
+	UFUNCTION()
+	void OnMultiplierActivated(const FMGEarningMultiplier& Multiplier);
+
+	/** Handle daily reward claimed from daily rewards subsystem */
+	UFUNCTION()
+	void OnDailyRewardClaimed(const FMGRewardClaimResult& Result);
+
+	/** Handle streak milestone from daily rewards subsystem */
+	UFUNCTION()
+	void OnStreakMilestoneReached(EMGStreakMilestone Milestone, const TArray<FMGDailyReward>& Rewards);
 };

@@ -1,0 +1,318 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Ownership and Modification History System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "TrackAllChanges": true,
+    "PreviousOwnerData": true,
+    "ValueHistory": true,
+    "ExportEnabled": true
+  },
+
+  "OwnershipTracking": {
+    "CurrentOwner": {
+      "PlayerID": true,
+      "PurchaseDate": true,
+      "PurchasePrice": true,
+      "AcquisitionMethod": true,
+      "TotalOwnershipTime": true
+    },
+    "PreviousOwners": {
+      "MaxTracked": 10,
+      "DataStored": {
+        "PlayerName": true,
+        "OwnershipDuration": true,
+        "ModificationsAdded": true,
+        "ConditionAtSale": true
+      },
+      "Privacy": {
+        "HideName": "Optional",
+        "ShowStats": true
+      }
+    },
+    "AcquisitionMethods": {
+      "Dealership": { "ID": "ACQ_DEALER", "Verifiable": true },
+      "Marketplace": { "ID": "ACQ_MARKET", "ShowSeller": true },
+      "Trade": { "ID": "ACQ_TRADE", "ShowTrader": true },
+      "PinkSlip": { "ID": "ACQ_PINKSLIP", "ShowWonFrom": true },
+      "Reward": { "ID": "ACQ_REWARD", "ShowSource": true },
+      "Gift": { "ID": "ACQ_GIFT", "ShowGifter": true },
+      "Found": { "ID": "ACQ_FOUND", "Location": true }
+    }
+  },
+
+  "ModificationHistory": {
+    "Tracking": {
+      "AllPartsInstalled": true,
+      "AllPartsRemoved": true,
+      "DateTimestamp": true,
+      "PartCondition": true,
+      "InstallLocation": true
+    },
+    "Categories": {
+      "Engine": {
+        "Tracked": ["Turbo", "Supercharger", "Internals", "Exhaust", "Intake", "ECU"],
+        "PowerChanges": true
+      },
+      "Drivetrain": {
+        "Tracked": ["Transmission", "Clutch", "Differential", "Driveshaft"],
+        "GearChanges": true
+      },
+      "Suspension": {
+        "Tracked": ["Coilovers", "Springs", "Shocks", "Bushings", "Swaybars"],
+        "HeightChanges": true
+      },
+      "Brakes": {
+        "Tracked": ["Calipers", "Rotors", "Pads", "Lines"],
+        "UpgradeLevel": true
+      },
+      "Wheels": {
+        "Tracked": ["Wheels", "Tires", "Spacers"],
+        "SizeChanges": true
+      },
+      "Cosmetic": {
+        "Tracked": ["BodyKits", "Paint", "Wraps", "Liveries", "Interior"],
+        "StyleChanges": true
+      }
+    },
+    "Timeline": {
+      "ViewMode": ["List", "Timeline", "Graph"],
+      "FilterByCategory": true,
+      "SearchParts": true
+    }
+  },
+
+  "StatisticsTracking": {
+    "Distance": {
+      "TotalMiles": true,
+      "ByOwner": true,
+      "ByMode": {
+        "FreeRoam": true,
+        "Racing": true,
+        "Cruise": true
+      }
+    },
+    "Racing": {
+      "TotalRaces": true,
+      "Wins": true,
+      "Podiums": true,
+      "FastestLaps": true,
+      "BestFinishes": {
+        "ByTrack": true,
+        "ByMode": true
+      }
+    },
+    "Performance": {
+      "TopSpeed": { "Recorded": true, "Location": true, "Date": true },
+      "BestQuarterMile": true,
+      "Best0to60": true,
+      "BestLapTimes": { "ByTrack": true },
+      "DynoRecords": { "MaxHP": true, "MaxTQ": true }
+    },
+    "Incidents": {
+      "Crashes": true,
+      "TotalDamage": true,
+      "Repairs": true,
+      "TotalRepairCost": true
+    },
+    "PoliceActivity": {
+      "TotalChases": true,
+      "Escapes": true,
+      "Busts": true,
+      "MaxHeatLevel": true
+    },
+    "Drift": {
+      "TotalDriftScore": true,
+      "LongestDrift": true,
+      "HighestSingleScore": true
+    }
+  },
+
+  "ValueTracking": {
+    "CurrentValue": {
+      "BaseValue": true,
+      "ModificationValue": true,
+      "ConditionModifier": true,
+      "MarketTrends": true
+    },
+    "ValueHistory": {
+      "PurchasePrice": true,
+      "HighestValue": true,
+      "LowestValue": true,
+      "ValueOverTime": "Graph"
+    },
+    "InvestmentTracking": {
+      "TotalSpent": true,
+      "PartsInvestment": true,
+      "RepairCosts": true,
+      "ROI": true
+    },
+    "Appreciation": {
+      "RareVehicles": true,
+      "LimitedEditions": true,
+      "HistoricalSignificance": true
+    }
+  },
+
+  "ConditionTracking": {
+    "Overall": {
+      "Scale": 100,
+      "Categories": {
+        "Mint": { "Min": 95 },
+        "Excellent": { "Min": 85 },
+        "Good": { "Min": 70 },
+        "Fair": { "Min": 50 },
+        "Poor": { "Min": 25 },
+        "Salvage": { "Min": 0 }
+      }
+    },
+    "ComponentCondition": {
+      "Engine": { "Tracked": true, "WearRate": 0.01 },
+      "Transmission": { "Tracked": true, "WearRate": 0.008 },
+      "Suspension": { "Tracked": true, "WearRate": 0.005 },
+      "Brakes": { "Tracked": true, "WearRate": 0.02 },
+      "Tires": { "Tracked": true, "WearRate": 0.03 },
+      "Body": { "Tracked": true, "WearRate": 0.002 }
+    },
+    "MaintenanceLog": {
+      "OilChanges": true,
+      "TireRotations": true,
+      "BrakeService": true,
+      "MajorService": true,
+      "DateTracked": true
+    }
+  },
+
+  "DocumentSystem": {
+    "Title": {
+      "Tracked": true,
+      "Clean": { "Description": "No accidents or issues" },
+      "Salvage": { "Description": "Previously totaled" },
+      "Rebuilt": { "Description": "Restored from salvage" },
+      "Lemon": { "Description": "Known defects" }
+    },
+    "Registration": {
+      "CurrentRegion": true,
+      "RegistrationHistory": true,
+      "LegalStatus": true
+    },
+    "Insurance": {
+      "CurrentPolicy": true,
+      "ClaimsHistory": true,
+      "PremiumHistory": true
+    }
+  },
+
+  "Achievements": {
+    "VehicleBased": {
+      "Milestone": {
+        "1000Miles": { "Reward": { "REP": 100 } },
+        "10000Miles": { "Reward": { "REP": 500 } },
+        "100000Miles": { "Reward": { "REP": 2500, "Title": "Road Warrior" } }
+      },
+      "Victories": {
+        "FirstWin": { "Reward": { "REP": 100 } },
+        "50Wins": { "Reward": { "REP": 1000 } },
+        "100Wins": { "Reward": { "REP": 2500, "Badge": "Century Club" } }
+      },
+      "Ownership": {
+        "1Year": { "Reward": { "REP": 500, "Title": "Loyal Owner" } },
+        "OriginalOwner": { "Reward": { "Badge": "Original" } }
+      }
+    }
+  },
+
+  "NotableEvents": {
+    "Tracking": {
+      "TournamentWins": true,
+      "RecordBreaks": true,
+      "RareEncounters": true,
+      "MilestoneAchievements": true
+    },
+    "EventTypes": {
+      "RaceVictory": { "StoresOpponent": true, "StoresTrack": true },
+      "RecordSet": { "StoresRecord": true, "StoresPrevious": true },
+      "PinkSlipWon": { "StoresFrom": true },
+      "PoliceEscape": { "StoresHeatLevel": true },
+      "MaxPowerReached": { "StoresHP": true }
+    },
+    "Highlights": {
+      "AutoGenerated": true,
+      "UserPinned": { "Max": 10 }
+    }
+  },
+
+  "BuildSheet": {
+    "Generated": {
+      "CurrentSpecs": true,
+      "AllModifications": true,
+      "PerformanceStats": true,
+      "History": true
+    },
+    "Export": {
+      "Formats": ["PDF", "Image", "JSON"],
+      "Shareable": true,
+      "Watermark": "Optional"
+    },
+    "Comparison": {
+      "VsStock": true,
+      "VsPrevious": true,
+      "VsOtherBuilds": true
+    }
+  },
+
+  "Provenance": {
+    "Certification": {
+      "Enabled": true,
+      "Verified": {
+        "OriginalOwner": true,
+        "NoAccidents": true,
+        "AllServiceRecords": true,
+        "MatchingNumbers": true
+      },
+      "Premium": {
+        "RareVehicle": true,
+        "LimitedEdition": true,
+        "HistoricalWins": true
+      }
+    },
+    "ValueImpact": {
+      "Certified": { "Bonus": 1.15 },
+      "OneOwner": { "Bonus": 1.1 },
+      "WinningHistory": { "Bonus": 1.2 },
+      "Celebrity": { "Bonus": 1.5 }
+    }
+  },
+
+  "Privacy": {
+    "Settings": {
+      "HideOwnerHistory": true,
+      "HideStatistics": true,
+      "HideModHistory": true,
+      "HideValue": true
+    },
+    "WhenSelling": {
+      "RequireDisclosure": ["TitleStatus", "AccidentHistory"],
+      "OptionalDisclosure": ["PreviousOwners", "ModificationHistory"]
+    }
+  },
+
+  "UI": {
+    "HistoryScreen": {
+      "TabLayout": ["Overview", "Modifications", "Statistics", "Timeline", "Value"],
+      "GraphViews": true,
+      "SearchFilter": true,
+      "ExportButton": true
+    },
+    "QuickStats": {
+      "ShowOnGarage": true,
+      "KeyMetrics": ["Miles", "Races", "Wins", "Value"]
+    },
+    "Notifications": {
+      "MilestoneReached": true,
+      "ValueChange": true,
+      "MaintenanceDue": true
+    }
+  }
+}
