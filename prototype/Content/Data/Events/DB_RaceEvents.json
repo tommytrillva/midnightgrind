@@ -1,0 +1,930 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Race Event Definitions",
+  "TotalEvents": 66,
+
+  "EventTypes": {
+    "Circuit": {
+      "Description": "Multi-lap races around a closed circuit",
+      "DefaultLaps": 3,
+      "MinRacers": 4,
+      "MaxRacers": 8,
+      "RespawnEnabled": true,
+      "TrafficEnabled": false
+    },
+    "Sprint": {
+      "Description": "Point-to-point races through the city",
+      "DefaultLaps": 1,
+      "MinRacers": 2,
+      "MaxRacers": 8,
+      "RespawnEnabled": true,
+      "TrafficEnabled": true
+    },
+    "Drift": {
+      "Description": "Score-based drifting competitions",
+      "ScoringType": "Points",
+      "MinRacers": 1,
+      "MaxRacers": 8,
+      "JudgingCriteria": ["Angle", "Speed", "Line", "Style"]
+    },
+    "TimeAttack": {
+      "Description": "Beat the clock, no opponents",
+      "MinRacers": 1,
+      "MaxRacers": 1,
+      "GhostEnabled": true,
+      "TrafficEnabled": false
+    },
+    "Drag": {
+      "Description": "Quarter mile acceleration races",
+      "Distance": 402,
+      "DistanceUnit": "meters",
+      "MinRacers": 2,
+      "MaxRacers": 2,
+      "LaunchControl": true
+    },
+    "Touge": {
+      "Description": "Mountain pass battles, chase format",
+      "Format": "Chase",
+      "MinRacers": 2,
+      "MaxRacers": 2,
+      "RespawnEnabled": false,
+      "TrafficEnabled": false
+    },
+    "Crew": {
+      "Description": "Team-based racing events",
+      "TeamsRequired": true,
+      "MinTeamSize": 2,
+      "MaxTeamSize": 4
+    },
+    "PinkSlip": {
+      "Description": "Winner takes the loser's car",
+      "HighStakes": true,
+      "MinRacers": 2,
+      "MaxRacers": 2,
+      "RequiresConfirmation": true
+    }
+  },
+
+  "Chapters": {
+    "Chapter1_Newcomer": {
+      "Name": "Fresh Blood",
+      "Description": "Prove yourself on the streets",
+      "REPTierRequired": "UNKNOWN",
+      "Events": [
+        {
+          "ID": "EVT_TUTORIAL_01",
+          "Name": "First Steps",
+          "Type": "Circuit",
+          "Track": "L_INDUSTRIAL_LOOP",
+          "Description": "Your first real race. Show them what you've got.",
+          "Laps": 2,
+          "Racers": 4,
+          "Opponents": ["DRIVER_KENNY", "DRIVER_MIRA", "DRIVER_TRAVIS"],
+          "PIClass": "D",
+          "Rewards": {
+            "Cash": 1500,
+            "REP": 150,
+            "FirstPlace": { "BonusCash": 500, "BonusREP": 50 }
+          },
+          "Unlocks": ["EVT_TUTORIAL_02"],
+          "IsTutorial": true
+        },
+        {
+          "ID": "EVT_TUTORIAL_02",
+          "Name": "Night Moves",
+          "Type": "Sprint",
+          "Track": "L_DOWNTOWN_SPRINT_A",
+          "Description": "Sprint through downtown. Watch for traffic.",
+          "Racers": 4,
+          "Opponents": ["DRIVER_YUKI", "DRIVER_KENNY", "DRIVER_MIRA"],
+          "PIClass": "D",
+          "TimeOfDay": "Night",
+          "Weather": "Clear",
+          "Rewards": {
+            "Cash": 2000,
+            "REP": 200,
+            "FirstPlace": { "BonusCash": 750, "BonusREP": 75 }
+          },
+          "Unlocks": ["EVT_ROOKIE_01", "EVT_DRIFT_INTRO"]
+        },
+        {
+          "ID": "EVT_DRIFT_INTRO",
+          "Name": "Sideways 101",
+          "Type": "Drift",
+          "Track": "L_DRIFT_LOT_A",
+          "Description": "Learn the basics of drifting. Score 5000 points to pass.",
+          "TargetScore": 5000,
+          "Opponents": [],
+          "PIClass": "Any",
+          "Rewards": {
+            "Cash": 1000,
+            "REP": 100,
+            "UnlockPart": "ANGLE_BASIC"
+          },
+          "IsTutorial": true
+        }
+      ]
+    },
+
+    "Chapter2_Rookie": {
+      "Name": "Making a Name",
+      "Description": "Build your reputation in the underground",
+      "REPTierRequired": "ROOKIE",
+      "Events": [
+        {
+          "ID": "EVT_ROOKIE_01",
+          "Name": "Warehouse District",
+          "Type": "Circuit",
+          "Track": "L_WAREHOUSE_CIRCUIT",
+          "Description": "Tight corners and narrow lanes. Precision wins here.",
+          "Laps": 3,
+          "Racers": 6,
+          "Opponents": ["DRIVER_MARCUS", "DRIVER_LISA", "DRIVER_KENNY", "DRIVER_DANNY", "DRIVER_YUKI"],
+          "PIClass": "D",
+          "Rewards": {
+            "Cash": 3500,
+            "REP": 350,
+            "FirstPlace": { "BonusCash": 1200, "BonusREP": 120 }
+          },
+          "Unlocks": ["EVT_ROOKIE_02"]
+        },
+        {
+          "ID": "EVT_ROOKIE_02",
+          "Name": "Harbor Run",
+          "Type": "Sprint",
+          "Track": "L_HARBOR_SPRINT",
+          "Description": "From the docks to downtown. 5 miles of pure street racing.",
+          "Racers": 6,
+          "Opponents": ["DRIVER_JEROME", "DRIVER_MARCUS", "DRIVER_ALEX", "DRIVER_LISA", "DRIVER_TRAVIS"],
+          "PIClass": "D",
+          "TimeOfDay": "Night",
+          "Weather": "Clear",
+          "Rewards": {
+            "Cash": 4000,
+            "REP": 400,
+            "FirstPlace": { "BonusCash": 1500, "BonusREP": 150 }
+          },
+          "Unlocks": ["EVT_ROOKIE_03", "EVT_ROOKIE_DRIFT_01"]
+        },
+        {
+          "ID": "EVT_ROOKIE_DRIFT_01",
+          "Name": "Parking Lot Legends",
+          "Type": "Drift",
+          "Track": "L_DRIFT_LOT_B",
+          "Description": "Drift competition in the old mall parking lot.",
+          "TargetScore": 15000,
+          "Opponents": ["DRIVER_JEROME", "DRIVER_YUKI", "DRIVER_ALEX"],
+          "PIClass": "D-C",
+          "Rewards": {
+            "Cash": 3000,
+            "REP": 300,
+            "FirstPlace": { "BonusCash": 1000, "BonusREP": 100 }
+          }
+        },
+        {
+          "ID": "EVT_ROOKIE_03",
+          "Name": "Night Owls",
+          "Type": "Circuit",
+          "Track": "L_DOWNTOWN_CIRCUIT_A",
+          "Description": "Downtown circuit at 2 AM. The city is yours.",
+          "Laps": 3,
+          "Racers": 6,
+          "Opponents": ["DRIVER_DANNY", "DRIVER_JEROME", "DRIVER_ALEX", "DRIVER_MARCUS", "DRIVER_LISA"],
+          "PIClass": "C",
+          "TimeOfDay": "LateNight",
+          "Rewards": {
+            "Cash": 5000,
+            "REP": 500,
+            "FirstPlace": { "BonusCash": 2000, "BonusREP": 200 }
+          },
+          "Unlocks": ["EVT_ROOKIE_BOSS"]
+        },
+        {
+          "ID": "EVT_ROOKIE_BOSS",
+          "Name": "Street Cred",
+          "Type": "Circuit",
+          "Track": "L_INDUSTRIAL_LONG",
+          "Description": "The local crew leaders want to see what you're made of.",
+          "Laps": 4,
+          "Racers": 4,
+          "Opponents": ["DRIVER_MARCUS", "DRIVER_JEROME", "DRIVER_ALEX"],
+          "PIClass": "C",
+          "IsBossRace": true,
+          "Rewards": {
+            "Cash": 10000,
+            "REP": 1000,
+            "FirstPlace": {
+              "BonusCash": 5000,
+              "BonusREP": 500,
+              "UnlockVehicle": "TENSHI_240"
+            }
+          },
+          "Unlocks": ["CHAPTER_STREET"]
+        }
+      ]
+    },
+
+    "Chapter3_Street": {
+      "Name": "Street Soldier",
+      "Description": "You're part of the scene now",
+      "REPTierRequired": "STREET",
+      "Events": [
+        {
+          "ID": "EVT_STREET_01",
+          "Name": "The Mile",
+          "Type": "Drag",
+          "Track": "L_AIRSTRIP_DRAG",
+          "Description": "Half-mile drag racing on the old airstrip.",
+          "Distance": 805,
+          "Opponents": ["DRIVER_MARCUS"],
+          "PIClass": "C",
+          "Rewards": {
+            "Cash": 6000,
+            "REP": 600,
+            "FirstPlace": { "BonusCash": 3000, "BonusREP": 300 }
+          }
+        },
+        {
+          "ID": "EVT_STREET_02",
+          "Name": "Uptown Hustle",
+          "Type": "Sprint",
+          "Track": "L_UPTOWN_SPRINT",
+          "Description": "Rich neighborhood, thin roads, heavy traffic. Don't crash into a Bentley.",
+          "Racers": 6,
+          "Opponents": ["DRIVER_RACHEL", "DRIVER_TYLER", "DRIVER_LISA", "DRIVER_DANNY", "DRIVER_ALEX"],
+          "PIClass": "C",
+          "TrafficDensity": "Heavy",
+          "Rewards": {
+            "Cash": 7000,
+            "REP": 700,
+            "FirstPlace": { "BonusCash": 3500, "BonusREP": 350 }
+          }
+        },
+        {
+          "ID": "EVT_STREET_03",
+          "Name": "Mountain Pass",
+          "Type": "Touge",
+          "Track": "L_MOUNTAIN_TOUGE_A",
+          "Description": "Downhill touge battle. No guardrails, no mercy.",
+          "Opponents": ["DRIVER_KENJI"],
+          "PIClass": "C",
+          "Format": "BestOf3",
+          "Rewards": {
+            "Cash": 8000,
+            "REP": 800,
+            "FirstPlace": { "BonusCash": 4000, "BonusREP": 400 }
+          }
+        },
+        {
+          "ID": "EVT_STREET_DRIFT_01",
+          "Name": "Drift Wars",
+          "Type": "Drift",
+          "Track": "L_DRIFT_MOUNTAIN_A",
+          "Description": "Tandem drifting on the mountain. Style matters.",
+          "TargetScore": 35000,
+          "Opponents": ["DRIVER_KENJI", "DRIVER_JEROME", "DRIVER_YUKI"],
+          "PIClass": "C",
+          "TandemMode": true,
+          "Rewards": {
+            "Cash": 6000,
+            "REP": 600,
+            "FirstPlace": { "BonusCash": 3000, "BonusREP": 300 }
+          }
+        },
+        {
+          "ID": "EVT_STREET_TIMEATTACK",
+          "Name": "Against the Clock",
+          "Type": "TimeAttack",
+          "Track": "L_TEST_TRACK",
+          "Description": "Beat the track record. Just you and the stopwatch.",
+          "TargetTime": 95.5,
+          "TargetTimeUnit": "seconds",
+          "PIClass": "C",
+          "Rewards": {
+            "Cash": 5000,
+            "REP": 500,
+            "BeatRecord": { "BonusCash": 10000, "BonusREP": 1000 }
+          }
+        },
+        {
+          "ID": "EVT_STREET_BOSS",
+          "Name": "The Proving",
+          "Type": "Circuit",
+          "Track": "L_GRAND_CIRCUIT",
+          "Description": "The pros are watching. Time to prove you belong.",
+          "Laps": 5,
+          "Racers": 6,
+          "Opponents": ["DRIVER_RACHEL", "DRIVER_KENJI", "DRIVER_MIKE", "DRIVER_NINA", "DRIVER_TYLER"],
+          "PIClass": "C",
+          "IsBossRace": true,
+          "Rewards": {
+            "Cash": 20000,
+            "REP": 2000,
+            "FirstPlace": {
+              "BonusCash": 10000,
+              "BonusREP": 1000,
+              "UnlockVehicle": "SAKURA_GTR"
+            }
+          },
+          "Unlocks": ["CHAPTER_PRO"]
+        }
+      ]
+    },
+
+    "Chapter4_Pro": {
+      "Name": "Professional",
+      "Description": "Running with the big dogs now",
+      "REPTierRequired": "PRO",
+      "Events": [
+        {
+          "ID": "EVT_PRO_01",
+          "Name": "Downtown Showdown",
+          "Type": "Circuit",
+          "Track": "L_DOWNTOWN_CIRCUIT_B",
+          "Description": "The biggest street circuit in the city. Everyone's watching.",
+          "Laps": 4,
+          "Racers": 8,
+          "Opponents": ["DRIVER_RACHEL", "DRIVER_NINA", "DRIVER_MIKE", "DRIVER_TYLER", "DRIVER_KENJI", "DRIVER_DANTE", "DRIVER_SAKURA"],
+          "PIClass": "B",
+          "Rewards": {
+            "Cash": 15000,
+            "REP": 1500,
+            "FirstPlace": { "BonusCash": 7500, "BonusREP": 750 }
+          }
+        },
+        {
+          "ID": "EVT_PRO_02",
+          "Name": "Night Highway",
+          "Type": "Sprint",
+          "Track": "L_HIGHWAY_SPRINT",
+          "Description": "Highway racing at 180 mph. Weave through traffic or become part of it.",
+          "Racers": 6,
+          "Opponents": ["DRIVER_VINCE", "DRIVER_JACK", "DRIVER_MIKE", "DRIVER_NINA", "DRIVER_MARCUS"],
+          "PIClass": "B",
+          "TrafficDensity": "Medium",
+          "Rewards": {
+            "Cash": 18000,
+            "REP": 1800,
+            "FirstPlace": { "BonusCash": 9000, "BonusREP": 900 }
+          }
+        },
+        {
+          "ID": "EVT_PRO_DRIFT_01",
+          "Name": "Drift Royale",
+          "Type": "Drift",
+          "Track": "L_DRIFT_CIRCUIT_A",
+          "Description": "Full drift circuit. 60,000 points to win.",
+          "TargetScore": 60000,
+          "Opponents": ["DRIVER_KENJI", "DRIVER_JEROME", "DRIVER_SAKURA", "DRIVER_ZARA"],
+          "PIClass": "B",
+          "Rewards": {
+            "Cash": 12000,
+            "REP": 1200,
+            "FirstPlace": { "BonusCash": 6000, "BonusREP": 600 }
+          }
+        },
+        {
+          "ID": "EVT_PRO_TOUGE_01",
+          "Name": "King of the Mountain",
+          "Type": "Touge",
+          "Track": "L_MOUNTAIN_TOUGE_B",
+          "Description": "The most dangerous mountain pass. One mistake and you're done.",
+          "Opponents": ["DRIVER_KENJI"],
+          "PIClass": "B",
+          "Format": "BestOf5",
+          "NightOnly": true,
+          "Rewards": {
+            "Cash": 20000,
+            "REP": 2000,
+            "FirstPlace": { "BonusCash": 10000, "BonusREP": 1000 }
+          }
+        },
+        {
+          "ID": "EVT_PRO_PINKSLIP",
+          "Name": "All or Nothing",
+          "Type": "PinkSlip",
+          "Track": "L_INDUSTRIAL_LONG",
+          "Description": "Winner takes the loser's ride. Are you sure about this?",
+          "Laps": 3,
+          "Opponents": ["DRIVER_VINCE"],
+          "PIClass": "B",
+          "Rewards": {
+            "WinnerTakesCar": true,
+            "REP": 3000
+          },
+          "WarningMessage": "You will lose your car if you lose this race!"
+        },
+        {
+          "ID": "EVT_PRO_BOSS",
+          "Name": "Elite Trials",
+          "Type": "Circuit",
+          "Track": "L_ELITE_CIRCUIT",
+          "Description": "Beat the elite drivers to earn your place among them.",
+          "Laps": 5,
+          "Racers": 6,
+          "Opponents": ["DRIVER_DANTE", "DRIVER_SAKURA", "DRIVER_VINCE", "DRIVER_ZARA", "DRIVER_JACK"],
+          "PIClass": "B",
+          "IsBossRace": true,
+          "Rewards": {
+            "Cash": 50000,
+            "REP": 5000,
+            "FirstPlace": {
+              "BonusCash": 25000,
+              "BonusREP": 2500,
+              "UnlockTier": "ELITE"
+            }
+          },
+          "Unlocks": ["CHAPTER_ELITE"]
+        }
+      ]
+    },
+
+    "Chapter5_Elite": {
+      "Name": "Elite",
+      "Description": "The top tier of street racing",
+      "REPTierRequired": "ELITE",
+      "Events": [
+        {
+          "ID": "EVT_ELITE_01",
+          "Name": "Midnight Club",
+          "Type": "Sprint",
+          "Track": "L_FULL_CITY_SPRINT",
+          "Description": "20 miles through the entire city. The ultimate street race.",
+          "Racers": 8,
+          "Opponents": ["DRIVER_DANTE", "DRIVER_SAKURA", "DRIVER_VINCE", "DRIVER_ZARA", "DRIVER_JACK", "DRIVER_NINA", "DRIVER_RACHEL"],
+          "PIClass": "A",
+          "TrafficDensity": "Low",
+          "Rewards": {
+            "Cash": 35000,
+            "REP": 3500,
+            "FirstPlace": { "BonusCash": 17500, "BonusREP": 1750 }
+          }
+        },
+        {
+          "ID": "EVT_ELITE_02",
+          "Name": "Thunder Road",
+          "Type": "Circuit",
+          "Track": "L_THUNDER_CIRCUIT",
+          "Description": "Storm's rolling in. Race in the rain against the best.",
+          "Laps": 5,
+          "Racers": 6,
+          "Opponents": ["DRIVER_DANTE", "DRIVER_SAKURA", "DRIVER_MIKE", "DRIVER_TYLER", "DRIVER_KENJI"],
+          "PIClass": "A",
+          "Weather": "Rain",
+          "Rewards": {
+            "Cash": 40000,
+            "REP": 4000,
+            "FirstPlace": { "BonusCash": 20000, "BonusREP": 2000 }
+          }
+        },
+        {
+          "ID": "EVT_ELITE_DRIFT_FINALS",
+          "Name": "Drift Championship",
+          "Type": "Drift",
+          "Track": "L_DRIFT_STADIUM",
+          "Description": "The ultimate drift competition. 100,000 points needed.",
+          "TargetScore": 100000,
+          "Opponents": ["DRIVER_KENJI", "DRIVER_SAKURA", "DRIVER_JEROME"],
+          "PIClass": "A",
+          "IsFinal": true,
+          "Rewards": {
+            "Cash": 30000,
+            "REP": 3000,
+            "FirstPlace": {
+              "BonusCash": 15000,
+              "BonusREP": 1500,
+              "UnlockTitle": "Drift King"
+            }
+          }
+        },
+        {
+          "ID": "EVT_ELITE_GAUNTLET",
+          "Name": "The Gauntlet",
+          "Type": "Circuit",
+          "Track": "L_GAUNTLET_CIRCUIT",
+          "Description": "10 laps. 8 drivers. Only one winner. The ultimate test of endurance.",
+          "Laps": 10,
+          "Racers": 8,
+          "Opponents": ["DRIVER_DANTE", "DRIVER_SAKURA", "DRIVER_VINCE", "DRIVER_ZARA", "DRIVER_JACK", "DRIVER_NINA", "DRIVER_MIKE"],
+          "PIClass": "A",
+          "Rewards": {
+            "Cash": 75000,
+            "REP": 7500,
+            "FirstPlace": { "BonusCash": 37500, "BonusREP": 3750 }
+          }
+        },
+        {
+          "ID": "EVT_ELITE_BOSS",
+          "Name": "Meet the Phoenix",
+          "Type": "Circuit",
+          "Track": "L_LEGENDARY_CIRCUIT",
+          "Description": "The legend has appeared. Beat them to unlock the final chapter.",
+          "Laps": 5,
+          "Racers": 2,
+          "Opponents": ["DRIVER_PHOENIX"],
+          "PIClass": "S",
+          "IsBossRace": true,
+          "IsLegendary": true,
+          "Rewards": {
+            "Cash": 100000,
+            "REP": 10000,
+            "FirstPlace": {
+              "BonusCash": 50000,
+              "BonusREP": 5000,
+              "UnlockEnding": "PhoenixDefeated"
+            }
+          },
+          "Unlocks": ["CHAPTER_LEGEND"]
+        }
+      ]
+    },
+
+    "Chapter6_Legend": {
+      "Name": "Legend",
+      "Description": "Write your name in history",
+      "REPTierRequired": "LEGEND",
+      "Events": [
+        {
+          "ID": "EVT_LEGEND_LEGACY",
+          "Name": "Face the Legacy",
+          "Type": "Circuit",
+          "Track": "L_LEGENDARY_CIRCUIT",
+          "Description": "The Three Kings challenge you. 3 vs 1. Prove you're the greatest.",
+          "Laps": 7,
+          "Racers": 4,
+          "Opponents": ["DRIVER_LEGACY_1", "DRIVER_LEGACY_2", "DRIVER_LEGACY_3"],
+          "PIClass": "S",
+          "SpecialRules": "3v1_Gauntlet",
+          "IsFinalBoss": true,
+          "Rewards": {
+            "Cash": 250000,
+            "REP": 25000,
+            "FirstPlace": {
+              "BonusCash": 125000,
+              "BonusREP": 12500,
+              "UnlockEnding": "TrueEnding",
+              "UnlockTitle": "The Legend"
+            }
+          }
+        }
+      ]
+    }
+  },
+
+  "SpecialEvents": {
+    "Weekly": [
+      {
+        "ID": "EVT_WEEKLY_TIME",
+        "Name": "Weekly Time Attack",
+        "Type": "TimeAttack",
+        "RotatingTrack": true,
+        "PIClass": "Any",
+        "LeaderboardEnabled": true,
+        "Rewards": {
+          "Participation": { "Cash": 2000, "REP": 200 },
+          "Top10Percent": { "Cash": 10000, "REP": 1000 },
+          "Top1Percent": { "Cash": 25000, "REP": 2500, "ExclusivePart": true }
+        }
+      },
+      {
+        "ID": "EVT_WEEKLY_DRIFT",
+        "Name": "Drift Friday",
+        "Type": "Drift",
+        "RotatingTrack": true,
+        "PIClass": "Any",
+        "LeaderboardEnabled": true,
+        "AvailableDay": "Friday",
+        "Rewards": {
+          "Participation": { "Cash": 2000, "REP": 200 },
+          "Top10Percent": { "Cash": 10000, "REP": 1000 }
+        }
+      }
+    ],
+    "Seasonal": [
+      {
+        "ID": "EVT_SEASON_CHAMPIONSHIP",
+        "Name": "Season Championship",
+        "Type": "Championship",
+        "Races": 10,
+        "PointsSystem": [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
+        "PIClass": "Mixed",
+        "Duration": "3_Months",
+        "Rewards": {
+          "Champion": { "Cash": 500000, "REP": 50000, "ExclusiveVehicle": true },
+          "TopThree": { "Cash": 200000, "REP": 20000 },
+          "TopTen": { "Cash": 50000, "REP": 5000 }
+        }
+      }
+    ]
+  },
+
+  "ModifierTags": {
+    "NightOnly": { "TimeRange": [22, 4], "Description": "Only available at night" },
+    "RainBonus": { "CashMultiplier": 1.25, "REPMultiplier": 1.25 },
+    "NoNitrous": { "NitrousDisabled": true },
+    "StockOnly": { "ModificationsDisabled": true },
+    "OneShot": { "RespawnDisabled": true, "RewardMultiplier": 1.5 }
+  },
+
+  "TrackSpecificEvents": {
+    "NeoCityCircuit": [
+      {
+        "ID": "EVT_NEO_CITY_01",
+        "Name": "Neon Nights",
+        "Type": "Circuit",
+        "Track": "NEO_CITY_CIRCUIT",
+        "Description": "Race through the neon-lit streets of downtown. The city never sleeps.",
+        "Laps": 4,
+        "Racers": 8,
+        "PIClass": "B",
+        "TimeOfDay": "Night",
+        "Rewards": {
+          "Cash": 12000,
+          "REP": 1200,
+          "FirstPlace": { "BonusCash": 6000, "BonusREP": 600 }
+        }
+      },
+      {
+        "ID": "EVT_NEO_CITY_02",
+        "Name": "Financial District Dash",
+        "Type": "Sprint",
+        "Track": "NEO_CITY_CIRCUIT",
+        "Description": "Sprint through the financial S-curves. Watch for the tunnel dive.",
+        "Racers": 6,
+        "PIClass": "A",
+        "TimeOfDay": "Night",
+        "Weather": "LightRain",
+        "Rewards": {
+          "Cash": 18000,
+          "REP": 1800,
+          "FirstPlace": { "BonusCash": 9000, "BonusREP": 900 }
+        }
+      },
+      {
+        "ID": "EVT_NEO_CITY_DRIFT",
+        "Name": "Club District Slide",
+        "Type": "Drift",
+        "Track": "NEO_CITY_CIRCUIT",
+        "Description": "Drift through the club district. The crowd is watching.",
+        "TargetScore": 75000,
+        "PIClass": "B",
+        "DriftZones": ["DZ_FINANCIAL_S", "DZ_PLAZA", "DZ_CLUB_FINAL"],
+        "Rewards": {
+          "Cash": 10000,
+          "REP": 1000,
+          "FirstPlace": { "BonusCash": 5000, "BonusREP": 500 }
+        }
+      },
+      {
+        "ID": "EVT_NEO_CITY_BOSS",
+        "Name": "Night Runner Challenge",
+        "Type": "Circuit",
+        "Track": "NEO_CITY_CIRCUIT",
+        "Description": "The Night Runner has emerged. Beat them on their home turf.",
+        "Laps": 5,
+        "Racers": 2,
+        "Opponents": ["AI_PRO_05"],
+        "PIClass": "A",
+        "IsBossRace": true,
+        "TimeOfDay": "LateNight",
+        "Rewards": {
+          "Cash": 35000,
+          "REP": 3500,
+          "FirstPlace": { "BonusCash": 15000, "BonusREP": 1500, "UnlockTitle": "City King" }
+        }
+      }
+    ],
+
+    "RedRockCanyon": [
+      {
+        "ID": "EVT_CANYON_01",
+        "Name": "Summit Descent",
+        "Type": "Touge",
+        "Track": "RED_ROCK_CANYON",
+        "Description": "8.2km downhill run. 620 meters of elevation change. No guardrails on the cliffs.",
+        "Format": "Chase",
+        "Opponents": ["AI_RACER_04"],
+        "PIClass": "B",
+        "TimeOfDay": "Sunset",
+        "Rewards": {
+          "Cash": 15000,
+          "REP": 1500,
+          "FirstPlace": { "BonusCash": 8000, "BonusREP": 800 }
+        }
+      },
+      {
+        "ID": "EVT_CANYON_02",
+        "Name": "Devil's Backbone",
+        "Type": "Touge",
+        "Track": "RED_ROCK_CANYON",
+        "Description": "The most dangerous section. One mistake means a long fall.",
+        "Format": "BestOf3",
+        "Opponents": ["AI_RACER_03"],
+        "PIClass": "B",
+        "TimeOfDay": "Night",
+        "DangerZone": true,
+        "Rewards": {
+          "Cash": 20000,
+          "REP": 2000,
+          "FirstPlace": { "BonusCash": 12000, "BonusREP": 1200 }
+        }
+      },
+      {
+        "ID": "EVT_CANYON_DRIFT",
+        "Name": "Cliff Edge Drift",
+        "Type": "Drift",
+        "Track": "RED_ROCK_CANYON",
+        "Description": "Drift on the edge. Literally. No guardrails, maximum points.",
+        "TargetScore": 100000,
+        "PIClass": "B",
+        "DriftZones": ["DZ_CLIFF_EDGE", "DZ_DEVILS_BACKBONE"],
+        "RiskMultiplier": 2.0,
+        "Rewards": {
+          "Cash": 18000,
+          "REP": 1800,
+          "FirstPlace": { "BonusCash": 10000, "BonusREP": 1000 }
+        }
+      },
+      {
+        "ID": "EVT_CANYON_BOSS",
+        "Name": "Red Canyon Ghost",
+        "Type": "Touge",
+        "Track": "RED_ROCK_CANYON",
+        "Description": "The Ghost has never lost on this canyon. Time to change that.",
+        "Format": "BestOf5",
+        "Opponents": ["AI_BOSS_05"],
+        "PIClass": "A",
+        "IsBossRace": true,
+        "TimeOfDay": "Night",
+        "HeadlightsOptional": true,
+        "Rewards": {
+          "Cash": 50000,
+          "REP": 5000,
+          "FirstPlace": { "BonusCash": 30000, "BonusREP": 3000, "UnlockTitle": "Canyon Master" }
+        }
+      }
+    ],
+
+    "SkyGarage": [
+      {
+        "ID": "EVT_GARAGE_01",
+        "Name": "Parking Prowl",
+        "Type": "Drift",
+        "Track": "SKY_GARAGE",
+        "Description": "Drift through all 5 levels. Hit the clip points for bonus score.",
+        "TargetScore": 50000,
+        "PIClass": "C",
+        "ClippingEnabled": true,
+        "Rewards": {
+          "Cash": 8000,
+          "REP": 800,
+          "FirstPlace": { "BonusCash": 4000, "BonusREP": 400 }
+        }
+      },
+      {
+        "ID": "EVT_GARAGE_TANDEM",
+        "Name": "Door to Door",
+        "Type": "Drift",
+        "Track": "SKY_GARAGE",
+        "Description": "Tandem drifting in tight spaces. Proximity is everything.",
+        "TargetScore": 70000,
+        "TandemMode": true,
+        "Opponents": ["AI_STREET_05"],
+        "PIClass": "C",
+        "Rewards": {
+          "Cash": 12000,
+          "REP": 1200,
+          "FirstPlace": { "BonusCash": 6000, "BonusREP": 600 }
+        }
+      },
+      {
+        "ID": "EVT_GARAGE_O_CLIP",
+        "Name": "O-Clip Challenge",
+        "Type": "Drift",
+        "Track": "SKY_GARAGE",
+        "Description": "Hit the O-Clip post perfectly. It's the signature move of this venue.",
+        "TargetScore": 30000,
+        "RequiredClips": ["CLIP_04"],
+        "PIClass": "B",
+        "Rewards": {
+          "Cash": 10000,
+          "REP": 1000,
+          "FirstPlace": { "BonusCash": 5000, "BonusREP": 500 }
+        }
+      },
+      {
+        "ID": "EVT_GARAGE_BOSS",
+        "Name": "Garage Phantom Showdown",
+        "Type": "Drift",
+        "Track": "SKY_GARAGE",
+        "Description": "The Phantom awaits on the rooftop. Tandem battle for supremacy.",
+        "TandemMode": true,
+        "Opponents": ["AI_RACER_06"],
+        "PIClass": "B",
+        "IsBossRace": true,
+        "Rewards": {
+          "Cash": 25000,
+          "REP": 2500,
+          "FirstPlace": { "BonusCash": 15000, "BonusREP": 1500, "UnlockTitle": "Garage King" }
+        }
+      }
+    ],
+
+    "AbandonedAirfield": [
+      {
+        "ID": "EVT_AIRFIELD_QUARTER",
+        "Name": "Quarter Mile Classic",
+        "Type": "Drag",
+        "Track": "ABANDONED_AIRFIELD",
+        "Configuration": "CONFIG_DRAG_QUARTER",
+        "Description": "Classic quarter mile drag racing. Launch matters.",
+        "Opponents": ["AI_STREET_06"],
+        "PIClass": "C",
+        "Rewards": {
+          "Cash": 6000,
+          "REP": 600,
+          "FirstPlace": { "BonusCash": 3000, "BonusREP": 300 }
+        }
+      },
+      {
+        "ID": "EVT_AIRFIELD_HALF",
+        "Name": "Half Mile Showdown",
+        "Type": "Drag",
+        "Track": "ABANDONED_AIRFIELD",
+        "Configuration": "CONFIG_DRAG_HALF",
+        "Description": "805 meters of pure acceleration. Top end power wins.",
+        "Opponents": ["AI_RACER_02"],
+        "PIClass": "B",
+        "Rewards": {
+          "Cash": 10000,
+          "REP": 1000,
+          "FirstPlace": { "BonusCash": 6000, "BonusREP": 600 }
+        }
+      },
+      {
+        "ID": "EVT_AIRFIELD_MILE",
+        "Name": "The Full Mile",
+        "Type": "Drag",
+        "Track": "ABANDONED_AIRFIELD",
+        "Configuration": "CONFIG_DRAG_MAIN",
+        "Description": "1609 meters. Terminal velocity territory. Only monsters need apply.",
+        "Opponents": ["AI_PRO_03"],
+        "PIClass": "A",
+        "Rewards": {
+          "Cash": 20000,
+          "REP": 2000,
+          "FirstPlace": { "BonusCash": 12000, "BonusREP": 1200 }
+        }
+      },
+      {
+        "ID": "EVT_AIRFIELD_CIRCUIT",
+        "Name": "Runway Circuit",
+        "Type": "Circuit",
+        "Track": "ABANDONED_AIRFIELD",
+        "Configuration": "CONFIG_CIRCUIT_FULL",
+        "Description": "4.8km circuit using the runways and taxiways. High speed meets precision.",
+        "Laps": 4,
+        "Racers": 8,
+        "PIClass": "A",
+        "Rewards": {
+          "Cash": 18000,
+          "REP": 1800,
+          "FirstPlace": { "BonusCash": 9000, "BonusREP": 900 }
+        }
+      },
+      {
+        "ID": "EVT_AIRFIELD_TOP_SPEED",
+        "Name": "Maximum Velocity",
+        "Type": "TopSpeed",
+        "Track": "ABANDONED_AIRFIELD",
+        "Configuration": "CONFIG_TOP_SPEED",
+        "Description": "3.2km to reach maximum speed. What's your terminal velocity?",
+        "TargetSpeed": 350,
+        "PIClass": "S",
+        "LeaderboardEnabled": true,
+        "Rewards": {
+          "Cash": 5000,
+          "REP": 500,
+          "SpeedBonus": 100,
+          "SpeedBonusUnit": "per 10 km/h over 300"
+        }
+      },
+      {
+        "ID": "EVT_AIRFIELD_BOSS",
+        "Name": "Wangan Devil Rematch",
+        "Type": "Drag",
+        "Track": "ABANDONED_AIRFIELD",
+        "Configuration": "CONFIG_DRAG_MAIN",
+        "Description": "The Wangan Devil wants a proper drag race. Full mile. No traffic.",
+        "Opponents": ["AI_BOSS_03"],
+        "PIClass": "S",
+        "IsBossRace": true,
+        "Rewards": {
+          "Cash": 75000,
+          "REP": 7500,
+          "FirstPlace": { "BonusCash": 40000, "BonusREP": 4000, "UnlockTitle": "Speed Demon" }
+        }
+      }
+    ]
+  }
+}
