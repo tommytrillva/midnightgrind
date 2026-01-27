@@ -247,9 +247,16 @@ void UMGEsportsSubsystem::EnableAutoDirector(const FMGAutoDirectorSettings& Sett
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGEsportsSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			AutoDirectorTimerHandle,
-			[this]() { UpdateAutoDirector(0.1f); },
+			[WeakThis]()
+			{
+				if (WeakThis.IsValid())
+				{
+					WeakThis->UpdateAutoDirector(0.1f);
+				}
+			},
 			0.1f,
 			true
 		);

@@ -137,6 +137,9 @@ void UMGAirtimeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			}
 		}, 0.033f, true);
 	}
+
+	// Load saved data
+	LoadAirtimeData();
 }
 
 void UMGAirtimeSubsystem::Deinitialize()

@@ -30,6 +30,10 @@ struct FMGPursuitUnit;
 enum class EMGSpeedtrapRating : uint8;
 struct FMGDestructionEvent;
 struct FMGScoreEvent;
+struct FMGAchievementDefinition;
+enum class EMGStreakType : uint8;
+enum class EMGStreakTier : uint8;
+enum class EMGPrestigeRank : uint8;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -553,4 +557,24 @@ protected:
 
 	/** Get local player ID for filtering events */
 	FString GetLocalPlayerId() const;
+
+	/** Handle achievement unlocked from achievement subsystem */
+	UFUNCTION()
+	void OnAchievementUnlocked(const FMGAchievementDefinition& Achievement, int32 TierUnlocked);
+
+	/** Handle streak tier up from streak subsystem */
+	UFUNCTION()
+	void OnStreakTierUp(const FString& PlayerId, EMGStreakType Type, EMGStreakTier NewTier);
+
+	/** Handle new streak record from streak subsystem */
+	UFUNCTION()
+	void OnNewStreakRecord(const FString& PlayerId, EMGStreakType Type);
+
+	/** Handle prestige rank up from prestige subsystem */
+	UFUNCTION()
+	void OnPrestigeRankUp(const FString& PlayerId, EMGPrestigeRank OldRank, EMGPrestigeRank NewRank);
+
+	/** Handle prestige level up from prestige subsystem */
+	UFUNCTION()
+	void OnPrestigeLevelUp(const FString& PlayerId, int32 OldLevel, int32 NewLevel);
 };

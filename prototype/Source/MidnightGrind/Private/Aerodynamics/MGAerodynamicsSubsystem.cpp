@@ -83,11 +83,15 @@ void UMGAerodynamicsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start tick timer
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGAerodynamicsSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			AeroTickTimer,
-			[this]()
+			[WeakThis]()
 			{
-				TickAerodynamics(0.033f);
+				if (WeakThis.IsValid())
+				{
+					WeakThis->TickAerodynamics(0.033f);
+				}
 			},
 			0.033f,
 			true

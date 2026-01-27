@@ -262,14 +262,18 @@ void UMGPerformanceMonitorSubsystem::StartBenchmark(float DurationSeconds)
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGPerformanceMonitorSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			BenchmarkTimerHandle,
-			[this]()
+			[WeakThis]()
 			{
-				BenchmarkElapsed += 0.1f;
-				if (BenchmarkElapsed >= BenchmarkDuration)
+				if (WeakThis.IsValid())
 				{
-					StopBenchmark();
+					WeakThis->BenchmarkElapsed += 0.1f;
+					if (WeakThis->BenchmarkElapsed >= WeakThis->BenchmarkDuration)
+					{
+						WeakThis->StopBenchmark();
+					}
 				}
 			},
 			0.1f,
