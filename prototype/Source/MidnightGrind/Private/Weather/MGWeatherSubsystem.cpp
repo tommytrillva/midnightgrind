@@ -1,6 +1,7 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Weather/MGWeatherSubsystem.h"
+#include "Environment/MGWeatherRacingEffects.h"
 #include "Engine/DirectionalLight.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Materials/MaterialParameterCollection.h"

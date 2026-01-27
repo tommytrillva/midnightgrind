@@ -37,9 +37,10 @@ void UMGMilestoneSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Start tick timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGMilestoneSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             TickTimerHandle,
-            [this]() { TickMilestoneSystem(0.033f); },
+            [WeakThis]() { if (WeakThis.IsValid()) WeakThis->TickMilestoneSystem(0.033f); },
             0.033f,
             true
         );

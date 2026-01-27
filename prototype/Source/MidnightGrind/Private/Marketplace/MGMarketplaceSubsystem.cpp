@@ -21,11 +21,15 @@ void UMGMarketplaceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Start tick timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGMarketplaceSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             TickTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                TickMarketplace(1.0f);
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->TickMarketplace(1.0f);
+                }
             },
             1.0f,
             true
