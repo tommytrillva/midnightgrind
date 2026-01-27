@@ -1,54 +1,114 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGCloudSaveSubsystem.h
+ * @brief Cloud Save and Synchronization Subsystem for Midnight Grind
+ *
+ * This subsystem manages both local save operations and cloud synchronization,
+ * enabling players to access their progress across multiple devices and platforms.
+ *
+ * ## Overview
+ * The Cloud Save Subsystem provides:
+ * - **Local Save Management**: Multiple save slots with metadata (playtime, level, etc.)
+ * - **Cloud Synchronization**: Upload/download saves to remote servers
+ * - **Conflict Resolution**: Handle cases where local and cloud saves diverge
+ * - **Auto-Save**: Configurable automatic save triggers based on game events
+ * - **Backup & Restore**: Create and restore save backups for data safety
+ * - **Import/Export**: Share saves between players or platforms
+ *
+ * ## Sync Architecture
+ * The system follows a "local-first" approach:
+ * 1. All saves are written locally first for reliability
+ * 2. Cloud sync happens in the background when online
+ * 3. Conflicts are detected by comparing timestamps and versions
+ * 4. Resolution can be automatic or prompt the user
+ *
+ * ## Usage Example
+ * @code
+ * UMGCloudSaveSubsystem* CloudSave = GameInstance->GetSubsystem<UMGCloudSaveSubsystem>();
+ *
+ * // Save locally
+ * CloudSave->SaveGame(0);  // Save to slot 0
+ *
+ * // Sync with cloud when ready
+ * if (CloudSave->IsOnline())
+ * {
+ *     CloudSave->SyncWithCloud();
+ * }
+ *
+ * // Handle conflicts via delegate
+ * CloudSave->OnSaveConflictDetected.AddDynamic(this, &MyClass::HandleConflict);
+ * @endcode
+ *
+ * @see UMGSaveManagerSubsystem For high-level save coordination
+ * @see UMGDataMigrationSubsystem For handling save format changes between versions
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MGCloudSaveSubsystem.generated.h"
 
+// ============================================================================
+// ENUMERATIONS
+// ============================================================================
+
 /**
- * Save Data Type
+ * @enum EMGSaveDataType
+ * @brief Categories of save data that can be saved/synced independently.
+ *
+ * Allows granular control over what data to save or sync, which is useful
+ * for optimizing bandwidth and handling partial updates.
  */
 UENUM(BlueprintType)
 enum class EMGSaveDataType : uint8
 {
-	PlayerProfile		UMETA(DisplayName = "Player Profile"),
-	GameProgress		UMETA(DisplayName = "Game Progress"),
-	Achievements		UMETA(DisplayName = "Achievements"),
-	Vehicles			UMETA(DisplayName = "Vehicles"),
-	Customization		UMETA(DisplayName = "Customization"),
-	Settings			UMETA(DisplayName = "Settings"),
-	Statistics			UMETA(DisplayName = "Statistics"),
-	Social				UMETA(DisplayName = "Social"),
-	All					UMETA(DisplayName = "All")
+	PlayerProfile		UMETA(DisplayName = "Player Profile"),    ///< Basic player info: name, avatar, level
+	GameProgress		UMETA(DisplayName = "Game Progress"),     ///< Campaign progress, unlocked content
+	Achievements		UMETA(DisplayName = "Achievements"),      ///< Achievement unlock status and progress
+	Vehicles			UMETA(DisplayName = "Vehicles"),          ///< Owned vehicles and their upgrades
+	Customization		UMETA(DisplayName = "Customization"),     ///< Visual customizations, paints, decals
+	Settings			UMETA(DisplayName = "Settings"),          ///< Game settings, controls, preferences
+	Statistics			UMETA(DisplayName = "Statistics"),        ///< Gameplay stats: races, wins, distances
+	Social				UMETA(DisplayName = "Social"),            ///< Friends list, crew membership
+	All					UMETA(DisplayName = "All")                ///< All data types combined
 };
 
 /**
- * Sync Status
+ * @enum EMGCloudSyncStatus
+ * @brief Current state of cloud synchronization.
+ *
+ * Use this to display sync status to the player (e.g., cloud icon in UI)
+ * and to determine when it's safe to perform operations.
  */
 UENUM(BlueprintType)
 enum class EMGCloudSyncStatus : uint8
 {
-	Synced				UMETA(DisplayName = "Synced"),
-	Syncing				UMETA(DisplayName = "Syncing"),
-	PendingUpload		UMETA(DisplayName = "Pending Upload"),
-	PendingDownload		UMETA(DisplayName = "Pending Download"),
-	Conflict			UMETA(DisplayName = "Conflict"),
-	Error				UMETA(DisplayName = "Error"),
-	Offline				UMETA(DisplayName = "Offline")
+	Synced				UMETA(DisplayName = "Synced"),           ///< Local and cloud data match
+	Syncing				UMETA(DisplayName = "Syncing"),          ///< Currently uploading or downloading
+	PendingUpload		UMETA(DisplayName = "Pending Upload"),   ///< Local changes need to be uploaded
+	PendingDownload		UMETA(DisplayName = "Pending Download"), ///< Cloud has newer data to download
+	Conflict			UMETA(DisplayName = "Conflict"),         ///< Both local and cloud have changes
+	Error				UMETA(DisplayName = "Error"),            ///< Sync failed due to an error
+	Offline				UMETA(DisplayName = "Offline")           ///< No network connection available
 };
 
 /**
- * Conflict Resolution Strategy
+ * @enum EMGConflictResolution
+ * @brief Strategy for resolving conflicts between local and cloud saves.
+ *
+ * Conflicts occur when both local and cloud data have changed since the last sync.
+ * This enum defines how to resolve such situations.
  */
 UENUM(BlueprintType)
 enum class EMGConflictResolution : uint8
 {
-	UseLocal			UMETA(DisplayName = "Use Local"),
-	UseCloud			UMETA(DisplayName = "Use Cloud"),
-	UseMostRecent		UMETA(DisplayName = "Use Most Recent"),
-	Merge				UMETA(DisplayName = "Merge"),
-	AskUser				UMETA(DisplayName = "Ask User")
+	UseLocal			UMETA(DisplayName = "Use Local"),        ///< Overwrite cloud with local data
+	UseCloud			UMETA(DisplayName = "Use Cloud"),        ///< Overwrite local with cloud data
+	UseMostRecent		UMETA(DisplayName = "Use Most Recent"),  ///< Automatically pick based on timestamp
+	Merge				UMETA(DisplayName = "Merge"),            ///< Attempt intelligent merge of both
+	AskUser				UMETA(DisplayName = "Ask User")          ///< Prompt player to choose
 };
 
 /**

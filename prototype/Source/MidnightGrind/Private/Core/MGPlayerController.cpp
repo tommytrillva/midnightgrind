@@ -42,6 +42,8 @@
 #include "Reputation/MGReputationSubsystem.h"
 #include "Ghost/MGGhostSubsystem.h"
 #include "Shortcut/MGShortcutSubsystem.h"
+#include "Career/MGCareerSubsystem.h"
+#include "Rivals/MGRivalsSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"

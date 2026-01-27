@@ -1,19 +1,49 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRivalsSubsystem.h
+ * @brief Dynamic rivalry system that turns real players into meaningful opponents
+ *
+ * The Rivals System creates persistent, narrative-driven relationships with other
+ * players you encounter in races. Unlike static NPC rivals, these are real players
+ * whose repeated encounters build into genuine rivalries over time.
+ *
+ * @section rivals_concept_sec Core Concept
+ * Every player you race against is tracked. As you encounter the same players
+ * repeatedly, the system builds a rivalry profile based on:
+ * - Win/loss record between you
+ * - Frequency of encounters
+ * - Closeness of race finishes
+ * - Streaks and dramatic moments
+ *
+ * @section intensity_sec Rivalry Intensity Levels
+ * Rivalries evolve through five intensity stages:
+ * - **Neutral**: Just another racer in the field
+ * - **Acquaintance**: You've raced a few times, starting to recognize them
+ * - **Competitor**: Regular opponent, competitive dynamic forming
+ * - **Rival**: True rivalry established, races feel personal
+ * - **Nemesis**: Ultimate rival - only one player can hold this designation
+ *
+ * @section nemesis_sec The Nemesis System
+ * Each player can designate one rival as their Nemesis - their ultimate opponent.
+ * The Nemesis relationship provides:
+ * - Special UI treatment and notifications
+ * - Bonus rewards for defeating your Nemesis
+ * - Matchmaking priority to enable rematch opportunities
+ * - Story progression tied to Nemesis encounters
+ *
+ * @section crew_integration_sec Crew Integration
+ * When a rival joins your crew (or vice versa), the rivalry can transform into
+ * an alliance, turning a former opponent into a teammate.
+ *
+ * @see UMGSocialSubsystem For crew membership that affects rivalries
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MGRivalsSubsystem.generated.h"
-
-/**
- * Rivals System - Real Players as Rivals
- * - Rivals are generated from actual players you race against
- * - Recurring matchups build rivalries over time
- * - Defeating rivals advances your story
- * - Losing to rivals creates grudge matches
- * - Rivals can become allies if you join the same crew
- */
 
 UENUM(BlueprintType)
 enum class EMGRivalryIntensity : uint8

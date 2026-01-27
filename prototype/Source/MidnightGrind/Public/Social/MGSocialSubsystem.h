@@ -1,5 +1,38 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGSocialSubsystem.h
+ * @brief Core social features subsystem for Midnight Grind
+ *
+ * This subsystem manages all social interactions between players, including:
+ * - Friends list management (adding, removing, blocking players)
+ * - Crew/club membership and management
+ * - Game invites and join-in-progress functionality
+ * - Recent players tracking from completed races
+ * - Player presence and status updates
+ *
+ * The Social Subsystem serves as the central hub for player-to-player interactions,
+ * enabling features like racing with friends, forming crews for competitive play,
+ * and maintaining social connections within the game.
+ *
+ * @section usage_sec Basic Usage
+ * Access this subsystem from any game code via:
+ * @code
+ * UMGSocialSubsystem* SocialSub = GameInstance->GetSubsystem<UMGSocialSubsystem>();
+ * if (SocialSub)
+ * {
+ *     TArray<FMGFriendData> OnlineFriends = SocialSub->GetOnlineFriends();
+ * }
+ * @endcode
+ *
+ * @section events_sec Event-Driven Architecture
+ * Subscribe to delegates like OnFriendListUpdated and OnGameInviteReceived to
+ * respond to social events in your UI or gameplay code.
+ *
+ * @see UMGLeaderboardSubsystem For competitive rankings integration
+ * @see UMGCrewSubsystem For advanced crew functionality (use Crew/ version)
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

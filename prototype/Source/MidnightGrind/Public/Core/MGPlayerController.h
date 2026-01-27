@@ -752,4 +752,36 @@ protected:
 	/** Handle streak milestone from daily rewards subsystem */
 	UFUNCTION()
 	void OnStreakMilestoneReached(EMGStreakMilestone Milestone, const TArray<FMGDailyReward>& Rewards);
+
+	/** Handle reputation tier reached from reputation subsystem */
+	UFUNCTION()
+	void OnReputationTierReached(EMGReputationCategory Category, EMGReputationTier Tier);
+
+	/** Handle reputation unlock earned from reputation subsystem */
+	UFUNCTION()
+	void OnReputationUnlockEarned(const FMGReputationUnlock& Unlock);
+
+	/** Handle new personal best from ghost subsystem */
+	UFUNCTION()
+	void OnGhostNewPersonalBest(FName TrackID, float NewTime);
+
+	/** Handle ghost comparison from ghost subsystem */
+	UFUNCTION()
+	void OnGhostComparison(const FMGGhostComparator& Comparison, EMGGhostComparison Status);
+
+	/** Handle shortcut discovered from shortcut subsystem */
+	UFUNCTION()
+	void OnShortcutDiscovered(const FString& ShortcutId, int32 DiscoveryPoints);
+
+	/** Handle shortcut completed from shortcut subsystem */
+	UFUNCTION()
+	void OnShortcutCompleted(const FString& ShortcutId, float TimeTaken, float TimeSaved);
+
+	/** Handle shortcut mastered from shortcut subsystem */
+	UFUNCTION()
+	void OnShortcutMastered(const FString& ShortcutId, int32 BonusPoints);
+
+	/** Handle secret shortcut found from shortcut subsystem */
+	UFUNCTION()
+	void OnSecretShortcutFound(const FString& ShortcutId, int32 BonusPoints);
 };

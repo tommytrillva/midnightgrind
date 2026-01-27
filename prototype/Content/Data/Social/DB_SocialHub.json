@@ -1,0 +1,279 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Social Features, Profiles, and Community Hub",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "OnlineRequired": false,
+    "CrossPlatform": true,
+    "PrivacyFirst": true,
+    "ModeratedContent": true
+  },
+
+  "PlayerProfiles": {
+    "PublicInfo": {
+      "DisplayName": { "MaxLength": 20, "AllowSpecialChars": false },
+      "Avatar": { "Custom": true, "FromCars": true, "Unlockables": true },
+      "ProfileBanner": { "Custom": true, "Unlockable": true },
+      "Title": { "Earned": true, "Selectable": true },
+      "Level": { "Shown": true },
+      "REPTier": { "Shown": true }
+    },
+    "Statistics": {
+      "Public": {
+        "TotalRaces": true,
+        "WinRate": true,
+        "FavoriteVehicle": true,
+        "TotalDistance": true,
+        "CrewMembership": true
+      },
+      "Private": {
+        "Earnings": true,
+        "GarageValue": true,
+        "PlayTime": true
+      }
+    },
+    "Showcase": {
+      "FeaturedCars": { "Slots": 3 },
+      "Achievements": { "Pinned": 5 },
+      "BestTimes": { "Display": 5 },
+      "CustomBio": { "MaxLength": 200 }
+    },
+    "PrivacySettings": {
+      "ProfileVisibility": ["Public", "FriendsOnly", "Private"],
+      "StatisticsVisibility": ["Public", "FriendsOnly", "Hidden"],
+      "OnlineStatus": ["Visible", "Friends", "Invisible"],
+      "JoinRequests": ["Anyone", "Friends", "Nobody"]
+    }
+  },
+
+  "FriendSystem": {
+    "MaxFriends": 500,
+    "Features": {
+      "AddByName": true,
+      "AddByCode": true,
+      "AddFromRecent": true,
+      "AddFromRace": true,
+      "ImportPlatform": true
+    },
+    "FriendCategories": {
+      "Favorites": { "Max": 20, "Priority": true },
+      "Crew": { "AutoTagged": true },
+      "Rivals": { "Competitive": true }
+    },
+    "Requests": {
+      "Pending": { "Max": 100, "Expiry": 30 },
+      "Blocked": { "Max": 1000, "Hidden": true }
+    },
+    "Notifications": {
+      "OnlineAlert": true,
+      "GameInvite": true,
+      "AchievementShare": true
+    }
+  },
+
+  "Messaging": {
+    "DirectMessages": {
+      "Enabled": true,
+      "MaxLength": 500,
+      "History": 100,
+      "Attachments": ["Screenshot", "CarShare", "TrackShare"]
+    },
+    "QuickChat": {
+      "Enabled": true,
+      "Presets": 20,
+      "Custom": true,
+      "InRace": true
+    },
+    "VoiceChat": {
+      "Enabled": true,
+      "Modes": ["Push", "Open", "Off"],
+      "Proximity": { "InFreeRoam": true },
+      "Party": { "MaxSize": 8 }
+    },
+    "Moderation": {
+      "ProfanityFilter": true,
+      "SpamProtection": true,
+      "ReportMessages": true,
+      "MutePlayer": true
+    }
+  },
+
+  "ActivityFeed": {
+    "Enabled": true,
+    "PostTypes": {
+      "Achievement": { "AutoPost": "Optional" },
+      "NewCar": { "AutoPost": "Optional" },
+      "RaceWin": { "AutoPost": "Optional" },
+      "Photo": { "Manual": true },
+      "Milestone": { "AutoPost": "Optional" }
+    },
+    "Interactions": {
+      "Like": true,
+      "Comment": true,
+      "Share": true
+    },
+    "Privacy": {
+      "WhoCanSee": ["Everyone", "Friends", "Nobody"],
+      "WhoCanComment": ["Everyone", "Friends", "Nobody"]
+    },
+    "Filtering": {
+      "ByFriends": true,
+      "ByCrew": true,
+      "ByType": true
+    }
+  },
+
+  "FindPlayers": {
+    "Matchmaking": {
+      "QuickMatch": true,
+      "SkillBased": true,
+      "RegionBased": true
+    },
+    "LookingForGroup": {
+      "Enabled": true,
+      "Categories": ["Racing", "Cruising", "Drifting", "Crew", "Trading"],
+      "Filters": {
+        "Skill": true,
+        "VehicleClass": true,
+        "Region": true,
+        "Language": true
+      }
+    },
+    "RecentPlayers": {
+      "Stored": 100,
+      "QuickAdd": true,
+      "QuickBlock": true
+    }
+  },
+
+  "Leaderboards": {
+    "Types": {
+      "Global": { "AllPlayers": true },
+      "Friends": { "FriendsOnly": true },
+      "Crew": { "CrewOnly": true },
+      "Regional": { "ByRegion": true }
+    },
+    "Categories": {
+      "Racing": ["Wins", "WinRate", "FastestLaps"],
+      "Progression": ["Level", "REP", "Achievements"],
+      "Collection": ["CarsOwned", "GarageValue"],
+      "Activity": ["Distance", "RacesCompleted", "PlayTime"]
+    },
+    "Timeframes": ["AllTime", "Monthly", "Weekly", "Daily"]
+  },
+
+  "CommunityEvents": {
+    "OfficialEvents": {
+      "Frequency": "Weekly",
+      "Types": ["TimeAttack", "Tournament", "CommunityChallenge"],
+      "Rewards": { "Exclusive": true }
+    },
+    "PlayerEvents": {
+      "CreateEvent": true,
+      "MaxParticipants": 32,
+      "Scheduling": true,
+      "Rewards": { "FromHost": true }
+    },
+    "CarMeets": {
+      "Scheduled": true,
+      "Themes": true,
+      "Voting": true,
+      "MaxAttendees": 50
+    }
+  },
+
+  "ContentSharing": {
+    "Liveries": {
+      "Share": true,
+      "Download": true,
+      "Rate": true,
+      "CreatorCredits": true
+    },
+    "Photos": {
+      "Gallery": true,
+      "Albums": { "Max": 20 },
+      "Share": true,
+      "Featured": true
+    },
+    "Tracks": {
+      "Share": true,
+      "Collaborate": true,
+      "Rate": true
+    },
+    "Replays": {
+      "Share": true,
+      "MaxLength": 300,
+      "Download": true
+    }
+  },
+
+  "Reputation": {
+    "PlayerRating": {
+      "Enabled": true,
+      "Categories": {
+        "Sportsmanship": { "Scale": 5 },
+        "Skill": { "Scale": 5 },
+        "Communication": { "Scale": 5 }
+      },
+      "Impact": {
+        "Matchmaking": true,
+        "TrustLevel": true
+      }
+    },
+    "TrustLevels": {
+      "New": { "Restrictions": ["LimitedTrading", "LimitedMessaging"] },
+      "Established": { "Restrictions": [] },
+      "Trusted": { "Perks": ["PrioritySupport"] },
+      "VIP": { "Perks": ["ExclusiveAccess", "BetaFeatures"] }
+    }
+  },
+
+  "Clubs": {
+    "Enabled": true,
+    "Types": {
+      "CarClub": { "FocusedOn": "VehicleBrand" },
+      "StyleClub": { "FocusedOn": "BuildStyle" },
+      "RegionalClub": { "FocusedOn": "Location" },
+      "CompetitiveClub": { "FocusedOn": "Racing" }
+    },
+    "Features": {
+      "Forums": true,
+      "Events": true,
+      "Leaderboards": true,
+      "SharedGarage": false
+    },
+    "MaxMembers": 100,
+    "MaxClubsJoined": 5
+  },
+
+  "Streaming": {
+    "Integration": {
+      "Twitch": true,
+      "YouTube": true
+    },
+    "Features": {
+      "StreamerMode": { "HideNames": true, "DelayedFeed": true },
+      "ViewerInteraction": true,
+      "Drops": true
+    }
+  },
+
+  "UI": {
+    "SocialHub": {
+      "Tabs": ["Feed", "Friends", "Crews", "Events", "Leaderboards"],
+      "Notifications": { "Unread": true, "Priority": true },
+      "QuickActions": ["Invite", "Message", "Join"]
+    },
+    "ProfileViewer": {
+      "FullProfile": true,
+      "QuickView": true,
+      "CompareStats": true
+    },
+    "InGameOverlay": {
+      "FriendsList": true,
+      "PartyChat": true,
+      "Invites": true
+    }
+  }
+}

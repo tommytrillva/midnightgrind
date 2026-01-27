@@ -86,89 +86,125 @@ enum class EMGViolationSeverity : uint8
 };
 
 /**
- * Player Trust Level
+ * @brief Player trust levels for reputation tracking
+ *
+ * Trust levels are calculated from cumulative player behavior over time.
+ * Higher trust players may receive reduced validation overhead, while
+ * lower trust players face increased scrutiny. Trust can be rebuilt
+ * through consistent fair play.
  */
 UENUM(BlueprintType)
 enum class EMGTrustLevel : uint8
 {
-	Trusted			UMETA(DisplayName = "Trusted"),
-	Normal			UMETA(DisplayName = "Normal"),
-	Suspicious		UMETA(DisplayName = "Suspicious"),
-	Flagged			UMETA(DisplayName = "Flagged"),
-	Banned			UMETA(DisplayName = "Banned")
+	Trusted			UMETA(DisplayName = "Trusted"),		///< Long-term clean record, reduced checks
+	Normal			UMETA(DisplayName = "Normal"),		///< Default starting level for all players
+	Suspicious		UMETA(DisplayName = "Suspicious"),	///< Minor violations detected, increased monitoring
+	Flagged			UMETA(DisplayName = "Flagged"),		///< Multiple violations, under review
+	Banned			UMETA(DisplayName = "Banned")		///< Access revoked due to cheating
 };
 
+// ============================================================================
+// DATA STRUCTURES
+// ============================================================================
+
 /**
- * Violation Record
+ * @brief Complete record of a detected cheating violation
+ *
+ * This structure captures all relevant information about a detected violation,
+ * including evidence that can be used for review. Records are stored locally
+ * and uploaded to the server for centralized tracking and analysis.
  */
 USTRUCT(BlueprintType)
 struct FMGViolationRecord
 {
 	GENERATED_BODY()
 
+	/// Unique identifier for this specific violation instance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
 	FString ViolationID;
 
+	/// The player who committed the violation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
 	FString PlayerID;
 
+	/// Classification of the cheating method used
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
 	EMGViolationType Type = EMGViolationType::Unknown;
 
+	/// How serious the violation is (affects penalty)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
 	EMGViolationSeverity Severity = EMGViolationSeverity::Info;
 
+	/// Human-readable explanation of what was detected
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
 	FString Description;
 
+	/// Contextual information (Race ID, session ID, track name, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
-	FString Context; // Race ID, session ID, etc.
+	FString Context;
 
+	/// Key-value pairs of evidence data (e.g., "speed" -> "500", "expected_max" -> "350")
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
 	TMap<FString, FString> Evidence;
 
+	/// When the violation was detected
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
 	FDateTime Timestamp;
 
+	/// Whether this violation has been sent to the backend server
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
 	bool bReportedToServer = false;
 
+	/// Whether a penalty has been applied for this violation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Violation")
 	bool bActionTaken = false;
 };
 
 /**
- * Player Report
+ * @brief Player-submitted report of suspected cheating
+ *
+ * Allows players to report suspicious behavior they observe in other players.
+ * Reports are stored and can be used alongside automated detection to identify
+ * cheaters. Multiple reports against the same player increases review priority.
  */
 USTRUCT(BlueprintType)
 struct FMGPlayerReport
 {
 	GENERATED_BODY()
 
+	/// Unique identifier for this report
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Report")
 	FString ReportID;
 
+	/// Player who submitted the report
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Report")
 	FString ReporterID;
 
+	/// Player being reported for cheating
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Report")
 	FString ReportedPlayerID;
 
+	/// Category of the report (e.g., "Speed Hack", "Unfair Advantage")
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Report")
 	FString Reason;
 
+	/// Additional details provided by the reporter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Report")
 	FString Description;
 
+	/// The race or match where the suspicious behavior was observed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Report")
 	FString MatchID;
 
+	/// When the report was submitted
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Report")
 	FDateTime Timestamp;
 
+	/// Whether a moderator has reviewed this report
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Report")
 	bool bReviewed = false;
 
+	/// Whether action was taken based on this report
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Report")
 	bool bActionTaken = false;
 };

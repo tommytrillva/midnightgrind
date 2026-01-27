@@ -1,5 +1,36 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGPlayerProgression.h
+ * @brief Core player progression system for Midnight Grind
+ *
+ * This file defines the primary progression subsystem that tracks all aspects of
+ * player advancement in the game. The progression system is the backbone of the
+ * Midnight Grind experience, managing:
+ *
+ * - **Player Leveling**: XP-based level progression with an exponential curve
+ * - **Crew Reputation**: Faction standing with five distinct racing crews
+ * - **Content Unlocks**: Vehicles, parts, tracks, and features earned through play
+ * - **Racing Statistics**: Comprehensive tracking of player performance metrics
+ *
+ * ## Progression Flow
+ * 1. Player completes races and earns XP/reputation
+ * 2. XP accumulates toward level thresholds
+ * 3. Reputation changes affect crew standing and unlock eligibility
+ * 4. Level/reputation milestones trigger content unlocks
+ * 5. Statistics are updated and persisted for leaderboards/achievements
+ *
+ * ## Integration Points
+ * - MGContentGatingSubsystem: Uses reputation/level data for access control
+ * - MGTransactionPipeline: Receives XP/reputation rewards from race completions
+ * - MGOnlineProfile: Syncs progression data with backend services
+ * - Save System: All data marked with SaveGame specifier for persistence
+ *
+ * @see UMGContentGatingSubsystem for REP-based content gating
+ * @see UMGTransactionPipeline for reward distribution
+ * @see UMGOnlineProfileSubsystem for server synchronization
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

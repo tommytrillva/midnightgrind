@@ -2,10 +2,26 @@
 
 /**
  * @file MGCrewSubsystem.h
+ * @brief Legacy crew/club management subsystem (DEPRECATED)
+ *
  * @deprecated This file is DEPRECATED. Use the comprehensive implementation at:
  *             Source/MidnightGrind/Public/Crew/MGCrewSubsystem.h
  *
- * The Crew/ folder contains the full crew system with:
+ * @warning This Social/ version will be removed in a future update.
+ *          DO NOT USE THIS FILE FOR NEW DEVELOPMENT.
+ *
+ * @section crew_overview_sec What is a Crew?
+ * A Crew (also called a Club or Clan in other games) is a group of players who
+ * team up for competitive play, shared rewards, and social features. Crews provide:
+ * - Shared identity through emblems, colors, and tags displayed in races
+ * - Crew vs Crew competitive modes
+ * - Shared liveries and customization options
+ * - Territory control for map-based bonuses
+ * - Weekly challenges with crew-wide rewards
+ * - Leveling system that unlocks crew perks
+ *
+ * @section migration_sec Migration Guide
+ * The Crew/ folder contains the full crew system with enhanced features:
  * - 7-rank hierarchy (Prospect through Leader)
  * - 19 permissions mapped to ranks
  * - Shared garage system
@@ -16,14 +32,13 @@
  * - Integration with CrewBattles subsystem
  * - Full Doxygen documentation
  *
- * This Social/ version will be removed in a future update.
- * DO NOT USE THIS FILE FOR NEW DEVELOPMENT.
- *
- * To migrate:
+ * @subsection migration_steps Migration Steps
  * 1. Include "Crew/MGCrewSubsystem.h" instead of "Social/MGCrewSubsystem.h"
  * 2. Update enum references from EMGCrewRole to EMGCrewRank
  * 3. Update struct references (FMGCrewData -> FMGCrewInfo, etc.)
  * 4. Note: The Crew/ version uses FName for PlayerID instead of FString
+ *
+ * @see UMGCrewSubsystem in Crew/MGCrewSubsystem.h for the current implementation
  */
 
 #pragma once

@@ -1,5 +1,58 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGReferralSubsystem.h
+ * @brief Player referral and invitation system for Midnight Grind
+ *
+ * The Referral Subsystem manages the "invite a friend" feature, rewarding players
+ * who bring new racers into the game. Both the referrer and the referred player
+ * receive rewards as the new player progresses through milestones.
+ *
+ * @section referral_overview_sec System Overview
+ * When a player shares their referral code with a friend:
+ * 1. Friend applies the code during registration or first login
+ * 2. Both players receive initial "welcome" rewards
+ * 3. As the new player hits milestones (level 5, first win, etc.), more rewards unlock
+ * 4. Completed referrals contribute to the referrer's tier progression
+ *
+ * @section referral_tiers_sec Referral Tiers
+ * Players earn higher tiers by successfully referring more friends:
+ * - **Bronze**: 1-2 completed referrals
+ * - **Silver**: 3-5 referrals (bonus currency multiplier)
+ * - **Gold**: 6-10 referrals (exclusive cosmetics)
+ * - **Platinum**: 11-25 referrals (unique vehicles)
+ * - **Diamond**: 26-50 referrals (premium rewards)
+ * - **Ambassador**: 50+ referrals (special title, exclusive perks)
+ *
+ * @section referral_milestones_sec Progress Milestones
+ * Referrals progress through these status stages:
+ * - Pending: Code applied, awaiting account creation
+ * - Registered: Account created
+ * - FirstLogin: Completed first game session
+ * - TutorialComplete: Finished the tutorial
+ * - ReachedLevel5/10: Hit level milestones
+ * - FirstWin: Won their first race
+ * - PurchasedPremium: Made a real-money purchase (optional bonus)
+ *
+ * @section referral_usage_sec Example Usage
+ * @code
+ * UMGReferralSubsystem* ReferralSub = GameInstance->GetSubsystem<UMGReferralSubsystem>();
+ *
+ * // Get your referral code to share
+ * FString Link = ReferralSub->GetReferralLink();
+ * ReferralSub->CopyReferralCodeToClipboard();
+ *
+ * // New player applies a friend's code
+ * ReferralSub->ApplyReferralCode(TEXT("FRIEND123"));
+ *
+ * // Check available rewards
+ * TArray<FMGReferralReward> Pending = ReferralSub->GetPendingRewards();
+ * ReferralSub->ClaimAllRewards();
+ * @endcode
+ *
+ * @see UMGSocialSubsystem For adding referred players as friends
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

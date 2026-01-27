@@ -1,5 +1,54 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGGiftSubsystem.h
+ * @brief Player-to-player gifting system for Midnight Grind
+ *
+ * The Gift Subsystem enables players to send items, currency, and bundles to
+ * friends and other players. This social feature strengthens player connections
+ * and enables generous interactions within the community.
+ *
+ * @section gift_features_sec Core Features
+ * - **Item Gifting**: Send vehicles, parts, cosmetics, and consumables
+ * - **Currency Gifting**: Share in-game currency with friends
+ * - **Gift Bundles**: Curated collections available for gifting
+ * - **Wrap Styles**: Visual customization for gift presentation
+ * - **Anonymous Gifting**: Option to send gifts without revealing identity
+ * - **Gift History**: Track sent and received gifts over time
+ *
+ * @section gift_flow_sec Gift Lifecycle
+ * 1. **Pending**: Gift created but not yet sent to server
+ * 2. **Sent**: Gift transmitted, awaiting delivery
+ * 3. **Delivered**: Gift arrived in recipient's inbox
+ * 4. **Claimed**: Recipient accepted and received items
+ * 5. **Expired**: Gift not claimed within time limit (returned to sender)
+ * 6. **Returned**: Recipient declined or gift bounced back
+ * 7. **Cancelled**: Sender cancelled before delivery
+ *
+ * @section gift_settings_sec Privacy Settings
+ * Players can configure who can send them gifts:
+ * - Friends only (default)
+ * - Anyone in the game
+ * - Accept/reject anonymous gifts
+ * - Auto-claim or manual claim
+ *
+ * @section gift_usage_sec Example Usage
+ * @code
+ * UMGGiftSubsystem* GiftSub = GameInstance->GetSubsystem<UMGGiftSubsystem>();
+ *
+ * // Send currency to a friend
+ * GiftSub->SendCurrencyGift(FriendID, 1000, FText::FromString("GG on that last race!"));
+ *
+ * // Check for pending gifts
+ * if (GiftSub->GetPendingGiftCount() > 0)
+ * {
+ *     GiftSub->ClaimAllGifts();
+ * }
+ * @endcode
+ *
+ * @see UMGSocialSubsystem For friends list integration
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

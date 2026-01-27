@@ -320,35 +320,84 @@ public:
 	FOnLoadCompleted OnLoadCompleted;
 
 protected:
-	/** Gather data from all subsystems */
+	// ============================================================================
+	// INTERNAL DATA MANAGEMENT
+	// ============================================================================
+
+	/**
+	 * @brief Collects save data from all game subsystems.
+	 *
+	 * Called before saving to gather the latest state from profile manager,
+	 * garage system, progression, etc. into the save game object.
+	 */
 	void GatherSubsystemData();
 
-	/** Distribute data to all subsystems */
+	/**
+	 * @brief Pushes loaded data out to all game subsystems.
+	 *
+	 * Called after loading to restore game state. Each subsystem receives
+	 * its relevant data portion and updates its internal state.
+	 */
 	void DistributeSubsystemData();
 
-	/** Validate save data integrity */
+	/**
+	 * @brief Validates save data integrity before use.
+	 *
+	 * Checks for corruption, version mismatches, and data consistency.
+	 *
+	 * @param SaveData The save data to validate.
+	 * @return true if the data is valid and safe to use.
+	 */
 	bool ValidateSaveData(const UMGSaveGame* SaveData) const;
 
-	/** Handle async save completion */
+	/**
+	 * @brief Callback for async save completion.
+	 *
+	 * Handles cleanup and broadcasts the OnSaveCompleted delegate.
+	 */
 	void OnAsyncSaveComplete(const FString& SlotName, int32 UserIndex, bool bSuccess);
 
-	/** Handle async load completion */
+	/**
+	 * @brief Callback for async load completion.
+	 *
+	 * Validates loaded data, distributes to subsystems, and broadcasts OnLoadCompleted.
+	 */
 	void OnAsyncLoadComplete(const FString& SlotName, int32 UserIndex, USaveGame* LoadedGame);
 
-	/** Autosave timer callback */
+	/**
+	 * @brief Timer callback that triggers autosave.
+	 *
+	 * Called by the autosave timer at the configured interval.
+	 */
 	void OnAutosaveTimer();
 
 private:
+	// ============================================================================
+	// MEMBER VARIABLES
+	// ============================================================================
+
+	/// The current save game data in memory
 	UPROPERTY()
 	UMGSaveGame* CurrentSaveGame;
 
+	/// Name of the currently active save slot
 	FString CurrentSlotName;
+
+	/// User index for multi-user systems (typically 0 for single-player)
 	int32 UserIndex = 0;
 
+	/// Flag indicating an async load is in progress
 	bool bIsLoading = false;
-	bool bIsSaving = false;
-	bool bAutosaveEnabled = true;
-	float AutosaveInterval = 300.0f; // 5 minutes
 
+	/// Flag indicating an async save is in progress
+	bool bIsSaving = false;
+
+	/// Whether autosave functionality is enabled
+	bool bAutosaveEnabled = true;
+
+	/// Time between autosaves in seconds (default: 5 minutes)
+	float AutosaveInterval = 300.0f;
+
+	/// Timer handle for the autosave timer
 	FTimerHandle AutosaveTimerHandle;
 };

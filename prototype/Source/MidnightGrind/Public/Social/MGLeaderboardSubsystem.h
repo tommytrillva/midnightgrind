@@ -1,5 +1,40 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGLeaderboardSubsystem.h
+ * @brief Leaderboard and ranking system for Midnight Grind
+ *
+ * This subsystem manages all competitive rankings, track records, and player statistics.
+ * It provides a comprehensive system for tracking and displaying player performance
+ * across multiple dimensions:
+ *
+ * @section features_sec Core Features
+ * - **Multiple Leaderboard Types**: Lap times, race times, wins, XP, reputation, etc.
+ * - **Flexible Scoping**: Global, regional, friends-only, crew-only, or nearby ranks
+ * - **Time Filters**: All-time, seasonal, monthly, weekly, and daily rankings
+ * - **Ranked Mode**: Tiered competitive system with placement matches and MMR
+ * - **Track Records**: Per-track best times with ghost data for replays
+ * - **Weekly Competitions**: Time-limited challenges with special rewards
+ *
+ * @section tiers_sec Rank Tiers (Lowest to Highest)
+ * - Unranked: New players before placement
+ * - Bronze, Silver, Gold: Entry competitive tiers
+ * - Platinum, Diamond: Advanced competitive tiers
+ * - Champion, Legend: Elite tiers for top players
+ *
+ * @section usage_sec Integration Example
+ * @code
+ * UMGLeaderboardSubsystem* LeaderboardSub = GameInstance->GetSubsystem<UMGLeaderboardSubsystem>();
+ * // Get friends leaderboard for wins
+ * LeaderboardSub->GetLeaderboard(EMGLeaderboardType::Wins, EMGLeaderboardScope::Friends,
+ *                                 EMGLeaderboardTimeFilter::Weekly);
+ * // Listen for results
+ * LeaderboardSub->OnLeaderboardLoaded.AddDynamic(this, &UMyWidget::HandleLeaderboardLoaded);
+ * @endcode
+ *
+ * @see UMGSocialSubsystem For friends integration with leaderboards
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

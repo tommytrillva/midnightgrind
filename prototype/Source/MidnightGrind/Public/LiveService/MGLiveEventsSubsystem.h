@@ -162,7 +162,15 @@ struct FMGEventReward
 };
 
 /**
- * Challenge objective
+ * @brief A single trackable objective within a challenge.
+ *
+ * Objectives are the atomic units of challenge progress. A challenge may have
+ * multiple objectives that must all be completed. Each objective tracks progress
+ * toward a TargetValue and may have additional requirements like specific tracks
+ * or vehicles.
+ *
+ * Example: "Win 3 races on Night City Circuit" would have:
+ * - Type = WinRaces, TargetValue = 3, RequiredTrack = "NightCityCircuit"
  */
 USTRUCT(BlueprintType)
 struct FMGChallengeObjective
@@ -207,7 +215,13 @@ struct FMGChallengeObjective
 };
 
 /**
- * Event challenge
+ * @brief A complete challenge with objectives, rewards, and tracking state.
+ *
+ * Challenges are the main engagement loop for events. Players complete objectives
+ * to finish challenges, then claim rewards. Challenges have difficulty ratings
+ * to help players choose appropriate tasks and set expectations.
+ *
+ * Workflow: Objectives completed -> bIsCompleted = true -> Player claims -> bIsClaimed = true
  */
 USTRUCT(BlueprintType)
 struct FMGEventChallenge
@@ -256,7 +270,14 @@ struct FMGEventChallenge
 };
 
 /**
- * Community goal data
+ * @brief Server-wide collaborative goal that all players contribute to.
+ *
+ * Community goals create shared experiences where the entire player base works
+ * toward massive targets (e.g., "Community drives 1 billion meters"). Progress
+ * is synced from the server and rewards unlock at tier thresholds.
+ *
+ * The TierThresholds array defines milestones (e.g., [250000, 500000, 750000, 1000000])
+ * and TierRewards contains corresponding rewards for each milestone reached.
  */
 USTRUCT(BlueprintType)
 struct FMGCommunityGoal
@@ -308,8 +329,16 @@ struct FMGCommunityGoal
 	bool bIsCompleted = false;
 };
 
+// ============================================================================
+// DATA STRUCTURES - Playlists and Race Configuration
+// ============================================================================
+
 /**
- * Playlist entry
+ * @brief A single race configuration within a featured playlist.
+ *
+ * Playlist entries define the specific race setup: track, weather, time of day,
+ * lap count, and any vehicle restrictions. This allows event designers to create
+ * curated racing experiences with specific conditions.
  */
 USTRUCT(BlueprintType)
 struct FMGPlaylistEntry

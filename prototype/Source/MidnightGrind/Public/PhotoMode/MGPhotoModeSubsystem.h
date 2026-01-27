@@ -97,8 +97,16 @@ enum class EMGPhotoFilter : uint8
 	Custom
 };
 
+// ============================================================================
+// STRUCTURES - Camera, Visual, and Overlay Configuration
+// ============================================================================
+
 /**
- * Photo camera settings
+ * @brief Camera configuration settings for photo mode.
+ *
+ * Contains all adjustable camera parameters including field of view,
+ * depth of field settings, and orbit mode configuration. These settings
+ * directly affect the captured image composition and focus.
  */
 USTRUCT(BlueprintType)
 struct FMGPhotoCameraSettings
@@ -135,7 +143,12 @@ struct FMGPhotoCameraSettings
 };
 
 /**
- * Photo visual settings
+ * @brief Visual and post-processing settings for photos.
+ *
+ * Controls all image adjustments including exposure, color correction,
+ * and visual effects like vignette and film grain. When Filter is set
+ * to Custom, these individual values are applied directly. When using
+ * a preset filter, these values are overridden by the preset.
  */
 USTRUCT(BlueprintType)
 struct FMGPhotoVisualSettings
@@ -188,7 +201,11 @@ struct FMGPhotoVisualSettings
 };
 
 /**
- * Photo overlay settings
+ * @brief Overlay and watermark settings for captured photos.
+ *
+ * Configures optional visual elements that appear on top of the captured
+ * image, such as game logos, decorative frames, timestamps, and contextual
+ * information about the vehicle and track.
  */
 USTRUCT(BlueprintType)
 struct FMGPhotoOverlaySettings
@@ -229,7 +246,11 @@ struct FMGPhotoOverlaySettings
 };
 
 /**
- * Saved photo info
+ * @brief Metadata for a saved photo.
+ *
+ * Contains all information about a captured and saved photo, including
+ * file paths, capture context (track, vehicle), and sharing status.
+ * Used by the gallery system to display and manage saved photos.
  */
 USTRUCT(BlueprintType)
 struct FMGPhotoInfo

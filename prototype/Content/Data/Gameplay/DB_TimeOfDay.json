@@ -1,0 +1,364 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Time of Day and Dynamic Lighting System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DayNightCycle": true,
+    "RealTimeScale": 48,
+    "PlayerControl": true,
+    "AffectsGameplay": true
+  },
+
+  "TimePeriods": {
+    "Dawn": {
+      "ID": "TIME_DAWN",
+      "Name": "Dawn",
+      "TimeRange": { "Start": "05:00", "End": "07:00" },
+      "SunPosition": { "Altitude": 5, "Azimuth": 90 },
+      "Lighting": {
+        "Intensity": 0.4,
+        "Color": "#FFB366",
+        "Shadows": "Soft",
+        "AmbientLevel": 0.3
+      },
+      "Atmosphere": {
+        "FogDensity": 0.02,
+        "FogColor": "#FFC080",
+        "SkyColor": "#FF9966",
+        "Haze": 0.3
+      },
+      "GameplayEffects": {
+        "Visibility": 0.8,
+        "TrafficDensity": 0.3,
+        "PoliceActivity": 0.5
+      }
+    },
+    "Morning": {
+      "ID": "TIME_MORNING",
+      "Name": "Morning",
+      "TimeRange": { "Start": "07:00", "End": "11:00" },
+      "SunPosition": { "Altitude": 30, "Azimuth": 120 },
+      "Lighting": {
+        "Intensity": 0.8,
+        "Color": "#FFF5E6",
+        "Shadows": "Medium",
+        "AmbientLevel": 0.5
+      },
+      "Atmosphere": {
+        "FogDensity": 0.005,
+        "FogColor": "#FFFFFF",
+        "SkyColor": "#87CEEB",
+        "Haze": 0.1
+      },
+      "GameplayEffects": {
+        "Visibility": 1.0,
+        "TrafficDensity": 1.2,
+        "PoliceActivity": 1.0
+      }
+    },
+    "Midday": {
+      "ID": "TIME_MIDDAY",
+      "Name": "Midday",
+      "TimeRange": { "Start": "11:00", "End": "14:00" },
+      "SunPosition": { "Altitude": 70, "Azimuth": 180 },
+      "Lighting": {
+        "Intensity": 1.0,
+        "Color": "#FFFFFF",
+        "Shadows": "Hard",
+        "AmbientLevel": 0.6
+      },
+      "Atmosphere": {
+        "FogDensity": 0.001,
+        "FogColor": "#FFFFFF",
+        "SkyColor": "#4A90D9",
+        "Haze": 0.05
+      },
+      "GameplayEffects": {
+        "Visibility": 1.0,
+        "TrafficDensity": 1.0,
+        "PoliceActivity": 1.0,
+        "HeatMirage": true
+      }
+    },
+    "Afternoon": {
+      "ID": "TIME_AFTERNOON",
+      "Name": "Afternoon",
+      "TimeRange": { "Start": "14:00", "End": "17:00" },
+      "SunPosition": { "Altitude": 45, "Azimuth": 240 },
+      "Lighting": {
+        "Intensity": 0.9,
+        "Color": "#FFF8E7",
+        "Shadows": "Medium",
+        "AmbientLevel": 0.55
+      },
+      "Atmosphere": {
+        "FogDensity": 0.003,
+        "FogColor": "#FFE4B5",
+        "SkyColor": "#6BB3F0",
+        "Haze": 0.15
+      },
+      "GameplayEffects": {
+        "Visibility": 1.0,
+        "TrafficDensity": 1.3,
+        "PoliceActivity": 1.1
+      }
+    },
+    "GoldenHour": {
+      "ID": "TIME_GOLDEN",
+      "Name": "Golden Hour",
+      "TimeRange": { "Start": "17:00", "End": "19:00" },
+      "SunPosition": { "Altitude": 15, "Azimuth": 270 },
+      "Lighting": {
+        "Intensity": 0.6,
+        "Color": "#FFD700",
+        "Shadows": "Long",
+        "AmbientLevel": 0.4
+      },
+      "Atmosphere": {
+        "FogDensity": 0.015,
+        "FogColor": "#FF8C00",
+        "SkyColor": "#FF7F50",
+        "Haze": 0.25
+      },
+      "GameplayEffects": {
+        "Visibility": 0.9,
+        "TrafficDensity": 1.5,
+        "PoliceActivity": 1.0,
+        "PhotoModeBonus": 1.5
+      }
+    },
+    "Dusk": {
+      "ID": "TIME_DUSK",
+      "Name": "Dusk",
+      "TimeRange": { "Start": "19:00", "End": "21:00" },
+      "SunPosition": { "Altitude": -5, "Azimuth": 280 },
+      "Lighting": {
+        "Intensity": 0.3,
+        "Color": "#FF6B6B",
+        "Shadows": "Fade",
+        "AmbientLevel": 0.25
+      },
+      "Atmosphere": {
+        "FogDensity": 0.02,
+        "FogColor": "#4B0082",
+        "SkyColor": "#483D8B",
+        "Haze": 0.2
+      },
+      "GameplayEffects": {
+        "Visibility": 0.7,
+        "TrafficDensity": 1.0,
+        "PoliceActivity": 0.9,
+        "HeadlightsRequired": true
+      }
+    },
+    "Night": {
+      "ID": "TIME_NIGHT",
+      "Name": "Night",
+      "TimeRange": { "Start": "21:00", "End": "01:00" },
+      "SunPosition": { "Altitude": -45, "Azimuth": 0 },
+      "Lighting": {
+        "Intensity": 0.05,
+        "Color": "#1E3A5F",
+        "Shadows": "None",
+        "AmbientLevel": 0.1,
+        "MoonLight": true
+      },
+      "Atmosphere": {
+        "FogDensity": 0.01,
+        "FogColor": "#191970",
+        "SkyColor": "#0D0D2B",
+        "Stars": true
+      },
+      "GameplayEffects": {
+        "Visibility": 0.5,
+        "TrafficDensity": 0.5,
+        "PoliceActivity": 0.7,
+        "StreetRacingBonus": 1.5,
+        "REPMultiplier": 1.25
+      }
+    },
+    "Midnight": {
+      "ID": "TIME_MIDNIGHT",
+      "Name": "Midnight",
+      "TimeRange": { "Start": "01:00", "End": "03:00" },
+      "SunPosition": { "Altitude": -60, "Azimuth": 0 },
+      "Lighting": {
+        "Intensity": 0.02,
+        "Color": "#0F1A2B",
+        "Shadows": "None",
+        "AmbientLevel": 0.05,
+        "MoonLight": true
+      },
+      "Atmosphere": {
+        "FogDensity": 0.015,
+        "FogColor": "#0A0A1F",
+        "SkyColor": "#000010",
+        "Stars": true,
+        "MilkyWay": true
+      },
+      "GameplayEffects": {
+        "Visibility": 0.4,
+        "TrafficDensity": 0.2,
+        "PoliceActivity": 0.5,
+        "StreetRacingBonus": 2.0,
+        "REPMultiplier": 1.5,
+        "SecretEvents": true
+      }
+    },
+    "LateNight": {
+      "ID": "TIME_LATENIGHT",
+      "Name": "Late Night",
+      "TimeRange": { "Start": "03:00", "End": "05:00" },
+      "SunPosition": { "Altitude": -30, "Azimuth": 60 },
+      "Lighting": {
+        "Intensity": 0.08,
+        "Color": "#1A2744",
+        "Shadows": "None",
+        "AmbientLevel": 0.08
+      },
+      "Atmosphere": {
+        "FogDensity": 0.025,
+        "FogColor": "#2F2F4F",
+        "SkyColor": "#1A1A3A",
+        "Stars": true
+      },
+      "GameplayEffects": {
+        "Visibility": 0.45,
+        "TrafficDensity": 0.1,
+        "PoliceActivity": 0.4,
+        "GhostRacers": true
+      }
+    }
+  },
+
+  "MoonPhases": {
+    "Enabled": true,
+    "Cycle": 28,
+    "Phases": {
+      "NewMoon": { "Brightness": 0, "NightBonus": { "Stealth": 1.5 } },
+      "WaxingCrescent": { "Brightness": 0.15 },
+      "FirstQuarter": { "Brightness": 0.3 },
+      "WaxingGibbous": { "Brightness": 0.6 },
+      "FullMoon": { "Brightness": 1.0, "NightBonus": { "Visibility": 1.3 } },
+      "WaningGibbous": { "Brightness": 0.6 },
+      "LastQuarter": { "Brightness": 0.3 },
+      "WaningCrescent": { "Brightness": 0.15 }
+    }
+  },
+
+  "CityLighting": {
+    "Streetlights": {
+      "Enabled": true,
+      "TurnOnTime": "19:00",
+      "TurnOffTime": "06:00",
+      "Types": {
+        "Highway": { "Spacing": 50, "Intensity": 0.8 },
+        "Urban": { "Spacing": 30, "Intensity": 1.0 },
+        "Residential": { "Spacing": 40, "Intensity": 0.6 },
+        "Industrial": { "Spacing": 60, "Intensity": 0.5 }
+      }
+    },
+    "BuildingLights": {
+      "Enabled": true,
+      "WindowLighting": { "RandomPattern": true },
+      "Signage": { "Neon": true, "Digital": true },
+      "Animated": { "Billboards": true, "Marquees": true }
+    },
+    "TrafficLights": {
+      "EmissiveAtNight": true,
+      "ReflectOnWetRoad": true
+    },
+    "NeonDistrict": {
+      "Enabled": true,
+      "Location": "Downtown",
+      "IntenseNeon": true,
+      "ReflectiveRoads": true
+    }
+  },
+
+  "Transitions": {
+    "BlendDuration": 300,
+    "SmoothLighting": true,
+    "CloudTransitions": true,
+    "StarFade": true
+  },
+
+  "PlayerControls": {
+    "TimeSkip": {
+      "Enabled": true,
+      "Options": ["Dawn", "Day", "Dusk", "Night"],
+      "Cost": 0,
+      "Locations": ["Safehouse", "Garage"]
+    },
+    "TimeLock": {
+      "Enabled": true,
+      "ForPhotoMode": true,
+      "ForRaces": true
+    }
+  },
+
+  "RaceTimeSettings": {
+    "PresetTimes": {
+      "SunriseChallenge": "06:00",
+      "MiddayShowdown": "12:00",
+      "GoldenHourGrandPrix": "18:00",
+      "MidnightRun": "00:00"
+    },
+    "DynamicDuringRace": {
+      "Enabled": true,
+      "AcceleratedTime": { "Multiplier": 4 }
+    }
+  },
+
+  "VisualEffects": {
+    "LensEffects": {
+      "Sunflare": { "Dawn": true, "Dusk": true },
+      "Moonflare": { "Night": true },
+      "StreetlightFlare": { "Night": true }
+    },
+    "Reflections": {
+      "WetRoads": { "TimeOfDay": "All" },
+      "CarPaint": { "DynamicCubemap": true },
+      "Windows": { "ReflectSky": true }
+    },
+    "Shadows": {
+      "ContactShadows": true,
+      "CascadedShadows": 4,
+      "ShadowDistance": { "Day": 500, "Night": 100 }
+    },
+    "VolumetricLighting": {
+      "Enabled": true,
+      "GodRays": { "Dawn": true, "Dusk": true },
+      "FogShafts": { "Night": true }
+    }
+  },
+
+  "Performance": {
+    "QualityScaling": {
+      "Low": { "Shadows": "Off", "Volumetrics": "Off" },
+      "Medium": { "Shadows": "Medium", "Volumetrics": "Low" },
+      "High": { "Shadows": "High", "Volumetrics": "Medium" },
+      "Ultra": { "Shadows": "Ultra", "Volumetrics": "High" }
+    },
+    "DynamicResolution": true,
+    "LODDistance": { "Day": 1000, "Night": 500 }
+  },
+
+  "UI": {
+    "ClockDisplay": {
+      "Position": "TopRight",
+      "Format": ["12Hour", "24Hour"],
+      "ShowPeriod": true
+    },
+    "SunMoonIndicator": {
+      "ShowPosition": true,
+      "ShowPhase": true
+    },
+    "TimeSkipUI": {
+      "TimelineSlider": true,
+      "QuickButtons": true,
+      "Preview": true
+    }
+  }
+}

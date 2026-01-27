@@ -92,112 +92,190 @@ enum class EMGPartSlot : uint8
 	// ----- Engine Components -----
 	/// The main engine block - determines displacement and base power potential
 	EngineBlock			UMETA(DisplayName = "Engine Block"),
+	/// Cylinder head - affects airflow and rev ceiling
 	CylinderHead		UMETA(DisplayName = "Cylinder Head"),
+	/// Camshaft - controls valve timing and power band characteristics
 	Camshaft			UMETA(DisplayName = "Camshaft"),
+	/// Intake manifold - distributes air/fuel mixture to cylinders
 	IntakeManifold		UMETA(DisplayName = "Intake Manifold"),
+	/// Throttle body - controls air intake volume
 	ThrottleBody		UMETA(DisplayName = "Throttle Body"),
+	/// Air filter/cold air intake - improves airflow into engine
 	AirFilter			UMETA(DisplayName = "Air Filter/Intake"),
+	/// Exhaust manifold/headers - collects exhaust gases from cylinders
 	ExhaustManifold		UMETA(DisplayName = "Exhaust Manifold/Headers"),
+	/// Full exhaust system - cat-back or turbo-back setups
 	ExhaustSystem		UMETA(DisplayName = "Exhaust System"),
+	/// Fuel injectors - deliver precise fuel amounts
 	FuelInjectors		UMETA(DisplayName = "Fuel Injectors"),
+	/// Fuel pump - supplies adequate fuel pressure
 	FuelPump			UMETA(DisplayName = "Fuel Pump"),
+	/// ECU tune - engine management calibration
 	ECU					UMETA(DisplayName = "ECU/Tune"),
 
-	// Forced Induction
+	// ----- Forced Induction -----
+	/// Turbocharger - exhaust-driven forced induction
 	Turbo				UMETA(DisplayName = "Turbocharger"),
+	/// Supercharger - belt-driven forced induction
 	Supercharger		UMETA(DisplayName = "Supercharger"),
+	/// Intercooler - cools compressed intake air
 	Intercooler			UMETA(DisplayName = "Intercooler"),
+	/// Wastegate - controls boost pressure
 	Wastegate			UMETA(DisplayName = "Wastegate"),
+	/// Blow off valve - relieves pressure between shifts
 	BlowOffValve		UMETA(DisplayName = "Blow Off Valve"),
 
-	// Drivetrain
+	// ----- Drivetrain -----
+	/// Clutch - transfers power to transmission, affects launches
 	Clutch				UMETA(DisplayName = "Clutch"),
+	/// Transmission - gear ratios and shift characteristics
 	Transmission		UMETA(DisplayName = "Transmission"),
+	/// Differential - power distribution and lock behavior
 	Differential		UMETA(DisplayName = "Differential"),
+	/// Driveshaft - power transfer, weight reduction
 	Driveshaft			UMETA(DisplayName = "Driveshaft"),
 
-	// Suspension
+	// ----- Suspension -----
+	/// Front springs - affects front ride height and handling
 	FrontSprings		UMETA(DisplayName = "Front Springs"),
+	/// Rear springs - affects rear ride height and handling
 	RearSprings			UMETA(DisplayName = "Rear Springs"),
+	/// Front dampers/shocks - controls front suspension movement
 	FrontDampers		UMETA(DisplayName = "Front Dampers"),
+	/// Rear dampers/shocks - controls rear suspension movement
 	RearDampers			UMETA(DisplayName = "Rear Dampers"),
+	/// Front anti-roll bar - reduces body roll in corners
 	FrontSwayBar		UMETA(DisplayName = "Front Sway Bar"),
+	/// Rear anti-roll bar - reduces body roll in corners
 	RearSwayBar			UMETA(DisplayName = "Rear Sway Bar"),
 
-	// Brakes
+	// ----- Brakes -----
+	/// Front brake rotors - primary stopping power
 	FrontRotors			UMETA(DisplayName = "Front Rotors"),
+	/// Rear brake rotors - secondary stopping power
 	RearRotors			UMETA(DisplayName = "Rear Rotors"),
+	/// Front brake calipers - clamp force on front rotors
 	FrontCalipers		UMETA(DisplayName = "Front Calipers"),
+	/// Rear brake calipers - clamp force on rear rotors
 	RearCalipers		UMETA(DisplayName = "Rear Calipers"),
+	/// Brake lines - stainless steel for better pedal feel
 	BrakeLines			UMETA(DisplayName = "Brake Lines"),
 
-	// Wheels & Tires
+	// ----- Wheels & Tires -----
+	/// Front wheels - affects weight and fitment
 	FrontWheels			UMETA(DisplayName = "Front Wheels"),
+	/// Rear wheels - affects weight and fitment
 	RearWheels			UMETA(DisplayName = "Rear Wheels"),
+	/// Front tires - grip and compound selection
 	FrontTires			UMETA(DisplayName = "Front Tires"),
+	/// Rear tires - grip and compound selection
 	RearTires			UMETA(DisplayName = "Rear Tires"),
 
-	// Aero
+	// ----- Aerodynamics -----
+	/// Front splitter - generates front downforce
 	FrontSplitter		UMETA(DisplayName = "Front Splitter"),
+	/// Rear wing - generates rear downforce
 	RearWing			UMETA(DisplayName = "Rear Wing"),
+	/// Rear diffuser - accelerates air under the car
 	Diffuser			UMETA(DisplayName = "Diffuser"),
+	/// Side skirts - manages airflow along body sides
 	SideSkirts			UMETA(DisplayName = "Side Skirts"),
 
-	// Body
+	// ----- Body -----
+	/// Hood - venting and weight reduction options
 	Hood				UMETA(DisplayName = "Hood"),
+	/// Front bumper - aero and visual customization
 	FrontBumper			UMETA(DisplayName = "Front Bumper"),
+	/// Rear bumper - aero and visual customization
 	RearBumper			UMETA(DisplayName = "Rear Bumper"),
+	/// Fenders - wider options for larger tires
 	Fenders				UMETA(DisplayName = "Fenders"),
 
-	// Special
+	// ----- Special Systems -----
+	/// Nitrous oxide system - temporary power boost
 	Nitrous				UMETA(DisplayName = "Nitrous System"),
+	/// Roll cage - chassis stiffening and safety
 	RollCage			UMETA(DisplayName = "Roll Cage"),
 
+	/// No slot specified (used for validation)
 	None				UMETA(Hidden)
 };
 
+// ============================================================================
+// PAINT SYSTEM
+// ============================================================================
+
 /**
- * Paint finish types
+ * @enum EMGPaintFinish
+ * @brief Types of paint finishes available for vehicle customization
+ *
+ * Paint finishes affect the visual appearance and material properties of the
+ * vehicle's paint job. Higher-tier finishes may cost more and unlock at
+ * higher player levels.
  */
 UENUM(BlueprintType)
 enum class EMGPaintFinish : uint8
 {
+	/// Flat, non-reflective finish - no shine
 	Matte				UMETA(DisplayName = "Matte"),
+	/// Semi-gloss finish - subtle shine
 	Satin				UMETA(DisplayName = "Satin"),
+	/// High-shine solid color finish
 	Gloss				UMETA(DisplayName = "Gloss"),
+	/// Contains metal flakes that sparkle in light
 	Metallic			UMETA(DisplayName = "Metallic"),
+	/// Color-shifting finish with iridescent quality
 	Pearl				UMETA(DisplayName = "Pearl"),
+	/// Mirror-like reflective finish
 	Chrome				UMETA(DisplayName = "Chrome"),
+	/// Translucent color over metallic base
 	Candy				UMETA(DisplayName = "Candy"),
+	/// Color shifts based on viewing angle
 	Chameleon			UMETA(DisplayName = "Chameleon/Color Shift")
 };
 
 /**
- * Paint configuration for a vehicle
+ * @struct FMGPaintConfiguration
+ * @brief Complete paint configuration for a vehicle
+ *
+ * Stores all paint-related settings including colors, finish type, and
+ * material properties. Used by the garage and livery systems.
+ *
+ * ## Color Layers
+ * - **Primary**: Main body color
+ * - **Secondary**: Accent panels, mirrors, trim
+ * - **Accent**: Small details, stripes, highlights
  */
 USTRUCT(BlueprintType)
 struct FMGPaintConfiguration
 {
 	GENERATED_BODY()
 
+	/// Main body color of the vehicle
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paint")
 	FLinearColor PrimaryColor = FLinearColor::White;
 
+	/// Secondary color for accent panels and trim
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paint")
 	FLinearColor SecondaryColor = FLinearColor::Black;
 
+	/// Accent color for details and highlights
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paint")
 	FLinearColor AccentColor = FLinearColor::Red;
 
+	/// Type of paint finish (matte, gloss, metallic, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paint")
 	EMGPaintFinish FinishType = EMGPaintFinish::Metallic;
 
+	/// Intensity of metallic flakes (0.0 = none, 1.0 = maximum sparkle)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paint")
 	float MetallicIntensity = 0.5f;
 
+	/// Clearcoat layer intensity (0.0 = flat, 1.0 = wet look)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paint")
 	float ClearcoatIntensity = 0.8f;
 
+	/// Color of metallic flakes (visible in metallic/pearl finishes)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Paint")
 	FLinearColor FlakeColor = FLinearColor::White;
 };

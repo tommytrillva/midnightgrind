@@ -48,37 +48,48 @@
 
 class UWorld;
 
+// ============================================================================
+// ENUMS - Game State Definitions
+// ============================================================================
+
 /**
- * Top-level game state
+ * @brief Top-level game state enumeration
+ *
+ * Defines all possible high-level states the game can be in.
+ * These states determine what UI is shown, what systems are active,
+ * and what transitions are valid.
+ *
+ * @note States follow a logical flow but allow some flexibility.
+ *       Use CanTransitionTo() to check if a transition is valid.
  */
 UENUM(BlueprintType)
 enum class EMGGameState : uint8
 {
-	/** Initial boot/splash */
+	/** Initial boot/splash screen - shown during startup initialization */
 	Boot,
-	/** Main menu */
+	/** Main menu - primary navigation hub after boot */
 	MainMenu,
-	/** In garage/customization */
+	/** Garage/customization - vehicle selection and tuning */
 	Garage,
-	/** Browsing multiplayer lobbies */
+	/** Lobby browser - searching for multiplayer sessions */
 	LobbyBrowser,
-	/** In a lobby waiting for race */
+	/** In lobby - waiting room before race starts */
 	InLobby,
-	/** Loading race */
+	/** Loading - transitioning to race level */
 	Loading,
-	/** Pre-race countdown */
+	/** Pre-race - grid lineup before countdown */
 	PreRace,
-	/** Active racing */
+	/** Racing - active gameplay */
 	Racing,
-	/** Race finished, showing results */
+	/** Post-race - results screen after race ends */
 	PostRace,
-	/** Watching replay */
+	/** Replay - watching recorded race footage */
 	Replay,
-	/** Photo mode */
+	/** Photo mode - in-game photography (can enter from Racing or Replay) */
 	PhotoMode,
-	/** Viewing leaderboards */
+	/** Leaderboards - viewing rankings and records */
 	Leaderboards,
-	/** In settings menu */
+	/** Settings - game configuration menu */
 	Settings
 };
 

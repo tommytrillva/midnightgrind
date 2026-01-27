@@ -1,0 +1,306 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Track Editor and Route Creation System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "UnlockLevel": 20,
+    "MaxCreatedTracks": 50,
+    "ShareEnabled": true,
+    "CommunityBrowsing": true
+  },
+
+  "EditorModes": {
+    "RouteEditor": {
+      "ID": "EDIT_ROUTE",
+      "Name": "Route Creator",
+      "Description": "Create point-to-point routes on existing roads",
+      "Complexity": "Easy",
+      "Features": {
+        "StartPointPlacement": true,
+        "CheckpointPlacement": true,
+        "FinishPointPlacement": true,
+        "RouteDrawing": true,
+        "RoadSnapping": true
+      }
+    },
+    "CircuitEditor": {
+      "ID": "EDIT_CIRCUIT",
+      "Name": "Circuit Creator",
+      "Description": "Design closed loop circuits",
+      "Complexity": "Medium",
+      "Features": {
+        "LoopValidation": true,
+        "LapCounter": true,
+        "SectorSplits": true,
+        "PitLaneOptional": true
+      }
+    },
+    "DriftEditor": {
+      "ID": "EDIT_DRIFT",
+      "Name": "Drift Zone Creator",
+      "Description": "Design drift scoring zones",
+      "Complexity": "Medium",
+      "Features": {
+        "ScoringZones": true,
+        "Multipliers": true,
+        "ClippingPoints": true,
+        "InitiationPoints": true
+      }
+    },
+    "DragEditor": {
+      "ID": "EDIT_DRAG",
+      "Name": "Drag Strip Creator",
+      "Description": "Set up quarter-mile and custom drag strips",
+      "Complexity": "Easy",
+      "Features": {
+        "StagingLights": true,
+        "DistanceMarkers": true,
+        "SpeedTraps": true,
+        "LaneConfiguration": true
+      }
+    },
+    "TimeAttackEditor": {
+      "ID": "EDIT_TIMEATTACK",
+      "Name": "Time Attack Creator",
+      "Description": "Create time trial challenges",
+      "Complexity": "Medium",
+      "Features": {
+        "GhostRecording": true,
+        "SectorTiming": true,
+        "TargetTimes": true,
+        "MedalThresholds": true
+      }
+    }
+  },
+
+  "PlacementTools": {
+    "Checkpoints": {
+      "Types": {
+        "Standard": { "Width": "Auto", "Visible": true },
+        "Wide": { "Width": "Large", "Visible": true },
+        "Hidden": { "Width": "Auto", "Visible": false },
+        "Mandatory": { "Width": "Auto", "Required": true }
+      },
+      "MaxPerTrack": 100,
+      "MinDistance": 50,
+      "SnapToRoad": true
+    },
+    "StartFinish": {
+      "Placement": "FreeOrSnap",
+      "Direction": "Auto",
+      "GridPositions": { "Min": 1, "Max": 16 },
+      "StagingArea": true
+    },
+    "Decorations": {
+      "Banners": { "Types": 20, "Customizable": true },
+      "Barriers": { "Types": 10, "Collision": true },
+      "Cones": { "Stackable": true },
+      "Lights": { "DayNightAware": true },
+      "Sponsors": { "PlayerBrands": true }
+    },
+    "HazardZones": {
+      "SlipperyArea": { "GripModifier": 0.7 },
+      "BumpyRoad": { "HandlingPenalty": true },
+      "NarrowSection": { "WidthReduction": true }
+    }
+  },
+
+  "RaceConfiguration": {
+    "RaceSettings": {
+      "Laps": { "Min": 1, "Max": 99, "Default": 3 },
+      "TimeLimit": { "Enabled": true, "Max": 3600 },
+      "GridSize": { "Min": 2, "Max": 16 },
+      "AIOpponents": { "Configurable": true },
+      "Difficulty": ["Easy", "Medium", "Hard", "Expert"]
+    },
+    "Rules": {
+      "CollisionType": ["Full", "Ghosted", "PushOnly"],
+      "CatchUp": { "Enabled": "Optional" },
+      "Nitro": { "Allowed": "Optional", "Unlimited": "Optional" },
+      "Damage": { "Visual": "Optional", "Mechanical": "Optional" }
+    },
+    "Weather": {
+      "SetWeather": ["Clear", "Cloudy", "Rain", "Storm", "Fog"],
+      "TimeOfDay": ["Dawn", "Day", "Dusk", "Night"],
+      "Dynamic": { "Enabled": "Optional" }
+    },
+    "VehicleRestrictions": {
+      "ClassRestriction": { "Enabled": true, "Classes": "All" },
+      "SpecificVehicles": { "Whitelist": true, "Blacklist": true },
+      "PowerLimit": { "Min": 100, "Max": 2000 },
+      "DrivetrainRestriction": ["Any", "RWD", "FWD", "AWD"]
+    }
+  },
+
+  "Validation": {
+    "TrackRequirements": {
+      "MinLength": 500,
+      "MaxLength": 50000,
+      "MinCheckpoints": 3,
+      "StartFinishRequired": true,
+      "RouteConnectivity": true
+    },
+    "SafetyChecks": {
+      "NoImpossibleJumps": true,
+      "MinRoadWidth": 5,
+      "CheckpointReachability": true,
+      "NoDeadEnds": true
+    },
+    "TestDrive": {
+      "Required": true,
+      "MustComplete": true,
+      "RecordBaseline": true
+    }
+  },
+
+  "PublishingSystem": {
+    "TrackInfo": {
+      "Required": {
+        "Name": { "MaxLength": 50 },
+        "Description": { "MaxLength": 500 },
+        "Thumbnail": { "AutoGenerate": true, "Custom": true },
+        "Category": true,
+        "Difficulty": true
+      },
+      "Optional": {
+        "Tags": { "Max": 10 },
+        "RecommendedCars": { "Max": 5 },
+        "CreatorNotes": true
+      }
+    },
+    "Visibility": {
+      "Private": { "Description": "Only you can access" },
+      "Friends": { "Description": "Friends and crew only" },
+      "Public": { "Description": "Available to all players" },
+      "Featured": { "Description": "Staff picked", "StaffOnly": true }
+    },
+    "Moderation": {
+      "AutoFilter": true,
+      "ReportSystem": true,
+      "StaffReview": { "ForFeatured": true }
+    }
+  },
+
+  "CommunityBrowsing": {
+    "Categories": {
+      "Official": { "StaffCreated": true, "Featured": true },
+      "Popular": { "SortBy": "Downloads" },
+      "TopRated": { "SortBy": "Rating" },
+      "New": { "SortBy": "Date" },
+      "Following": { "FromFollowedCreators": true },
+      "Friends": { "FromFriends": true }
+    },
+    "Filters": {
+      "TrackType": true,
+      "Length": { "Ranges": true },
+      "Difficulty": true,
+      "Rating": { "MinStars": true },
+      "PlayerCount": true
+    },
+    "Search": {
+      "ByName": true,
+      "ByCreator": true,
+      "ByTag": true
+    }
+  },
+
+  "RatingSystem": {
+    "Stars": {
+      "Scale": 5,
+      "RequiresCompletion": true,
+      "OneRatingPerPlayer": true
+    },
+    "Reviews": {
+      "Enabled": true,
+      "MaxLength": 500,
+      "Moderated": true
+    },
+    "Metrics": {
+      "Downloads": true,
+      "Plays": true,
+      "Completions": true,
+      "AverageTime": true,
+      "UniqueRacers": true
+    }
+  },
+
+  "CreatorRewards": {
+    "Downloads": {
+      "100": { "REP": 500 },
+      "1000": { "REP": 2500, "Badge": "PopularCreator" },
+      "10000": { "REP": 10000, "Badge": "ViralCreator" },
+      "100000": { "REP": 50000, "Title": "Track Legend" }
+    },
+    "Ratings": {
+      "AverageAbove4": { "Badge": "QualityCreator" },
+      "Featured": { "REP": 5000, "Badge": "FeaturedCreator" }
+    },
+    "PlayTime": {
+      "1000Hours": { "Description": "Players spent 1000 hours on your tracks" }
+    }
+  },
+
+  "Sharing": {
+    "ExportOptions": {
+      "ShareCode": { "Length": 8, "Expiry": "Never" },
+      "DirectLink": true,
+      "SocialMedia": true
+    },
+    "ImportOptions": {
+      "ByCode": true,
+      "ByLink": true,
+      "FromFriends": true
+    },
+    "Permissions": {
+      "AllowRemix": { "Default": true },
+      "CreditOriginal": { "Required": true }
+    }
+  },
+
+  "RemixSystem": {
+    "Enabled": true,
+    "Requirements": {
+      "OriginalMustAllow": true,
+      "CreditRequired": true
+    },
+    "Tracking": {
+      "ShowOriginal": true,
+      "RemixCount": true,
+      "RemixChain": true
+    }
+  },
+
+  "Achievements": {
+    "Creator": {
+      "FirstTrack": { "Reward": { "REP": 500 } },
+      "10Tracks": { "Reward": { "REP": 2500 } },
+      "50Tracks": { "Reward": { "REP": 10000, "Title": "Prolific Creator" } }
+    },
+    "Community": {
+      "FirstDownload": { "Reward": { "REP": 100 } },
+      "100CommunityRaces": { "Reward": { "REP": 2500 } }
+    }
+  },
+
+  "UI": {
+    "EditorInterface": {
+      "TopDownView": true,
+      "FreeCam": true,
+      "FirstPerson": true,
+      "GridSnapping": true,
+      "UndoRedo": { "MaxSteps": 100 }
+    },
+    "BrowseInterface": {
+      "ThumbnailGrid": true,
+      "ListMode": true,
+      "PreviewVideo": true,
+      "QuickPlay": true
+    },
+    "Statistics": {
+      "CreatorDashboard": true,
+      "TrackAnalytics": true,
+      "DownloadHistory": true
+    }
+  }
+}

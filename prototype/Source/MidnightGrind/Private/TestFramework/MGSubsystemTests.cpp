@@ -18,6 +18,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Vehicle/MGPhysicsConstants.h"
 #include "Vehicle/MGStatCalculator.h"
+#include "UI/MGHUDDataProvider.h"
+#include "UI/MGRaceHUDSubsystem.h"
 
 void UMGSubsystemTests::Initialize(FSubsystemCollectionBase& Collection)
 {
