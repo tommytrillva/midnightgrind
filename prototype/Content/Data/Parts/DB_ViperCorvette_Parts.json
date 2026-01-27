@@ -1,0 +1,181 @@
+{
+  "VehicleID": "VIPER_CORVETTE",
+  "Version": "1.0",
+  "TotalParts": 72,
+
+  "Engine": {
+    "Intake": [
+      { "ID": "INTAKE_STOCK", "Name": "Stock Intake", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "INTAKE_KN", "Name": "K&N Cold Air", "Power": 12, "Price": 450, "Tier": "Sport" },
+      { "ID": "INTAKE_CALLAWAY", "Name": "Callaway Intake", "Power": 28, "Price": 1200, "Tier": "Race" },
+      { "ID": "INTAKE_FULL_RACE", "Name": "Full Race Intake", "Power": 45, "Price": 4500, "Tier": "Elite" }
+    ],
+    "Exhaust": [
+      { "ID": "EXHAUST_STOCK", "Name": "Stock NPP Exhaust", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "EXHAUST_BORLA", "Name": "Borla S-Type", "Power": 20, "Price": 1800, "Tier": "Sport" },
+      { "ID": "EXHAUST_CORSA", "Name": "Corsa Extreme", "Power": 45, "Price": 3500, "Tier": "Race" },
+      { "ID": "EXHAUST_HEADERS", "Name": "Kooks Long Tubes + X-Pipe", "Power": 85, "Price": 6500, "Tier": "Elite" }
+    ],
+    "Supercharger": [
+      { "ID": "SC_STOCK", "Name": "Stock 1.7L Supercharger", "Power": 0, "Boost": 9.4, "Price": 0, "Tier": "Stock" },
+      { "ID": "SC_20L", "Name": "2.0L Supercharger Upgrade", "Power": 65, "Boost": 12, "Price": 3200, "Tier": "Sport" },
+      { "ID": "SC_23L", "Name": "2.3L Supercharger Upgrade", "Power": 120, "Boost": 15, "Price": 5500, "Tier": "Race" },
+      { "ID": "SC_WHIPPLE", "Name": "Whipple 2.9L", "Power": 200, "Boost": 18, "Price": 12000, "Tier": "Elite" }
+    ],
+    "Intercooler": [
+      { "ID": "IC_STOCK", "Name": "Stock Heat Exchanger", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "IC_LARGE", "Name": "Large Heat Exchanger", "Power": 25, "Price": 1500, "Tier": "Sport" },
+      { "ID": "IC_HX", "Name": "Upgraded Heat Exchanger System", "Power": 45, "Price": 3500, "Tier": "Elite" }
+    ],
+    "ECU": [
+      { "ID": "ECU_STOCK", "Name": "Stock ECU", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "ECU_STAGE1", "Name": "HP Tuners Stage 1", "Power": 35, "Price": 650, "Tier": "Sport" },
+      { "ID": "ECU_STAGE2", "Name": "HP Tuners Stage 2", "Power": 75, "Price": 1300, "Tier": "Race" },
+      { "ID": "ECU_STANDALONE", "Name": "Holley Dominator", "Power": 120, "Price": 4000, "Tier": "Elite" }
+    ],
+    "FuelSystem": [
+      { "ID": "FUEL_STOCK", "Name": "Stock Fuel System", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "FUEL_HIGHFLOW", "Name": "High Flow Pump + Injectors", "Power": 30, "Price": 1200, "Tier": "Sport" },
+      { "ID": "FUEL_E85", "Name": "E85 Conversion", "Power": 75, "Price": 2500, "Tier": "Race" },
+      { "ID": "FUEL_FLEX", "Name": "Flex Fuel System", "Power": 95, "Price": 3800, "Tier": "Elite" }
+    ],
+    "Internals": [
+      { "ID": "INT_STOCK", "Name": "Stock Internals", "Power": 0, "Price": 0, "BoostLimit": 12, "Tier": "Stock" },
+      { "ID": "INT_RODS", "Name": "Forged Rods", "Power": 0, "Price": 3500, "BoostLimit": 18, "Tier": "Race" },
+      { "ID": "INT_FORGED", "Name": "Full Forged Build", "Power": 0, "Price": 12000, "BoostLimit": 25, "Tier": "Elite" }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "CLUTCH_STOCK", "Name": "Stock Clutch", "Capacity": 650, "Price": 0, "Tier": "Stock" },
+      { "ID": "CLUTCH_SPORT", "Name": "Mantic Sport", "Capacity": 850, "Price": 1000, "Tier": "Sport" },
+      { "ID": "CLUTCH_RACING", "Name": "McLeod RXT", "Capacity": 1100, "Price": 2800, "Tier": "Race" },
+      { "ID": "CLUTCH_TWIN", "Name": "Mantic Twin Disc", "Capacity": 1400, "Price": 5500, "Tier": "Elite" }
+    ],
+    "Transmission": [
+      { "ID": "TRANS_STOCK", "Name": "Stock Tremec 7-Speed", "Price": 0, "Tier": "Stock" },
+      { "ID": "TRANS_SHORT", "Name": "Short Ratio Kit", "Price": 3500, "Tier": "Race" },
+      { "ID": "TRANS_SEQ", "Name": "Sequential Gearbox", "Price": 22000, "Tier": "Elite" }
+    ],
+    "FinalDrive": [
+      { "ID": "FD_STOCK", "Name": "Stock 2.73 Final Drive", "Ratio": 2.73, "Price": 0, "Tier": "Stock" },
+      { "ID": "FD_285", "Name": "2.85 Final Drive", "Ratio": 2.85, "Price": 900, "Tier": "Sport" },
+      { "ID": "FD_308", "Name": "3.08 Final Drive", "Ratio": 3.08, "Price": 1100, "Tier": "Race" },
+      { "ID": "FD_342", "Name": "3.42 Final Drive", "Ratio": 3.42, "Price": 1300, "Tier": "Elite" }
+    ],
+    "LSD": [
+      { "ID": "LSD_STOCK", "Name": "Stock eLSD", "LockPercent": 45, "Price": 0, "Tier": "Stock" },
+      { "ID": "LSD_MECH", "Name": "Mechanical 2-Way", "LockPercent": 80, "Price": 2500, "Tier": "Race" }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "SPRING_STOCK", "Name": "Stock MagRide", "Price": 0, "Tier": "Stock" },
+      { "ID": "SPRING_TRACK", "Name": "Track Day Springs", "Price": 800, "Tier": "Sport" },
+      { "ID": "SPRING_RACE", "Name": "Penske Racing", "Price": 4500, "Tier": "Elite" }
+    ],
+    "Dampers": [
+      { "ID": "DAMP_STOCK", "Name": "Stock MagRide Dampers", "Price": 0, "Tier": "Stock" },
+      { "ID": "DAMP_MAGRIDE_TUNE", "Name": "MagRide Track Tune", "Price": 500, "Tier": "Sport" },
+      { "ID": "DAMP_OHLINS", "Name": "Ohlins TTX", "Price": 6500, "Tier": "Elite" }
+    ],
+    "Swaybars": [
+      { "ID": "SWAY_STOCK", "Name": "Stock Sway Bars", "Price": 0, "Tier": "Stock" },
+      { "ID": "SWAY_Z07", "Name": "Z07 Package Swaybars", "Price": 1200, "Tier": "Race" },
+      { "ID": "SWAY_RACE", "Name": "Racing Adjustable", "Price": 2200, "Tier": "Elite" }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "PAD_STOCK", "Name": "Stock Carbon Ceramic Pads", "Price": 0, "Tier": "Stock" },
+      { "ID": "PAD_TRACK", "Name": "Carbotech XP12", "Price": 1200, "Tier": "Race" },
+      { "ID": "PAD_RACE", "Name": "Endless MX72", "Price": 1800, "Tier": "Elite" }
+    ],
+    "Rotors": [
+      { "ID": "ROTOR_STOCK", "Name": "Stock Carbon Ceramic", "Price": 0, "Tier": "Stock" },
+      { "ID": "ROTOR_SLOT", "Name": "Slotted Carbon Ceramic", "Price": 4000, "Tier": "Race" },
+      { "ID": "ROTOR_CARBON", "Name": "Full Carbon Upgrade", "Price": 12000, "Tier": "Elite" }
+    ],
+    "Calipers": [
+      { "ID": "CAL_STOCK", "Name": "Stock Brembo", "Price": 0, "Tier": "Stock" },
+      { "ID": "CAL_Z07", "Name": "Z07 Calipers", "Price": 6000, "Tier": "Race" },
+      { "ID": "CAL_8POT", "Name": "StopTech 8-Piston", "Price": 9000, "Tier": "Elite" }
+    ]
+  },
+
+  "Wheels": {
+    "Sets": [
+      { "ID": "WHEEL_STOCK", "Name": "Stock 19/20\" Wheels", "Size": 20, "Weight": 28, "Price": 0, "Tier": "Stock" },
+      { "ID": "WHEEL_FORGELINE", "Name": "Forgeline GA1R 19\"", "Size": 19, "Weight": 22, "Price": 6500, "Tier": "Race" },
+      { "ID": "WHEEL_HRE", "Name": "HRE P104 20\"", "Size": 20, "Weight": 19, "Price": 9500, "Tier": "Elite" }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "TIRE_SPORT", "Name": "Michelin Pilot Sport 4S", "Grip": 1.0, "Price": 1800, "Tier": "Sport" },
+      { "ID": "TIRE_CUP", "Name": "Michelin Pilot Sport Cup 2", "Grip": 1.20, "Price": 2400, "Tier": "Race" },
+      { "ID": "TIRE_SLICK", "Name": "Hoosier A7", "Grip": 1.45, "Price": 3500, "Tier": "Elite" },
+      { "ID": "TIRE_DRAG", "Name": "Mickey Thompson ET Street R", "Grip": 1.55, "Price": 1800, "Tier": "Elite" }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "FBUMP_STOCK", "Name": "Stock Front Bumper", "Price": 0, "Tier": "Stock" },
+      { "ID": "FBUMP_Z07", "Name": "Z07 Front Splitter", "Downforce": 18, "Price": 2500, "Tier": "Race" },
+      { "ID": "FBUMP_GT3", "Name": "GT3 Style Front", "Downforce": 35, "Price": 5500, "Tier": "Elite" }
+    ],
+    "Spoiler": [
+      { "ID": "SPOILER_STOCK", "Name": "Stock Active Spoiler", "Downforce": 10, "Price": 0, "Tier": "Stock" },
+      { "ID": "SPOILER_Z07", "Name": "Z07 Wing", "Downforce": 25, "Price": 2800, "Tier": "Race" },
+      { "ID": "SPOILER_HIGH", "Name": "High Downforce Wing", "Downforce": 50, "Price": 5000, "Tier": "Elite" },
+      { "ID": "SPOILER_APR", "Name": "APR GTC-500", "Downforce": 65, "Price": 6500, "Tier": "Elite" }
+    ],
+    "Hood": [
+      { "ID": "HOOD_STOCK", "Name": "Stock Hood", "Weight": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "HOOD_ZR1", "Name": "ZR1 Vented Hood", "Weight": -10, "Power": 8, "Price": 2200, "Tier": "Race" },
+      { "ID": "HOOD_CARBON", "Name": "Full Carbon Hood", "Weight": -35, "Price": 4500, "Tier": "Elite" }
+    ],
+    "Splitter": [
+      { "ID": "SPLIT_STOCK", "Name": "Stock Splitter", "Downforce": 5, "Price": 0, "Tier": "Stock" },
+      { "ID": "SPLIT_Z07", "Name": "Z07 Splitter", "Downforce": 15, "Price": 1800, "Tier": "Race" },
+      { "ID": "SPLIT_GT3", "Name": "GT3 Splitter", "Downforce": 30, "Price": 3500, "Tier": "Elite" }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "BODY_STOCK", "Name": "Stock Body", "Price": 0, "Tier": "Stock" },
+      { "ID": "BODY_ZR1", "Name": "ZR1 Wide Body", "Price": 8500, "Tier": "Race" },
+      { "ID": "BODY_GT3", "Name": "GT3 Wide Body", "Price": 18000, "Tier": "Elite" }
+    ]
+  },
+
+  "Packages": {
+    "StreetBuild": {
+      "Name": "Street Beast Package",
+      "Price": 8000,
+      "Parts": ["INTAKE_KN", "EXHAUST_BORLA", "ECU_STAGE1"],
+      "PowerGain": 67,
+      "Tier": "Sport"
+    },
+    "TrackBuild": {
+      "Name": "Track Attack Package",
+      "Price": 28000,
+      "Parts": ["SC_23L", "EXHAUST_CORSA", "ECU_STAGE2", "TIRE_CUP", "SPOILER_Z07"],
+      "PowerGain": 240,
+      "Tier": "Race"
+    },
+    "FullBuild": {
+      "Name": "900HP Monster Package",
+      "Price": 55000,
+      "Parts": ["SC_WHIPPLE", "INT_FORGED", "FUEL_FLEX", "ECU_STANDALONE", "CLUTCH_TWIN"],
+      "PowerGain": 450,
+      "Tier": "Elite"
+    }
+  }
+}
