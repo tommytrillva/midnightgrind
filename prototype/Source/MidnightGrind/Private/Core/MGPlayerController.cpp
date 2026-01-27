@@ -29,6 +29,7 @@
 #include "Powerup/MGPowerupSubsystem.h"
 #include "Vehicle/MGVehicleWearSubsystem.h"
 #include "Weather/MGWeatherSubsystem.h"
+#include "Caution/MGCautionSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -229,6 +230,15 @@ void AMGPlayerController::BeginPlay()
 				PowerupSubsystem->OnPowerupCollected.AddDynamic(this, &AMGPlayerController::OnPowerupCollected);
 				PowerupSubsystem->OnPowerupHit.AddDynamic(this, &AMGPlayerController::OnPowerupHit);
 			}
+
+			// Bind to caution subsystem for yellow flag/safety car
+			if (UMGCautionSubsystem* CautionSubsystem = GI->GetSubsystem<UMGCautionSubsystem>())
+			{
+				CautionSubsystem->OnCautionDeployed.AddDynamic(this, &AMGPlayerController::OnCautionDeployed);
+				CautionSubsystem->OnCautionEnded.AddDynamic(this, &AMGPlayerController::OnCautionEnded);
+				CautionSubsystem->OnSafetyCarDeployed.AddDynamic(this, &AMGPlayerController::OnSafetyCarDeployed);
+				CautionSubsystem->OnSafetyCarIn.AddDynamic(this, &AMGPlayerController::OnSafetyCarIn);
+			}
 		}
 	}
 }
@@ -379,6 +389,14 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		{
 			PowerupSubsystem->OnPowerupCollected.RemoveDynamic(this, &AMGPlayerController::OnPowerupCollected);
 			PowerupSubsystem->OnPowerupHit.RemoveDynamic(this, &AMGPlayerController::OnPowerupHit);
+		}
+
+		if (UMGCautionSubsystem* CautionSubsystem = GI->GetSubsystem<UMGCautionSubsystem>())
+		{
+			CautionSubsystem->OnCautionDeployed.RemoveDynamic(this, &AMGPlayerController::OnCautionDeployed);
+			CautionSubsystem->OnCautionEnded.RemoveDynamic(this, &AMGPlayerController::OnCautionEnded);
+			CautionSubsystem->OnSafetyCarDeployed.RemoveDynamic(this, &AMGPlayerController::OnSafetyCarDeployed);
+			CautionSubsystem->OnSafetyCarIn.RemoveDynamic(this, &AMGPlayerController::OnSafetyCarIn);
 		}
 	}
 
@@ -2136,6 +2154,87 @@ void AMGPlayerController::OnWeatherTransitionStarted(EMGWeatherType FromType, EM
 
 			FText WeatherMessage = FText::FromString(WeatherName);
 			HUDSubsystem->ShowNotification(WeatherMessage, 4.0f, WeatherColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnCautionDeployed(EMGCautionType Type, EMGCautionReason Reason)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText CautionMessage;
+			FLinearColor CautionColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
+
+			switch (Type)
+			{
+				case EMGCautionType::LocalYellow:
+					CautionMessage = FText::FromString(TEXT("LOCAL YELLOW FLAG"));
+					break;
+				case EMGCautionType::FullCourseYellow:
+					CautionMessage = FText::FromString(TEXT("FULL COURSE YELLOW"));
+					break;
+				case EMGCautionType::SafetyCar:
+					CautionMessage = FText::FromString(TEXT("SAFETY CAR DEPLOYED"));
+					CautionColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+					break;
+				case EMGCautionType::VirtualSafetyCar:
+					CautionMessage = FText::FromString(TEXT("VIRTUAL SAFETY CAR"));
+					CautionColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+					break;
+				case EMGCautionType::RedFlag:
+					CautionMessage = FText::FromString(TEXT("RED FLAG - RACE STOPPED"));
+					CautionColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+					break;
+				case EMGCautionType::Code60:
+					CautionMessage = FText::FromString(TEXT("CODE 60 - SLOW DOWN"));
+					break;
+				default:
+					CautionMessage = FText::FromString(TEXT("CAUTION"));
+					break;
+			}
+
+			HUDSubsystem->ShowNotification(CautionMessage, 5.0f, CautionColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnCautionEnded(EMGCautionType Type)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText Message = FText::FromString(TEXT("GREEN FLAG - RACING RESUMES"));
+			FLinearColor GreenColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f);
+			HUDSubsystem->ShowNotification(Message, 4.0f, GreenColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSafetyCarDeployed(const FMGSafetyCarState& State)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText Message = FText::FromString(TEXT("SAFETY CAR - MAINTAIN POSITION"));
+			FLinearColor OrangeColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f);
+			HUDSubsystem->ShowNotification(Message, 5.0f, OrangeColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSafetyCarIn()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText Message = FText::FromString(TEXT("SAFETY CAR IN THIS LAP"));
+			FLinearColor YellowColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f);
+			HUDSubsystem->ShowNotification(Message, 4.0f, YellowColor);
 		}
 	}
 }

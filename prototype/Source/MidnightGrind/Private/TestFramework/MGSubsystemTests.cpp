@@ -16,6 +16,8 @@
 #include "Save/MGSaveGame.h"
 #include "Save/MGSaveManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Vehicle/MGPhysicsConstants.h"
+#include "Vehicle/MGStatCalculator.h"
 
 void UMGSubsystemTests::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -344,7 +346,54 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 37);
+	// Physics Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Physics_TireCompoundGrip"));
+		Test.TestName = FText::FromString(TEXT("Physics - Tire Compound Grip"));
+		Test.Description = FText::FromString(TEXT("Verify tire compound grip coefficients"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Physics")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Physics_WetGripModifiers"));
+		Test.TestName = FText::FromString(TEXT("Physics - Wet Grip Modifiers"));
+		Test.Description = FText::FromString(TEXT("Verify wet surface grip modifiers"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Physics")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Physics_WeightTransferConstants"));
+		Test.TestName = FText::FromString(TEXT("Physics - Weight Transfer Constants"));
+		Test.Description = FText::FromString(TEXT("Verify weight transfer physics constants"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Physics")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Physics_TireTemperatureConstants"));
+		Test.TestName = FText::FromString(TEXT("Physics - Tire Temperature Constants"));
+		Test.Description = FText::FromString(TEXT("Verify tire temperature physics constants"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Physics")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Physics_HandlingModeSettings"));
+		Test.TestName = FText::FromString(TEXT("Physics - Handling Mode Settings"));
+		Test.Description = FText::FromString(TEXT("Verify handling mode presets"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Physics")));
+		TestFramework->RegisterTest(Test);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 42);
 }
 
 // ==========================================

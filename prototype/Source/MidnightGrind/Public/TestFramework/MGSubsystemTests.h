@@ -17,7 +17,7 @@ class UMGSaveGame;
 /**
  * Subsystem Unit Tests
  * Provides actual test implementations for core subsystems
- * Total Tests: 37
+ * Total Tests: 42
  *
  * Test Categories:
  * - Currency (6): Earning, spending, balance tracking, multipliers
@@ -27,10 +27,11 @@ class UMGSaveGame;
  * - AI (5): Driving states, skills, personality, strategies
  * - Performance (4): Tick time, memory, delegates, data access
  * - Save/Load (5): Save game creation, data structures, slot naming
+ * - Physics (5): Tire grip, wet modifiers, weight transfer, handling modes
  * - Integration (2): Cross-system verification
  *
  * Console Commands:
- * - MG.RunAllTests - Run all 37 tests
+ * - MG.RunAllTests - Run all 42 tests
  * - MG.RunCurrencyTests - Run 6 currency subsystem tests
  * - MG.RunWeatherTests - Run 6 weather subsystem tests
  * - MG.RunEconomyTests - Run 3 economy tests
@@ -38,6 +39,7 @@ class UMGSaveGame;
  * - MG.RunAITests - Run 5 AI tests
  * - MG.RunPerformanceTests - Run 4 performance tests
  * - MG.RunSaveTests - Run 5 save/load tests
+ * - MG.RunPhysicsTests - Run 5 physics tests
  * - MG.RunSmokeTests - Run quick smoke tests
  * - MG.PrintTestReport - Print last test report
  */
@@ -296,6 +298,10 @@ public:
 	/** Run save/load tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunSaveTests();
+
+	/** Run physics tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunPhysicsTests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")

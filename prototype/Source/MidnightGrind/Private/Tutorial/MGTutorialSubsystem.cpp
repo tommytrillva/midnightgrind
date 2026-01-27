@@ -2,6 +2,11 @@
 
 #include "Tutorial/MGTutorialSubsystem.h"
 #include "TimerManager.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "Misc/Paths.h"
 
 void UMGTutorialSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -458,14 +463,90 @@ void UMGTutorialSubsystem::LoadTooltipDefinitions()
 
 void UMGTutorialSubsystem::LoadProgress()
 {
-	// Would load from save data
-	// For now, start fresh
+	// Default to first time user
 	bIsFirstTimeUser = true;
+
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Tutorial");
+	FString FilePath = SaveDir / TEXT("TutorialProgress.sav");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	int32 Version = 0;
+	Archive << Version;
+
+	if (Version >= 1)
+	{
+		Archive << bIsFirstTimeUser;
+
+		// Load completed sequences
+		int32 CompletedCount;
+		Archive << CompletedCount;
+		CompletedSequences.Empty();
+		for (int32 i = 0; i < CompletedCount; i++)
+		{
+			FName SeqID;
+			Archive << SeqID;
+			CompletedSequences.Add(SeqID);
+		}
+
+		// Load seen tooltips
+		int32 SeenCount;
+		Archive << SeenCount;
+		SeenTooltips.Empty();
+		for (int32 i = 0; i < SeenCount; i++)
+		{
+			FName TooltipID;
+			Archive << TooltipID;
+			SeenTooltips.Add(TooltipID);
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Tutorial progress loaded - Completed: %d sequences, Seen: %d tooltips"),
+			CompletedSequences.Num(), SeenTooltips.Num());
+	}
 }
 
 void UMGTutorialSubsystem::SaveProgress()
 {
-	// Would save to persistent storage
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Tutorial");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("TutorialProgress.sav");
+
+	FBufferArchive Archive;
+
+	int32 Version = 1;
+	Archive << Version;
+
+	Archive << bIsFirstTimeUser;
+
+	// Save completed sequences
+	int32 CompletedCount = CompletedSequences.Num();
+	Archive << CompletedCount;
+	for (const FName& SeqID : CompletedSequences)
+	{
+		FName ID = SeqID;
+		Archive << ID;
+	}
+
+	// Save seen tooltips
+	int32 SeenCount = SeenTooltips.Num();
+	Archive << SeenCount;
+	for (const FName& TooltipID : SeenTooltips)
+	{
+		FName ID = TooltipID;
+		Archive << ID;
+	}
+
+	if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Tutorial progress saved - Completed: %d sequences, Seen: %d tooltips"),
+			CompletedSequences.Num(), SeenTooltips.Num());
+	}
 }
 
 void UMGTutorialSubsystem::OnAutoAdvanceTimer()

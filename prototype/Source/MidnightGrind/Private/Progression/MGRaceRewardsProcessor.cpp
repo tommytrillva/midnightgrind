@@ -344,9 +344,15 @@ FMGXPBreakdown UMGRaceRewardsProcessor::CalculateXPBreakdown(const FMGFinalRaceR
 		XP.PositionXP = XPPerPosition * PositionBonus;
 
 		// Best lap bonus - check if this racer had the best lap
-		// This would require comparing across all results
-		// For now, give bonus if position is 1st-3rd and they have a lap time
-		if (Result.Position <= 3 && Result.BestLap > 0.0f)
+		bool bHadBestLap = false;
+		if (RaceGameMode.IsValid() && Result.BestLap > 0.0f)
+		{
+			FMGRaceResults RaceResults = RaceGameMode->GetRaceResults();
+			// Check if player's best lap matches the race's best lap time
+			// Use small epsilon for float comparison
+			bHadBestLap = FMath::IsNearlyEqual(Result.BestLap, RaceResults.BestLapTime, 0.001f);
+		}
+		if (bHadBestLap)
 		{
 			XP.BestLapXP = BestLapXP;
 		}

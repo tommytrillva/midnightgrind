@@ -3,6 +3,7 @@
 #include "WorldEvents/MGWorldEventsSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "HeatLevel/MGHeatLevelSubsystem.h"
 
 void UMGWorldEventsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -293,11 +294,34 @@ void UMGWorldEventsSubsystem::UpdatePoliceChase(float DeltaTime)
 
 	CurrentPoliceEncounter.TimeInPursuit += DeltaTime;
 
-	// Natural escape progress when out of sight (would check actual visibility)
-	// This is placeholder logic
-	float EscapeGain = 0.01f * DeltaTime; // 1% per second when hidden
-	CurrentPoliceEncounter.EscapeProgress = FMath::Min(
-		1.0f, CurrentPoliceEncounter.EscapeProgress + EscapeGain);
+	// Check visibility via HeatLevelSubsystem for escape progress
+	bool bHasVisual = true; // Default to being spotted
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGHeatLevelSubsystem* HeatSubsystem = GI->GetSubsystem<UMGHeatLevelSubsystem>())
+		{
+			bHasVisual = HeatSubsystem->AnyUnitHasVisual();
+		}
+	}
+
+	// Calculate escape progress based on visibility
+	if (bHasVisual)
+	{
+		// When visible, escape progress decreases (cops are catching up)
+		float EscapeLoss = 0.03f * DeltaTime; // 3% per second when spotted
+		CurrentPoliceEncounter.EscapeProgress = FMath::Max(
+			0.0f, CurrentPoliceEncounter.EscapeProgress - EscapeLoss);
+	}
+	else
+	{
+		// When hidden, escape progress increases (getting away)
+		// Rate depends on heat level - higher heat = slower escape
+		float BaseEscapeRate = 0.05f; // 5% per second base rate
+		float HeatPenalty = FMath::Clamp(CurrentPoliceEncounter.HeatLevel * 0.01f, 0.0f, 0.03f);
+		float EscapeGain = (BaseEscapeRate - HeatPenalty) * DeltaTime;
+		CurrentPoliceEncounter.EscapeProgress = FMath::Min(
+			1.0f, CurrentPoliceEncounter.EscapeProgress + EscapeGain);
+	}
 }
 
 void UMGWorldEventsSubsystem::TrySpawnRandomEvent()

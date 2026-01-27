@@ -1,0 +1,274 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Loading Screen Configuration",
+
+  "LoadingSystem": {
+    "MinDisplayTime": 2.0,
+    "FadeInDuration": 0.5,
+    "FadeOutDuration": 0.5,
+    "ShowProgress": true,
+    "ShowTips": true,
+    "ShowVehicleInfo": true,
+    "AllowSkip": false,
+    "SkipAfterLoaded": true
+  },
+
+  "ScreenTypes": {
+    "Initial": {
+      "ID": "LOAD_INITIAL",
+      "Background": "BG_Loading_Splash",
+      "ShowLogo": true,
+      "ShowProgress": true,
+      "ShowTips": false,
+      "Music": "MUS_Loading_Ambient"
+    },
+    "Race": {
+      "ID": "LOAD_RACE",
+      "Background": "Dynamic",
+      "ShowTrackPreview": true,
+      "ShowOpponents": true,
+      "ShowVehicleStats": true,
+      "ShowTips": true,
+      "Music": "MUS_Loading_Tense"
+    },
+    "Garage": {
+      "ID": "LOAD_GARAGE",
+      "Background": "BG_Loading_Garage",
+      "ShowVehicleRotating": true,
+      "ShowTips": true,
+      "Music": "MUS_Loading_Chill"
+    },
+    "FreeRoam": {
+      "ID": "LOAD_FREEROAM",
+      "Background": "BG_Loading_City",
+      "ShowMapPreview": true,
+      "ShowTimeWeather": true,
+      "ShowTips": true,
+      "Music": "MUS_Loading_Ambient"
+    },
+    "Online": {
+      "ID": "LOAD_ONLINE",
+      "Background": "BG_Loading_Online",
+      "ShowPlayerCards": true,
+      "ShowLobbyInfo": true,
+      "ShowTips": true,
+      "Music": "MUS_Loading_Electronic"
+    }
+  },
+
+  "Backgrounds": {
+    "Static": [
+      { "ID": "BG_Loading_Splash", "Asset": "T_Loading_Splash", "Default": true },
+      { "ID": "BG_Loading_Garage", "Asset": "T_Loading_Garage" },
+      { "ID": "BG_Loading_City", "Asset": "T_Loading_City" },
+      { "ID": "BG_Loading_Online", "Asset": "T_Loading_Online" },
+      { "ID": "BG_Loading_Night", "Asset": "T_Loading_Night" },
+      { "ID": "BG_Loading_Drift", "Asset": "T_Loading_Drift" },
+      { "ID": "BG_Loading_Drag", "Asset": "T_Loading_Drag" }
+    ],
+    "Dynamic": {
+      "TrackPreview": {
+        "Enabled": true,
+        "ShowMinimap": true,
+        "ShowTrackName": true,
+        "ShowBestTime": true
+      },
+      "VehicleShowcase": {
+        "Enabled": true,
+        "RotateVehicle": true,
+        "ShowStats": true
+      },
+      "CommunityPhotos": {
+        "Enabled": true,
+        "Source": "FeaturedPhotos",
+        "ShowCredit": true,
+        "RotationInterval": 5.0
+      }
+    },
+    "Seasonal": {
+      "Spring": { "Asset": "T_Loading_Spring", "Active": "March-May" },
+      "Summer": { "Asset": "T_Loading_Summer", "Active": "June-August" },
+      "Fall": { "Asset": "T_Loading_Fall", "Active": "September-November" },
+      "Winter": { "Asset": "T_Loading_Winter", "Active": "December-February" },
+      "Halloween": { "Asset": "T_Loading_Halloween", "Active": "October 15-November 5" },
+      "Christmas": { "Asset": "T_Loading_Christmas", "Active": "December 15-January 5" }
+    }
+  },
+
+  "Tips": {
+    "Enabled": true,
+    "RotationInterval": 5.0,
+    "Categories": {
+      "Driving": {
+        "Weight": 1.0,
+        "Tips": [
+          "Smooth inputs lead to faster lap times than jerky corrections.",
+          "Trail braking helps rotate the car into tight corners.",
+          "Look ahead to where you want to go, not at your hood.",
+          "In wet conditions, the racing line becomes slippery. Try alternative lines.",
+          "Weight transfer is key - braking shifts weight forward, acceleration shifts it back.",
+          "Feather the throttle out of slow corners to avoid wheelspin.",
+          "The fastest line isn't always the obvious one. Experiment!",
+          "Use reference points for braking and turn-in to be consistent."
+        ]
+      },
+      "Drifting": {
+        "Weight": 0.8,
+        "Tips": [
+          "Initiate drifts with the handbrake, throttle, or weight transfer.",
+          "Counter-steer to control your drift angle - look where you want to go.",
+          "Maintain throttle to keep the rear wheels spinning during a drift.",
+          "Link drifts together for massive combo multipliers.",
+          "Rear-wheel drive cars are naturally easier to drift.",
+          "Softer rear suspension helps break traction more easily.",
+          "Scandinavian flick: turn opposite first, then snap back to initiate."
+        ]
+      },
+      "Tuning": {
+        "Weight": 0.7,
+        "Tips": [
+          "Softer front springs reduce understeer, stiffer rear springs reduce oversteer.",
+          "Lower ride height improves aerodynamics but watch for bottoming out.",
+          "Wider tires provide more grip but also more drag.",
+          "Weight reduction improves acceleration, braking, AND handling.",
+          "Turbo adds power but introduces lag. Plan your shifts accordingly.",
+          "Short gear ratios improve acceleration, tall ratios improve top speed.",
+          "Negative camber improves cornering grip but wears tires unevenly."
+        ]
+      },
+      "Strategy": {
+        "Weight": 0.6,
+        "Tips": [
+          "Save nitrous for straights where you can use all the power.",
+          "Draft behind opponents to recharge nitrous and save fuel.",
+          "Sometimes it's faster to brake late and pass on corner exit.",
+          "Learn the track before pushing - memorize braking points.",
+          "In elimination races, staying ahead early reduces pressure.",
+          "Watch your mirrors - defending position is as important as attacking."
+        ]
+      },
+      "Economy": {
+        "Weight": 0.5,
+        "Tips": [
+          "Winning races earns more than just finishing - push for the podium!",
+          "Higher REP tiers unlock better parts and exclusive vehicles.",
+          "Sell unused parts to fund upgrades for your main car.",
+          "Daily and weekly challenges offer bonus cash and REP.",
+          "Crew membership provides discounts at shops.",
+          "Mystery boxes can contain rare parts at a fraction of their value."
+        ]
+      },
+      "Secrets": {
+        "Weight": 0.3,
+        "Tips": [
+          "Explore the map thoroughly - there are hidden rewards everywhere.",
+          "Some locations only appear at certain times of day.",
+          "Photo mode isn't just for screenshots - some secrets require it.",
+          "The underground has more to offer than meets the eye.",
+          "Legends speak of hidden vehicles waiting to be discovered..."
+        ]
+      }
+    },
+    "ContextualTips": {
+      "FirstRace": "Focus on finishing cleanly before pushing for the win.",
+      "LostThreeInARow": "Consider upgrading your vehicle or trying different assists.",
+      "HighHeat": "Lay low after losing the cops - heat takes time to fully clear.",
+      "NewVehicle": "Test your new ride in free roam before racing competitively.",
+      "LowFunds": "Complete daily challenges for quick cash!",
+      "NeverDrifted": "Try the drift tutorial to learn the basics of controlled oversteer."
+    }
+  },
+
+  "RaceLoading": {
+    "TrackInfo": {
+      "ShowName": true,
+      "ShowLength": true,
+      "ShowLaps": true,
+      "ShowBestTime": true,
+      "ShowWeather": true,
+      "ShowTimeOfDay": true
+    },
+    "OpponentInfo": {
+      "ShowNames": true,
+      "ShowVehicles": true,
+      "ShowLevel": true,
+      "ShowStats": false,
+      "MaxDisplayed": 4
+    },
+    "PlayerInfo": {
+      "ShowVehicle": true,
+      "ShowPI": true,
+      "ShowPreviousBest": true
+    },
+    "MiniGame": {
+      "Enabled": true,
+      "UnlockLevel": 10,
+      "Types": [
+        {
+          "ID": "MINIGAME_REV",
+          "Name": "Rev Match",
+          "Description": "Hit the target RPM",
+          "Reward": { "Cash": 100 }
+        },
+        {
+          "ID": "MINIGAME_REACT",
+          "Name": "Reaction Time",
+          "Description": "Press when the light turns green",
+          "Reward": { "REP": 10 }
+        }
+      ]
+    }
+  },
+
+  "ProgressIndicator": {
+    "Style": "Bar",
+    "Styles": {
+      "Bar": { "Asset": "UI_LoadingBar", "Animated": true },
+      "Circle": { "Asset": "UI_LoadingCircle", "Animated": true },
+      "Car": { "Asset": "UI_LoadingCar", "Animated": true },
+      "Retro": { "Asset": "UI_LoadingRetro", "Animated": true, "UnlockCondition": "REP_TIER_STREET" }
+    },
+    "ShowPercentage": true,
+    "ShowStatus": true,
+    "StatusMessages": {
+      "Loading": "Loading...",
+      "LoadingAssets": "Loading assets...",
+      "LoadingTrack": "Preparing track...",
+      "LoadingVehicles": "Loading vehicles...",
+      "LoadingAI": "Preparing opponents...",
+      "Synchronizing": "Synchronizing...",
+      "AlmostReady": "Almost ready...",
+      "Ready": "Ready!"
+    }
+  },
+
+  "Transitions": {
+    "ToGame": {
+      "Type": "Fade",
+      "Duration": 0.5,
+      "Color": "#000000"
+    },
+    "ToMenu": {
+      "Type": "Fade",
+      "Duration": 0.3,
+      "Color": "#000000"
+    },
+    "RaceStart": {
+      "Type": "Wipe",
+      "Duration": 0.75,
+      "Direction": "Right"
+    }
+  },
+
+  "Unlockables": {
+    "Backgrounds": [
+      { "ID": "BG_UNLOCK_DRIFT", "UnlockCondition": "WIN_DRIFT_EVENT", "Asset": "T_Loading_DriftChamp" },
+      { "ID": "BG_UNLOCK_LEGEND", "UnlockCondition": "REP_TIER_LEGEND", "Asset": "T_Loading_Legend" },
+      { "ID": "BG_UNLOCK_CHAMPION", "UnlockCondition": "SEASON_CHAMPION", "Asset": "T_Loading_Champion" }
+    ],
+    "ProgressStyles": [
+      { "ID": "PROG_NEON", "UnlockCondition": "LEVEL_25", "Asset": "UI_LoadingNeon" },
+      { "ID": "PROG_GOLD", "UnlockCondition": "REP_TIER_ELITE", "Asset": "UI_LoadingGold" }
+    ]
+  }
+}

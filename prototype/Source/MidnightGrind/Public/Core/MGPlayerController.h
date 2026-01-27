@@ -40,6 +40,9 @@ struct FMGLapData;
 struct FMGStuntEvent;
 enum class EMGPowerupType : uint8;
 enum class EMGWeatherType : uint8;
+enum class EMGCautionType : uint8;
+enum class EMGCautionReason : uint8;
+struct FMGSafetyCarState;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -627,4 +630,20 @@ protected:
 	/** Handle weather transition from weather subsystem */
 	UFUNCTION()
 	void OnWeatherTransitionStarted(EMGWeatherType FromType, EMGWeatherType ToType);
+
+	/** Handle caution deployed from caution subsystem */
+	UFUNCTION()
+	void OnCautionDeployed(EMGCautionType Type, EMGCautionReason Reason);
+
+	/** Handle caution ended from caution subsystem */
+	UFUNCTION()
+	void OnCautionEnded(EMGCautionType Type);
+
+	/** Handle safety car deployed from caution subsystem */
+	UFUNCTION()
+	void OnSafetyCarDeployed(const FMGSafetyCarState& State);
+
+	/** Handle safety car coming in from caution subsystem */
+	UFUNCTION()
+	void OnSafetyCarIn();
 };
