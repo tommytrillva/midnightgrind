@@ -1,0 +1,350 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Car Meet and Social Gathering System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxPlayersPerMeet": 16,
+    "MeetDuration": 3600,
+    "AutoExtend": true,
+    "ExtendDuration": 1800,
+    "VotingRequired": true
+  },
+
+  "MeetTypes": {
+    "Public": {
+      "ID": "MEET_PUBLIC",
+      "Name": "Public Meet",
+      "Description": "Open to all players",
+      "JoinRequirement": "None",
+      "Visibility": "Global",
+      "MaxPlayers": 16
+    },
+    "Private": {
+      "ID": "MEET_PRIVATE",
+      "Name": "Private Meet",
+      "Description": "Invite only gathering",
+      "JoinRequirement": "Invite",
+      "Visibility": "InviteOnly",
+      "MaxPlayers": 16
+    },
+    "Crew": {
+      "ID": "MEET_CREW",
+      "Name": "Crew Meet",
+      "Description": "Exclusive to crew members",
+      "JoinRequirement": "CrewMember",
+      "Visibility": "CrewOnly",
+      "MaxPlayers": 20
+    },
+    "Themed": {
+      "ID": "MEET_THEMED",
+      "Name": "Themed Meet",
+      "Description": "Vehicle class or theme restricted",
+      "JoinRequirement": "ThemeMatch",
+      "Visibility": "Global",
+      "MaxPlayers": 16,
+      "ThemeRequired": true
+    },
+    "Official": {
+      "ID": "MEET_OFFICIAL",
+      "Name": "Official Meet",
+      "Description": "Developer-hosted special events",
+      "JoinRequirement": "None",
+      "Visibility": "Featured",
+      "MaxPlayers": 32,
+      "DeveloperHosted": true
+    }
+  },
+
+  "MeetThemes": {
+    "JDM": {
+      "ID": "THEME_JDM",
+      "Name": "JDM Night",
+      "Description": "Japanese Domestic Market vehicles",
+      "VehicleFilter": { "Origin": "Japan" },
+      "Rewards": { "REPBonus": 1.25 }
+    },
+    "Euro": {
+      "ID": "THEME_EURO",
+      "Name": "Euro Cruise",
+      "Description": "European vehicles",
+      "VehicleFilter": { "Origin": "Europe" },
+      "Rewards": { "REPBonus": 1.25 }
+    },
+    "Muscle": {
+      "ID": "THEME_MUSCLE",
+      "Name": "Muscle Madness",
+      "Description": "American muscle cars",
+      "VehicleFilter": { "Class": "Muscle" },
+      "Rewards": { "REPBonus": 1.25 }
+    },
+    "Drift": {
+      "ID": "THEME_DRIFT",
+      "Name": "Drift Meet",
+      "Description": "Drift-focused vehicles",
+      "VehicleFilter": { "BuildType": "Drift" },
+      "Rewards": { "REPBonus": 1.25 }
+    },
+    "Classic": {
+      "ID": "THEME_CLASSIC",
+      "Name": "Classic Showcase",
+      "Description": "Pre-2000 vehicles",
+      "VehicleFilter": { "Year": { "Max": 2000 } },
+      "Rewards": { "REPBonus": 1.25 }
+    },
+    "Supercar": {
+      "ID": "THEME_SUPER",
+      "Name": "Supercar Sunday",
+      "Description": "High-end supercars",
+      "VehicleFilter": { "Class": "S" },
+      "Rewards": { "REPBonus": 1.5 }
+    },
+    "Stance": {
+      "ID": "THEME_STANCE",
+      "Name": "Stance Nation",
+      "Description": "Stance and show cars",
+      "VehicleFilter": { "Lowered": true },
+      "Rewards": { "REPBonus": 1.25 }
+    },
+    "Open": {
+      "ID": "THEME_OPEN",
+      "Name": "Open Meet",
+      "Description": "All vehicles welcome",
+      "VehicleFilter": null,
+      "Rewards": { "REPBonus": 1.0 }
+    }
+  },
+
+  "Activities": {
+    "Showcase": {
+      "ID": "ACTIVITY_SHOWCASE",
+      "Name": "Vehicle Showcase",
+      "Description": "Display your vehicle for others",
+      "Duration": 60,
+      "SpotlightEnabled": true,
+      "VotingEnabled": true,
+      "REPReward": 100
+    },
+    "PopUpRace": {
+      "ID": "ACTIVITY_POPUP",
+      "Name": "Pop-Up Race",
+      "Description": "Quick impromptu race",
+      "MinPlayers": 2,
+      "MaxPlayers": 8,
+      "VotingToStart": true,
+      "RewardMultiplier": 0.75
+    },
+    "DragRace": {
+      "ID": "ACTIVITY_DRAG",
+      "Name": "Drag Race",
+      "Description": "1v1 drag competition",
+      "MinPlayers": 2,
+      "MaxPlayers": 2,
+      "BettingEnabled": true
+    },
+    "PhotoSession": {
+      "ID": "ACTIVITY_PHOTO",
+      "Name": "Photo Session",
+      "Description": "Group photo opportunity",
+      "Duration": 120,
+      "Countdown": true,
+      "SharedAlbum": true
+    },
+    "Cruise": {
+      "ID": "ACTIVITY_CRUISE",
+      "Name": "Group Cruise",
+      "Description": "Cruise together through the city",
+      "MinPlayers": 3,
+      "MaxPlayers": 16,
+      "WaypointSystem": true,
+      "LeaderRotation": true,
+      "REPPerCheckpoint": 50
+    },
+    "ShowAndShine": {
+      "ID": "ACTIVITY_SHINE",
+      "Name": "Show & Shine",
+      "Description": "Competitive vehicle judging",
+      "Duration": 300,
+      "Categories": ["BestOverall", "BestPaint", "BestEngine", "BestStance", "PeopleChoice"],
+      "JudgingEnabled": true,
+      "Prizes": {
+        "1st": { "Cash": 10000, "REP": 1000 },
+        "2nd": { "Cash": 5000, "REP": 500 },
+        "3rd": { "Cash": 2500, "REP": 250 }
+      }
+    },
+    "TunerShowdown": {
+      "ID": "ACTIVITY_TUNER",
+      "Name": "Tuner Showdown",
+      "Description": "Best tuned vehicle competition",
+      "Categories": ["BestBuild", "MostPower", "BestSound"],
+      "DynoEnabled": true,
+      "Prizes": {
+        "1st": { "Cash": 15000, "REP": 1500 }
+      }
+    }
+  },
+
+  "Voting": {
+    "ShowAndShine": {
+      "VoteCategories": [
+        { "ID": "VOTE_EXTERIOR", "Name": "Exterior", "Weight": 1.0 },
+        { "ID": "VOTE_INTERIOR", "Name": "Interior", "Weight": 0.8 },
+        { "ID": "VOTE_ENGINE", "Name": "Engine Bay", "Weight": 0.8 },
+        { "ID": "VOTE_STANCE", "Name": "Stance", "Weight": 0.7 },
+        { "ID": "VOTE_ORIGINALITY", "Name": "Originality", "Weight": 0.9 }
+      ],
+      "VotingTime": 60,
+      "AnonymousVoting": true,
+      "NoSelfVoting": true
+    },
+    "PopUpActivity": {
+      "VotingTime": 30,
+      "MinVotesRequired": 0.5,
+      "TieBreaker": "FirstToVote"
+    }
+  },
+
+  "MeetFeatures": {
+    "VehicleInspection": {
+      "Enabled": true,
+      "ViewStats": true,
+      "ViewBuild": true,
+      "ViewLivery": true,
+      "ShareBuild": true
+    },
+    "Dyno": {
+      "Enabled": true,
+      "ShowHP": true,
+      "ShowTorque": true,
+      "ShowCurve": true,
+      "Competition": true
+    },
+    "PhotoSpots": {
+      "Enabled": true,
+      "LightingRigs": true,
+      "Backdrops": true,
+      "GroupArrangement": true
+    },
+    "MusicJukebox": {
+      "Enabled": true,
+      "SharedPlaylist": true,
+      "VoteToSkip": true,
+      "DJMode": true
+    },
+    "EmoteInteractions": {
+      "Enabled": true,
+      "WaveDistance": 20.0,
+      "GroupEmotes": true
+    }
+  },
+
+  "Locations": {
+    "ParkingGarage": {
+      "ID": "MEET_LOC_GARAGE",
+      "Name": "Neo City Parking Structure",
+      "Capacity": 16,
+      "Lighting": "Night",
+      "Features": ["Dyno", "PhotoSpots"],
+      "Ambiance": "Urban"
+    },
+    "Waterfront": {
+      "ID": "MEET_LOC_WATERFRONT",
+      "Name": "Harbor Waterfront",
+      "Capacity": 20,
+      "Lighting": "Sunset",
+      "Features": ["PhotoSpots", "Cruise"],
+      "Ambiance": "Scenic"
+    },
+    "Industrial": {
+      "ID": "MEET_LOC_INDUSTRIAL",
+      "Name": "Industrial District",
+      "Capacity": 16,
+      "Lighting": "Night",
+      "Features": ["DragStrip", "Dyno"],
+      "Ambiance": "Gritty"
+    },
+    "MountainLookout": {
+      "ID": "MEET_LOC_MOUNTAIN",
+      "Name": "Mountain Lookout",
+      "Capacity": 12,
+      "Lighting": "Variable",
+      "Features": ["PhotoSpots", "Cruise"],
+      "Ambiance": "Scenic"
+    },
+    "ServiceStation": {
+      "ID": "MEET_LOC_SERVICE",
+      "Name": "24hr Service Station",
+      "Capacity": 16,
+      "Lighting": "Night",
+      "Features": ["QuickRace"],
+      "Ambiance": "Classic"
+    },
+    "AbandonedAirfield": {
+      "ID": "MEET_LOC_AIRFIELD",
+      "Name": "Abandoned Airfield",
+      "Capacity": 20,
+      "Lighting": "Night",
+      "Features": ["DragStrip", "Cruise", "PhotoSpots"],
+      "Ambiance": "Open"
+    }
+  },
+
+  "Rewards": {
+    "Attendance": {
+      "BaseREP": 100,
+      "PerMinute": 5,
+      "MaxDuration": 60
+    },
+    "Participation": {
+      "Activity": 50,
+      "ActivityWin": 200,
+      "VoteCast": 10
+    },
+    "Social": {
+      "NewConnection": 25,
+      "PhotoShared": 15,
+      "BuildShared": 20
+    },
+    "Achievements": {
+      "FirstMeet": { "REP": 500, "Title": "Meet Newbie" },
+      "HostedMeet": { "REP": 300 },
+      "ShowWinner": { "REP": 1000, "Title": "Show Winner" },
+      "MeetRegular": { "REP": 2000, "Requirement": "Attend 50 meets" }
+    }
+  },
+
+  "UI": {
+    "MeetBrowser": {
+      "Filters": ["Theme", "Location", "PlayerCount", "Friends"],
+      "Sorting": ["Newest", "MostPlayers", "Nearby"],
+      "QuickJoin": true
+    },
+    "InMeetHUD": {
+      "PlayerList": true,
+      "ActivityStatus": true,
+      "ChatOverlay": true,
+      "VotingUI": true
+    },
+    "HostTools": {
+      "KickPlayer": true,
+      "StartActivity": true,
+      "SetTheme": true,
+      "EndMeet": true
+    }
+  },
+
+  "Moderation": {
+    "ReportPlayer": true,
+    "KickVote": {
+      "Enabled": true,
+      "Threshold": 0.6,
+      "CooldownAfterKick": 600
+    },
+    "AutoModeration": {
+      "IdleKick": 300,
+      "TrollDetection": true,
+      "GriefingDetection": true
+    }
+  }
+}

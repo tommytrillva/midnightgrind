@@ -1,0 +1,418 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Master Vehicle Database Index",
+
+  "VehicleRoster": {
+    "TotalVehicles": 30,
+    "ClassDistribution": {
+      "D": 5,
+      "C": 8,
+      "B": 8,
+      "A": 6,
+      "S": 3
+    }
+  },
+
+  "VehicleIndex": {
+    "ClassD": {
+      "Description": "Entry-level vehicles for beginners",
+      "PIRange": [100, 300],
+      "PriceRange": [15000, 35000],
+      "Vehicles": [
+        {
+          "ID": "VEH_BEATER_SEDAN",
+          "Name": "Beater Sedan",
+          "DataAsset": "DA_BeaterSedan",
+          "PartsDB": "DB_BeaterSedan_Parts",
+          "BasePrice": 15000,
+          "BasePI": 150,
+          "Drivetrain": "FWD",
+          "Origin": "USA",
+          "StarterVehicle": true
+        },
+        {
+          "ID": "VEH_KAZE_CIVIC",
+          "Name": "Kaze Civic",
+          "DataAsset": "DA_KazeCivic",
+          "PartsDB": "DB_KazeCivic_Parts",
+          "BasePrice": 22000,
+          "BasePI": 180,
+          "Drivetrain": "FWD",
+          "Origin": "Japan"
+        },
+        {
+          "ID": "VEH_TENSHI_240",
+          "Name": "Tenshi 240",
+          "DataAsset": "DA_Tenshi240",
+          "PartsDB": "DB_Tenshi240_Parts",
+          "BasePrice": 28000,
+          "BasePI": 220,
+          "Drivetrain": "RWD",
+          "Origin": "Japan",
+          "DriftPotential": "High"
+        },
+        {
+          "ID": "VEH_STALLION_GT",
+          "Name": "Stallion GT",
+          "DataAsset": "DA_StallionGT",
+          "PartsDB": "DB_StallionGT_Parts",
+          "BasePrice": 32000,
+          "BasePI": 250,
+          "Drivetrain": "RWD",
+          "Origin": "USA"
+        },
+        {
+          "ID": "VEH_STORM_GTI",
+          "Name": "Storm GTI",
+          "DataAsset": "DA_StormGTI",
+          "PartsDB": "DB_StormGTI_Parts",
+          "BasePrice": 35000,
+          "BasePI": 280,
+          "Drivetrain": "FWD",
+          "Origin": "Germany"
+        }
+      ]
+    },
+    "ClassC": {
+      "Description": "Mid-tier performance vehicles",
+      "PIRange": [300, 450],
+      "PriceRange": [40000, 80000],
+      "Vehicles": [
+        {
+          "ID": "VEH_SAKURA_GTR",
+          "Name": "Sakura GT-R",
+          "DataAsset": "DA_SakuraGTR",
+          "PartsDB": "DB_SakuraGTR_Parts",
+          "BasePrice": 45000,
+          "BasePI": 320,
+          "Drivetrain": "AWD",
+          "Origin": "Japan",
+          "Iconic": true
+        },
+        {
+          "ID": "VEH_KARASU_RX7",
+          "Name": "Karasu RX-7",
+          "DataAsset": "DA_KarasuRX7",
+          "PartsDB": "DB_KarasuRX7_Parts",
+          "BasePrice": 50000,
+          "BasePI": 350,
+          "Drivetrain": "RWD",
+          "Origin": "Japan",
+          "EngineType": "Rotary"
+        },
+        {
+          "ID": "VEH_GHOST_E46",
+          "Name": "Ghost E46",
+          "DataAsset": "DA_GhostE46",
+          "PartsDB": "DB_GhostE46_Parts",
+          "BasePrice": 48000,
+          "BasePI": 340,
+          "Drivetrain": "RWD",
+          "Origin": "Germany"
+        },
+        {
+          "ID": "VEH_KUMO_350Z",
+          "Name": "Kumo 350Z",
+          "DataAsset": "DA_Kumo350Z",
+          "PartsDB": "DB_Kumo350Z_Parts",
+          "BasePrice": 42000,
+          "BasePI": 310,
+          "Drivetrain": "RWD",
+          "Origin": "Japan"
+        },
+        {
+          "ID": "VEH_COBRA_S2000",
+          "Name": "Cobra S2000",
+          "DataAsset": "DA_CobraS2000",
+          "PartsDB": "DB_CobraS2000_Parts",
+          "BasePrice": 55000,
+          "BasePI": 360,
+          "Drivetrain": "RWD",
+          "Origin": "Japan",
+          "Convertible": true
+        },
+        {
+          "ID": "VEH_HAYATE_WRX",
+          "Name": "Hayate WRX",
+          "DataAsset": "DA_HayateWRX",
+          "PartsDB": "DB_HayateWRX_Parts",
+          "BasePrice": 52000,
+          "BasePI": 380,
+          "Drivetrain": "AWD",
+          "Origin": "Japan"
+        },
+        {
+          "ID": "VEH_LIGHTNING_86",
+          "Name": "Lightning 86",
+          "DataAsset": "DA_Lightning86",
+          "PartsDB": "DB_Lightning86_Parts",
+          "BasePrice": 38000,
+          "BasePI": 290,
+          "Drivetrain": "RWD",
+          "Origin": "Japan",
+          "Lightweight": true
+        },
+        {
+          "ID": "VEH_INFERNO_FOCUS",
+          "Name": "Inferno Focus RS",
+          "DataAsset": "DA_InfernoFocus",
+          "PartsDB": "DB_InfernoFocus_Parts",
+          "BasePrice": 58000,
+          "BasePI": 400,
+          "Drivetrain": "AWD",
+          "Origin": "Europe"
+        }
+      ]
+    },
+    "ClassB": {
+      "Description": "High-performance enthusiast vehicles",
+      "PIRange": [450, 600],
+      "PriceRange": [80000, 150000],
+      "Vehicles": [
+        {
+          "ID": "VEH_RAIJIN_SUPRA",
+          "Name": "Raijin Supra",
+          "DataAsset": "DA_RaijinSupra",
+          "PartsDB": "DB_RaijinSupra_Parts",
+          "BasePrice": 85000,
+          "BasePI": 480,
+          "Drivetrain": "RWD",
+          "Origin": "Japan",
+          "Iconic": true
+        },
+        {
+          "ID": "VEH_RONIN_EVO",
+          "Name": "Ronin EVO X",
+          "DataAsset": "DA_RoninEvo",
+          "PartsDB": "DB_RoninEvo_Parts",
+          "BasePrice": 95000,
+          "BasePI": 520,
+          "Drivetrain": "AWD",
+          "Origin": "Japan"
+        },
+        {
+          "ID": "VEH_PHANTOM_CAMARO",
+          "Name": "Phantom Camaro",
+          "DataAsset": "DA_PhantomCamaro",
+          "PartsDB": "DB_PhantomCamaro_Parts",
+          "BasePrice": 90000,
+          "BasePI": 490,
+          "Drivetrain": "RWD",
+          "Origin": "USA",
+          "Muscle": true
+        },
+        {
+          "ID": "VEH_DEMON_CHALLENGER",
+          "Name": "Demon Challenger",
+          "DataAsset": "DA_DemonChallenger",
+          "PartsDB": "DB_DemonChallenger_Parts",
+          "BasePrice": 100000,
+          "BasePI": 540,
+          "Drivetrain": "RWD",
+          "Origin": "USA",
+          "Muscle": true,
+          "DragSpecialist": true
+        },
+        {
+          "ID": "VEH_VIPER_CORVETTE",
+          "Name": "Viper Corvette",
+          "DataAsset": "DA_ViperCorvette",
+          "PartsDB": "DB_ViperCorvette_Parts",
+          "BasePrice": 120000,
+          "BasePI": 560,
+          "Drivetrain": "RWD",
+          "Origin": "USA"
+        },
+        {
+          "ID": "VEH_DRIFTKING_SILVIA",
+          "Name": "Drift King Silvia",
+          "DataAsset": "DA_DriftKingSilvia",
+          "PartsDB": "DB_DriftKingSilvia_Parts",
+          "BasePrice": 75000,
+          "BasePI": 460,
+          "Drivetrain": "RWD",
+          "Origin": "Japan",
+          "DriftPotential": "Excellent"
+        },
+        {
+          "ID": "VEH_BLITZ_M4",
+          "Name": "Blitz M4",
+          "DataAsset": "DA_BlitzM4",
+          "PartsDB": "DB_BlitzM4_Parts",
+          "BasePrice": 110000,
+          "BasePI": 550,
+          "Drivetrain": "RWD",
+          "Origin": "Germany"
+        },
+        {
+          "ID": "VEH_THUNDER_370Z",
+          "Name": "Thunder 370Z",
+          "DataAsset": "DA_Thunder370Z",
+          "PartsDB": "DB_Thunder370Z_Parts",
+          "BasePrice": 82000,
+          "BasePI": 470,
+          "Drivetrain": "RWD",
+          "Origin": "Japan"
+        }
+      ]
+    },
+    "ClassA": {
+      "Description": "Premium performance vehicles",
+      "PIRange": [600, 750],
+      "PriceRange": [150000, 300000],
+      "Vehicles": [
+        {
+          "ID": "VEH_SHOGUN_NSX",
+          "Name": "Shogun NSX",
+          "DataAsset": "DA_ShogunNSX",
+          "PartsDB": "DB_ShogunNSX_Parts",
+          "BasePrice": 180000,
+          "BasePI": 650,
+          "Drivetrain": "RWD",
+          "Origin": "Japan",
+          "Iconic": true
+        },
+        {
+          "ID": "VEH_RAMPAGE_CHARGER",
+          "Name": "Rampage Charger",
+          "DataAsset": "DA_RampageCharger",
+          "PartsDB": "DB_RampageCharger_Parts",
+          "BasePrice": 160000,
+          "BasePI": 620,
+          "Drivetrain": "RWD",
+          "Origin": "USA",
+          "Muscle": true
+        },
+        {
+          "ID": "VEH_TITAN_CTS",
+          "Name": "Titan CTS-V",
+          "DataAsset": "DA_TitanCTS",
+          "PartsDB": "DB_TitanCTS_Parts",
+          "BasePrice": 170000,
+          "BasePI": 640,
+          "Drivetrain": "RWD",
+          "Origin": "USA"
+        },
+        {
+          "ID": "VEH_APEX_CAYMAN",
+          "Name": "Apex Cayman",
+          "DataAsset": "DA_ApexCayman",
+          "PartsDB": "DB_ApexCayman_Parts",
+          "BasePrice": 200000,
+          "BasePI": 680,
+          "Drivetrain": "RWD",
+          "Origin": "Germany"
+        },
+        {
+          "ID": "VEH_LEGEND_R35",
+          "Name": "Legend R35",
+          "DataAsset": "DA_LegendR35",
+          "PartsDB": "DB_LegendR35_Parts",
+          "BasePrice": 250000,
+          "BasePI": 720,
+          "Drivetrain": "AWD",
+          "Origin": "Japan",
+          "Iconic": true
+        },
+        {
+          "ID": "VEH_FLASH_AMG",
+          "Name": "Flash AMG GT",
+          "DataAsset": "DA_FlashAMG",
+          "PartsDB": "DB_FlashAMG_Parts",
+          "BasePrice": 280000,
+          "BasePI": 740,
+          "Drivetrain": "RWD",
+          "Origin": "Germany"
+        }
+      ]
+    },
+    "ClassS": {
+      "Description": "Elite supercar tier",
+      "PIRange": [750, 900],
+      "PriceRange": [300000, 600000],
+      "Vehicles": [
+        {
+          "ID": "VEH_SHADOW_LFA",
+          "Name": "Shadow LFA",
+          "DataAsset": "DA_ShadowLFA",
+          "PartsDB": "DB_ShadowLFA_Parts",
+          "BasePrice": 400000,
+          "BasePI": 800,
+          "Drivetrain": "RWD",
+          "Origin": "Japan",
+          "Supercar": true,
+          "LimitedProduction": true
+        },
+        {
+          "ID": "VEH_SPECTER_911",
+          "Name": "Specter 911 GT3",
+          "DataAsset": "DA_Specter911",
+          "PartsDB": "DB_Specter911_Parts",
+          "BasePrice": 350000,
+          "BasePI": 780,
+          "Drivetrain": "RWD",
+          "Origin": "Germany",
+          "TrackFocused": true
+        },
+        {
+          "ID": "VEH_NOVA_GT500",
+          "Name": "Nova GT500",
+          "DataAsset": "DA_NovaGT500",
+          "PartsDB": "DB_NovaGT500_Parts",
+          "BasePrice": 320000,
+          "BasePI": 760,
+          "Drivetrain": "RWD",
+          "Origin": "USA",
+          "Muscle": true
+        }
+      ]
+    }
+  },
+
+  "VehicleCategories": {
+    "ByOrigin": {
+      "Japan": ["VEH_KAZE_CIVIC", "VEH_TENSHI_240", "VEH_SAKURA_GTR", "VEH_KARASU_RX7", "VEH_KUMO_350Z", "VEH_COBRA_S2000", "VEH_HAYATE_WRX", "VEH_LIGHTNING_86", "VEH_RAIJIN_SUPRA", "VEH_RONIN_EVO", "VEH_DRIFTKING_SILVIA", "VEH_THUNDER_370Z", "VEH_SHOGUN_NSX", "VEH_LEGEND_R35", "VEH_SHADOW_LFA"],
+      "USA": ["VEH_BEATER_SEDAN", "VEH_STALLION_GT", "VEH_PHANTOM_CAMARO", "VEH_DEMON_CHALLENGER", "VEH_VIPER_CORVETTE", "VEH_RAMPAGE_CHARGER", "VEH_TITAN_CTS", "VEH_NOVA_GT500"],
+      "Germany": ["VEH_STORM_GTI", "VEH_GHOST_E46", "VEH_BLITZ_M4", "VEH_APEX_CAYMAN", "VEH_FLASH_AMG", "VEH_SPECTER_911"],
+      "Europe": ["VEH_INFERNO_FOCUS"]
+    },
+    "ByDrivetrain": {
+      "FWD": ["VEH_BEATER_SEDAN", "VEH_KAZE_CIVIC", "VEH_STORM_GTI"],
+      "RWD": ["VEH_TENSHI_240", "VEH_STALLION_GT", "VEH_KARASU_RX7", "VEH_GHOST_E46", "VEH_KUMO_350Z", "VEH_COBRA_S2000", "VEH_LIGHTNING_86", "VEH_RAIJIN_SUPRA", "VEH_PHANTOM_CAMARO", "VEH_DEMON_CHALLENGER", "VEH_VIPER_CORVETTE", "VEH_DRIFTKING_SILVIA", "VEH_BLITZ_M4", "VEH_THUNDER_370Z", "VEH_SHOGUN_NSX", "VEH_RAMPAGE_CHARGER", "VEH_TITAN_CTS", "VEH_APEX_CAYMAN", "VEH_FLASH_AMG", "VEH_SHADOW_LFA", "VEH_SPECTER_911", "VEH_NOVA_GT500"],
+      "AWD": ["VEH_SAKURA_GTR", "VEH_HAYATE_WRX", "VEH_RONIN_EVO", "VEH_INFERNO_FOCUS", "VEH_LEGEND_R35"]
+    },
+    "ByType": {
+      "Muscle": ["VEH_PHANTOM_CAMARO", "VEH_DEMON_CHALLENGER", "VEH_VIPER_CORVETTE", "VEH_RAMPAGE_CHARGER", "VEH_NOVA_GT500"],
+      "JDM": ["VEH_KAZE_CIVIC", "VEH_TENSHI_240", "VEH_SAKURA_GTR", "VEH_KARASU_RX7", "VEH_KUMO_350Z", "VEH_COBRA_S2000", "VEH_HAYATE_WRX", "VEH_LIGHTNING_86", "VEH_RAIJIN_SUPRA", "VEH_RONIN_EVO", "VEH_DRIFTKING_SILVIA", "VEH_THUNDER_370Z", "VEH_SHOGUN_NSX", "VEH_LEGEND_R35", "VEH_SHADOW_LFA"],
+      "Euro": ["VEH_STORM_GTI", "VEH_GHOST_E46", "VEH_BLITZ_M4", "VEH_APEX_CAYMAN", "VEH_FLASH_AMG", "VEH_SPECTER_911", "VEH_INFERNO_FOCUS"],
+      "DriftCars": ["VEH_TENSHI_240", "VEH_KARASU_RX7", "VEH_DRIFTKING_SILVIA"],
+      "Supercars": ["VEH_SHADOW_LFA", "VEH_SPECTER_911"]
+    }
+  },
+
+  "UnlockConditions": {
+    "StarterVehicle": {
+      "VEH_BEATER_SEDAN": "Free at game start"
+    },
+    "LevelLocked": {
+      "VEH_SHADOW_LFA": "Level 50",
+      "VEH_LEGEND_R35": "Level 40",
+      "VEH_SHOGUN_NSX": "Level 35"
+    },
+    "REPLocked": {
+      "VEH_RAIJIN_SUPRA": "REP_TIER_KNOWN",
+      "VEH_RONIN_EVO": "REP_TIER_RESPECTED"
+    },
+    "CareerLocked": {
+      "VEH_DRIFTKING_SILVIA": "Complete Drift Chapter"
+    }
+  },
+
+  "Statistics": {
+    "TotalBasePrice": 4097000,
+    "AveragePrice": 136567,
+    "LowestPrice": 15000,
+    "HighestPrice": 400000,
+    "TotalParts": "900+ across all vehicles"
+  }
+}

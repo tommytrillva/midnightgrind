@@ -1,0 +1,293 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Premium Currency and Monetization System",
+
+  "Currencies": {
+    "Cash": {
+      "ID": "CURRENCY_CASH",
+      "Name": "Cash",
+      "Symbol": "$",
+      "Type": "Soft",
+      "EarnedInGame": true,
+      "Purchasable": false,
+      "MaxBalance": 999999999,
+      "Description": "Standard in-game currency earned through races and activities"
+    },
+    "REP": {
+      "ID": "CURRENCY_REP",
+      "Name": "REP",
+      "Symbol": "★",
+      "Type": "Progression",
+      "EarnedInGame": true,
+      "Purchasable": false,
+      "MaxBalance": 999999999,
+      "Description": "Reputation points that unlock tiers and rewards"
+    },
+    "Tokens": {
+      "ID": "CURRENCY_TOKENS",
+      "Name": "Grind Tokens",
+      "Symbol": "GT",
+      "Type": "Premium",
+      "EarnedInGame": true,
+      "Purchasable": true,
+      "MaxBalance": 99999,
+      "Description": "Premium currency for exclusive items",
+      "EarnMethods": ["DailyLogin", "SeasonPass", "Achievements", "Events"]
+    }
+  },
+
+  "TokenPacks": {
+    "Starter": {
+      "ID": "PACK_STARTER",
+      "Tokens": 500,
+      "BonusTokens": 0,
+      "Price": { "USD": 4.99, "EUR": 4.99, "GBP": 3.99 },
+      "BestFor": "New Players"
+    },
+    "Standard": {
+      "ID": "PACK_STANDARD",
+      "Tokens": 1100,
+      "BonusTokens": 100,
+      "Price": { "USD": 9.99, "EUR": 9.99, "GBP": 7.99 },
+      "ValueTag": "+10% Bonus"
+    },
+    "Plus": {
+      "ID": "PACK_PLUS",
+      "Tokens": 2400,
+      "BonusTokens": 400,
+      "Price": { "USD": 19.99, "EUR": 19.99, "GBP": 16.99 },
+      "ValueTag": "+20% Bonus",
+      "Popular": true
+    },
+    "Premium": {
+      "ID": "PACK_PREMIUM",
+      "Tokens": 6500,
+      "BonusTokens": 1500,
+      "Price": { "USD": 49.99, "EUR": 49.99, "GBP": 39.99 },
+      "ValueTag": "+30% Bonus"
+    },
+    "Ultimate": {
+      "ID": "PACK_ULTIMATE",
+      "Tokens": 14000,
+      "BonusTokens": 4000,
+      "Price": { "USD": 99.99, "EUR": 99.99, "GBP": 79.99 },
+      "ValueTag": "Best Value +40%",
+      "BestValue": true
+    }
+  },
+
+  "FreeTokenSources": {
+    "DailyLogin": {
+      "Day1": 10,
+      "Day2": 10,
+      "Day3": 15,
+      "Day4": 15,
+      "Day5": 20,
+      "Day6": 25,
+      "Day7": 50,
+      "WeekTotal": 145
+    },
+    "SeasonPass": {
+      "FreeTrack": {
+        "TotalTokens": 500,
+        "Distribution": "Spread across 50 tiers"
+      }
+    },
+    "Achievements": {
+      "FirstWin": 50,
+      "LevelMilestones": { "Every10Levels": 100 },
+      "RareAchievements": { "Range": [50, 200] }
+    },
+    "Events": {
+      "WeeklyChallenge": { "Completion": 25 },
+      "SpecialEvent": { "Range": [50, 200] }
+    },
+    "ReferralProgram": {
+      "PerReferral": 100,
+      "MaxReferrals": 10
+    }
+  },
+
+  "PremiumPurchases": {
+    "Vehicles": {
+      "ExclusiveVehicles": {
+        "Type": "TokenOnly",
+        "PriceRange": { "Min": 500, "Max": 3000 },
+        "EarlyAccess": { "Duration": 2592000, "Discount": 0.2 }
+      },
+      "StarterPacks": {
+        "Type": "Bundle",
+        "Contents": ["Vehicle", "Cash", "Parts"],
+        "PriceRange": { "Min": 1000, "Max": 2500 }
+      }
+    },
+    "Cosmetics": {
+      "Liveries": {
+        "Standard": { "Tokens": 100 },
+        "Premium": { "Tokens": 250 },
+        "Exclusive": { "Tokens": 500 }
+      },
+      "Underglow": {
+        "Standard": { "Tokens": 150 },
+        "Animated": { "Tokens": 300 }
+      },
+      "Horns": {
+        "Standard": { "Tokens": 50 },
+        "Special": { "Tokens": 150 }
+      },
+      "Plates": {
+        "Style": { "Tokens": 100 },
+        "Animated": { "Tokens": 250 }
+      },
+      "PlayerBanners": { "Tokens": 75 },
+      "PlayerTitles": { "Tokens": 100 },
+      "Avatars": { "Tokens": 50 }
+    },
+    "Convenience": {
+      "GarageSlots": {
+        "SingleSlot": { "Tokens": 200 },
+        "FiveSlots": { "Tokens": 750 }
+      },
+      "SaveSlots": {
+        "SingleSlot": { "Tokens": 100 }
+      }
+    },
+    "Boosters": {
+      "XPBoost": {
+        "1Hour": { "Tokens": 50, "Multiplier": 2.0 },
+        "3Hour": { "Tokens": 100, "Multiplier": 2.0 },
+        "24Hour": { "Tokens": 250, "Multiplier": 2.0 }
+      },
+      "CashBoost": {
+        "1Hour": { "Tokens": 50, "Multiplier": 1.5 },
+        "3Hour": { "Tokens": 100, "Multiplier": 1.5 },
+        "24Hour": { "Tokens": 250, "Multiplier": 1.5 }
+      },
+      "REPBoost": {
+        "1Hour": { "Tokens": 50, "Multiplier": 1.5 },
+        "3Hour": { "Tokens": 100, "Multiplier": 1.5 },
+        "24Hour": { "Tokens": 250, "Multiplier": 1.5 }
+      }
+    }
+  },
+
+  "SeasonPass": {
+    "Price": { "Tokens": 1500 },
+    "Duration": 2592000,
+    "Tiers": 100,
+    "FreeTierRewards": true,
+    "PremiumTierRewards": true,
+    "Contents": {
+      "ExclusiveVehicle": 1,
+      "ExclusiveLiveries": 5,
+      "Cash": 500000,
+      "Tokens": 1000,
+      "TitleUnlocks": 3,
+      "AvatarUnlocks": 5,
+      "BannerUnlocks": 3
+    },
+    "CatchUpMechanic": {
+      "Enabled": true,
+      "AcceleratedXP": true,
+      "PurchaseTiers": {
+        "PricePerTier": 150,
+        "Discount": "BulkPurchase"
+      }
+    }
+  },
+
+  "Bundles": {
+    "StarterBundle": {
+      "ID": "BUNDLE_STARTER",
+      "Contents": {
+        "Vehicle": "VEHICLE_STARTER_EXCLUSIVE",
+        "Cash": 100000,
+        "Tokens": 500,
+        "GarageSlot": 1
+      },
+      "Price": { "USD": 9.99 },
+      "OneTimePurchase": true,
+      "NewPlayerOnly": true
+    },
+    "VehicleBundle": {
+      "ID": "BUNDLE_VEHICLE",
+      "Contents": {
+        "Vehicle": "Featured",
+        "Livery": "Matching",
+        "Cash": 50000
+      },
+      "Price": { "Tokens": 2000 },
+      "Rotating": true,
+      "RotationPeriod": 604800
+    },
+    "CosmeticBundle": {
+      "ID": "BUNDLE_COSMETIC",
+      "Contents": {
+        "Liveries": 3,
+        "Underglow": 1,
+        "Plate": 1
+      },
+      "Price": { "Tokens": 750 },
+      "Discount": 0.25
+    }
+  },
+
+  "Shop": {
+    "FeaturedItems": {
+      "RefreshPeriod": 86400,
+      "Slots": 6,
+      "DiscountChance": 0.2,
+      "MaxDiscount": 0.3
+    },
+    "RotatingStock": {
+      "RefreshPeriod": 604800,
+      "Categories": ["Vehicles", "Liveries", "Bundles"]
+    },
+    "PermanentStock": {
+      "TokenPacks": true,
+      "SeasonPass": true,
+      "GarageSlots": true
+    }
+  },
+
+  "Policies": {
+    "Refunds": {
+      "TokenPurchases": "NoRefunds",
+      "UnusedTokens": "RefundWindow30Days",
+      "AccidentalPurchase": "OneTimeRefund"
+    },
+    "GiftingDisabled": true,
+    "TradingDisabled": true,
+    "TransferDisabled": true,
+    "SpendingLimits": {
+      "Enabled": true,
+      "Daily": { "Optional": true, "Default": "None" },
+      "Monthly": { "Optional": true, "Default": "None" }
+    },
+    "ParentalControls": {
+      "RequirePassword": true,
+      "SpendingRestrictions": true
+    }
+  },
+
+  "Analytics": {
+    "TrackPurchases": true,
+    "TrackSpending": true,
+    "TrackEarning": true,
+    "ConversionMetrics": true
+  },
+
+  "Localization": {
+    "CurrencyDisplay": "LocalCurrency",
+    "TaxHandling": "IncludedInPrice",
+    "RegionalPricing": true
+  },
+
+  "ComplianceSettings": {
+    "AgeGating": true,
+    "LootBoxTransparency": "NotApplicable",
+    "OddsDisclosure": "NotApplicable",
+    "PurchaseConfirmation": true,
+    "ReceiptProvided": true
+  }
+}
