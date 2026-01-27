@@ -18,9 +18,12 @@
 #include "WheeledVehiclePawn.h"
 #include "InputActionValue.h"
 #include "MGVehicleData.h"
+#include "MGTirePressureTypes.h"
 #include "MGVehiclePawn.generated.h"
 
 class UMGVehicleMovementComponent;
+class UMGVehicleVFXComponent;
+class UMGEngineAudioComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -256,6 +259,14 @@ public:
 	/** Nitrous VFX */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UNiagaraComponent> NitrousVFX;
+
+	/** Vehicle VFX component - handles all wear/damage visual effects */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UMGVehicleVFXComponent> VehicleVFX;
+
+	/** Engine audio component - handles RPM/load-based engine sounds */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UMGEngineAudioComponent> VehicleEngineAudio;
 
 	// ==========================================
 	// VEHICLE CONFIGURATION
@@ -790,6 +801,28 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Vehicle|Events")
 	void OnVehicleCollision(const FHitResult& HitResult, float ImpactForce);
 
+protected:
+	// ==========================================
+	// WEAR EVENT HANDLERS
+	// ==========================================
+
+	/** Handler for clutch overheat - triggers VFX */
+	UFUNCTION()
+	void HandleClutchOverheat(float Temperature, float WearLevel);
+
+	/** Handler for clutch burnout - triggers severe VFX */
+	UFUNCTION()
+	void HandleClutchBurnout();
+
+	/** Handler for tire blowout - triggers VFX and audio */
+	UFUNCTION()
+	void HandleTireBlowout(int32 WheelIndex, EMGPressureLossCause Cause);
+
+	/** Handler for money shift - triggers transmission grind VFX */
+	UFUNCTION()
+	void HandleMoneyShift(float OverRevAmount);
+
+public:
 	// ==========================================
 	// STATE
 	// ==========================================

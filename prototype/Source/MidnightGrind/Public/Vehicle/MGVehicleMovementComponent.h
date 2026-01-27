@@ -6,6 +6,7 @@
 #include "ChaosWheeledVehicleMovementComponent.h"
 #include "MGVehicleData.h"
 #include "MGTirePressureTypes.h"
+#include "RacingWheel/MGRacingWheelTypes.h"
 #include "MGVehicleMovementComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGearChanged, int32, NewGear);
@@ -1636,6 +1637,23 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	FMGClutchWearState GetClutchWearState() const { return ClutchWearState; }
 
+	/** Get brake temperature (Celsius) */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
+	float GetBrakeTemperature() const { return BrakeTemperature; }
+
+	/**
+	 * Get normalized brake glow intensity (0-1).
+	 * 0 = cold brakes, 1 = glowing hot.
+	 * Based on temp range ~100C (cold) to ~700C (glowing).
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
+	float GetBrakeGlowIntensity() const
+	{
+		const float ColdTemp = 100.0f;
+		const float GlowTemp = 700.0f;
+		return FMath::Clamp((BrakeTemperature - ColdTemp) / (GlowTemp - ColdTemp), 0.0f, 1.0f);
+	}
+
 	/** Get clutch temperature as percentage of burnout threshold */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	float GetClutchTemperaturePercent() const
@@ -1709,6 +1727,56 @@ public:
 	/** Get current part wear effects */
 	UFUNCTION(BlueprintPure, Category = "Vehicle|State")
 	FMGPartWearEffects GetPartWearEffects() const { return PartWearEffects; }
+
+	// ==========================================
+	// FORCE FEEDBACK DATA
+	// ==========================================
+
+	/**
+	 * @brief Get physics data for force feedback calculation
+	 *
+	 * Provides all vehicle physics state needed by the racing wheel FFB system
+	 * to calculate appropriate force feedback effects.
+	 *
+	 * @return FFB input data structure with current vehicle state
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|FFB")
+	FMGFFBInputData GetFFBInputData() const;
+
+	/**
+	 * @brief Check if vehicle is currently understeering
+	 * @return True if front tires are slipping more than rear
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|FFB")
+	bool IsUndersteering() const;
+
+	/**
+	 * @brief Check if vehicle is currently oversteering
+	 * @return True if rear tires are slipping more than front
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|FFB")
+	bool IsOversteering() const;
+
+	/**
+	 * @brief Get current drift angle in degrees
+	 * @return Angle between velocity and heading
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|FFB")
+	float GetDriftAngle() const;
+
+	/**
+	 * @brief Get the lateral G-force currently experienced
+	 * @return Lateral acceleration in G
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|FFB")
+	float GetLateralG() const;
+
+	/**
+	 * @brief Get the longitudinal G-force currently experienced
+	 * @return Longitudinal acceleration in G (positive = acceleration)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|FFB")
+	float GetLongitudinalG() const;
 
 	// ==========================================
 	// DIFFERENTIAL STATE QUERIES

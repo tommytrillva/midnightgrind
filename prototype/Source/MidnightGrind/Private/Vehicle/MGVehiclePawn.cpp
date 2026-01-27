@@ -2,6 +2,8 @@
 
 #include "Vehicle/MGVehiclePawn.h"
 #include "Vehicle/MGVehicleMovementComponent.h"
+#include "VFX/MGVehicleVFXComponent.h"
+#include "Audio/MGEngineAudioComponent.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -86,6 +88,12 @@ void AMGVehiclePawn::SetupComponents()
 	NitrousVFX->SetupAttachment(GetMesh());
 	NitrousVFX->SetRelativeLocation(FVector(-200.0f, 0.0f, 30.0f));
 	NitrousVFX->bAutoActivate = false;
+
+	// Create vehicle VFX component (handles wear/damage effects)
+	VehicleVFX = CreateDefaultSubobject<UMGVehicleVFXComponent>(TEXT("VehicleVFX"));
+
+	// Create engine audio component (handles RPM/load audio)
+	VehicleEngineAudio = CreateDefaultSubobject<UMGEngineAudioComponent>(TEXT("VehicleEngineAudio"));
 }
 
 void AMGVehiclePawn::BeginPlay()
@@ -663,19 +671,33 @@ void AMGVehiclePawn::UpdateCamera(float DeltaTime)
 
 void AMGVehiclePawn::UpdateAudio(float DeltaTime)
 {
-	if (!EngineAudio)
+	// Get engine state for audio params
+	FMGEngineState EngineState = MGVehicleMovement ? MGVehicleMovement->GetEngineState() : FMGEngineState();
+
+	// Update legacy engine audio component
+	if (EngineAudio)
 	{
-		return;
+		// Update engine sound pitch based on RPM
+		float PitchMultiplier = FMath::Lerp(0.5f, 2.0f, RuntimeState.RPMPercent);
+		EngineAudio->SetPitchMultiplier(PitchMultiplier);
+
+		// Volume based on throttle
+		float VolumeMultiplier = FMath::Lerp(0.3f, 1.0f, EngineState.ThrottlePosition);
+		EngineAudio->SetVolumeMultiplier(VolumeMultiplier);
 	}
 
-	// Update engine sound pitch based on RPM
-	float PitchMultiplier = FMath::Lerp(0.5f, 2.0f, RuntimeState.RPMPercent);
-	EngineAudio->SetPitchMultiplier(PitchMultiplier);
+	// Update new engine audio component with all parameters
+	if (VehicleEngineAudio)
+	{
+		VehicleEngineAudio->SetRPM(RuntimeState.RPM);
+		VehicleEngineAudio->SetThrottle(EngineState.ThrottlePosition);
+		VehicleEngineAudio->SetLoad(EngineState.EngineLoad);
+		VehicleEngineAudio->SetGear(RuntimeState.CurrentGear);
 
-	// Volume based on throttle
-	FMGEngineState EngineState = MGVehicleMovement ? MGVehicleMovement->GetEngineState() : FMGEngineState();
-	float VolumeMultiplier = FMath::Lerp(0.3f, 1.0f, EngineState.ThrottlePosition);
-	EngineAudio->SetVolumeMultiplier(VolumeMultiplier);
+		// Set boost level (normalized from PSI, assuming 30 PSI max)
+		const float NormalizedBoost = FMath::Clamp(RuntimeState.BoostPSI / 30.0f, 0.0f, 1.0f);
+		VehicleEngineAudio->SetBoost(NormalizedBoost);
+	}
 }
 
 void AMGVehiclePawn::UpdateVFX(float DeltaTime)
@@ -723,6 +745,21 @@ void AMGVehiclePawn::UpdateVFX(float DeltaTime)
 			OnNitrousDeactivated();
 		}
 	}
+
+	// Brake glow VFX (from VehicleVFX component)
+	if (VehicleVFX && MGVehicleMovement)
+	{
+		const float BrakeGlow = MGVehicleMovement->GetBrakeGlowIntensity();
+		if (BrakeGlow > 0.05f)
+		{
+			// Apply same glow to all 4 wheels for now
+			// Could be per-wheel if we tracked per-wheel brake temps
+			for (int32 i = 0; i < 4; ++i)
+			{
+				VehicleVFX->SetBrakeGlowIntensity(i, BrakeGlow);
+			}
+		}
+	}
 }
 
 void AMGVehiclePawn::BindMovementEvents()
@@ -731,5 +768,63 @@ void AMGVehiclePawn::BindMovementEvents()
 	{
 		// Bind to movement component delegates
 		MGVehicleMovement->OnGearChanged.AddDynamic(this, &AMGVehiclePawn::OnGearChanged);
+
+		// Bind wear system events to VFX component
+		MGVehicleMovement->OnClutchOverheating.AddDynamic(this, &AMGVehiclePawn::HandleClutchOverheat);
+		MGVehicleMovement->OnClutchBurnout.AddDynamic(this, &AMGVehiclePawn::HandleClutchBurnout);
+		MGVehicleMovement->OnTireBlowout.AddDynamic(this, &AMGVehiclePawn::HandleTireBlowout);
+		MGVehicleMovement->OnMoneyShift.AddDynamic(this, &AMGVehiclePawn::HandleMoneyShift);
+	}
+}
+
+// ==========================================
+// WEAR EVENT HANDLERS
+// ==========================================
+
+void AMGVehiclePawn::HandleClutchOverheat(float Temperature, float WearLevel)
+{
+	if (VehicleVFX)
+	{
+		// Intensity based on how much over the safe temp we are
+		// Safe temp ~120C, danger at ~200C
+		const float SafeTemp = 120.0f;
+		const float DangerTemp = 200.0f;
+		const float Intensity = FMath::Clamp((Temperature - SafeTemp) / (DangerTemp - SafeTemp), 0.0f, 1.0f);
+
+		VehicleVFX->TriggerClutchOverheatSmoke(Intensity);
+	}
+}
+
+void AMGVehiclePawn::HandleClutchBurnout()
+{
+	if (VehicleVFX)
+	{
+		// Full intensity smoke for burnout
+		VehicleVFX->TriggerClutchOverheatSmoke(1.0f);
+
+		// Also trigger engine damage smoke (clutch failure can cause smoke)
+		VehicleVFX->TriggerEngineDamageSmoke(0); // Light oil smoke
+	}
+}
+
+void AMGVehiclePawn::HandleTireBlowout(int32 WheelIndex, EMGPressureLossCause Cause)
+{
+	if (VehicleVFX)
+	{
+		VehicleVFX->TriggerTireBlowout(WheelIndex);
+	}
+}
+
+void AMGVehiclePawn::HandleMoneyShift(float OverRevAmount)
+{
+	if (VehicleVFX)
+	{
+		VehicleVFX->TriggerTransmissionGrind();
+
+		// If severe money shift, also trigger engine damage smoke
+		if (OverRevAmount > 1000.0f)
+		{
+			VehicleVFX->TriggerEngineDamageSmoke(1); // Coolant steam from stress
+		}
 	}
 }
