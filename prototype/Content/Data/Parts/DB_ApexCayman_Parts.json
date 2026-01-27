@@ -1,0 +1,178 @@
+{
+  "VehicleID": "APEX_CAYMAN",
+  "PartsVersion": "1.0",
+  "TotalParts": 68,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "CAYMAN_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CAYMAN_INT_02", "Name": "IPD Plenum", "Tier": 1, "PowerGain": 12, "Price": 850 },
+      { "ID": "CAYMAN_INT_03", "Name": "Full Race Intake", "Tier": 2, "PowerGain": 20, "Price": 1500 }
+    ],
+    "Exhaust": [
+      { "ID": "CAYMAN_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CAYMAN_EXH_02", "Name": "Akrapovic Slip-On", "Tier": 1, "PowerGain": 15, "Price": 3500 },
+      { "ID": "CAYMAN_EXH_03", "Name": "GMG WC", "Tier": 2, "PowerGain": 22, "Price": 2800 },
+      { "ID": "CAYMAN_EXH_04", "Name": "Race Headers + Exhaust", "Tier": 3, "PowerGain": 38, "Price": 6500 }
+    ],
+    "Cams": [
+      { "ID": "CAYMAN_CAM_01", "Name": "Stock Cams", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CAYMAN_CAM_02", "Name": "Sport Cams", "Tier": 1, "PowerGain": 15, "Price": 2200 },
+      { "ID": "CAYMAN_CAM_03", "Name": "Race Cams", "Tier": 2, "PowerGain": 28, "Price": 4500 }
+    ],
+    "ECU": [
+      { "ID": "CAYMAN_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CAYMAN_ECU_02", "Name": "GIAC Flash", "Tier": 1, "PowerGain": 12, "Price": 800 },
+      { "ID": "CAYMAN_ECU_03", "Name": "Cobb AP Tune", "Tier": 2, "PowerGain": 18, "Price": 1200 },
+      { "ID": "CAYMAN_ECU_04", "Name": "Standalone", "Tier": 3, "PowerGain": 25, "Price": 3500 }
+    ],
+    "Internals": [
+      { "ID": "CAYMAN_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CAYMAN_INTS_02", "Name": "Forged Rods", "Tier": 1, "PowerGain": 0, "Price": 4500 },
+      { "ID": "CAYMAN_INTS_03", "Name": "Full NA Build", "Tier": 2, "PowerGain": 30, "Price": 15000 }
+    ]
+  },
+
+  "ForcedInduction": {
+    "Supercharger": [
+      { "ID": "CAYMAN_SC_01", "Name": "None", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CAYMAN_SC_02", "Name": "VF Engineering", "Tier": 1, "PowerGain": 95, "BoostPSI": 6, "Price": 9500 },
+      { "ID": "CAYMAN_SC_03", "Name": "Softronic Supercharger", "Tier": 2, "PowerGain": 130, "BoostPSI": 8, "Price": 14000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "CAYMAN_CLT_01", "Name": "Stock Clutch", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_CLT_02", "Name": "Sport Clutch", "Tier": 1, "Price": 1200 },
+      { "ID": "CAYMAN_CLT_03", "Name": "Racing Clutch", "Tier": 2, "Price": 2400 }
+    ],
+    "Transmission": [
+      { "ID": "CAYMAN_TRN_01", "Name": "Stock 6MT", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_TRN_02", "Name": "Short Throw", "Tier": 1, "Price": 450 },
+      { "ID": "CAYMAN_TRN_03", "Name": "Sequential", "Tier": 2, "Price": 18000 }
+    ],
+    "FinalDrive": [
+      { "ID": "CAYMAN_FD_01", "Name": "Stock 3.89", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_FD_02", "Name": "4.00 Final Drive", "Tier": 1, "Price": 950 },
+      { "ID": "CAYMAN_FD_03", "Name": "4.18 Final Drive", "Tier": 2, "Price": 1200 }
+    ],
+    "LSD": [
+      { "ID": "CAYMAN_LSD_01", "Name": "Stock PTV", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_LSD_02", "Name": "Guard LSD", "Tier": 1, "Price": 2800 },
+      { "ID": "CAYMAN_LSD_03", "Name": "Wavetrac", "Tier": 2, "Price": 2400 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "CAYMAN_SPR_01", "Name": "Stock GT4 Springs", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_SPR_02", "Name": "Eibach Track Springs", "Tier": 1, "Price": 650 },
+      { "ID": "CAYMAN_SPR_03", "Name": "KW Clubsport", "Tier": 2, "Price": 4200 },
+      { "ID": "CAYMAN_SPR_04", "Name": "Ohlins TTX", "Tier": 3, "Price": 6500 }
+    ],
+    "Dampers": [
+      { "ID": "CAYMAN_DMP_01", "Name": "Stock Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_DMP_02", "Name": "Bilstein PSS10", "Tier": 1, "Price": 2800 },
+      { "ID": "CAYMAN_DMP_03", "Name": "MCS 2-Way", "Tier": 2, "Price": 5500 }
+    ],
+    "Swaybars": [
+      { "ID": "CAYMAN_SWB_01", "Name": "Stock GT4 Bars", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_SWB_02", "Name": "Tarett Adjustable", "Tier": 1, "Price": 850 },
+      { "ID": "CAYMAN_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 1400 }
+    ],
+    "Bushings": [
+      { "ID": "CAYMAN_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_BSH_02", "Name": "Poly Bushings", "Tier": 1, "Price": 550 },
+      { "ID": "CAYMAN_BSH_03", "Name": "Solid Mounts", "Tier": 2, "Price": 1200 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "CAYMAN_BPD_01", "Name": "Stock GT4 Pads", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_BPD_02", "Name": "Pagid RSL1", "Tier": 1, "Price": 550 },
+      { "ID": "CAYMAN_BPD_03", "Name": "Racing Pads", "Tier": 2, "Price": 850 }
+    ],
+    "Rotors": [
+      { "ID": "CAYMAN_BRT_01", "Name": "Stock Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_BRT_02", "Name": "2-Piece Floating", "Tier": 1, "Price": 2200 },
+      { "ID": "CAYMAN_BRT_03", "Name": "PCCB Ceramic", "Tier": 2, "Price": 12000 }
+    ],
+    "Calipers": [
+      { "ID": "CAYMAN_CAL_01", "Name": "Stock GT4 Calipers", "Tier": 0, "Price": 0 },
+      { "ID": "CAYMAN_CAL_02", "Name": "6-Piston BBK", "Tier": 1, "Price": 4500 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "CAYMAN_WHL_01", "Name": "Stock GT4 20-inch", "Size": "20x8.5/20x11", "Weight": 26, "Price": 0 },
+      { "ID": "CAYMAN_WHL_02", "Name": "BBS FI-R", "Size": "20x8.5/20x11", "Weight": 19, "Price": 5500 },
+      { "ID": "CAYMAN_WHL_03", "Name": "Forgeline GA1R", "Size": "20x9/20x12", "Weight": 17, "Price": 7500 },
+      { "ID": "CAYMAN_WHL_04", "Name": "HRE P101", "Size": "20x9/20x12", "Weight": 16, "Price": 9500 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "CAYMAN_TIR_01", "Name": "Stock Sport", "Grip": 1.12, "Price": 0 },
+      { "ID": "CAYMAN_TIR_02", "Name": "Michelin Cup 2", "Grip": 1.22, "Price": 1800 },
+      { "ID": "CAYMAN_TIR_03", "Name": "Slick", "Grip": 1.32, "Price": 2800 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "CAYMAN_FB_01", "Name": "Stock GT4", "Downforce": 25, "Price": 0 },
+      { "ID": "CAYMAN_FB_02", "Name": "Clubsport Splitter", "Downforce": 40, "Price": 1800 },
+      { "ID": "CAYMAN_FB_03", "Name": "Manthey Racing", "Downforce": 60, "Price": 4500 }
+    ],
+    "Spoiler": [
+      { "ID": "CAYMAN_SPL_01", "Name": "Stock GT4 Wing", "Downforce": 45, "Price": 0 },
+      { "ID": "CAYMAN_SPL_02", "Name": "Adjustable Wing", "Downforce": 70, "Price": 3200 },
+      { "ID": "CAYMAN_SPL_03", "Name": "Swan Neck GT Wing", "Downforce": 100, "Price": 5500 }
+    ],
+    "Hood": [
+      { "ID": "CAYMAN_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "CAYMAN_HOD_02", "Name": "Vented", "WeightReduction": 10, "Price": 1200 },
+      { "ID": "CAYMAN_HOD_03", "Name": "Carbon Fiber", "WeightReduction": 22, "Price": 3500 }
+    ]
+  },
+
+  "Body": {
+    "WeightReduction": [
+      { "ID": "CAYMAN_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "CAYMAN_WR_02", "Name": "Lightweight Panels", "WeightSaved": 50, "Price": 4500 },
+      { "ID": "CAYMAN_WR_03", "Name": "Full Carbon + Strip", "WeightSaved": 110, "Price": 15000 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "CAYMAN_PKG_01",
+      "Name": "NA Track Build",
+      "Description": "Naturally aspirated perfection",
+      "Parts": ["CAYMAN_INT_03", "CAYMAN_EXH_04", "CAYMAN_CAM_03", "CAYMAN_ECU_04", "CAYMAN_INTS_03"],
+      "TotalPower": 526,
+      "TotalPrice": 31000
+    },
+    {
+      "ID": "CAYMAN_PKG_02",
+      "Name": "Supercharged Street",
+      "Description": "Forced induction daily driver",
+      "Parts": ["CAYMAN_SC_02", "CAYMAN_EXH_03", "CAYMAN_ECU_03"],
+      "TotalPower": 512,
+      "TotalPrice": 13500
+    },
+    {
+      "ID": "CAYMAN_PKG_03",
+      "Name": "Manthey Spec",
+      "Description": "Factory race spec setup",
+      "Parts": ["CAYMAN_SPR_04", "CAYMAN_FB_03", "CAYMAN_SPL_03", "CAYMAN_BRT_02", "CAYMAN_TIR_02"],
+      "TotalPower": 385,
+      "TotalPrice": 20500
+    }
+  ]
+}

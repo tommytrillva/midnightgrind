@@ -1,0 +1,196 @@
+{
+  "VehicleID": "INFERNO_FOCUS",
+  "PartsVersion": "1.0",
+  "TotalParts": 76,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "FRS_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "FRS_INT_02", "Name": "Mountune Intake", "Tier": 1, "PowerGain": 10, "Price": 450 },
+      { "ID": "FRS_INT_03", "Name": "Full Race Intake", "Tier": 2, "PowerGain": 18, "Price": 850 }
+    ],
+    "Exhaust": [
+      { "ID": "FRS_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "FRS_EXH_02", "Name": "Mountune Cat-Back", "Tier": 1, "PowerGain": 12, "Price": 1200 },
+      { "ID": "FRS_EXH_03", "Name": "Milltek Sport", "Tier": 2, "PowerGain": 18, "Price": 1800 },
+      { "ID": "FRS_EXH_04", "Name": "Full Race System", "Tier": 3, "PowerGain": 28, "Price": 2800 }
+    ],
+    "Turbo": [
+      { "ID": "FRS_TRB_01", "Name": "Stock Turbo", "Tier": 0, "PowerGain": 0, "BoostPSI": 23, "Price": 0 },
+      { "ID": "FRS_TRB_02", "Name": "Mountune Turbo", "Tier": 1, "PowerGain": 45, "BoostPSI": 26, "Price": 2800 },
+      { "ID": "FRS_TRB_03", "Name": "Hybrid Turbo", "Tier": 2, "PowerGain": 95, "BoostPSI": 30, "Price": 4500 },
+      { "ID": "FRS_TRB_04", "Name": "Big Turbo Kit", "Tier": 3, "PowerGain": 150, "BoostPSI": 35, "Price": 7500 }
+    ],
+    "Intercooler": [
+      { "ID": "FRS_IC_01", "Name": "Stock Intercooler", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "FRS_IC_02", "Name": "Front Mount", "Tier": 1, "PowerGain": 12, "Price": 950 },
+      { "ID": "FRS_IC_03", "Name": "Wagner Competition", "Tier": 2, "PowerGain": 22, "Price": 1800 }
+    ],
+    "ECU": [
+      { "ID": "FRS_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "FRS_ECU_02", "Name": "Mountune mTune", "Tier": 1, "PowerGain": 35, "Price": 650 },
+      { "ID": "FRS_ECU_03", "Name": "Cobb Stage 2", "Tier": 2, "PowerGain": 60, "Price": 950 },
+      { "ID": "FRS_ECU_04", "Name": "Standalone Tune", "Tier": 3, "PowerGain": 90, "Price": 1800 }
+    ],
+    "FuelSystem": [
+      { "ID": "FRS_FUL_01", "Name": "Stock Fuel System", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "FRS_FUL_02", "Name": "Port Injection", "Tier": 1, "PowerGain": 15, "Price": 1800 },
+      { "ID": "FRS_FUL_03", "Name": "E85 Setup", "Tier": 2, "PowerGain": 30, "Price": 2800 }
+    ],
+    "Internals": [
+      { "ID": "FRS_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "FRS_INTS_02", "Name": "Forged Rods", "Tier": 1, "PowerGain": 0, "Price": 2500 },
+      { "ID": "FRS_INTS_03", "Name": "Full Forged Build", "Tier": 2, "PowerGain": 10, "Price": 7500 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "FRS_CLT_01", "Name": "Stock Clutch", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_CLT_02", "Name": "Mountune Sport Clutch", "Tier": 1, "Price": 750 },
+      { "ID": "FRS_CLT_03", "Name": "Racing Clutch", "Tier": 2, "Price": 1400 }
+    ],
+    "Transmission": [
+      { "ID": "FRS_TRN_01", "Name": "Stock 6MT", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_TRN_02", "Name": "Short Throw Shifter", "Tier": 1, "Price": 350 },
+      { "ID": "FRS_TRN_03", "Name": "Quaife Gearset", "Tier": 2, "Price": 5500 }
+    ],
+    "FinalDrive": [
+      { "ID": "FRS_FD_01", "Name": "Stock 3.82", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_FD_02", "Name": "4.06 Final Drive", "Tier": 1, "Price": 650 },
+      { "ID": "FRS_FD_03", "Name": "4.25 Final Drive", "Tier": 2, "Price": 850 }
+    ],
+    "RearDiff": [
+      { "ID": "FRS_RDU_01", "Name": "Stock RDU", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_RDU_02", "Name": "Quaife LSD", "Tier": 1, "Price": 1800 },
+      { "ID": "FRS_RDU_03", "Name": "Wavetrac", "Tier": 2, "Price": 1600 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "FRS_SPR_01", "Name": "Stock Springs", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_SPR_02", "Name": "Mountune Sport Springs", "Tier": 1, "Price": 450 },
+      { "ID": "FRS_SPR_03", "Name": "KW V3", "Tier": 2, "Price": 2800 },
+      { "ID": "FRS_SPR_04", "Name": "Ohlins Road & Track", "Tier": 3, "Price": 4500 }
+    ],
+    "Dampers": [
+      { "ID": "FRS_DMP_01", "Name": "Stock Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_DMP_02", "Name": "Bilstein B8", "Tier": 1, "Price": 950 },
+      { "ID": "FRS_DMP_03", "Name": "Ohlins DFV", "Tier": 2, "Price": 3200 }
+    ],
+    "Swaybars": [
+      { "ID": "FRS_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_SWB_02", "Name": "Mountune Sport", "Tier": 1, "Price": 480 },
+      { "ID": "FRS_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 950 }
+    ],
+    "Bushings": [
+      { "ID": "FRS_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_BSH_02", "Name": "Whiteline Poly", "Tier": 1, "Price": 380 },
+      { "ID": "FRS_BSH_03", "Name": "Solid Mounts", "Tier": 2, "Price": 750 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "FRS_BPD_01", "Name": "Stock Brembo Pads", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_BPD_02", "Name": "Hawk HP Plus", "Tier": 1, "Price": 280 },
+      { "ID": "FRS_BPD_03", "Name": "Pagid Racing", "Tier": 2, "Price": 550 }
+    ],
+    "Rotors": [
+      { "ID": "FRS_BRT_01", "Name": "Stock Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_BRT_02", "Name": "DBA Slotted", "Tier": 1, "Price": 450 },
+      { "ID": "FRS_BRT_03", "Name": "2-Piece Rotors", "Tier": 2, "Price": 1400 }
+    ],
+    "Calipers": [
+      { "ID": "FRS_CAL_01", "Name": "Stock Brembo", "Tier": 0, "Price": 0 },
+      { "ID": "FRS_CAL_02", "Name": "6-Piston BBK", "Tier": 1, "Price": 3200 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "FRS_WHL_01", "Name": "Stock 19-inch", "Size": "19x8", "Weight": 24, "Price": 0 },
+      { "ID": "FRS_WHL_02", "Name": "Team Dynamics Pro 1.2", "Size": "19x8.5", "Weight": 18, "Price": 1600 },
+      { "ID": "FRS_WHL_03", "Name": "OZ Superturismo", "Size": "19x8.5", "Weight": 17, "Price": 2200 },
+      { "ID": "FRS_WHL_04", "Name": "BBS RI-A", "Size": "20x8.5", "Weight": 16, "Price": 3800 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "FRS_TIR_01", "Name": "Stock Sport", "Grip": 1.05, "Price": 0 },
+      { "ID": "FRS_TIR_02", "Name": "Michelin PS4S", "Grip": 1.15, "Price": 1200 },
+      { "ID": "FRS_TIR_03", "Name": "Semi-Slick", "Grip": 1.22, "Price": 1600 },
+      { "ID": "FRS_TIR_04", "Name": "Rally Tires", "Grip": 0.95, "GravelGrip": 1.4, "Price": 1400 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "FRS_FB_01", "Name": "Stock", "Downforce": 5, "Price": 0 },
+      { "ID": "FRS_FB_02", "Name": "Mountune Splitter", "Downforce": 15, "Price": 550 },
+      { "ID": "FRS_FB_03", "Name": "Rally Front", "Downforce": 10, "Price": 850 },
+      { "ID": "FRS_FB_04", "Name": "Wide Front", "Downforce": 20, "Price": 1800 }
+    ],
+    "RearBumper": [
+      { "ID": "FRS_RB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "FRS_RB_02", "Name": "Mountune Diffuser", "Downforce": 10, "Price": 650 }
+    ],
+    "Spoiler": [
+      { "ID": "FRS_SPL_01", "Name": "Stock RS Wing", "Downforce": 15, "Price": 0 },
+      { "ID": "FRS_SPL_02", "Name": "Larger Wing", "Downforce": 30, "Price": 850 },
+      { "ID": "FRS_SPL_03", "Name": "GT Wing", "Downforce": 60, "Price": 1800 }
+    ],
+    "Hood": [
+      { "ID": "FRS_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "FRS_HOD_02", "Name": "Vented", "WeightReduction": 8, "Price": 550 },
+      { "ID": "FRS_HOD_03", "Name": "Carbon Fiber", "WeightReduction": 18, "Price": 1400 }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "FRS_WB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "FRS_WB_02", "Name": "Wide Fenders", "Price": 3200 }
+    ],
+    "RallyEquipment": [
+      { "ID": "FRS_RLY_01", "Name": "None", "Price": 0 },
+      { "ID": "FRS_RLY_02", "Name": "Rally Light Pods", "Price": 650 },
+      { "ID": "FRS_RLY_03", "Name": "Full Rally Kit", "Price": 2500 }
+    ],
+    "WeightReduction": [
+      { "ID": "FRS_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "FRS_WR_02", "Name": "Rear Seat Delete", "WeightSaved": 45, "Price": 200 },
+      { "ID": "FRS_WR_03", "Name": "Full Strip", "WeightSaved": 150, "Price": 1200 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "FRS_PKG_01",
+      "Name": "Mountune M400",
+      "Description": "Factory-approved power upgrade",
+      "Parts": ["FRS_INT_02", "FRS_EXH_02", "FRS_TRB_02", "FRS_ECU_02", "FRS_IC_02"],
+      "TotalPower": 450,
+      "TotalPrice": 6050
+    },
+    {
+      "ID": "FRS_PKG_02",
+      "Name": "Big Turbo Monster",
+      "Description": "Maximum power build",
+      "Parts": ["FRS_TRB_04", "FRS_IC_03", "FRS_ECU_04", "FRS_FUL_03", "FRS_INTS_03", "FRS_CLT_03"],
+      "TotalPower": 550,
+      "TotalPrice": 22400
+    },
+    {
+      "ID": "FRS_PKG_03",
+      "Name": "Rally Spec",
+      "Description": "Rally-ready setup",
+      "Parts": ["FRS_TRB_02", "FRS_ECU_02", "FRS_SPR_03", "FRS_RDU_02", "FRS_TIR_04", "FRS_RLY_03"],
+      "TotalPower": 420,
+      "TotalPrice": 14200
+    }
+  ]
+}

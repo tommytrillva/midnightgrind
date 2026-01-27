@@ -1,0 +1,189 @@
+{
+  "VehicleID": "TITAN_CTS",
+  "PartsVersion": "1.0",
+  "TotalParts": 75,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "CTS_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CTS_INT_02", "Name": "K&N Typhoon", "Tier": 1, "PowerGain": 12, "Price": 450 },
+      { "ID": "CTS_INT_03", "Name": "Vararam VR Performance", "Tier": 2, "PowerGain": 18, "Price": 850 },
+      { "ID": "CTS_INT_04", "Name": "Full Race Intake", "Tier": 3, "PowerGain": 25, "Price": 1400 }
+    ],
+    "Exhaust": [
+      { "ID": "CTS_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CTS_EXH_02", "Name": "Corsa Xtreme", "Tier": 1, "PowerGain": 15, "Price": 1800 },
+      { "ID": "CTS_EXH_03", "Name": "Kooks Headers + Exhaust", "Tier": 2, "PowerGain": 35, "Price": 3500 },
+      { "ID": "CTS_EXH_04", "Name": "Full Race System", "Tier": 3, "PowerGain": 45, "Price": 5500 }
+    ],
+    "Supercharger": [
+      { "ID": "CTS_SC_01", "Name": "Stock 1.7L Roots", "Tier": 0, "PowerGain": 0, "BoostPSI": 9.4, "Price": 0 },
+      { "ID": "CTS_SC_02", "Name": "2.0L Supercharger", "Tier": 1, "PowerGain": 50, "BoostPSI": 12, "Price": 3500 },
+      { "ID": "CTS_SC_03", "Name": "2.3L Supercharger", "Tier": 2, "PowerGain": 95, "BoostPSI": 14, "Price": 5500 },
+      { "ID": "CTS_SC_04", "Name": "Whipple Twin-Screw", "Tier": 3, "PowerGain": 160, "BoostPSI": 18, "Price": 8500 }
+    ],
+    "Intercooler": [
+      { "ID": "CTS_IC_01", "Name": "Stock Intercooler", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CTS_IC_02", "Name": "Large Heat Exchanger", "Tier": 1, "PowerGain": 10, "Price": 1200 },
+      { "ID": "CTS_IC_03", "Name": "Dual Pass System", "Tier": 2, "PowerGain": 18, "Price": 2400 }
+    ],
+    "ECU": [
+      { "ID": "CTS_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CTS_ECU_02", "Name": "HPTuners Stage 1", "Tier": 1, "PowerGain": 30, "Price": 650 },
+      { "ID": "CTS_ECU_03", "Name": "HPTuners Stage 2", "Tier": 2, "PowerGain": 55, "Price": 950 },
+      { "ID": "CTS_ECU_04", "Name": "Standalone ECU", "Tier": 3, "PowerGain": 85, "Price": 2800 }
+    ],
+    "FuelSystem": [
+      { "ID": "CTS_FUL_01", "Name": "Stock Fuel System", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CTS_FUL_02", "Name": "High Flow Injectors", "Tier": 1, "PowerGain": 0, "Price": 850 },
+      { "ID": "CTS_FUL_03", "Name": "E85 Conversion", "Tier": 2, "PowerGain": 35, "Price": 2200 },
+      { "ID": "CTS_FUL_04", "Name": "Flex Fuel Kit", "Tier": 2, "PowerGain": 25, "Price": 1800 }
+    ],
+    "Internals": [
+      { "ID": "CTS_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CTS_INTS_02", "Name": "Forged Rods", "Tier": 1, "PowerGain": 0, "Price": 3500 },
+      { "ID": "CTS_INTS_03", "Name": "Full Forged Build", "Tier": 2, "PowerGain": 15, "Price": 12000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "TorqueConverter": [
+      { "ID": "CTS_TC_01", "Name": "Stock Converter", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_TC_02", "Name": "High Stall Converter", "Tier": 1, "Price": 1200 }
+    ],
+    "Transmission": [
+      { "ID": "CTS_TRN_01", "Name": "Stock 8L90", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_TRN_02", "Name": "Built 8L90", "Tier": 1, "Price": 4500 }
+    ],
+    "FinalDrive": [
+      { "ID": "CTS_FD_01", "Name": "Stock 2.85", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_FD_02", "Name": "3.08 Final Drive", "Tier": 1, "Price": 750 },
+      { "ID": "CTS_FD_03", "Name": "3.42 Final Drive", "Tier": 2, "Price": 950 }
+    ],
+    "LSD": [
+      { "ID": "CTS_LSD_01", "Name": "Stock eLSD", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_LSD_02", "Name": "Mechanical LSD", "Tier": 1, "Price": 1800 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "CTS_SPR_01", "Name": "Stock MagRide", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_SPR_02", "Name": "Eibach Pro-Kit", "Tier": 1, "Price": 450 },
+      { "ID": "CTS_SPR_03", "Name": "KW V3", "Tier": 2, "Price": 3200 },
+      { "ID": "CTS_SPR_04", "Name": "Ohlins Road & Track", "Tier": 3, "Price": 5200 }
+    ],
+    "Dampers": [
+      { "ID": "CTS_DMP_01", "Name": "Stock MagRide", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_DMP_02", "Name": "KW DDC", "Tier": 1, "Price": 2800 },
+      { "ID": "CTS_DMP_03", "Name": "Ohlins DFV", "Tier": 2, "Price": 4500 }
+    ],
+    "Swaybars": [
+      { "ID": "CTS_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_SWB_02", "Name": "Sport Swaybars", "Tier": 1, "Price": 550 },
+      { "ID": "CTS_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 950 }
+    ],
+    "Bushings": [
+      { "ID": "CTS_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_BSH_02", "Name": "Poly Bushings", "Tier": 1, "Price": 450 },
+      { "ID": "CTS_BSH_03", "Name": "Solid Mounts", "Tier": 2, "Price": 850 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "CTS_BPD_01", "Name": "Stock Brembo Pads", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_BPD_02", "Name": "Hawk HP Plus", "Tier": 1, "Price": 350 },
+      { "ID": "CTS_BPD_03", "Name": "Pagid Racing", "Tier": 2, "Price": 650 }
+    ],
+    "Rotors": [
+      { "ID": "CTS_BRT_01", "Name": "Stock Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_BRT_02", "Name": "Slotted Rotors", "Tier": 1, "Price": 550 },
+      { "ID": "CTS_BRT_03", "Name": "Carbon Ceramic", "Tier": 2, "Price": 8500 }
+    ],
+    "Calipers": [
+      { "ID": "CTS_CAL_01", "Name": "Stock Brembo 6-Piston", "Tier": 0, "Price": 0 },
+      { "ID": "CTS_CAL_02", "Name": "8-Piston BBK", "Tier": 1, "Price": 4500 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "CTS_WHL_01", "Name": "Stock 19-inch", "Size": "19x9/19x10", "Weight": 28, "Price": 0 },
+      { "ID": "CTS_WHL_02", "Name": "TSW Nurburgring", "Size": "19x9.5/19x10.5", "Weight": 22, "Price": 1800 },
+      { "ID": "CTS_WHL_03", "Name": "Forgeline GA3C", "Size": "20x9/20x11", "Weight": 18, "Price": 4500 },
+      { "ID": "CTS_WHL_04", "Name": "HRE FF01", "Size": "20x10/20x11", "Weight": 17, "Price": 6500 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "CTS_TIR_01", "Name": "Stock Sport", "Grip": 1.05, "Price": 0 },
+      { "ID": "CTS_TIR_02", "Name": "Michelin PS4S", "Grip": 1.15, "Price": 1400 },
+      { "ID": "CTS_TIR_03", "Name": "Semi-Slick", "Grip": 1.22, "Price": 1800 },
+      { "ID": "CTS_TIR_04", "Name": "Drag Radials", "Grip": 0.85, "DragGrip": 1.5, "Price": 1200 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "CTS_FB_01", "Name": "Stock V-Sport", "Downforce": 5, "Price": 0 },
+      { "ID": "CTS_FB_02", "Name": "V-Sport Lip", "Downforce": 12, "Price": 650 },
+      { "ID": "CTS_FB_03", "Name": "Racing Front", "Downforce": 25, "Price": 1800 }
+    ],
+    "RearBumper": [
+      { "ID": "CTS_RB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "CTS_RB_02", "Name": "V-Sport Diffuser", "Downforce": 10, "Price": 850 }
+    ],
+    "Spoiler": [
+      { "ID": "CTS_SPL_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "CTS_SPL_02", "Name": "V-Sport Spoiler", "Downforce": 15, "Price": 650 },
+      { "ID": "CTS_SPL_03", "Name": "GT Wing", "Downforce": 55, "Price": 1800 }
+    ],
+    "Hood": [
+      { "ID": "CTS_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "CTS_HOD_02", "Name": "Vented Hood", "WeightReduction": 10, "Price": 850 },
+      { "ID": "CTS_HOD_03", "Name": "Carbon Fiber", "WeightReduction": 22, "Price": 2200 }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "CTS_WB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "CTS_WB_02", "Name": "Wide Fenders", "Price": 4500 }
+    ],
+    "WeightReduction": [
+      { "ID": "CTS_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "CTS_WR_02", "Name": "Interior Strip", "WeightSaved": 100, "Price": 600 },
+      { "ID": "CTS_WR_03", "Name": "Full Strip + Carbon", "WeightSaved": 245, "Price": 5500 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "CTS_PKG_01",
+      "Name": "Bolt-On Beast",
+      "Description": "Simple power upgrades",
+      "Parts": ["CTS_INT_03", "CTS_EXH_02", "CTS_ECU_02", "CTS_SC_02"],
+      "TotalPower": 750,
+      "TotalPrice": 6800
+    },
+    {
+      "ID": "CTS_PKG_02",
+      "Name": "Whipple Monster",
+      "Description": "Maximum supercharged power",
+      "Parts": ["CTS_SC_04", "CTS_EXH_04", "CTS_ECU_04", "CTS_IC_03", "CTS_FUL_03", "CTS_INTS_03"],
+      "TotalPower": 900,
+      "TotalPrice": 33400
+    },
+    {
+      "ID": "CTS_PKG_03",
+      "Name": "Track Day Sedan",
+      "Description": "Balanced track setup",
+      "Parts": ["CTS_SC_03", "CTS_ECU_03", "CTS_SPR_04", "CTS_TIR_03", "CTS_BRT_02"],
+      "TotalPower": 790,
+      "TotalPrice": 13450
+    }
+  ]
+}

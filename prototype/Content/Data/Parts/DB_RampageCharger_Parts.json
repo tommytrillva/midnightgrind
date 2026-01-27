@@ -1,0 +1,209 @@
+{
+  "VehicleID": "RAMPAGE_CHARGER",
+  "PartsVersion": "1.0",
+  "TotalParts": 78,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "CHG_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CHG_INT_02", "Name": "K&N Cold Air", "Tier": 1, "PowerGain": 10, "Price": 380 },
+      { "ID": "CHG_INT_03", "Name": "Hellcat Intake", "Tier": 2, "PowerGain": 18, "Price": 750 },
+      { "ID": "CHG_INT_04", "Name": "Full Race Intake", "Tier": 3, "PowerGain": 25, "Price": 1200 }
+    ],
+    "Exhaust": [
+      { "ID": "CHG_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CHG_EXH_02", "Name": "Corsa Sport", "Tier": 1, "PowerGain": 12, "Price": 1200 },
+      { "ID": "CHG_EXH_03", "Name": "Borla ATAK", "Tier": 2, "PowerGain": 18, "Price": 1600 },
+      { "ID": "CHG_EXH_04", "Name": "Full Race System", "Tier": 3, "PowerGain": 28, "Price": 2800 }
+    ],
+    "Headers": [
+      { "ID": "CHG_HDR_01", "Name": "Stock Headers", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CHG_HDR_02", "Name": "Long Tube Headers", "Tier": 1, "PowerGain": 22, "Price": 1800 },
+      { "ID": "CHG_HDR_03", "Name": "Kooks Headers", "Tier": 2, "PowerGain": 32, "Price": 2800 }
+    ],
+    "Cam": [
+      { "ID": "CHG_CAM_01", "Name": "Stock Cam", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CHG_CAM_02", "Name": "Performance Cam", "Tier": 1, "PowerGain": 25, "Price": 1500 },
+      { "ID": "CHG_CAM_03", "Name": "Race Cam", "Tier": 2, "PowerGain": 45, "Price": 2800 }
+    ],
+    "ECU": [
+      { "ID": "CHG_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CHG_ECU_02", "Name": "DiabloSport Tune", "Tier": 1, "PowerGain": 18, "Price": 550 },
+      { "ID": "CHG_ECU_03", "Name": "HP Tuners", "Tier": 2, "PowerGain": 30, "Price": 850 },
+      { "ID": "CHG_ECU_04", "Name": "Standalone", "Tier": 3, "PowerGain": 45, "Price": 2200 }
+    ],
+    "Internals": [
+      { "ID": "CHG_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CHG_INTS_02", "Name": "Forged Pistons", "Tier": 1, "PowerGain": 0, "Price": 2800 },
+      { "ID": "CHG_INTS_03", "Name": "Full Forged Build", "Tier": 2, "PowerGain": 15, "Price": 8500 }
+    ]
+  },
+
+  "ForcedInduction": {
+    "Supercharger": [
+      { "ID": "CHG_SC_01", "Name": "None", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CHG_SC_02", "Name": "ProCharger P1SC", "Tier": 1, "PowerGain": 120, "BoostPSI": 8, "Price": 6500 },
+      { "ID": "CHG_SC_03", "Name": "Whipple 2.9L", "Tier": 2, "PowerGain": 180, "BoostPSI": 12, "Price": 9500 },
+      { "ID": "CHG_SC_04", "Name": "Hellcat Swap Kit", "Tier": 3, "PowerGain": 280, "BoostPSI": 11.6, "Price": 18000 }
+    ],
+    "Turbo": [
+      { "ID": "CHG_TB_01", "Name": "None", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "CHG_TB_02", "Name": "Single Turbo Kit", "Tier": 1, "PowerGain": 150, "BoostPSI": 8, "Price": 8500 },
+      { "ID": "CHG_TB_03", "Name": "Twin Turbo Kit", "Tier": 2, "PowerGain": 230, "BoostPSI": 12, "Price": 15000 }
+    ]
+  },
+
+  "EngineSwap": {
+    "Options": [
+      { "ID": "CHG_SWP_01", "Name": "Stock 5.7 HEMI", "Power": 370, "Tier": 0, "Price": 0 },
+      { "ID": "CHG_SWP_02", "Name": "6.4 392 HEMI", "Power": 485, "Tier": 1, "Price": 8500 },
+      { "ID": "CHG_SWP_03", "Name": "6.2 Hellcat", "Power": 707, "Tier": 2, "Price": 25000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "TorqueConverter": [
+      { "ID": "CHG_TC_01", "Name": "Stock Converter", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_TC_02", "Name": "High Stall Converter", "Tier": 1, "Price": 950 }
+    ],
+    "Transmission": [
+      { "ID": "CHG_TRN_01", "Name": "Stock 8HP", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_TRN_02", "Name": "Built 8HP", "Tier": 1, "Price": 4500 },
+      { "ID": "CHG_TRN_03", "Name": "Manual Swap (Tremec)", "Tier": 2, "Price": 8500 }
+    ],
+    "FinalDrive": [
+      { "ID": "CHG_FD_01", "Name": "Stock 3.07", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_FD_02", "Name": "3.27 Final Drive", "Tier": 1, "Price": 550 },
+      { "ID": "CHG_FD_03", "Name": "3.55 Final Drive", "Tier": 2, "Price": 750 },
+      { "ID": "CHG_FD_04", "Name": "3.92 Final Drive", "Tier": 3, "Price": 950 }
+    ],
+    "LSD": [
+      { "ID": "CHG_LSD_01", "Name": "Stock eLSD", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_LSD_02", "Name": "Mechanical LSD", "Tier": 1, "Price": 1400 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "CHG_SPR_01", "Name": "Stock Springs", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_SPR_02", "Name": "Eibach Pro-Kit", "Tier": 1, "Price": 380 },
+      { "ID": "CHG_SPR_03", "Name": "BC Racing Coilovers", "Tier": 2, "Price": 1800 },
+      { "ID": "CHG_SPR_04", "Name": "KW V3", "Tier": 3, "Price": 3200 }
+    ],
+    "Dampers": [
+      { "ID": "CHG_DMP_01", "Name": "Stock Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_DMP_02", "Name": "Bilstein B6", "Tier": 1, "Price": 750 },
+      { "ID": "CHG_DMP_03", "Name": "KW DDC", "Tier": 2, "Price": 2800 }
+    ],
+    "Swaybars": [
+      { "ID": "CHG_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_SWB_02", "Name": "SRT Swaybars", "Tier": 1, "Price": 450 },
+      { "ID": "CHG_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 850 }
+    ],
+    "Bushings": [
+      { "ID": "CHG_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_BSH_02", "Name": "Poly Bushings", "Tier": 1, "Price": 380 },
+      { "ID": "CHG_BSH_03", "Name": "Solid Mounts", "Tier": 2, "Price": 750 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "CHG_BPD_01", "Name": "Stock Pads", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_BPD_02", "Name": "Hawk HP Plus", "Tier": 1, "Price": 250 },
+      { "ID": "CHG_BPD_03", "Name": "Pagid Track", "Tier": 2, "Price": 480 }
+    ],
+    "Rotors": [
+      { "ID": "CHG_BRT_01", "Name": "Stock Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_BRT_02", "Name": "Slotted Rotors", "Tier": 1, "Price": 380 },
+      { "ID": "CHG_BRT_03", "Name": "2-Piece Rotors", "Tier": 2, "Price": 1400 }
+    ],
+    "Calipers": [
+      { "ID": "CHG_CAL_01", "Name": "Stock Calipers", "Tier": 0, "Price": 0 },
+      { "ID": "CHG_CAL_02", "Name": "Brembo BBK", "Tier": 1, "Price": 3200 },
+      { "ID": "CHG_CAL_03", "Name": "6-Piston BBK", "Tier": 2, "Price": 4500 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "CHG_WHL_01", "Name": "Stock 20-inch", "Size": "20x9/20x10", "Weight": 30, "Price": 0 },
+      { "ID": "CHG_WHL_02", "Name": "Hellcat Wheels", "Size": "20x9.5/20x10.5", "Weight": 26, "Price": 1800 },
+      { "ID": "CHG_WHL_03", "Name": "Ferrada FR2", "Size": "20x10/20x11", "Weight": 24, "Price": 2800 },
+      { "ID": "CHG_WHL_04", "Name": "Velgen VMB7", "Size": "22x10/22x11", "Weight": 28, "Price": 3500 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "CHG_TIR_01", "Name": "Stock Sport", "Grip": 0.98, "Price": 0 },
+      { "ID": "CHG_TIR_02", "Name": "Michelin PS4S", "Grip": 1.1, "Price": 1200 },
+      { "ID": "CHG_TIR_03", "Name": "Semi-Slick", "Grip": 1.18, "Price": 1600 },
+      { "ID": "CHG_TIR_04", "Name": "Drag Radials", "Grip": 0.88, "DragGrip": 1.45, "Price": 1100 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "CHG_FB_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "CHG_FB_02", "Name": "SRT Splitter", "Downforce": 10, "Price": 550 },
+      { "ID": "CHG_FB_03", "Name": "Widebody Front", "Downforce": 18, "Price": 2200 }
+    ],
+    "RearBumper": [
+      { "ID": "CHG_RB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "CHG_RB_02", "Name": "SRT Diffuser", "Downforce": 8, "Price": 650 }
+    ],
+    "Spoiler": [
+      { "ID": "CHG_SPL_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "CHG_SPL_02", "Name": "SRT Spoiler", "Downforce": 12, "Price": 450 },
+      { "ID": "CHG_SPL_03", "Name": "Lip Spoiler", "Downforce": 8, "Price": 280 },
+      { "ID": "CHG_SPL_04", "Name": "GT Wing", "Downforce": 45, "Price": 1400 }
+    ],
+    "Hood": [
+      { "ID": "CHG_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "CHG_HOD_02", "Name": "SRT Hood", "WeightReduction": 5, "Price": 650 },
+      { "ID": "CHG_HOD_03", "Name": "Hellcat Hood", "WeightReduction": 8, "Price": 1200 },
+      { "ID": "CHG_HOD_04", "Name": "Carbon Fiber", "WeightReduction": 20, "Price": 2200 }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "CHG_WB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "CHG_WB_02", "Name": "Widebody Kit", "Price": 5500 }
+    ],
+    "WeightReduction": [
+      { "ID": "CHG_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "CHG_WR_02", "Name": "Rear Seat Delete", "WeightSaved": 50, "Price": 200 },
+      { "ID": "CHG_WR_03", "Name": "Interior Strip", "WeightSaved": 150, "Price": 800 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "CHG_PKG_01",
+      "Name": "Bolt-On Build",
+      "Description": "Simple NA power gains",
+      "Parts": ["CHG_INT_03", "CHG_EXH_03", "CHG_HDR_02", "CHG_ECU_03", "CHG_CAM_02"],
+      "TotalPower": 475,
+      "TotalPrice": 6450
+    },
+    {
+      "ID": "CHG_PKG_02",
+      "Name": "392 Swap Street",
+      "Description": "Bigger displacement upgrade",
+      "Parts": ["CHG_SWP_02", "CHG_INT_03", "CHG_EXH_04", "CHG_ECU_03"],
+      "TotalPower": 560,
+      "TotalPrice": 13200
+    },
+    {
+      "ID": "CHG_PKG_03",
+      "Name": "Hellcat Killer",
+      "Description": "Supercharged 5.7 monster",
+      "Parts": ["CHG_SC_03", "CHG_EXH_04", "CHG_ECU_04", "CHG_INTS_03", "CHG_TRN_02", "CHG_LSD_02"],
+      "TotalPower": 680,
+      "TotalPrice": 40900
+    }
+  ]
+}

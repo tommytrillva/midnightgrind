@@ -1,0 +1,199 @@
+{
+  "VehicleID": "SHOGUN_NSX",
+  "PartsVersion": "1.0",
+  "TotalParts": 72,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "NSX_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "NSX_INT_02", "Name": "HKS Racing Suction", "Tier": 1, "PowerGain": 12, "Price": 450 },
+      { "ID": "NSX_INT_03", "Name": "Comptech Dual Intake", "Tier": 2, "PowerGain": 18, "Price": 850 },
+      { "ID": "NSX_INT_04", "Name": "ITB Conversion", "Tier": 3, "PowerGain": 32, "Price": 3200 }
+    ],
+    "Exhaust": [
+      { "ID": "NSX_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "NSX_EXH_02", "Name": "Taitec GT Exhaust", "Tier": 1, "PowerGain": 15, "Price": 1200 },
+      { "ID": "NSX_EXH_03", "Name": "Mugen Twin Loop", "Tier": 2, "PowerGain": 22, "Price": 2800 },
+      { "ID": "NSX_EXH_04", "Name": "Titanium Race System", "Tier": 3, "PowerGain": 35, "Price": 6500 }
+    ],
+    "Headers": [
+      { "ID": "NSX_HDR_01", "Name": "Stock Headers", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "NSX_HDR_02", "Name": "Mugen Headers", "Tier": 1, "PowerGain": 18, "Price": 2200 },
+      { "ID": "NSX_HDR_03", "Name": "ScienceOfSpeed Headers", "Tier": 2, "PowerGain": 28, "Price": 3800 }
+    ],
+    "Cams": [
+      { "ID": "NSX_CAM_01", "Name": "Stock Cams", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "NSX_CAM_02", "Name": "Toda Racing Cams", "Tier": 1, "PowerGain": 15, "Price": 1800 },
+      { "ID": "NSX_CAM_03", "Name": "CT Engineering Race Cams", "Tier": 2, "PowerGain": 28, "Price": 3200 }
+    ],
+    "ECU": [
+      { "ID": "NSX_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "NSX_ECU_02", "Name": "Comptech Stage 1", "Tier": 1, "PowerGain": 8, "Price": 600 },
+      { "ID": "NSX_ECU_03", "Name": "Hondata Reflash", "Tier": 2, "PowerGain": 15, "Price": 1200 },
+      { "ID": "NSX_ECU_04", "Name": "AEM Infinity Standalone", "Tier": 3, "PowerGain": 25, "Price": 3500 }
+    ],
+    "Internals": [
+      { "ID": "NSX_INT_S_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "NSX_INT_S_02", "Name": "Forged Pistons", "Tier": 1, "PowerGain": 5, "Price": 2800 },
+      { "ID": "NSX_INT_S_03", "Name": "Full NA Build", "Tier": 2, "PowerGain": 35, "Price": 12000 }
+    ]
+  },
+
+  "ForcedInduction": {
+    "Supercharger": [
+      { "ID": "NSX_SC_01", "Name": "None", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "NSX_SC_02", "Name": "Comptech Supercharger", "Tier": 1, "PowerGain": 85, "BoostPSI": 6, "Price": 7500 },
+      { "ID": "NSX_SC_03", "Name": "ScienceOfSpeed SC", "Tier": 2, "PowerGain": 120, "BoostPSI": 8, "Price": 12000 }
+    ],
+    "Turbo": [
+      { "ID": "NSX_TB_01", "Name": "None", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "NSX_TB_02", "Name": "Single Turbo Kit", "Tier": 1, "PowerGain": 150, "BoostPSI": 8, "Price": 15000 },
+      { "ID": "NSX_TB_03", "Name": "Twin Turbo Kit", "Tier": 2, "PowerGain": 220, "BoostPSI": 12, "Price": 25000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "NSX_CLT_01", "Name": "Stock Clutch", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_CLT_02", "Name": "OS Giken Single", "Tier": 1, "Price": 1400 },
+      { "ID": "NSX_CLT_03", "Name": "OS Giken Twin Plate", "Tier": 2, "Price": 3200 }
+    ],
+    "Transmission": [
+      { "ID": "NSX_TRN_01", "Name": "Stock 5MT", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_TRN_02", "Name": "6MT Conversion", "Tier": 1, "Price": 4500 },
+      { "ID": "NSX_TRN_03", "Name": "Sequential Gearbox", "Tier": 2, "Price": 18000 }
+    ],
+    "FinalDrive": [
+      { "ID": "NSX_FD_01", "Name": "Stock 4.06", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_FD_02", "Name": "4.23 Final Drive", "Tier": 1, "Price": 800 },
+      { "ID": "NSX_FD_03", "Name": "4.56 Final Drive", "Tier": 2, "Price": 1200 }
+    ],
+    "LSD": [
+      { "ID": "NSX_LSD_01", "Name": "Stock VLSD", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_LSD_02", "Name": "OS Giken Super Lock", "Tier": 1, "Price": 2800 },
+      { "ID": "NSX_LSD_03", "Name": "Quaife ATB", "Tier": 2, "Price": 2200 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "NSX_SPR_01", "Name": "Stock Springs", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_SPR_02", "Name": "Tein S-Tech Lowering", "Tier": 1, "Price": 450 },
+      { "ID": "NSX_SPR_03", "Name": "JIC Cross Coilovers", "Tier": 2, "Price": 2800 },
+      { "ID": "NSX_SPR_04", "Name": "Ohlins DFV", "Tier": 3, "Price": 4500 }
+    ],
+    "Dampers": [
+      { "ID": "NSX_DMP_01", "Name": "Stock Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_DMP_02", "Name": "Koni Yellow", "Tier": 1, "Price": 1200 },
+      { "ID": "NSX_DMP_03", "Name": "Bilstein PSS10", "Tier": 2, "Price": 2400 }
+    ],
+    "Swaybars": [
+      { "ID": "NSX_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_SWB_02", "Name": "Progress Swaybars", "Tier": 1, "Price": 650 },
+      { "ID": "NSX_SWB_03", "Name": "Racing Swaybars", "Tier": 2, "Price": 1200 }
+    ],
+    "Bushings": [
+      { "ID": "NSX_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_BSH_02", "Name": "Energy Polyurethane", "Tier": 1, "Price": 450 },
+      { "ID": "NSX_BSH_03", "Name": "Spherical Bearings", "Tier": 2, "Price": 1800 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "NSX_BPD_01", "Name": "Stock Pads", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_BPD_02", "Name": "Hawk HP Plus", "Tier": 1, "Price": 280 },
+      { "ID": "NSX_BPD_03", "Name": "Pagid Racing", "Tier": 2, "Price": 600 }
+    ],
+    "Rotors": [
+      { "ID": "NSX_BRT_01", "Name": "Stock Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_BRT_02", "Name": "DBA Slotted", "Tier": 1, "Price": 450 },
+      { "ID": "NSX_BRT_03", "Name": "2-Piece Floating", "Tier": 2, "Price": 1800 }
+    ],
+    "Calipers": [
+      { "ID": "NSX_CAL_01", "Name": "Stock Calipers", "Tier": 0, "Price": 0 },
+      { "ID": "NSX_CAL_02", "Name": "Spoon 4-Piston", "Tier": 1, "Price": 2200 },
+      { "ID": "NSX_CAL_03", "Name": "AP Racing 6-Piston", "Tier": 2, "Price": 4500 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "NSX_WHL_01", "Name": "Stock 16/17", "Size": "16F/17R", "Weight": 22, "Price": 0 },
+      { "ID": "NSX_WHL_02", "Name": "Enkei RPF1", "Size": "17x8/17x9", "Weight": 16, "Price": 1800 },
+      { "ID": "NSX_WHL_03", "Name": "Volk TE37", "Size": "17x8/17x9", "Weight": 14, "Price": 3600 },
+      { "ID": "NSX_WHL_04", "Name": "Rays RE30", "Size": "18x8/18x9.5", "Weight": 15, "Price": 4200 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "NSX_TIR_01", "Name": "Stock Sport", "Grip": 1.0, "Price": 0 },
+      { "ID": "NSX_TIR_02", "Name": "Bridgestone RE-71R", "Grip": 1.12, "Price": 1200 },
+      { "ID": "NSX_TIR_03", "Name": "Toyo R888R", "Grip": 1.18, "Price": 1600 },
+      { "ID": "NSX_TIR_04", "Name": "Slick", "Grip": 1.28, "Price": 2400 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "NSX_FB_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "NSX_FB_02", "Name": "Mugen Lip", "Downforce": 10, "Price": 800 },
+      { "ID": "NSX_FB_03", "Name": "NSX-R Lip", "Downforce": 18, "Price": 1400 }
+    ],
+    "RearBumper": [
+      { "ID": "NSX_RB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "NSX_RB_02", "Name": "Downforce Diffuser", "Downforce": 15, "Price": 1200 }
+    ],
+    "Spoiler": [
+      { "ID": "NSX_SPL_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "NSX_SPL_02", "Name": "NSX-R Wing", "Downforce": 35, "Price": 2200 },
+      { "ID": "NSX_SPL_03", "Name": "GT Wing", "Downforce": 75, "Price": 3500 }
+    ],
+    "Hood": [
+      { "ID": "NSX_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "NSX_HOD_02", "Name": "Vented", "WeightReduction": 8, "Price": 650 },
+      { "ID": "NSX_HOD_03", "Name": "Carbon Fiber", "WeightReduction": 18, "Price": 2200 }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "NSX_WB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "NSX_WB_02", "Name": "NSX-R GT Fenders", "Price": 4500 }
+    ],
+    "WeightReduction": [
+      { "ID": "NSX_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "NSX_WR_02", "Name": "Interior Strip", "WeightSaved": 80, "Price": 500 },
+      { "ID": "NSX_WR_03", "Name": "Full Strip + Lexan", "WeightSaved": 180, "Price": 2500 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "NSX_PKG_01",
+      "Name": "NA Spirit Build",
+      "Description": "High-revving naturally aspirated perfection",
+      "Parts": ["NSX_INT_04", "NSX_EXH_04", "NSX_HDR_03", "NSX_CAM_03", "NSX_ECU_04", "NSX_INT_S_03"],
+      "TotalPower": 380,
+      "TotalPrice": 28700
+    },
+    {
+      "ID": "NSX_PKG_02",
+      "Name": "Comptech Street",
+      "Description": "Supercharged daily driver",
+      "Parts": ["NSX_INT_03", "NSX_EXH_03", "NSX_SC_02", "NSX_ECU_03"],
+      "TotalPower": 420,
+      "TotalPrice": 12350
+    },
+    {
+      "ID": "NSX_PKG_03",
+      "Name": "Twin Turbo Monster",
+      "Description": "Maximum power build",
+      "Parts": ["NSX_TB_03", "NSX_EXH_04", "NSX_INT_S_03", "NSX_ECU_04", "NSX_CLT_03"],
+      "TotalPower": 550,
+      "TotalPrice": 50200
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "VehicleID": "DRIFT_KING_SILVIA",
+  "PartsVersion": "1.0",
+  "TotalParts": 85,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "S15_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "S15_INT_02", "Name": "Apexi Power Intake", "Tier": 1, "PowerGain": 8, "Price": 280 },
+      { "ID": "S15_INT_03", "Name": "HKS Racing Suction", "Tier": 2, "PowerGain": 14, "Price": 450 },
+      { "ID": "S15_INT_04", "Name": "Full Race Intake", "Tier": 3, "PowerGain": 20, "Price": 850 }
+    ],
+    "Exhaust": [
+      { "ID": "S15_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "S15_EXH_02", "Name": "HKS Hi-Power", "Tier": 1, "PowerGain": 12, "Price": 650 },
+      { "ID": "S15_EXH_03", "Name": "Tomei Expreme", "Tier": 2, "PowerGain": 18, "Price": 1100 },
+      { "ID": "S15_EXH_04", "Name": "Titanium Race System", "Tier": 3, "PowerGain": 28, "Price": 2800 }
+    ],
+    "Turbo": [
+      { "ID": "S15_TRB_01", "Name": "Stock T28", "Tier": 0, "PowerGain": 0, "BoostPSI": 12, "Price": 0 },
+      { "ID": "S15_TRB_02", "Name": "GT2871R", "Tier": 1, "PowerGain": 65, "BoostPSI": 18, "Price": 2200 },
+      { "ID": "S15_TRB_03", "Name": "GT3076R", "Tier": 2, "PowerGain": 120, "BoostPSI": 22, "Price": 3500 },
+      { "ID": "S15_TRB_04", "Name": "GTX3582R", "Tier": 3, "PowerGain": 180, "BoostPSI": 28, "Price": 5500 }
+    ],
+    "Intercooler": [
+      { "ID": "S15_IC_01", "Name": "Stock Intercooler", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "S15_IC_02", "Name": "Front Mount", "Tier": 1, "PowerGain": 15, "Price": 850 },
+      { "ID": "S15_IC_03", "Name": "V-Mount Setup", "Tier": 2, "PowerGain": 25, "Price": 2200 }
+    ],
+    "ECU": [
+      { "ID": "S15_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "S15_ECU_02", "Name": "Apexi Power FC", "Tier": 1, "PowerGain": 15, "Price": 850 },
+      { "ID": "S15_ECU_03", "Name": "HKS F-CON V Pro", "Tier": 2, "PowerGain": 25, "Price": 1500 },
+      { "ID": "S15_ECU_04", "Name": "Link G4+ Standalone", "Tier": 3, "PowerGain": 35, "Price": 2800 }
+    ],
+    "FuelSystem": [
+      { "ID": "S15_FUL_01", "Name": "Stock Fuel System", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "S15_FUL_02", "Name": "High Flow Injectors", "Tier": 1, "PowerGain": 0, "BoostCap": 500, "Price": 550 },
+      { "ID": "S15_FUL_03", "Name": "E85 Setup", "Tier": 2, "PowerGain": 25, "BoostCap": 650, "Price": 1800 }
+    ],
+    "Internals": [
+      { "ID": "S15_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "S15_INTS_02", "Name": "Forged Rods", "Tier": 1, "PowerGain": 0, "BoostCap": 450, "Price": 1800 },
+      { "ID": "S15_INTS_03", "Name": "Full Forged Build", "Tier": 2, "PowerGain": 10, "BoostCap": 650, "Price": 6500 }
+    ]
+  },
+
+  "EngineSwap": {
+    "Options": [
+      { "ID": "S15_SWP_01", "Name": "Stock SR20DET", "Power": 250, "Tier": 0, "Price": 0 },
+      { "ID": "S15_SWP_02", "Name": "RB25DET", "Power": 280, "Tier": 1, "Price": 6500 },
+      { "ID": "S15_SWP_03", "Name": "2JZ-GTE", "Power": 320, "Tier": 2, "Price": 12000 },
+      { "ID": "S15_SWP_04", "Name": "LS3 V8", "Power": 430, "Tier": 3, "Price": 18000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "S15_CLT_01", "Name": "Stock Clutch", "Tier": 0, "Price": 0 },
+      { "ID": "S15_CLT_02", "Name": "Nismo Sport Clutch", "Tier": 1, "Price": 550 },
+      { "ID": "S15_CLT_03", "Name": "OS Giken Racing", "Tier": 2, "Price": 1200 },
+      { "ID": "S15_CLT_04", "Name": "Twin Disc", "Tier": 3, "Price": 2400 }
+    ],
+    "Transmission": [
+      { "ID": "S15_TRN_01", "Name": "Stock 6MT", "Tier": 0, "Price": 0 },
+      { "ID": "S15_TRN_02", "Name": "Close Ratio Gears", "Tier": 1, "Price": 2200 },
+      { "ID": "S15_TRN_03", "Name": "Sequential Gearbox", "Tier": 2, "Price": 12000 }
+    ],
+    "FinalDrive": [
+      { "ID": "S15_FD_01", "Name": "Stock 4.08", "Tier": 0, "Price": 0 },
+      { "ID": "S15_FD_02", "Name": "4.30 Final Drive", "Tier": 1, "Price": 650 },
+      { "ID": "S15_FD_03", "Name": "4.63 Final Drive", "Tier": 2, "Price": 850 }
+    ],
+    "LSD": [
+      { "ID": "S15_LSD_01", "Name": "Stock Helical", "Tier": 0, "Price": 0 },
+      { "ID": "S15_LSD_02", "Name": "Nismo 1.5Way", "Tier": 1, "Price": 1400 },
+      { "ID": "S15_LSD_03", "Name": "Cusco RS 2Way", "Tier": 2, "Price": 1800 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "S15_SPR_01", "Name": "Stock Springs", "Tier": 0, "Price": 0 },
+      { "ID": "S15_SPR_02", "Name": "Tein Lowering", "Tier": 1, "Price": 350 },
+      { "ID": "S15_SPR_03", "Name": "BC Racing BR", "Tier": 2, "Price": 1400 },
+      { "ID": "S15_SPR_04", "Name": "KW V3", "Tier": 3, "Price": 2800 }
+    ],
+    "Dampers": [
+      { "ID": "S15_DMP_01", "Name": "Stock Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "S15_DMP_02", "Name": "Cusco Adjustable", "Tier": 1, "Price": 850 },
+      { "ID": "S15_DMP_03", "Name": "Ohlins DFV", "Tier": 2, "Price": 3500 }
+    ],
+    "AngleKit": [
+      { "ID": "S15_ANG_01", "Name": "Stock", "Tier": 0, "AngleIncrease": 0, "Price": 0 },
+      { "ID": "S15_ANG_02", "Name": "Basic +15°", "Tier": 1, "AngleIncrease": 15, "Price": 550 },
+      { "ID": "S15_ANG_03", "Name": "Pro +30°", "Tier": 2, "AngleIncrease": 30, "Price": 1200 },
+      { "ID": "S15_ANG_04", "Name": "Max +50°", "Tier": 3, "AngleIncrease": 50, "Price": 2400 }
+    ],
+    "Swaybars": [
+      { "ID": "S15_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "S15_SWB_02", "Name": "Nismo Sport Set", "Tier": 1, "Price": 480 },
+      { "ID": "S15_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 850 }
+    ],
+    "Bushings": [
+      { "ID": "S15_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "S15_BSH_02", "Name": "Nismo Poly", "Tier": 1, "Price": 380 },
+      { "ID": "S15_BSH_03", "Name": "Solid Mounts", "Tier": 2, "Price": 850 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "S15_BPD_01", "Name": "Stock Pads", "Tier": 0, "Price": 0 },
+      { "ID": "S15_BPD_02", "Name": "Project Mu HC+", "Tier": 1, "Price": 280 },
+      { "ID": "S15_BPD_03", "Name": "Endless W007", "Tier": 2, "Price": 550 }
+    ],
+    "Rotors": [
+      { "ID": "S15_BRT_01", "Name": "Stock Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "S15_BRT_02", "Name": "DBA Slotted", "Tier": 1, "Price": 380 },
+      { "ID": "S15_BRT_03", "Name": "2-Piece Rotors", "Tier": 2, "Price": 1200 }
+    ],
+    "Calipers": [
+      { "ID": "S15_CAL_01", "Name": "Stock Calipers", "Tier": 0, "Price": 0 },
+      { "ID": "S15_CAL_02", "Name": "Nismo 4-Piston", "Tier": 1, "Price": 1800 },
+      { "ID": "S15_CAL_03", "Name": "AP Racing 6-Piston", "Tier": 2, "Price": 3500 }
+    ],
+    "HydroEBrake": [
+      { "ID": "S15_HYD_01", "Name": "None", "Tier": 0, "Price": 0 },
+      { "ID": "S15_HYD_02", "Name": "Hydraulic E-Brake", "Tier": 1, "Price": 450 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "S15_WHL_01", "Name": "Stock 17-inch", "Size": "17x7.5", "Weight": 20, "Price": 0 },
+      { "ID": "S15_WHL_02", "Name": "Work Emotion", "Size": "17x9", "Weight": 15, "Price": 1800 },
+      { "ID": "S15_WHL_03", "Name": "Rays TE37", "Size": "18x9.5", "Weight": 13, "Price": 3200 },
+      { "ID": "S15_WHL_04", "Name": "Work Meister S1", "Size": "18x10.5", "Weight": 14, "Price": 4500 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "S15_TIR_01", "Name": "Stock Sport", "Grip": 0.95, "Price": 0 },
+      { "ID": "S15_TIR_02", "Name": "Semi-Slick", "Grip": 1.1, "Price": 850 },
+      { "ID": "S15_TIR_03", "Name": "Slick", "Grip": 1.22, "Price": 1400 },
+      { "ID": "S15_TIR_04", "Name": "Drift Tires", "Grip": 0.82, "SlideMultiplier": 1.35, "Price": 550 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "S15_FB_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "S15_FB_02", "Name": "Nismo Front", "Downforce": 10, "Price": 850 },
+      { "ID": "S15_FB_03", "Name": "Origin Labo", "Downforce": 15, "Price": 1200 },
+      { "ID": "S15_FB_04", "Name": "Wide Front", "Downforce": 18, "Price": 1800 }
+    ],
+    "RearBumper": [
+      { "ID": "S15_RB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "S15_RB_02", "Name": "Nismo Rear", "Price": 750 },
+      { "ID": "S15_RB_03", "Name": "Origin Labo", "Price": 1100 }
+    ],
+    "Spoiler": [
+      { "ID": "S15_SPL_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "S15_SPL_02", "Name": "Nismo Spoiler", "Downforce": 20, "Price": 550 },
+      { "ID": "S15_SPL_03", "Name": "Duck Tail", "Downforce": 25, "Price": 850 },
+      { "ID": "S15_SPL_04", "Name": "GT Wing", "Downforce": 65, "Price": 1500 }
+    ],
+    "Hood": [
+      { "ID": "S15_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "S15_HOD_02", "Name": "Vented Hood", "WeightReduction": 8, "Price": 550 },
+      { "ID": "S15_HOD_03", "Name": "Carbon Fiber", "WeightReduction": 18, "Price": 1400 }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "S15_WB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "S15_WB_02", "Name": "Origin Labo Stream", "Price": 3500 },
+      { "ID": "S15_WB_03", "Name": "Rocket Bunny", "Price": 4500 },
+      { "ID": "S15_WB_04", "Name": "Pandem", "Price": 5500 }
+    ],
+    "Mirrors": [
+      { "ID": "S15_MIR_01", "Name": "Stock Mirrors", "Price": 0 },
+      { "ID": "S15_MIR_02", "Name": "Ganador Mirrors", "Price": 280 },
+      { "ID": "S15_MIR_03", "Name": "Carbon Mirrors", "Price": 450 }
+    ],
+    "WeightReduction": [
+      { "ID": "S15_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "S15_WR_02", "Name": "Strip Interior", "WeightSaved": 100, "Price": 400 },
+      { "ID": "S15_WR_03", "Name": "Full Strip + Lexan", "WeightSaved": 250, "Price": 1500 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "S15_PKG_01",
+      "Name": "Formula D Spec",
+      "Description": "Competition drift build",
+      "Parts": ["S15_TRB_04", "S15_IC_03", "S15_ECU_04", "S15_INTS_03", "S15_ANG_04", "S15_LSD_03", "S15_HYD_02"],
+      "TotalPower": 500,
+      "TotalPrice": 22650
+    },
+    {
+      "ID": "S15_PKG_02",
+      "Name": "Street Drift",
+      "Description": "Weekend warrior setup",
+      "Parts": ["S15_TRB_02", "S15_IC_02", "S15_ECU_02", "S15_ANG_02", "S15_LSD_02", "S15_TIR_04"],
+      "TotalPower": 350,
+      "TotalPrice": 6500
+    },
+    {
+      "ID": "S15_PKG_03",
+      "Name": "LS Swap Monster",
+      "Description": "V8 drift machine",
+      "Parts": ["S15_SWP_04", "S15_CLT_04", "S15_ANG_03", "S15_SPR_04", "S15_WB_03"],
+      "TotalPower": 550,
+      "TotalPrice": 28100
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "VehicleID": "STORM_GTI",
+  "PartsVersion": "1.0",
+  "TotalParts": 74,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "GTI_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GTI_INT_02", "Name": "APR Intake", "Tier": 1, "PowerGain": 8, "Price": 350 },
+      { "ID": "GTI_INT_03", "Name": "Unitronic Intake", "Tier": 2, "PowerGain": 14, "Price": 550 },
+      { "ID": "GTI_INT_04", "Name": "Full Race Intake", "Tier": 3, "PowerGain": 20, "Price": 950 }
+    ],
+    "Exhaust": [
+      { "ID": "GTI_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GTI_EXH_02", "Name": "AWE Track Edition", "Tier": 1, "PowerGain": 10, "Price": 850 },
+      { "ID": "GTI_EXH_03", "Name": "Borla S-Type", "Tier": 2, "PowerGain": 15, "Price": 1200 },
+      { "ID": "GTI_EXH_04", "Name": "Milltek Race System", "Tier": 3, "PowerGain": 22, "Price": 2200 }
+    ],
+    "Turbo": [
+      { "ID": "GTI_TRB_01", "Name": "Stock IHI", "Tier": 0, "PowerGain": 0, "BoostPSI": 15, "Price": 0 },
+      { "ID": "GTI_TRB_02", "Name": "IS38 Swap", "Tier": 1, "PowerGain": 55, "BoostPSI": 22, "Price": 1800 },
+      { "ID": "GTI_TRB_03", "Name": "Hybrid Turbo", "Tier": 2, "PowerGain": 95, "BoostPSI": 28, "Price": 3200 },
+      { "ID": "GTI_TRB_04", "Name": "Big Turbo Kit", "Tier": 3, "PowerGain": 150, "BoostPSI": 32, "Price": 5500 }
+    ],
+    "Intercooler": [
+      { "ID": "GTI_IC_01", "Name": "Stock Intercooler", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GTI_IC_02", "Name": "Front Mount IC", "Tier": 1, "PowerGain": 10, "Price": 850 },
+      { "ID": "GTI_IC_03", "Name": "Wagner Competition", "Tier": 2, "PowerGain": 18, "Price": 1500 }
+    ],
+    "ECU": [
+      { "ID": "GTI_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GTI_ECU_02", "Name": "APR Stage 1", "Tier": 1, "PowerGain": 45, "Price": 700 },
+      { "ID": "GTI_ECU_03", "Name": "APR Stage 2", "Tier": 2, "PowerGain": 70, "Price": 950 },
+      { "ID": "GTI_ECU_04", "Name": "Unitronic Stage 3+", "Tier": 3, "PowerGain": 120, "Price": 1500 }
+    ],
+    "FuelSystem": [
+      { "ID": "GTI_FUL_01", "Name": "Stock Fuel System", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GTI_FUL_02", "Name": "High Flow Injectors", "Tier": 1, "PowerGain": 0, "Price": 550 },
+      { "ID": "GTI_FUL_03", "Name": "Port Injection Kit", "Tier": 2, "PowerGain": 15, "Price": 1800 }
+    ],
+    "Internals": [
+      { "ID": "GTI_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GTI_INTS_02", "Name": "Forged Rods", "Tier": 1, "PowerGain": 0, "Price": 2200 },
+      { "ID": "GTI_INTS_03", "Name": "Full Forged Build", "Tier": 2, "PowerGain": 10, "Price": 6500 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "GTI_CLT_01", "Name": "Stock Clutch", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_CLT_02", "Name": "South Bend Stage 2", "Tier": 1, "Price": 650 },
+      { "ID": "GTI_CLT_03", "Name": "Sachs Racing", "Tier": 2, "Price": 1100 },
+      { "ID": "GTI_CLT_04", "Name": "Single Mass Flywheel", "Tier": 2, "Price": 850 }
+    ],
+    "Transmission": [
+      { "ID": "GTI_TRN_01", "Name": "Stock 6MT", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_TRN_02", "Name": "Short Throw Shifter", "Tier": 1, "Price": 350 },
+      { "ID": "GTI_TRN_03", "Name": "Quaife Dog Box", "Tier": 2, "Price": 8500 }
+    ],
+    "FinalDrive": [
+      { "ID": "GTI_FD_01", "Name": "Stock 3.65", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_FD_02", "Name": "3.94 Final Drive", "Tier": 1, "Price": 550 },
+      { "ID": "GTI_FD_03", "Name": "4.20 Final Drive", "Tier": 2, "Price": 750 }
+    ],
+    "LSD": [
+      { "ID": "GTI_LSD_01", "Name": "Stock VAQ", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_LSD_02", "Name": "Wavetrac LSD", "Tier": 1, "Price": 1600 },
+      { "ID": "GTI_LSD_03", "Name": "Quaife ATB", "Tier": 2, "Price": 1400 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "GTI_SPR_01", "Name": "Stock Springs", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_SPR_02", "Name": "H&R Lowering Springs", "Tier": 1, "Price": 280 },
+      { "ID": "GTI_SPR_03", "Name": "KW V2 Coilovers", "Tier": 2, "Price": 1800 },
+      { "ID": "GTI_SPR_04", "Name": "Ohlins Road & Track", "Tier": 3, "Price": 3200 }
+    ],
+    "Dampers": [
+      { "ID": "GTI_DMP_01", "Name": "Stock Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_DMP_02", "Name": "Bilstein B8", "Tier": 1, "Price": 650 },
+      { "ID": "GTI_DMP_03", "Name": "KW DDC", "Tier": 2, "Price": 2400 }
+    ],
+    "Swaybars": [
+      { "ID": "GTI_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_SWB_02", "Name": "Neuspeed Sport", "Tier": 1, "Price": 380 },
+      { "ID": "GTI_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 750 }
+    ],
+    "Bushings": [
+      { "ID": "GTI_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_BSH_02", "Name": "Superpro Poly", "Tier": 1, "Price": 350 },
+      { "ID": "GTI_BSH_03", "Name": "Solid Mounts", "Tier": 2, "Price": 650 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "GTI_BPD_01", "Name": "Stock Pads", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_BPD_02", "Name": "EBC Yellowstuff", "Tier": 1, "Price": 180 },
+      { "ID": "GTI_BPD_03", "Name": "Hawk DTC-60", "Tier": 2, "Price": 380 },
+      { "ID": "GTI_BPD_04", "Name": "Racing Pads", "Tier": 3, "Price": 550 }
+    ],
+    "Rotors": [
+      { "ID": "GTI_BRT_01", "Name": "Stock Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_BRT_02", "Name": "DBA Slotted", "Tier": 1, "Price": 350 },
+      { "ID": "GTI_BRT_03", "Name": "2-Piece Rotors", "Tier": 2, "Price": 1200 }
+    ],
+    "Calipers": [
+      { "ID": "GTI_CAL_01", "Name": "Stock Calipers", "Tier": 0, "Price": 0 },
+      { "ID": "GTI_CAL_02", "Name": "6-Piston BBK", "Tier": 1, "Price": 2400 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "GTI_WHL_01", "Name": "Stock 18-inch", "Size": "18x7.5", "Weight": 22, "Price": 0 },
+      { "ID": "GTI_WHL_02", "Name": "BBS SR", "Size": "18x8", "Weight": 18, "Price": 1400 },
+      { "ID": "GTI_WHL_03", "Name": "Enkei RPF1", "Size": "18x8.5", "Weight": 16, "Price": 1800 },
+      { "ID": "GTI_WHL_04", "Name": "OZ Racing Superforgiata", "Size": "19x8.5", "Weight": 15, "Price": 3500 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "GTI_TIR_01", "Name": "Stock Sport", "Grip": 1.0, "Price": 0 },
+      { "ID": "GTI_TIR_02", "Name": "Michelin PS4S", "Grip": 1.1, "Price": 950 },
+      { "ID": "GTI_TIR_03", "Name": "Semi-Slick", "Grip": 1.18, "Price": 1400 },
+      { "ID": "GTI_TIR_04", "Name": "Slick", "Grip": 1.25, "Price": 1800 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "GTI_FB_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "GTI_FB_02", "Name": "Clubsport Splitter", "Downforce": 10, "Price": 450 },
+      { "ID": "GTI_FB_03", "Name": "TCR Front", "Downforce": 20, "Price": 1200 },
+      { "ID": "GTI_FB_04", "Name": "Wide Front", "Downforce": 25, "Price": 1800 }
+    ],
+    "RearBumper": [
+      { "ID": "GTI_RB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "GTI_RB_02", "Name": "Clubsport Rear", "Price": 650 }
+    ],
+    "Spoiler": [
+      { "ID": "GTI_SPL_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "GTI_SPL_02", "Name": "Clubsport Spoiler", "Downforce": 15, "Price": 550 },
+      { "ID": "GTI_SPL_03", "Name": "GT Wing", "Downforce": 50, "Price": 1400 }
+    ],
+    "Hood": [
+      { "ID": "GTI_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "GTI_HOD_02", "Name": "Vented", "WeightReduction": 6, "Price": 450 },
+      { "ID": "GTI_HOD_03", "Name": "Carbon Fiber", "WeightReduction": 15, "Price": 1200 }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "GTI_WB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "GTI_WB_02", "Name": "TCR Wide Fenders", "Price": 3500 }
+    ],
+    "WeightReduction": [
+      { "ID": "GTI_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "GTI_WR_02", "Name": "Rear Seat Delete", "WeightSaved": 40, "Price": 200 },
+      { "ID": "GTI_WR_03", "Name": "Interior Strip", "WeightSaved": 120, "Price": 600 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "GTI_PKG_01",
+      "Name": "APR Stage 2",
+      "Description": "Popular bolt-on power build",
+      "Parts": ["GTI_INT_02", "GTI_EXH_03", "GTI_ECU_03", "GTI_IC_02"],
+      "TotalPower": 345,
+      "TotalPrice": 3700
+    },
+    {
+      "ID": "GTI_PKG_02",
+      "Name": "IS38 Swap Build",
+      "Description": "Big power on stock internals",
+      "Parts": ["GTI_TRB_02", "GTI_INT_03", "GTI_EXH_04", "GTI_ECU_04", "GTI_IC_03", "GTI_CLT_03"],
+      "TotalPower": 420,
+      "TotalPrice": 9650
+    },
+    {
+      "ID": "GTI_PKG_03",
+      "Name": "Big Turbo Track",
+      "Description": "Maximum power track build",
+      "Parts": ["GTI_TRB_04", "GTI_INTS_03", "GTI_ECU_04", "GTI_FUL_03", "GTI_CLT_04", "GTI_LSD_02"],
+      "TotalPower": 500,
+      "TotalPrice": 18150
+    }
+  ]
+}

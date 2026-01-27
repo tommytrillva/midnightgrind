@@ -1,0 +1,205 @@
+{
+  "VehicleID": "THUNDER_370Z",
+  "PartsVersion": "1.0",
+  "TotalParts": 76,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "370Z_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "370Z_INT_02", "Name": "Stillen Gen 3", "Tier": 1, "PowerGain": 10, "Price": 550 },
+      { "ID": "370Z_INT_03", "Name": "Z1 Cold Air", "Tier": 2, "PowerGain": 15, "Price": 850 },
+      { "ID": "370Z_INT_04", "Name": "Full Race Intake", "Tier": 3, "PowerGain": 22, "Price": 1400 }
+    ],
+    "Exhaust": [
+      { "ID": "370Z_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "370Z_EXH_02", "Name": "Motordyne Shockwave", "Tier": 1, "PowerGain": 15, "Price": 1200 },
+      { "ID": "370Z_EXH_03", "Name": "Fast Intentions Cat-Back", "Tier": 2, "PowerGain": 22, "Price": 1800 },
+      { "ID": "370Z_EXH_04", "Name": "Full Race System", "Tier": 3, "PowerGain": 32, "Price": 3200 }
+    ],
+    "Headers": [
+      { "ID": "370Z_HDR_01", "Name": "Stock Headers", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "370Z_HDR_02", "Name": "Tomei Expreme", "Tier": 1, "PowerGain": 18, "Price": 1500 },
+      { "ID": "370Z_HDR_03", "Name": "PPE Engineering", "Tier": 2, "PowerGain": 28, "Price": 2800 }
+    ],
+    "Cams": [
+      { "ID": "370Z_CAM_01", "Name": "Stock Cams", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "370Z_CAM_02", "Name": "Brian Crower Stage 2", "Tier": 1, "PowerGain": 20, "Price": 1800 },
+      { "ID": "370Z_CAM_03", "Name": "Jim Wolf Technology", "Tier": 2, "PowerGain": 32, "Price": 3200 }
+    ],
+    "ECU": [
+      { "ID": "370Z_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "370Z_ECU_02", "Name": "UpRev Tune", "Tier": 1, "PowerGain": 12, "Price": 750 },
+      { "ID": "370Z_ECU_03", "Name": "Ecutek ProECU", "Tier": 2, "PowerGain": 18, "Price": 1200 },
+      { "ID": "370Z_ECU_04", "Name": "AEM Infinity", "Tier": 3, "PowerGain": 28, "Price": 3000 }
+    ],
+    "Internals": [
+      { "ID": "370Z_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "370Z_INTS_02", "Name": "Forged Rods", "Tier": 1, "PowerGain": 0, "Price": 2200 },
+      { "ID": "370Z_INTS_03", "Name": "Full NA Build", "Tier": 2, "PowerGain": 20, "Price": 8500 }
+    ]
+  },
+
+  "ForcedInduction": {
+    "Supercharger": [
+      { "ID": "370Z_SC_01", "Name": "None", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "370Z_SC_02", "Name": "Stillen Supercharger", "Tier": 1, "PowerGain": 100, "BoostPSI": 6, "Price": 6500 },
+      { "ID": "370Z_SC_03", "Name": "AAM Competition SC", "Tier": 2, "PowerGain": 150, "BoostPSI": 9, "Price": 9500 }
+    ],
+    "Turbo": [
+      { "ID": "370Z_TB_01", "Name": "None", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "370Z_TB_02", "Name": "JWT Single Turbo", "Tier": 1, "PowerGain": 130, "BoostPSI": 8, "Price": 8500 },
+      { "ID": "370Z_TB_03", "Name": "GTX3076R Kit", "Tier": 2, "PowerGain": 180, "BoostPSI": 12, "Price": 12000 },
+      { "ID": "370Z_TB_04", "Name": "Twin Turbo Kit", "Tier": 3, "PowerGain": 250, "BoostPSI": 15, "Price": 18000 }
+    ]
+  },
+
+  "EngineSwap": {
+    "Options": [
+      { "ID": "370Z_SWP_01", "Name": "Stock VQ37VHR", "Power": 350, "Tier": 0, "Price": 0 },
+      { "ID": "370Z_SWP_02", "Name": "VR38DETT", "Power": 545, "Tier": 1, "Price": 35000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "370Z_CLT_01", "Name": "Stock Clutch", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_CLT_02", "Name": "JWT Sport Clutch", "Tier": 1, "Price": 650 },
+      { "ID": "370Z_CLT_03", "Name": "OS Giken Racing", "Tier": 2, "Price": 1400 },
+      { "ID": "370Z_CLT_04", "Name": "Twin Disc", "Tier": 3, "Price": 2800 }
+    ],
+    "Transmission": [
+      { "ID": "370Z_TRN_01", "Name": "Stock 6MT/7AT", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_TRN_02", "Name": "CD009 Swap", "Tier": 1, "Price": 3500 },
+      { "ID": "370Z_TRN_03", "Name": "Sequential", "Tier": 2, "Price": 15000 }
+    ],
+    "FinalDrive": [
+      { "ID": "370Z_FD_01", "Name": "Stock 3.69", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_FD_02", "Name": "3.90 Final Drive", "Tier": 1, "Price": 750 },
+      { "ID": "370Z_FD_03", "Name": "4.08 Final Drive", "Tier": 2, "Price": 950 }
+    ],
+    "LSD": [
+      { "ID": "370Z_LSD_01", "Name": "Stock VLSD", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_LSD_02", "Name": "Nismo 1.5Way", "Tier": 1, "Price": 1600 },
+      { "ID": "370Z_LSD_03", "Name": "OS Giken Super Lock", "Tier": 2, "Price": 2800 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "370Z_SPR_01", "Name": "Stock Nismo Springs", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_SPR_02", "Name": "Swift Lowering", "Tier": 1, "Price": 450 },
+      { "ID": "370Z_SPR_03", "Name": "KW V3 Coilovers", "Tier": 2, "Price": 3200 },
+      { "ID": "370Z_SPR_04", "Name": "Ohlins Road & Track", "Tier": 3, "Price": 4800 }
+    ],
+    "Dampers": [
+      { "ID": "370Z_DMP_01", "Name": "Stock Nismo Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_DMP_02", "Name": "Bilstein B8", "Tier": 1, "Price": 1200 },
+      { "ID": "370Z_DMP_03", "Name": "JRZ RS Pro", "Tier": 2, "Price": 4500 }
+    ],
+    "AngleKit": [
+      { "ID": "370Z_ANG_01", "Name": "Stock", "Tier": 0, "AngleIncrease": 0, "Price": 0 },
+      { "ID": "370Z_ANG_02", "Name": "Basic Angle Kit", "Tier": 1, "AngleIncrease": 15, "Price": 650 },
+      { "ID": "370Z_ANG_03", "Name": "Pro Angle Kit", "Tier": 2, "AngleIncrease": 30, "Price": 1400 }
+    ],
+    "Swaybars": [
+      { "ID": "370Z_SWB_01", "Name": "Stock Nismo Bars", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_SWB_02", "Name": "Hotchkis Sport", "Tier": 1, "Price": 550 },
+      { "ID": "370Z_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 950 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "370Z_BPD_01", "Name": "Stock Nismo Pads", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_BPD_02", "Name": "Hawk HP Plus", "Tier": 1, "Price": 320 },
+      { "ID": "370Z_BPD_03", "Name": "Endless Racing", "Tier": 2, "Price": 650 }
+    ],
+    "Rotors": [
+      { "ID": "370Z_BRT_01", "Name": "Stock Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_BRT_02", "Name": "DBA 5000 Series", "Tier": 1, "Price": 550 },
+      { "ID": "370Z_BRT_03", "Name": "2-Piece Floating", "Tier": 2, "Price": 1600 }
+    ],
+    "Calipers": [
+      { "ID": "370Z_CAL_01", "Name": "Stock Nismo Calipers", "Tier": 0, "Price": 0 },
+      { "ID": "370Z_CAL_02", "Name": "Akebono Sport", "Tier": 1, "Price": 2400 },
+      { "ID": "370Z_CAL_03", "Name": "StopTech ST-60", "Tier": 2, "Price": 4200 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "370Z_WHL_01", "Name": "Stock Nismo 19-inch", "Size": "19x9.5/19x10.5", "Weight": 24, "Price": 0 },
+      { "ID": "370Z_WHL_02", "Name": "Enkei PF01", "Size": "19x9.5/19x10.5", "Weight": 19, "Price": 2200 },
+      { "ID": "370Z_WHL_03", "Name": "Rays TE37 Ultra", "Size": "19x10/19x11", "Weight": 16, "Price": 4200 },
+      { "ID": "370Z_WHL_04", "Name": "Volk ZE40", "Size": "20x10/20x11", "Weight": 17, "Price": 5500 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "370Z_TIR_01", "Name": "Stock Sport", "Grip": 1.02, "Price": 0 },
+      { "ID": "370Z_TIR_02", "Name": "Michelin PS4S", "Grip": 1.12, "Price": 1400 },
+      { "ID": "370Z_TIR_03", "Name": "Toyo R888R", "Grip": 1.2, "Price": 1800 },
+      { "ID": "370Z_TIR_04", "Name": "Drift Tires", "Grip": 0.85, "SlideMultiplier": 1.3, "Price": 850 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "370Z_FB_01", "Name": "Stock Nismo", "Downforce": 10, "Price": 0 },
+      { "ID": "370Z_FB_02", "Name": "Amuse Vestito", "Downforce": 20, "Price": 1800 },
+      { "ID": "370Z_FB_03", "Name": "Wide Bumper", "Downforce": 28, "Price": 2800 }
+    ],
+    "Spoiler": [
+      { "ID": "370Z_SPL_01", "Name": "Stock Nismo", "Downforce": 15, "Price": 0 },
+      { "ID": "370Z_SPL_02", "Name": "GT Wing", "Downforce": 60, "Price": 1800 },
+      { "ID": "370Z_SPL_03", "Name": "Duck Tail", "Downforce": 25, "Price": 850 }
+    ],
+    "Hood": [
+      { "ID": "370Z_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "370Z_HOD_02", "Name": "Vented", "WeightReduction": 8, "Price": 750 },
+      { "ID": "370Z_HOD_03", "Name": "Carbon Fiber", "WeightReduction": 18, "Price": 1800 }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "370Z_WB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "370Z_WB_02", "Name": "Rocket Bunny V2", "Price": 5500 },
+      { "ID": "370Z_WB_03", "Name": "LB Works", "Price": 7500 }
+    ],
+    "WeightReduction": [
+      { "ID": "370Z_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "370Z_WR_02", "Name": "Interior Strip", "WeightSaved": 100, "Price": 500 },
+      { "ID": "370Z_WR_03", "Name": "Full Strip", "WeightSaved": 230, "Price": 1800 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "370Z_PKG_01",
+      "Name": "NA Track Spec",
+      "Description": "Naturally aspirated perfection",
+      "Parts": ["370Z_INT_04", "370Z_EXH_04", "370Z_HDR_03", "370Z_CAM_03", "370Z_ECU_04", "370Z_INTS_03"],
+      "TotalPower": 450,
+      "TotalPrice": 22100
+    },
+    {
+      "ID": "370Z_PKG_02",
+      "Name": "Twin Turbo Street",
+      "Description": "Serious power for the street",
+      "Parts": ["370Z_TB_04", "370Z_ECU_04", "370Z_CLT_04", "370Z_LSD_03"],
+      "TotalPower": 600,
+      "TotalPrice": 26600
+    },
+    {
+      "ID": "370Z_PKG_03",
+      "Name": "Drift Build",
+      "Description": "Slide machine setup",
+      "Parts": ["370Z_SC_02", "370Z_ANG_03", "370Z_LSD_03", "370Z_SPR_03", "370Z_TIR_04", "370Z_WB_02"],
+      "TotalPower": 450,
+      "TotalPrice": 20450
+    }
+  ]
+}

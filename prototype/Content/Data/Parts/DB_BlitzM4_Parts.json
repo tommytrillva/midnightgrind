@@ -1,0 +1,194 @@
+{
+  "VehicleID": "BLITZ_M4",
+  "PartsVersion": "1.0",
+  "TotalParts": 78,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "M4_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "M4_INT_02", "Name": "Eventuri Carbon", "Tier": 1, "PowerGain": 12, "Price": 950 },
+      { "ID": "M4_INT_03", "Name": "Dinan Carbon", "Tier": 2, "PowerGain": 18, "Price": 1200 },
+      { "ID": "M4_INT_04", "Name": "Full Race Intake", "Tier": 3, "PowerGain": 25, "Price": 1800 }
+    ],
+    "Exhaust": [
+      { "ID": "M4_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "M4_EXH_02", "Name": "Akrapovic Slip-On", "Tier": 1, "PowerGain": 15, "Price": 2800 },
+      { "ID": "M4_EXH_03", "Name": "AWE Track Edition", "Tier": 2, "PowerGain": 22, "Price": 1800 },
+      { "ID": "M4_EXH_04", "Name": "Full Race Titanium", "Tier": 3, "PowerGain": 32, "Price": 4500 }
+    ],
+    "Turbo": [
+      { "ID": "M4_TRB_01", "Name": "Stock Twin Turbos", "Tier": 0, "PowerGain": 0, "BoostPSI": 17, "Price": 0 },
+      { "ID": "M4_TRB_02", "Name": "Pure Stage 2", "Tier": 1, "PowerGain": 80, "BoostPSI": 22, "Price": 3500 },
+      { "ID": "M4_TRB_03", "Name": "Vargas Turbos", "Tier": 2, "PowerGain": 150, "BoostPSI": 26, "Price": 6500 }
+    ],
+    "Intercooler": [
+      { "ID": "M4_IC_01", "Name": "Stock Intercooler", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "M4_IC_02", "Name": "Front Mount", "Tier": 1, "PowerGain": 12, "Price": 1200 },
+      { "ID": "M4_IC_03", "Name": "CSF Race", "Tier": 2, "PowerGain": 20, "Price": 2200 }
+    ],
+    "ECU": [
+      { "ID": "M4_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "M4_ECU_02", "Name": "Stage 1 Tune", "Tier": 1, "PowerGain": 50, "Price": 800 },
+      { "ID": "M4_ECU_03", "Name": "Stage 2 Tune", "Tier": 2, "PowerGain": 85, "Price": 1200 },
+      { "ID": "M4_ECU_04", "Name": "Bootmod3 Pro", "Tier": 3, "PowerGain": 120, "Price": 2000 }
+    ],
+    "FuelSystem": [
+      { "ID": "M4_FUL_01", "Name": "Stock Fuel System", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "M4_FUL_02", "Name": "Port Injection", "Tier": 1, "PowerGain": 15, "Price": 2200 },
+      { "ID": "M4_FUL_03", "Name": "E85 Setup", "Tier": 2, "PowerGain": 35, "Price": 3500 },
+      { "ID": "M4_FUL_04", "Name": "Methanol Injection", "Tier": 2, "PowerGain": 30, "Price": 1800 }
+    ],
+    "Internals": [
+      { "ID": "M4_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "M4_INTS_02", "Name": "Forged Rods", "Tier": 1, "PowerGain": 0, "Price": 3500 },
+      { "ID": "M4_INTS_03", "Name": "Full Forged Build", "Tier": 2, "PowerGain": 10, "Price": 12000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "M4_CLT_01", "Name": "Stock DCT", "Tier": 0, "Price": 0 },
+      { "ID": "M4_CLT_02", "Name": "Racing Clutch Pack", "Tier": 1, "Price": 2800 }
+    ],
+    "Transmission": [
+      { "ID": "M4_TRN_01", "Name": "Stock DCT", "Tier": 0, "Price": 0 },
+      { "ID": "M4_TRN_02", "Name": "Upgraded DCT", "Tier": 1, "Price": 4500 },
+      { "ID": "M4_TRN_03", "Name": "Manual Swap", "Tier": 2, "Price": 8500 }
+    ],
+    "FinalDrive": [
+      { "ID": "M4_FD_01", "Name": "Stock 2.81", "Tier": 0, "Price": 0 },
+      { "ID": "M4_FD_02", "Name": "3.08 Final Drive", "Tier": 1, "Price": 850 },
+      { "ID": "M4_FD_03", "Name": "3.23 Final Drive", "Tier": 2, "Price": 1100 }
+    ],
+    "LSD": [
+      { "ID": "M4_LSD_01", "Name": "Stock Active M Diff", "Tier": 0, "Price": 0 },
+      { "ID": "M4_LSD_02", "Name": "Drexler LSD", "Tier": 1, "Price": 3200 },
+      { "ID": "M4_LSD_03", "Name": "Wavetrac", "Tier": 2, "Price": 2800 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "M4_SPR_01", "Name": "Stock Adaptive", "Tier": 0, "Price": 0 },
+      { "ID": "M4_SPR_02", "Name": "Eibach Pro-Kit", "Tier": 1, "Price": 450 },
+      { "ID": "M4_SPR_03", "Name": "KW V3", "Tier": 2, "Price": 3500 },
+      { "ID": "M4_SPR_04", "Name": "Ohlins Road & Track", "Tier": 3, "Price": 5500 }
+    ],
+    "Dampers": [
+      { "ID": "M4_DMP_01", "Name": "Stock Adaptive", "Tier": 0, "Price": 0 },
+      { "ID": "M4_DMP_02", "Name": "Bilstein B16", "Tier": 1, "Price": 2200 },
+      { "ID": "M4_DMP_03", "Name": "JRZ RS Pro", "Tier": 2, "Price": 5500 }
+    ],
+    "Swaybars": [
+      { "ID": "M4_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "M4_SWB_02", "Name": "Dinan Adjustable", "Tier": 1, "Price": 750 },
+      { "ID": "M4_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 1200 }
+    ],
+    "Bushings": [
+      { "ID": "M4_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "M4_BSH_02", "Name": "Turner Poly", "Tier": 1, "Price": 450 },
+      { "ID": "M4_BSH_03", "Name": "Solid Mounts", "Tier": 2, "Price": 950 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "M4_BPD_01", "Name": "Stock Pads", "Tier": 0, "Price": 0 },
+      { "ID": "M4_BPD_02", "Name": "Hawk HP Plus", "Tier": 1, "Price": 380 },
+      { "ID": "M4_BPD_03", "Name": "Pagid Racing", "Tier": 2, "Price": 750 }
+    ],
+    "Rotors": [
+      { "ID": "M4_BRT_01", "Name": "Stock Compound Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "M4_BRT_02", "Name": "2-Piece Floating", "Tier": 1, "Price": 1800 },
+      { "ID": "M4_BRT_03", "Name": "Carbon Ceramic", "Tier": 2, "Price": 8500 }
+    ],
+    "Calipers": [
+      { "ID": "M4_CAL_01", "Name": "Stock M Calipers", "Tier": 0, "Price": 0 },
+      { "ID": "M4_CAL_02", "Name": "M Carbon Calipers", "Tier": 1, "Price": 3500 },
+      { "ID": "M4_CAL_03", "Name": "StopTech ST-60", "Tier": 2, "Price": 4800 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "M4_WHL_01", "Name": "Stock 19-inch", "Size": "19x9/19x10", "Weight": 26, "Price": 0 },
+      { "ID": "M4_WHL_02", "Name": "Apex Arc-8", "Size": "19x9.5/19x10.5", "Weight": 20, "Price": 2400 },
+      { "ID": "M4_WHL_03", "Name": "BBS FI-R", "Size": "20x9/20x10.5", "Weight": 18, "Price": 4800 },
+      { "ID": "M4_WHL_04", "Name": "Volk TE37 Ultra", "Size": "20x9.5/20x11", "Weight": 16, "Price": 6500 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "M4_TIR_01", "Name": "Stock Sport", "Grip": 1.08, "Price": 0 },
+      { "ID": "M4_TIR_02", "Name": "Michelin Cup 2", "Grip": 1.2, "Price": 1800 },
+      { "ID": "M4_TIR_03", "Name": "Slick", "Grip": 1.28, "Price": 2400 },
+      { "ID": "M4_TIR_04", "Name": "Drift Tires", "Grip": 0.88, "SlideMultiplier": 1.3, "Price": 950 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "M4_FB_01", "Name": "Stock", "Downforce": 10, "Price": 0 },
+      { "ID": "M4_FB_02", "Name": "GTS Front", "Downforce": 25, "Price": 2200 },
+      { "ID": "M4_FB_03", "Name": "DTM Front", "Downforce": 40, "Price": 4500 },
+      { "ID": "M4_FB_04", "Name": "Wide Front", "Downforce": 35, "Price": 3500 }
+    ],
+    "RearBumper": [
+      { "ID": "M4_RB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "M4_RB_02", "Name": "GTS Diffuser", "Downforce": 20, "Price": 1800 }
+    ],
+    "Spoiler": [
+      { "ID": "M4_SPL_01", "Name": "Stock", "Downforce": 10, "Price": 0 },
+      { "ID": "M4_SPL_02", "Name": "GTS Wing", "Downforce": 45, "Price": 2500 },
+      { "ID": "M4_SPL_03", "Name": "GT Wing", "Downforce": 80, "Price": 3200 },
+      { "ID": "M4_SPL_04", "Name": "APR GTC-300", "Downforce": 95, "Price": 4500 }
+    ],
+    "Hood": [
+      { "ID": "M4_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "M4_HOD_02", "Name": "GTS Carbon", "WeightReduction": 15, "Price": 2800 },
+      { "ID": "M4_HOD_03", "Name": "Full Carbon", "WeightReduction": 25, "Price": 4500 }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "M4_WB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "M4_WB_02", "Name": "GTS Widebody", "Price": 5500 },
+      { "ID": "M4_WB_03", "Name": "Liberty Walk", "Price": 8500 }
+    ],
+    "WeightReduction": [
+      { "ID": "M4_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "M4_WR_02", "Name": "Carbon Panels", "WeightSaved": 80, "Price": 3500 },
+      { "ID": "M4_WR_03", "Name": "Full Carbon + Strip", "WeightSaved": 230, "Price": 12000 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "M4_PKG_01",
+      "Name": "Stage 2 Street",
+      "Description": "Bolt-on power monster",
+      "Parts": ["M4_INT_03", "M4_EXH_03", "M4_ECU_03", "M4_IC_02"],
+      "TotalPower": 560,
+      "TotalPrice": 6200
+    },
+    {
+      "ID": "M4_PKG_02",
+      "Name": "Track Weapon",
+      "Description": "Time attack build",
+      "Parts": ["M4_TRB_03", "M4_ECU_04", "M4_IC_03", "M4_FUL_03", "M4_SPR_04", "M4_TIR_02"],
+      "TotalPower": 680,
+      "TotalPrice": 21500
+    },
+    {
+      "ID": "M4_PKG_03",
+      "Name": "GTS Spec",
+      "Description": "Factory race car setup",
+      "Parts": ["M4_TRB_02", "M4_ECU_03", "M4_SPR_03", "M4_FB_02", "M4_SPL_02", "M4_HOD_02", "M4_WB_02"],
+      "TotalPower": 590,
+      "TotalPrice": 22700
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "VehicleID": "LIGHTNING_86",
+  "PartsVersion": "1.0",
+  "TotalParts": 78,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "AE86_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AE86_INT_02", "Name": "TRD Filter", "Tier": 1, "PowerGain": 5, "Price": 180 },
+      { "ID": "AE86_INT_03", "Name": "HKS Racing Suction", "Tier": 2, "PowerGain": 10, "Price": 380 },
+      { "ID": "AE86_INT_04", "Name": "Individual Throttle Bodies", "Tier": 3, "PowerGain": 25, "Price": 2800 }
+    ],
+    "Exhaust": [
+      { "ID": "AE86_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AE86_EXH_02", "Name": "Fujitsubo RM-01A", "Tier": 1, "PowerGain": 8, "Price": 650 },
+      { "ID": "AE86_EXH_03", "Name": "HKS Hi-Power", "Tier": 2, "PowerGain": 14, "Price": 950 },
+      { "ID": "AE86_EXH_04", "Name": "Full Race Titanium", "Tier": 3, "PowerGain": 22, "Price": 2200 }
+    ],
+    "Cams": [
+      { "ID": "AE86_CAM_01", "Name": "Stock Cams", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AE86_CAM_02", "Name": "TRD High Lift", "Tier": 1, "PowerGain": 12, "Price": 850 },
+      { "ID": "AE86_CAM_03", "Name": "Toda Racing Cams", "Tier": 2, "PowerGain": 20, "Price": 1400 }
+    ],
+    "HeadSwap": [
+      { "ID": "AE86_HED_01", "Name": "Stock 16V", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AE86_HED_02", "Name": "20V Silvertop", "Tier": 1, "PowerGain": 35, "Price": 2200 },
+      { "ID": "AE86_HED_03", "Name": "20V Blacktop", "Tier": 2, "PowerGain": 45, "Price": 3500 }
+    ],
+    "ECU": [
+      { "ID": "AE86_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AE86_ECU_02", "Name": "HKS F-CON", "Tier": 1, "PowerGain": 8, "Price": 650 },
+      { "ID": "AE86_ECU_03", "Name": "AEM Standalone", "Tier": 2, "PowerGain": 15, "Price": 1800 }
+    ],
+    "Internals": [
+      { "ID": "AE86_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AE86_INTS_02", "Name": "Forged Pistons", "Tier": 1, "PowerGain": 5, "Price": 1200 },
+      { "ID": "AE86_INTS_03", "Name": "Full NA Build", "Tier": 2, "PowerGain": 25, "Price": 5500 }
+    ]
+  },
+
+  "ForcedInduction": {
+    "Supercharger": [
+      { "ID": "AE86_SC_01", "Name": "None", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AE86_SC_02", "Name": "TRD Supercharger", "Tier": 1, "PowerGain": 45, "BoostPSI": 6, "Price": 3500 }
+    ],
+    "Turbo": [
+      { "ID": "AE86_TB_01", "Name": "None", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AE86_TB_02", "Name": "T25 Turbo Kit", "Tier": 1, "PowerGain": 55, "BoostPSI": 8, "Price": 3200 },
+      { "ID": "AE86_TB_03", "Name": "T28 Turbo Kit", "Tier": 2, "PowerGain": 85, "BoostPSI": 12, "Price": 4500 },
+      { "ID": "AE86_TB_04", "Name": "GT2871 Kit", "Tier": 3, "PowerGain": 130, "BoostPSI": 18, "Price": 7500 }
+    ]
+  },
+
+  "EngineSwap": {
+    "Options": [
+      { "ID": "AE86_SWP_01", "Name": "Stock 4A-GE", "Power": 128, "Tier": 0, "Price": 0 },
+      { "ID": "AE86_SWP_02", "Name": "3S-GE Beams", "Power": 200, "Tier": 1, "Price": 4500 },
+      { "ID": "AE86_SWP_03", "Name": "1JZ-GTE", "Power": 280, "Tier": 2, "Price": 8500 },
+      { "ID": "AE86_SWP_04", "Name": "2JZ-GE NA-T", "Power": 350, "Tier": 3, "Price": 12000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "AE86_CLT_01", "Name": "Stock Clutch", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_CLT_02", "Name": "TRD Sport Clutch", "Tier": 1, "Price": 450 },
+      { "ID": "AE86_CLT_03", "Name": "Exedy Racing", "Tier": 2, "Price": 850 }
+    ],
+    "Transmission": [
+      { "ID": "AE86_TRN_01", "Name": "Stock T50", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_TRN_02", "Name": "Close Ratio Gears", "Tier": 1, "Price": 1800 },
+      { "ID": "AE86_TRN_03", "Name": "6-Speed Swap (J160)", "Tier": 2, "Price": 3500 }
+    ],
+    "FinalDrive": [
+      { "ID": "AE86_FD_01", "Name": "Stock 4.30", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_FD_02", "Name": "4.56 Final Drive", "Tier": 1, "Price": 550 },
+      { "ID": "AE86_FD_03", "Name": "4.78 Final Drive", "Tier": 2, "Price": 750 }
+    ],
+    "LSD": [
+      { "ID": "AE86_LSD_01", "Name": "Stock Open", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_LSD_02", "Name": "TRD 1.5Way", "Tier": 1, "Price": 1200 },
+      { "ID": "AE86_LSD_03", "Name": "Cusco RS 2Way", "Tier": 2, "Price": 1800 },
+      { "ID": "AE86_LSD_04", "Name": "Welded Diff", "Tier": 1, "Price": 200, "DriftOnly": true }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "AE86_SPR_01", "Name": "Stock Springs", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_SPR_02", "Name": "Tein Lowering Springs", "Tier": 1, "Price": 280 },
+      { "ID": "AE86_SPR_03", "Name": "BC Racing Coilovers", "Tier": 2, "Price": 1200 },
+      { "ID": "AE86_SPR_04", "Name": "HKS Hipermax IV", "Tier": 3, "Price": 2400 }
+    ],
+    "Dampers": [
+      { "ID": "AE86_DMP_01", "Name": "Stock Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_DMP_02", "Name": "KYB AGX Adjustable", "Tier": 1, "Price": 450 },
+      { "ID": "AE86_DMP_03", "Name": "Cusco Spec S", "Tier": 2, "Price": 1200 }
+    ],
+    "AngleKit": [
+      { "ID": "AE86_ANG_01", "Name": "Stock", "Tier": 0, "AngleIncrease": 0, "Price": 0 },
+      { "ID": "AE86_ANG_02", "Name": "Basic Angle Kit", "Tier": 1, "AngleIncrease": 15, "Price": 450 },
+      { "ID": "AE86_ANG_03", "Name": "Pro Angle Kit", "Tier": 2, "AngleIncrease": 30, "Price": 950 }
+    ],
+    "Swaybars": [
+      { "ID": "AE86_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_SWB_02", "Name": "Cusco Adjustable", "Tier": 1, "Price": 380 },
+      { "ID": "AE86_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 650 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "AE86_BPD_01", "Name": "Stock Pads", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_BPD_02", "Name": "Project Mu Sport", "Tier": 1, "Price": 180 },
+      { "ID": "AE86_BPD_03", "Name": "Endless Track", "Tier": 2, "Price": 380 }
+    ],
+    "RearDisc": [
+      { "ID": "AE86_RDC_01", "Name": "Stock Drums", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_RDC_02", "Name": "Disc Conversion", "Tier": 1, "Price": 850 }
+    ],
+    "Calipers": [
+      { "ID": "AE86_CAL_01", "Name": "Stock Calipers", "Tier": 0, "Price": 0 },
+      { "ID": "AE86_CAL_02", "Name": "4-Piston Upgrade", "Tier": 1, "Price": 1200 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "AE86_WHL_01", "Name": "Stock 14-inch", "Size": "14x6", "Weight": 18, "Price": 0 },
+      { "ID": "AE86_WHL_02", "Name": "Watanabe RS", "Size": "15x7", "Weight": 12, "Price": 1200 },
+      { "ID": "AE86_WHL_03", "Name": "Work Meister", "Size": "15x8", "Weight": 11, "Price": 2400 },
+      { "ID": "AE86_WHL_04", "Name": "Volk TE37V", "Size": "16x8", "Weight": 10, "Price": 3200 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "AE86_TIR_01", "Name": "Stock Street", "Grip": 0.88, "Price": 0 },
+      { "ID": "AE86_TIR_02", "Name": "Sport", "Grip": 1.0, "Price": 350 },
+      { "ID": "AE86_TIR_03", "Name": "Semi-Slick", "Grip": 1.12, "Price": 650 },
+      { "ID": "AE86_TIR_04", "Name": "Drift Tires", "Grip": 0.85, "SlideMultiplier": 1.3, "Price": 450 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "AE86_FB_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "AE86_FB_02", "Name": "TRD Front Lip", "Downforce": 5, "Price": 350 },
+      { "ID": "AE86_FB_03", "Name": "Origin Labo Bumper", "Downforce": 10, "Price": 850 },
+      { "ID": "AE86_FB_04", "Name": "Wide Bumper", "Downforce": 12, "Price": 1200 }
+    ],
+    "Spoiler": [
+      { "ID": "AE86_SPL_01", "Name": "Stock", "Downforce": 0, "Price": 0 },
+      { "ID": "AE86_SPL_02", "Name": "TRD Duckbill", "Downforce": 15, "Price": 450 },
+      { "ID": "AE86_SPL_03", "Name": "GT Wing", "Downforce": 45, "Price": 1200 }
+    ],
+    "Hood": [
+      { "ID": "AE86_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "AE86_HOD_02", "Name": "TRD Vented", "WeightReduction": 10, "Price": 450 },
+      { "ID": "AE86_HOD_03", "Name": "Carbon Fiber", "WeightReduction": 18, "Price": 1200 }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "AE86_WB_01", "Name": "Stock", "Price": 0 },
+      { "ID": "AE86_WB_02", "Name": "Origin Labo Fenders", "Price": 1800 },
+      { "ID": "AE86_WB_03", "Name": "Levin/Trueno Front End", "Price": 2500 }
+    ],
+    "WeightReduction": [
+      { "ID": "AE86_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "AE86_WR_02", "Name": "Gut Interior", "WeightSaved": 120, "Price": 300 },
+      { "ID": "AE86_WR_03", "Name": "Full Strip", "WeightSaved": 250, "Price": 800 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "AE86_PKG_01",
+      "Name": "Touge Legend",
+      "Description": "NA screamer for mountain passes",
+      "Parts": ["AE86_HED_03", "AE86_INT_04", "AE86_EXH_04", "AE86_CAM_03", "AE86_ECU_03"],
+      "TotalPower": 220,
+      "TotalPrice": 11700
+    },
+    {
+      "ID": "AE86_PKG_02",
+      "Name": "Drift Missile",
+      "Description": "Grassroots drift build",
+      "Parts": ["AE86_TB_03", "AE86_LSD_04", "AE86_ANG_03", "AE86_SPR_03", "AE86_TIR_04"],
+      "TotalPower": 210,
+      "TotalPrice": 7800
+    },
+    {
+      "ID": "AE86_PKG_03",
+      "Name": "2JZ Swap Monster",
+      "Description": "Big power small chassis",
+      "Parts": ["AE86_SWP_04", "AE86_CLT_03", "AE86_TRN_03", "AE86_LSD_03"],
+      "TotalPower": 350,
+      "TotalPrice": 18150
+    }
+  ]
+}
