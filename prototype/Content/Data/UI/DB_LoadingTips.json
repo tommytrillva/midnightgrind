@@ -1,0 +1,413 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Loading Screen Tips and Hints",
+  "TotalTips": 80,
+
+  "Categories": {
+    "Driving": { "Icon": "tip_driving", "Weight": 1.5 },
+    "Tuning": { "Icon": "tip_tuning", "Weight": 1.2 },
+    "Drifting": { "Icon": "tip_drift", "Weight": 1.3 },
+    "Economy": { "Icon": "tip_economy", "Weight": 1.0 },
+    "Career": { "Icon": "tip_career", "Weight": 1.0 },
+    "Combat": { "Icon": "tip_combat", "Weight": 0.8 },
+    "Social": { "Icon": "tip_social", "Weight": 0.7 },
+    "Lore": { "Icon": "tip_lore", "Weight": 0.5 }
+  },
+
+  "Tips": {
+    "Driving": [
+      {
+        "ID": "TIP_BRAKE_EARLY",
+        "Text": "Brake early and accelerate through the corner. Speed is maintained, not created, in turns.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_RACING_LINE",
+        "Text": "The racing line isn't always the shortest path—it's the fastest. Outside-inside-outside.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_SMOOTH_INPUTS",
+        "Text": "Smooth inputs make fast drivers. Jerky steering unsettles the car and scrubs speed.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_WEIGHT_TRANSFER",
+        "Text": "Weight transfer affects grip. Braking shifts weight forward, acceleration shifts it back.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_TIRE_TEMP",
+        "Text": "Cold tires have less grip. The first few corners of a race are the most dangerous.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_TRAIL_BRAKING",
+        "Text": "Trail braking—gradually releasing the brake through a corner—can shave precious tenths.",
+        "Priority": "Advanced"
+      },
+      {
+        "ID": "TIP_HEEL_TOE",
+        "Text": "In manual cars, heel-toe downshifting keeps the car balanced through deceleration.",
+        "Priority": "Advanced"
+      },
+      {
+        "ID": "TIP_RAIN_DRIVING",
+        "Text": "In the rain, the racing line is often the worst line. Standing water collects where cars usually drive.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_NIGHT_VISION",
+        "Text": "At night, look where your headlights illuminate, but anticipate what's beyond.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_TRAFFIC_PATTERNS",
+        "Text": "Traffic tends to cluster. If you see clear road ahead, there's probably congestion coming.",
+        "Priority": "Medium"
+      }
+    ],
+
+    "Tuning": [
+      {
+        "ID": "TIP_BALANCE_BUILD",
+        "Text": "A balanced build beats a one-trick pony. Power means nothing without the grip to use it.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_SUSPENSION_STIFF",
+        "Text": "Stiffer suspension improves handling on smooth tracks but punishes you on rough roads.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_TIRE_COMPOUND",
+        "Text": "Softer tires grip better but wear faster. Match your compound to the race length.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_GEAR_RATIOS",
+        "Text": "Shorter gears mean faster acceleration, longer gears mean higher top speed. Choose wisely.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_BOOST_CONTROL",
+        "Text": "More boost isn't always better. Reliability matters when you can't afford a new engine.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_WEIGHT_REDUCTION",
+        "Text": "Every pound you remove is free horsepower. Light cars dance; heavy cars lumber.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_DOWNFORCE",
+        "Text": "Downforce improves grip but adds drag. More wing helps on twisty tracks, hurts on straights.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_ENGINE_SWAPS",
+        "Text": "Some vehicles support engine swaps. A different heart can completely change a car's character.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_DYNO_TUNING",
+        "Text": "Use the dyno to verify your power numbers. Claimed HP and actual HP can differ.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_BRAKE_BIAS",
+        "Text": "Adjusting brake bias can cure understeer or oversteer. More front = more stable, more rear = more rotation.",
+        "Priority": "Advanced"
+      }
+    ],
+
+    "Drifting": [
+      {
+        "ID": "TIP_DRIFT_INITIATION",
+        "Text": "Entry speed and angle set up the entire drift. Get these right, and the rest follows.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_DRIFT_THROTTLE",
+        "Text": "Throttle controls angle during a drift. More gas = more angle, less gas = straighten out.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_DRIFT_COUNTERSTEER",
+        "Text": "Countersteer should be gradual and smooth. Snapping the wheel causes spin or snap-back.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_DRIFT_TRANSITIONS",
+        "Text": "In transitions, use weight transfer to switch directions. Lift-flick-throttle.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_DRIFT_LINE",
+        "Text": "Drift competitions reward line consistency. Hit the same clipping points every time.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_DRIFT_POWER",
+        "Text": "You don't need 1000HP to drift well, but you do need enough power to break traction.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_TANDEM_CHASE",
+        "Text": "As chase driver, match the lead's line and stay close. Proximity scores points.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_TANDEM_LEAD",
+        "Text": "As lead driver, be consistent and predictable. Wild lines make you look good but lose battles.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_DRIFT_SETUP",
+        "Text": "Drift setups often run more rear suspension stiffness to promote oversteer.",
+        "Priority": "Advanced"
+      },
+      {
+        "ID": "TIP_MANJI",
+        "Text": "The manji technique—rapid side-to-side transitions—looks impressive but requires perfect timing.",
+        "Priority": "Advanced"
+      }
+    ],
+
+    "Economy": [
+      {
+        "ID": "TIP_RISK_REWARD",
+        "Text": "Higher risk races pay more. Night, rain, traffic—each adds to the payout.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_DAILY_BONUS",
+        "Text": "Log in daily for bonus rewards. Streaks multiply the payout significantly.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_SELL_SMART",
+        "Text": "Parts sell back at 60% value. Think twice before buying—but don't be afraid to experiment.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_MARKETPLACE",
+        "Text": "The marketplace lets you trade with other players. Rare parts can fetch premium prices.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_INSURANCE",
+        "Text": "Insurance protects your investment. The more valuable your car, the more important coverage becomes.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_PINK_SLIP_RISK",
+        "Text": "Pink slip races are permanent. Your car is gone if you lose. Make sure you're ready.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_REP_GATES",
+        "Text": "Some content is gated by reputation. Build REP to unlock new challenges and parts.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_STARTER_CAR",
+        "Text": "Don't dismiss your starter car. A well-built economy car can punch well above its weight.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_BUDGET_BUILD",
+        "Text": "You don't need the most expensive parts to win. Skill beats money at every level.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_WAGER_SMART",
+        "Text": "Only wager what you can afford to lose. Pride heals; an empty garage doesn't.",
+        "Priority": "High"
+      }
+    ],
+
+    "Career": [
+      {
+        "ID": "TIP_STORY_PROGRESS",
+        "Text": "Career chapters unlock new challenges, vehicles, and parts. Progress to see everything.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_BOSS_FIGHTS",
+        "Text": "Boss races are the real tests. Study their patterns, learn their weaknesses.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_REPUTATION",
+        "Text": "Your reputation precedes you. High REP opens doors; low REP closes them.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_SPECIALIZATION",
+        "Text": "You don't have to be good at everything. Find your specialty and master it.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_RIVALS",
+        "Text": "Rivals remember you. Beat them enough times and they'll come looking for a rematch.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_HIDDEN_EVENTS",
+        "Text": "Some events only appear at certain times or conditions. Explore to find everything.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_ACHIEVEMENTS",
+        "Text": "Achievements reward milestone accomplishments. Check the list for bonus cash and REP.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_SEASON_PASS",
+        "Text": "The season pass offers exclusive rewards. Premium tiers unlock even more.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_WEEKLY_EVENTS",
+        "Text": "Weekly events rotate tracks and challenges. Leaderboard placement earns special rewards.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_LEGEND_STATUS",
+        "Text": "Becoming a Legend isn't just about winning—it's about how you win.",
+        "Priority": "Low"
+      }
+    ],
+
+    "Combat": [
+      {
+        "ID": "TIP_POLICE_HEAT",
+        "Text": "Heat builds as you race. Higher heat means more aggressive police response.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_POLICE_ESCAPE",
+        "Text": "To escape police, break line of sight and find a hiding spot. Cooldown takes time.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_POLICE_PURSUIT",
+        "Text": "Police will try to box you in. Don't let them. Keep moving, stay unpredictable.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_PURSUIT_BREAKER",
+        "Text": "Some environmental features can help shake pursuit. Look for shortcuts and hazards.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_BUST_PENALTY",
+        "Text": "Getting busted costs money and reputation. At high heat, the penalties are severe.",
+        "Priority": "High"
+      },
+      {
+        "ID": "TIP_SAFE_HOUSES",
+        "Text": "Safe houses can shield you from pursuit—if you can reach them.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_SPIKE_STRIPS",
+        "Text": "Watch for spike strips at roadblocks. Hitting one is race-ending.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_HEAT_MANAGEMENT",
+        "Text": "Sometimes it's smarter to let heat cool down than to risk everything in pursuit.",
+        "Priority": "Medium"
+      }
+    ],
+
+    "Social": [
+      {
+        "ID": "TIP_CREW_BENEFITS",
+        "Text": "Crews share garages, bonuses, and territory income. Stronger together.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_MEET_SPOTS",
+        "Text": "Meet spots are where the community gathers. Show off your build, find rivals.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_SHOWCASE",
+        "Text": "Enter showcases to have your build voted on. Winners earn REP and bragging rights.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_TERRITORY",
+        "Text": "Controlling territory earns passive income for your crew. Defend what's yours.",
+        "Priority": "Medium"
+      },
+      {
+        "ID": "TIP_CREW_RANKS",
+        "Text": "Rise through crew ranks to unlock more permissions and leadership roles.",
+        "Priority": "Low"
+      }
+    ],
+
+    "Lore": [
+      {
+        "ID": "TIP_LORE_PHOENIX",
+        "Text": "They call them the Phoenix because no matter how many times they lose, they rise again.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_LORE_MOUNTAIN",
+        "Text": "The mountains have claimed many who thought they were faster than the road.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_LORE_MIDNIGHT",
+        "Text": "Midnight is when the real racing happens. When the streets belong to us.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_LORE_PINK_SLIP",
+        "Text": "A pink slip race is more than a bet. It's a statement. Are you willing to risk everything?",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_LORE_LEGEND",
+        "Text": "Legends aren't born—they're built. One race at a time.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_LORE_WANGAN",
+        "Text": "The highway at night is a different world. Speed limits are suggestions nobody reads.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_LORE_TOUGE",
+        "Text": "The old masters say the mountain chooses who wins. Respect the road.",
+        "Priority": "Low"
+      },
+      {
+        "ID": "TIP_LORE_GARAGE",
+        "Text": "Some say the best builds come from the smallest garages.",
+        "Priority": "Low"
+      }
+    ]
+  },
+
+  "DisplaySettings": {
+    "MinDisplayTime": 3.0,
+    "MaxDisplayTime": 8.0,
+    "FadeTime": 0.5,
+    "ShowCategory": true,
+    "ShowIcon": true,
+    "RandomizeOrder": true,
+    "AvoidRepeats": 5,
+    "PriorityWeight": {
+      "High": 2.0,
+      "Medium": 1.0,
+      "Low": 0.5,
+      "Advanced": 0.3
+    }
+  }
+}

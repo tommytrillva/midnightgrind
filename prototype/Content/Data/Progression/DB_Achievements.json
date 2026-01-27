@@ -1,0 +1,670 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Achievement & Trophy System",
+  "TotalAchievements": 85,
+
+  "Categories": {
+    "Racing": {
+      "Description": "Racing accomplishments",
+      "Icon": "trophy_racing",
+      "Color": "#FFD700"
+    },
+    "Drift": {
+      "Description": "Drifting achievements",
+      "Icon": "trophy_drift",
+      "Color": "#FF6B35"
+    },
+    "Collection": {
+      "Description": "Vehicles and parts collection",
+      "Icon": "trophy_collection",
+      "Color": "#4ECDC4"
+    },
+    "Social": {
+      "Description": "Community and crew achievements",
+      "Icon": "trophy_social",
+      "Color": "#9B59B6"
+    },
+    "Career": {
+      "Description": "Story and progression",
+      "Icon": "trophy_career",
+      "Color": "#3498DB"
+    },
+    "Mastery": {
+      "Description": "Skill-based challenges",
+      "Icon": "trophy_mastery",
+      "Color": "#E74C3C"
+    },
+    "Hidden": {
+      "Description": "Secret achievements",
+      "Icon": "trophy_hidden",
+      "Color": "#2C3E50"
+    }
+  },
+
+  "Achievements": {
+    "Racing": [
+      {
+        "ID": "ACH_FIRST_WIN",
+        "Name": "First Blood",
+        "Description": "Win your first race",
+        "Tier": "Bronze",
+        "Points": 10,
+        "Reward": { "Cash": 1000, "REP": 100 }
+      },
+      {
+        "ID": "ACH_WIN_10",
+        "Name": "Getting Warmed Up",
+        "Description": "Win 10 races",
+        "Tier": "Bronze",
+        "Points": 15,
+        "Reward": { "Cash": 2500, "REP": 250 }
+      },
+      {
+        "ID": "ACH_WIN_50",
+        "Name": "Contender",
+        "Description": "Win 50 races",
+        "Tier": "Silver",
+        "Points": 30,
+        "Reward": { "Cash": 10000, "REP": 1000 }
+      },
+      {
+        "ID": "ACH_WIN_100",
+        "Name": "Veteran Racer",
+        "Description": "Win 100 races",
+        "Tier": "Silver",
+        "Points": 50,
+        "Reward": { "Cash": 25000, "REP": 2500 }
+      },
+      {
+        "ID": "ACH_WIN_500",
+        "Name": "Living Legend",
+        "Description": "Win 500 races",
+        "Tier": "Gold",
+        "Points": 100,
+        "Reward": { "Cash": 100000, "REP": 10000, "Title": "Racing Legend" }
+      },
+      {
+        "ID": "ACH_PERFECT_RACE",
+        "Name": "Flawless",
+        "Description": "Win a race without taking any damage",
+        "Tier": "Silver",
+        "Points": 25,
+        "Reward": { "Cash": 5000, "REP": 500 }
+      },
+      {
+        "ID": "ACH_COME_FROM_BEHIND",
+        "Name": "Never Give Up",
+        "Description": "Win a race after being in last place on the final lap",
+        "Tier": "Silver",
+        "Points": 35,
+        "Reward": { "Cash": 7500, "REP": 750 }
+      },
+      {
+        "ID": "ACH_PHOTO_FINISH",
+        "Name": "By a Hair",
+        "Description": "Win a race by less than 0.1 seconds",
+        "Tier": "Gold",
+        "Points": 50,
+        "Reward": { "Cash": 15000, "REP": 1500 }
+      },
+      {
+        "ID": "ACH_DOMINATION",
+        "Name": "Total Domination",
+        "Description": "Lead an entire race from start to finish",
+        "Tier": "Silver",
+        "Points": 30,
+        "Reward": { "Cash": 8000, "REP": 800 }
+      },
+      {
+        "ID": "ACH_WIN_RAIN",
+        "Name": "Rain Master",
+        "Description": "Win 10 races in wet conditions",
+        "Tier": "Silver",
+        "Points": 35,
+        "Reward": { "Cash": 10000, "REP": 1000 }
+      },
+      {
+        "ID": "ACH_WIN_TRAFFIC",
+        "Name": "Traffic Weaver",
+        "Description": "Win a sprint race with heavy traffic enabled",
+        "Tier": "Silver",
+        "Points": 30,
+        "Reward": { "Cash": 7500, "REP": 750 }
+      },
+      {
+        "ID": "ACH_WIN_ALL_TRACKS",
+        "Name": "World Traveler",
+        "Description": "Win a race on every track",
+        "Tier": "Gold",
+        "Points": 60,
+        "Reward": { "Cash": 50000, "REP": 5000 }
+      }
+    ],
+
+    "Drift": [
+      {
+        "ID": "ACH_FIRST_DRIFT",
+        "Name": "Sideways Initiation",
+        "Description": "Complete your first drift",
+        "Tier": "Bronze",
+        "Points": 10,
+        "Reward": { "Cash": 500, "REP": 50 }
+      },
+      {
+        "ID": "ACH_DRIFT_10K",
+        "Name": "Smoke Show",
+        "Description": "Score 10,000 drift points in a single drift",
+        "Tier": "Bronze",
+        "Points": 20,
+        "Reward": { "Cash": 2000, "REP": 200 }
+      },
+      {
+        "ID": "ACH_DRIFT_50K",
+        "Name": "Tire Killer",
+        "Description": "Score 50,000 drift points in a single drift",
+        "Tier": "Silver",
+        "Points": 40,
+        "Reward": { "Cash": 10000, "REP": 1000 }
+      },
+      {
+        "ID": "ACH_DRIFT_100K",
+        "Name": "Drift Deity",
+        "Description": "Score 100,000 drift points in a single drift",
+        "Tier": "Gold",
+        "Points": 75,
+        "Reward": { "Cash": 30000, "REP": 3000, "Title": "Drift God" }
+      },
+      {
+        "ID": "ACH_DRIFT_CHAIN_5",
+        "Name": "Combo Starter",
+        "Description": "Chain 5 drifts without breaking",
+        "Tier": "Bronze",
+        "Points": 15,
+        "Reward": { "Cash": 1500, "REP": 150 }
+      },
+      {
+        "ID": "ACH_DRIFT_CHAIN_15",
+        "Name": "Combo Master",
+        "Description": "Chain 15 drifts without breaking",
+        "Tier": "Silver",
+        "Points": 35,
+        "Reward": { "Cash": 8000, "REP": 800 }
+      },
+      {
+        "ID": "ACH_TANDEM_WIN",
+        "Name": "Door to Door",
+        "Description": "Win a tandem drift battle",
+        "Tier": "Silver",
+        "Points": 30,
+        "Reward": { "Cash": 5000, "REP": 500 }
+      },
+      {
+        "ID": "ACH_TANDEM_PERFECT",
+        "Name": "Mirror Image",
+        "Description": "Score a perfect tandem run (95%+ sync)",
+        "Tier": "Gold",
+        "Points": 60,
+        "Reward": { "Cash": 20000, "REP": 2000 }
+      },
+      {
+        "ID": "ACH_DRIFT_SSS",
+        "Name": "Triple S",
+        "Description": "Achieve an SSS drift grade",
+        "Tier": "Gold",
+        "Points": 50,
+        "Reward": { "Cash": 15000, "REP": 1500 }
+      },
+      {
+        "ID": "ACH_DRIFT_TOUGE",
+        "Name": "Mountain Stylist",
+        "Description": "Score 75,000 drift points on a touge course",
+        "Tier": "Silver",
+        "Points": 40,
+        "Reward": { "Cash": 12000, "REP": 1200 }
+      },
+      {
+        "ID": "ACH_CLIP_MASTER",
+        "Name": "Clip Artist",
+        "Description": "Hit 50 clipping points in drift competitions",
+        "Tier": "Silver",
+        "Points": 35,
+        "Reward": { "Cash": 8000, "REP": 800 }
+      }
+    ],
+
+    "Collection": [
+      {
+        "ID": "ACH_OWN_5_CARS",
+        "Name": "Growing Collection",
+        "Description": "Own 5 vehicles",
+        "Tier": "Bronze",
+        "Points": 15,
+        "Reward": { "Cash": 2500, "REP": 250 }
+      },
+      {
+        "ID": "ACH_OWN_15_CARS",
+        "Name": "Garage Expansion",
+        "Description": "Own 15 vehicles",
+        "Tier": "Silver",
+        "Points": 40,
+        "Reward": { "Cash": 15000, "REP": 1500 }
+      },
+      {
+        "ID": "ACH_OWN_ALL_CARS",
+        "Name": "Complete Collection",
+        "Description": "Own all 30 vehicles",
+        "Tier": "Platinum",
+        "Points": 150,
+        "Reward": { "Cash": 500000, "REP": 50000, "Title": "Collector" }
+      },
+      {
+        "ID": "ACH_MAX_BUILD",
+        "Name": "Fully Built",
+        "Description": "Fully upgrade a vehicle with max tier parts",
+        "Tier": "Silver",
+        "Points": 35,
+        "Reward": { "Cash": 10000, "REP": 1000 }
+      },
+      {
+        "ID": "ACH_OWN_JDM",
+        "Name": "JDM Enthusiast",
+        "Description": "Own all JDM vehicles",
+        "Tier": "Gold",
+        "Points": 60,
+        "Reward": { "Cash": 50000, "REP": 5000, "Title": "JDM Legend" }
+      },
+      {
+        "ID": "ACH_OWN_MUSCLE",
+        "Name": "American Muscle",
+        "Description": "Own all Muscle vehicles",
+        "Tier": "Gold",
+        "Points": 50,
+        "Reward": { "Cash": 40000, "REP": 4000, "Title": "Muscle King" }
+      },
+      {
+        "ID": "ACH_OWN_EURO",
+        "Name": "Euro Elite",
+        "Description": "Own all Euro vehicles",
+        "Tier": "Gold",
+        "Points": 50,
+        "Reward": { "Cash": 40000, "REP": 4000, "Title": "Euro Master" }
+      },
+      {
+        "ID": "ACH_MILLIONAIRE",
+        "Name": "Millionaire",
+        "Description": "Accumulate $1,000,000 total earnings",
+        "Tier": "Gold",
+        "Points": 75,
+        "Reward": { "REP": 5000, "Title": "Millionaire" }
+      },
+      {
+        "ID": "ACH_FIRST_S_CLASS",
+        "Name": "Hypercar Owner",
+        "Description": "Purchase your first Class S vehicle",
+        "Tier": "Silver",
+        "Points": 40,
+        "Reward": { "Cash": 25000, "REP": 2500 }
+      }
+    ],
+
+    "Social": [
+      {
+        "ID": "ACH_JOIN_CREW",
+        "Name": "Crew Member",
+        "Description": "Join a crew",
+        "Tier": "Bronze",
+        "Points": 10,
+        "Reward": { "Cash": 1000, "REP": 100 }
+      },
+      {
+        "ID": "ACH_CREATE_CREW",
+        "Name": "Crew Founder",
+        "Description": "Create a crew",
+        "Tier": "Silver",
+        "Points": 25,
+        "Reward": { "Cash": 5000, "REP": 500 }
+      },
+      {
+        "ID": "ACH_CREW_10_MEMBERS",
+        "Name": "Growing Family",
+        "Description": "Have 10 members in your crew",
+        "Tier": "Silver",
+        "Points": 30,
+        "Reward": { "Cash": 10000, "REP": 1000 }
+      },
+      {
+        "ID": "ACH_CREW_TERRITORY",
+        "Name": "Turf Claimed",
+        "Description": "Capture a crew territory",
+        "Tier": "Silver",
+        "Points": 35,
+        "Reward": { "Cash": 15000, "REP": 1500 }
+      },
+      {
+        "ID": "ACH_CREW_ALL_TERRITORIES",
+        "Name": "Total Control",
+        "Description": "Control all territories simultaneously",
+        "Tier": "Platinum",
+        "Points": 100,
+        "Reward": { "Cash": 250000, "REP": 25000 }
+      },
+      {
+        "ID": "ACH_MEET_SPOT",
+        "Name": "Social Butterfly",
+        "Description": "Visit all meet spots",
+        "Tier": "Bronze",
+        "Points": 20,
+        "Reward": { "Cash": 3000, "REP": 300 }
+      },
+      {
+        "ID": "ACH_SHOWCASE_WIN",
+        "Name": "Show Winner",
+        "Description": "Win a car showcase vote",
+        "Tier": "Silver",
+        "Points": 30,
+        "Reward": { "Cash": 8000, "REP": 800 }
+      },
+      {
+        "ID": "ACH_TRADE_10",
+        "Name": "Market Trader",
+        "Description": "Complete 10 marketplace transactions",
+        "Tier": "Bronze",
+        "Points": 20,
+        "Reward": { "Cash": 5000, "REP": 500 }
+      }
+    ],
+
+    "Career": [
+      {
+        "ID": "ACH_COMPLETE_TUTORIAL",
+        "Name": "Fresh Meat",
+        "Description": "Complete the tutorial",
+        "Tier": "Bronze",
+        "Points": 10,
+        "Reward": { "Cash": 2500, "REP": 250 }
+      },
+      {
+        "ID": "ACH_CHAPTER_1",
+        "Name": "Making Waves",
+        "Description": "Complete Chapter 1: Fresh Blood",
+        "Tier": "Bronze",
+        "Points": 20,
+        "Reward": { "Cash": 5000, "REP": 500 }
+      },
+      {
+        "ID": "ACH_CHAPTER_2",
+        "Name": "Street Cred",
+        "Description": "Complete Chapter 2: Making a Name",
+        "Tier": "Silver",
+        "Points": 30,
+        "Reward": { "Cash": 10000, "REP": 1000 }
+      },
+      {
+        "ID": "ACH_CHAPTER_3",
+        "Name": "Street Soldier",
+        "Description": "Complete Chapter 3: Street Soldier",
+        "Tier": "Silver",
+        "Points": 40,
+        "Reward": { "Cash": 20000, "REP": 2000 }
+      },
+      {
+        "ID": "ACH_CHAPTER_4",
+        "Name": "Professional",
+        "Description": "Complete Chapter 4: Professional",
+        "Tier": "Gold",
+        "Points": 50,
+        "Reward": { "Cash": 35000, "REP": 3500 }
+      },
+      {
+        "ID": "ACH_CHAPTER_5",
+        "Name": "Elite Status",
+        "Description": "Complete Chapter 5: Elite",
+        "Tier": "Gold",
+        "Points": 75,
+        "Reward": { "Cash": 75000, "REP": 7500 }
+      },
+      {
+        "ID": "ACH_CHAPTER_6",
+        "Name": "Legend",
+        "Description": "Complete Chapter 6: Legend",
+        "Tier": "Platinum",
+        "Points": 100,
+        "Reward": { "Cash": 250000, "REP": 25000, "Title": "The Legend" }
+      },
+      {
+        "ID": "ACH_DEFEAT_PHOENIX",
+        "Name": "Phoenix Slayer",
+        "Description": "Defeat the Phoenix",
+        "Tier": "Gold",
+        "Points": 75,
+        "Reward": { "Cash": 100000, "REP": 10000, "Vinyl": "VNL_PHOENIX_RISING" }
+      },
+      {
+        "ID": "ACH_TRUE_ENDING",
+        "Name": "True Legend",
+        "Description": "Achieve the true ending",
+        "Tier": "Platinum",
+        "Points": 150,
+        "Reward": { "Cash": 500000, "REP": 50000, "Vinyl": "VNL_LEGEND_LEGACY" }
+      },
+      {
+        "ID": "ACH_REP_LEGEND",
+        "Name": "Legendary Status",
+        "Description": "Reach Legend reputation tier",
+        "Tier": "Gold",
+        "Points": 60,
+        "Reward": { "Cash": 50000, "Paint": "COL_CHROME" }
+      }
+    ],
+
+    "Mastery": [
+      {
+        "ID": "ACH_SPEED_200",
+        "Name": "200 Club",
+        "Description": "Reach 200 mph",
+        "Tier": "Bronze",
+        "Points": 15,
+        "Reward": { "Cash": 3000, "REP": 300 }
+      },
+      {
+        "ID": "ACH_SPEED_250",
+        "Name": "250 Club",
+        "Description": "Reach 250 mph",
+        "Tier": "Silver",
+        "Points": 35,
+        "Reward": { "Cash": 15000, "REP": 1500 }
+      },
+      {
+        "ID": "ACH_SPEED_300",
+        "Name": "300 Club",
+        "Description": "Reach 300 mph",
+        "Tier": "Gold",
+        "Points": 75,
+        "Reward": { "Cash": 50000, "REP": 5000, "Title": "Speed Demon" }
+      },
+      {
+        "ID": "ACH_TOUGE_MASTER",
+        "Name": "Touge Master",
+        "Description": "Win 25 touge battles",
+        "Tier": "Gold",
+        "Points": 50,
+        "Reward": { "Cash": 25000, "REP": 2500, "Title": "Mountain King" }
+      },
+      {
+        "ID": "ACH_DRAG_MASTER",
+        "Name": "Drag King",
+        "Description": "Win 25 drag races",
+        "Tier": "Gold",
+        "Points": 50,
+        "Reward": { "Cash": 25000, "REP": 2500, "Title": "Drag King" }
+      },
+      {
+        "ID": "ACH_CIRCUIT_MASTER",
+        "Name": "Circuit Pro",
+        "Description": "Win 25 circuit races",
+        "Tier": "Gold",
+        "Points": 50,
+        "Reward": { "Cash": 25000, "REP": 2500, "Title": "Circuit Master" }
+      },
+      {
+        "ID": "ACH_NEAR_MISS_100",
+        "Name": "Traffic Dodger",
+        "Description": "Perform 100 near misses with traffic",
+        "Tier": "Silver",
+        "Points": 30,
+        "Reward": { "Cash": 8000, "REP": 800 }
+      },
+      {
+        "ID": "ACH_CLEAN_SECTION",
+        "Name": "Clean Sector",
+        "Description": "Complete a sector without hitting anything",
+        "Tier": "Bronze",
+        "Points": 15,
+        "Reward": { "Cash": 2000, "REP": 200 }
+      },
+      {
+        "ID": "ACH_ESCAPE_HEAT_5",
+        "Name": "Great Escape",
+        "Description": "Escape the police at Heat Level 5",
+        "Tier": "Gold",
+        "Points": 60,
+        "Reward": { "Cash": 30000, "REP": 3000, "Title": "Ghost" }
+      },
+      {
+        "ID": "ACH_NO_DAMAGE_RACE",
+        "Name": "Untouchable",
+        "Description": "Complete 10 races without taking any damage",
+        "Tier": "Gold",
+        "Points": 50,
+        "Reward": { "Cash": 20000, "REP": 2000 }
+      }
+    ],
+
+    "Hidden": [
+      {
+        "ID": "ACH_HIDDEN_BEATER",
+        "Name": "Beater Believer",
+        "Description": "Win a Class A race in the Beater Sedan",
+        "Tier": "Gold",
+        "Points": 75,
+        "Hidden": true,
+        "HintText": "Never underestimate the underdog...",
+        "Reward": { "Cash": 50000, "REP": 5000, "Title": "Sleeper King" }
+      },
+      {
+        "ID": "ACH_HIDDEN_PINK_SLIP_10",
+        "Name": "High Roller",
+        "Description": "Win 10 pink slip races",
+        "Tier": "Gold",
+        "Points": 75,
+        "Hidden": true,
+        "HintText": "Fortune favors the bold...",
+        "Reward": { "Cash": 100000, "REP": 10000 }
+      },
+      {
+        "ID": "ACH_HIDDEN_LOSE_PINK",
+        "Name": "Redemption",
+        "Description": "Lose a pink slip then win it back in the rematch",
+        "Tier": "Silver",
+        "Points": 40,
+        "Hidden": true,
+        "HintText": "What's lost can be found...",
+        "Reward": { "Cash": 25000, "REP": 2500 }
+      },
+      {
+        "ID": "ACH_HIDDEN_REVERSE",
+        "Name": "Wrong Way",
+        "Description": "Complete a race while driving in reverse for 500m",
+        "Tier": "Silver",
+        "Points": 35,
+        "Hidden": true,
+        "HintText": "Sometimes the scenic route is backwards...",
+        "Reward": { "Cash": 15000, "REP": 1500 }
+      },
+      {
+        "ID": "ACH_HIDDEN_AIR_TIME",
+        "Name": "Frequent Flyer",
+        "Description": "Accumulate 60 seconds of air time",
+        "Tier": "Silver",
+        "Points": 30,
+        "Hidden": true,
+        "HintText": "Ground is overrated...",
+        "Reward": { "Cash": 10000, "REP": 1000 }
+      },
+      {
+        "ID": "ACH_HIDDEN_CRASH_100",
+        "Name": "Demolition Derby",
+        "Description": "Total 100 vehicles in crashes",
+        "Tier": "Bronze",
+        "Points": 20,
+        "Hidden": true,
+        "HintText": "Destruction has its rewards...",
+        "Reward": { "Cash": 5000, "REP": 500 }
+      },
+      {
+        "ID": "ACH_HIDDEN_MIDNIGHT",
+        "Name": "Midnight Runner",
+        "Description": "Win a race at exactly midnight (00:00)",
+        "Tier": "Silver",
+        "Points": 30,
+        "Hidden": true,
+        "HintText": "The witching hour...",
+        "Reward": { "Cash": 12000, "REP": 1200 }
+      },
+      {
+        "ID": "ACH_HIDDEN_GUTTER",
+        "Name": "Gutter Technique",
+        "Description": "Successfully use the gutter run technique 10 times",
+        "Tier": "Gold",
+        "Points": 50,
+        "Hidden": true,
+        "HintText": "The old masters knew the way...",
+        "Reward": { "Cash": 25000, "REP": 2500 }
+      },
+      {
+        "ID": "ACH_HIDDEN_ROTARY",
+        "Name": "Brap Brap",
+        "Description": "Rev a rotary engine to 10,000 RPM",
+        "Tier": "Bronze",
+        "Points": 15,
+        "Hidden": true,
+        "HintText": "Triangles of power...",
+        "Reward": { "Cash": 5000, "REP": 500 }
+      },
+      {
+        "ID": "ACH_HIDDEN_ALL_BOSSES",
+        "Name": "Boss Slayer",
+        "Description": "Defeat all boss drivers",
+        "Tier": "Platinum",
+        "Points": 100,
+        "Hidden": true,
+        "HintText": "The king slayer...",
+        "Reward": { "Cash": 200000, "REP": 20000, "Title": "Boss Killer" }
+      }
+    ]
+  },
+
+  "TierRewards": {
+    "Bronze": { "Points": 10, "BaseReward": 1000 },
+    "Silver": { "Points": 30, "BaseReward": 5000 },
+    "Gold": { "Points": 60, "BaseReward": 20000 },
+    "Platinum": { "Points": 100, "BaseReward": 100000 }
+  },
+
+  "Milestones": {
+    "TotalPoints": [
+      { "Points": 100, "Reward": { "Cash": 10000, "REP": 1000 } },
+      { "Points": 250, "Reward": { "Cash": 25000, "REP": 2500 } },
+      { "Points": 500, "Reward": { "Cash": 75000, "REP": 7500, "Title": "Achievement Hunter" } },
+      { "Points": 1000, "Reward": { "Cash": 200000, "REP": 20000, "Paint": "COL_CHAMELEON" } },
+      { "Points": 1500, "Reward": { "Cash": 500000, "REP": 50000, "Title": "Completionist" } }
+    ]
+  },
+
+  "DisplaySettings": {
+    "ShowPopupOnUnlock": true,
+    "PopupDuration": 5.0,
+    "PlaySound": true,
+    "ScreenshotOnPlatinum": true
+  }
+}

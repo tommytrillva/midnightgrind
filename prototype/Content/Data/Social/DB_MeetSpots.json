@@ -1,0 +1,418 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Meet Spot & Social Hub Locations",
+  "TotalMeetSpots": 12,
+
+  "MeetSpotTypes": {
+    "Parking": {
+      "Description": "Parking lots and structures",
+      "Capacity": "Large",
+      "Activities": ["Showcase", "Trade", "Hangout", "Drift"],
+      "Icon": "meetspot_parking"
+    },
+    "Gas": {
+      "Description": "Gas stations and convenience stores",
+      "Capacity": "Small",
+      "Activities": ["Quick Meet", "Fuel", "Snacks"],
+      "Icon": "meetspot_gas"
+    },
+    "Industrial": {
+      "Description": "Warehouses and industrial areas",
+      "Capacity": "Medium",
+      "Activities": ["Drag Race", "Trade", "Crew Meets"],
+      "Icon": "meetspot_industrial"
+    },
+    "Scenic": {
+      "Description": "Overlooks and scenic spots",
+      "Capacity": "Small",
+      "Activities": ["Photo Shoots", "Hangout", "Sunrise Meets"],
+      "Icon": "meetspot_scenic"
+    },
+    "Underground": {
+      "Description": "Hidden spots known only to insiders",
+      "Capacity": "Medium",
+      "Activities": ["Pink Slips", "High Stakes", "Exclusive Meets"],
+      "Icon": "meetspot_underground",
+      "RequiresUnlock": true
+    }
+  },
+
+  "MeetSpots": [
+    {
+      "ID": "MEET_DOWNTOWN_LOT",
+      "Name": "Downtown Mega Lot",
+      "Type": "Parking",
+      "Description": "The biggest parking lot in the city. Where it all started.",
+      "Location": {
+        "District": "Downtown",
+        "Coordinates": { "X": 2450, "Y": 1280 }
+      },
+      "Capacity": 50,
+      "Hours": {
+        "Peak": { "Start": 22, "End": 3 },
+        "Active": { "Start": 20, "End": 5 }
+      },
+      "Activities": [
+        { "Type": "Showcase", "Enabled": true, "MinCapacity": 10 },
+        { "Type": "Trade", "Enabled": true },
+        { "Type": "Hangout", "Enabled": true },
+        { "Type": "Drift", "Enabled": true, "Area": "Back Lot" }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["CrowdMurmur", "CarEngines", "Music"],
+        "Lighting": "Streetlights",
+        "Vibes": "Classic"
+      },
+      "Unlock": { "Type": "Default" },
+      "REPBonus": 1.0,
+      "NPCDensity": 0.8
+    },
+    {
+      "ID": "MEET_HIGHWAY_REST",
+      "Name": "Highway Rest Stop",
+      "Type": "Gas",
+      "Description": "Truckers and racers share coffee at 3 AM.",
+      "Location": {
+        "District": "Highway",
+        "Coordinates": { "X": 5600, "Y": 890 }
+      },
+      "Capacity": 15,
+      "Hours": {
+        "Peak": { "Start": 2, "End": 5 },
+        "Active": { "Start": 0, "End": 6 }
+      },
+      "Activities": [
+        { "Type": "Quick Meet", "Enabled": true },
+        { "Type": "Fuel", "Enabled": true, "Discount": 0.1 },
+        { "Type": "Snacks", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["HighwayTraffic", "TruckEngines", "CoffeeShop"],
+        "Lighting": "Fluorescent",
+        "Vibes": "Late Night"
+      },
+      "Unlock": { "Type": "Default" },
+      "REPBonus": 0.5,
+      "NPCDensity": 0.4
+    },
+    {
+      "ID": "MEET_INDUSTRIAL_STRIP",
+      "Name": "The Strip",
+      "Type": "Industrial",
+      "Description": "Abandoned loading docks perfect for drag racing.",
+      "Location": {
+        "District": "Industrial",
+        "Coordinates": { "X": 1890, "Y": 3200 }
+      },
+      "Capacity": 30,
+      "Hours": {
+        "Peak": { "Start": 23, "End": 2 },
+        "Active": { "Start": 21, "End": 4 }
+      },
+      "Activities": [
+        { "Type": "Drag Race", "Enabled": true, "Length": 402 },
+        { "Type": "Trade", "Enabled": true },
+        { "Type": "Crew Meets", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["IndustrialHum", "CarEngines", "MetalCreaking"],
+        "Lighting": "Minimal",
+        "Vibes": "Gritty"
+      },
+      "Unlock": { "Type": "REP", "Amount": 500 },
+      "REPBonus": 1.2,
+      "NPCDensity": 0.6,
+      "PoliceRisk": "Low"
+    },
+    {
+      "ID": "MEET_MOUNTAIN_OVERLOOK",
+      "Name": "Summit View",
+      "Type": "Scenic",
+      "Description": "The best view in the city. Worth the drive.",
+      "Location": {
+        "District": "Mountains",
+        "Coordinates": { "X": 780, "Y": 4500 }
+      },
+      "Capacity": 12,
+      "Hours": {
+        "Peak": { "Start": 4, "End": 6 },
+        "Active": { "Start": 0, "End": 8 }
+      },
+      "Activities": [
+        { "Type": "Photo Shoots", "Enabled": true, "Backdrop": "City Skyline" },
+        { "Type": "Hangout", "Enabled": true },
+        { "Type": "Sunrise Meets", "Enabled": true, "SpecialTime": 5 }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["Wind", "NatureNight", "DistantCity"],
+        "Lighting": "Natural",
+        "Vibes": "Peaceful"
+      },
+      "Unlock": { "Type": "Track", "TrackID": "HARUNA_PASS" },
+      "REPBonus": 0.8,
+      "NPCDensity": 0.3
+    },
+    {
+      "ID": "MEET_PARKING_GARAGE",
+      "Name": "Sky Garage",
+      "Type": "Parking",
+      "Description": "Five levels of parking turned drift playground.",
+      "Location": {
+        "District": "Downtown",
+        "Coordinates": { "X": 2100, "Y": 1450 }
+      },
+      "Capacity": 40,
+      "Hours": {
+        "Peak": { "Start": 22, "End": 1 },
+        "Active": { "Start": 20, "End": 4 }
+      },
+      "Activities": [
+        { "Type": "Showcase", "Enabled": true },
+        { "Type": "Drift", "Enabled": true, "Area": "All Levels" },
+        { "Type": "Tandem", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["TireSqueal", "Echoes", "Music"],
+        "Lighting": "Fluorescent",
+        "Vibes": "Underground"
+      },
+      "Unlock": { "Type": "REP", "Amount": 1000 },
+      "REPBonus": 1.5,
+      "NPCDensity": 0.7,
+      "DriftCompetitions": true
+    },
+    {
+      "ID": "MEET_DINER_24HR",
+      "Name": "Sal's 24-Hour",
+      "Type": "Gas",
+      "Description": "Best burgers in town. Racers get a discount.",
+      "Location": {
+        "District": "Suburbs",
+        "Coordinates": { "X": 3800, "Y": 2100 }
+      },
+      "Capacity": 20,
+      "Hours": {
+        "Peak": { "Start": 0, "End": 3 },
+        "Active": "24/7"
+      },
+      "Activities": [
+        { "Type": "Quick Meet", "Enabled": true },
+        { "Type": "Snacks", "Enabled": true, "HealthRestore": true },
+        { "Type": "Rumors", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["DinerAmbience", "Jukebox", "Conversation"],
+        "Lighting": "Warm",
+        "Vibes": "Classic Americana"
+      },
+      "Unlock": { "Type": "Default" },
+      "REPBonus": 0.6,
+      "NPCDensity": 0.5,
+      "Special": {
+        "RumorSystem": true,
+        "HiddenEventsHints": true
+      }
+    },
+    {
+      "ID": "MEET_HARBOR_DOCK",
+      "Name": "Container Yard",
+      "Type": "Industrial",
+      "Description": "Where deals are made and scores are settled.",
+      "Location": {
+        "District": "Harbor",
+        "Coordinates": { "X": 4200, "Y": 450 }
+      },
+      "Capacity": 35,
+      "Hours": {
+        "Peak": { "Start": 1, "End": 4 },
+        "Active": { "Start": 22, "End": 5 }
+      },
+      "Activities": [
+        { "Type": "Trade", "Enabled": true, "BlackMarket": true },
+        { "Type": "Crew Meets", "Enabled": true },
+        { "Type": "Pink Slips", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["Harbor", "ShipHorns", "Machinery"],
+        "Lighting": "Industrial",
+        "Vibes": "Dangerous"
+      },
+      "Unlock": { "Type": "REP", "Amount": 2000 },
+      "REPBonus": 1.8,
+      "NPCDensity": 0.5,
+      "PoliceRisk": "Medium",
+      "Special": {
+        "BlackMarket": true,
+        "RareParts": true
+      }
+    },
+    {
+      "ID": "MEET_AIRFIELD_HANGER",
+      "Name": "Hanger 7",
+      "Type": "Industrial",
+      "Description": "Abandoned military hanger. Perfect for top speed runs.",
+      "Location": {
+        "District": "Outskirts",
+        "Coordinates": { "X": 6500, "Y": 3800 }
+      },
+      "Capacity": 25,
+      "Hours": {
+        "Peak": { "Start": 0, "End": 4 },
+        "Active": { "Start": 22, "End": 5 }
+      },
+      "Activities": [
+        { "Type": "Drag Race", "Enabled": true, "Length": 1609 },
+        { "Type": "Top Speed", "Enabled": true },
+        { "Type": "Crew Meets", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["Wind", "MetalCreaking", "DistantPlanes"],
+        "Lighting": "Minimal",
+        "Vibes": "Isolated"
+      },
+      "Unlock": { "Type": "Track", "TrackID": "ABANDONED_AIRFIELD" },
+      "REPBonus": 1.6,
+      "NPCDensity": 0.4,
+      "PoliceRisk": "Low"
+    },
+    {
+      "ID": "MEET_CANYON_OVERLOOK",
+      "Name": "Red Rock Vista",
+      "Type": "Scenic",
+      "Description": "Where canyon runners gather before the descent.",
+      "Location": {
+        "District": "Canyon",
+        "Coordinates": { "X": 200, "Y": 5200 }
+      },
+      "Capacity": 15,
+      "Hours": {
+        "Peak": { "Start": 19, "End": 22 },
+        "Active": { "Start": 17, "End": 2 }
+      },
+      "Activities": [
+        { "Type": "Photo Shoots", "Enabled": true, "Backdrop": "Canyon Sunset" },
+        { "Type": "Touge Challenge", "Enabled": true },
+        { "Type": "Hangout", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["DesertWind", "Wildlife", "Silence"],
+        "Lighting": "Golden Hour",
+        "Vibes": "Dramatic"
+      },
+      "Unlock": { "Type": "Track", "TrackID": "RED_ROCK_CANYON" },
+      "REPBonus": 1.2,
+      "NPCDensity": 0.3
+    },
+    {
+      "ID": "MEET_UNDERGROUND_GARAGE",
+      "Name": "The Vault",
+      "Type": "Underground",
+      "Description": "Invitation only. The elite meet here.",
+      "Location": {
+        "District": "Unknown",
+        "Coordinates": { "X": 2800, "Y": 2800 }
+      },
+      "Capacity": 20,
+      "Hours": {
+        "Peak": { "Start": 1, "End": 4 },
+        "Active": { "Start": 0, "End": 5 }
+      },
+      "Activities": [
+        { "Type": "Pink Slips", "Enabled": true, "MinStake": 50000 },
+        { "Type": "High Stakes", "Enabled": true },
+        { "Type": "Exclusive Meets", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["LowHum", "ExclusiveMusic", "Whispers"],
+        "Lighting": "Dramatic",
+        "Vibes": "Elite"
+      },
+      "Unlock": { "Type": "REP", "Amount": 5000 },
+      "REPBonus": 2.5,
+      "NPCDensity": 0.6,
+      "PoliceRisk": "None",
+      "Special": {
+        "ExclusiveCars": true,
+        "HighStakesOnly": true
+      }
+    },
+    {
+      "ID": "MEET_NEON_DISTRICT",
+      "Name": "Electric Avenue",
+      "Type": "Parking",
+      "Description": "The neon-lit heart of the night scene.",
+      "Location": {
+        "District": "Entertainment",
+        "Coordinates": { "X": 3100, "Y": 1650 }
+      },
+      "Capacity": 45,
+      "Hours": {
+        "Peak": { "Start": 23, "End": 3 },
+        "Active": { "Start": 21, "End": 5 }
+      },
+      "Activities": [
+        { "Type": "Showcase", "Enabled": true, "Premium": true },
+        { "Type": "Trade", "Enabled": true },
+        { "Type": "Hangout", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["NeonBuzz", "ClubMusic", "CrowdEnergy"],
+        "Lighting": "Neon",
+        "Vibes": "Cyberpunk"
+      },
+      "Unlock": { "Type": "Track", "TrackID": "NEO_CITY_CIRCUIT" },
+      "REPBonus": 1.4,
+      "NPCDensity": 0.9,
+      "Special": {
+        "PremiumShowcase": true,
+        "PhotoOpportunities": true
+      }
+    },
+    {
+      "ID": "MEET_LEGEND_GARAGE",
+      "Name": "Legend's Den",
+      "Type": "Underground",
+      "Description": "Where the legends of the scene once raced. Now a shrine.",
+      "Location": {
+        "District": "Old Town",
+        "Coordinates": { "X": 1200, "Y": 2400 }
+      },
+      "Capacity": 10,
+      "Hours": {
+        "Peak": { "Start": 2, "End": 4 },
+        "Active": { "Start": 0, "End": 5 }
+      },
+      "Activities": [
+        { "Type": "Exclusive Meets", "Enabled": true },
+        { "Type": "Legacy Races", "Enabled": true },
+        { "Type": "Mentorship", "Enabled": true }
+      ],
+      "Atmosphere": {
+        "AmbientSounds": ["Silence", "OldEngines", "Memories"],
+        "Lighting": "Dim",
+        "Vibes": "Reverent"
+      },
+      "Unlock": { "Type": "Achievement", "AchievementID": "ACH_CHAPTER_6" },
+      "REPBonus": 3.0,
+      "NPCDensity": 0.2,
+      "Special": {
+        "LegendNPCs": true,
+        "LoreUnlocks": true,
+        "MentorSystem": true
+      }
+    }
+  ],
+
+  "GlobalSettings": {
+    "PresenceREPRate": 10,
+    "PresenceInterval": 60,
+    "ShowcaseVoteReward": 50,
+    "ShowcaseWinReward": 500,
+    "MaxActiveMeetSpots": 3,
+    "PoliceScanChance": {
+      "Low": 0.05,
+      "Medium": 0.15,
+      "High": 0.30
+    }
+  }
+}
