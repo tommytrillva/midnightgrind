@@ -1,0 +1,289 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Minimap and Navigation System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultPosition": "TopRight",
+    "DefaultSize": "Medium",
+    "DefaultOpacity": 0.85,
+    "RotateWithPlayer": true,
+    "NorthUp": false
+  },
+
+  "MinimapModes": {
+    "Standard": {
+      "ID": "MINIMAP_STANDARD",
+      "Name": "Standard",
+      "Description": "Fixed zoom level minimap",
+      "ZoomLevel": 1.0,
+      "ShowRoute": true,
+      "ShowOpponents": true,
+      "ShowCheckpoints": true
+    },
+    "Dynamic": {
+      "ID": "MINIMAP_DYNAMIC",
+      "Name": "Dynamic",
+      "Description": "Zoom adjusts based on speed",
+      "ZoomRange": { "Min": 0.5, "Max": 2.0 },
+      "SpeedThreshold": { "Low": 50, "High": 200 },
+      "SmoothTransition": true
+    },
+    "Wide": {
+      "ID": "MINIMAP_WIDE",
+      "Name": "Wide View",
+      "Description": "Zoomed out for better overview",
+      "ZoomLevel": 0.5,
+      "ShowFullTrack": false,
+      "ShowMoreCheckpoints": true
+    },
+    "TrackOverview": {
+      "ID": "MINIMAP_OVERVIEW",
+      "Name": "Track Overview",
+      "Description": "Full track visible",
+      "ShowFullTrack": true,
+      "ShowAllPositions": true,
+      "ReducedDetail": true
+    },
+    "Off": {
+      "ID": "MINIMAP_OFF",
+      "Name": "Off",
+      "Description": "Minimap disabled"
+    }
+  },
+
+  "MinimapStyles": {
+    "Modern": {
+      "ID": "STYLE_MODERN",
+      "Name": "Modern",
+      "Shape": "Round",
+      "Border": { "Style": "Thin", "Color": "#FFFFFF", "Glow": true },
+      "Background": { "Color": "#000000", "Opacity": 0.6 },
+      "PlayerIcon": "Triangle",
+      "Default": true
+    },
+    "Classic": {
+      "ID": "STYLE_CLASSIC",
+      "Name": "Classic",
+      "Shape": "Square",
+      "Border": { "Style": "Solid", "Color": "#333333" },
+      "Background": { "Color": "#1A1A1A", "Opacity": 0.8 },
+      "PlayerIcon": "Arrow"
+    },
+    "Minimal": {
+      "ID": "STYLE_MINIMAL",
+      "Name": "Minimal",
+      "Shape": "Round",
+      "Border": { "Style": "None" },
+      "Background": { "Color": "#000000", "Opacity": 0.4 },
+      "PlayerIcon": "Dot"
+    },
+    "Racing": {
+      "ID": "STYLE_RACING",
+      "Name": "Racing",
+      "Shape": "RoundedSquare",
+      "Border": { "Style": "Racing", "Color": "#FF0000", "Animated": true },
+      "Background": { "Color": "#0A0A0A", "Opacity": 0.75 },
+      "PlayerIcon": "Car"
+    },
+    "Cyberpunk": {
+      "ID": "STYLE_CYBERPUNK",
+      "Name": "Cyberpunk",
+      "Shape": "Hexagon",
+      "Border": { "Style": "Neon", "Color": "#00FFFF", "Pulse": true },
+      "Background": { "Color": "#0D0D1A", "Opacity": 0.7 },
+      "PlayerIcon": "Hologram"
+    }
+  },
+
+  "MapElements": {
+    "Track": {
+      "LineWidth": { "Min": 2, "Max": 8, "Default": 4 },
+      "Color": "#FFFFFF",
+      "Opacity": 0.9,
+      "ShowShortcuts": true,
+      "ShowOffroad": true
+    },
+    "Checkpoints": {
+      "Visible": true,
+      "NextCheckpoint": { "Color": "#FFD700", "Size": "Large", "Pulse": true },
+      "FutureCheckpoints": { "Color": "#FFFFFF", "Size": "Small", "Count": 3 },
+      "PassedCheckpoints": { "Color": "#444444", "Fade": true }
+    },
+    "StartFinish": {
+      "Icon": "Checkered",
+      "Color": "#FFFFFF",
+      "Size": "Large"
+    },
+    "Sectors": {
+      "ShowSectors": true,
+      "Colors": {
+        "Sector1": "#FF0000",
+        "Sector2": "#00FF00",
+        "Sector3": "#0000FF"
+      }
+    }
+  },
+
+  "OpponentDisplay": {
+    "ShowOpponents": true,
+    "MaxVisible": 15,
+    "Indicators": {
+      "Player": { "Color": "#00FF00", "Icon": "Triangle", "Size": "Large" },
+      "Opponent": { "Color": "#FF0000", "Icon": "Dot", "Size": "Medium" },
+      "Teammate": { "Color": "#00FFFF", "Icon": "Diamond", "Size": "Medium" },
+      "Crew": { "Color": "#FFD700", "Icon": "Star", "Size": "Medium" },
+      "Friend": { "Color": "#9932CC", "Icon": "Circle", "Size": "Medium" }
+    },
+    "PositionLabels": {
+      "Enabled": true,
+      "ShowNumber": true,
+      "ShowName": false,
+      "ShowGap": true
+    },
+    "ProximityWarning": {
+      "Enabled": true,
+      "Range": 50,
+      "VisualIndicator": "Pulse",
+      "SoundAlert": false
+    }
+  },
+
+  "Navigation": {
+    "RacingLine": {
+      "Enabled": false,
+      "Color": "#00FF00",
+      "Opacity": 0.5,
+      "BrakingZones": { "Color": "#FF0000" },
+      "AccelerationZones": { "Color": "#00FF00" }
+    },
+    "DirectionArrows": {
+      "Enabled": true,
+      "AtCheckpoints": true,
+      "BeforeCorners": true,
+      "LeadDistance": 100
+    },
+    "CornerIndicators": {
+      "Enabled": true,
+      "ShowSeverity": true,
+      "Colors": {
+        "Light": "#00FF00",
+        "Medium": "#FFFF00",
+        "Heavy": "#FF8800",
+        "Hairpin": "#FF0000"
+      }
+    }
+  },
+
+  "FreeRoamElements": {
+    "PointsOfInterest": {
+      "ShowPOI": true,
+      "Categories": {
+        "Garage": { "Icon": "Garage", "Color": "#00FF00" },
+        "Shop": { "Icon": "Shop", "Color": "#FFD700" },
+        "RaceStart": { "Icon": "Flag", "Color": "#FF0000" },
+        "CarMeet": { "Icon": "Car", "Color": "#00FFFF" },
+        "Collectible": { "Icon": "Star", "Color": "#9932CC" },
+        "PhotoSpot": { "Icon": "Camera", "Color": "#FF69B4" },
+        "SpeedTrap": { "Icon": "Speed", "Color": "#FF8800" },
+        "DriftZone": { "Icon": "Drift", "Color": "#00FF00" },
+        "SecretLocation": { "Icon": "Question", "Color": "#FFFFFF" }
+      }
+    },
+    "Waypoints": {
+      "CustomWaypoint": true,
+      "MaxWaypoints": 5,
+      "ShowDistance": true,
+      "ShowETA": true,
+      "GPSLine": { "Enabled": true, "Color": "#00FFFF", "Style": "Dashed" }
+    },
+    "DiscoveredAreas": {
+      "ShowExplored": true,
+      "FogOfWar": false,
+      "PercentComplete": true
+    }
+  },
+
+  "SpecialIndicators": {
+    "Police": {
+      "Enabled": true,
+      "Icon": "Police",
+      "Color": "#0000FF",
+      "FlashingWhenPursuit": true,
+      "ShowSearchArea": true
+    },
+    "Bounty": {
+      "ShowBountyTargets": true,
+      "Icon": "Target",
+      "Color": "#FF0000",
+      "Range": 500
+    },
+    "Events": {
+      "ShowNearbyEvents": true,
+      "Icon": "Event",
+      "Color": "#FFD700",
+      "Pulse": true
+    },
+    "Hazards": {
+      "ShowHazards": true,
+      "Types": {
+        "Crash": { "Icon": "Warning", "Color": "#FF8800" },
+        "Roadblock": { "Icon": "Block", "Color": "#FF0000" },
+        "Slippery": { "Icon": "Wet", "Color": "#00FFFF" }
+      }
+    }
+  },
+
+  "Customization": {
+    "Size": {
+      "Options": ["Small", "Medium", "Large", "XLarge"],
+      "Default": "Medium",
+      "Pixels": { "Small": 150, "Medium": 200, "Large": 250, "XLarge": 300 }
+    },
+    "Position": {
+      "Options": ["TopLeft", "TopRight", "BottomLeft", "BottomRight", "Custom"],
+      "Default": "TopRight",
+      "CustomPosition": { "X": { "Min": 0, "Max": 100 }, "Y": { "Min": 0, "Max": 100 } }
+    },
+    "Opacity": {
+      "Min": 0.3,
+      "Max": 1.0,
+      "Default": 0.85,
+      "FadeWhenNearEdge": true
+    },
+    "Rotation": {
+      "Options": ["PlayerUp", "NorthUp", "TrackUp"],
+      "Default": "PlayerUp"
+    }
+  },
+
+  "Accessibility": {
+    "HighContrast": {
+      "Enabled": false,
+      "BoostColors": true,
+      "ThickerLines": true
+    },
+    "Colorblind": {
+      "Enabled": false,
+      "Mode": ["Deuteranopia", "Protanopia", "Tritanopia"],
+      "AdjustedColors": true
+    },
+    "LargeIcons": {
+      "Enabled": false,
+      "ScaleMultiplier": 1.5
+    }
+  },
+
+  "Performance": {
+    "UpdateRate": {
+      "High": 60,
+      "Medium": 30,
+      "Low": 15
+    },
+    "DetailLevel": {
+      "High": { "ShowAll": true, "Antialiasing": true },
+      "Medium": { "ReducedPOI": true, "NoAntialiasing": false },
+      "Low": { "MinimalElements": true, "NoAntialiasing": true }
+    }
+  }
+}

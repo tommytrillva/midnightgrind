@@ -1,0 +1,349 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Rival System and Nemesis Mechanics",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxActiveRivals": 5,
+    "RivalryDecay": true,
+    "DecayPeriod": 604800,
+    "RivalMatchmaking": true
+  },
+
+  "RivalryTypes": {
+    "Nemesis": {
+      "ID": "RIVAL_NEMESIS",
+      "Name": "Nemesis",
+      "Description": "Your greatest rival - bitter competition",
+      "MaxCount": 1,
+      "IntensityLevel": "Maximum",
+      "Requirements": {
+        "MinLosses": 5,
+        "MinRaces": 10,
+        "CloseRaces": 3
+      },
+      "Effects": {
+        "REPBonus": 2.0,
+        "CashBonus": 1.5,
+        "IntensifiedAI": true,
+        "SpecialDialogue": true
+      }
+    },
+    "Rival": {
+      "ID": "RIVAL_STANDARD",
+      "Name": "Rival",
+      "Description": "Competitive rival - regular encounters",
+      "MaxCount": 3,
+      "IntensityLevel": "High",
+      "Requirements": {
+        "MinLosses": 2,
+        "MinRaces": 5
+      },
+      "Effects": {
+        "REPBonus": 1.5,
+        "CashBonus": 1.25,
+        "PriorityMatching": true
+      }
+    },
+    "Competitor": {
+      "ID": "RIVAL_COMPETITOR",
+      "Name": "Competitor",
+      "Description": "Emerging rivalry - building tension",
+      "MaxCount": 5,
+      "IntensityLevel": "Medium",
+      "Requirements": {
+        "MinLosses": 1,
+        "MinRaces": 3
+      },
+      "Effects": {
+        "REPBonus": 1.25,
+        "CashBonus": 1.1
+      }
+    },
+    "Acquaintance": {
+      "ID": "RIVAL_ACQUAINTANCE",
+      "Name": "Acquaintance",
+      "Description": "Potential rival - early encounters",
+      "MaxCount": 10,
+      "IntensityLevel": "Low",
+      "Requirements": {
+        "MinRaces": 1
+      },
+      "Effects": {
+        "TrackingEnabled": true
+      }
+    }
+  },
+
+  "RivalryFormation": {
+    "Triggers": {
+      "LossToPlayer": {
+        "Weight": 30,
+        "Description": "Losing to the same player"
+      },
+      "CloseRace": {
+        "Weight": 20,
+        "Threshold": 2.0,
+        "Description": "Finishing within 2 seconds"
+      },
+      "OvertakeOnLastLap": {
+        "Weight": 25,
+        "Description": "Being overtaken on the final lap"
+      },
+      "Contact": {
+        "Weight": 15,
+        "Description": "Significant contact during race"
+      },
+      "DenyOvertake": {
+        "Weight": 10,
+        "Description": "Successfully blocking an overtake attempt"
+      },
+      "ChatTrash": {
+        "Weight": 20,
+        "Description": "Trash talk in chat"
+      },
+      "Rematch": {
+        "Weight": 25,
+        "Description": "Requesting/accepting rematch"
+      }
+    },
+    "PointThresholds": {
+      "Acquaintance": 25,
+      "Competitor": 75,
+      "Rival": 150,
+      "Nemesis": 300
+    },
+    "PointDecay": {
+      "PerDay": 2,
+      "MinimumAfterDecay": 10,
+      "PauseOnActivity": true
+    }
+  },
+
+  "RivalryInteractions": {
+    "InRace": {
+      "ProximityIndicator": {
+        "Enabled": true,
+        "Range": 100,
+        "VisualEffect": "Glow",
+        "Color": "#FF0000"
+      },
+      "RivalMusic": {
+        "Enabled": true,
+        "IntensifyWhenNear": true
+      },
+      "Announcer": {
+        "CallOutRival": true,
+        "NarrateBattle": true
+      },
+      "AggressionIncrease": {
+        "Enabled": true,
+        "Multiplier": 1.3
+      }
+    },
+    "OutOfRace": {
+      "ShowOnMap": {
+        "Enabled": true,
+        "WhenNearby": true,
+        "Range": 500
+      },
+      "QuickChallenge": {
+        "Enabled": true,
+        "OneClick": true
+      },
+      "RivalTracking": {
+        "LastSeen": true,
+        "FrequentTracks": true,
+        "PreferredVehicle": true
+      }
+    }
+  },
+
+  "RivalryRewards": {
+    "Defeat": {
+      "FirstDefeat": {
+        "REP": 500,
+        "Title": "Rivalry Begins"
+      },
+      "DefeatNemesis": {
+        "REP": 2500,
+        "Cash": 25000,
+        "Achievement": "Nemesis Defeated"
+      },
+      "WinStreak": {
+        "Per3Wins": {
+          "REP": 1000,
+          "Cash": 10000
+        }
+      }
+    },
+    "Milestones": {
+      "10RivalWins": {
+        "REP": 5000,
+        "Title": "Rival Crusher"
+      },
+      "50RivalWins": {
+        "REP": 25000,
+        "Title": "Rival Destroyer"
+      },
+      "100RivalWins": {
+        "REP": 100000,
+        "Title": "Rivalry Legend",
+        "Badge": "RivalryLegendBadge"
+      }
+    }
+  },
+
+  "RivalProfile": {
+    "Display": {
+      "Name": true,
+      "Level": true,
+      "REPTier": true,
+      "Vehicle": true,
+      "WinLossRecord": true,
+      "LastRace": true,
+      "RivalryDuration": true
+    },
+    "Statistics": {
+      "TotalRaces": true,
+      "Wins": true,
+      "Losses": true,
+      "WinRate": true,
+      "ClosestRace": true,
+      "BiggestVictory": true,
+      "CurrentStreak": true,
+      "BestStreak": true
+    },
+    "History": {
+      "RecentResults": 10,
+      "TrackHistory": true,
+      "VehicleHistory": true
+    }
+  },
+
+  "AIRivals": {
+    "StoryRivals": {
+      "Enabled": true,
+      "Characters": {
+        "TakeshiYamamoto": {
+          "Personality": "Calculated",
+          "DialogueStyle": "Mysterious",
+          "IntroductionEvent": "Story_Chapter3",
+          "Signature": "Drift Master"
+        },
+        "MariaSantos": {
+          "Personality": "Aggressive",
+          "DialogueStyle": "Confident",
+          "IntroductionEvent": "Story_Chapter5",
+          "Signature": "Speed Queen"
+        },
+        "ViktorKozlov": {
+          "Personality": "Defensive",
+          "DialogueStyle": "Intimidating",
+          "IntroductionEvent": "Story_Chapter7",
+          "Signature": "The Wall"
+        }
+      }
+    },
+    "DynamicRivals": {
+      "Enabled": true,
+      "Generation": {
+        "MatchPlayerLevel": true,
+        "SimilarVehicleClass": true,
+        "RandomPersonality": true
+      },
+      "Persistence": {
+        "RememberAcrossSession": true,
+        "EvolveDifficulty": true
+      }
+    }
+  },
+
+  "RivalChallenges": {
+    "Types": {
+      "1v1Race": {
+        "ID": "CHALLENGE_1V1",
+        "Stakes": ["Pride", "Cash", "PinkSlip"],
+        "Format": "HeadToHead"
+      },
+      "BestOf3": {
+        "ID": "CHALLENGE_BESTOF3",
+        "Stakes": ["Cash", "REP"],
+        "Format": "Series"
+      },
+      "DriftBattle": {
+        "ID": "CHALLENGE_DRIFT",
+        "Stakes": ["REP", "Title"],
+        "Format": "Tandem"
+      },
+      "TimeAttack": {
+        "ID": "CHALLENGE_TIME",
+        "Stakes": ["BraggingRights"],
+        "Format": "GhostRace"
+      }
+    },
+    "Initiation": {
+      "DirectChallenge": true,
+      "InLobby": true,
+      "AfterRace": true,
+      "ThroughMenu": true
+    },
+    "StakesMultiplier": {
+      "Competitor": 1.0,
+      "Rival": 1.5,
+      "Nemesis": 2.0
+    }
+  },
+
+  "RivalryEnding": {
+    "Conditions": {
+      "Inactivity": {
+        "Days": 30,
+        "DemoteLevel": true
+      },
+      "Dominance": {
+        "WinStreak": 10,
+        "Effect": "RivalBreaks",
+        "Reward": { "REP": 5000, "Title": "Dominated" }
+      },
+      "Mutual": {
+        "Option": "EndRivalry",
+        "RequiresConsent": true
+      }
+    },
+    "Consequences": {
+      "RivalEnds": {
+        "StatsPreserved": true,
+        "CanReform": true,
+        "CooldownDays": 14
+      }
+    }
+  },
+
+  "UI": {
+    "RivalList": {
+      "Sorting": ["Intensity", "Recent", "WinRate"],
+      "Filtering": ["Active", "Inactive", "All"],
+      "QuickActions": ["Challenge", "ViewProfile", "TrackLocation"]
+    },
+    "Notifications": {
+      "RivalNearby": true,
+      "RivalOnline": true,
+      "RivalRacing": true,
+      "RivalLevelUp": true,
+      "ChallengeReceived": true
+    },
+    "HUDIndicators": {
+      "RivalInRace": true,
+      "RivalPosition": true,
+      "GapToRival": true
+    }
+  },
+
+  "Leaderboards": {
+    "MostRivalWins": true,
+    "LongestRivalry": true,
+    "MostNemesesDefeated": true,
+    "CurrentWinStreaks": true
+  }
+}
