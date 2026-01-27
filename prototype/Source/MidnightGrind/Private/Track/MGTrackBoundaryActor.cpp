@@ -40,6 +40,18 @@ void AMGTrackBoundaryActor::BeginPlay()
 	SetBoundaryVisible(bShowInGame);
 }
 
+void AMGTrackBoundaryActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unbind delegates to prevent dangling references
+	if (BoundarySpline)
+	{
+		BoundarySpline->OnComponentBeginOverlap.RemoveDynamic(this, &AMGTrackBoundaryActor::OnBoundaryOverlapBegin);
+		BoundarySpline->OnComponentEndOverlap.RemoveDynamic(this, &AMGTrackBoundaryActor::OnBoundaryOverlapEnd);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void AMGTrackBoundaryActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

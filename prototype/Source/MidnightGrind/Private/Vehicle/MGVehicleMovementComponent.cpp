@@ -2654,7 +2654,7 @@ void UMGVehicleMovementComponent::UpdateTurboShaftSimulation(float DeltaTime)
 	const float InertiaFactor = 1.0f / FMath::Max(TurboShaftInertia, 0.1f);
 
 	// Target shaft RPM based on exhaust energy and turbo size
-	const float MaxShaftRPM = Turbo.MaxShaftRPM;
+	const float MaxShaftRPM = FMath::Max(Turbo.MaxShaftRPM, 1.0f); // Prevent division by zero
 	const float TargetShaftRPM = ExhaustEnergy * MaxShaftRPM;
 
 	// Apply spool-up/spool-down with inertia

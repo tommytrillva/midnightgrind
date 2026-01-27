@@ -134,7 +134,9 @@ void AMGSpectatorPawn::MoveForward(float Value)
 	}
 
 	FVector Direction = GetActorForwardVector();
-	AddMovementInput(Direction, Value * Speed * GetWorld()->GetDeltaSeconds());
+	UWorld* World = GetWorld();
+	float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
+	AddMovementInput(Direction, Value * Speed * DeltaSeconds);
 }
 
 void AMGSpectatorPawn::MoveRight(float Value)
@@ -160,7 +162,9 @@ void AMGSpectatorPawn::MoveRight(float Value)
 	}
 
 	FVector Direction = GetActorRightVector();
-	AddMovementInput(Direction, Value * Speed * GetWorld()->GetDeltaSeconds());
+	UWorld* World = GetWorld();
+	float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
+	AddMovementInput(Direction, Value * Speed * DeltaSeconds);
 }
 
 void AMGSpectatorPawn::MoveUp(float Value)
@@ -186,7 +190,9 @@ void AMGSpectatorPawn::MoveUp(float Value)
 	}
 
 	FVector Direction = FVector::UpVector;
-	AddMovementInput(Direction, Value * Speed * GetWorld()->GetDeltaSeconds());
+	UWorld* World = GetWorld();
+	float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
+	AddMovementInput(Direction, Value * Speed * DeltaSeconds);
 }
 
 void AMGSpectatorPawn::LookUp(float Value)

@@ -462,6 +462,11 @@ void UMGCautionSubsystem::ConfigureZones(int32 NumZones, float InTrackLength)
 	TrackLength = InTrackLength;
 	CautionZones.Empty();
 
+	if (NumZones <= 0)
+	{
+		return;
+	}
+
 	float ZoneLength = TrackLength / NumZones;
 
 	for (int32 i = 0; i < NumZones; i++)

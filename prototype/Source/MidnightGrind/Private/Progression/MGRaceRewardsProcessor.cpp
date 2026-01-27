@@ -27,6 +27,12 @@ void UMGRaceRewardsProcessor::Initialize(FSubsystemCollectionBase& Collection)
 
 void UMGRaceRewardsProcessor::Deinitialize()
 {
+	// Unbind from race game mode delegate
+	if (RaceGameMode.IsValid())
+	{
+		RaceGameMode->OnRaceResultsReady.RemoveDynamic(this, &UMGRaceRewardsProcessor::OnRaceResultsReady);
+	}
+
 	Super::Deinitialize();
 }
 

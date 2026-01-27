@@ -5,6 +5,11 @@
 #include "Engine/World.h"
 #include "Engine/StreamableManager.h"
 #include "Engine/AssetManager.h"
+#include "Progression/MGPlayerProgression.h"
+#include "Career/MGCareerSubsystem.h"
+#include "Social/MGLeaderboardSubsystem.h"
+#include "Economy/MGEconomySubsystem.h"
+#include "Rivals/MGRivalsSubsystem.h"
 
 void UMGRaceFlowManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -48,8 +53,14 @@ void UMGRaceFlowManager::BeginRaceLoad(const FSoftObjectPath& TrackMapPath, cons
 	LatentInfo.Linkage = 0;
 	LatentInfo.UUID = FMath::Rand();
 
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
 	UGameplayStatics::LoadStreamLevelBySoftObjectPtr(
-		GetWorld(),
+		World,
 		TSoftObjectPtr<UWorld>(TrackMapPath),
 		true, // Make visible
 		false, // Should block
@@ -357,46 +368,121 @@ TArray<FText> UMGRaceFlowManager::UpdateChallengeProgress(const FMGRaceResults& 
 
 void UMGRaceFlowManager::ApplyRewards(const FMGRaceRewardBreakdown& Rewards)
 {
-	// Apply credits
-	if (EconomySubsystem.IsValid())
+	// Apply credits via EconomySubsystem (integrates with save system)
+	if (UMGEconomySubsystem* EconSub = GetGameInstance()->GetSubsystem<UMGEconomySubsystem>())
 	{
-		// EconomySubsystem->AddCredits(Rewards.TotalCredits, TEXT("Race Reward"));
+		EconSub->AwardRaceWinnings(Rewards.TotalCredits, CurrentConfig.TrackName);
 	}
 
-	// Apply XP
+	// Apply XP via PlayerProgression
 	if (ProgressionSubsystem.IsValid())
 	{
-		// ProgressionSubsystem->AddXP(Rewards.XPEarned);
+		ProgressionSubsystem->AddXP(Rewards.XPEarned, true);
 	}
 
-	// Apply reputation
+	// Apply reputation via PlayerProgression (reputation is earned, not purchased)
+	if (ProgressionSubsystem.IsValid() && Rewards.ReputationEarned > 0)
+	{
+		// Get the crew from current race config or default to Midnight
+		EMGCrew RaceCrew = EMGCrew::Midnight; // Could be from CurrentConfig
+		ProgressionSubsystem->AddCrewReputation(RaceCrew, Rewards.ReputationEarned);
+	}
+
+	// Record race result in career system
 	if (CareerSubsystem.IsValid())
 	{
-		// CareerSubsystem->AddReputation(Rewards.ReputationEarned);
+		// Find player position from cached results
+		int32 PlayerPosition = 1;
+		int32 TotalRacers = CachedResults.RacerResults.Num();
+		TArray<FString> DefeatedRivals;
+
+		for (const FMGRacerData& Racer : CachedResults.RacerResults)
+		{
+			if (!Racer.bIsAI)
+			{
+				PlayerPosition = Racer.Position;
+				break;
+			}
+		}
+
+		// Clean race if no major collisions (placeholder - would track from race)
+		bool bCleanRace = Rewards.CleanRaceBonus > 0;
+
+		CareerSubsystem->OnRaceCompleted(PlayerPosition, TotalRacers, bCleanRace, DefeatedRivals);
+	}
+
+	// Record race statistics
+	if (ProgressionSubsystem.IsValid())
+	{
+		int32 PlayerPosition = 1;
+		int32 TotalRacers = CachedResults.RacerResults.Num();
+
+		for (const FMGRacerData& Racer : CachedResults.RacerResults)
+		{
+			if (!Racer.bIsAI)
+			{
+				PlayerPosition = Racer.Position;
+
+				// Record drift score if any
+				if (Racer.DriftScore > 0.0f)
+				{
+					ProgressionSubsystem->RecordDriftScore(Racer.DriftScore);
+				}
+				break;
+			}
+		}
+
+		// Determine race type from config
+		FName RaceTypeID = FName(TEXT("Circuit")); // Would come from CurrentConfig.RaceType
+
+		ProgressionSubsystem->RecordRaceResult(PlayerPosition, TotalRacers, EMGCrew::None, RaceTypeID);
 	}
 }
 
 void UMGRaceFlowManager::ApplyUnlocks(const TArray<FMGRaceUnlock>& Unlocks)
 {
+	if (!ProgressionSubsystem.IsValid())
+	{
+		return;
+	}
+
 	for (const FMGRaceUnlock& Unlock : Unlocks)
 	{
-		// Apply unlock based on type
+		// Create unlock entry for progression system
+		FMGUnlock ProgressionUnlock;
+		ProgressionUnlock.UnlockID = Unlock.ItemID;
+		ProgressionUnlock.DisplayName = Unlock.DisplayName;
+		ProgressionUnlock.Description = Unlock.Description;
+		ProgressionUnlock.UnlockedAt = FDateTime::Now();
+
+		// Map unlock type
 		if (Unlock.UnlockType == FName(TEXT("Vehicle")))
 		{
-			// Unlock vehicle in garage
+			ProgressionUnlock.Type = EMGUnlockType::Vehicle;
 		}
 		else if (Unlock.UnlockType == FName(TEXT("Part")))
 		{
-			// Add part to inventory
+			ProgressionUnlock.Type = EMGUnlockType::Part;
 		}
 		else if (Unlock.UnlockType == FName(TEXT("Customization")))
 		{
-			// Unlock paint/vinyl/etc.
+			ProgressionUnlock.Type = EMGUnlockType::Cosmetic;
+		}
+		else if (Unlock.UnlockType == FName(TEXT("Track")))
+		{
+			ProgressionUnlock.Type = EMGUnlockType::Track;
 		}
 		else if (Unlock.UnlockType == FName(TEXT("Achievement")))
 		{
-			// Mark achievement complete
+			ProgressionUnlock.Type = EMGUnlockType::Feature;
 		}
+		else
+		{
+			ProgressionUnlock.Type = EMGUnlockType::Feature;
+		}
+
+		// Grant the unlock via progression system
+		ProgressionSubsystem->GrantUnlock(ProgressionUnlock);
 	}
 }
 
@@ -407,16 +493,34 @@ void UMGRaceFlowManager::SubmitToLeaderboards(const FMGRaceResults& Results)
 		return;
 	}
 
-	// Find player's best lap and submit
+	// Find player's data and submit to leaderboards
 	for (const FMGRacerData& Racer : Results.RacerResults)
 	{
-		if (!Racer.bIsAI && Racer.BestLapTime > 0.0f)
+		if (!Racer.bIsAI)
 		{
-			// LeaderboardSubsystem->SubmitLapTime(
-			//     CurrentConfig.TrackID,
-			//     CurrentPlayerVehicleID,
-			//     Racer.BestLapTime
-			// );
+			// Submit best lap time
+			if (Racer.BestLapTime > 0.0f)
+			{
+				TArray<uint8> GhostData; // Empty for now - ghost replay data would go here
+				LeaderboardSubsystem->SubmitLapTime(
+					CurrentConfig.TrackName,
+					Racer.BestLapTime,
+					CurrentPlayerVehicleID,
+					GhostData
+				);
+			}
+
+			// Submit total race time
+			if (Racer.TotalTime > 0.0f)
+			{
+				LeaderboardSubsystem->SubmitRaceTime(
+					CurrentConfig.TrackName,
+					Racer.TotalTime,
+					CurrentConfig.LapCount,
+					CurrentPlayerVehicleID
+				);
+			}
+
 			break;
 		}
 	}
@@ -424,19 +528,78 @@ void UMGRaceFlowManager::SubmitToLeaderboards(const FMGRaceResults& Results)
 
 void UMGRaceFlowManager::UpdateRivalRelationships(const FMGRaceResults& Results)
 {
-	// Check if racing against a rival
-	// Update rival stats based on outcome
-	// Potentially create new rivalries based on close finishes
+	// Get rivals subsystem
+	UMGRivalsSubsystem* RivalsSubsystem = nullptr;
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		RivalsSubsystem = GI->GetSubsystem<UMGRivalsSubsystem>();
+	}
+
+	if (!RivalsSubsystem)
+	{
+		return;
+	}
+
+	// Find player data
+	int32 PlayerPosition = 0;
+	float PlayerFinishTime = 0.0f;
+	for (const FMGRacerData& Racer : Results.RacerResults)
+	{
+		if (!Racer.bIsAI)
+		{
+			PlayerPosition = Racer.Position;
+			PlayerFinishTime = Racer.FinishTime;
+			break;
+		}
+	}
+
+	if (PlayerPosition <= 0)
+	{
+		return;
+	}
+
+	// Process each AI racer as potential rival encounter
+	for (const FMGRacerData& Racer : Results.RacerResults)
+	{
+		if (Racer.bIsAI && Racer.bFinished)
+		{
+			// Calculate time difference (positive = player faster)
+			float TimeDiff = Racer.FinishTime - PlayerFinishTime;
+
+			// Create rivalry encounter for close races
+			FString AIPlayerID = FString::Printf(TEXT("AI_%d"), Racer.RacerIndex);
+			RivalsSubsystem->OnRaceWithPlayer(
+				AIPlayerID,
+				Racer.DisplayName,
+				PlayerPosition,
+				Racer.Position,
+				TimeDiff
+			);
+		}
+	}
+
+	// Check for defeated rival and update post-race summary
+	if (Results.bPlayerWon)
+	{
+		FMGRival Nemesis = RivalsSubsystem->GetNemesis();
+		if (RivalsSubsystem->HasNemesis())
+		{
+			PostRaceSummary.RivalDefeated = FText::Format(
+				NSLOCTEXT("MG", "RivalDefeated", "Defeated rival: {0}"),
+				Nemesis.DisplayName
+			);
+		}
+	}
 }
 
 void UMGRaceFlowManager::CacheSubsystems()
 {
 	if (UGameInstance* GI = GetGameInstance())
 	{
-		// ProgressionSubsystem = GI->GetSubsystem<UMGProgressionSubsystem>();
-		// EconomySubsystem = GI->GetSubsystem<UMGEconomySubsystem>();
-		// CareerSubsystem = GI->GetSubsystem<UMGCareerSubsystem>();
-		// LeaderboardSubsystem = GI->GetSubsystem<UMGLeaderboardSubsystem>();
+		ProgressionSubsystem = GI->GetSubsystem<UMGPlayerProgression>();
+		CareerSubsystem = GI->GetSubsystem<UMGCareerSubsystem>();
+		LeaderboardSubsystem = GI->GetSubsystem<UMGLeaderboardSubsystem>();
+		// Note: Economy handled via ShopSubsystem->AddCurrency()
 	}
 }
 
@@ -485,17 +648,58 @@ void UMGRaceFlowManager::BuildPostRaceSummary(const FMGRaceResults& Results)
 	// Update challenge progress
 	PostRaceSummary.ChallengeProgress = UpdateChallengeProgress(Results);
 
-	// Get current level info (would come from progression subsystem)
-	PostRaceSummary.LevelBefore = 1;
-	PostRaceSummary.XPProgressBefore = 0.0f;
+	// Get current level info from progression subsystem
+	if (ProgressionSubsystem.IsValid())
+	{
+		PostRaceSummary.LevelBefore = ProgressionSubsystem->GetCurrentLevel();
+		PostRaceSummary.XPProgressBefore = ProgressionSubsystem->GetLevelProgress();
 
-	// Calculate new level after XP
-	// This would use the progression subsystem
-	PostRaceSummary.LevelAfter = PostRaceSummary.LevelBefore;
-	PostRaceSummary.XPProgressAfter = PostRaceSummary.XPProgressBefore;
-	PostRaceSummary.bLeveledUp = PostRaceSummary.LevelAfter > PostRaceSummary.LevelBefore;
+		// Calculate what level will be after XP is applied
+		int64 CurrentXP = ProgressionSubsystem->GetCurrentXP();
+		int64 XPAfter = CurrentXP + PostRaceSummary.Rewards.XPEarned;
+		int64 XPForNext = ProgressionSubsystem->GetXPForNextLevel();
 
-	// Check for records
-	// PostRaceSummary.bNewPersonalBest = LeaderboardSubsystem->IsNewPersonalBest(...);
-	// PostRaceSummary.bTrackRecord = LeaderboardSubsystem->IsTrackRecord(...);
+		// Guard against division by zero
+		if (XPForNext <= 0)
+		{
+			XPForNext = 1;
+		}
+
+		if (XPAfter >= XPForNext)
+		{
+			PostRaceSummary.LevelAfter = PostRaceSummary.LevelBefore + 1;
+			PostRaceSummary.XPProgressAfter = static_cast<float>(XPAfter - XPForNext) / static_cast<float>(XPForNext);
+			PostRaceSummary.bLeveledUp = true;
+		}
+		else
+		{
+			PostRaceSummary.LevelAfter = PostRaceSummary.LevelBefore;
+			PostRaceSummary.XPProgressAfter = static_cast<float>(XPAfter) / static_cast<float>(XPForNext);
+			PostRaceSummary.bLeveledUp = false;
+		}
+	}
+	else
+	{
+		PostRaceSummary.LevelBefore = 1;
+		PostRaceSummary.XPProgressBefore = 0.0f;
+		PostRaceSummary.LevelAfter = 1;
+		PostRaceSummary.XPProgressAfter = 0.0f;
+		PostRaceSummary.bLeveledUp = false;
+	}
+
+	// Check for personal best lap time
+	if (LeaderboardSubsystem.IsValid())
+	{
+		// Find player's best lap from results
+		for (const FMGRacerData& Racer : Results.RacerResults)
+		{
+			if (!Racer.bIsAI && Racer.BestLapTime > 0.0f)
+			{
+				// Would check against stored personal best
+				PostRaceSummary.bNewPersonalBest = false; // Placeholder
+				PostRaceSummary.bTrackRecord = (Racer.BestLapTime == Results.BestLapTime);
+				break;
+			}
+		}
+	}
 }

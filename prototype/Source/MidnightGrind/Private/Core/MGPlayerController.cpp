@@ -6,6 +6,10 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "InputRemap/MGInputRemapSubsystem.h"
+#include "Checkpoint/MGCheckpointSubsystem.h"
+#include "NearMiss/MGNearMissSubsystem.h"
+#include "Drift/MGDriftSubsystem.h"
+#include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/GameStateBase.h"
@@ -37,7 +41,58 @@ void AMGPlayerController::BeginPlay()
 				Subsystem->AddMappingContext(DefaultMappingContext, 0);
 			}
 		}
+
+		// Bind to checkpoint subsystem's wrong-way detection
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGCheckpointSubsystem* CheckpointSubsystem = World->GetSubsystem<UMGCheckpointSubsystem>())
+			{
+				CheckpointSubsystem->OnWrongWay.AddDynamic(this, &AMGPlayerController::OnWrongWayDetected);
+			}
+
+			// Bind to near miss subsystem for HUD popups
+			if (UMGNearMissSubsystem* NearMissSubsystem = World->GetSubsystem<UMGNearMissSubsystem>())
+			{
+				NearMissSubsystem->OnNearMissOccurred.AddDynamic(this, &AMGPlayerController::OnNearMissDetected);
+			}
+		}
+
+		// Bind to drift subsystem for score popups (GameInstance subsystem)
+		if (UGameInstance* GI = GetGameInstance())
+		{
+			if (UMGDriftSubsystem* DriftSubsystem = GI->GetSubsystem<UMGDriftSubsystem>())
+			{
+				DriftSubsystem->OnDriftEnded.AddDynamic(this, &AMGPlayerController::OnDriftEnded);
+			}
+		}
 	}
+}
+
+void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unbind from subsystem delegates
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGCheckpointSubsystem* CheckpointSubsystem = World->GetSubsystem<UMGCheckpointSubsystem>())
+		{
+			CheckpointSubsystem->OnWrongWay.RemoveDynamic(this, &AMGPlayerController::OnWrongWayDetected);
+		}
+
+		if (UMGNearMissSubsystem* NearMissSubsystem = World->GetSubsystem<UMGNearMissSubsystem>())
+		{
+			NearMissSubsystem->OnNearMissOccurred.RemoveDynamic(this, &AMGPlayerController::OnNearMissDetected);
+		}
+	}
+
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGDriftSubsystem* DriftSubsystem = GI->GetSubsystem<UMGDriftSubsystem>())
+		{
+			DriftSubsystem->OnDriftEnded.RemoveDynamic(this, &AMGPlayerController::OnDriftEnded);
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void AMGPlayerController::SetupInputComponent()
@@ -562,4 +617,43 @@ void AMGPlayerController::ClientOnRaceEnded_Implementation()
 {
 	bRaceStarted = false;
 	SetInputMode(EMGInputMode::Menu);
+}
+
+void AMGPlayerController::OnWrongWayDetected(bool bIsWrongWay)
+{
+	// Forward wrong-way status to HUD subsystem
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			HUDSubsystem->ShowWrongWayWarning(bIsWrongWay);
+		}
+	}
+}
+
+void AMGPlayerController::OnNearMissDetected(const FMGNearMissEvent& Event, int32 TotalPoints)
+{
+	// Forward near miss to HUD subsystem
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			HUDSubsystem->ShowNearMissBonus(Event.BasePoints);
+		}
+	}
+}
+
+void AMGPlayerController::OnDriftEnded(const FMGDriftResult& Result)
+{
+	// Forward drift score to HUD subsystem
+	if (Result.TotalPoints > 0 && !Result.bFailed)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+			{
+				HUDSubsystem->ShowDriftScorePopup(Result.TotalPoints, Result.Multiplier);
+			}
+		}
+	}
 }

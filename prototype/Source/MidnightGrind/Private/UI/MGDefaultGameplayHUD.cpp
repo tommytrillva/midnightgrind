@@ -75,7 +75,9 @@ void UMGDefaultGameplayHUD::UpdateSpeedDisplay_Implementation(float SpeedKPH, fl
 	{
 		float TargetOpacity = bHighSpeed ? 1.0f : 0.0f;
 		float CurrentOpacity = SpeedGlowEffect->GetColorAndOpacity().A;
-		float NewOpacity = FMath::FInterpTo(CurrentOpacity, TargetOpacity, GetWorld()->GetDeltaSeconds(), 5.0f);
+		UWorld* World = GetWorld();
+		float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
+		float NewOpacity = FMath::FInterpTo(CurrentOpacity, TargetOpacity, DeltaSeconds, 5.0f);
 		SpeedGlowEffect->SetOpacity(NewOpacity);
 	}
 }
@@ -154,7 +156,9 @@ void UMGDefaultGameplayHUD::UpdateNOSGauge_Implementation(float NOSAmount, bool 
 	{
 		float TargetOpacity = bNOSActive ? 1.0f : 0.0f;
 		float CurrentOpacity = NitrousActiveGlow->GetColorAndOpacity().A;
-		float NewOpacity = FMath::FInterpTo(CurrentOpacity, TargetOpacity, GetWorld()->GetDeltaSeconds(), 8.0f);
+		UWorld* World = GetWorld();
+		float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
+		float NewOpacity = FMath::FInterpTo(CurrentOpacity, TargetOpacity, DeltaSeconds, 8.0f);
 		NitrousActiveGlow->SetOpacity(NewOpacity);
 	}
 
@@ -355,7 +359,9 @@ void UMGDefaultGameplayHUD::PlayRedlineWarning_Implementation()
 	if (RedlinePulse)
 	{
 		// Flash the redline border
-		float PulseAlpha = FMath::Sin(GetWorld()->GetTimeSeconds() * 15.0f) * 0.5f + 0.5f;
+		UWorld* World = GetWorld();
+		float TimeSeconds = World ? World->GetTimeSeconds() : 0.0f;
+		float PulseAlpha = FMath::Sin(TimeSeconds * 15.0f) * 0.5f + 0.5f;
 		RedlinePulse->SetBrushColor(FLinearColor(TachRedlineColor.R, TachRedlineColor.G, TachRedlineColor.B, PulseAlpha));
 	}
 }
@@ -434,13 +440,14 @@ void UMGDefaultGameplayHUD::AnimatePulse(UWidget* Widget, float Duration)
 	if (UWorld* World = GetWorld())
 	{
 		FTimerHandle ResetHandle;
-		World->GetTimerManager().SetTimer(ResetHandle, [Widget]()
+		TWeakObjectPtr<UWidget> WeakWidget(Widget);
+		World->GetTimerManager().SetTimer(ResetHandle, [WeakWidget]()
 		{
-			if (Widget)
+			if (WeakWidget.IsValid())
 			{
-				FWidgetTransform ResetTransform = Widget->GetRenderTransform();
+				FWidgetTransform ResetTransform = WeakWidget->GetRenderTransform();
 				ResetTransform.Scale = FVector2D(1.0f, 1.0f);
-				Widget->SetRenderTransform(ResetTransform);
+				WeakWidget->SetRenderTransform(ResetTransform);
 			}
 		}, Duration, false);
 	}

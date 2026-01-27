@@ -528,7 +528,7 @@ void UMGProfileManagerSubsystem::UpdateTrackRecord(const FMGTrackRecord& Record)
         // Update average position
         float TotalPositions = Existing->AveragePosition * (Existing->TimesPlayed - Record.TimesPlayed);
         TotalPositions += Record.BestPosition;
-        Existing->AveragePosition = TotalPositions / Existing->TimesPlayed;
+        Existing->AveragePosition = (Existing->TimesPlayed > 0) ? TotalPositions / Existing->TimesPlayed : Record.BestPosition;
     }
     else
     {
@@ -609,7 +609,8 @@ bool UMGProfileManagerSubsystem::UpdateAchievementProgress(const FString& Achiev
         Achievement->Progress = FMath::Clamp(Progress, 0.0f, Achievement->TargetValue);
         MarkDirty();
 
-        OnAchievementProgress.Broadcast(AchievementId, Achievement->Progress / Achievement->TargetValue);
+        float ProgressRatio = (Achievement->TargetValue > 0.0f) ? Achievement->Progress / Achievement->TargetValue : 1.0f;
+        OnAchievementProgress.Broadcast(AchievementId, ProgressRatio);
 
         // Check for completion
         if (Achievement->Progress >= Achievement->TargetValue)

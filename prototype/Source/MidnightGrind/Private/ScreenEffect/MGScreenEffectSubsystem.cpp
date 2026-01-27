@@ -204,7 +204,7 @@ void UMGScreenEffectSubsystem::UpdateSpeedEffect(float CurrentSpeed)
     else
     {
         float Range = SpeedParams.MaxSpeedThreshold - SpeedParams.MinSpeedThreshold;
-        CurrentSpeedEffectIntensity = (CurrentSpeed - SpeedParams.MinSpeedThreshold) / Range;
+        CurrentSpeedEffectIntensity = (Range > KINDA_SMALL_NUMBER) ? (CurrentSpeed - SpeedParams.MinSpeedThreshold) / Range : 0.0f;
     }
 
     CurrentSpeedEffectIntensity *= GlobalEffectScale;

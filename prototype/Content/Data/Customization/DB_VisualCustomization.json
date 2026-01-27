@@ -1,0 +1,457 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Visual Customization Database",
+
+  "PaintColors": {
+    "Standard": [
+      { "ID": "COL_WHITE", "Name": "Arctic White", "Hex": "#F5F5F5", "Price": 0, "Metallic": false },
+      { "ID": "COL_BLACK", "Name": "Midnight Black", "Hex": "#0A0A0A", "Price": 0, "Metallic": false },
+      { "ID": "COL_SILVER", "Name": "Silver Storm", "Hex": "#C0C0C0", "Price": 500, "Metallic": true },
+      { "ID": "COL_GREY", "Name": "Gunmetal Grey", "Hex": "#4A4A4A", "Price": 500, "Metallic": true },
+      { "ID": "COL_RED", "Name": "Racing Red", "Hex": "#CC0000", "Price": 750, "Metallic": false },
+      { "ID": "COL_BLUE", "Name": "Electric Blue", "Hex": "#0066CC", "Price": 750, "Metallic": false },
+      { "ID": "COL_GREEN", "Name": "Forest Green", "Hex": "#228B22", "Price": 750, "Metallic": false },
+      { "ID": "COL_YELLOW", "Name": "Sunburst Yellow", "Hex": "#FFD700", "Price": 750, "Metallic": false },
+      { "ID": "COL_ORANGE", "Name": "Blaze Orange", "Hex": "#FF6600", "Price": 750, "Metallic": false },
+      { "ID": "COL_PURPLE", "Name": "Deep Purple", "Hex": "#6A0DAD", "Price": 750, "Metallic": false }
+    ],
+    "Metallic": [
+      { "ID": "COL_MET_BLUE", "Name": "Bayside Blue", "Hex": "#1E90FF", "Price": 2500, "Metallic": true, "Flake": 0.3 },
+      { "ID": "COL_MET_RED", "Name": "Candy Apple Red", "Hex": "#FF0800", "Price": 2500, "Metallic": true, "Flake": 0.4 },
+      { "ID": "COL_MET_GREEN", "Name": "British Racing Green", "Hex": "#004225", "Price": 2500, "Metallic": true, "Flake": 0.2 },
+      { "ID": "COL_MET_GOLD", "Name": "Championship Gold", "Hex": "#DAA520", "Price": 3000, "Metallic": true, "Flake": 0.5 },
+      { "ID": "COL_MET_BRONZE", "Name": "Bronze Medal", "Hex": "#CD7F32", "Price": 2500, "Metallic": true, "Flake": 0.4 },
+      { "ID": "COL_MET_COPPER", "Name": "Burnished Copper", "Hex": "#B87333", "Price": 2500, "Metallic": true, "Flake": 0.35 }
+    ],
+    "Pearl": [
+      { "ID": "COL_PEARL_WHITE", "Name": "Ghost Pearl", "Hex": "#F8F8FF", "Price": 5000, "Pearl": true, "PearlShift": "#E6E6FA" },
+      { "ID": "COL_PEARL_BLUE", "Name": "Ocean Pearl", "Hex": "#4169E1", "Price": 5000, "Pearl": true, "PearlShift": "#00CED1" },
+      { "ID": "COL_PEARL_PINK", "Name": "Sakura Pearl", "Hex": "#FFB7C5", "Price": 5000, "Pearl": true, "PearlShift": "#FFC0CB" },
+      { "ID": "COL_PEARL_GREEN", "Name": "Mystic Jade", "Hex": "#00A86B", "Price": 5000, "Pearl": true, "PearlShift": "#40E0D0" }
+    ],
+    "Special": [
+      { "ID": "COL_MIDNIGHT_PURPLE", "Name": "Midnight Purple", "Hex": "#4B0082", "Price": 15000, "ColorShift": true, "ShiftColors": ["#4B0082", "#8B008B", "#0000CD"], "Unlock": "REP_TIER_ELITE" },
+      { "ID": "COL_CHAMELEON", "Name": "Chameleon", "Hex": "#00FF00", "Price": 25000, "ColorShift": true, "ShiftColors": ["#00FF00", "#0000FF", "#FF00FF", "#FF0000"], "Unlock": "LEVEL_70" },
+      { "ID": "COL_CHROME", "Name": "Mirror Chrome", "Hex": "#C0C0C0", "Price": 50000, "Chrome": true, "Reflectivity": 0.95, "Unlock": "REP_TIER_LEGEND" },
+      { "ID": "COL_MATTE_BLACK", "Name": "Stealth Matte", "Hex": "#1A1A1A", "Price": 8000, "Matte": true, "Roughness": 0.8 },
+      { "ID": "COL_SATIN_WHITE", "Name": "Satin Frost", "Hex": "#FAFAFA", "Price": 8000, "Satin": true, "Roughness": 0.5 }
+    ],
+    "Prestige": [
+      { "ID": "COL_PRES_BRONZE", "Name": "Prestige Bronze", "Hex": "#8B4513", "Price": 0, "Unlock": "PRESTIGE_1", "Exclusive": true },
+      { "ID": "COL_PRES_SILVER", "Name": "Prestige Silver", "Hex": "#C0C0C0", "Price": 0, "Unlock": "PRESTIGE_3", "Exclusive": true },
+      { "ID": "COL_PRES_GOLD", "Name": "Prestige Gold", "Hex": "#FFD700", "Price": 0, "Unlock": "PRESTIGE_5", "Exclusive": true },
+      { "ID": "COL_PRES_PLATINUM", "Name": "Prestige Platinum", "Hex": "#E5E4E2", "Price": 0, "Unlock": "PRESTIGE_7", "Exclusive": true },
+      { "ID": "COL_PRES_DIAMOND", "Name": "Prestige Diamond", "Hex": "#B9F2FF", "Price": 0, "Unlock": "PRESTIGE_9", "Exclusive": true }
+    ]
+  },
+
+  "WheelStyles": {
+    "Categories": {
+      "Stock": {
+        "Description": "Factory wheels",
+        "PriceMultiplier": 0
+      },
+      "Street": {
+        "Description": "Affordable aftermarket",
+        "PriceMultiplier": 1.0
+      },
+      "Sport": {
+        "Description": "Performance oriented",
+        "PriceMultiplier": 1.5
+      },
+      "Racing": {
+        "Description": "Lightweight track wheels",
+        "PriceMultiplier": 2.5
+      },
+      "Luxury": {
+        "Description": "Premium show wheels",
+        "PriceMultiplier": 3.0
+      }
+    },
+    "Wheels": [
+      {
+        "ID": "WHL_TE37",
+        "Name": "TE-37 Style",
+        "Category": "Racing",
+        "Spokes": 6,
+        "Style": "Mesh",
+        "Sizes": [15, 16, 17, 18, 19],
+        "Widths": [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0],
+        "BasePrice": 2500,
+        "Weight": "Light",
+        "WeightReduction": 5
+      },
+      {
+        "ID": "WHL_RPF1",
+        "Name": "RPF1 Style",
+        "Category": "Racing",
+        "Spokes": 7,
+        "Style": "Spoke",
+        "Sizes": [15, 16, 17, 18],
+        "Widths": [7.0, 8.0, 9.0],
+        "BasePrice": 2000,
+        "Weight": "Ultralight",
+        "WeightReduction": 8
+      },
+      {
+        "ID": "WHL_WORK_MEISTER",
+        "Name": "Meister Style",
+        "Category": "Luxury",
+        "Spokes": 3,
+        "Style": "Split",
+        "Sizes": [17, 18, 19, 20],
+        "Widths": [8.0, 9.0, 9.5, 10.0, 10.5, 11.0],
+        "BasePrice": 5000,
+        "Weight": "Medium",
+        "Deep": true
+      },
+      {
+        "ID": "WHL_SSR_SP",
+        "Name": "SP1 Style",
+        "Category": "Sport",
+        "Spokes": 5,
+        "Style": "Split",
+        "Sizes": [16, 17, 18],
+        "Widths": [7.0, 8.0, 9.0],
+        "BasePrice": 1800,
+        "Weight": "Medium"
+      },
+      {
+        "ID": "WHL_BBS_LM",
+        "Name": "LM Style",
+        "Category": "Luxury",
+        "Spokes": 10,
+        "Style": "Mesh",
+        "Sizes": [17, 18, 19, 20],
+        "Widths": [8.0, 8.5, 9.0, 9.5, 10.0],
+        "BasePrice": 4500,
+        "Weight": "Medium",
+        "TwoTone": true
+      },
+      {
+        "ID": "WHL_WATANABE",
+        "Name": "8-Spoke Classic",
+        "Category": "Street",
+        "Spokes": 8,
+        "Style": "Classic",
+        "Sizes": [13, 14, 15],
+        "Widths": [6.0, 7.0, 8.0],
+        "BasePrice": 800,
+        "Weight": "Light",
+        "Retro": true
+      },
+      {
+        "ID": "WHL_TURBINE",
+        "Name": "Turbine Style",
+        "Category": "Street",
+        "Spokes": 5,
+        "Style": "Turbine",
+        "Sizes": [15, 16, 17, 18],
+        "Widths": [7.0, 8.0, 9.0],
+        "BasePrice": 1200,
+        "Weight": "Medium"
+      },
+      {
+        "ID": "WHL_DRAG",
+        "Name": "Drag Skinnies",
+        "Category": "Racing",
+        "Spokes": 5,
+        "Style": "Skinny",
+        "Sizes": [15],
+        "Widths": [3.5, 4.0],
+        "BasePrice": 600,
+        "Weight": "Ultralight",
+        "DragOnly": true,
+        "FrontOnly": true
+      },
+      {
+        "ID": "WHL_DEEP_DISH",
+        "Name": "Deep Dish Mesh",
+        "Category": "Luxury",
+        "Spokes": 100,
+        "Style": "Mesh",
+        "Sizes": [17, 18, 19, 20],
+        "Widths": [9.0, 10.0, 11.0, 12.0],
+        "BasePrice": 3500,
+        "Weight": "Heavy",
+        "Deep": true,
+        "ShowOnly": true
+      },
+      {
+        "ID": "WHL_STEELIES",
+        "Name": "Steel Wheels",
+        "Category": "Stock",
+        "Spokes": 0,
+        "Style": "Steel",
+        "Sizes": [13, 14, 15, 16],
+        "Widths": [5.5, 6.0, 6.5],
+        "BasePrice": 100,
+        "Weight": "Heavy",
+        "Sleeper": true
+      }
+    ],
+    "WheelColors": [
+      { "ID": "WHLCOL_SILVER", "Name": "Silver", "Hex": "#C0C0C0", "Price": 0 },
+      { "ID": "WHLCOL_BLACK", "Name": "Gloss Black", "Hex": "#0A0A0A", "Price": 200 },
+      { "ID": "WHLCOL_BRONZE", "Name": "Bronze", "Hex": "#CD7F32", "Price": 500 },
+      { "ID": "WHLCOL_GOLD", "Name": "Gold", "Hex": "#FFD700", "Price": 500 },
+      { "ID": "WHLCOL_WHITE", "Name": "White", "Hex": "#FFFFFF", "Price": 300 },
+      { "ID": "WHLCOL_GUNMETAL", "Name": "Gunmetal", "Hex": "#4A4A4A", "Price": 400 },
+      { "ID": "WHLCOL_CHROME", "Name": "Chrome", "Hex": "#E8E8E8", "Price": 1500, "Chrome": true },
+      { "ID": "WHLCOL_MACHINED", "Name": "Machined Face", "Hex": "#D3D3D3", "Price": 800, "Machined": true }
+    ]
+  },
+
+  "Vinyls": {
+    "Categories": ["Racing", "JDM", "Tribal", "Flames", "Geometric", "Text", "Crew", "Special"],
+    "Vinyls": [
+      {
+        "ID": "VNL_RACING_STRIPE",
+        "Name": "Racing Stripes",
+        "Category": "Racing",
+        "Price": 500,
+        "Customizable": true,
+        "Colors": 2
+      },
+      {
+        "ID": "VNL_SIDE_STRIPE",
+        "Name": "Side Stripe",
+        "Category": "Racing",
+        "Price": 400,
+        "Customizable": true,
+        "Colors": 2
+      },
+      {
+        "ID": "VNL_TOUGE_STYLE",
+        "Name": "Touge Style",
+        "Category": "JDM",
+        "Price": 1500,
+        "Customizable": true,
+        "Colors": 3
+      },
+      {
+        "ID": "VNL_ITASHA_BASE",
+        "Name": "Itasha Base",
+        "Category": "JDM",
+        "Price": 3000,
+        "Customizable": true,
+        "Colors": 4
+      },
+      {
+        "ID": "VNL_KANJI_SIDE",
+        "Name": "Kanji Side Art",
+        "Category": "JDM",
+        "Price": 800,
+        "Customizable": true,
+        "Colors": 2
+      },
+      {
+        "ID": "VNL_TRIBAL_FLAME",
+        "Name": "Tribal Flames",
+        "Category": "Tribal",
+        "Price": 1200,
+        "Customizable": true,
+        "Colors": 2
+      },
+      {
+        "ID": "VNL_CLASSIC_FLAME",
+        "Name": "Classic Flames",
+        "Category": "Flames",
+        "Price": 1000,
+        "Customizable": true,
+        "Colors": 3
+      },
+      {
+        "ID": "VNL_GEOMETRIC",
+        "Name": "Geometric Pattern",
+        "Category": "Geometric",
+        "Price": 1500,
+        "Customizable": true,
+        "Colors": 3
+      },
+      {
+        "ID": "VNL_HEXAGON",
+        "Name": "Hexagon Fade",
+        "Category": "Geometric",
+        "Price": 2000,
+        "Customizable": true,
+        "Colors": 2
+      },
+      {
+        "ID": "VNL_LIVERY_SPONSOR",
+        "Name": "Sponsor Livery",
+        "Category": "Racing",
+        "Price": 2500,
+        "Customizable": true,
+        "Colors": 4,
+        "Unlock": "REP_TIER_PRO"
+      }
+    ],
+    "SpecialVinyls": [
+      {
+        "ID": "VNL_PHOENIX_RISING",
+        "Name": "Phoenix Rising",
+        "Category": "Special",
+        "Price": 0,
+        "Unlock": "DEFEAT_PHOENIX",
+        "Exclusive": true,
+        "Animated": true
+      },
+      {
+        "ID": "VNL_LEGEND_LEGACY",
+        "Name": "Legend's Legacy",
+        "Category": "Special",
+        "Price": 0,
+        "Unlock": "TRUE_ENDING",
+        "Exclusive": true,
+        "Animated": true
+      },
+      {
+        "ID": "VNL_DRIFT_KING",
+        "Name": "Drift King Crown",
+        "Category": "Special",
+        "Price": 0,
+        "Unlock": "TITLE_DRIFT_KING",
+        "Exclusive": true
+      }
+    ]
+  },
+
+  "BodyKits": {
+    "Universal": [
+      {
+        "ID": "BKIT_STOCK",
+        "Name": "Stock Body",
+        "Price": 0,
+        "Parts": ["FrontBumper", "RearBumper", "Sideskirts", "Fenders"]
+      },
+      {
+        "ID": "BKIT_WIDE_BOLT",
+        "Name": "Bolt-On Widebody",
+        "Price": 8000,
+        "Parts": ["FrontBumper", "RearBumper", "Sideskirts", "Fenders"],
+        "WidthIncrease": 50,
+        "Description": "Aggressive bolt-on flares"
+      },
+      {
+        "ID": "BKIT_WIDE_BLEND",
+        "Name": "Blended Widebody",
+        "Price": 15000,
+        "Parts": ["FrontBumper", "RearBumper", "Sideskirts", "Fenders"],
+        "WidthIncrease": 75,
+        "Description": "Smoothly blended wide fenders",
+        "Unlock": "REP_TIER_PRO"
+      }
+    ],
+    "Spoilers": [
+      { "ID": "SPL_NONE", "Name": "Delete", "Price": 0, "Downforce": 0 },
+      { "ID": "SPL_LIP", "Name": "Trunk Lip", "Price": 300, "Downforce": 0.02 },
+      { "ID": "SPL_DUCK", "Name": "Ducktail", "Price": 600, "Downforce": 0.04 },
+      { "ID": "SPL_SMALL_WING", "Name": "Low Wing", "Price": 1200, "Downforce": 0.08, "Drag": 0.02 },
+      { "ID": "SPL_GT_WING", "Name": "GT Wing", "Price": 2500, "Downforce": 0.15, "Drag": 0.04, "Adjustable": true },
+      { "ID": "SPL_TIMEATTACK", "Name": "Time Attack Wing", "Price": 5000, "Downforce": 0.25, "Drag": 0.06, "Adjustable": true, "Unlock": "REP_TIER_ELITE" },
+      { "ID": "SPL_DRAG_DELETE", "Name": "Drag Wing Delete", "Price": 800, "Downforce": -0.02, "Drag": -0.02, "DragSpec": true }
+    ],
+    "Hoods": [
+      { "ID": "HOOD_STOCK", "Name": "Stock Hood", "Price": 0, "Weight": 0 },
+      { "ID": "HOOD_VENTED", "Name": "Vented Hood", "Price": 800, "Weight": -5, "CoolingBonus": 0.05 },
+      { "ID": "HOOD_CARBON", "Name": "Carbon Fiber Hood", "Price": 2000, "Weight": -15, "CoolingBonus": 0.05 },
+      { "ID": "HOOD_COWL", "Name": "Cowl Induction", "Price": 2500, "Weight": -10, "CoolingBonus": 0.08, "SCClearance": true },
+      { "ID": "HOOD_TIMEATTACK", "Name": "Time Attack Hood", "Price": 4000, "Weight": -20, "CoolingBonus": 0.1, "VentedExhaust": true }
+    ]
+  },
+
+  "Lighting": {
+    "Headlights": [
+      { "ID": "HL_STOCK", "Name": "Stock Headlights", "Price": 0 },
+      { "ID": "HL_CLEAR", "Name": "Clear Lenses", "Price": 300 },
+      { "ID": "HL_SMOKED", "Name": "Smoked Lenses", "Price": 400 },
+      { "ID": "HL_HID", "Name": "HID Projectors", "Price": 1200, "Brightness": 1.5 },
+      { "ID": "HL_LED", "Name": "LED Conversion", "Price": 2000, "Brightness": 1.8 },
+      { "ID": "HL_SEQUENTIAL", "Name": "Sequential LEDs", "Price": 3000, "Brightness": 1.8, "Animation": true }
+    ],
+    "Taillights": [
+      { "ID": "TL_STOCK", "Name": "Stock Taillights", "Price": 0 },
+      { "ID": "TL_CLEAR", "Name": "Clear Taillights", "Price": 300 },
+      { "ID": "TL_SMOKED", "Name": "Smoked Taillights", "Price": 400 },
+      { "ID": "TL_LED", "Name": "LED Taillights", "Price": 1500 },
+      { "ID": "TL_SEQUENTIAL", "Name": "Sequential LEDs", "Price": 2500, "Animation": true }
+    ],
+    "Underglow": [
+      { "ID": "UG_NONE", "Name": "None", "Price": 0 },
+      { "ID": "UG_SINGLE", "Name": "Single Color", "Price": 500, "Colors": 1 },
+      { "ID": "UG_RGB", "Name": "RGB Underglow", "Price": 1500, "Colors": "Unlimited", "Patterns": ["Solid", "Fade", "Chase"] },
+      { "ID": "UG_NEON", "Name": "Neon Tubes", "Price": 2000, "Colors": 1, "RetroStyle": true }
+    ]
+  },
+
+  "Interior": {
+    "Seats": [
+      { "ID": "SEAT_STOCK", "Name": "Stock Seats", "Price": 0 },
+      { "ID": "SEAT_SPORT", "Name": "Sport Seats", "Price": 1500, "Weight": -10 },
+      { "ID": "SEAT_BUCKET", "Name": "Bucket Seats", "Price": 2500, "Weight": -20 },
+      { "ID": "SEAT_RACING", "Name": "Racing Seats", "Price": 4000, "Weight": -30, "Harness": true }
+    ],
+    "SteeringWheel": [
+      { "ID": "SW_STOCK", "Name": "Stock Wheel", "Price": 0 },
+      { "ID": "SW_SPORT", "Name": "Sport Wheel", "Price": 400, "Diameter": 350 },
+      { "ID": "SW_DEEP", "Name": "Deep Dish", "Price": 600, "Diameter": 330, "Dish": 90 },
+      { "ID": "SW_FLAT", "Name": "Flat Bottom", "Price": 800, "Diameter": 340 },
+      { "ID": "SW_SUEDE", "Name": "Suede Racing", "Price": 1200, "Diameter": 320, "Material": "Suede" }
+    ],
+    "RollCage": [
+      { "ID": "CAGE_NONE", "Name": "No Cage", "Price": 0 },
+      { "ID": "CAGE_HARNESS", "Name": "Harness Bar", "Price": 400, "Weight": 15 },
+      { "ID": "CAGE_4PT", "Name": "4-Point Cage", "Price": 1200, "Weight": 30, "Rigidity": 1.05 },
+      { "ID": "CAGE_6PT", "Name": "6-Point Cage", "Price": 2000, "Weight": 45, "Rigidity": 1.1 },
+      { "ID": "CAGE_10PT", "Name": "10-Point Cage", "Price": 3500, "Weight": 65, "Rigidity": 1.2 }
+    ],
+    "GaugeCluster": [
+      { "ID": "GAUGE_STOCK", "Name": "Stock Gauges", "Price": 0 },
+      { "ID": "GAUGE_DIGITAL", "Name": "Digital Cluster", "Price": 2000, "Style": "Digital" },
+      { "ID": "GAUGE_RACING", "Name": "Racing Display", "Price": 3500, "Style": "Racing", "ShiftLight": true },
+      { "ID": "GAUGE_RETRO", "Name": "Retro Digital", "Price": 1500, "Style": "Retro", "PS1Look": true }
+    ]
+  },
+
+  "Accessories": {
+    "TowHooks": [
+      { "ID": "TOW_NONE", "Name": "None", "Price": 0 },
+      { "ID": "TOW_FRONT", "Name": "Front Tow Hook", "Price": 100 },
+      { "ID": "TOW_REAR", "Name": "Rear Tow Hook", "Price": 100 },
+      { "ID": "TOW_BOTH", "Name": "Front + Rear", "Price": 180 }
+    ],
+    "Mirrors": [
+      { "ID": "MIR_STOCK", "Name": "Stock Mirrors", "Price": 0 },
+      { "ID": "MIR_DELETE", "Name": "Mirror Delete", "Price": 0, "Weight": -2 },
+      { "ID": "MIR_GANADORS", "Name": "Aero Mirrors", "Price": 400 },
+      { "ID": "MIR_CARBON", "Name": "Carbon Mirrors", "Price": 800, "Weight": -1 }
+    ],
+    "Antennas": [
+      { "ID": "ANT_STOCK", "Name": "Stock Antenna", "Price": 0 },
+      { "ID": "ANT_DELETE", "Name": "Antenna Delete", "Price": 0 },
+      { "ID": "ANT_STUBBY", "Name": "Stubby Antenna", "Price": 50 },
+      { "ID": "ANT_SHARK", "Name": "Shark Fin", "Price": 150 }
+    ],
+    "Roof": [
+      { "ID": "ROOF_STOCK", "Name": "Stock Roof", "Price": 0 },
+      { "ID": "ROOF_CARBON", "Name": "Carbon Roof", "Price": 5000, "Weight": -20 },
+      { "ID": "ROOF_SCOOP", "Name": "Roof Scoop", "Price": 800 }
+    ]
+  },
+
+  "Numberplates": {
+    "Styles": [
+      { "ID": "PLATE_US", "Name": "US Standard", "Price": 0 },
+      { "ID": "PLATE_JDM", "Name": "JDM Style", "Price": 500 },
+      { "ID": "PLATE_EURO", "Name": "Euro Style", "Price": 500 },
+      { "ID": "PLATE_CUSTOM", "Name": "Custom Plate", "Price": 1000, "Customizable": true },
+      { "ID": "PLATE_DELETE", "Name": "Plate Delete", "Price": 200 }
+    ],
+    "CustomText": {
+      "MaxLength": 7,
+      "AllowedChars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "ProfanityFilter": true
+    }
+  }
+}

@@ -1,0 +1,391 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Audio Configuration",
+
+  "EngineProfiles": {
+    "InlineFour_Econobox": {
+      "ID": "ENG_I4_ECON",
+      "Description": "Tired economy 4-cylinder",
+      "BaseFrequency": 80,
+      "HarmonicMultipliers": [1.0, 2.0, 3.0, 4.0],
+      "HarmonicAmplitudes": [1.0, 0.4, 0.2, 0.1],
+      "IdleRPM": 750,
+      "RedlineRPM": 6500,
+      "Character": {
+        "Raspy": 0.6,
+        "Smooth": 0.3,
+        "Aggressive": 0.1
+      },
+      "Quirks": {
+        "RattleOnIdle": true,
+        "ValveTick": true,
+        "ExhaustLeak": true
+      },
+      "Layers": [
+        { "Type": "Intake", "Volume": 0.3, "LowpassFreq": 2000 },
+        { "Type": "Mechanical", "Volume": 0.4, "HighpassFreq": 500 },
+        { "Type": "Exhaust", "Volume": 0.5, "LowpassFreq": 4000 }
+      ]
+    },
+
+    "InlineFour_VTEC": {
+      "ID": "ENG_I4_VTEC",
+      "Description": "High-revving VTEC engine",
+      "BaseFrequency": 90,
+      "HarmonicMultipliers": [1.0, 2.0, 4.0, 6.0],
+      "HarmonicAmplitudes": [1.0, 0.6, 0.4, 0.2],
+      "IdleRPM": 850,
+      "RedlineRPM": 8400,
+      "Character": {
+        "Raspy": 0.3,
+        "Smooth": 0.4,
+        "Aggressive": 0.6,
+        "Screaming": 0.8
+      },
+      "VTECEngagement": {
+        "EngageRPM": 5800,
+        "ToneShift": 1.3,
+        "VolumeBoost": 1.4,
+        "TransitionTime": 0.15
+      },
+      "Layers": [
+        { "Type": "Intake", "Volume": 0.4, "LowpassFreq": 3000 },
+        { "Type": "Mechanical", "Volume": 0.35, "HighpassFreq": 800 },
+        { "Type": "Exhaust", "Volume": 0.6, "LowpassFreq": 6000 },
+        { "Type": "VTEC_Scream", "Volume": 0.5, "HighpassFreq": 4000, "ActivationRPM": 5800 }
+      ]
+    },
+
+    "InlineFour_NA": {
+      "ID": "ENG_I4_NA",
+      "Description": "Naturally aspirated inline-4 (KA24)",
+      "BaseFrequency": 75,
+      "HarmonicMultipliers": [1.0, 2.0, 3.0, 4.0],
+      "HarmonicAmplitudes": [1.0, 0.5, 0.3, 0.15],
+      "IdleRPM": 800,
+      "RedlineRPM": 6800,
+      "Character": {
+        "Raspy": 0.4,
+        "Smooth": 0.5,
+        "Aggressive": 0.4
+      },
+      "Layers": [
+        { "Type": "Intake", "Volume": 0.35, "LowpassFreq": 2500 },
+        { "Type": "Mechanical", "Volume": 0.4, "HighpassFreq": 600 },
+        { "Type": "Exhaust", "Volume": 0.55, "LowpassFreq": 5000 }
+      ]
+    },
+
+    "InlineFour_Turbo": {
+      "ID": "ENG_I4_TURBO",
+      "Description": "Turbocharged inline-4",
+      "BaseFrequency": 85,
+      "HarmonicMultipliers": [1.0, 2.0, 3.0, 4.0],
+      "HarmonicAmplitudes": [1.0, 0.55, 0.35, 0.2],
+      "IdleRPM": 900,
+      "RedlineRPM": 7500,
+      "Character": {
+        "Raspy": 0.3,
+        "Smooth": 0.5,
+        "Aggressive": 0.7,
+        "Whoosh": 0.8
+      },
+      "TurboSounds": {
+        "SpoolWhine": { "MinRPM": 2500, "MaxVolume": 0.4, "Frequency": 8000 },
+        "WastegateChatter": { "Threshold": 0.8, "Volume": 0.6 },
+        "BlowoffValve": { "OnThrottleLift": true, "Volume": 0.7, "Type": "Atmospheric" },
+        "Surge": { "OnDecel": true, "Volume": 0.3 }
+      },
+      "Layers": [
+        { "Type": "Intake", "Volume": 0.3, "LowpassFreq": 2000 },
+        { "Type": "Turbo", "Volume": 0.5, "BandpassFreq": [4000, 12000] },
+        { "Type": "Mechanical", "Volume": 0.35, "HighpassFreq": 600 },
+        { "Type": "Exhaust", "Volume": 0.6, "LowpassFreq": 5500 }
+      ]
+    },
+
+    "InlineSix_RB": {
+      "ID": "ENG_I6_RB",
+      "Description": "RB26DETT twin-turbo inline-6",
+      "BaseFrequency": 70,
+      "HarmonicMultipliers": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+      "HarmonicAmplitudes": [1.0, 0.7, 0.5, 0.35, 0.2, 0.1],
+      "IdleRPM": 850,
+      "RedlineRPM": 8000,
+      "Character": {
+        "Raspy": 0.2,
+        "Smooth": 0.8,
+        "Aggressive": 0.7,
+        "Howl": 0.9
+      },
+      "TurboSounds": {
+        "SpoolWhine": { "MinRPM": 3000, "MaxVolume": 0.5, "Frequency": 7000 },
+        "WastegateChatter": { "Threshold": 0.75, "Volume": 0.7 },
+        "BlowoffValve": { "OnThrottleLift": true, "Volume": 0.8, "Type": "Hybrid" }
+      },
+      "Layers": [
+        { "Type": "Intake", "Volume": 0.35, "LowpassFreq": 2500 },
+        { "Type": "Turbo", "Volume": 0.55, "BandpassFreq": [3500, 10000] },
+        { "Type": "Mechanical", "Volume": 0.3, "HighpassFreq": 500 },
+        { "Type": "Exhaust", "Volume": 0.7, "LowpassFreq": 6000 },
+        { "Type": "Inline6_Howl", "Volume": 0.6, "HighpassFreq": 3000, "ActivationRPM": 5000 }
+      ]
+    },
+
+    "V8_NA_American": {
+      "ID": "ENG_V8_AMERICAN",
+      "Description": "American V8 naturally aspirated",
+      "BaseFrequency": 50,
+      "HarmonicMultipliers": [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0],
+      "HarmonicAmplitudes": [0.6, 1.0, 0.7, 0.5, 0.4, 0.3, 0.2],
+      "IdleRPM": 650,
+      "RedlineRPM": 6500,
+      "Character": {
+        "Raspy": 0.3,
+        "Smooth": 0.4,
+        "Aggressive": 0.8,
+        "Rumble": 1.0,
+        "Burble": 0.7
+      },
+      "CamLope": {
+        "Enabled": true,
+        "Intensity": 0.4,
+        "Frequency": 2.5
+      },
+      "Quirks": {
+        "ColdStartBurble": true,
+        "DecelPops": true,
+        "ThrottleBlip": 0.6
+      },
+      "Layers": [
+        { "Type": "Intake", "Volume": 0.4, "LowpassFreq": 2000, "RumbleBoost": 0.3 },
+        { "Type": "Mechanical", "Volume": 0.25, "HighpassFreq": 400 },
+        { "Type": "Exhaust", "Volume": 0.8, "LowpassFreq": 4000 },
+        { "Type": "V8_Rumble", "Volume": 0.7, "LowpassFreq": 200 }
+      ]
+    },
+
+    "V8_Supercharged": {
+      "ID": "ENG_V8_SC",
+      "Description": "Supercharged American V8",
+      "BaseFrequency": 50,
+      "HarmonicMultipliers": [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0],
+      "HarmonicAmplitudes": [0.7, 1.0, 0.8, 0.6, 0.45, 0.35, 0.25],
+      "IdleRPM": 700,
+      "RedlineRPM": 6800,
+      "Character": {
+        "Raspy": 0.4,
+        "Smooth": 0.3,
+        "Aggressive": 0.9,
+        "Rumble": 0.9,
+        "Whine": 0.8
+      },
+      "SuperchargerSounds": {
+        "Whine": { "MinRPM": 1500, "MaxVolume": 0.7, "FrequencyMultiplier": 3.5 },
+        "BeltNoise": { "Volume": 0.2 }
+      },
+      "Layers": [
+        { "Type": "Intake", "Volume": 0.35, "LowpassFreq": 2000 },
+        { "Type": "Supercharger", "Volume": 0.6, "HighpassFreq": 2000 },
+        { "Type": "Mechanical", "Volume": 0.25, "HighpassFreq": 400 },
+        { "Type": "Exhaust", "Volume": 0.85, "LowpassFreq": 4500 },
+        { "Type": "V8_Rumble", "Volume": 0.65, "LowpassFreq": 200 }
+      ]
+    }
+  },
+
+  "ExhaustProfiles": {
+    "Stock_Raspy": {
+      "ID": "EXH_STOCK_RASPY",
+      "Resonance": 0.4,
+      "Raspiness": 0.7,
+      "Volume": 0.6,
+      "PopsCrackles": false
+    },
+    "JDM_Hatch": {
+      "ID": "EXH_JDM_HATCH",
+      "Resonance": 0.6,
+      "Raspiness": 0.5,
+      "Volume": 0.75,
+      "PopsCrackles": false,
+      "CannonTip": true
+    },
+    "JDM_Drift": {
+      "ID": "EXH_JDM_DRIFT",
+      "Resonance": 0.7,
+      "Raspiness": 0.6,
+      "Volume": 0.85,
+      "PopsCrackles": true,
+      "SingleExit": true
+    },
+    "Muscle_Deep": {
+      "ID": "EXH_MUSCLE",
+      "Resonance": 0.9,
+      "Raspiness": 0.3,
+      "Volume": 0.9,
+      "PopsCrackles": true,
+      "Burble": true,
+      "LowFreqBoost": 1.3
+    },
+    "Straight_Pipe": {
+      "ID": "EXH_STRAIGHT",
+      "Resonance": 0.3,
+      "Raspiness": 0.9,
+      "Volume": 1.0,
+      "PopsCrackles": true,
+      "Deafening": true
+    },
+    "Titanium": {
+      "ID": "EXH_TI",
+      "Resonance": 0.5,
+      "Raspiness": 0.4,
+      "Volume": 0.95,
+      "PopsCrackles": true,
+      "TitaniumTing": true,
+      "HighFreqBoost": 1.2
+    }
+  },
+
+  "TireSounds": {
+    "Screech": {
+      "GripThreshold": 0.7,
+      "VolumeMultiplier": 1.0,
+      "PitchRange": [0.8, 1.2]
+    },
+    "Drift": {
+      "SlipAngleMin": 15,
+      "VolumeMultiplier": 1.2,
+      "SmokeSync": true
+    },
+    "Surfaces": {
+      "Asphalt": { "RollNoise": 0.4, "GripNoise": 1.0 },
+      "Concrete": { "RollNoise": 0.5, "GripNoise": 0.9 },
+      "WetAsphalt": { "RollNoise": 0.6, "GripNoise": 0.7, "SprayNoise": 0.5 },
+      "Gravel": { "RollNoise": 0.9, "GripNoise": 0.4, "DebrisNoise": 0.7 }
+    }
+  },
+
+  "AmbientAudio": {
+    "City_Clear": {
+      "Layers": [
+        { "Type": "DistantTraffic", "Volume": 0.3 },
+        { "Type": "CityHum", "Volume": 0.2 },
+        { "Type": "RandomHorns", "Frequency": 0.05, "Volume": 0.4 },
+        { "Type": "Sirens", "Frequency": 0.02, "Volume": 0.5 }
+      ]
+    },
+    "City_Night": {
+      "Layers": [
+        { "Type": "DistantTraffic", "Volume": 0.15 },
+        { "Type": "NeonBuzz", "Volume": 0.1 },
+        { "Type": "DistantBass", "Volume": 0.2 },
+        { "Type": "Crickets", "Volume": 0.1 }
+      ]
+    },
+    "City_LightRain": {
+      "Layers": [
+        { "Type": "RainAmbient", "Volume": 0.5 },
+        { "Type": "DistantTraffic", "Volume": 0.2 },
+        { "Type": "DripsDrops", "Volume": 0.3 }
+      ]
+    },
+    "City_Storm": {
+      "Layers": [
+        { "Type": "HeavyRain", "Volume": 0.8 },
+        { "Type": "Thunder", "Frequency": 0.03, "Volume": 0.9 },
+        { "Type": "Wind", "Volume": 0.6 }
+      ]
+    },
+    "City_Fog": {
+      "Layers": [
+        { "Type": "MuffledCity", "Volume": 0.1 },
+        { "Type": "Eerie", "Volume": 0.2 },
+        { "Type": "FogHorn", "Frequency": 0.01, "Volume": 0.4 }
+      ]
+    },
+    "Mountain": {
+      "Layers": [
+        { "Type": "Wind", "Volume": 0.4 },
+        { "Type": "Forest", "Volume": 0.3 },
+        { "Type": "DistantWater", "Volume": 0.15 }
+      ]
+    }
+  },
+
+  "MusicSystem": {
+    "Genres": ["Synthwave", "JapaneseHipHop", "DrumAndBass", "LoFi", "Electronica"],
+    "Adaptive": {
+      "Racing": {
+        "IntensityLayers": true,
+        "SpeedSync": true,
+        "NitrousStinger": true,
+        "OvertakeHit": true
+      },
+      "Garage": {
+        "Chill": true,
+        "VolumeReduction": 0.4
+      },
+      "Menu": {
+        "SynthwaveDefault": true,
+        "FadeOnRaceStart": true
+      }
+    },
+    "DynamicMixing": {
+      "EngineVolume": { "MusicDuck": 0.3 },
+      "NitrousActive": { "MusicBoost": 1.2, "LowpassSweep": true },
+      "FinalLap": { "IntensityBoost": 1.3 },
+      "PhotoFinish": { "Slowmo": true, "HeartbeatLayer": true }
+    }
+  },
+
+  "UIAudio": {
+    "MenuNavigate": { "Sound": "UI_Blip", "Volume": 0.6 },
+    "MenuSelect": { "Sound": "UI_Confirm", "Volume": 0.7 },
+    "MenuBack": { "Sound": "UI_Cancel", "Volume": 0.5 },
+    "CountdownBeep": { "Sound": "UI_Beep", "Volume": 0.8 },
+    "CountdownGo": { "Sound": "UI_Go", "Volume": 1.0 },
+    "LapComplete": { "Sound": "UI_Lap", "Volume": 0.7 },
+    "RaceFinish": { "Sound": "UI_Finish", "Volume": 0.9 },
+    "NewRecord": { "Sound": "UI_Record", "Volume": 1.0 },
+    "LevelUp": { "Sound": "UI_LevelUp", "Volume": 0.9 },
+    "REPGain": { "Sound": "UI_REP", "Volume": 0.5 },
+    "CashGain": { "Sound": "UI_Cash", "Volume": 0.5 },
+    "Notification": { "Sound": "UI_Notify", "Volume": 0.6 }
+  },
+
+  "SpecialSounds": {
+    "NitrousActivate": {
+      "Sound": "SFX_Nitrous_Fire",
+      "Volume": 0.9,
+      "LowFreqRumble": true
+    },
+    "NitrousEmpty": {
+      "Sound": "SFX_Nitrous_Empty",
+      "Volume": 0.6
+    },
+    "Collision": {
+      "Light": { "Sound": "SFX_Bump", "Volume": 0.5 },
+      "Medium": { "Sound": "SFX_Crash_Med", "Volume": 0.7 },
+      "Heavy": { "Sound": "SFX_Crash_Heavy", "Volume": 0.9 }
+    },
+    "PhotoFlash": {
+      "Sound": "SFX_Camera",
+      "Volume": 0.4
+    }
+  },
+
+  "RetroAudioFilters": {
+    "PS1Mode": {
+      "SampleRate": 22050,
+      "BitDepth": 16,
+      "Reverb": "PS1_Hall",
+      "Compression": "Aggressive"
+    },
+    "PS2Mode": {
+      "SampleRate": 44100,
+      "BitDepth": 16,
+      "Reverb": "PS2_Environment",
+      "Compression": "Medium"
+    }
+  }
+}

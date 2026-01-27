@@ -2,6 +2,8 @@
 
 #include "Checkpoint/MGCheckpointSubsystem.h"
 #include "TimerManager.h"
+#include "Save/MGSaveManagerSubsystem.h"
+#include "Save/MGSaveGame.h"
 
 void UMGCheckpointSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -655,7 +657,21 @@ FMGBestTimesRecord UMGCheckpointSubsystem::GetBestTimesRecord(const FString& Lay
 
 void UMGCheckpointSubsystem::SaveBestTimes(const FString& LayoutId)
 {
-	// Placeholder - would save to persistent storage
+	// Save specific layout's best time to save game
+	if (const FMGBestTimesRecord* Record = BestTimesRecords.Find(LayoutId))
+	{
+		if (UGameInstance* GI = GetGameInstance())
+		{
+			if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+			{
+				if (UMGSaveGame* SaveData = SaveManager->GetSaveDataMutable())
+				{
+					FName TrackName = FName(*LayoutId);
+					SaveData->TrackBestTimes.Add(TrackName, Record->BestLapTime);
+				}
+			}
+		}
+	}
 }
 
 // ============================================================================
@@ -785,12 +801,44 @@ FLinearColor UMGCheckpointSubsystem::GetDeltaColor(float DeltaSeconds) const
 
 void UMGCheckpointSubsystem::SaveCheckpointData()
 {
-	// Placeholder - would serialize to save game
+	// Get save manager and update track best times
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			if (UMGSaveGame* SaveData = SaveManager->GetSaveDataMutable())
+			{
+				// Transfer best times to save game
+				for (const auto& Pair : BestTimesRecords)
+				{
+					FName TrackName = FName(*Pair.Key);
+					SaveData->TrackBestTimes.Add(TrackName, Pair.Value.BestLapTime);
+				}
+			}
+		}
+	}
 }
 
 void UMGCheckpointSubsystem::LoadCheckpointData()
 {
-	// Placeholder - would deserialize from save game
+	// Get save manager and load track best times
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGSaveManagerSubsystem* SaveManager = GI->GetSubsystem<UMGSaveManagerSubsystem>())
+		{
+			if (const UMGSaveGame* SaveData = SaveManager->GetCurrentSaveData())
+			{
+				// Transfer best times from save game
+				for (const auto& Pair : SaveData->TrackBestTimes)
+				{
+					FString LayoutId = Pair.Key.ToString();
+					FMGBestTimesRecord Record;
+					Record.BestLapTime = Pair.Value;
+					BestTimesRecords.Add(LayoutId, Record);
+				}
+			}
+		}
+	}
 }
 
 // ============================================================================

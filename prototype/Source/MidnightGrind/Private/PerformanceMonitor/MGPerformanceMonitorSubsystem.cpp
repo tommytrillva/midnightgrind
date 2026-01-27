@@ -359,9 +359,9 @@ void UMGPerformanceMonitorSubsystem::UpdateFrameStats()
 	}
 
 	float AverageFrameTime = Sum / FrameTimeBufferSize;
-	CurrentSnapshot.FrameStats.AverageFPS = 1000.0f / AverageFrameTime;
-	CurrentSnapshot.FrameStats.MinFPS = 1000.0f / Max;
-	CurrentSnapshot.FrameStats.MaxFPS = 1000.0f / Min;
+	CurrentSnapshot.FrameStats.AverageFPS = (AverageFrameTime > KINDA_SMALL_NUMBER) ? 1000.0f / AverageFrameTime : 0.0f;
+	CurrentSnapshot.FrameStats.MinFPS = (Max > KINDA_SMALL_NUMBER) ? 1000.0f / Max : 0.0f;
+	CurrentSnapshot.FrameStats.MaxFPS = (Min > KINDA_SMALL_NUMBER) ? 1000.0f / Min : 9999.0f;
 
 	// Calculate 1% and 0.1% lows
 	TArray<float> SortedFrameTimes = FrameTimeBuffer;
@@ -370,8 +370,10 @@ void UMGPerformanceMonitorSubsystem::UpdateFrameStats()
 	int32 OnePercentIndex = FMath::Max(0, FrameTimeBufferSize / 100);
 	int32 PointOnePercentIndex = FMath::Max(0, FrameTimeBufferSize / 1000);
 
-	CurrentSnapshot.FrameStats.OnePercentLow = 1000.0f / SortedFrameTimes[OnePercentIndex];
-	CurrentSnapshot.FrameStats.PointOnePercentLow = 1000.0f / SortedFrameTimes[PointOnePercentIndex];
+	float OnePercentTime = SortedFrameTimes[OnePercentIndex];
+	float PointOnePercentTime = SortedFrameTimes[PointOnePercentIndex];
+	CurrentSnapshot.FrameStats.OnePercentLow = (OnePercentTime > KINDA_SMALL_NUMBER) ? 1000.0f / OnePercentTime : 0.0f;
+	CurrentSnapshot.FrameStats.PointOnePercentLow = (PointOnePercentTime > KINDA_SMALL_NUMBER) ? 1000.0f / PointOnePercentTime : 0.0f;
 
 	// Calculate variance
 	float VarianceSum = 0.0f;

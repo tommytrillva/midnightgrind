@@ -47,9 +47,13 @@ void UMGInstantReplaySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start replay tick
 	if (UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().SetTimer(ReplayTickTimer, [this]()
+		TWeakObjectPtr<UMGInstantReplaySubsystem> WeakThis(this);
+		World->GetTimerManager().SetTimer(ReplayTickTimer, [WeakThis]()
 		{
-			UpdateReplaySystem(0.033f);
+			if (WeakThis.IsValid())
+			{
+				WeakThis->UpdateReplaySystem(0.033f);
+			}
 		}, 0.033f, true);
 	}
 }

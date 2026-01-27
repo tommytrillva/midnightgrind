@@ -1,0 +1,302 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Progression and REP System",
+
+  "REPSystem": {
+    "Description": "Reputation is earned through racing, winning, and style",
+    "MaxLevel": 100,
+    "REPPerLevel": [
+      { "LevelRange": [1, 10], "REPRequired": 500 },
+      { "LevelRange": [11, 25], "REPRequired": 1000 },
+      { "LevelRange": [26, 50], "REPRequired": 2000 },
+      { "LevelRange": [51, 75], "REPRequired": 3500 },
+      { "LevelRange": [76, 100], "REPRequired": 5000 }
+    ],
+
+    "Tiers": {
+      "UNKNOWN": {
+        "Name": "Unknown",
+        "LevelRange": [1, 5],
+        "Description": "Fresh face on the streets. Nobody knows your name yet.",
+        "Color": "#808080",
+        "IconTier": 0,
+        "Perks": [],
+        "UnlockedContent": {
+          "Vehicles": ["BEATER_SEDAN"],
+          "Events": ["CHAPTER_NEWCOMER"],
+          "Features": ["BasicGarage", "TutorialRaces"]
+        }
+      },
+      "ROOKIE": {
+        "Name": "Rookie",
+        "LevelRange": [6, 15],
+        "Description": "People are starting to recognize your car. Keep pushing.",
+        "Color": "#4CAF50",
+        "IconTier": 1,
+        "Perks": [
+          { "Type": "ShopDiscount", "Value": 0.05 },
+          { "Type": "REPMultiplier", "Value": 1.05 }
+        ],
+        "UnlockedContent": {
+          "Vehicles": ["KAZE_CIVIC", "TENSHI_240", "STALLION_GT"],
+          "Events": ["CHAPTER_ROOKIE"],
+          "Features": ["CrewJoin", "DriftMode", "TimeAttack"],
+          "GarageSlots": 3
+        }
+      },
+      "STREET": {
+        "Name": "Street",
+        "LevelRange": [16, 35],
+        "Description": "A regular on the scene. Crews want you to join.",
+        "Color": "#2196F3",
+        "IconTier": 2,
+        "Perks": [
+          { "Type": "ShopDiscount", "Value": 0.10 },
+          { "Type": "REPMultiplier", "Value": 1.10 },
+          { "Type": "NitrousCapacity", "Value": 1.10 }
+        ],
+        "UnlockedContent": {
+          "Vehicles": ["SAKURA_GTR", "KUMO_350Z", "HAYATE_WRX"],
+          "Events": ["CHAPTER_STREET"],
+          "Features": ["CrewCreate", "PinkSlipRacing", "AdvancedTuning"],
+          "GarageSlots": 5
+        }
+      },
+      "PRO": {
+        "Name": "Pro",
+        "LevelRange": [36, 60],
+        "Description": "The underground elite know your name. You're competition now.",
+        "Color": "#9C27B0",
+        "IconTier": 3,
+        "Perks": [
+          { "Type": "ShopDiscount", "Value": 0.15 },
+          { "Type": "REPMultiplier", "Value": 1.15 },
+          { "Type": "NitrousCapacity", "Value": 1.15 },
+          { "Type": "RaceRewards", "Value": 1.10 }
+        ],
+        "UnlockedContent": {
+          "Vehicles": ["RAIJIN_SUPRA", "KARASU_RX7", "RONIN_EVO", "PHANTOM_CAMARO"],
+          "Events": ["CHAPTER_PRO"],
+          "Features": ["ProParts", "EliteChallenges", "Sponsorships"],
+          "GarageSlots": 8
+        }
+      },
+      "ELITE": {
+        "Name": "Elite",
+        "LevelRange": [61, 85],
+        "Description": "One of the best in the city. Legends whisper your name.",
+        "Color": "#FF9800",
+        "IconTier": 4,
+        "Perks": [
+          { "Type": "ShopDiscount", "Value": 0.20 },
+          { "Type": "REPMultiplier", "Value": 1.20 },
+          { "Type": "NitrousCapacity", "Value": 1.20 },
+          { "Type": "RaceRewards", "Value": 1.15 },
+          { "Type": "PartUnlock", "Value": "Elite" }
+        ],
+        "UnlockedContent": {
+          "Vehicles": ["DEMON_CHALLENGER", "VIPER_CORVETTE", "GHOST_E46", "COBRA_S2000"],
+          "Events": ["CHAPTER_ELITE"],
+          "Features": ["EliteParts", "LegendChallenges", "ExclusiveColors"],
+          "GarageSlots": 12
+        }
+      },
+      "LEGEND": {
+        "Name": "Legend",
+        "LevelRange": [86, 100],
+        "Description": "Your name is spoken with reverence. You've transcended the game.",
+        "Color": "#F44336",
+        "IconTier": 5,
+        "Perks": [
+          { "Type": "ShopDiscount", "Value": 0.25 },
+          { "Type": "REPMultiplier", "Value": 1.30 },
+          { "Type": "NitrousCapacity", "Value": 1.25 },
+          { "Type": "RaceRewards", "Value": 1.25 },
+          { "Type": "PartUnlock", "Value": "Legendary" },
+          { "Type": "InfiniteBuildSlots", "Value": true }
+        ],
+        "UnlockedContent": {
+          "Vehicles": ["LEGEND_R35", "SHADOW_LFA", "SPECTER_911", "FLASH_AMG", "NOVA_GT500"],
+          "Events": ["CHAPTER_LEGEND"],
+          "Features": ["LegendaryParts", "UnlimitedGarage", "GoldAccents", "LegendTitle"],
+          "GarageSlots": -1
+        }
+      }
+    }
+  },
+
+  "MilestoneRewards": {
+    "ByLevel": [
+      { "Level": 5, "Reward": { "Cash": 5000, "UnlockTier": "ROOKIE" } },
+      { "Level": 10, "Reward": { "Cash": 10000, "GarageSlot": 1 } },
+      { "Level": 15, "Reward": { "Cash": 15000, "UnlockTier": "STREET", "Title": "Street Racer" } },
+      { "Level": 20, "Reward": { "Cash": 20000, "ExclusivePart": "NITROUS_STAGE2" } },
+      { "Level": 25, "Reward": { "Cash": 30000, "GarageSlot": 1, "ExclusiveColor": "Midnight Purple" } },
+      { "Level": 30, "Reward": { "Cash": 40000, "Title": "Night Rider" } },
+      { "Level": 35, "Reward": { "Cash": 50000, "UnlockTier": "PRO", "ExclusiveVinyl": "Pro_Stripe" } },
+      { "Level": 40, "Reward": { "Cash": 60000, "GarageSlot": 1 } },
+      { "Level": 45, "Reward": { "Cash": 75000, "ExclusivePart": "ENGINE_ELITE_ACCESS" } },
+      { "Level": 50, "Reward": { "Cash": 100000, "Title": "Street Legend", "ExclusiveHorn": "Legend" } },
+      { "Level": 60, "Reward": { "Cash": 150000, "UnlockTier": "ELITE", "GarageSlot": 2 } },
+      { "Level": 70, "Reward": { "Cash": 200000, "ExclusiveColor": "Chameleon" } },
+      { "Level": 80, "Reward": { "Cash": 300000, "Title": "Underground King" } },
+      { "Level": 85, "Reward": { "Cash": 400000, "UnlockTier": "LEGEND" } },
+      { "Level": 90, "Reward": { "Cash": 500000, "ExclusiveVehicle": "CLASSIC_SPECIAL" } },
+      { "Level": 100, "Reward": { "Cash": 1000000, "Title": "The One", "GoldNameplate": true } }
+    ]
+  },
+
+  "REPSources": {
+    "Racing": {
+      "RaceWin": { "Base": 100, "Multipliers": ["Difficulty", "PIClass", "PerfectRace"] },
+      "RaceFinish": { "Base": 25, "PerPosition": -5, "Minimum": 10 },
+      "LapRecord": { "Base": 50 },
+      "CleanLap": { "Base": 10 },
+      "Overtake": { "Base": 5 },
+      "DraftDistance": { "Per100Meters": 2 },
+      "NearMiss": { "Base": 3 },
+      "CloseFinish": { "Base": 25, "WithinSeconds": 0.5 }
+    },
+    "Drift": {
+      "DriftPoints": { "Per1000Points": 5 },
+      "DriftCombo": { "PerMultiplier": 10 },
+      "PerfectDrift": { "Base": 25 },
+      "TandemDrift": { "Base": 15 },
+      "DriftZoneComplete": { "Base": 20 }
+    },
+    "Style": {
+      "AirTime": { "PerSecond": 5 },
+      "TwoWheels": { "PerSecond": 3 },
+      "J-Turn": { "Base": 10 },
+      "Burnout": { "Per5Seconds": 5 },
+      "DonutComplete": { "Base": 15 }
+    },
+    "Social": {
+      "CrewRaceWin": { "Base": 50 },
+      "CrewEventComplete": { "Base": 100 },
+      "RivalDefeated": { "Base": 75 },
+      "OnlineRaceWin": { "Base": 150 },
+      "LeaderboardTop10": { "Base": 200 }
+    }
+  },
+
+  "CrewProgression": {
+    "MaxCrewLevel": 50,
+    "ExpPerLevel": 5000,
+    "CrewPerks": {
+      "Level5": { "Name": "Crew Discount", "Effect": "5% shop discount for all members" },
+      "Level10": { "Name": "Shared Garage", "Effect": "Crew members can share cars" },
+      "Level15": { "Name": "Crew Livery", "Effect": "Unlock crew-specific livery options" },
+      "Level20": { "Name": "REP Bonus", "Effect": "10% REP bonus for crew races" },
+      "Level25": { "Name": "Crew HQ", "Effect": "Unlock crew headquarters customization" },
+      "Level30": { "Name": "Crew Parts", "Effect": "Access to crew-exclusive parts" },
+      "Level35": { "Name": "Crew Events", "Effect": "Host custom crew events" },
+      "Level40": { "Name": "Crew Colors", "Effect": "Exclusive crew color options" },
+      "Level45": { "Name": "Crew Fame", "Effect": "Crew appears in world events" },
+      "Level50": { "Name": "Legendary Crew", "Effect": "Gold crew badge, 20% bonus to all rewards" }
+    },
+    "CrewRoles": {
+      "Leader": { "Permissions": ["All"], "MaxPerCrew": 1 },
+      "Lieutenant": { "Permissions": ["InviteMembers", "KickMembers", "StartEvents"], "MaxPerCrew": 3 },
+      "Veteran": { "Permissions": ["InviteMembers", "StartEvents"], "MaxPerCrew": 10 },
+      "Member": { "Permissions": ["JoinEvents"], "MaxPerCrew": -1 }
+    }
+  },
+
+  "Achievements": {
+    "Racing": [
+      { "ID": "ACH_FIRST_WIN", "Name": "First Blood", "Description": "Win your first race", "REP": 100, "Cash": 1000 },
+      { "ID": "ACH_10_WINS", "Name": "Double Digits", "Description": "Win 10 races", "REP": 500, "Cash": 5000 },
+      { "ID": "ACH_50_WINS", "Name": "Winning Streak", "Description": "Win 50 races", "REP": 2000, "Cash": 20000 },
+      { "ID": "ACH_100_WINS", "Name": "Century Club", "Description": "Win 100 races", "REP": 5000, "Cash": 50000, "Title": "Champion" },
+      { "ID": "ACH_PERFECT_RACE", "Name": "Flawless Victory", "Description": "Win a race with no collisions", "REP": 250, "Cash": 2500 },
+      { "ID": "ACH_PHOTO_FINISH", "Name": "Photo Finish", "Description": "Win by less than 0.1 seconds", "REP": 500, "Cash": 5000 },
+      { "ID": "ACH_UNDERDOG", "Name": "Underdog", "Description": "Win a race with a car 2+ classes below opponents", "REP": 1000, "Cash": 10000 }
+    ],
+    "Drift": [
+      { "ID": "ACH_FIRST_DRIFT", "Name": "Sideways", "Description": "Complete your first drift", "REP": 50, "Cash": 500 },
+      { "ID": "ACH_10K_DRIFT", "Name": "Smoke Show", "Description": "Score 10,000 drift points in one run", "REP": 200, "Cash": 2000 },
+      { "ID": "ACH_50K_DRIFT", "Name": "Drift Lord", "Description": "Score 50,000 drift points in one run", "REP": 1000, "Cash": 10000 },
+      { "ID": "ACH_100K_DRIFT", "Name": "Drift King", "Description": "Score 100,000 drift points in one run", "REP": 5000, "Cash": 50000, "Title": "Drift King" },
+      { "ID": "ACH_TANDEM_MASTER", "Name": "Tandem Master", "Description": "Complete 25 tandem drifts", "REP": 750, "Cash": 7500 }
+    ],
+    "Collection": [
+      { "ID": "ACH_5_CARS", "Name": "Collector", "Description": "Own 5 cars", "REP": 200, "Cash": 2000 },
+      { "ID": "ACH_15_CARS", "Name": "Enthusiast", "Description": "Own 15 cars", "REP": 1000, "Cash": 10000 },
+      { "ID": "ACH_ALL_CARS", "Name": "Complete Collection", "Description": "Own all vehicles", "REP": 10000, "Cash": 100000, "Title": "Collector" },
+      { "ID": "ACH_MAX_BUILD", "Name": "Fully Built", "Description": "Max out a vehicle's performance", "REP": 500, "Cash": 5000 },
+      { "ID": "ACH_5_MAX_BUILDS", "Name": "Master Builder", "Description": "Max out 5 vehicles", "REP": 2500, "Cash": 25000, "Title": "Builder" }
+    ],
+    "Story": [
+      { "ID": "ACH_ROOKIE_COMPLETE", "Name": "Making Moves", "Description": "Complete Rookie chapter", "REP": 500, "Cash": 5000 },
+      { "ID": "ACH_STREET_COMPLETE", "Name": "Street Cred", "Description": "Complete Street chapter", "REP": 1000, "Cash": 10000 },
+      { "ID": "ACH_PRO_COMPLETE", "Name": "Professional", "Description": "Complete Pro chapter", "REP": 2500, "Cash": 25000 },
+      { "ID": "ACH_ELITE_COMPLETE", "Name": "Elite Status", "Description": "Complete Elite chapter", "REP": 5000, "Cash": 50000 },
+      { "ID": "ACH_PHOENIX_DEFEATED", "Name": "Phoenix Slayer", "Description": "Defeat Phoenix", "REP": 10000, "Cash": 100000, "Title": "Phoenix Slayer" },
+      { "ID": "ACH_TRUE_ENDING", "Name": "The Legend", "Description": "Complete the true ending", "REP": 25000, "Cash": 250000, "Title": "The Legend" }
+    ],
+    "Special": [
+      { "ID": "ACH_NIGHT_OWL", "Name": "Night Owl", "Description": "Win 25 races at night", "REP": 500, "Cash": 5000 },
+      { "ID": "ACH_RAIN_MASTER", "Name": "Rain Master", "Description": "Win 10 races in the rain", "REP": 750, "Cash": 7500 },
+      { "ID": "ACH_CREW_CHAMPION", "Name": "Crew Champion", "Description": "Win a crew championship", "REP": 2000, "Cash": 20000 },
+      { "ID": "ACH_PINK_SLIP_5", "Name": "High Roller", "Description": "Win 5 pink slip races", "REP": 2500, "Cash": 25000 },
+      { "ID": "ACH_NO_DAMAGE", "Name": "Untouchable", "Description": "Complete 10 races with no damage", "REP": 1000, "Cash": 10000 }
+    ]
+  },
+
+  "Titles": {
+    "Earned": [
+      { "ID": "TITLE_NEWCOMER", "Name": "Newcomer", "UnlockCondition": "Start the game" },
+      { "ID": "TITLE_STREET_RACER", "Name": "Street Racer", "UnlockCondition": "Reach Level 15" },
+      { "ID": "TITLE_NIGHT_RIDER", "Name": "Night Rider", "UnlockCondition": "Reach Level 30" },
+      { "ID": "TITLE_STREET_LEGEND", "Name": "Street Legend", "UnlockCondition": "Reach Level 50" },
+      { "ID": "TITLE_UNDERGROUND_KING", "Name": "Underground King", "UnlockCondition": "Reach Level 80" },
+      { "ID": "TITLE_THE_ONE", "Name": "The One", "UnlockCondition": "Reach Level 100" },
+      { "ID": "TITLE_DRIFT_KING", "Name": "Drift King", "UnlockCondition": "Score 100K drift points" },
+      { "ID": "TITLE_CHAMPION", "Name": "Champion", "UnlockCondition": "Win 100 races" },
+      { "ID": "TITLE_COLLECTOR", "Name": "Collector", "UnlockCondition": "Own all vehicles" },
+      { "ID": "TITLE_BUILDER", "Name": "Builder", "UnlockCondition": "Max out 5 vehicles" },
+      { "ID": "TITLE_PHOENIX_SLAYER", "Name": "Phoenix Slayer", "UnlockCondition": "Defeat Phoenix" },
+      { "ID": "TITLE_THE_LEGEND", "Name": "The Legend", "UnlockCondition": "Complete true ending" }
+    ]
+  },
+
+  "DailyBonuses": {
+    "Login": {
+      "Day1": { "Cash": 1000, "REP": 100 },
+      "Day2": { "Cash": 1500, "REP": 150 },
+      "Day3": { "Cash": 2000, "REP": 200 },
+      "Day4": { "Cash": 2500, "REP": 250 },
+      "Day5": { "Cash": 3000, "REP": 300 },
+      "Day6": { "Cash": 4000, "REP": 400 },
+      "Day7": { "Cash": 10000, "REP": 1000, "BonusPart": true }
+    },
+    "DailyChallenge": {
+      "Easy": { "Cash": 2000, "REP": 200 },
+      "Medium": { "Cash": 5000, "REP": 500 },
+      "Hard": { "Cash": 10000, "REP": 1000 }
+    },
+    "FirstWinOfDay": {
+      "CashMultiplier": 2.0,
+      "REPMultiplier": 2.0
+    }
+  },
+
+  "Prestige": {
+    "MaxPrestige": 10,
+    "ResetOnPrestige": ["Level", "Cash"],
+    "KeepOnPrestige": ["Vehicles", "Parts", "Titles", "Achievements"],
+    "PrestigeRewards": {
+      "Prestige1": { "REPMultiplier": 1.10, "ExclusiveColor": "Prestige Bronze" },
+      "Prestige2": { "REPMultiplier": 1.15, "CashMultiplier": 1.05 },
+      "Prestige3": { "REPMultiplier": 1.20, "ExclusiveColor": "Prestige Silver" },
+      "Prestige4": { "REPMultiplier": 1.25, "CashMultiplier": 1.10 },
+      "Prestige5": { "REPMultiplier": 1.30, "ExclusiveColor": "Prestige Gold", "ExclusiveCar": true },
+      "Prestige6": { "REPMultiplier": 1.35, "CashMultiplier": 1.15 },
+      "Prestige7": { "REPMultiplier": 1.40, "ExclusiveColor": "Prestige Platinum" },
+      "Prestige8": { "REPMultiplier": 1.45, "CashMultiplier": 1.20 },
+      "Prestige9": { "REPMultiplier": 1.50, "ExclusiveColor": "Prestige Diamond" },
+      "Prestige10": { "REPMultiplier": 2.0, "CashMultiplier": 1.50, "Title": "Immortal", "GoldenAura": true }
+    }
+  }
+}

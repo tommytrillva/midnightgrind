@@ -9,7 +9,7 @@ public class MidnightGrind : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		// Enable IWYU (Include What You Use)
-		bEnforceIWYU = true;
+		IWYUSupport = IWYUSupport.Full;
 
 		// Enable exceptions for third-party library compatibility
 		bEnableExceptions = true;

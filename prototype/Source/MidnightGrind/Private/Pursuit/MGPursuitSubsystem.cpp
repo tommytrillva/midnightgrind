@@ -1,7 +1,12 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Midnight Grind. All Rights Reserved.
 
 #include "Pursuit/MGPursuitSubsystem.h"
 #include "TimerManager.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
+#include "HAL/PlatformFileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
 
 void UMGPursuitSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -896,12 +901,85 @@ TArray<FMGPursuitEvent> UMGPursuitSubsystem::GetPursuitEvents(const FString& Pla
 
 void UMGPursuitSubsystem::SavePursuitData()
 {
-	// Placeholder - would serialize to save game
+	FString DataDir = FPaths::ProjectSavedDir() / TEXT("Pursuit");
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if (!PlatformFile.DirectoryExists(*DataDir))
+	{
+		PlatformFile.CreateDirectory(*DataDir);
+	}
+
+	FString FilePath = DataDir / TEXT("pursuit_stats.dat");
+
+	FBufferArchive Archive;
+
+	// Write version
+	int32 Version = 1;
+	Archive << Version;
+
+	// Write session stats
+	Archive << SessionStats.TotalPursuitsStarted;
+	Archive << SessionStats.TotalEscapes;
+	Archive << SessionStats.TotalBusted;
+	Archive << SessionStats.TotalUnitsDisabled;
+	Archive << SessionStats.TotalRoadblocksEvaded;
+	Archive << SessionStats.TotalSpikeStripsEvaded;
+	Archive << SessionStats.LongestPursuitDuration;
+	Archive << SessionStats.HighestBounty;
+	Archive << SessionStats.TotalBountyEarned;
+	Archive << SessionStats.TotalBountyLost;
+	int32 HighestIntensityInt = static_cast<int32>(SessionStats.HighestIntensity);
+	Archive << HighestIntensityInt;
+	Archive << SessionStats.MostUnitsEngagedAtOnce;
+
+	FFileHelper::SaveArrayToFile(Archive, *FilePath);
+	Archive.FlushCache();
+	Archive.Empty();
+
+	UE_LOG(LogTemp, Log, TEXT("MGPursuit: Saved pursuit stats (Escapes: %d, Busted: %d)"),
+		SessionStats.TotalEscapes, SessionStats.TotalBusted);
 }
 
 void UMGPursuitSubsystem::LoadPursuitData()
 {
-	// Placeholder - would deserialize from save game
+	FString DataDir = FPaths::ProjectSavedDir() / TEXT("Pursuit");
+	FString FilePath = DataDir / TEXT("pursuit_stats.dat");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	// Read version
+	int32 Version;
+	Archive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGPursuit: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Read session stats
+	Archive << SessionStats.TotalPursuitsStarted;
+	Archive << SessionStats.TotalEscapes;
+	Archive << SessionStats.TotalBusted;
+	Archive << SessionStats.TotalUnitsDisabled;
+	Archive << SessionStats.TotalRoadblocksEvaded;
+	Archive << SessionStats.TotalSpikeStripsEvaded;
+	Archive << SessionStats.LongestPursuitDuration;
+	Archive << SessionStats.HighestBounty;
+	Archive << SessionStats.TotalBountyEarned;
+	Archive << SessionStats.TotalBountyLost;
+	int32 HighestIntensityInt;
+	Archive << HighestIntensityInt;
+	SessionStats.HighestIntensity = static_cast<EMGPursuitIntensity>(HighestIntensityInt);
+	Archive << SessionStats.MostUnitsEngagedAtOnce;
+
+	UE_LOG(LogTemp, Log, TEXT("MGPursuit: Loaded pursuit stats (Escapes: %d, Busted: %d)"),
+		SessionStats.TotalEscapes, SessionStats.TotalBusted);
 }
 
 // ============================================================================

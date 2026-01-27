@@ -1,0 +1,541 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Weather and Atmosphere Presets",
+
+  "TimeOfDay": {
+    "Dawn": {
+      "TimeRange": [5, 7],
+      "SunAngle": { "Start": -10, "End": 15 },
+      "Lighting": {
+        "SunIntensity": 0.3,
+        "SkyIntensity": 0.5,
+        "AmbientIntensity": 0.4,
+        "SunColor": "#FFA07A",
+        "SkyColor": "#FFB6C1",
+        "AmbientColor": "#4169E1"
+      },
+      "Fog": {
+        "Density": 0.02,
+        "Color": "#E6E6FA",
+        "StartDistance": 100,
+        "MaxDistance": 2000
+      },
+      "PostProcess": {
+        "Exposure": 0.8,
+        "Contrast": 1.0,
+        "Saturation": 0.9,
+        "ColorGrade": "Dawn_Warm"
+      },
+      "TrafficDensity": 0.3,
+      "Mood": "Peaceful",
+      "SpecialEvents": ["SunriseRun"]
+    },
+
+    "Morning": {
+      "TimeRange": [7, 10],
+      "SunAngle": { "Start": 15, "End": 45 },
+      "Lighting": {
+        "SunIntensity": 0.8,
+        "SkyIntensity": 0.9,
+        "AmbientIntensity": 0.6,
+        "SunColor": "#FFE4B5",
+        "SkyColor": "#87CEEB",
+        "AmbientColor": "#B0C4DE"
+      },
+      "Fog": {
+        "Density": 0.005,
+        "Color": "#F0F8FF",
+        "StartDistance": 500,
+        "MaxDistance": 5000
+      },
+      "PostProcess": {
+        "Exposure": 1.0,
+        "Contrast": 1.05,
+        "Saturation": 1.0,
+        "ColorGrade": "Morning_Clean"
+      },
+      "TrafficDensity": 0.7,
+      "Mood": "Energetic"
+    },
+
+    "Noon": {
+      "TimeRange": [10, 14],
+      "SunAngle": { "Start": 45, "End": 75 },
+      "Lighting": {
+        "SunIntensity": 1.0,
+        "SkyIntensity": 1.0,
+        "AmbientIntensity": 0.7,
+        "SunColor": "#FFFACD",
+        "SkyColor": "#00BFFF",
+        "AmbientColor": "#F0F8FF"
+      },
+      "Fog": {
+        "Density": 0.001,
+        "Color": "#FFFFFF",
+        "StartDistance": 1000,
+        "MaxDistance": 10000
+      },
+      "PostProcess": {
+        "Exposure": 1.1,
+        "Contrast": 1.1,
+        "Saturation": 1.05,
+        "ColorGrade": "Noon_Bright"
+      },
+      "TrafficDensity": 0.8,
+      "Mood": "Harsh"
+    },
+
+    "Afternoon": {
+      "TimeRange": [14, 18],
+      "SunAngle": { "Start": 75, "End": 30 },
+      "Lighting": {
+        "SunIntensity": 0.9,
+        "SkyIntensity": 0.85,
+        "AmbientIntensity": 0.65,
+        "SunColor": "#FFD700",
+        "SkyColor": "#87CEFA",
+        "AmbientColor": "#DEB887"
+      },
+      "Fog": {
+        "Density": 0.003,
+        "Color": "#FFF8DC",
+        "StartDistance": 800,
+        "MaxDistance": 6000
+      },
+      "PostProcess": {
+        "Exposure": 1.0,
+        "Contrast": 1.05,
+        "Saturation": 1.1,
+        "ColorGrade": "Afternoon_Golden"
+      },
+      "TrafficDensity": 0.9,
+      "Mood": "Warm"
+    },
+
+    "Sunset": {
+      "TimeRange": [18, 20],
+      "SunAngle": { "Start": 30, "End": 0 },
+      "Lighting": {
+        "SunIntensity": 0.5,
+        "SkyIntensity": 0.6,
+        "AmbientIntensity": 0.5,
+        "SunColor": "#FF6347",
+        "SkyColor": "#FF7F50",
+        "AmbientColor": "#4B0082"
+      },
+      "Fog": {
+        "Density": 0.01,
+        "Color": "#FFA500",
+        "StartDistance": 200,
+        "MaxDistance": 3000
+      },
+      "PostProcess": {
+        "Exposure": 0.9,
+        "Contrast": 1.15,
+        "Saturation": 1.2,
+        "ColorGrade": "Sunset_Cinematic"
+      },
+      "TrafficDensity": 0.6,
+      "Mood": "Dramatic",
+      "SpecialEvents": ["GoldenHour"]
+    },
+
+    "Dusk": {
+      "TimeRange": [20, 22],
+      "SunAngle": { "Start": 0, "End": -15 },
+      "Lighting": {
+        "SunIntensity": 0.1,
+        "SkyIntensity": 0.3,
+        "AmbientIntensity": 0.35,
+        "SunColor": "#8B0000",
+        "SkyColor": "#483D8B",
+        "AmbientColor": "#191970"
+      },
+      "Fog": {
+        "Density": 0.015,
+        "Color": "#4B0082",
+        "StartDistance": 150,
+        "MaxDistance": 2000
+      },
+      "PostProcess": {
+        "Exposure": 0.7,
+        "Contrast": 1.1,
+        "Saturation": 0.95,
+        "ColorGrade": "Dusk_Purple"
+      },
+      "CityLights": {
+        "IntensityRamp": [0.0, 1.0],
+        "NeonGlow": 0.5
+      },
+      "TrafficDensity": 0.5,
+      "Mood": "Transitional"
+    },
+
+    "Night": {
+      "TimeRange": [22, 2],
+      "SunAngle": { "Start": -15, "End": -45 },
+      "Lighting": {
+        "SunIntensity": 0.0,
+        "MoonIntensity": 0.15,
+        "SkyIntensity": 0.1,
+        "AmbientIntensity": 0.2,
+        "MoonColor": "#E6E6FA",
+        "SkyColor": "#0A0A1A",
+        "AmbientColor": "#1A1A2E"
+      },
+      "Fog": {
+        "Density": 0.008,
+        "Color": "#1A1A2E",
+        "StartDistance": 100,
+        "MaxDistance": 1500
+      },
+      "PostProcess": {
+        "Exposure": 0.5,
+        "Contrast": 1.2,
+        "Saturation": 0.8,
+        "ColorGrade": "Night_Noir",
+        "FilmGrain": 0.05
+      },
+      "CityLights": {
+        "Intensity": 1.0,
+        "NeonGlow": 1.0,
+        "Bloom": 0.4
+      },
+      "Stars": {
+        "Visible": true,
+        "Intensity": 0.8
+      },
+      "TrafficDensity": 0.2,
+      "Mood": "Iconic",
+      "SpecialEvents": ["MidnightRun", "Underground"]
+    },
+
+    "LateNight": {
+      "TimeRange": [2, 5],
+      "SunAngle": { "Start": -45, "End": -10 },
+      "Lighting": {
+        "SunIntensity": 0.0,
+        "MoonIntensity": 0.1,
+        "SkyIntensity": 0.05,
+        "AmbientIntensity": 0.15,
+        "MoonColor": "#C0C0C0",
+        "SkyColor": "#050510",
+        "AmbientColor": "#101020"
+      },
+      "Fog": {
+        "Density": 0.02,
+        "Color": "#101020",
+        "StartDistance": 50,
+        "MaxDistance": 1000
+      },
+      "PostProcess": {
+        "Exposure": 0.4,
+        "Contrast": 1.25,
+        "Saturation": 0.7,
+        "ColorGrade": "LateNight_Cold",
+        "FilmGrain": 0.08
+      },
+      "CityLights": {
+        "Intensity": 0.7,
+        "NeonGlow": 0.8,
+        "Bloom": 0.5
+      },
+      "TrafficDensity": 0.05,
+      "Mood": "Desolate",
+      "SpecialEvents": ["GhostRun", "LegendChallenge"]
+    }
+  },
+
+  "Weather": {
+    "Clear": {
+      "ID": "WEATHER_CLEAR",
+      "Name": "Clear",
+      "Description": "Perfect racing conditions",
+      "Probability": 0.5,
+      "Effects": {
+        "Rain": false,
+        "RainIntensity": 0,
+        "CloudCoverage": 0.1,
+        "WindSpeed": 5,
+        "Visibility": 1.0
+      },
+      "Gameplay": {
+        "GripMultiplier": 1.0,
+        "VisibilityMultiplier": 1.0,
+        "REPMultiplier": 1.0,
+        "CashMultiplier": 1.0
+      },
+      "Audio": {
+        "WindIntensity": 0.3,
+        "AmbientProfile": "City_Clear"
+      }
+    },
+
+    "Cloudy": {
+      "ID": "WEATHER_CLOUDY",
+      "Name": "Overcast",
+      "Description": "Gray skies, flat lighting",
+      "Probability": 0.25,
+      "Effects": {
+        "Rain": false,
+        "RainIntensity": 0,
+        "CloudCoverage": 0.8,
+        "WindSpeed": 10,
+        "Visibility": 0.9
+      },
+      "Lighting": {
+        "SunIntensityMultiplier": 0.4,
+        "AmbientBoost": 0.2,
+        "SkyColorTint": "#A0A0A0"
+      },
+      "Gameplay": {
+        "GripMultiplier": 1.0,
+        "VisibilityMultiplier": 0.95,
+        "REPMultiplier": 1.0,
+        "CashMultiplier": 1.0
+      },
+      "Audio": {
+        "WindIntensity": 0.5,
+        "AmbientProfile": "City_Overcast"
+      }
+    },
+
+    "LightRain": {
+      "ID": "WEATHER_LIGHT_RAIN",
+      "Name": "Light Rain",
+      "Description": "Drizzle - roads are getting slick",
+      "Probability": 0.12,
+      "Effects": {
+        "Rain": true,
+        "RainIntensity": 0.3,
+        "CloudCoverage": 0.9,
+        "WindSpeed": 15,
+        "Visibility": 0.8,
+        "WetSurface": 0.5
+      },
+      "Lighting": {
+        "SunIntensityMultiplier": 0.3,
+        "AmbientBoost": 0.15,
+        "SkyColorTint": "#707070"
+      },
+      "Gameplay": {
+        "GripMultiplier": 0.85,
+        "VisibilityMultiplier": 0.85,
+        "REPMultiplier": 1.15,
+        "CashMultiplier": 1.15
+      },
+      "VFX": {
+        "RainDrops": true,
+        "WindshieldWater": true,
+        "Puddles": "Small",
+        "RoadReflections": 0.6
+      },
+      "Audio": {
+        "RainIntensity": 0.4,
+        "WindIntensity": 0.6,
+        "TireWaterSpray": true,
+        "AmbientProfile": "City_LightRain"
+      }
+    },
+
+    "HeavyRain": {
+      "ID": "WEATHER_HEAVY_RAIN",
+      "Name": "Heavy Rain",
+      "Description": "Downpour - visibility is low, grip is worse",
+      "Probability": 0.08,
+      "Effects": {
+        "Rain": true,
+        "RainIntensity": 0.8,
+        "CloudCoverage": 1.0,
+        "WindSpeed": 25,
+        "Visibility": 0.5,
+        "WetSurface": 1.0
+      },
+      "Lighting": {
+        "SunIntensityMultiplier": 0.15,
+        "AmbientBoost": 0.1,
+        "SkyColorTint": "#404040"
+      },
+      "Gameplay": {
+        "GripMultiplier": 0.7,
+        "VisibilityMultiplier": 0.6,
+        "AquaplaningRisk": 0.3,
+        "REPMultiplier": 1.35,
+        "CashMultiplier": 1.35
+      },
+      "VFX": {
+        "RainDrops": true,
+        "RainStreaks": true,
+        "WindshieldWater": true,
+        "Puddles": "Large",
+        "RoadReflections": 0.9,
+        "Spray": true,
+        "Lightning": { "Enabled": true, "Frequency": 0.02 }
+      },
+      "Audio": {
+        "RainIntensity": 0.9,
+        "WindIntensity": 0.8,
+        "ThunderRumble": true,
+        "TireWaterSpray": true,
+        "AmbientProfile": "City_Storm"
+      }
+    },
+
+    "Fog": {
+      "ID": "WEATHER_FOG",
+      "Name": "Fog",
+      "Description": "Dense fog - can barely see ahead",
+      "Probability": 0.05,
+      "TimeRestriction": ["Dawn", "LateNight"],
+      "Effects": {
+        "Rain": false,
+        "RainIntensity": 0,
+        "CloudCoverage": 1.0,
+        "WindSpeed": 2,
+        "Visibility": 0.3
+      },
+      "Fog": {
+        "Density": 0.08,
+        "Color": "#C0C0C0",
+        "StartDistance": 10,
+        "MaxDistance": 200,
+        "Height": 50
+      },
+      "Lighting": {
+        "SunIntensityMultiplier": 0.2,
+        "AmbientBoost": 0.3,
+        "ScatteringBoost": 0.5
+      },
+      "Gameplay": {
+        "GripMultiplier": 0.95,
+        "VisibilityMultiplier": 0.35,
+        "REPMultiplier": 1.5,
+        "CashMultiplier": 1.5
+      },
+      "VFX": {
+        "VolumetricFog": true,
+        "HeadlightBeams": true,
+        "TaillightGlow": 1.5
+      },
+      "Audio": {
+        "WindIntensity": 0.1,
+        "MuffledAmbient": true,
+        "AmbientProfile": "City_Fog"
+      }
+    }
+  },
+
+  "RetroEffects": {
+    "PS1Mode": {
+      "VertexWobble": {
+        "Enabled": true,
+        "Intensity": 1.0,
+        "Frequency": 30
+      },
+      "AffineTexturing": {
+        "Enabled": true,
+        "Intensity": 0.8
+      },
+      "ColorDepth": {
+        "Bits": 15,
+        "Dithering": true,
+        "DitheringPattern": "Ordered4x4"
+      },
+      "Resolution": {
+        "Scale": 0.25,
+        "IntegerScaling": true
+      }
+    },
+    "PS2Mode": {
+      "VertexWobble": {
+        "Enabled": true,
+        "Intensity": 0.3,
+        "Frequency": 60
+      },
+      "AffineTexturing": {
+        "Enabled": false
+      },
+      "ColorDepth": {
+        "Bits": 24,
+        "Dithering": false
+      },
+      "Resolution": {
+        "Scale": 0.5,
+        "IntegerScaling": true
+      },
+      "MotionBlur": {
+        "Enabled": true,
+        "Intensity": 0.4
+      }
+    },
+    "ModernRetro": {
+      "VertexWobble": {
+        "Enabled": true,
+        "Intensity": 0.5,
+        "Frequency": 60
+      },
+      "ColorDepth": {
+        "Bits": 32,
+        "Dithering": true,
+        "DitheringPattern": "Subtle"
+      },
+      "CRTEffect": {
+        "Enabled": true,
+        "Scanlines": 0.3,
+        "Curvature": 0.1,
+        "Vignette": 0.2
+      },
+      "ChromaticAberration": {
+        "Enabled": true,
+        "Intensity": 0.02
+      }
+    }
+  },
+
+  "NeonLighting": {
+    "CityNeon": {
+      "Colors": ["#FF00FF", "#00FFFF", "#FF6600", "#00FF00", "#FF0066"],
+      "Intensity": 1.0,
+      "Bloom": 0.5,
+      "FlickerChance": 0.1,
+      "AnimationSpeed": 1.0
+    },
+    "SignTypes": [
+      { "Type": "Kanji", "Probability": 0.3, "Colors": ["#FF0066", "#FF00FF"] },
+      { "Type": "English", "Probability": 0.4, "Colors": ["#00FFFF", "#00FF00"] },
+      { "Type": "Arrow", "Probability": 0.15, "Colors": ["#FF6600"] },
+      { "Type": "Logo", "Probability": 0.15, "Colors": ["#FFFFFF", "#FF0000"] }
+    ]
+  },
+
+  "Presets": {
+    "MidnightGrind_Classic": {
+      "TimeOfDay": "Night",
+      "Weather": "Clear",
+      "RetroMode": "ModernRetro",
+      "NeonIntensity": 1.0,
+      "Description": "The signature Midnight Grind look"
+    },
+    "Rainy_Neon": {
+      "TimeOfDay": "Night",
+      "Weather": "LightRain",
+      "RetroMode": "ModernRetro",
+      "NeonIntensity": 1.2,
+      "Description": "Blade Runner vibes"
+    },
+    "Golden_Hour": {
+      "TimeOfDay": "Sunset",
+      "Weather": "Clear",
+      "RetroMode": "PS2Mode",
+      "NeonIntensity": 0.3,
+      "Description": "Warm cinematic sunset racing"
+    },
+    "Ghost_Run": {
+      "TimeOfDay": "LateNight",
+      "Weather": "Fog",
+      "RetroMode": "PS1Mode",
+      "NeonIntensity": 0.5,
+      "Description": "Eerie late night atmosphere"
+    }
+  }
+}

@@ -742,8 +742,10 @@ void UMGRaceDirectorSubsystem::UpdateTension()
     }
 
     // Smooth tension changes
+    UWorld* World = GetWorld();
+    float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
     TensionScore = FMath::FInterpTo(TensionScore, FMath::Clamp(NewTension, 0.0f, 1.0f),
-                                     GetWorld()->GetDeltaSeconds(), DramaConfig.TensionBuildupRate * 10.0f);
+                                     DeltaSeconds, DramaConfig.TensionBuildupRate * 10.0f);
 
     // Update tension level category
     EMGRaceTension NewLevel;
@@ -803,8 +805,10 @@ void UMGRaceDirectorSubsystem::UpdateRubberBanding()
         float Modifier = CalculateRubberBandModifier(State);
 
         // Smooth modifier changes
+        UWorld* ModWorld = GetWorld();
+        float ModDeltaSeconds = ModWorld ? ModWorld->GetDeltaSeconds() : 0.016f;
         State.SpeedModifier = FMath::FInterpTo(State.SpeedModifier, Modifier,
-                                                GetWorld()->GetDeltaSeconds(),
+                                                ModDeltaSeconds,
                                                 1.0f / RubberBandConfig.RampUpTime);
 
         // Apply handling modifier if trailing

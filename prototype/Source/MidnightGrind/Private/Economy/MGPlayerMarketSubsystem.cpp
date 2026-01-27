@@ -3,6 +3,9 @@
 #include "Economy/MGPlayerMarketSubsystem.h"
 #include "Economy/MGEconomySubsystem.h"
 #include "Garage/MGGarageSubsystem.h"
+#include "Catalog/MGVehicleCatalogSubsystem.h"
+#include "Catalog/MGPartsCatalogSubsystem.h"
+#include "Vehicle/MGVehicleData.h"
 #include "Engine/World.h"
 #include "Engine/GameInstance.h"
 #include "TimerManager.h"
@@ -404,6 +407,25 @@ bool UMGPlayerMarketSubsystem::ExecuteBuyNow(FGuid BuyerID, FGuid ListingID)
 	Transaction.SalePrice = SalePrice;
 	Transaction.MarketFee = MarketFee;
 	Transaction.SellerReceived = SellerReceives;
+
+	// Capture ModelID for vehicle transactions (for price history filtering)
+	if (Listing->ItemType == EMGMarketItemType::Vehicle)
+	{
+		if (UGameInstance* GI = GetGameInstance())
+		{
+			if (UMGGarageSubsystem* Garage = GI->GetSubsystem<UMGGarageSubsystem>())
+			{
+				FMGOwnedVehicle Vehicle;
+				if (Garage->GetVehicle(Listing->ItemID, Vehicle))
+				{
+					if (UMGVehicleModelData* ModelData = Vehicle.VehicleModelData.LoadSynchronous())
+					{
+						Transaction.ModelID = ModelData->ModelID;
+					}
+				}
+			}
+		}
+	}
 
 	RecordTransaction(Transaction);
 
@@ -922,13 +944,102 @@ TArray<FMGTradeOffer> UMGPlayerMarketSubsystem::GetPendingTrades(FGuid PlayerID)
 
 int64 UMGPlayerMarketSubsystem::GetEstimatedMarketValue(FGuid VehicleID) const
 {
-	// TODO: Look up vehicle data and calculate based on:
-	// - Base model value
-	// - Parts installed
-	// - Condition
-	// - Recent sale prices for similar vehicles
+	// Get vehicle instance from garage
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGGarageSubsystem* Garage = GI->GetSubsystem<UMGGarageSubsystem>())
+		{
+			FMGOwnedVehicle Vehicle;
+			if (Garage->GetVehicle(VehicleID, Vehicle))
+			{
+				int64 TotalValue = 0;
 
-	return 50000; // Placeholder
+				// 1. Get base model value from catalog
+				if (UMGVehicleCatalogSubsystem* VehicleCatalog = GI->GetSubsystem<UMGVehicleCatalogSubsystem>())
+				{
+					// Get ModelID from vehicle model data
+					FName ModelID = NAME_None;
+					if (UMGVehicleModelData* ModelData = Vehicle.VehicleModelData.LoadSynchronous())
+					{
+						ModelID = ModelData->ModelID;
+					}
+
+					if (!ModelID.IsNone())
+					{
+						FMGVehiclePricingInfo Pricing = VehicleCatalog->GetVehiclePricing(ModelID);
+						if (Pricing.bIsValid)
+						{
+							TotalValue = Pricing.StreetValue;
+						}
+						else
+						{
+							// Fallback if model not in catalog
+							TotalValue = 25000;
+						}
+					}
+					else
+					{
+						TotalValue = 25000; // Default
+					}
+				}
+				else
+				{
+					TotalValue = 25000; // No catalog available
+				}
+
+				// 2. Add value of installed parts
+				if (UMGPartsCatalogSubsystem* PartsCatalog = GI->GetSubsystem<UMGPartsCatalogSubsystem>())
+				{
+					for (const auto& PartPair : Vehicle.InstalledParts)
+					{
+						const FMGInstalledPart& InstalledPart = PartPair.Value;
+						FName PartID = InstalledPart.PartData.PartID;
+
+						if (!PartID.IsNone())
+						{
+							int32 PartPrice = PartsCatalog->GetPartBasePrice(PartID);
+							if (PartPrice > 0)
+							{
+								// Parts depreciate: 70% of original value
+								TotalValue += static_cast<int64>(PartPrice * 0.7f);
+							}
+						}
+					}
+				}
+				else
+				{
+					// Fallback: estimate parts value from count
+					TotalValue += Vehicle.InstalledParts.Num() * 2000;
+				}
+
+				// 3. Apply condition modifier (50% - 100% based on overall health)
+				float ConditionMultiplier = FMath::Clamp(Vehicle.GetOverallHealth() / 100.0f, 0.5f, 1.0f);
+				TotalValue = static_cast<int64>(TotalValue * ConditionMultiplier);
+
+				// 4. Mileage depreciation (high mileage reduces value)
+				// Convert odometer from cm to miles (1 mile = 160934 cm)
+				float Miles = Vehicle.Odometer / 160934.0f;
+				if (Miles > 10000)
+				{
+					// Depreciate 1% per 5000 miles over 10000
+					float MileageDepreciation = FMath::Min((Miles - 10000) / 5000.0f * 0.01f, 0.3f);
+					TotalValue = static_cast<int64>(TotalValue * (1.0f - MileageDepreciation));
+				}
+
+				// 5. Race history bonus (winning cars are more valuable)
+				if (Vehicle.RacesWon > 0)
+				{
+					// +1% per win, max +10%
+					float WinBonus = FMath::Min(Vehicle.RacesWon * 0.01f, 0.1f);
+					TotalValue = static_cast<int64>(TotalValue * (1.0f + WinBonus));
+				}
+
+				return FMath::Max(TotalValue, static_cast<int64>(1000)); // Minimum $1000
+			}
+		}
+	}
+
+	return 50000; // Fallback if vehicle not found
 }
 
 TArray<FMGMarketTransaction> UMGPlayerMarketSubsystem::GetPriceHistory(FName ModelID, int32 DaysBack) const
@@ -941,10 +1052,18 @@ TArray<FMGMarketTransaction> UMGPlayerMarketSubsystem::GetPriceHistory(FName Mod
 	{
 		if (Transaction.TransactionTime >= Cutoff)
 		{
-			// TODO: Filter by ModelID
-			Results.Add(Transaction);
+			// Filter by ModelID - only include matching vehicle models
+			if (ModelID.IsNone() || Transaction.ModelID == ModelID)
+			{
+				Results.Add(Transaction);
+			}
 		}
 	}
+
+	// Sort by transaction time (most recent first)
+	Results.Sort([](const FMGMarketTransaction& A, const FMGMarketTransaction& B) {
+		return A.TransactionTime > B.TransactionTime;
+	});
 
 	return Results;
 }
@@ -1174,6 +1293,25 @@ void UMGPlayerMarketSubsystem::FinalizeAuctionSale(FMGMarketListing& Listing)
 	Transaction.SalePrice = SalePrice;
 	Transaction.MarketFee = MarketFee;
 	Transaction.SellerReceived = SellerReceives;
+
+	// Capture ModelID for vehicle transactions (for price history filtering)
+	if (Listing.ItemType == EMGMarketItemType::Vehicle)
+	{
+		if (UGameInstance* GI = GetGameInstance())
+		{
+			if (UMGGarageSubsystem* Garage = GI->GetSubsystem<UMGGarageSubsystem>())
+			{
+				FMGOwnedVehicle Vehicle;
+				if (Garage->GetVehicle(Listing.ItemID, Vehicle))
+				{
+					if (UMGVehicleModelData* ModelData = Vehicle.VehicleModelData.LoadSynchronous())
+					{
+						Transaction.ModelID = ModelData->ModelID;
+					}
+				}
+			}
+		}
+	}
 
 	RecordTransaction(Transaction);
 

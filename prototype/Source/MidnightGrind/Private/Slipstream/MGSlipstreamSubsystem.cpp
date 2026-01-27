@@ -609,7 +609,13 @@ bool UMGSlipstreamSubsystem::HasLineOfSight(AActor* Follower, AActor* Leader) co
 	QueryParams.AddIgnoredActor(Follower);
 	QueryParams.AddIgnoredActor(Leader);
 
-	bool bHit = GetWorld()->LineTraceSingleByChannel(
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	bool bHit = World->LineTraceSingleByChannel(
 		HitResult,
 		FollowerData->Position,
 		LeaderData->Position,

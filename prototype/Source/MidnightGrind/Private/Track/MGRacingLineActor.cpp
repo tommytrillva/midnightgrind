@@ -221,20 +221,30 @@ FMGRacingLinePoint AMGRacingLineActor::GetInterpolatedPointData(float Distance) 
 	}
 
 	// Find surrounding points
-	float DistancePerPoint = TotalLength / RacingLinePoints.Num();
+	int32 NumPoints = RacingLinePoints.Num();
+	if (NumPoints <= 0)
+	{
+		return Result;
+	}
+
+	float DistancePerPoint = TotalLength / NumPoints;
+	if (DistancePerPoint <= KINDA_SMALL_NUMBER)
+	{
+		return RacingLinePoints[0];
+	}
 
 	int32 LowerIndex = FMath::FloorToInt(Distance / DistancePerPoint);
 	int32 UpperIndex = LowerIndex + 1;
 
 	if (bIsClosedLoop)
 	{
-		LowerIndex = LowerIndex % RacingLinePoints.Num();
-		UpperIndex = UpperIndex % RacingLinePoints.Num();
+		LowerIndex = LowerIndex % NumPoints;
+		UpperIndex = UpperIndex % NumPoints;
 	}
 	else
 	{
-		LowerIndex = FMath::Clamp(LowerIndex, 0, RacingLinePoints.Num() - 1);
-		UpperIndex = FMath::Clamp(UpperIndex, 0, RacingLinePoints.Num() - 1);
+		LowerIndex = FMath::Clamp(LowerIndex, 0, NumPoints - 1);
+		UpperIndex = FMath::Clamp(UpperIndex, 0, NumPoints - 1);
 	}
 
 	// Interpolate

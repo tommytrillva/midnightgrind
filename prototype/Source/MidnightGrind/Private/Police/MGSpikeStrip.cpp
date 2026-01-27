@@ -61,6 +61,17 @@ void AMGSpikeStrip::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AMGSpikeStrip::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unbind overlap events
+	if (TriggerBox)
+	{
+		TriggerBox->OnComponentBeginOverlap.RemoveDynamic(this, &AMGSpikeStrip::OnTriggerBeginOverlap);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void AMGSpikeStrip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

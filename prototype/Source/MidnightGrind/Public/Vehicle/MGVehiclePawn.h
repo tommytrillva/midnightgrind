@@ -27,6 +27,7 @@ class UMGVehicleVFXComponent;
 class UMGEngineAudioComponent;
 class UMGVehicleDamageSystem;
 class UMGVehicleSFXComponent;
+class UMGCameraVFXComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -221,6 +222,7 @@ public:
 
 	//~ Begin AActor Interface
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
@@ -287,6 +289,10 @@ public:
 	/** @brief Vehicle SFX component - handles collision, scrape, and tire sounds. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Vehicle|Components")
 	TObjectPtr<UMGVehicleSFXComponent> VehicleSFX;
+
+	/** @brief Camera VFX component - handles camera shake, speed effects, impact flash. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Vehicle|Components")
+	TObjectPtr<UMGCameraVFXComponent> CameraVFX;
 
 	// ==========================================
 	// VEHICLE CONFIGURATION

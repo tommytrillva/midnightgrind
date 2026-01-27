@@ -1337,8 +1337,8 @@ TArray<TPair<int32, int32>> UMGTournamentSubsystem::GetSeededMatchups(int32 Part
 		CurrentSize *= 2;
 	}
 
-	// Create matchups from seeded order
-	for (int32 i = 0; i < Seeds.Num(); i += 2)
+	// Create matchups from seeded order (ensure even number of seeds)
+	for (int32 i = 0; i + 1 < Seeds.Num(); i += 2)
 	{
 		Matchups.Add(TPair<int32, int32>(Seeds[i], Seeds[i + 1]));
 	}

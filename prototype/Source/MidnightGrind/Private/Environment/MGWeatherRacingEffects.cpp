@@ -1,7 +1,7 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Environment/MGWeatherRacingEffects.h"
-#include "Environment/MGWeatherSubsystem.h"
+#include "Weather/MGWeatherSubsystem.h"
 #include "AI/MGRacingAIController.h"
 #include "Vehicle/MGVehicleMovementComponent.h"
 #include "Engine/World.h"

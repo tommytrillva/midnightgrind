@@ -1,0 +1,644 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - AI Rival Driver Profiles",
+  "TotalDrivers": 24,
+
+  "DifficultyTiers": {
+    "Rookie": { "AISkill": 0.4, "Aggression": 0.3, "Consistency": 0.5, "RubberBanding": 0.8 },
+    "Street": { "AISkill": 0.55, "Aggression": 0.45, "Consistency": 0.6, "RubberBanding": 0.6 },
+    "Pro": { "AISkill": 0.7, "Aggression": 0.6, "Consistency": 0.75, "RubberBanding": 0.4 },
+    "Elite": { "AISkill": 0.85, "Aggression": 0.7, "Consistency": 0.85, "RubberBanding": 0.2 },
+    "Legend": { "AISkill": 0.95, "Aggression": 0.8, "Consistency": 0.95, "RubberBanding": 0.0 }
+  },
+
+  "Drivers": {
+    "Rookie": [
+      {
+        "ID": "DRIVER_KENNY",
+        "Name": "Kenny Matsuda",
+        "Nickname": "The Student",
+        "Age": 19,
+        "Nationality": "Japanese-American",
+        "PreferredVehicle": "KAZE_CIVIC",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Cautious",
+        "Specialty": "Cornering",
+        "Aggression": 0.25,
+        "DefenseSkill": 0.3,
+        "AttackSkill": 0.35,
+        "RecoverySkill": 0.5,
+        "DriftSkill": 0.4,
+        "Backstory": "College student who just got into the scene. His dad used to race in the 90s and passed down his love for JDM. Still learning but has natural talent.",
+        "Quotes": {
+          "PreRace": "I've been practicing! Let's see what I've learned.",
+          "Losing": "Okay okay, I see you!",
+          "Winning": "Wait, I'm actually winning?!",
+          "PostWin": "I can't believe I did it! My dad's gonna be so hyped!"
+        }
+      },
+      {
+        "ID": "DRIVER_MIRA",
+        "Name": "Mira Chen",
+        "Nickname": "Learner's Permit",
+        "Age": 21,
+        "Nationality": "Chinese-American",
+        "PreferredVehicle": "BEATER_SEDAN",
+        "PreferredCategory": "Economy",
+        "DrivingStyle": "Smooth",
+        "Specialty": "Consistency",
+        "Aggression": 0.2,
+        "DefenseSkill": 0.4,
+        "AttackSkill": 0.25,
+        "RecoverySkill": 0.45,
+        "DriftSkill": 0.3,
+        "Backstory": "Saved up for months working at her parents' restaurant to buy her first car. What she lacks in experience, she makes up for in determination.",
+        "Quotes": {
+          "PreRace": "I'm just here to have fun and learn.",
+          "Losing": "That was smooth! Teach me that line!",
+          "Winning": "Oh my god, I'm actually ahead!",
+          "PostWin": "I need to tell everyone at the restaurant!"
+        }
+      },
+      {
+        "ID": "DRIVER_TRAVIS",
+        "Name": "Travis Webb",
+        "Nickname": "YouTube University",
+        "Age": 22,
+        "Nationality": "American",
+        "PreferredVehicle": "STALLION_GT",
+        "PreferredCategory": "Muscle",
+        "DrivingStyle": "Aggressive",
+        "Specialty": "Straight Line",
+        "Aggression": 0.45,
+        "DefenseSkill": 0.25,
+        "AttackSkill": 0.4,
+        "RecoverySkill": 0.35,
+        "DriftSkill": 0.25,
+        "Backstory": "Learned everything from YouTube tutorials. Talks a big game but still figuring out how to put the power down. His Stallion is louder than it is fast... for now.",
+        "Quotes": {
+          "PreRace": "I watched like 50 videos on racing lines. I got this.",
+          "Losing": "The algorithm lied to me!",
+          "Winning": "See? YouTube works!",
+          "PostWin": "Time to make my own channel!"
+        }
+      },
+      {
+        "ID": "DRIVER_YUKI",
+        "Name": "Yuki Tanaka",
+        "Nickname": "Tofu Runner",
+        "Age": 20,
+        "Nationality": "Japanese",
+        "PreferredVehicle": "BEATER_SEDAN",
+        "PreferredCategory": "Economy",
+        "DrivingStyle": "Technical",
+        "Specialty": "Downhill",
+        "Aggression": 0.3,
+        "DefenseSkill": 0.45,
+        "AttackSkill": 0.35,
+        "RecoverySkill": 0.55,
+        "DriftSkill": 0.5,
+        "Backstory": "Exchange student who grew up driving mountain roads in Japan. Her family owns a tofu shop. The memes write themselves, but she's legit skilled.",
+        "Quotes": {
+          "PreRace": "These roads remind me of home.",
+          "Losing": "Your technique is good!",
+          "Winning": "Just like Mount Akina...",
+          "PostWin": "Maybe I should call my dad..."
+        }
+      }
+    ],
+
+    "Street": [
+      {
+        "ID": "DRIVER_MARCUS",
+        "Name": "Marcus \"Heavy Foot\" Williams",
+        "Nickname": "Heavy Foot",
+        "Age": 26,
+        "Nationality": "American",
+        "PreferredVehicle": "STALLION_GT",
+        "PreferredCategory": "Muscle",
+        "DrivingStyle": "Aggressive",
+        "Specialty": "Straight Line",
+        "Aggression": 0.6,
+        "DefenseSkill": 0.4,
+        "AttackSkill": 0.65,
+        "RecoverySkill": 0.5,
+        "DriftSkill": 0.35,
+        "Backstory": "Former drag strip regular who transitioned to street racing. His right foot knows only two positions: off and floor. Working on finesse, but raw power is his game.",
+        "Quotes": {
+          "PreRace": "Hope you like eating my exhaust.",
+          "Losing": "Alright, you got some moves.",
+          "Winning": "Can't outrun 8 cylinders!",
+          "PostWin": "That V8 sound never gets old."
+        }
+      },
+      {
+        "ID": "DRIVER_LISA",
+        "Name": "Lisa Park",
+        "Nickname": "Seoul Sister",
+        "Age": 24,
+        "Nationality": "Korean-American",
+        "PreferredVehicle": "KAZE_CIVIC",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Balanced",
+        "Specialty": "Cornering",
+        "Aggression": 0.45,
+        "DefenseSkill": 0.55,
+        "AttackSkill": 0.5,
+        "RecoverySkill": 0.6,
+        "DriftSkill": 0.55,
+        "Backstory": "Graphic designer by day, street racer by night. Her Civic is a rolling art piece. Precise and calculated, she makes everything look effortless.",
+        "Quotes": {
+          "PreRace": "Let's paint some lines together.",
+          "Losing": "Nice apex! Respect.",
+          "Winning": "Flow state activated.",
+          "PostWin": "That's going on the mood board."
+        }
+      },
+      {
+        "ID": "DRIVER_JEROME",
+        "Name": "Jerome \"J-Slide\" Davis",
+        "Nickname": "J-Slide",
+        "Age": 27,
+        "Nationality": "American",
+        "PreferredVehicle": "TENSHI_240",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Drift",
+        "Specialty": "Drift",
+        "Aggression": 0.5,
+        "DefenseSkill": 0.45,
+        "AttackSkill": 0.55,
+        "RecoverySkill": 0.7,
+        "DriftSkill": 0.75,
+        "Backstory": "Started drifting in parking lots as a teenager. Now he's one of the smoothest sideways pilots in the city. Racing isn't his main thing, but he'll still smoke you.",
+        "Quotes": {
+          "PreRace": "Grip racing? Aight, I'll play your game.",
+          "Losing": "You're fast, but can you slide?",
+          "Winning": "Even going straight, I'm sideways.",
+          "PostWin": "Now let's do a real competition - drift battle."
+        }
+      },
+      {
+        "ID": "DRIVER_DANNY",
+        "Name": "Danny Reyes",
+        "Nickname": "El Rápido",
+        "Age": 25,
+        "Nationality": "Mexican-American",
+        "PreferredVehicle": "KAZE_CIVIC",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Aggressive",
+        "Specialty": "Acceleration",
+        "Aggression": 0.55,
+        "DefenseSkill": 0.5,
+        "AttackSkill": 0.6,
+        "RecoverySkill": 0.55,
+        "DriftSkill": 0.5,
+        "Backstory": "Mechanic at his uncle's shop. Knows Honda engines inside and out. His turbocharged Civic is a pocket rocket that punches way above its weight class.",
+        "Quotes": {
+          "PreRace": "My uncle taught me everything. You're in trouble.",
+          "Losing": "Okay, I need more boost.",
+          "Winning": "VTEC just kicked in, yo!",
+          "PostWin": "Family recipe for speed right there."
+        }
+      },
+      {
+        "ID": "DRIVER_ALEX",
+        "Name": "Alex Volkov",
+        "Nickname": "The Import",
+        "Age": 28,
+        "Nationality": "Russian-American",
+        "PreferredVehicle": "TENSHI_240",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Technical",
+        "Specialty": "Late Braking",
+        "Aggression": 0.5,
+        "DefenseSkill": 0.6,
+        "AttackSkill": 0.55,
+        "RecoverySkill": 0.6,
+        "DriftSkill": 0.6,
+        "Backstory": "Grew up racing on frozen lakes back in Russia. Ice taught him car control that most will never understand. Cold, calculated, and dangerously smooth.",
+        "Quotes": {
+          "PreRace": "In Russia, we race in conditions you cannot imagine.",
+          "Losing": "Good. Very good.",
+          "Winning": "Control is everything.",
+          "PostWin": "That was like warm-up on ice."
+        }
+      }
+    ],
+
+    "Pro": [
+      {
+        "ID": "DRIVER_RACHEL",
+        "Name": "Rachel \"Rev\" Morgan",
+        "Nickname": "Rev",
+        "Age": 29,
+        "Nationality": "American",
+        "PreferredVehicle": "SAKURA_GTR",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Aggressive",
+        "Specialty": "All-Around",
+        "Aggression": 0.65,
+        "DefenseSkill": 0.7,
+        "AttackSkill": 0.75,
+        "RecoverySkill": 0.7,
+        "DriftSkill": 0.65,
+        "Backstory": "Former professional track day instructor who got tired of teaching. Now she's showing everyone what she learned. Her GTR is a surgical instrument.",
+        "Quotes": {
+          "PreRace": "Class is in session. Try to keep up.",
+          "Losing": "Interesting technique. Let me adapt.",
+          "Winning": "This is what years of practice looks like.",
+          "PostWin": "Another lesson delivered."
+        }
+      },
+      {
+        "ID": "DRIVER_KENJI",
+        "Name": "Kenji Watanabe",
+        "Nickname": "The Exile",
+        "Age": 32,
+        "Nationality": "Japanese",
+        "PreferredVehicle": "TENSHI_240",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Drift",
+        "Specialty": "Drift",
+        "Aggression": 0.55,
+        "DefenseSkill": 0.65,
+        "AttackSkill": 0.7,
+        "RecoverySkill": 0.8,
+        "DriftSkill": 0.9,
+        "Backstory": "Former D1 driver who left Japan under mysterious circumstances. Rumor has it he was too fast and made the wrong people look bad. Now he drifts the American streets.",
+        "Quotes": {
+          "PreRace": "Show me what American streets have to offer.",
+          "Losing": "You have good instincts.",
+          "Winning": "The angle was perfect.",
+          "PostWin": "This reminds me of Osaka nights."
+        }
+      },
+      {
+        "ID": "DRIVER_MIKE",
+        "Name": "Mike \"The Machine\" Torres",
+        "Nickname": "The Machine",
+        "Age": 31,
+        "Nationality": "American",
+        "PreferredVehicle": "STALLION_GT",
+        "PreferredCategory": "Muscle",
+        "DrivingStyle": "Consistent",
+        "Specialty": "Endurance",
+        "Aggression": 0.5,
+        "DefenseSkill": 0.75,
+        "AttackSkill": 0.65,
+        "RecoverySkill": 0.75,
+        "DriftSkill": 0.5,
+        "Backstory": "Ex-military, now works as a driving instructor. Known for never making mistakes and always running perfect lap times. His consistency is almost inhuman.",
+        "Quotes": {
+          "PreRace": "I've calculated every scenario. Let's execute.",
+          "Losing": "Recalculating...",
+          "Winning": "Right on schedule.",
+          "PostWin": "Mission accomplished."
+        }
+      },
+      {
+        "ID": "DRIVER_NINA",
+        "Name": "Nina Castellanos",
+        "Nickname": "La Reina",
+        "Age": 27,
+        "Nationality": "Colombian-American",
+        "PreferredVehicle": "SAKURA_GTR",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Aggressive",
+        "Specialty": "Overtaking",
+        "Aggression": 0.7,
+        "DefenseSkill": 0.6,
+        "AttackSkill": 0.8,
+        "RecoverySkill": 0.65,
+        "DriftSkill": 0.6,
+        "Backstory": "She came from nothing and built everything herself. Her GTR started as a shell she found in a junkyard. Now it's a beast, just like her.",
+        "Quotes": {
+          "PreRace": "I didn't come here to be second.",
+          "Losing": "You got heart. I respect that.",
+          "Winning": "Crown stays on my head.",
+          "PostWin": "From the junkyard to the winner's circle."
+        }
+      },
+      {
+        "ID": "DRIVER_TYLER",
+        "Name": "Tyler Kim",
+        "Nickname": "TK",
+        "Age": 26,
+        "Nationality": "Korean-American",
+        "PreferredVehicle": "KAZE_CIVIC",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Technical",
+        "Specialty": "Time Attack",
+        "Aggression": 0.45,
+        "DefenseSkill": 0.7,
+        "AttackSkill": 0.65,
+        "RecoverySkill": 0.75,
+        "DriftSkill": 0.55,
+        "Backstory": "Software engineer who approaches racing like debugging code. He's optimized every millisecond of his lap times. Data-driven and frighteningly precise.",
+        "Quotes": {
+          "PreRace": "I've analyzed your runs. I know your weaknesses.",
+          "Losing": "Anomaly detected. Interesting.",
+          "Winning": "Exactly as simulated.",
+          "PostWin": "The data never lies."
+        }
+      }
+    ],
+
+    "Elite": [
+      {
+        "ID": "DRIVER_DANTE",
+        "Name": "Dante \"Ghost\" Morales",
+        "Nickname": "Ghost",
+        "Age": 34,
+        "Nationality": "Mexican-American",
+        "PreferredVehicle": "SAKURA_GTR",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Tactical",
+        "Specialty": "All-Around",
+        "Aggression": 0.6,
+        "DefenseSkill": 0.85,
+        "AttackSkill": 0.8,
+        "RecoverySkill": 0.85,
+        "DriftSkill": 0.75,
+        "Backstory": "Nobody knows where he came from or where he goes after races. He appears, wins, and vanishes. Some say he's been racing these streets for decades. Others say he's a legend that never existed.",
+        "Quotes": {
+          "PreRace": "...",
+          "Losing": "Interesting.",
+          "Winning": "As expected.",
+          "PostWin": "Until next time."
+        }
+      },
+      {
+        "ID": "DRIVER_SAKURA",
+        "Name": "Sakura Hayashi",
+        "Nickname": "Cherry Blossom",
+        "Age": 28,
+        "Nationality": "Japanese",
+        "PreferredVehicle": "SAKURA_GTR",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Balanced",
+        "Specialty": "Technical",
+        "Aggression": 0.55,
+        "DefenseSkill": 0.8,
+        "AttackSkill": 0.85,
+        "RecoverySkill": 0.8,
+        "DriftSkill": 0.85,
+        "Backstory": "Daughter of a famous Japanese racing dynasty. Came to America to escape her family's shadow and forge her own legend. The Sakura GTR is named after her.",
+        "Quotes": {
+          "PreRace": "My family name means nothing here. Only skill matters.",
+          "Losing": "You've earned my respect.",
+          "Winning": "Cherry blossoms fall, but always return.",
+          "PostWin": "Father would be proud... I think."
+        }
+      },
+      {
+        "ID": "DRIVER_VINCE",
+        "Name": "Vince \"V12\" Romano",
+        "Nickname": "V12",
+        "Age": 36,
+        "Nationality": "Italian-American",
+        "PreferredVehicle": "STALLION_GT",
+        "PreferredCategory": "Muscle",
+        "DrivingStyle": "Aggressive",
+        "Specialty": "Straight Line",
+        "Aggression": 0.75,
+        "DefenseSkill": 0.7,
+        "AttackSkill": 0.85,
+        "RecoverySkill": 0.7,
+        "DriftSkill": 0.55,
+        "Backstory": "Old school racer who's been in the game since the 2000s. His Stallion has a swapped supercharged V12 that's louder than thunder. Respects tradition but isn't afraid to evolve.",
+        "Quotes": {
+          "PreRace": "You kids have no idea what real power feels like.",
+          "Losing": "Alright young blood, you got skills.",
+          "Winning": "Experience beats enthusiasm every time.",
+          "PostWin": "That's how we did it back in the day."
+        }
+      },
+      {
+        "ID": "DRIVER_ZARA",
+        "Name": "Zara Okonkwo",
+        "Nickname": "The Prodigy",
+        "Age": 23,
+        "Nationality": "Nigerian-British",
+        "PreferredVehicle": "KAZE_CIVIC",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Aggressive",
+        "Specialty": "Acceleration",
+        "Aggression": 0.7,
+        "DefenseSkill": 0.75,
+        "AttackSkill": 0.85,
+        "RecoverySkill": 0.8,
+        "DriftSkill": 0.7,
+        "Backstory": "Sim racing champion who transitioned to real racing and dominated immediately. Some old-timers doubted her, until she left them in the dust. Now nobody questions her.",
+        "Quotes": {
+          "PreRace": "Sim or real, fast is fast.",
+          "Losing": "GG. I'll study this replay.",
+          "Winning": "Another lap record secured.",
+          "PostWin": "Time to update my stream with this W."
+        }
+      },
+      {
+        "ID": "DRIVER_JACK",
+        "Name": "Jack \"Hellcat\" Henderson",
+        "Nickname": "Hellcat",
+        "Age": 33,
+        "Nationality": "American",
+        "PreferredVehicle": "STALLION_GT",
+        "PreferredCategory": "Muscle",
+        "DrivingStyle": "Aggressive",
+        "Specialty": "Power",
+        "Aggression": 0.8,
+        "DefenseSkill": 0.65,
+        "AttackSkill": 0.9,
+        "RecoverySkill": 0.7,
+        "DriftSkill": 0.6,
+        "Backstory": "Built his reputation on pure American muscle. His supercharged Stallion puts down over 800hp. If the road is straight enough, nobody can touch him. Corners are... a work in progress.",
+        "Quotes": {
+          "PreRace": "Hope this track has some straights.",
+          "Losing": "Too many damn corners!",
+          "Winning": "All that matters is who crosses first!",
+          "PostWin": "800 horsepower of freedom right there!"
+        }
+      }
+    ],
+
+    "Legend": [
+      {
+        "ID": "DRIVER_PHOENIX",
+        "Name": "Unknown",
+        "Nickname": "Phoenix",
+        "Age": "Unknown",
+        "Nationality": "Unknown",
+        "PreferredVehicle": "SAKURA_GTR",
+        "PreferredCategory": "JDM",
+        "DrivingStyle": "Perfect",
+        "Specialty": "Everything",
+        "Aggression": 0.75,
+        "DefenseSkill": 0.95,
+        "AttackSkill": 0.95,
+        "RecoverySkill": 0.95,
+        "DriftSkill": 0.9,
+        "Backstory": "The final boss of the underground. Nobody knows their identity, face always hidden. Some say Phoenix is actually multiple drivers sharing one identity. Others say they're a ghost of a racer who died on these streets decades ago. All anyone knows is: when Phoenix appears, records fall.",
+        "Quotes": {
+          "PreRace": "You've come far. Let's see if you're worthy.",
+          "Losing": "You... are different.",
+          "Winning": "Not yet. Keep climbing.",
+          "PostWin": "Remember this feeling. Use it."
+        },
+        "Special": {
+          "UnlockCondition": "Complete all Elite races with Gold",
+          "IsHidden": true,
+          "UnlocksEnding": true
+        }
+      },
+      {
+        "ID": "DRIVER_LEGACY",
+        "Name": "The Three Kings",
+        "Nickname": "Legacy",
+        "Age": "Various",
+        "Nationality": "Various",
+        "PreferredVehicle": "Mixed",
+        "PreferredCategory": "Mixed",
+        "DrivingStyle": "Legendary",
+        "Specialty": "Team Racing",
+        "Description": "Three legendary drivers who dominated the scene in the 2000s. They race as a unit, covering each other's weaknesses. Beating all three in a single race is considered impossible.",
+        "Members": [
+          {
+            "ID": "DRIVER_LEGACY_1",
+            "Name": "Victor \"The Patriarch\" Yamamoto",
+            "Vehicle": "SAKURA_GTR",
+            "Role": "Leader"
+          },
+          {
+            "ID": "DRIVER_LEGACY_2",
+            "Name": "Maria \"La Muerte\" Sanchez",
+            "Vehicle": "TENSHI_240",
+            "Role": "Disruptor"
+          },
+          {
+            "ID": "DRIVER_LEGACY_3",
+            "Name": "Big Mike O'Brien",
+            "Vehicle": "STALLION_GT",
+            "Role": "Closer"
+          }
+        ],
+        "Special": {
+          "UnlockCondition": "Defeat Phoenix",
+          "IsHidden": true,
+          "RaceType": "3v1 Gauntlet"
+        }
+      }
+    ]
+  },
+
+  "BehaviorProfiles": {
+    "Cautious": {
+      "BrakingDistance": 1.3,
+      "OvertakeAggression": 0.3,
+      "DefensivePositioning": 0.8,
+      "RiskTolerance": 0.2,
+      "TrafficAvoidance": 0.9
+    },
+    "Smooth": {
+      "BrakingDistance": 1.1,
+      "OvertakeAggression": 0.4,
+      "DefensivePositioning": 0.6,
+      "RiskTolerance": 0.4,
+      "TrafficAvoidance": 0.7
+    },
+    "Balanced": {
+      "BrakingDistance": 1.0,
+      "OvertakeAggression": 0.5,
+      "DefensivePositioning": 0.5,
+      "RiskTolerance": 0.5,
+      "TrafficAvoidance": 0.5
+    },
+    "Aggressive": {
+      "BrakingDistance": 0.85,
+      "OvertakeAggression": 0.7,
+      "DefensivePositioning": 0.3,
+      "RiskTolerance": 0.7,
+      "TrafficAvoidance": 0.3
+    },
+    "Technical": {
+      "BrakingDistance": 0.95,
+      "OvertakeAggression": 0.5,
+      "DefensivePositioning": 0.6,
+      "RiskTolerance": 0.4,
+      "TrafficAvoidance": 0.6,
+      "LineOptimization": 0.9
+    },
+    "Drift": {
+      "BrakingDistance": 0.9,
+      "OvertakeAggression": 0.6,
+      "DefensivePositioning": 0.4,
+      "RiskTolerance": 0.6,
+      "DriftPreference": 0.8,
+      "AngleAggression": 0.7
+    },
+    "Tactical": {
+      "BrakingDistance": 1.0,
+      "OvertakeAggression": 0.55,
+      "DefensivePositioning": 0.7,
+      "RiskTolerance": 0.5,
+      "TrafficAvoidance": 0.5,
+      "AdaptationRate": 0.9
+    },
+    "Consistent": {
+      "BrakingDistance": 1.05,
+      "OvertakeAggression": 0.45,
+      "DefensivePositioning": 0.65,
+      "RiskTolerance": 0.3,
+      "LapTimeVariance": 0.1
+    },
+    "Perfect": {
+      "BrakingDistance": 0.92,
+      "OvertakeAggression": 0.75,
+      "DefensivePositioning": 0.8,
+      "RiskTolerance": 0.6,
+      "LineOptimization": 0.98,
+      "AdaptationRate": 0.95
+    },
+    "Legendary": {
+      "BrakingDistance": 0.9,
+      "OvertakeAggression": 0.8,
+      "DefensivePositioning": 0.85,
+      "RiskTolerance": 0.7,
+      "TeamCoordination": 0.95
+    }
+  },
+
+  "VoiceLines": {
+    "Generic": {
+      "Overtaken": [
+        "Nice move!",
+        "Where did you come from?!",
+        "I'll get you back!",
+        "Not bad!"
+      ],
+      "Overtaking": [
+        "Coming through!",
+        "See ya!",
+        "Too slow!",
+        "Move over!"
+      ],
+      "NearMiss": [
+        "Whoa!",
+        "Close one!",
+        "Watch it!",
+        "That was tight!"
+      ],
+      "Crash": [
+        "No!",
+        "Damn it!",
+        "Are you serious?!",
+        "My car!"
+      ],
+      "NitroUse": [
+        "Boost!",
+        "Full send!",
+        "Later!",
+        "Catch this!"
+      ]
+    }
+  }
+}

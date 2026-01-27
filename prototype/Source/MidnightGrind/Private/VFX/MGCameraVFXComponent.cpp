@@ -110,11 +110,12 @@ void UMGCameraVFXComponent::UpdateSpeedEffects(float SpeedKPH)
 	else
 	{
 		float Range = SpeedEffectConfig.MaxThreshold - SpeedEffectConfig.StartThreshold;
-		TargetSpeedIntensity = (SpeedKPH - SpeedEffectConfig.StartThreshold) / Range;
+		TargetSpeedIntensity = (Range > KINDA_SMALL_NUMBER) ? (SpeedKPH - SpeedEffectConfig.StartThreshold) / Range : 0.0f;
 	}
 
 	// Smooth interpolation
-	float DeltaTime = GetWorld()->GetDeltaSeconds();
+	UWorld* World = GetWorld();
+	float DeltaTime = World ? World->GetDeltaSeconds() : 0.016f;
 	CurrentSpeedIntensity = FMath::FInterpTo(CurrentSpeedIntensity, TargetSpeedIntensity, DeltaTime, 5.0f);
 
 	// Apply FOV increase
@@ -170,7 +171,8 @@ void UMGCameraVFXComponent::UpdateDriftEffects(float DriftAngle, float DriftInte
 	TargetDriftOffset = DriftCameraConfig.DriftOffset * NormalizedAngle * DriftIntensity;
 
 	// Smooth interpolation
-	float DeltaTime = GetWorld()->GetDeltaSeconds();
+	UWorld* World = GetWorld();
+	float DeltaTime = World ? World->GetDeltaSeconds() : 0.016f;
 	CurrentDriftRoll = FMath::FInterpTo(CurrentDriftRoll, TargetDriftRoll, DeltaTime, DriftCameraConfig.RollInterpSpeed);
 	CurrentDriftOffset = FMath::VInterpTo(CurrentDriftOffset, TargetDriftOffset, DeltaTime, DriftCameraConfig.OffsetInterpSpeed);
 
@@ -451,15 +453,22 @@ void UMGCameraVFXComponent::UpdateSlowMotion(float DeltaTime)
 		return;
 	}
 
-	float CurrentDilation = UGameplayStatics::GetGlobalTimeDilation(GetWorld());
-	float NewDilation = FMath::FInterpTo(CurrentDilation, TargetTimeDilation, DeltaTime / CurrentDilation, 1.0f / SlowMotionTransitionTime);
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
 
-	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), NewDilation);
+	float CurrentDilation = UGameplayStatics::GetGlobalTimeDilation(World);
+	float SafeDilation = FMath::Max(CurrentDilation, 0.01f); // Prevent division by zero
+	float NewDilation = FMath::FInterpTo(CurrentDilation, TargetTimeDilation, DeltaTime / SafeDilation, 1.0f / SlowMotionTransitionTime);
+
+	UGameplayStatics::SetGlobalTimeDilation(World, NewDilation);
 
 	if (FMath::IsNearlyEqual(NewDilation, TargetTimeDilation, 0.01f))
 	{
 		SlowMotionTransitionTime = 0.0f;
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), TargetTimeDilation);
+		UGameplayStatics::SetGlobalTimeDilation(World, TargetTimeDilation);
 	}
 }
 
@@ -476,7 +485,8 @@ void UMGCameraVFXComponent::UpdateContinuousShake(float DeltaTime)
 	Intensity *= ContinuousShakeScale * ShakeIntensityMultiplier;
 
 	// Generate continuous shake
-	float Time = GetWorld()->GetTimeSeconds() * Frequency;
+	UWorld* World = GetWorld();
+	float Time = (World ? World->GetTimeSeconds() : 0.0f) * Frequency;
 
 	FVector ShakeOff;
 	ShakeOff.X = FMath::PerlinNoise1D(Time) * Intensity * 5.0f;
@@ -509,7 +519,8 @@ void UMGCameraVFXComponent::UpdateCustomShake(float DeltaTime)
 		float Progress = CustomShakeTimer / CustomShakeDuration;
 		float CurrentIntensity = CustomShakeIntensity * (1.0f - Progress);
 
-		float Time = GetWorld()->GetTimeSeconds() * CustomShakeFrequency;
+		UWorld* World = GetWorld();
+		float Time = (World ? World->GetTimeSeconds() : 0.0f) * CustomShakeFrequency;
 
 		ShakeOffset.X = FMath::Sin(Time * 1.1f) * CurrentIntensity * 10.0f;
 		ShakeOffset.Y = FMath::Sin(Time * 0.9f + 1.0f) * CurrentIntensity * 10.0f;

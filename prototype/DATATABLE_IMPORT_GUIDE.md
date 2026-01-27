@@ -2,17 +2,23 @@
 ## Midnight Grind - Content Integration
 
 **Purpose:** Import vehicle JSON data into UE5 DataTables for runtime access
+**Updated:** Iteration 81 - Vehicle Catalog Subsystem Implementation
 
 ---
 
 ## OVERVIEW
 
-The Vehicle Catalog Subsystem uses UE5's native DataTable system to provide fast, Blueprint-accessible lookups of vehicle pricing and specifications.
+The Vehicle Catalog Subsystem (`UMGVehicleCatalogSubsystem`) uses UE5's native DataTable system to provide fast, Blueprint-accessible lookups of vehicle pricing and specifications.
 
 **Data Flow:**
 ```
 JSON Files → UE5 DataTable Import → Runtime Subsystem → Economy Systems
 ```
+
+**Key Files:**
+- `Public/Catalog/MGCatalogTypes.h` - DataTable row definitions
+- `Public/Catalog/MGVehicleCatalogSubsystem.h` - Subsystem interface
+- `Private/Catalog/MGVehicleCatalogSubsystem.cpp` - Implementation
 
 ---
 
@@ -154,53 +160,76 @@ if (UMGVehicleCatalogSubsystem* Catalog = GetGameInstance()->GetSubsystem<UMGVeh
 
 ## JSON TO STRUCT FIELD MAPPING
 
+**Row Struct:** `FMGVehicleCatalogRow` (defined in `MGCatalogTypes.h`)
+
 ### Identity Fields
 
 | JSON Field | Struct Field | Type | Example |
 |------------|--------------|------|---------|
-| VehicleID | VehicleID | FString | "KAZE_CIVIC" |
-| DisplayName | DisplayName | FString | "Kaze Civic" |
-| Manufacturer | Manufacturer | FString | "Kaze Motors" |
+| VehicleID | VehicleID | FName | "KAZE_CIVIC" |
+| DisplayName | DisplayName | FText | "Kaze Civic" |
+| Manufacturer | Manufacturer | FText | "Kaze Motors" |
 | Year | Year | int32 | 1998 |
-| Category | Category | FString | "JDM" |
+| Category | Category | EMGVehicleCategory | JDM |
 | Country | Country | FString | "Japan" |
+| Description | Description | FText | (vehicle lore) |
 
-### Economy Fields (Nested in JSON)
-
-| JSON Path | Struct Field | Type | Example |
-|-----------|--------------|------|---------|
-| Economy.BasePurchasePrice | Pricing.BasePurchasePrice | int32 | 12000 |
-| Economy.StreetValue | Pricing.StreetValue | int32 | 15000 |
-| Economy.LegendaryValue | Pricing.LegendaryValue | int32 | 45000 |
-| Economy.MaintenanceCostMultiplier | Pricing.MaintenanceCostMultiplier | float | 0.7 |
-| Economy.PartsPriceMultiplier | Pricing.PartsPriceMultiplier | float | 0.6 |
-| Economy.InsuranceClass | Pricing.InsuranceClass | FString | "D" |
-
-### Performance Fields
+### Economy Fields (Nested in JSON → `FMGVehicleEconomy` struct)
 
 | JSON Path | Struct Field | Type | Example |
 |-----------|--------------|------|---------|
-| PerformanceIndex.Base | Performance.BasePI | int32 | 420 |
-| PerformanceIndex.Class | Performance.PerformanceClass | FString | "D" |
-| PerformanceIndex.MaxPotential | Performance.MaxPIPotential | int32 | 750 |
-| BaseStats.Power | Performance.BaseHorsepower | int32 | 185 |
-| BaseStats.Torque | Performance.BaseTorque | int32 | 128 |
-| BaseStats.Weight | Performance.BaseWeight | int32 | 2400 |
-| BaseStats.Drivetrain | Performance.Drivetrain | FString | "FWD" |
+| Economy.BasePurchasePrice | Economy.BasePurchasePrice | int32 | 12000 |
+| Economy.StreetValue | Economy.StreetValue | int32 | 15000 |
+| Economy.LegendaryValue | Economy.LegendaryValue | int32 | 45000 |
+| Economy.MaintenanceCostMultiplier | Economy.MaintenanceCostMultiplier | float | 0.7 |
+| Economy.PartsPriceMultiplier | Economy.PartsPriceMultiplier | float | 0.6 |
+| Economy.InsuranceClass | Economy.InsuranceClass | FString | "D" |
 
-### Requirements Fields
+### Base Stats Fields (Nested → `FMGVehicleBaseStats` struct)
 
 | JSON Path | Struct Field | Type | Example |
 |-----------|--------------|------|---------|
-| Unlocks.RequiredREPTier | RequiredREPTier | FString | "UNKNOWN" |
-| Unlocks.RequiredLevel | RequiredLevel | int32 | 1 |
-| Unlocks.SpecialConditions | SpecialConditions | TArray<FString> | ["Tutorial Complete"] |
+| BaseStats.Power | BaseStats.Power | int32 | 185 |
+| BaseStats.Torque | BaseStats.Torque | int32 | 128 |
+| BaseStats.Weight | BaseStats.Weight | int32 | 2400 |
+| BaseStats.WeightDistribution | BaseStats.WeightDistributionFront | int32 | 63 |
+| BaseStats.Drivetrain | BaseStats.Drivetrain | EMGDrivetrain | FWD |
+| BaseStats.Displacement | BaseStats.Displacement | int32 | 1800 |
+| BaseStats.Redline | BaseStats.Redline | int32 | 8400 |
+| BaseStats.TopSpeed | BaseStats.TopSpeed | float | 140.0 |
+| BaseStats.Acceleration0to60 | BaseStats.Acceleration0to60 | float | 6.7 |
 
-### Tags
+### Performance Index Fields (Nested → `FMGVehiclePerformanceIndex` struct)
+
+| JSON Path | Struct Field | Type | Example |
+|-----------|--------------|------|---------|
+| PerformanceIndex.Base | PerformanceIndex.Base | int32 | 420 |
+| PerformanceIndex.Class | PerformanceIndex.Class | EMGPerformanceClass | D |
+| PerformanceIndex.MaxPotential | PerformanceIndex.MaxPotential | int32 | 750 |
+
+### Unlock Requirements Fields (Nested → `FMGVehicleUnlockRequirements` struct)
+
+| JSON Path | Struct Field | Type | Example |
+|-----------|--------------|------|---------|
+| Unlocks.RequiredREPTier | Unlocks.RequiredREPTier | FString | "UNKNOWN" |
+| Unlocks.RequiredLevel | Unlocks.RequiredLevel | int32 | 1 |
+| Unlocks.SpecialConditions | Unlocks.SpecialConditions | TArray<FString> | ["Tutorial Complete"] |
+
+### Max Build Stats Fields
+
+| JSON Path | Struct Field | Type | Example |
+|-----------|--------------|------|---------|
+| MaxBuildStats.MaxPower | MaxPower | int32 | 450 |
+| MaxBuildStats.MaxTorque | MaxTorque | int32 | 350 |
+| MaxBuildStats.MinWeight | MinWeight | int32 | 2200 |
+| MaxBuildStats.MaxPI | MaxPI | int32 | 750 |
+
+### Tags & Assets
 
 | JSON Field | Struct Field | Type | Example |
 |------------|--------------|------|---------|
 | Tags | Tags | TArray<FString> | ["JDM", "FWD", "Starter"] |
+| Audio.EngineProfile | EngineAudioProfile | FName | "InlineFour_VTEC" |
 
 ---
 

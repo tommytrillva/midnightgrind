@@ -561,7 +561,7 @@ void UMGFuelConsumptionComponent::UpdateTelemetry(float DeltaTime, float FrameCo
 		TotalConsumption += ConsumptionHistory[i];
 	}
 	// Average gallons per frame * frames per second * 3600 = GPH
-	const float AvgGallonsPerFrame = TotalConsumption / ConsumptionHistorySamples;
+	const float AvgGallonsPerFrame = (ConsumptionHistorySamples > 0) ? TotalConsumption / ConsumptionHistorySamples : 0.0f;
 	Telemetry.AverageGPH = (AvgGallonsPerFrame / FMath::Max(0.001f, DeltaTime)) * 3600.0f;
 
 	// Update distance tracking
@@ -699,7 +699,12 @@ float UMGFuelConsumptionComponent::GetLateralGForce() const
 	const FVector Right = Owner->GetActorRightVector();
 
 	// Calculate velocity change for acceleration
-	const FVector Acceleration = (Velocity - PreviousVelocity) / FMath::Max(0.001f, GetWorld()->GetDeltaSeconds());
+	float DeltaSeconds = 0.001f;
+	if (UWorld* World = GetWorld())
+	{
+		DeltaSeconds = FMath::Max(0.001f, World->GetDeltaSeconds());
+	}
+	const FVector Acceleration = (Velocity - PreviousVelocity) / DeltaSeconds;
 	const_cast<UMGFuelConsumptionComponent*>(this)->PreviousVelocity = Velocity;
 
 	// Lateral acceleration is the component along the right vector

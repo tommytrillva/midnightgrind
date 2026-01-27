@@ -1,7 +1,48 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Economy/MGMechanicSubsystem.h"
+#include "Catalog/MGPartsCatalogSubsystem.h"
 #include "Engine/World.h"
+#include "Engine/GameInstance.h"
+
+namespace
+{
+	/**
+	 * Maps part category to mechanic specialization
+	 * Used for matching mechanics to parts they specialize in
+	 */
+	EMGMechanicSpecialization PartCategoryToMechanicSpecialization(EMGPartCategory Category)
+	{
+		switch (Category)
+		{
+		case EMGPartCategory::Engine:
+			return EMGMechanicSpecialization::Engine;
+
+		case EMGPartCategory::Drivetrain:
+			return EMGMechanicSpecialization::Transmission;
+
+		case EMGPartCategory::Suspension:
+		case EMGPartCategory::Brakes:
+			return EMGMechanicSpecialization::Suspension;
+
+		case EMGPartCategory::Wheels:
+		case EMGPartCategory::Tires:
+			return EMGMechanicSpecialization::General;
+
+		case EMGPartCategory::Aero:
+		case EMGPartCategory::Body:
+			return EMGMechanicSpecialization::Bodywork;
+
+		case EMGPartCategory::Nitrous:
+		case EMGPartCategory::Electronics:
+			return EMGMechanicSpecialization::Electrical;
+
+		case EMGPartCategory::Interior:
+		default:
+			return EMGMechanicSpecialization::General;
+		}
+	}
+}
 
 void UMGMechanicSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -266,22 +307,54 @@ TArray<FMGMechanic> UMGMechanicSubsystem::GetMechanicsBySpecialization(EMGMechan
 
 FName UMGMechanicSubsystem::GetRecommendedMechanic(FName PartID, EMGMechanicService ServiceType) const
 {
-	// TODO: Determine specialization needed from part type
-	// For now, recommend based on service type and availability
-
 	TArray<FMGMechanic> Available = GetAvailableMechanics();
 	if (Available.Num() == 0)
 	{
 		return TEXT("DIY");
 	}
 
-	// Sort by quality and trust
-	Available.Sort([this](const FMGMechanic& A, const FMGMechanic& B)
+	// Determine required specialization from part catalog
+	EMGMechanicSpecialization RequiredSpec = EMGMechanicSpecialization::General;
+	if (UGameInstance* GI = GetGameInstance())
 	{
+		if (UMGPartsCatalogSubsystem* PartsCatalog = GI->GetSubsystem<UMGPartsCatalogSubsystem>())
+		{
+			EMGPartCategory PartCategory = PartsCatalog->GetPartCategory(PartID);
+			RequiredSpec = PartCategoryToMechanicSpecialization(PartCategory);
+		}
+	}
+
+	// Sort by: specialization match > quality > trust
+	Available.Sort([this, RequiredSpec](const FMGMechanic& A, const FMGMechanic& B)
+	{
+		// Check specialization match (primary or secondary)
+		const bool AMatchesPrimary = (A.PrimarySpecialization == RequiredSpec);
+		const bool AMatchesSecondary = (A.SecondarySpecialization == RequiredSpec);
+		const bool AMatches = AMatchesPrimary || AMatchesSecondary || (RequiredSpec == EMGMechanicSpecialization::General);
+
+		const bool BMatchesPrimary = (B.PrimarySpecialization == RequiredSpec);
+		const bool BMatchesSecondary = (B.SecondarySpecialization == RequiredSpec);
+		const bool BMatches = BMatchesPrimary || BMatchesSecondary || (RequiredSpec == EMGMechanicSpecialization::General);
+
+		// Specialization match is most important
+		if (AMatches != BMatches)
+		{
+			return AMatches;
+		}
+
+		// Primary specialization match > secondary
+		if (AMatches && BMatches)
+		{
+			if (AMatchesPrimary != BMatchesPrimary)
+			{
+				return AMatchesPrimary;
+			}
+		}
+
+		// Then sort by quality and trust
 		const int32 TrustA = GetTrustLevel(A.MechanicID);
 		const int32 TrustB = GetTrustLevel(B.MechanicID);
 
-		// Weight quality heavily, but also consider trust
 		const float ScoreA = A.QualityRating * 0.7f + TrustA * 0.3f;
 		const float ScoreB = B.QualityRating * 0.7f + TrustB * 0.3f;
 
@@ -589,7 +662,31 @@ float UMGMechanicSubsystem::GetExpectedQuality(FName MechanicID, FName PartID, E
 	const int32 Trust = GetTrustLevel(MechanicID);
 	Quality += Trust * 0.05f;
 
-	// TODO: Check if part matches specialization for bonus
+	// Check if part matches mechanic's specialization for bonus
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGPartsCatalogSubsystem* PartsCatalog = GI->GetSubsystem<UMGPartsCatalogSubsystem>())
+		{
+			EMGPartCategory PartCategory = PartsCatalog->GetPartCategory(PartID);
+			EMGMechanicSpecialization RequiredSpec = PartCategoryToMechanicSpecialization(PartCategory);
+
+			// Primary specialization match: +10% quality bonus
+			if (Mechanic.PrimarySpecialization == RequiredSpec)
+			{
+				Quality += 10.0f;
+			}
+			// Secondary specialization match: +5% quality bonus
+			else if (Mechanic.SecondarySpecialization == RequiredSpec)
+			{
+				Quality += 5.0f;
+			}
+			// General specialists get a small bonus on everything
+			else if (Mechanic.PrimarySpecialization == EMGMechanicSpecialization::General)
+			{
+				Quality += 2.0f;
+			}
+		}
+	}
 
 	return FMath::Clamp(Quality, 0.0f, 100.0f);
 }
@@ -1057,8 +1154,21 @@ bool UMGMechanicSubsystem::IsMechanicAvailable(const FMGMechanic& Mechanic) cons
 
 int32 UMGMechanicSubsystem::GetPartBaseInstallTime(FName PartID) const
 {
-	// TODO: Look up from parts catalog
-	// For now, estimate based on part type naming conventions
+	// Look up from parts catalog
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGPartsCatalogSubsystem* PartsCatalog = GI->GetSubsystem<UMGPartsCatalogSubsystem>())
+		{
+			float InstallTimeMinutes = PartsCatalog->GetPartInstallTime(PartID);
+			if (InstallTimeMinutes > 0)
+			{
+				// Convert minutes to hours (rounding up, minimum 1 hour)
+				return FMath::Max(1, FMath::CeilToInt(InstallTimeMinutes / 60.0f));
+			}
+		}
+	}
+
+	// Fallback: estimate based on part type naming conventions
 	FString PartString = PartID.ToString();
 
 	if (PartString.Contains(TEXT("Engine")) || PartString.Contains(TEXT("Motor")))
@@ -1103,8 +1213,22 @@ int32 UMGMechanicSubsystem::GetPartBaseInstallTime(FName PartID) const
 
 int32 UMGMechanicSubsystem::GetPartBaseInstallCost(FName PartID) const
 {
-	// TODO: Look up from parts catalog
-	// For now, estimate based on install time
+	// Look up from parts catalog
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGPartsCatalogSubsystem* PartsCatalog = GI->GetSubsystem<UMGPartsCatalogSubsystem>())
+		{
+			FMGPartPricingInfo PricingInfo = PartsCatalog->GetPartPricing(PartID);
+
+			if (PricingInfo.bIsValid && PricingInfo.LaborCost > 0)
+			{
+				// Return the labor cost from catalog
+				return PricingInfo.LaborCost;
+			}
+		}
+	}
+
+	// Fallback: estimate based on install time
 	const int32 Hours = GetPartBaseInstallTime(PartID);
 	const int32 HourlyRate = 75; // $75/hour base labor
 

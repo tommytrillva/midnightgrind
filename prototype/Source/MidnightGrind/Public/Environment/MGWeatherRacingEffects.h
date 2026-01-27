@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "Environment/MGWeatherSubsystem.h"
+#include "Weather/MGWeatherSubsystem.h"
 #include "MGWeatherRacingEffects.generated.h"
 
 class UMGVehicleMovementComponent;

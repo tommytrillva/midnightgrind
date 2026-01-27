@@ -2,7 +2,7 @@
 
 #include "GameModes/RaceTypes/MGWeatherRaceHandler.h"
 #include "Environment/MGWeatherRacingEffects.h"
-#include "Environment/MGWeatherSubsystem.h"
+#include "Weather/MGWeatherSubsystem.h"
 #include "AI/MGRacingAIController.h"
 #include "GameModes/MGRaceGameMode.h"
 #include "Kismet/GameplayStatics.h"

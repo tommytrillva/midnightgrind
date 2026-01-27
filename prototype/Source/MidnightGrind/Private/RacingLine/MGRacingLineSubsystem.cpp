@@ -697,7 +697,7 @@ FMGRacingLine UMGRacingLineSubsystem::GenerateOptimalLine(FName TrackID, FName V
 		);
 
 		Point.OptimalSpeed = 150.0f;
-		Point.Curvature = 1.0f / TrackRadius;
+		Point.Curvature = (TrackRadius > KINDA_SMALL_NUMBER) ? 1.0f / TrackRadius : 0.0f;
 
 		NewLine.Points.Add(Point);
 	}

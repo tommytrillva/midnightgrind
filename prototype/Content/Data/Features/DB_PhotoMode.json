@@ -1,0 +1,646 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Photo Mode Configuration",
+
+  "PhotoMode": {
+    "UnlockCondition": "LEVEL_5",
+    "AccessibleFrom": ["Garage", "FreeRoam", "Replay", "Showroom"],
+    "PauseGameplay": true,
+    "TimeLimit": 0,
+
+    "Camera": {
+      "Movement": {
+        "Type": "Orbital",
+        "MinDistance": 1.5,
+        "MaxDistance": 50.0,
+        "DefaultDistance": 8.0,
+        "MovementSpeed": 5.0,
+        "RotationSpeed": 45.0,
+        "HeightRange": [-2.0, 15.0],
+        "Smoothing": 0.15,
+        "CollisionEnabled": true
+      },
+      "FOV": {
+        "Min": 15,
+        "Max": 120,
+        "Default": 50,
+        "Presets": [
+          { "Name": "Telephoto", "Value": 20, "Icon": "ICO_Telephoto" },
+          { "Name": "Portrait", "Value": 35, "Icon": "ICO_Portrait" },
+          { "Name": "Standard", "Value": 50, "Icon": "ICO_Standard" },
+          { "Name": "Wide", "Value": 75, "Icon": "ICO_Wide" },
+          { "Name": "Ultra Wide", "Value": 100, "Icon": "ICO_UltraWide" }
+        ]
+      },
+      "Roll": {
+        "Enabled": true,
+        "Range": [-45, 45],
+        "SnapAngles": [0, 15, 30, 45, -15, -30, -45]
+      },
+      "Tracking": {
+        "Enabled": true,
+        "Modes": ["Fixed", "FollowVehicle", "LockTarget", "FreeCam"]
+      }
+    },
+
+    "Focus": {
+      "DepthOfField": {
+        "Enabled": true,
+        "Method": "BokehDOF",
+        "FocusModes": ["Auto", "Manual", "TapToFocus"],
+        "ApertureRange": [1.4, 22.0],
+        "ApertureDefault": 2.8,
+        "BokehShapes": ["Circle", "Hexagon", "Octagon", "Heart", "Star"],
+        "BokehSize": {
+          "Min": 0,
+          "Max": 100,
+          "Default": 50
+        },
+        "FocusDistance": {
+          "Min": 0.5,
+          "Max": 100.0,
+          "Auto": true
+        },
+        "FocalLength": {
+          "Min": 12,
+          "Max": 300,
+          "Default": 50
+        }
+      },
+      "MotionBlur": {
+        "Enabled": true,
+        "Intensity": {
+          "Min": 0,
+          "Max": 100,
+          "Default": 0
+        },
+        "Samples": 8
+      }
+    },
+
+    "Exposure": {
+      "Mode": "Manual",
+      "EVRange": [-5.0, 5.0],
+      "EVDefault": 0,
+      "AutoExposure": {
+        "Enabled": true,
+        "SpeedUp": 3.0,
+        "SpeedDown": 1.0
+      },
+      "Brightness": {
+        "Min": -100,
+        "Max": 100,
+        "Default": 0
+      },
+      "Contrast": {
+        "Min": -100,
+        "Max": 100,
+        "Default": 0
+      },
+      "Highlights": {
+        "Min": -100,
+        "Max": 100,
+        "Default": 0
+      },
+      "Shadows": {
+        "Min": -100,
+        "Max": 100,
+        "Default": 0
+      }
+    },
+
+    "ColorGrading": {
+      "Saturation": {
+        "Min": -100,
+        "Max": 100,
+        "Default": 0
+      },
+      "Vibrance": {
+        "Min": -100,
+        "Max": 100,
+        "Default": 0
+      },
+      "Temperature": {
+        "Min": 2000,
+        "Max": 12000,
+        "Default": 6500
+      },
+      "Tint": {
+        "Min": -100,
+        "Max": 100,
+        "Default": 0
+      },
+      "ColorChannels": {
+        "Red": { "Min": -100, "Max": 100, "Default": 0 },
+        "Green": { "Min": -100, "Max": 100, "Default": 0 },
+        "Blue": { "Min": -100, "Max": 100, "Default": 0 }
+      },
+      "SplitToning": {
+        "Enabled": true,
+        "Highlights": { "Hue": 0, "Saturation": 0 },
+        "Shadows": { "Hue": 0, "Saturation": 0 },
+        "Balance": 0
+      }
+    },
+
+    "Filters": {
+      "Presets": [
+        {
+          "ID": "FILTER_NONE",
+          "Name": "None",
+          "Description": "No filter applied",
+          "Unlocked": true,
+          "Settings": {}
+        },
+        {
+          "ID": "FILTER_MIDNIGHT",
+          "Name": "Midnight",
+          "Description": "Deep blues and neon highlights",
+          "Unlocked": true,
+          "Settings": {
+            "Temperature": 4500,
+            "Tint": -10,
+            "Contrast": 20,
+            "Saturation": 15,
+            "LUT": "LUT_Midnight"
+          }
+        },
+        {
+          "ID": "FILTER_GOLDEN_HOUR",
+          "Name": "Golden Hour",
+          "Description": "Warm sunset tones",
+          "Unlocked": true,
+          "Settings": {
+            "Temperature": 8000,
+            "Tint": 10,
+            "Contrast": 10,
+            "Saturation": 20,
+            "LUT": "LUT_GoldenHour"
+          }
+        },
+        {
+          "ID": "FILTER_CINEMA",
+          "Name": "Cinema",
+          "Description": "Cinematic color grading",
+          "Unlocked": true,
+          "Settings": {
+            "Contrast": 25,
+            "Saturation": -10,
+            "Highlights": -15,
+            "Shadows": 10,
+            "LUT": "LUT_Cinema"
+          }
+        },
+        {
+          "ID": "FILTER_NEON",
+          "Name": "Neon Dreams",
+          "Description": "Intense neon color pop",
+          "UnlockCondition": "LEVEL_10",
+          "Settings": {
+            "Saturation": 40,
+            "Vibrance": 30,
+            "Contrast": 30,
+            "LUT": "LUT_Neon"
+          }
+        },
+        {
+          "ID": "FILTER_VINTAGE",
+          "Name": "Vintage",
+          "Description": "Faded retro look",
+          "UnlockCondition": "LEVEL_15",
+          "Settings": {
+            "Saturation": -20,
+            "Contrast": -10,
+            "Temperature": 7000,
+            "FadeAmount": 20,
+            "LUT": "LUT_Vintage"
+          }
+        },
+        {
+          "ID": "FILTER_BW",
+          "Name": "Black & White",
+          "Description": "Classic monochrome",
+          "UnlockCondition": "LEVEL_20",
+          "Settings": {
+            "Saturation": -100,
+            "Contrast": 30,
+            "LUT": "LUT_BW"
+          }
+        },
+        {
+          "ID": "FILTER_PS1",
+          "Name": "PS1 Mode",
+          "Description": "Full PlayStation 1 aesthetic",
+          "UnlockCondition": "REP_TIER_STREET",
+          "Settings": {
+            "RetroEffects": {
+              "VertexWobble": 1.0,
+              "TextureWarping": 1.0,
+              "Dithering": 1.0,
+              "ColorDepth": 15,
+              "Resolution": "240p"
+            },
+            "LUT": "LUT_PS1"
+          }
+        },
+        {
+          "ID": "FILTER_VHS",
+          "Name": "VHS",
+          "Description": "Analog video distortion",
+          "UnlockCondition": "REP_TIER_PRO",
+          "Settings": {
+            "ChromaticAberration": 50,
+            "Scanlines": 30,
+            "Noise": 20,
+            "Tracking": true,
+            "LUT": "LUT_VHS"
+          }
+        },
+        {
+          "ID": "FILTER_NOIR",
+          "Name": "Noir",
+          "Description": "High contrast black and white",
+          "UnlockCondition": "REP_TIER_PRO",
+          "Settings": {
+            "Saturation": -100,
+            "Contrast": 60,
+            "Shadows": -30,
+            "Vignette": 50,
+            "LUT": "LUT_Noir"
+          }
+        },
+        {
+          "ID": "FILTER_TOKYO_DRIFT",
+          "Name": "Tokyo Drift",
+          "Description": "Japanese street racing aesthetic",
+          "UnlockCondition": "WIN_JDM_CHAMPIONSHIP",
+          "Settings": {
+            "Temperature": 5000,
+            "Saturation": 25,
+            "Contrast": 20,
+            "NeonGlow": 40,
+            "LUT": "LUT_TokyoDrift"
+          }
+        },
+        {
+          "ID": "FILTER_LEGEND",
+          "Name": "Legend",
+          "Description": "Exclusive legendary filter",
+          "UnlockCondition": "REP_TIER_LEGEND",
+          "Settings": {
+            "GoldTint": true,
+            "Bloom": 30,
+            "LensFlare": true,
+            "LUT": "LUT_Legend"
+          }
+        }
+      ],
+      "CustomFilters": {
+        "MaxSlots": 10,
+        "SaveEnabled": true,
+        "ShareEnabled": true
+      }
+    },
+
+    "Effects": {
+      "Vignette": {
+        "Enabled": true,
+        "Intensity": { "Min": 0, "Max": 100, "Default": 0 },
+        "Softness": { "Min": 0, "Max": 100, "Default": 50 },
+        "Shape": ["Circle", "Oval", "Rectangle"]
+      },
+      "ChromaticAberration": {
+        "Enabled": true,
+        "Intensity": { "Min": 0, "Max": 100, "Default": 0 }
+      },
+      "FilmGrain": {
+        "Enabled": true,
+        "Intensity": { "Min": 0, "Max": 100, "Default": 0 },
+        "Size": { "Min": 0, "Max": 100, "Default": 50 }
+      },
+      "Bloom": {
+        "Enabled": true,
+        "Intensity": { "Min": 0, "Max": 100, "Default": 10 },
+        "Threshold": { "Min": 0, "Max": 100, "Default": 50 }
+      },
+      "LensFlare": {
+        "Enabled": true,
+        "Intensity": { "Min": 0, "Max": 100, "Default": 0 },
+        "Styles": ["Anamorphic", "Standard", "Cinematic", "SciFi"]
+      },
+      "Scanlines": {
+        "Enabled": true,
+        "Intensity": { "Min": 0, "Max": 100, "Default": 0 },
+        "Density": { "Min": 1, "Max": 5, "Default": 2 }
+      },
+      "RetroEffects": {
+        "Dithering": { "Min": 0, "Max": 100, "Default": 0 },
+        "ColorDepth": { "Options": [32, 24, 16, 15, 8], "Default": 32 },
+        "VertexWobble": { "Min": 0, "Max": 100, "Default": 0 },
+        "AffineTextures": { "Enabled": false }
+      }
+    },
+
+    "Lighting": {
+      "TimeOfDay": {
+        "Enabled": true,
+        "Override": true,
+        "Presets": ["Dawn", "Morning", "Noon", "Afternoon", "Sunset", "Dusk", "Night", "LateNight"]
+      },
+      "Weather": {
+        "Override": true,
+        "Options": ["Clear", "Cloudy", "LightRain", "HeavyRain", "Fog"]
+      },
+      "SpotLights": {
+        "Enabled": true,
+        "MaxLights": 3,
+        "Properties": {
+          "Color": true,
+          "Intensity": { "Min": 0, "Max": 100 },
+          "Angle": { "Min": 15, "Max": 120 },
+          "Distance": { "Min": 1, "Max": 20 },
+          "Softness": { "Min": 0, "Max": 100 }
+        },
+        "UnlockCondition": "LEVEL_15"
+      },
+      "NeonLights": {
+        "Enabled": true,
+        "IntensityOverride": { "Min": 0, "Max": 200, "Default": 100 },
+        "ColorOverride": true
+      },
+      "AmbientLight": {
+        "Color": true,
+        "Intensity": { "Min": 0, "Max": 200, "Default": 100 }
+      }
+    },
+
+    "Vehicle": {
+      "Visibility": {
+        "ShowVehicle": true,
+        "ShowDriver": true,
+        "ShowLicensePlate": true,
+        "ShowDamage": true
+      },
+      "Positioning": {
+        "WheelAngle": { "Min": -45, "Max": 45, "Default": 0 },
+        "SuspensionHeight": { "Min": -50, "Max": 50, "Default": 0 },
+        "Doors": { "Open": true, "Angles": [0, 30, 60, 90] },
+        "Hood": { "Open": true },
+        "Trunk": { "Open": true }
+      },
+      "Lighting": {
+        "Headlights": { "Options": ["Off", "Low", "High", "Popup"] },
+        "Taillights": { "Options": ["Off", "On", "Brake"] },
+        "Indicators": { "Options": ["Off", "Left", "Right", "Hazard"] },
+        "InteriorLights": { "Enabled": true }
+      },
+      "Effects": {
+        "EngineRunning": { "Enabled": true },
+        "ExhaustFlames": { "Enabled": true, "UnlockCondition": "HAS_EXHAUST_FLAMES" },
+        "NitrousPurge": { "Enabled": true, "UnlockCondition": "HAS_NITROUS" },
+        "TireSmokeColor": { "Enabled": true, "UnlockCondition": "HAS_COLORED_SMOKE" }
+      }
+    },
+
+    "Stickers": {
+      "Enabled": true,
+      "MaxStickers": 10,
+      "Categories": [
+        {
+          "ID": "STICKER_LOGOS",
+          "Name": "Logos",
+          "Items": ["MG_Logo", "Midnight_Text", "Underground_Badge"],
+          "Unlocked": true
+        },
+        {
+          "ID": "STICKER_DATES",
+          "Name": "Date Stamps",
+          "Items": ["Date_Current", "Date_Custom", "Timestamp"],
+          "Unlocked": true
+        },
+        {
+          "ID": "STICKER_STATS",
+          "Name": "Vehicle Stats",
+          "Items": ["Horsepower", "Torque", "Weight", "PI_Rating"],
+          "UnlockCondition": "LEVEL_10"
+        },
+        {
+          "ID": "STICKER_FRAMES",
+          "Name": "Frames",
+          "Items": ["Frame_Racing", "Frame_Polaroid", "Frame_Film", "Frame_VHS"],
+          "UnlockCondition": "LEVEL_15"
+        },
+        {
+          "ID": "STICKER_EMOTES",
+          "Name": "Emotes",
+          "Items": ["Speed_Lines", "Impact_Stars", "Manga_Effects"],
+          "UnlockCondition": "REP_TIER_STREET"
+        }
+      ],
+      "Customization": {
+        "Position": true,
+        "Scale": { "Min": 0.1, "Max": 3.0 },
+        "Rotation": true,
+        "Opacity": { "Min": 0, "Max": 100 },
+        "Color": true
+      }
+    },
+
+    "Borders": {
+      "Enabled": true,
+      "Options": [
+        { "ID": "BORDER_NONE", "Name": "None", "Unlocked": true },
+        { "ID": "BORDER_SIMPLE", "Name": "Simple Frame", "Unlocked": true },
+        { "ID": "BORDER_RACING", "Name": "Racing Stripes", "UnlockCondition": "LEVEL_10" },
+        { "ID": "BORDER_POLAROID", "Name": "Polaroid", "UnlockCondition": "LEVEL_15" },
+        { "ID": "BORDER_FILM", "Name": "35mm Film", "UnlockCondition": "LEVEL_20" },
+        { "ID": "BORDER_VHS", "Name": "VHS Recording", "UnlockCondition": "REP_TIER_STREET" },
+        { "ID": "BORDER_MAGAZINE", "Name": "Magazine Cover", "UnlockCondition": "REP_TIER_PRO" },
+        { "ID": "BORDER_LEGEND", "Name": "Legend Frame", "UnlockCondition": "REP_TIER_LEGEND" }
+      ]
+    }
+  },
+
+  "Output": {
+    "Resolution": {
+      "Options": [
+        { "Name": "720p", "Width": 1280, "Height": 720 },
+        { "Name": "1080p", "Width": 1920, "Height": 1080, "Default": true },
+        { "Name": "1440p", "Width": 2560, "Height": 1440, "UnlockCondition": "LEVEL_10" },
+        { "Name": "4K", "Width": 3840, "Height": 2160, "UnlockCondition": "LEVEL_20" },
+        { "Name": "Ultrawide", "Width": 3440, "Height": 1440, "UnlockCondition": "LEVEL_15" },
+        { "Name": "Square", "Width": 1080, "Height": 1080 },
+        { "Name": "Portrait", "Width": 1080, "Height": 1920, "UnlockCondition": "LEVEL_5" }
+      ]
+    },
+    "Format": {
+      "Options": ["PNG", "JPG"],
+      "DefaultFormat": "PNG",
+      "JPGQuality": 95
+    },
+    "Supersampling": {
+      "Enabled": true,
+      "Options": ["1x", "2x", "4x"],
+      "Default": "2x"
+    },
+    "Watermark": {
+      "Enabled": true,
+      "Optional": true,
+      "Position": "BottomRight",
+      "Opacity": 50,
+      "Image": "T_MG_Watermark"
+    }
+  },
+
+  "Gallery": {
+    "LocalStorage": {
+      "Enabled": true,
+      "MaxPhotos": 500,
+      "Location": "SaveGames/PhotoMode/"
+    },
+    "CloudStorage": {
+      "Enabled": true,
+      "MaxPhotos": 100,
+      "SyncEnabled": true
+    },
+    "Organization": {
+      "Folders": true,
+      "Tags": true,
+      "Favorites": true,
+      "AutoTagging": {
+        "Enabled": true,
+        "Tags": ["VehicleName", "Location", "TimeOfDay", "Filter"]
+      }
+    },
+    "Slideshow": {
+      "Enabled": true,
+      "Transitions": ["Fade", "Slide", "Zoom", "None"],
+      "IntervalSeconds": [3, 5, 10, 15],
+      "MusicEnabled": true
+    }
+  },
+
+  "Sharing": {
+    "Platforms": [
+      {
+        "ID": "SHARE_INGAME",
+        "Name": "Community Gallery",
+        "Enabled": true,
+        "MaxDaily": 10
+      },
+      {
+        "ID": "SHARE_CLIPBOARD",
+        "Name": "Copy to Clipboard",
+        "Enabled": true
+      },
+      {
+        "ID": "SHARE_EXPORT",
+        "Name": "Save to Device",
+        "Enabled": true
+      }
+    ],
+    "CommunityGallery": {
+      "Browse": true,
+      "Like": true,
+      "Download": true,
+      "Report": true,
+      "Featured": {
+        "Enabled": true,
+        "DailySelection": 10,
+        "WeeklyBest": 50
+      },
+      "Contests": {
+        "Enabled": true,
+        "WeeklyTheme": true,
+        "Rewards": {
+          "Winner": { "Cash": 50000, "ExclusiveItem": true },
+          "TopTen": { "Cash": 10000 },
+          "Participation": { "Cash": 1000 }
+        }
+      }
+    },
+    "Metadata": {
+      "IncludeVehicleInfo": true,
+      "IncludeSettings": true,
+      "IncludeLocation": true,
+      "PrivacyMode": {
+        "Enabled": true,
+        "StripAll": false
+      }
+    }
+  },
+
+  "Tutorials": {
+    "FirstTimeHelp": true,
+    "ControlHints": true,
+    "TipOfTheDay": {
+      "Enabled": true,
+      "Tips": [
+        "Use a low aperture (f/1.4-2.8) for dramatic background blur",
+        "Golden hour lighting creates the most flattering vehicle shots",
+        "Try the PS1 filter for authentic retro screenshots",
+        "Position spotlights to highlight your vehicle's best angles",
+        "Use roll to create dynamic diagonal compositions",
+        "Lower FOV compresses the background for cleaner shots",
+        "The VHS filter adds authentic 90s racing game vibes",
+        "Open the hood to show off your engine bay upgrades",
+        "Night shots with neon lights create the best Midnight Grind aesthetic"
+      ]
+    }
+  },
+
+  "Challenges": {
+    "Daily": {
+      "Enabled": true,
+      "Rewards": {
+        "Complete": { "Cash": 2500, "REP": 100 }
+      },
+      "Examples": [
+        "Take a photo using the Neon Dreams filter",
+        "Capture a vehicle with all doors open",
+        "Take a photo during a thunderstorm",
+        "Use depth of field with aperture below f/2.0"
+      ]
+    },
+    "Weekly": {
+      "Enabled": true,
+      "Theme": true,
+      "Rewards": {
+        "Submit": { "Cash": 5000, "REP": 250 },
+        "Featured": { "Cash": 25000, "REP": 1000, "ExclusiveReward": true }
+      }
+    },
+    "Achievements": [
+      {
+        "ID": "ACH_FIRST_SHOT",
+        "Name": "Shutter Bug",
+        "Description": "Take your first photo",
+        "Reward": { "REP": 50 }
+      },
+      {
+        "ID": "ACH_100_PHOTOS",
+        "Name": "Photographer",
+        "Description": "Take 100 photos",
+        "Reward": { "Cash": 10000, "Unlock": "FILTER_CINEMA" }
+      },
+      {
+        "ID": "ACH_ALL_FILTERS",
+        "Name": "Filter Master",
+        "Description": "Use every filter at least once",
+        "Reward": { "Cash": 25000, "REP": 500 }
+      },
+      {
+        "ID": "ACH_FEATURED",
+        "Name": "Featured Artist",
+        "Description": "Have a photo featured in the community gallery",
+        "Reward": { "Cash": 50000, "REP": 2000, "Unlock": "BORDER_LEGEND" }
+      },
+      {
+        "ID": "ACH_CONTEST_WINNER",
+        "Name": "Contest Champion",
+        "Description": "Win a weekly photo contest",
+        "Reward": { "Cash": 100000, "REP": 5000, "Unlock": "EXCLUSIVE_CAMERA_SKIN" }
+      }
+    ]
+  }
+}

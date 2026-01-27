@@ -1142,6 +1142,10 @@ FMGInventoryItem UMGInventorySubsystem::RollCrateReward(const FMGCrateContents& 
 	if (EligibleItems.Num() == 0)
 	{
 		// Fallback to any item
+		if (Crate.PossibleItems.Num() == 0)
+		{
+			return FMGInventoryItem();
+		}
 		return Crate.PossibleItems[FMath::RandRange(0, Crate.PossibleItems.Num() - 1)];
 	}
 

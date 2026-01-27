@@ -1,0 +1,374 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Garage and Shop Configuration",
+
+  "Garage": {
+    "Slots": {
+      "BaseSlots": 2,
+      "MaxSlots": 50,
+      "SlotsByREPTier": {
+        "UNKNOWN": 2,
+        "ROOKIE": 3,
+        "STREET": 5,
+        "PRO": 8,
+        "ELITE": 12,
+        "LEGEND": -1
+      },
+      "PurchaseSlot": {
+        "Enabled": true,
+        "Prices": [5000, 10000, 20000, 35000, 50000, 75000, 100000],
+        "MaxPurchasable": 10
+      }
+    },
+    "Features": {
+      "Dyno": {
+        "Name": "Dyno Room",
+        "UnlockLevel": 5,
+        "Functions": ["PowerGraph", "TorqueGraph", "TopSpeedTest", "0to60Test"]
+      },
+      "TuningBay": {
+        "Name": "Tuning Bay",
+        "UnlockLevel": 10,
+        "Functions": ["SuspensionTune", "GearRatios", "DiffSettings", "NitrousTune"]
+      },
+      "PaintBooth": {
+        "Name": "Paint Booth",
+        "UnlockLevel": 1,
+        "Functions": ["ColorChange", "Vinyls", "Wraps"]
+      },
+      "MechanicBay": {
+        "Name": "Mechanic Bay",
+        "UnlockLevel": 1,
+        "Functions": ["InstallParts", "RemoveParts", "RepairDamage"]
+      },
+      "ShowRoom": {
+        "Name": "Showroom",
+        "UnlockLevel": 20,
+        "Functions": ["PhotoMode", "VehicleDisplay", "ShareOnline"]
+      }
+    },
+    "Builds": {
+      "MaxBuildsPerVehicle": 5,
+      "BuildSlotPrices": [0, 5000, 10000, 20000, 50000],
+      "BuildNaming": true,
+      "QuickSwitch": true
+    },
+    "Storage": {
+      "PartStorage": {
+        "Enabled": true,
+        "MaxParts": 100,
+        "Expansion": {
+          "Price": 10000,
+          "SlotsAdded": 50
+        }
+      }
+    }
+  },
+
+  "Dealers": {
+    "MainDealer": {
+      "ID": "DEALER_MAIN",
+      "Name": "Underground Motors",
+      "Description": "Your main source for vehicles",
+      "Location": "Downtown",
+      "VehicleTypes": ["JDM", "Muscle", "Euro", "Economy"],
+      "Inventory": {
+        "RotationDays": 7,
+        "VehicleCount": 8,
+        "IncludesNew": true,
+        "IncludesUsed": true
+      },
+      "Services": ["Buy", "Sell", "Trade"],
+      "SellPriceMultiplier": 0.6,
+      "TradeBonus": 0.1
+    },
+    "JDMSpecialist": {
+      "ID": "DEALER_JDM",
+      "Name": "Rising Sun Imports",
+      "Description": "JDM specialist with rare imports",
+      "Location": "Little Tokyo",
+      "VehicleTypes": ["JDM"],
+      "UnlockCondition": "REP_TIER_STREET",
+      "Inventory": {
+        "RotationDays": 5,
+        "VehicleCount": 6,
+        "RareVehicleChance": 0.3
+      },
+      "Services": ["Buy"],
+      "PriceMultiplier": 1.1,
+      "ExclusiveVehicles": ["SHOGUN_NSX", "DRIFT_KING_SILVIA"]
+    },
+    "MuscleDealer": {
+      "ID": "DEALER_MUSCLE",
+      "Name": "American Thunder",
+      "Description": "Classic and modern American muscle",
+      "Location": "Industrial District",
+      "VehicleTypes": ["Muscle"],
+      "UnlockCondition": "REP_TIER_STREET",
+      "Inventory": {
+        "RotationDays": 5,
+        "VehicleCount": 5,
+        "RareVehicleChance": 0.25
+      },
+      "Services": ["Buy", "Sell"],
+      "SellPriceMultiplier": 0.65
+    },
+    "ExoticDealer": {
+      "ID": "DEALER_EXOTIC",
+      "Name": "Velocity Exotics",
+      "Description": "High-end performance vehicles",
+      "Location": "Uptown",
+      "VehicleTypes": ["Euro", "Sports"],
+      "UnlockCondition": "REP_TIER_ELITE",
+      "Inventory": {
+        "RotationDays": 14,
+        "VehicleCount": 4,
+        "OnlyClassA": true,
+        "OnlyClassS": true
+      },
+      "Services": ["Buy"],
+      "PriceMultiplier": 1.0
+    },
+    "PrivateSeller": {
+      "ID": "DEALER_PRIVATE",
+      "Name": "Private Listings",
+      "Description": "Find deals from other racers",
+      "Location": "Online",
+      "VehicleTypes": ["All"],
+      "UnlockCondition": "LEVEL_15",
+      "Inventory": {
+        "RotationHours": 6,
+        "VehicleCount": 10,
+        "UsedOnly": true,
+        "ModifiedVehicles": true,
+        "BargainChance": 0.4
+      },
+      "Services": ["Buy"],
+      "PriceRange": [0.5, 0.9]
+    }
+  },
+
+  "PartShops": {
+    "MainShop": {
+      "ID": "SHOP_MAIN",
+      "Name": "Midnight Performance",
+      "Description": "Full-service performance shop",
+      "Location": "Your Garage",
+      "Categories": ["Engine", "Drivetrain", "Suspension", "Brakes", "Tires", "Aero"],
+      "TierAccess": {
+        "Stock": true,
+        "Sport": true,
+        "Race": "REP_TIER_STREET",
+        "Elite": "REP_TIER_PRO"
+      },
+      "Services": ["Buy", "Install", "Remove", "Sell"],
+      "InstallTime": {
+        "Engine": 2,
+        "Suspension": 1,
+        "Brakes": 0.5,
+        "Tires": 0.25,
+        "Aero": 0.5
+      },
+      "InstallTimeUnit": "hours",
+      "InstantInstall": {
+        "Available": true,
+        "PriceMultiplier": 1.5
+      }
+    },
+    "TireShop": {
+      "ID": "SHOP_TIRES",
+      "Name": "Grip Masters",
+      "Description": "Tire and wheel specialists",
+      "Location": "Harbor",
+      "Categories": ["Tires", "Wheels"],
+      "UnlockCondition": "LEVEL_5",
+      "Discount": 0.1,
+      "Services": ["Buy", "Install", "Alignment"],
+      "Alignment": {
+        "Price": 200,
+        "HandlingBonus": 0.02
+      }
+    },
+    "TunerShop": {
+      "ID": "SHOP_TUNER",
+      "Name": "Boost Brothers",
+      "Description": "Turbo and engine specialists",
+      "Location": "Industrial",
+      "Categories": ["Turbo", "Supercharger", "ECU", "FuelSystem"],
+      "UnlockCondition": "REP_TIER_STREET",
+      "Services": ["Buy", "Install", "CustomTune"],
+      "CustomTuning": {
+        "Enabled": true,
+        "BasePrice": 500,
+        "DynoRuns": 3,
+        "PowerGainRange": [0.05, 0.15]
+      }
+    },
+    "BodyShop": {
+      "ID": "SHOP_BODY",
+      "Name": "Clean Lines Customs",
+      "Description": "Body kits and visual mods",
+      "Location": "Arts District",
+      "Categories": ["BodyKits", "Lighting", "Interior", "Accessories"],
+      "UnlockCondition": "LEVEL_8",
+      "Services": ["Buy", "Install", "Paint", "Vinyl"],
+      "CustomPaint": {
+        "Enabled": true,
+        "BasePrice": 1000,
+        "CustomColorPrice": 500
+      }
+    },
+    "BlackMarket": {
+      "ID": "SHOP_BLACK",
+      "Name": "The Back Room",
+      "Description": "Rare and illegal parts",
+      "Location": "Hidden",
+      "UnlockCondition": "REP_TIER_PRO",
+      "Categories": ["RacingParts", "NitrousSystems", "WeightReduction"],
+      "RarePartsOnly": true,
+      "Services": ["Buy"],
+      "PriceMultiplier": 0.8,
+      "Availability": {
+        "RandomStock": true,
+        "RefreshHours": 12
+      }
+    }
+  },
+
+  "Transactions": {
+    "Purchase": {
+      "Financing": {
+        "Enabled": true,
+        "MinDownPayment": 0.2,
+        "InterestRate": 0.05,
+        "MaxTermMonths": 12,
+        "UnlockLevel": 10
+      },
+      "Insurance": {
+        "Required": false,
+        "Recommended": true,
+        "CostPercentage": 0.02,
+        "Coverage": ["Theft", "Damage", "TotalLoss"]
+      }
+    },
+    "Sell": {
+      "BasePricePercentage": 0.6,
+      "ConditionModifiers": {
+        "Mint": 1.0,
+        "Good": 0.9,
+        "Fair": 0.75,
+        "Poor": 0.5
+      },
+      "ModificationValue": {
+        "PartsIncluded": 0.3,
+        "RarePartsBonus": 0.5
+      },
+      "QuickSell": {
+        "Enabled": true,
+        "PenaltyPercentage": 0.1
+      }
+    },
+    "Trade": {
+      "Enabled": true,
+      "BonusPercentage": 0.1,
+      "MinimumValue": 5000
+    },
+    "PinkSlip": {
+      "Enabled": true,
+      "UnlockCondition": "REP_TIER_STREET",
+      "ConfirmationRequired": true,
+      "CooldownHours": 24,
+      "MaxValueDifference": 0.5
+    }
+  },
+
+  "Maintenance": {
+    "Repair": {
+      "CostPerDamagePercent": 50,
+      "TimePerDamagePercent": 0.1,
+      "TimeUnit": "hours",
+      "InstantRepairMultiplier": 2.0
+    },
+    "Condition": {
+      "DegradationRate": {
+        "Racing": 0.02,
+        "FreeDrive": 0.005,
+        "Collision": 0.1
+      },
+      "ConditionEffects": {
+        "100-80": { "Performance": 1.0, "Reliability": 1.0 },
+        "80-60": { "Performance": 0.98, "Reliability": 0.95 },
+        "60-40": { "Performance": 0.95, "Reliability": 0.85 },
+        "40-20": { "Performance": 0.90, "Reliability": 0.70 },
+        "20-0": { "Performance": 0.80, "Reliability": 0.50 }
+      }
+    },
+    "Consumables": {
+      "Tires": {
+        "WearRate": 0.01,
+        "ReplacementCost": 0.1,
+        "PerformanceWhenWorn": 0.85
+      },
+      "Brakes": {
+        "WearRate": 0.005,
+        "ReplacementCost": 0.05,
+        "PerformanceWhenWorn": 0.80
+      }
+    }
+  },
+
+  "Auctions": {
+    "Enabled": true,
+    "UnlockCondition": "REP_TIER_PRO",
+    "Types": {
+      "Live": {
+        "Duration": 60,
+        "DurationUnit": "seconds",
+        "MinimumBidIncrement": 0.05,
+        "BuyoutEnabled": true,
+        "BuyoutMultiplier": 1.5
+      },
+      "Silent": {
+        "Duration": 24,
+        "DurationUnit": "hours",
+        "SingleBidPerPlayer": true,
+        "RevealAtEnd": true
+      }
+    },
+    "Fees": {
+      "ListingFee": 0.02,
+      "SellerFee": 0.05,
+      "BuyerFee": 0
+    },
+    "Limits": {
+      "MaxActiveListings": 3,
+      "MaxBidsPerDay": 10,
+      "CooldownAfterWin": 1
+    }
+  },
+
+  "Rewards": {
+    "DailyLogin": {
+      "Enabled": true,
+      "PartRewardChance": 0.1,
+      "RarePartChance": 0.01
+    },
+    "MysteryBox": {
+      "Enabled": true,
+      "Price": 5000,
+      "Contents": {
+        "Cash": { "Chance": 0.3, "Range": [1000, 10000] },
+        "Part": { "Chance": 0.4, "TierWeights": { "Sport": 0.6, "Race": 0.3, "Elite": 0.1 } },
+        "Vinyl": { "Chance": 0.15 },
+        "Color": { "Chance": 0.1 },
+        "Vehicle": { "Chance": 0.05, "ClassD": true }
+      }
+    },
+    "WheelSpin": {
+      "Enabled": true,
+      "UnlockLevel": 15,
+      "SpinsPerDay": 1,
+      "PurchaseExtraSpinPrice": 2500
+    }
+  }
+}

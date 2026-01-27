@@ -60,6 +60,17 @@ void AMGCheckpoint::BeginPlay()
 	UpdateVisuals();
 }
 
+void AMGCheckpoint::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unbind delegate to prevent dangling references
+	if (TriggerVolume)
+	{
+		TriggerVolume->OnComponentBeginOverlap.RemoveDynamic(this, &AMGCheckpoint::OnTriggerOverlap);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void AMGCheckpoint::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
@@ -206,7 +217,7 @@ void AMGStartFinishLine::OnConstruction(const FTransform& Transform)
 
 FTransform AMGStartFinishLine::GetGridPositionTransform(int32 GridPosition) const
 {
-	if (GridPosition < 0 || GridPosition >= GridPositionCount)
+	if (GridPosition < 0 || GridPosition >= GridPositionCount || PositionsPerRow <= 0)
 	{
 		return GetActorTransform();
 	}

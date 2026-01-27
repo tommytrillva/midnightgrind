@@ -677,12 +677,17 @@ void UMGDefaultRaceOverlay::OnCountdownGo_Implementation()
 	if (UWorld* World = GetWorld())
 	{
 		FTimerHandle HideHandle;
-		World->GetTimerManager().SetTimer(HideHandle, [this]()
+		TWeakObjectPtr<UMGDefaultRaceOverlay> WeakThis(this);
+		World->GetTimerManager().SetTimer(HideHandle, [WeakThis]()
 		{
-			if (CountdownPanel)
+			if (!WeakThis.IsValid())
 			{
-				CountdownPanel->SetVisibility(ESlateVisibility::Collapsed);
-				bCountdownAnimating = false;
+				return;
+			}
+			if (WeakThis->CountdownPanel)
+			{
+				WeakThis->CountdownPanel->SetVisibility(ESlateVisibility::Collapsed);
+				WeakThis->bCountdownAnimating = false;
 			}
 		}, 1.0f, false);
 	}

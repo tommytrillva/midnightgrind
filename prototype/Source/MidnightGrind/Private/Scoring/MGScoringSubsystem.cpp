@@ -251,9 +251,13 @@ void UMGScoringSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start scoring tick
 	if (UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().SetTimer(ScoringTickTimer, [this]()
+		TWeakObjectPtr<UMGScoringSubsystem> WeakThis(this);
+		World->GetTimerManager().SetTimer(ScoringTickTimer, [WeakThis]()
 		{
-			UpdateScoringSystem(0.033f);
+			if (WeakThis.IsValid())
+			{
+				WeakThis->UpdateScoringSystem(0.033f);
+			}
 		}, 0.033f, true);
 	}
 }

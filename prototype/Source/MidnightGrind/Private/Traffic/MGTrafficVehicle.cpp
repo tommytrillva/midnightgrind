@@ -32,9 +32,26 @@ void AMGTrafficVehicle::BeginPlay()
 	bHeadlightsOn = true;
 }
 
+void AMGTrafficVehicle::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unbind collision events
+	if (CollisionBox)
+	{
+		CollisionBox->OnComponentHit.RemoveDynamic(this, &AMGTrafficVehicle::OnCollisionHit);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void AMGTrafficVehicle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Early exit for parked or despawned vehicles
+	if (CurrentBehavior == EMGTrafficBehavior::Parked || bIsDespawning)
+	{
+		return;
+	}
 
 	UpdateBehavior(DeltaTime);
 	UpdateMovement(DeltaTime);

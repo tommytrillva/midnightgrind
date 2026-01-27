@@ -3,6 +3,12 @@
 #include "Contract/MGContractSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Save/MGSaveManagerSubsystem.h"
+#include "Save/MGSaveGame.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
 
 void UMGContractSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -858,10 +864,157 @@ int32 UMGContractSubsystem::GetTotalContractCount() const
 
 void UMGContractSubsystem::SaveContractData()
 {
-	// Placeholder for save implementation
+	// Save contract progress to file
+	FString ContractsDir = FPaths::ProjectSavedDir() / TEXT("Contracts");
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if (!PlatformFile.DirectoryExists(*ContractsDir))
+	{
+		PlatformFile.CreateDirectory(*ContractsDir);
+	}
+
+	FString FilePath = ContractsDir / TEXT("contract_progress.dat");
+
+	FBufferArchive Archive;
+
+	// Write version
+	int32 Version = 1;
+	Archive << Version;
+
+	// Write progress data
+	Archive << Progress.TotalContractsCompleted;
+	Archive << Progress.TotalCreditsEarned;
+	Archive << Progress.TotalXPEarned;
+	Archive << Progress.ContractStreak;
+	Archive << Progress.BestStreak;
+	Archive << Progress.CompletedContractIDs;
+	Archive << Progress.FailedContractIDs;
+
+	int32 TypeCount = Progress.ContractsByType.Num();
+	Archive << TypeCount;
+	for (const auto& Pair : Progress.ContractsByType)
+	{
+		int32 TypeInt = static_cast<int32>(Pair.Key);
+		int32 Count = Pair.Value;
+		Archive << TypeInt;
+		Archive << Count;
+	}
+
+	// Write reset timestamps
+	Archive << LastDailyReset;
+	Archive << LastWeeklyReset;
+
+	// Write active contracts state
+	TArray<FName> ActiveContractIDs;
+	for (const auto& Pair : ContractDatabase)
+	{
+		if (Pair.Value.State == EMGContractState::Active)
+		{
+			ActiveContractIDs.Add(Pair.Key);
+		}
+	}
+	Archive << ActiveContractIDs;
+
+	// Write sponsor reputation
+	int32 SponsorCount = Sponsors.Num();
+	Archive << SponsorCount;
+	for (const auto& Pair : Sponsors)
+	{
+		FName SponsorID = Pair.Key;
+		int32 RepLevel = Pair.Value.ReputationLevel;
+		int32 RepCurrent = Pair.Value.CurrentReputation;
+		Archive << SponsorID;
+		Archive << RepLevel;
+		Archive << RepCurrent;
+	}
+
+	FFileHelper::SaveArrayToFile(Archive, *FilePath);
+	Archive.FlushCache();
+	Archive.Empty();
+
+	UE_LOG(LogTemp, Log, TEXT("MGContract: Saved contract progress (%d completed, streak %d)"),
+		Progress.TotalContractsCompleted, Progress.ContractStreak);
 }
 
 void UMGContractSubsystem::LoadContractData()
 {
-	// Placeholder for load implementation
+	FString ContractsDir = FPaths::ProjectSavedDir() / TEXT("Contracts");
+	FString FilePath = ContractsDir / TEXT("contract_progress.dat");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		// No save file yet
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	// Read version
+	int32 Version;
+	Archive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGContract: Unknown contract save version %d"), Version);
+		return;
+	}
+
+	// Read progress data
+	Archive << Progress.TotalContractsCompleted;
+	Archive << Progress.TotalCreditsEarned;
+	Archive << Progress.TotalXPEarned;
+	Archive << Progress.ContractStreak;
+	Archive << Progress.BestStreak;
+	Archive << Progress.CompletedContractIDs;
+	Archive << Progress.FailedContractIDs;
+
+	int32 TypeCount;
+	Archive << TypeCount;
+	for (int32 i = 0; i < TypeCount; i++)
+	{
+		int32 TypeInt;
+		int32 Count;
+		Archive << TypeInt;
+		Archive << Count;
+		Progress.ContractsByType.Add(static_cast<EMGContractType>(TypeInt), Count);
+	}
+
+	// Read reset timestamps
+	Archive << LastDailyReset;
+	Archive << LastWeeklyReset;
+
+	// Read active contracts state
+	TArray<FName> ActiveContractIDs;
+	Archive << ActiveContractIDs;
+
+	// Restore active contract states
+	for (const FName& ContractID : ActiveContractIDs)
+	{
+		if (ContractDatabase.Contains(ContractID))
+		{
+			ContractDatabase[ContractID].State = EMGContractState::Active;
+		}
+	}
+
+	// Read sponsor reputation
+	int32 SponsorCount;
+	Archive << SponsorCount;
+	for (int32 i = 0; i < SponsorCount; i++)
+	{
+		FName SponsorID;
+		int32 RepLevel;
+		int32 RepCurrent;
+		Archive << SponsorID;
+		Archive << RepLevel;
+		Archive << RepCurrent;
+
+		if (Sponsors.Contains(SponsorID))
+		{
+			Sponsors[SponsorID].ReputationLevel = RepLevel;
+			Sponsors[SponsorID].CurrentReputation = RepCurrent;
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGContract: Loaded contract progress (%d completed, streak %d)"),
+		Progress.TotalContractsCompleted, Progress.ContractStreak);
 }

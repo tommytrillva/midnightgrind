@@ -178,17 +178,22 @@ void UMGEngineAudioSubsystem::StartEngine(FName VehicleID)
 	if (UWorld* World = GetWorld())
 	{
 		FTimerHandle TempHandle;
+		TWeakObjectPtr<UMGEngineAudioSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			TempHandle,
-			[this, VehicleID]()
+			[WeakThis, VehicleID]()
 			{
-				FMGVehicleAudioInstance* Inst = ActiveVehicles.Find(VehicleID);
+				if (!WeakThis.IsValid())
+				{
+					return;
+				}
+				FMGVehicleAudioInstance* Inst = WeakThis->ActiveVehicles.Find(VehicleID);
 				if (Inst && Inst->State.State == EMGEngineState::Starting)
 				{
 					Inst->State.State = EMGEngineState::Idle;
 					Inst->State.CurrentRPM = Inst->Profile.IdleRPM;
 					Inst->State.TargetRPM = Inst->Profile.IdleRPM;
-					OnEngineStateChanged.Broadcast(VehicleID, EMGEngineState::Idle);
+					WeakThis->OnEngineStateChanged.Broadcast(VehicleID, EMGEngineState::Idle);
 				}
 			},
 			1.5f,
@@ -246,11 +251,16 @@ void UMGEngineAudioSubsystem::TriggerBackfire(FName VehicleID)
 	if (UWorld* World = GetWorld())
 	{
 		FTimerHandle TempHandle;
+		TWeakObjectPtr<UMGEngineAudioSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			TempHandle,
-			[this, VehicleID]()
+			[WeakThis, VehicleID]()
 			{
-				FMGVehicleAudioInstance* Inst = ActiveVehicles.Find(VehicleID);
+				if (!WeakThis.IsValid())
+				{
+					return;
+				}
+				FMGVehicleAudioInstance* Inst = WeakThis->ActiveVehicles.Find(VehicleID);
 				if (Inst)
 				{
 					Inst->State.bIsBackfiring = false;
@@ -292,11 +302,16 @@ void UMGEngineAudioSubsystem::TriggerGearShift(FName VehicleID, int32 FromGear, 
 	if (UWorld* World = GetWorld())
 	{
 		FTimerHandle TempHandle;
+		TWeakObjectPtr<UMGEngineAudioSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			TempHandle,
-			[this, VehicleID]()
+			[WeakThis, VehicleID]()
 			{
-				FMGVehicleAudioInstance* Inst = ActiveVehicles.Find(VehicleID);
+				if (!WeakThis.IsValid())
+				{
+					return;
+				}
+				FMGVehicleAudioInstance* Inst = WeakThis->ActiveVehicles.Find(VehicleID);
 				if (Inst)
 				{
 					Inst->State.bIsShifting = false;

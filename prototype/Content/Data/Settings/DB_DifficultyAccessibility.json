@@ -1,0 +1,596 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Difficulty and Accessibility Settings",
+
+  "DifficultyPresets": {
+    "Easy": {
+      "ID": "DIFF_EASY",
+      "Name": "Casual",
+      "Description": "Relaxed racing for players who want to enjoy the story and cars",
+      "AISettings": {
+        "SkillLevel": 0.4,
+        "Aggression": 0.3,
+        "RubberBanding": 0.9,
+        "MistakeRate": 0.15,
+        "ReactionTime": 0.4
+      },
+      "PlayerAssists": {
+        "BrakingAssist": true,
+        "SteeringAssist": true,
+        "StabilityControl": true,
+        "TractionControl": true,
+        "AntiLockBrakes": true,
+        "AutoShift": true,
+        "RacingLine": "Full",
+        "RewindEnabled": true,
+        "RewindCharges": -1,
+        "CollisionForgiving": true
+      },
+      "Rewards": {
+        "CashMultiplier": 0.75,
+        "REPMultiplier": 0.75
+      }
+    },
+    "Normal": {
+      "ID": "DIFF_NORMAL",
+      "Name": "Street Racer",
+      "Description": "Balanced challenge for most players",
+      "AISettings": {
+        "SkillLevel": 0.6,
+        "Aggression": 0.5,
+        "RubberBanding": 0.5,
+        "MistakeRate": 0.08,
+        "ReactionTime": 0.25
+      },
+      "PlayerAssists": {
+        "BrakingAssist": false,
+        "SteeringAssist": false,
+        "StabilityControl": true,
+        "TractionControl": true,
+        "AntiLockBrakes": true,
+        "AutoShift": true,
+        "RacingLine": "Corners",
+        "RewindEnabled": true,
+        "RewindCharges": 5,
+        "CollisionForgiving": false
+      },
+      "Rewards": {
+        "CashMultiplier": 1.0,
+        "REPMultiplier": 1.0
+      }
+    },
+    "Hard": {
+      "ID": "DIFF_HARD",
+      "Name": "Underground",
+      "Description": "Serious competition for skilled racers",
+      "AISettings": {
+        "SkillLevel": 0.8,
+        "Aggression": 0.7,
+        "RubberBanding": 0.2,
+        "MistakeRate": 0.03,
+        "ReactionTime": 0.15
+      },
+      "PlayerAssists": {
+        "BrakingAssist": false,
+        "SteeringAssist": false,
+        "StabilityControl": false,
+        "TractionControl": false,
+        "AntiLockBrakes": true,
+        "AutoShift": false,
+        "RacingLine": "Off",
+        "RewindEnabled": true,
+        "RewindCharges": 2,
+        "CollisionForgiving": false
+      },
+      "Rewards": {
+        "CashMultiplier": 1.25,
+        "REPMultiplier": 1.25
+      }
+    },
+    "Expert": {
+      "ID": "DIFF_EXPERT",
+      "Name": "Legend",
+      "Description": "Maximum challenge - no mercy",
+      "AISettings": {
+        "SkillLevel": 0.95,
+        "Aggression": 0.8,
+        "RubberBanding": 0.0,
+        "MistakeRate": 0.01,
+        "ReactionTime": 0.1
+      },
+      "PlayerAssists": {
+        "BrakingAssist": false,
+        "SteeringAssist": false,
+        "StabilityControl": false,
+        "TractionControl": false,
+        "AntiLockBrakes": false,
+        "AutoShift": false,
+        "RacingLine": "Off",
+        "RewindEnabled": false,
+        "RewindCharges": 0,
+        "CollisionForgiving": false
+      },
+      "Rewards": {
+        "CashMultiplier": 1.5,
+        "REPMultiplier": 1.5
+      },
+      "UnlockCondition": "Complete game on Hard"
+    }
+  },
+
+  "AssistOptions": {
+    "Driving": {
+      "BrakingAssist": {
+        "Name": "Braking Assist",
+        "Description": "Automatically applies brakes before corners",
+        "Type": "Toggle",
+        "Default": false,
+        "Levels": ["Off", "Low", "Medium", "High"]
+      },
+      "SteeringAssist": {
+        "Name": "Steering Assist",
+        "Description": "Helps keep the car pointed in the right direction",
+        "Type": "Toggle",
+        "Default": false,
+        "Levels": ["Off", "Low", "Medium", "High"]
+      },
+      "StabilityControl": {
+        "Name": "Stability Control (ESC)",
+        "Description": "Electronic stability control prevents spinning",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "TractionControl": {
+        "Name": "Traction Control (TCS)",
+        "Description": "Limits wheelspin during acceleration",
+        "Type": "Toggle",
+        "Default": true,
+        "Levels": ["Off", "Low", "Medium", "High"]
+      },
+      "AntiLockBrakes": {
+        "Name": "Anti-Lock Brakes (ABS)",
+        "Description": "Prevents wheel lockup during braking",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "AutoCountersteer": {
+        "Name": "Auto Countersteer",
+        "Description": "Automatically countersteers during slides",
+        "Type": "Toggle",
+        "Default": false
+      }
+    },
+    "Transmission": {
+      "AutoShift": {
+        "Name": "Automatic Transmission",
+        "Description": "Automatically shifts gears",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "AutoClutch": {
+        "Name": "Auto Clutch",
+        "Description": "Automatically operates clutch (for manual mode)",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "ShiftAssist": {
+        "Name": "Shift Indicator",
+        "Description": "Shows optimal shift points on HUD",
+        "Type": "Toggle",
+        "Default": true
+      }
+    },
+    "Racing": {
+      "RacingLine": {
+        "Name": "Racing Line",
+        "Description": "Shows optimal racing line on track",
+        "Type": "Option",
+        "Default": "Corners",
+        "Options": ["Off", "Corners", "Full"]
+      },
+      "BrakingZones": {
+        "Name": "Braking Zones",
+        "Description": "Shows braking points before corners",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "OpponentIndicators": {
+        "Name": "Opponent Indicators",
+        "Description": "Shows nearby opponents on HUD",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "MiniMap": {
+        "Name": "Mini Map",
+        "Description": "Shows track map with positions",
+        "Type": "Toggle",
+        "Default": true
+      }
+    },
+    "Rewind": {
+      "RewindEnabled": {
+        "Name": "Rewind Feature",
+        "Description": "Allows rewinding time after mistakes",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "RewindCharges": {
+        "Name": "Rewind Charges",
+        "Description": "Number of rewinds per race (-1 = unlimited)",
+        "Type": "Slider",
+        "Default": 5,
+        "Range": [-1, 10]
+      },
+      "RewindDuration": {
+        "Name": "Rewind Duration",
+        "Description": "Maximum seconds to rewind",
+        "Type": "Slider",
+        "Default": 10,
+        "Range": [3, 30]
+      }
+    }
+  },
+
+  "Accessibility": {
+    "Visual": {
+      "ColorBlindMode": {
+        "Name": "Color Blind Mode",
+        "Description": "Adjusts colors for color vision deficiency",
+        "Type": "Option",
+        "Default": "Off",
+        "Options": ["Off", "Protanopia", "Deuteranopia", "Tritanopia"]
+      },
+      "HighContrastHUD": {
+        "Name": "High Contrast HUD",
+        "Description": "Increases HUD contrast for better visibility",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "LargeText": {
+        "Name": "Large Text",
+        "Description": "Increases text size throughout the game",
+        "Type": "Toggle",
+        "Default": false,
+        "Levels": ["Normal", "Large", "Extra Large"]
+      },
+      "SubtitleSize": {
+        "Name": "Subtitle Size",
+        "Description": "Size of dialogue subtitles",
+        "Type": "Option",
+        "Default": "Medium",
+        "Options": ["Small", "Medium", "Large", "Extra Large"]
+      },
+      "SubtitleBackground": {
+        "Name": "Subtitle Background",
+        "Description": "Add background to subtitles for readability",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "ScreenShake": {
+        "Name": "Screen Shake",
+        "Description": "Camera shake intensity",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0, 1]
+      },
+      "MotionBlur": {
+        "Name": "Motion Blur",
+        "Description": "Motion blur effect intensity",
+        "Type": "Slider",
+        "Default": 0.5,
+        "Range": [0, 1]
+      },
+      "FlashingEffects": {
+        "Name": "Reduce Flashing",
+        "Description": "Reduces or disables flashing/strobing effects",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "PhotosensitivityMode": {
+        "Name": "Photosensitivity Mode",
+        "Description": "Comprehensive reduction of all intense visual effects",
+        "Type": "Toggle",
+        "Default": false,
+        "Effects": ["DisableFlashing", "ReduceNeon", "StabilizeCamera", "DisableLightning"]
+      }
+    },
+    "Audio": {
+      "MasterVolume": {
+        "Name": "Master Volume",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0, 1]
+      },
+      "MusicVolume": {
+        "Name": "Music Volume",
+        "Type": "Slider",
+        "Default": 0.8,
+        "Range": [0, 1]
+      },
+      "SFXVolume": {
+        "Name": "Sound Effects Volume",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0, 1]
+      },
+      "EngineVolume": {
+        "Name": "Engine Volume",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0, 1]
+      },
+      "VoiceVolume": {
+        "Name": "Voice/Dialogue Volume",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0, 1]
+      },
+      "Subtitles": {
+        "Name": "Subtitles",
+        "Description": "Enable subtitles for dialogue",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "AudioDescriptions": {
+        "Name": "Audio Descriptions",
+        "Description": "Narrated descriptions of visual elements",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "MonoAudio": {
+        "Name": "Mono Audio",
+        "Description": "Combine stereo audio to mono",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "VisualAudioCues": {
+        "Name": "Visual Audio Cues",
+        "Description": "Show visual indicators for important sounds",
+        "Type": "Toggle",
+        "Default": false
+      }
+    },
+    "Controls": {
+      "ControllerVibration": {
+        "Name": "Controller Vibration",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0, 1]
+      },
+      "SteeringSensitivity": {
+        "Name": "Steering Sensitivity",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0.5, 2.0]
+      },
+      "DeadZone": {
+        "Name": "Stick Dead Zone",
+        "Type": "Slider",
+        "Default": 0.1,
+        "Range": [0, 0.5]
+      },
+      "InvertYAxis": {
+        "Name": "Invert Y Axis",
+        "Description": "Invert camera up/down controls",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "HoldToAccelerate": {
+        "Name": "Hold to Accelerate",
+        "Description": "Toggle between hold and press for throttle",
+        "Type": "Toggle",
+        "Default": true
+      },
+      "OneHandedMode": {
+        "Name": "One-Handed Mode",
+        "Description": "Remap all controls to one side of controller",
+        "Type": "Option",
+        "Default": "Off",
+        "Options": ["Off", "Left Hand", "Right Hand"]
+      },
+      "AutoSteer": {
+        "Name": "Auto Steer",
+        "Description": "Car automatically follows track (accessibility feature)",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "SimplifiedControls": {
+        "Name": "Simplified Controls",
+        "Description": "Reduce to essential controls only (steer + go)",
+        "Type": "Toggle",
+        "Default": false
+      }
+    },
+    "Gameplay": {
+      "SlowMotion": {
+        "Name": "Global Slow Motion",
+        "Description": "Slow down game speed for easier play",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0.5, 1.0]
+      },
+      "InvincibleMode": {
+        "Name": "No Damage Mode",
+        "Description": "Vehicle cannot be damaged or wrecked",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "UnlimitedNitrous": {
+        "Name": "Unlimited Nitrous",
+        "Description": "Nitrous never runs out",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "SkipRaces": {
+        "Name": "Skip Difficult Races",
+        "Description": "Option to skip races after multiple failures",
+        "Type": "Toggle",
+        "Default": true,
+        "FailuresRequired": 5
+      },
+      "NarratedMenus": {
+        "Name": "Narrated Menus",
+        "Description": "Read aloud menu options",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "AutoSave": {
+        "Name": "Auto Save Frequency",
+        "Type": "Option",
+        "Default": "Frequent",
+        "Options": ["Off", "Checkpoints", "Frequent", "Constant"]
+      }
+    },
+    "HUD": {
+      "HUDScale": {
+        "Name": "HUD Scale",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0.75, 1.5]
+      },
+      "HUDOpacity": {
+        "Name": "HUD Opacity",
+        "Type": "Slider",
+        "Default": 1.0,
+        "Range": [0.5, 1.0]
+      },
+      "MinimalHUD": {
+        "Name": "Minimal HUD",
+        "Description": "Show only essential information",
+        "Type": "Toggle",
+        "Default": false
+      },
+      "SafeArea": {
+        "Name": "Safe Area",
+        "Description": "Adjust HUD margins for TV overscan",
+        "Type": "Slider",
+        "Default": 0.95,
+        "Range": [0.85, 1.0]
+      },
+      "SpeedometerUnit": {
+        "Name": "Speed Unit",
+        "Type": "Option",
+        "Default": "MPH",
+        "Options": ["MPH", "KPH"]
+      },
+      "DistanceUnit": {
+        "Name": "Distance Unit",
+        "Type": "Option",
+        "Default": "Miles",
+        "Options": ["Miles", "Kilometers", "Meters"]
+      }
+    }
+  },
+
+  "InputProfiles": {
+    "Standard": {
+      "Name": "Standard",
+      "Description": "Default control layout",
+      "Layout": {
+        "Accelerate": "RightTrigger",
+        "Brake": "LeftTrigger",
+        "Steer": "LeftStick",
+        "Handbrake": "A/Cross",
+        "Nitrous": "B/Circle",
+        "ShiftUp": "RightBumper",
+        "ShiftDown": "LeftBumper",
+        "LookBack": "RightStickClick",
+        "Camera": "Y/Triangle",
+        "Rewind": "X/Square",
+        "Pause": "Start"
+      }
+    },
+    "Alternative": {
+      "Name": "Alternative",
+      "Description": "Face buttons for gas/brake",
+      "Layout": {
+        "Accelerate": "A/Cross",
+        "Brake": "B/Circle",
+        "Steer": "LeftStick",
+        "Handbrake": "LeftTrigger",
+        "Nitrous": "RightTrigger",
+        "ShiftUp": "RightBumper",
+        "ShiftDown": "LeftBumper",
+        "LookBack": "RightStickClick",
+        "Camera": "Y/Triangle",
+        "Rewind": "X/Square",
+        "Pause": "Start"
+      }
+    },
+    "Simplified": {
+      "Name": "Simplified",
+      "Description": "Minimal controls - steer and go",
+      "Layout": {
+        "Accelerate": "RightTrigger",
+        "Brake": "LeftTrigger",
+        "Steer": "LeftStick",
+        "Pause": "Start"
+      },
+      "AutoAssists": {
+        "AutoBrake": true,
+        "AutoNitrous": true,
+        "AutoShift": true
+      }
+    },
+    "OneHandLeft": {
+      "Name": "Left Hand Only",
+      "Description": "All controls on left side",
+      "Layout": {
+        "Accelerate": "LeftTrigger",
+        "Brake": "LeftBumper",
+        "Steer": "LeftStick",
+        "Handbrake": "LeftStickClick",
+        "Nitrous": "DPadUp",
+        "Camera": "DPadRight",
+        "Pause": "Back/Select"
+      },
+      "AutoAssists": {
+        "AutoShift": true,
+        "AutoRewind": true
+      }
+    },
+    "OneHandRight": {
+      "Name": "Right Hand Only",
+      "Description": "All controls on right side",
+      "Layout": {
+        "Accelerate": "RightTrigger",
+        "Brake": "RightBumper",
+        "Steer": "RightStick",
+        "Handbrake": "RightStickClick",
+        "Nitrous": "A/Cross",
+        "Camera": "Y/Triangle",
+        "Pause": "Start"
+      },
+      "AutoAssists": {
+        "AutoShift": true,
+        "AutoRewind": true
+      }
+    }
+  },
+
+  "PerformanceOptions": {
+    "FrameRate": {
+      "Name": "Target Frame Rate",
+      "Type": "Option",
+      "Default": 60,
+      "Options": [30, 60, 120, "Unlimited"]
+    },
+    "VSync": {
+      "Name": "V-Sync",
+      "Type": "Toggle",
+      "Default": true
+    },
+    "QualityPreset": {
+      "Name": "Quality Preset",
+      "Type": "Option",
+      "Default": "High",
+      "Options": ["Low", "Medium", "High", "Ultra", "Custom"]
+    },
+    "RetroMode": {
+      "Name": "Retro Visual Mode",
+      "Type": "Option",
+      "Default": "Modern Retro",
+      "Options": ["Off", "PS1 Mode", "PS2 Mode", "Modern Retro"]
+    }
+  }
+}

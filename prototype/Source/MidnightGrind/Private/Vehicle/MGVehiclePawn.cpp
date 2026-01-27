@@ -4,6 +4,7 @@
 #include "Vehicle/MGVehicleMovementComponent.h"
 #include "Vehicle/MGVehicleDamageSystem.h"
 #include "VFX/MGVehicleVFXComponent.h"
+#include "VFX/MGCameraVFXComponent.h"
 #include "Audio/MGEngineAudioComponent.h"
 #include "Audio/MGVehicleSFXComponent.h"
 #include "UI/MGRaceHUDSubsystem.h"
@@ -102,6 +103,9 @@ void AMGVehiclePawn::SetupComponents()
 
 	// Create vehicle SFX component (handles collision, scrape, tire sounds)
 	VehicleSFX = CreateDefaultSubobject<UMGVehicleSFXComponent>(TEXT("VehicleSFX"));
+
+	// Create camera VFX component (handles camera shake, speed effects, impact flash)
+	CameraVFX = CreateDefaultSubobject<UMGCameraVFXComponent>(TEXT("CameraVFX"));
 }
 
 void AMGVehiclePawn::BeginPlay()
@@ -259,6 +263,24 @@ void AMGVehiclePawn::UpdateHUDTelemetry()
 
 				HUDSubsystem->UpdateDamageState(DamageData);
 			}
+		}
+	}
+
+	// Update camera VFX with speed and drift effects
+	if (CameraVFX)
+	{
+		// Speed effects (FOV increase, motion blur, etc.)
+		CameraVFX->UpdateSpeedEffects(RuntimeState.SpeedKPH);
+
+		// Drift camera effects (roll, offset)
+		if (RuntimeState.bIsDrifting)
+		{
+			float DriftIntensity = FMath::Clamp(FMath::Abs(RuntimeState.DriftAngle) / 45.0f, 0.0f, 1.0f);
+			CameraVFX->UpdateDriftEffects(RuntimeState.DriftAngle, DriftIntensity);
+		}
+		else
+		{
+			CameraVFX->UpdateDriftEffects(0.0f, 0.0f);
 		}
 	}
 }
@@ -963,6 +985,33 @@ void AMGVehiclePawn::HandleDamageTaken(const FMGDamageEvent& DamageEvent)
 			DamageEvent.ImpactLocation,
 			DamageEvent.ImpactNormal
 		);
+	}
+
+	// Trigger camera shake and flash (for locally controlled player)
+	if (CameraVFX && IsLocallyControlled())
+	{
+		// Calculate normalized intensity (scale impact force to 0-1 range)
+		float NormalizedForce = FMath::Clamp(DamageEvent.ImpactForce / 50000.0f, 0.0f, 1.0f);
+
+		// Determine shake type based on intensity
+		if (NormalizedForce > 0.6f)
+		{
+			// Heavy impact - intense shake
+			CameraVFX->TriggerShake(EMGCameraShakeType::Heavy, NormalizedForce);
+			CameraVFX->TriggerImpactFlashPreset(DamageEvent.ImpactForce);
+			CameraVFX->TriggerJudder(NormalizedForce, 0.08f);
+		}
+		else if (NormalizedForce > 0.3f)
+		{
+			// Medium impact
+			CameraVFX->TriggerShake(EMGCameraShakeType::Medium, NormalizedForce);
+			CameraVFX->TriggerImpactFlashPreset(DamageEvent.ImpactForce);
+		}
+		else if (NormalizedForce > 0.1f)
+		{
+			// Light impact
+			CameraVFX->TriggerShake(EMGCameraShakeType::Light, NormalizedForce);
+		}
 	}
 
 	// Trigger HUD impact feedback (for locally controlled player)

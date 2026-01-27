@@ -487,22 +487,38 @@ void UMGEngineAudioComponent::TriggerBackfire()
 	bBackfireTriggered = true;
 	OnExhaustPop.Broadcast();
 
-	// Reset on next tick
-	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+	// Reset on next tick with weak reference for safety
+	UWorld* World = GetWorld();
+	if (World)
 	{
-		bBackfireTriggered = false;
-	});
+		TWeakObjectPtr<UMGEngineAudioComponent> WeakThis(this);
+		World->GetTimerManager().SetTimerForNextTick([WeakThis]()
+		{
+			if (WeakThis.IsValid())
+			{
+				WeakThis->bBackfireTriggered = false;
+			}
+		});
+	}
 }
 
 void UMGEngineAudioComponent::TriggerBlowOffValve()
 {
 	bBOVTriggered = true;
 
-	// Reset on next tick
-	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+	// Reset on next tick with weak reference for safety
+	UWorld* World = GetWorld();
+	if (World)
 	{
-		bBOVTriggered = false;
-	});
+		TWeakObjectPtr<UMGEngineAudioComponent> WeakThis(this);
+		World->GetTimerManager().SetTimerForNextTick([WeakThis]()
+		{
+			if (WeakThis.IsValid())
+			{
+				WeakThis->bBOVTriggered = false;
+			}
+		});
+	}
 }
 
 // ==========================================

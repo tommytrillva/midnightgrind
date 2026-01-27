@@ -1,0 +1,719 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Multiplayer and Online Configuration",
+
+  "Network": {
+    "Architecture": "DedicatedServer",
+    "FallbackP2P": true,
+    "TickRate": 60,
+    "ClientTickRate": 60,
+    "MaxPing": 250,
+    "PingWarningThreshold": 150,
+    "ReconnectTimeout": 30,
+    "ReconnectAttempts": 3,
+    "Regions": [
+      { "ID": "NA_EAST", "Name": "North America - East", "Location": "Virginia" },
+      { "ID": "NA_WEST", "Name": "North America - West", "Location": "Oregon" },
+      { "ID": "EU_WEST", "Name": "Europe - West", "Location": "Frankfurt" },
+      { "ID": "EU_NORTH", "Name": "Europe - North", "Location": "Stockholm" },
+      { "ID": "ASIA_EAST", "Name": "Asia - East", "Location": "Tokyo" },
+      { "ID": "ASIA_SE", "Name": "Asia - Southeast", "Location": "Singapore" },
+      { "ID": "OCE", "Name": "Oceania", "Location": "Sydney" },
+      { "ID": "SA", "Name": "South America", "Location": "Sao Paulo" }
+    ],
+    "AutoRegion": true,
+    "RegionLock": false,
+    "CrossRegion": {
+      "Enabled": true,
+      "MaxPingAllowed": 200,
+      "WarningPrompt": true
+    }
+  },
+
+  "CrossPlay": {
+    "Enabled": true,
+    "OptOut": true,
+    "Platforms": ["PC", "PlayStation", "Xbox", "Switch"],
+    "InputBasedMatchmaking": {
+      "Enabled": true,
+      "Categories": ["Controller", "Keyboard", "Mixed"],
+      "DefaultPool": "Mixed"
+    },
+    "PerformanceBasedMatchmaking": {
+      "Enabled": false,
+      "SeparatePools": ["30fps", "60fps", "120fps"]
+    }
+  },
+
+  "Matchmaking": {
+    "Enabled": true,
+    "Algorithm": "SkillBased",
+    "SearchTimeout": 120,
+    "SearchExpansion": {
+      "Enabled": true,
+      "IntervalSeconds": 15,
+      "MaxExpansions": 5,
+      "SkillRangeExpansion": 100
+    },
+    "Factors": {
+      "SkillRating": { "Weight": 0.4, "Enabled": true },
+      "VehiclePI": { "Weight": 0.3, "Enabled": true },
+      "Ping": { "Weight": 0.2, "Enabled": true },
+      "WaitTime": { "Weight": 0.1, "Enabled": true }
+    },
+    "PartyMatchmaking": {
+      "Enabled": true,
+      "UseHighestSkill": true,
+      "MaxPartySize": 4
+    },
+    "QuickMatch": {
+      "Enabled": true,
+      "DefaultMode": "QuickRace",
+      "AutoFillBots": true,
+      "BotFillDelay": 45
+    },
+    "Playlists": [
+      {
+        "ID": "PLAYLIST_QUICK",
+        "Name": "Quick Race",
+        "Description": "Jump into a random race",
+        "Modes": ["CircuitRace", "SprintRace", "DragRace"],
+        "PlayerCount": { "Min": 2, "Max": 8, "Optimal": 6 },
+        "Ranked": false,
+        "UnlockLevel": 1
+      },
+      {
+        "ID": "PLAYLIST_RANKED",
+        "Name": "Ranked Racing",
+        "Description": "Competitive ranked matches",
+        "Modes": ["CircuitRace", "SprintRace"],
+        "PlayerCount": { "Min": 4, "Max": 8, "Optimal": 8 },
+        "Ranked": true,
+        "UnlockLevel": 10,
+        "SeasonBased": true
+      },
+      {
+        "ID": "PLAYLIST_DRIFT",
+        "Name": "Drift Sessions",
+        "Description": "Competitive drift scoring",
+        "Modes": ["DriftAttack", "DriftBattle", "TandemDrift"],
+        "PlayerCount": { "Min": 2, "Max": 8, "Optimal": 4 },
+        "Ranked": true,
+        "UnlockLevel": 15
+      },
+      {
+        "ID": "PLAYLIST_DRAG",
+        "Name": "Drag Strip",
+        "Description": "1/4 and 1/2 mile drag races",
+        "Modes": ["DragRace"],
+        "PlayerCount": { "Min": 2, "Max": 2, "Optimal": 2 },
+        "Ranked": true,
+        "UnlockLevel": 5
+      },
+      {
+        "ID": "PLAYLIST_PINKSLIP",
+        "Name": "Pink Slip Racing",
+        "Description": "Race for keeps - winner takes the car",
+        "Modes": ["PinkSlipRace"],
+        "PlayerCount": { "Min": 2, "Max": 2, "Optimal": 2 },
+        "Ranked": false,
+        "UnlockCondition": "REP_TIER_STREET",
+        "Restrictions": {
+          "MaxValueDifference": 0.5,
+          "CooldownHours": 24,
+          "ConfirmationRequired": true
+        }
+      },
+      {
+        "ID": "PLAYLIST_CREW",
+        "Name": "Crew Battles",
+        "Description": "Crew vs Crew competition",
+        "Modes": ["CrewRace", "CrewDrift", "CrewRelay"],
+        "PlayerCount": { "Min": 4, "Max": 8, "Optimal": 8 },
+        "Ranked": true,
+        "RequiresCrew": true,
+        "UnlockLevel": 20
+      }
+    ]
+  },
+
+  "Lobbies": {
+    "Public": {
+      "Enabled": true,
+      "MaxPlayers": 16,
+      "JoinInProgress": true,
+      "Spectators": {
+        "Enabled": true,
+        "MaxSpectators": 8
+      }
+    },
+    "Private": {
+      "Enabled": true,
+      "MaxPlayers": 16,
+      "PasswordProtected": true,
+      "InviteOnly": true
+    },
+    "Settings": {
+      "Countdown": {
+        "Default": 60,
+        "Min": 15,
+        "Max": 300,
+        "AutoStart": true,
+        "AutoStartMinPlayers": 2
+      },
+      "VotingSystem": {
+        "Enabled": true,
+        "TrackVoting": true,
+        "ModeVoting": true,
+        "VoteTimeout": 30,
+        "RequiredMajority": 0.5
+      },
+      "ReadySystem": {
+        "Enabled": true,
+        "AllMustReady": false,
+        "ReadyPercentage": 0.75,
+        "ForceStartTimer": 120
+      },
+      "HostMigration": {
+        "Enabled": true,
+        "AutoMigrate": true,
+        "MigrationTimeout": 15
+      }
+    },
+    "Chat": {
+      "TextChat": {
+        "Enabled": true,
+        "Filter": true,
+        "MaxLength": 200,
+        "RateLimit": 5
+      },
+      "QuickChat": {
+        "Enabled": true,
+        "Messages": [
+          "Good race!",
+          "Nice drift!",
+          "Rematch?",
+          "GG",
+          "Close one!",
+          "Let's go!",
+          "Waiting for players",
+          "Ready when you are"
+        ]
+      }
+    }
+  },
+
+  "GameModes": {
+    "CircuitRace": {
+      "ID": "MODE_CIRCUIT",
+      "Name": "Circuit Race",
+      "Description": "Multi-lap races on closed circuits",
+      "PlayerCount": { "Min": 2, "Max": 8 },
+      "Settings": {
+        "Laps": { "Default": 3, "Min": 1, "Max": 10 },
+        "Collisions": { "Default": true, "Configurable": true },
+        "Catchup": { "Default": false, "Configurable": true },
+        "GhostMode": { "Default": false, "Configurable": true },
+        "RollingStart": { "Default": false, "Configurable": true }
+      }
+    },
+    "SprintRace": {
+      "ID": "MODE_SPRINT",
+      "Name": "Sprint Race",
+      "Description": "Point-to-point races",
+      "PlayerCount": { "Min": 2, "Max": 8 },
+      "Settings": {
+        "Collisions": { "Default": true, "Configurable": true },
+        "RollingStart": { "Default": true, "Configurable": true }
+      }
+    },
+    "DragRace": {
+      "ID": "MODE_DRAG",
+      "Name": "Drag Race",
+      "Description": "Straight-line acceleration battles",
+      "PlayerCount": { "Min": 2, "Max": 2 },
+      "Settings": {
+        "Distance": { "Default": "QuarterMile", "Options": ["QuarterMile", "HalfMile", "Mile"] },
+        "TreeType": { "Default": "ProTree", "Options": ["ProTree", "FullTree", "NoTree"] },
+        "BestOf": { "Default": 1, "Options": [1, 3, 5] }
+      }
+    },
+    "DriftAttack": {
+      "ID": "MODE_DRIFT_ATTACK",
+      "Name": "Drift Attack",
+      "Description": "Score the highest drift points",
+      "PlayerCount": { "Min": 2, "Max": 8 },
+      "Settings": {
+        "TimeLimit": { "Default": 180, "Min": 60, "Max": 600 },
+        "ScoringZones": { "Default": true },
+        "Multipliers": { "Default": true }
+      }
+    },
+    "DriftBattle": {
+      "ID": "MODE_DRIFT_BATTLE",
+      "Name": "Drift Battle",
+      "Description": "Head-to-head drift competition",
+      "PlayerCount": { "Min": 2, "Max": 2 },
+      "Settings": {
+        "Rounds": { "Default": 3, "Min": 1, "Max": 5 },
+        "LeadFollow": { "Default": true },
+        "JudgingCriteria": ["Angle", "Speed", "Line", "Proximity", "Style"]
+      }
+    },
+    "TandemDrift": {
+      "ID": "MODE_TANDEM",
+      "Name": "Tandem Drift",
+      "Description": "Synchronized drifting for combined score",
+      "PlayerCount": { "Min": 2, "Max": 2 },
+      "Settings": {
+        "TimeLimit": { "Default": 120 },
+        "ProximityBonus": true,
+        "SyncBonus": true
+      }
+    },
+    "TimeAttack": {
+      "ID": "MODE_TIME_ATTACK",
+      "Name": "Time Attack",
+      "Description": "Set the fastest lap time",
+      "PlayerCount": { "Min": 1, "Max": 16 },
+      "Settings": {
+        "GhostCars": { "Default": true },
+        "Attempts": { "Default": 0, "Comment": "0 = unlimited" },
+        "Leaderboard": { "Default": true }
+      }
+    },
+    "Elimination": {
+      "ID": "MODE_ELIMINATION",
+      "Name": "Elimination",
+      "Description": "Last place eliminated each lap",
+      "PlayerCount": { "Min": 4, "Max": 8 },
+      "Settings": {
+        "EliminationInterval": { "Default": "PerLap", "Options": ["PerLap", "Timed"] },
+        "TimedInterval": { "Default": 30 }
+      }
+    },
+    "KingOfTheHill": {
+      "ID": "MODE_KOTH",
+      "Name": "King of the Hill",
+      "Description": "Lead the pack to earn points",
+      "PlayerCount": { "Min": 4, "Max": 8 },
+      "Settings": {
+        "PointsPerSecond": { "Default": 1 },
+        "TargetScore": { "Default": 300 },
+        "TimeLimit": { "Default": 600 }
+      }
+    },
+    "Infected": {
+      "ID": "MODE_INFECTED",
+      "Name": "Infected",
+      "Description": "Tag other players to infect them",
+      "PlayerCount": { "Min": 4, "Max": 16 },
+      "Settings": {
+        "InitialInfected": { "Default": 1 },
+        "TimeLimit": { "Default": 300 },
+        "InfectedSpeedBonus": { "Default": 1.1 }
+      }
+    },
+    "FreeRoam": {
+      "ID": "MODE_FREEROAM",
+      "Name": "Free Roam",
+      "Description": "Explore the city together",
+      "PlayerCount": { "Min": 1, "Max": 16 },
+      "Settings": {
+        "Police": { "Default": false, "Configurable": true },
+        "Traffic": { "Default": true, "Configurable": true },
+        "Meetups": { "Default": true }
+      }
+    },
+    "CrewRace": {
+      "ID": "MODE_CREW_RACE",
+      "Name": "Crew Race",
+      "Description": "Team-based racing",
+      "PlayerCount": { "Min": 4, "Max": 8 },
+      "Settings": {
+        "TeamScoring": { "Default": "Combined", "Options": ["Combined", "BestFinisher"] },
+        "TeamSize": { "Default": 4, "Min": 2, "Max": 4 }
+      }
+    },
+    "CrewRelay": {
+      "ID": "MODE_CREW_RELAY",
+      "Name": "Crew Relay",
+      "Description": "Tag-team relay racing",
+      "PlayerCount": { "Min": 4, "Max": 8 },
+      "Settings": {
+        "LegsPerTeam": { "Default": 4 },
+        "HandoffZones": true
+      }
+    },
+    "PinkSlipRace": {
+      "ID": "MODE_PINKSLIP",
+      "Name": "Pink Slip",
+      "Description": "Race for vehicle ownership",
+      "PlayerCount": { "Min": 2, "Max": 2 },
+      "Settings": {
+        "RaceType": { "Default": "Sprint", "Options": ["Sprint", "Circuit", "Drag"] },
+        "Escrow": true,
+        "NoQuitPenalty": true
+      }
+    }
+  },
+
+  "RankedSystem": {
+    "Enabled": true,
+    "Seasons": {
+      "DurationWeeks": 12,
+      "ResetType": "SoftReset",
+      "SoftResetPercentage": 0.5,
+      "PlacementMatches": 10
+    },
+    "Ranks": [
+      { "ID": "RANK_BRONZE", "Name": "Bronze", "Tiers": 3, "Icon": "ICO_Bronze", "MinMMR": 0 },
+      { "ID": "RANK_SILVER", "Name": "Silver", "Tiers": 3, "Icon": "ICO_Silver", "MinMMR": 1000 },
+      { "ID": "RANK_GOLD", "Name": "Gold", "Tiers": 3, "Icon": "ICO_Gold", "MinMMR": 1500 },
+      { "ID": "RANK_PLATINUM", "Name": "Platinum", "Tiers": 3, "Icon": "ICO_Platinum", "MinMMR": 2000 },
+      { "ID": "RANK_DIAMOND", "Name": "Diamond", "Tiers": 3, "Icon": "ICO_Diamond", "MinMMR": 2500 },
+      { "ID": "RANK_LEGEND", "Name": "Legend", "Tiers": 1, "Icon": "ICO_Legend", "MinMMR": 3000, "TopPercentage": 1 }
+    ],
+    "MMR": {
+      "StartingMMR": 1000,
+      "KFactor": 32,
+      "MinGain": 5,
+      "MaxGain": 50,
+      "MinLoss": 5,
+      "MaxLoss": 50,
+      "PlacementMultiplier": 2.0
+    },
+    "Rewards": {
+      "SeasonEnd": {
+        "Bronze": { "Cash": 10000 },
+        "Silver": { "Cash": 25000, "Part": "RANDOM_SPORT" },
+        "Gold": { "Cash": 50000, "Part": "RANDOM_RACE" },
+        "Platinum": { "Cash": 100000, "Part": "RANDOM_RACE", "Vinyl": "VINYL_PLATINUM" },
+        "Diamond": { "Cash": 200000, "Part": "RANDOM_ELITE", "Vinyl": "VINYL_DIAMOND", "Wheel": "WHEEL_DIAMOND" },
+        "Legend": { "Cash": 500000, "Part": "RANDOM_ELITE", "Vinyl": "VINYL_LEGEND", "Wheel": "WHEEL_LEGEND", "ExclusiveVehicle": true }
+      }
+    },
+    "Decay": {
+      "Enabled": true,
+      "InactiveDays": 14,
+      "DecayPerDay": 25,
+      "FloorRank": "RANK_GOLD"
+    }
+  },
+
+  "Leaderboards": {
+    "Global": {
+      "Enabled": true,
+      "Categories": [
+        {
+          "ID": "LB_RACE_WINS",
+          "Name": "Race Wins",
+          "Type": "Cumulative",
+          "ResetPeriod": "Never"
+        },
+        {
+          "ID": "LB_DRIFT_SCORE",
+          "Name": "Highest Drift Score",
+          "Type": "HighScore",
+          "ResetPeriod": "Never"
+        },
+        {
+          "ID": "LB_RANKED_MMR",
+          "Name": "Ranked Rating",
+          "Type": "Rating",
+          "ResetPeriod": "Season"
+        },
+        {
+          "ID": "LB_WEEKLY_REP",
+          "Name": "Weekly REP",
+          "Type": "Cumulative",
+          "ResetPeriod": "Weekly"
+        },
+        {
+          "ID": "LB_TOTAL_REP",
+          "Name": "Total REP",
+          "Type": "Cumulative",
+          "ResetPeriod": "Never"
+        }
+      ]
+    },
+    "TrackSpecific": {
+      "Enabled": true,
+      "PerTrackLapTimes": true,
+      "PerTrackDriftScores": true,
+      "PerTrackSpeedTraps": true
+    },
+    "VehicleSpecific": {
+      "Enabled": true,
+      "PerVehicleBestLaps": true,
+      "PerVehicleDragTimes": true
+    },
+    "Friends": {
+      "Enabled": true,
+      "ShowInRace": true,
+      "GhostCars": true
+    },
+    "Display": {
+      "TopPlayersShown": 100,
+      "NearbyPlayersShown": 5,
+      "FriendsHighlighted": true,
+      "RefreshInterval": 60
+    }
+  },
+
+  "Social": {
+    "Friends": {
+      "MaxFriends": 500,
+      "Presence": {
+        "ShowOnlineStatus": true,
+        "ShowCurrentActivity": true,
+        "ShowVehicle": true,
+        "Privacy": {
+          "Options": ["Everyone", "FriendsOnly", "Nobody"],
+          "Default": "FriendsOnly"
+        }
+      },
+      "Invites": {
+        "GameInvites": true,
+        "LobbyInvites": true,
+        "CrewInvites": true,
+        "MaxPendingInvites": 20,
+        "InviteExpiry": 3600
+      },
+      "RecentPlayers": {
+        "Enabled": true,
+        "MaxStored": 50,
+        "RetentionDays": 30
+      }
+    },
+    "Blocking": {
+      "Enabled": true,
+      "MaxBlocked": 200,
+      "HideFromMatchmaking": true,
+      "MuteAll": true
+    },
+    "Reporting": {
+      "Enabled": true,
+      "Categories": [
+        "Cheating",
+        "Unsportsmanlike",
+        "Harassment",
+        "InappropriateName",
+        "InappropriateVinyl",
+        "Griefing",
+        "Other"
+      ],
+      "MaxReportsPerDay": 10,
+      "CooldownMinutes": 5
+    }
+  },
+
+  "Crews": {
+    "Enabled": true,
+    "UnlockLevel": 10,
+    "Creation": {
+      "NameMinLength": 3,
+      "NameMaxLength": 20,
+      "TagMinLength": 2,
+      "TagMaxLength": 4,
+      "CreationCost": 10000,
+      "NameChangeCost": 5000
+    },
+    "Membership": {
+      "MaxMembers": 50,
+      "Roles": [
+        { "ID": "ROLE_LEADER", "Name": "Leader", "Permissions": ["All"] },
+        { "ID": "ROLE_OFFICER", "Name": "Officer", "Permissions": ["Invite", "Kick", "ManageEvents"] },
+        { "ID": "ROLE_MEMBER", "Name": "Member", "Permissions": [] }
+      ],
+      "LeaderTransfer": true,
+      "LeaveCooldown": 24
+    },
+    "Customization": {
+      "Emblem": true,
+      "Colors": true,
+      "Banner": true,
+      "MOTD": {
+        "Enabled": true,
+        "MaxLength": 500
+      }
+    },
+    "Progression": {
+      "MaxLevel": 50,
+      "XPSources": {
+        "CrewRaceWin": 100,
+        "CrewRaceParticipate": 25,
+        "MemberLevelUp": 10,
+        "DailyActive": 5
+      },
+      "Rewards": {
+        "Level10": { "GarageSlots": 2 },
+        "Level20": { "Discount": 0.05, "ExclusiveVinyl": true },
+        "Level30": { "Discount": 0.10, "ExclusivePaint": true },
+        "Level40": { "Discount": 0.15, "ExclusiveWheel": true },
+        "Level50": { "Discount": 0.20, "ExclusiveVehicle": true }
+      }
+    },
+    "Events": {
+      "CrewMeetups": true,
+      "CrewChallenges": true,
+      "CrewVsCrew": true,
+      "ScheduledEvents": {
+        "Enabled": true,
+        "MaxScheduled": 10
+      }
+    },
+    "Leaderboards": {
+      "CrewRanking": true,
+      "WeeklyScore": true,
+      "SeasonScore": true
+    }
+  },
+
+  "VoiceChat": {
+    "Enabled": true,
+    "DefaultEnabled": false,
+    "Channels": {
+      "Lobby": { "Enabled": true, "MaxPlayers": 16 },
+      "Race": { "Enabled": true, "MaxPlayers": 8 },
+      "Party": { "Enabled": true, "MaxPlayers": 4 },
+      "Crew": { "Enabled": true, "MaxPlayers": 16 }
+    },
+    "Settings": {
+      "PushToTalk": { "Default": true, "Configurable": true },
+      "VoiceActivation": { "Default": false, "Threshold": 0.3 },
+      "InputVolume": { "Default": 100, "Min": 0, "Max": 200 },
+      "OutputVolume": { "Default": 100, "Min": 0, "Max": 200 },
+      "NoiseSupression": { "Default": true },
+      "EchoCancellation": { "Default": true }
+    },
+    "Moderation": {
+      "MuteAll": true,
+      "MuteIndividual": true,
+      "BlockedPlayersMuted": true,
+      "AutoMuteOnReport": true
+    },
+    "Accessibility": {
+      "VoiceToText": { "Enabled": true },
+      "TextToVoice": { "Enabled": true }
+    }
+  },
+
+  "AntiCheat": {
+    "Enabled": true,
+    "ClientValidation": {
+      "VehicleStats": true,
+      "Position": true,
+      "Speed": true,
+      "Input": true
+    },
+    "ServerAuthoritative": {
+      "RaceResults": true,
+      "DriftScores": true,
+      "LapTimes": true,
+      "Transactions": true
+    },
+    "Detection": {
+      "SpeedHack": { "Tolerance": 1.1, "Action": "Flag" },
+      "Teleport": { "MaxDistance": 50, "Action": "Kick" },
+      "WallClip": { "Action": "Respawn" },
+      "ModifiedClient": { "Action": "Ban" }
+    },
+    "Penalties": {
+      "Warning": { "Duration": 0, "Description": "Verbal warning" },
+      "TempBan": { "Durations": [3600, 86400, 604800], "Unit": "seconds" },
+      "PermaBan": { "Description": "Permanent account suspension" },
+      "Shadowban": { "Description": "Matched only with other flagged players" }
+    },
+    "Reporting": {
+      "ManualReview": true,
+      "ReplayStorage": true,
+      "ReplayRetentionDays": 30
+    }
+  },
+
+  "Progression": {
+    "OnlineMultipliers": {
+      "CashMultiplier": 1.5,
+      "REPMultiplier": 1.5,
+      "BonusForFullLobby": 0.25
+    },
+    "ChallengesOnline": {
+      "DailyOnline": {
+        "Enabled": true,
+        "Examples": [
+          "Win 3 online races",
+          "Finish top 3 in 5 races",
+          "Complete 10 online laps",
+          "Score 50,000 drift points online"
+        ],
+        "Rewards": { "Cash": 5000, "REP": 200 }
+      },
+      "WeeklyOnline": {
+        "Enabled": true,
+        "Rewards": { "Cash": 25000, "REP": 1000, "RandomPart": true }
+      }
+    },
+    "FirstWinBonus": {
+      "Enabled": true,
+      "DailyBonus": { "Cash": 2500, "REP": 100 }
+    }
+  },
+
+  "Events": {
+    "LimitedTimeEvents": {
+      "Enabled": true,
+      "Types": [
+        {
+          "ID": "EVENT_DOUBLE_XP",
+          "Name": "Double REP Weekend",
+          "Description": "Earn double REP in all online modes",
+          "Duration": 48,
+          "DurationUnit": "hours"
+        },
+        {
+          "ID": "EVENT_COMMUNITY",
+          "Name": "Community Challenge",
+          "Description": "Work together to reach a global goal",
+          "Goals": ["TotalRaces", "TotalDriftScore", "TotalDistance"],
+          "Rewards": "CommunityReward"
+        },
+        {
+          "ID": "EVENT_TOURNAMENT",
+          "Name": "Online Tournament",
+          "Description": "Compete in bracket-style elimination",
+          "Format": "SingleElimination",
+          "Prizes": ["ExclusiveVehicle", "ExclusiveParts", "Cash"]
+        }
+      ]
+    },
+    "SeasonalEvents": {
+      "Enabled": true,
+      "Examples": [
+        "Summer Cruise",
+        "Halloween Night Racing",
+        "Winter Wonderland",
+        "New Year's Countdown"
+      ]
+    }
+  },
+
+  "Privacy": {
+    "DataCollection": {
+      "Telemetry": { "Default": true, "OptOut": true },
+      "Analytics": { "Default": true, "OptOut": true },
+      "CrashReports": { "Default": true, "OptOut": true }
+    },
+    "Visibility": {
+      "Profile": { "Options": ["Public", "FriendsOnly", "Private"], "Default": "Public" },
+      "Stats": { "Options": ["Public", "FriendsOnly", "Private"], "Default": "Public" },
+      "Garage": { "Options": ["Public", "FriendsOnly", "Private"], "Default": "FriendsOnly" },
+      "Activity": { "Options": ["Public", "FriendsOnly", "Private"], "Default": "FriendsOnly" }
+    },
+    "GDPR": {
+      "DataExport": true,
+      "DataDeletion": true,
+      "ConsentRequired": true
+    }
+  }
+}

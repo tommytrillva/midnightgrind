@@ -305,7 +305,12 @@ void UMGDefaultRaceHUD::UpdateNOSGauge_Implementation(float NOSAmount, bool bNOS
 		// Pulse when active
 		if (bNOSActive)
 		{
-			float Pulse = 0.7f + 0.3f * FMath::Abs(FMath::Sin(GetWorld()->GetTimeSeconds() * 10.0f));
+			float TimeSeconds = 0.0f;
+			if (UWorld* World = GetWorld())
+			{
+				TimeSeconds = World->GetTimeSeconds();
+			}
+			float Pulse = 0.7f + 0.3f * FMath::Abs(FMath::Sin(TimeSeconds * 10.0f));
 			NOSBar->SetFillColorAndOpacity(FLinearColor(0.0f, Pulse, 1.0f, 1.0f));
 		}
 		else
@@ -451,8 +456,11 @@ void UMGDefaultRaceHUD::PlayPositionChangeAnimation_Implementation(int32 OldPosi
 		StatusMessageText->SetText(FText::FromString(Message));
 		StatusMessageText->SetVisibility(ESlateVisibility::HitTestInvisible);
 
-		GetWorld()->GetTimerManager().ClearTimer(StatusMessageTimerHandle);
-		GetWorld()->GetTimerManager().SetTimer(StatusMessageTimerHandle, this, &UMGDefaultRaceHUD::ClearStatusMessage, 2.0f, false);
+		if (UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(StatusMessageTimerHandle);
+			World->GetTimerManager().SetTimer(StatusMessageTimerHandle, this, &UMGDefaultRaceHUD::ClearStatusMessage, 2.0f, false);
+		}
 	}
 }
 
@@ -480,8 +488,11 @@ void UMGDefaultRaceHUD::PlayNOSActivationEffect_Implementation()
 		StatusMessageText->SetColorAndOpacity(FSlateColor(FLinearColor(0.0f, 0.5f, 1.0f, 1.0f)));
 		StatusMessageText->SetVisibility(ESlateVisibility::HitTestInvisible);
 
-		GetWorld()->GetTimerManager().ClearTimer(StatusMessageTimerHandle);
-		GetWorld()->GetTimerManager().SetTimer(StatusMessageTimerHandle, this, &UMGDefaultRaceHUD::ClearStatusMessage, 1.0f, false);
+		if (UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(StatusMessageTimerHandle);
+			World->GetTimerManager().SetTimer(StatusMessageTimerHandle, this, &UMGDefaultRaceHUD::ClearStatusMessage, 1.0f, false);
+		}
 	}
 }
 
@@ -510,8 +521,11 @@ void UMGDefaultRaceHUD::PlayBestLapEffect_Implementation()
 		StatusMessageText->SetColorAndOpacity(AccentColor);
 		StatusMessageText->SetVisibility(ESlateVisibility::HitTestInvisible);
 
-		GetWorld()->GetTimerManager().ClearTimer(StatusMessageTimerHandle);
-		GetWorld()->GetTimerManager().SetTimer(StatusMessageTimerHandle, this, &UMGDefaultRaceHUD::ClearStatusMessage, 3.0f, false);
+		if (UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(StatusMessageTimerHandle);
+			World->GetTimerManager().SetTimer(StatusMessageTimerHandle, this, &UMGDefaultRaceHUD::ClearStatusMessage, 3.0f, false);
+		}
 	}
 }
 

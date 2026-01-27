@@ -1,7 +1,7 @@
 # ITERATION 81 - Vehicle Catalog Subsystem Implementation
 ## Midnight Grind - Data Loading Infrastructure Created
 
-**Date:** 2026-01-26 21:00 PST
+**Date:** 2026-01-26 21:00 PST (Updated: 2026-01-26)
 **Phase:** Phase 3 - Implementation
 **Focus:** Implement vehicle catalog subsystem for pricing lookups
 
@@ -9,15 +9,37 @@
 
 ## IMPLEMENTATION COMPLETE ✅
 
-Created complete vehicle catalog system using UE5 DataTables.
+Created complete vehicle catalog system using UE5 DataTables with clean separation of types and subsystem.
 
 ---
 
 ## FILES CREATED
 
-### 1. MGVehicleCatalogSubsystem.h (237 lines)
+### 1. MGCatalogTypes.h (~280 lines)
 
-**Location:** `/Source/MidnightGrind/Public/Data/`
+**Location:** `/Source/MidnightGrind/Public/Catalog/`
+
+**Purpose:** Defines all DataTable row structs and supporting types.
+
+**Key Enums:**
+- `EMGPerformanceClass` - D through X performance tiers
+- `EMGVehicleCategory` - JDM, American, European, Korean, Exotic
+- `EMGDrivetrain` - FWD, RWD, AWD
+- `EMGPartTier` - Stock through Legendary
+- `EMGPartCategory` - Engine, Drivetrain, Suspension, etc.
+
+**Key Structs:**
+- `FMGVehicleBaseStats` - Power, torque, weight, drivetrain specs
+- `FMGVehicleEconomy` - Purchase price, street value, maintenance multipliers
+- `FMGVehiclePerformanceIndex` - Base PI, max potential, class
+- `FMGVehicleUnlockRequirements` - REP tier, level, special conditions
+- `FMGVehicleCatalogRow` - Complete DataTable row for vehicles
+- `FMGPartCatalogRow` - DataTable row for parts catalog
+- `FMGVehiclePricingInfo` - Simplified pricing for quick lookups
+
+### 2. MGVehicleCatalogSubsystem.h (~165 lines)
+
+**Location:** `/Source/MidnightGrind/Public/Catalog/`
 
 **Key Components:**
 
@@ -505,12 +527,13 @@ This implementation:
 
 ## FILES SUMMARY
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| MGVehicleCatalogSubsystem.h | 237 | Subsystem header + structs |
-| MGVehicleCatalogSubsystem.cpp | 168 | Implementation |
-| DATATABLE_IMPORT_GUIDE.md | 400+ | Documentation |
-| **Total** | **805+** | **Complete system** |
+| File | Lines | Location | Purpose |
+|------|-------|----------|---------|
+| MGCatalogTypes.h | ~280 | Public/Catalog/ | DataTable row structs + enums |
+| MGVehicleCatalogSubsystem.h | ~165 | Public/Catalog/ | Subsystem interface |
+| MGVehicleCatalogSubsystem.cpp | ~230 | Private/Catalog/ | Implementation |
+| DATATABLE_IMPORT_GUIDE.md | 400+ | prototype/ | Documentation (updated) |
+| **Total** | **1075+** | | **Complete system** |
 
 ---
 

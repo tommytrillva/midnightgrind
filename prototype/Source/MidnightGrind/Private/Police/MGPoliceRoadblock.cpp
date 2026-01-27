@@ -67,6 +67,17 @@ void AMGPoliceRoadblock::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AMGPoliceRoadblock::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unbind collision events
+	if (CollisionBox)
+	{
+		CollisionBox->OnComponentHit.RemoveDynamic(this, &AMGPoliceRoadblock::OnCollisionHit);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void AMGPoliceRoadblock::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

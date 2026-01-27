@@ -7,8 +7,8 @@
 #include "GameModes/MGRaceGameMode.h"
 #include "MGRaceFlowManager.generated.h"
 
-class UMGProgressionSubsystem;
-class UMGEconomySubsystem;
+class UMGPlayerProgression;
+class UMGShopSubsystem;
 class UMGCareerSubsystem;
 class UMGLeaderboardSubsystem;
 class UMGRaceResultsWidget;
@@ -387,10 +387,9 @@ private:
 	// ==========================================
 
 	UPROPERTY()
-	TWeakObjectPtr<UMGProgressionSubsystem> ProgressionSubsystem;
+	TWeakObjectPtr<UMGPlayerProgression> ProgressionSubsystem;
 
-	UPROPERTY()
-	TWeakObjectPtr<UMGEconomySubsystem> EconomySubsystem;
+	// Note: Economy handled via UMGShopSubsystem::AddCurrency() - accessed directly when needed
 
 	UPROPERTY()
 	TWeakObjectPtr<UMGCareerSubsystem> CareerSubsystem;

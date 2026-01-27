@@ -69,9 +69,26 @@ void AMGPoliceUnit::BeginPlay()
 	BindCollisionEvents();
 }
 
+void AMGPoliceUnit::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unbind collision events
+	if (UPrimitiveComponent* MeshComp = Cast<UPrimitiveComponent>(GetMesh()))
+	{
+		MeshComp->OnComponentHit.RemoveDynamic(this, &AMGPoliceUnit::OnCollisionHit);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void AMGPoliceUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Early exit for idle or despawning units
+	if (CurrentState == EMGPoliceState::Idle || CurrentState == EMGPoliceState::Despawning)
+	{
+		return;
+	}
 
 	// Update visual tracking for target
 	UpdateVisualOnTarget();

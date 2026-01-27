@@ -688,7 +688,9 @@ void AMGEnvironmentVFXManager::UpdateLighting()
 
 	// Adjust neon intensity based on time
 	float TargetNeonIntensity = bIsNight ? 1.5f : 0.3f;
-	NeonGlowIntensity = FMath::FInterpTo(NeonGlowIntensity, TargetNeonIntensity, GetWorld()->GetDeltaSeconds(), 1.0f);
+	UWorld* World = GetWorld();
+	float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
+	NeonGlowIntensity = FMath::FInterpTo(NeonGlowIntensity, TargetNeonIntensity, DeltaSeconds, 1.0f);
 
 	if (NeonGlowComp)
 	{

@@ -739,7 +739,7 @@ float UMGFuelSubsystem::GetRefuelingProgress(FName VehicleID) const
 
 float UMGFuelSubsystem::CalculateRefuelTime(float Amount) const
 {
-	return Amount / Settings.RefuelRate;
+	return (Settings.RefuelRate > KINDA_SMALL_NUMBER) ? Amount / Settings.RefuelRate : 0.0f;
 }
 
 void UMGFuelSubsystem::RegisterFuelType(const FMGFuelTypeData& FuelData)
@@ -815,7 +815,7 @@ FMGFuelStrategy UMGFuelSubsystem::CalculateOptimalStrategy(FName VehicleID, int3
 		// No stops needed
 		Strategy.StartingFuel = TotalFuelNeeded;
 	}
-	else
+	else if (TankCapacity > KINDA_SMALL_NUMBER)
 	{
 		// Need at least one stop
 		int32 NumStops = FMath::CeilToInt(TotalFuelNeeded / TankCapacity) - 1;

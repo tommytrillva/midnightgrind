@@ -173,9 +173,12 @@ void UMGVehicleInputHandler::TriggerForceFeedback(float Intensity, float Duratio
 
 	float ScaledIntensity = Intensity * SensitivitySettings.ForceFeedbackStrength;
 
-	if (APlayerController* PC = Cast<APlayerController>(Cast<APawn>(GetOwner())->GetController()))
+	if (APawn* OwnerPawn = Cast<APawn>(GetOwner()))
 	{
-		PC->PlayDynamicForceFeedback(ScaledIntensity, Duration, true, true, true, true);
+		if (APlayerController* PC = Cast<APlayerController>(OwnerPawn->GetController()))
+		{
+			PC->PlayDynamicForceFeedback(ScaledIntensity, Duration, true, true, true, true);
+		}
 	}
 
 	bForceFeedbackActive = true;
@@ -201,10 +204,13 @@ void UMGVehicleInputHandler::SetContinuousForceFeedback(float LeftIntensity, flo
 	}
 
 	// Fall back to gamepad vibration
-	if (APlayerController* PC = Cast<APlayerController>(Cast<APawn>(GetOwner())->GetController()))
+	if (APawn* OwnerPawn = Cast<APawn>(GetOwner()))
 	{
-		PC->PlayDynamicForceFeedback(ScaledLeft, -1.0f, true, false, false, false);
-		PC->PlayDynamicForceFeedback(ScaledRight, -1.0f, false, true, false, false);
+		if (APlayerController* PC = Cast<APlayerController>(OwnerPawn->GetController()))
+		{
+			PC->PlayDynamicForceFeedback(ScaledLeft, -1.0f, true, false, false, false);
+			PC->PlayDynamicForceFeedback(ScaledRight, -1.0f, false, true, false, false);
+		}
 	}
 
 	bForceFeedbackActive = true;
@@ -212,9 +218,12 @@ void UMGVehicleInputHandler::SetContinuousForceFeedback(float LeftIntensity, flo
 
 void UMGVehicleInputHandler::StopForceFeedback()
 {
-	if (APlayerController* PC = Cast<APlayerController>(Cast<APawn>(GetOwner())->GetController()))
+	if (APawn* OwnerPawn = Cast<APawn>(GetOwner()))
 	{
-		PC->StopForceFeedback(nullptr, NAME_None);
+		if (APlayerController* PC = Cast<APlayerController>(OwnerPawn->GetController()))
+		{
+			PC->StopForceFeedback(nullptr, NAME_None);
+		}
 	}
 
 	bForceFeedbackActive = false;

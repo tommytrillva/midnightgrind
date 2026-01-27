@@ -1,7 +1,12 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Midnight Grind. All Rights Reserved.
 
 #include "Bonus/MGBonusSubsystem.h"
 #include "TimerManager.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
+#include "HAL/PlatformFileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
 
 void UMGBonusSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -887,12 +892,139 @@ void UMGBonusSubsystem::UpdateBonusSystem(float DeltaTime)
 
 void UMGBonusSubsystem::SaveBonusData()
 {
-	// Placeholder - would serialize to save game
+	FString DataDir = FPaths::ProjectSavedDir() / TEXT("Bonus");
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if (!PlatformFile.DirectoryExists(*DataDir))
+	{
+		PlatformFile.CreateDirectory(*DataDir);
+	}
+
+	FString FilePath = DataDir / TEXT("bonus_stats.dat");
+
+	FBufferArchive Archive;
+
+	// Write version
+	int32 Version = 1;
+	Archive << Version;
+
+	// Write player stats
+	int32 PlayerCount = PlayerStats.Num();
+	Archive << PlayerCount;
+
+	for (const auto& Pair : PlayerStats)
+	{
+		FString PlayerId = Pair.Key;
+		const FMGBonusPlayerStats& Stats = Pair.Value;
+
+		Archive << PlayerId;
+		Archive << Stats.TotalBonusesCollected;
+		Archive << Stats.TotalPointsFromBonuses;
+		Archive << Stats.BestMultiplier;
+		Archive << Stats.LongestChain;
+		Archive << Stats.SecretBonusesFound;
+		Archive << Stats.TotalBonusRoundsCompleted;
+		Archive << Stats.BestBonusRoundScore;
+
+		// Write rarity counts
+		int32 RarityCount = Stats.RaritiesCollected.Num();
+		Archive << RarityCount;
+		for (const auto& RarityPair : Stats.RaritiesCollected)
+		{
+			int32 RarityInt = static_cast<int32>(RarityPair.Key);
+			int32 Count = RarityPair.Value;
+			Archive << RarityInt;
+			Archive << Count;
+		}
+
+		// Write type counts
+		int32 TypeCount = Stats.TypesCollected.Num();
+		Archive << TypeCount;
+		for (const auto& TypePair : Stats.TypesCollected)
+		{
+			int32 TypeInt = static_cast<int32>(TypePair.Key);
+			int32 Count = TypePair.Value;
+			Archive << TypeInt;
+			Archive << Count;
+		}
+	}
+
+	FFileHelper::SaveArrayToFile(Archive, *FilePath);
+	Archive.FlushCache();
+	Archive.Empty();
+
+	UE_LOG(LogTemp, Log, TEXT("MGBonus: Saved bonus stats for %d players"), PlayerCount);
 }
 
 void UMGBonusSubsystem::LoadBonusData()
 {
-	// Placeholder - would deserialize from save game
+	FString DataDir = FPaths::ProjectSavedDir() / TEXT("Bonus");
+	FString FilePath = DataDir / TEXT("bonus_stats.dat");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	// Read version
+	int32 Version;
+	Archive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGBonus: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Read player stats
+	int32 PlayerCount;
+	Archive << PlayerCount;
+
+	for (int32 i = 0; i < PlayerCount; i++)
+	{
+		FString PlayerId;
+		FMGBonusPlayerStats Stats;
+
+		Archive << PlayerId;
+		Archive << Stats.TotalBonusesCollected;
+		Archive << Stats.TotalPointsFromBonuses;
+		Archive << Stats.BestMultiplier;
+		Archive << Stats.LongestChain;
+		Archive << Stats.SecretBonusesFound;
+		Archive << Stats.TotalBonusRoundsCompleted;
+		Archive << Stats.BestBonusRoundScore;
+
+		// Read rarity counts
+		int32 RarityCount;
+		Archive << RarityCount;
+		for (int32 j = 0; j < RarityCount; j++)
+		{
+			int32 RarityInt;
+			int32 Count;
+			Archive << RarityInt;
+			Archive << Count;
+			Stats.RaritiesCollected.Add(static_cast<EMGBonusRarity>(RarityInt), Count);
+		}
+
+		// Read type counts
+		int32 TypeCount;
+		Archive << TypeCount;
+		for (int32 j = 0; j < TypeCount; j++)
+		{
+			int32 TypeInt;
+			int32 Count;
+			Archive << TypeInt;
+			Archive << Count;
+			Stats.TypesCollected.Add(static_cast<EMGBonusType>(TypeInt), Count);
+		}
+
+		Stats.PlayerId = PlayerId;
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGBonus: Loaded bonus stats for %d players"), PlayerCount);
 }
 
 // ============================================================================

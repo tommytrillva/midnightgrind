@@ -901,7 +901,8 @@ FMGAISteeringOutput AMGAIRacerController::CalculateRacingLineSteering()
 
 	// PID steering calculation
 	float SteeringError = FMath::Atan2(DotRight, DotForward);
-	float DeltaTime = GetWorld()->GetDeltaSeconds();
+	UWorld* World = GetWorld();
+	float DeltaTime = World ? World->GetDeltaSeconds() : 0.016f;
 
 	SteeringErrorIntegral += SteeringError * DeltaTime;
 	SteeringErrorIntegral = FMath::Clamp(SteeringErrorIntegral, -1.0f, 1.0f);

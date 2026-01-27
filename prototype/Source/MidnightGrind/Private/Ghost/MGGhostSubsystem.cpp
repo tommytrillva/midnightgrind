@@ -3,6 +3,11 @@
 #include "Ghost/MGGhostSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
+#include "HAL/PlatformFileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
 
 void UMGGhostSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -785,21 +790,329 @@ void UMGGhostSubsystem::DecompressGhostData(FMGGhostData& GhostData)
 
 void UMGGhostSubsystem::SaveGhostToFile(const FMGGhostData& GhostData)
 {
-	// Placeholder for file save implementation
+	// Create ghosts directory if needed
+	FString GhostsDir = FPaths::ProjectSavedDir() / TEXT("Ghosts");
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if (!PlatformFile.DirectoryExists(*GhostsDir))
+	{
+		PlatformFile.CreateDirectory(*GhostsDir);
+	}
+
+	// Create file path using Ghost ID
+	FString FilePath = GhostsDir / FString::Printf(TEXT("%s.ghost"), *GhostData.GhostID.ToString());
+
+	// Serialize to buffer
+	FBufferArchive Archive;
+
+	// Write header/version
+	int32 Version = 1;
+	Archive << Version;
+
+	// Write metadata
+	FGuid GhostID = GhostData.GhostID;
+	FName TrackID = GhostData.TrackID;
+	FName VehicleID = GhostData.VehicleID;
+	FName PlayerID = GhostData.PlayerID;
+	FString PlayerNameStr = GhostData.PlayerName.ToString();
+	int32 GhostTypeInt = static_cast<int32>(GhostData.GhostType);
+	float TotalTime = GhostData.TotalTime;
+	float BestLapTime = GhostData.BestLapTime;
+	FDateTime RecordedDate = GhostData.RecordedDate;
+	FString GameVersion = GhostData.GameVersion;
+	bool bValidated = GhostData.bValidated;
+	bool bIsWorldRecord = GhostData.bIsWorldRecord;
+
+	Archive << GhostID;
+	Archive << TrackID;
+	Archive << VehicleID;
+	Archive << PlayerID;
+	Archive << PlayerNameStr;
+	Archive << GhostTypeInt;
+	Archive << TotalTime;
+	Archive << BestLapTime;
+	Archive << RecordedDate;
+	Archive << GameVersion;
+	Archive << bValidated;
+	Archive << bIsWorldRecord;
+
+	// Write lap times
+	TArray<float> LapTimes = GhostData.LapTimes;
+	Archive << LapTimes;
+
+	// Write sector times
+	TArray<float> SectorTimes = GhostData.SectorTimes;
+	Archive << SectorTimes;
+
+	// Write frames
+	int32 FrameCount = GhostData.Frames.Num();
+	Archive << FrameCount;
+
+	for (const FMGGhostFrame& Frame : GhostData.Frames)
+	{
+		float Timestamp = Frame.Timestamp;
+		FVector Position = Frame.Position;
+		FRotator Rotation = Frame.Rotation;
+		FVector Velocity = Frame.Velocity;
+		float Speed = Frame.Speed;
+		float Throttle = Frame.Throttle;
+		float Brake = Frame.Brake;
+		float Steering = Frame.Steering;
+		int32 Gear = Frame.Gear;
+		float EngineRPM = Frame.EngineRPM;
+		bool bNitroActive = Frame.bNitroActive;
+		bool bDrifting = Frame.bDrifting;
+		float WheelFL = Frame.WheelFL;
+		float WheelFR = Frame.WheelFR;
+		float WheelRL = Frame.WheelRL;
+		float WheelRR = Frame.WheelRR;
+		float DistanceAlongTrack = Frame.DistanceAlongTrack;
+		int32 LapNumber = Frame.LapNumber;
+		int32 Sector = Frame.Sector;
+
+		Archive << Timestamp;
+		Archive << Position;
+		Archive << Rotation;
+		Archive << Velocity;
+		Archive << Speed;
+		Archive << Throttle;
+		Archive << Brake;
+		Archive << Steering;
+		Archive << Gear;
+		Archive << EngineRPM;
+		Archive << bNitroActive;
+		Archive << bDrifting;
+		Archive << WheelFL;
+		Archive << WheelFR;
+		Archive << WheelRL;
+		Archive << WheelRR;
+		Archive << DistanceAlongTrack;
+		Archive << LapNumber;
+		Archive << Sector;
+	}
+
+	// Write to file
+	FFileHelper::SaveArrayToFile(Archive, *FilePath);
+	Archive.FlushCache();
+	Archive.Empty();
+
+	UE_LOG(LogTemp, Log, TEXT("MGGhost: Saved ghost %s to %s (%d frames)"),
+		*GhostData.GhostID.ToString(), *FilePath, GhostData.Frames.Num());
 }
 
 bool UMGGhostSubsystem::LoadGhostFromFile(FGuid GhostID, FMGGhostData& OutData)
 {
-	// Placeholder for file load implementation
-	return false;
+	FString GhostsDir = FPaths::ProjectSavedDir() / TEXT("Ghosts");
+	FString FilePath = GhostsDir / FString::Printf(TEXT("%s.ghost"), *GhostID.ToString());
+
+	// Load file data
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		return false;
+	}
+
+	// Deserialize from buffer
+	FMemoryReader Archive(FileData, true);
+
+	// Read header/version
+	int32 Version;
+	Archive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGGhost: Unknown ghost file version %d"), Version);
+		return false;
+	}
+
+	// Read metadata
+	FGuid LoadedGhostID;
+	FName TrackID;
+	FName VehicleID;
+	FName PlayerID;
+	FString PlayerNameStr;
+	int32 GhostTypeInt;
+	float TotalTime;
+	float BestLapTime;
+	FDateTime RecordedDate;
+	FString GameVersion;
+	bool bValidated;
+	bool bIsWorldRecord;
+
+	Archive << LoadedGhostID;
+	Archive << TrackID;
+	Archive << VehicleID;
+	Archive << PlayerID;
+	Archive << PlayerNameStr;
+	Archive << GhostTypeInt;
+	Archive << TotalTime;
+	Archive << BestLapTime;
+	Archive << RecordedDate;
+	Archive << GameVersion;
+	Archive << bValidated;
+	Archive << bIsWorldRecord;
+
+	OutData.GhostID = LoadedGhostID;
+	OutData.TrackID = TrackID;
+	OutData.VehicleID = VehicleID;
+	OutData.PlayerID = PlayerID;
+	OutData.PlayerName = FText::FromString(PlayerNameStr);
+	OutData.GhostType = static_cast<EMGGhostType>(GhostTypeInt);
+	OutData.TotalTime = TotalTime;
+	OutData.BestLapTime = BestLapTime;
+	OutData.RecordedDate = RecordedDate;
+	OutData.GameVersion = GameVersion;
+	OutData.bValidated = bValidated;
+	OutData.bIsWorldRecord = bIsWorldRecord;
+
+	// Read lap times
+	Archive << OutData.LapTimes;
+
+	// Read sector times
+	Archive << OutData.SectorTimes;
+
+	// Read frames
+	int32 FrameCount;
+	Archive << FrameCount;
+
+	OutData.Frames.Reserve(FrameCount);
+	for (int32 i = 0; i < FrameCount; i++)
+	{
+		FMGGhostFrame Frame;
+
+		Archive << Frame.Timestamp;
+		Archive << Frame.Position;
+		Archive << Frame.Rotation;
+		Archive << Frame.Velocity;
+		Archive << Frame.Speed;
+		Archive << Frame.Throttle;
+		Archive << Frame.Brake;
+		Archive << Frame.Steering;
+		Archive << Frame.Gear;
+		Archive << Frame.EngineRPM;
+		Archive << Frame.bNitroActive;
+		Archive << Frame.bDrifting;
+		Archive << Frame.WheelFL;
+		Archive << Frame.WheelFR;
+		Archive << Frame.WheelRL;
+		Archive << Frame.WheelRR;
+		Archive << Frame.DistanceAlongTrack;
+		Archive << Frame.LapNumber;
+		Archive << Frame.Sector;
+
+		OutData.Frames.Add(Frame);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGGhost: Loaded ghost %s (%d frames)"),
+		*GhostID.ToString(), FrameCount);
+
+	return true;
 }
 
 void UMGGhostSubsystem::SaveGhostIndex()
 {
-	// Placeholder for save implementation
+	FString GhostsDir = FPaths::ProjectSavedDir() / TEXT("Ghosts");
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if (!PlatformFile.DirectoryExists(*GhostsDir))
+	{
+		PlatformFile.CreateDirectory(*GhostsDir);
+	}
+
+	FString FilePath = GhostsDir / TEXT("ghost_index.dat");
+
+	FBufferArchive Archive;
+
+	// Write version
+	int32 Version = 1;
+	Archive << Version;
+
+	// Write ghost index
+	int32 IndexCount = GhostIndex.Num();
+	Archive << IndexCount;
+	for (const FGuid& ID : GhostIndex)
+	{
+		FGuid GhostID = ID;
+		Archive << GhostID;
+	}
+
+	// Write personal bests metadata (just track -> ghost ID mapping)
+	int32 PBCount = PersonalBests.Num();
+	Archive << PBCount;
+	for (const auto& Pair : PersonalBests)
+	{
+		FName TrackID = Pair.Key;
+		FGuid GhostID = Pair.Value.GhostID;
+		float BestLapTime = Pair.Value.BestLapTime;
+
+		Archive << TrackID;
+		Archive << GhostID;
+		Archive << BestLapTime;
+	}
+
+	FFileHelper::SaveArrayToFile(Archive, *FilePath);
+	Archive.FlushCache();
+	Archive.Empty();
+
+	UE_LOG(LogTemp, Log, TEXT("MGGhost: Saved ghost index (%d ghosts, %d personal bests)"),
+		IndexCount, PBCount);
 }
 
 void UMGGhostSubsystem::LoadGhostIndex()
 {
-	// Placeholder for load implementation
+	FString GhostsDir = FPaths::ProjectSavedDir() / TEXT("Ghosts");
+	FString FilePath = GhostsDir / TEXT("ghost_index.dat");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		// No index file yet, that's OK
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	// Read version
+	int32 Version;
+	Archive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGGhost: Unknown ghost index version %d"), Version);
+		return;
+	}
+
+	// Read ghost index
+	int32 IndexCount;
+	Archive << IndexCount;
+	GhostIndex.Reserve(IndexCount);
+	for (int32 i = 0; i < IndexCount; i++)
+	{
+		FGuid GhostID;
+		Archive << GhostID;
+		GhostIndex.Add(GhostID);
+	}
+
+	// Read personal bests metadata
+	int32 PBCount;
+	Archive << PBCount;
+	for (int32 i = 0; i < PBCount; i++)
+	{
+		FName TrackID;
+		FGuid GhostID;
+		float BestLapTime;
+
+		Archive << TrackID;
+		Archive << GhostID;
+		Archive << BestLapTime;
+
+		// Try to load the full ghost data
+		FMGGhostData GhostData;
+		if (LoadGhostFromFile(GhostID, GhostData))
+		{
+			PersonalBests.Add(TrackID, GhostData);
+			GhostCache.Add(GhostID, GhostData);
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGGhost: Loaded ghost index (%d ghosts, %d personal bests)"),
+		IndexCount, PBCount);
 }

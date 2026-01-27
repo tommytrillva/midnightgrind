@@ -1506,7 +1506,7 @@ FTrackSegment UMGProceduralContentSubsystem::CreateCurveSegment(const FVector& S
     Segment.SpeedLimit = FMath::Clamp(Radius * 1.2f, 60.0f, 200.0f);
 
     // Difficulty based on curve tightness
-    Segment.DifficultyRating = FMath::Clamp(180.0f / Radius, 1.0f, 5.0f);
+    Segment.DifficultyRating = (Radius > KINDA_SMALL_NUMBER) ? FMath::Clamp(180.0f / Radius, 1.0f, 5.0f) : 5.0f;
 
     Segment.GripMultiplier = 1.0f;
     Segment.bHasBarriers = true;

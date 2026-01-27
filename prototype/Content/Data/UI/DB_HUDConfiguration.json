@@ -1,0 +1,412 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - HUD and UI Configuration",
+
+  "HUDProfiles": {
+    "Default": {
+      "ID": "HUD_DEFAULT",
+      "Name": "Default",
+      "Description": "Balanced information display",
+      "Elements": {
+        "Speedometer": { "Visible": true, "Position": "BottomRight", "Size": "Medium" },
+        "Tachometer": { "Visible": true, "Position": "BottomRight", "Size": "Medium" },
+        "GearIndicator": { "Visible": true, "Position": "BottomRight", "Size": "Medium" },
+        "MiniMap": { "Visible": true, "Position": "TopLeft", "Size": "Medium" },
+        "RacePosition": { "Visible": true, "Position": "TopRight", "Size": "Medium" },
+        "LapCounter": { "Visible": true, "Position": "TopCenter", "Size": "Medium" },
+        "Timer": { "Visible": true, "Position": "TopCenter", "Size": "Medium" },
+        "NitrousBar": { "Visible": true, "Position": "BottomCenter", "Size": "Medium" },
+        "DriftScore": { "Visible": true, "Position": "CenterRight", "Size": "Large" }
+      }
+    },
+    "Minimal": {
+      "ID": "HUD_MINIMAL",
+      "Name": "Minimal",
+      "Description": "Essential info only",
+      "Elements": {
+        "Speedometer": { "Visible": true, "Position": "BottomRight", "Size": "Small" },
+        "GearIndicator": { "Visible": true, "Position": "BottomRight", "Size": "Small" },
+        "RacePosition": { "Visible": true, "Position": "TopRight", "Size": "Small" },
+        "LapCounter": { "Visible": true, "Position": "TopCenter", "Size": "Small" }
+      }
+    },
+    "Pro": {
+      "ID": "HUD_PRO",
+      "Name": "Pro Racer",
+      "Description": "Maximum information",
+      "UnlockCondition": "LEVEL_15",
+      "Elements": {
+        "Speedometer": { "Visible": true, "Position": "BottomRight", "Size": "Large" },
+        "Tachometer": { "Visible": true, "Position": "BottomRight", "Size": "Large" },
+        "GearIndicator": { "Visible": true, "Position": "BottomRight", "Size": "Large" },
+        "MiniMap": { "Visible": true, "Position": "TopLeft", "Size": "Large" },
+        "RacePosition": { "Visible": true, "Position": "TopRight", "Size": "Large" },
+        "LapCounter": { "Visible": true, "Position": "TopCenter", "Size": "Large" },
+        "Timer": { "Visible": true, "Position": "TopCenter", "Size": "Large" },
+        "SplitTimes": { "Visible": true, "Position": "CenterLeft", "Size": "Medium" },
+        "TireTemp": { "Visible": true, "Position": "BottomLeft", "Size": "Small" },
+        "BrakeTemp": { "Visible": true, "Position": "BottomLeft", "Size": "Small" },
+        "NitrousBar": { "Visible": true, "Position": "BottomCenter", "Size": "Large" },
+        "DriftScore": { "Visible": true, "Position": "CenterRight", "Size": "Large" },
+        "RelativeTimer": { "Visible": true, "Position": "TopCenter", "Size": "Medium" }
+      }
+    },
+    "Cinematic": {
+      "ID": "HUD_CINEMATIC",
+      "Name": "Cinematic",
+      "Description": "No HUD for immersion",
+      "Elements": {}
+    },
+    "Retro": {
+      "ID": "HUD_RETRO",
+      "Name": "Retro PS1",
+      "Description": "Classic PS1-style gauges",
+      "UnlockCondition": "REP_TIER_STREET",
+      "Style": "PS1",
+      "Elements": {
+        "Speedometer": { "Visible": true, "Position": "BottomRight", "Size": "Large", "Style": "Digital" },
+        "GearIndicator": { "Visible": true, "Position": "BottomRight", "Size": "Large", "Style": "Digital" },
+        "MiniMap": { "Visible": true, "Position": "TopLeft", "Size": "Medium", "Style": "Wireframe" },
+        "RacePosition": { "Visible": true, "Position": "TopRight", "Size": "Large", "Style": "Pixelated" },
+        "LapCounter": { "Visible": true, "Position": "TopCenter", "Size": "Large", "Style": "Digital" },
+        "Timer": { "Visible": true, "Position": "TopCenter", "Size": "Large", "Style": "Digital" },
+        "NitrousBar": { "Visible": true, "Position": "BottomCenter", "Size": "Large", "Style": "SegmentedBar" }
+      }
+    }
+  },
+
+  "Elements": {
+    "Speedometer": {
+      "ID": "ELEM_SPEED",
+      "Name": "Speedometer",
+      "Variants": [
+        { "ID": "SPEED_DIGITAL", "Name": "Digital", "Style": "Digital" },
+        { "ID": "SPEED_ANALOG", "Name": "Analog Gauge", "Style": "Analog" },
+        { "ID": "SPEED_MINIMAL", "Name": "Minimal", "Style": "Minimal" },
+        { "ID": "SPEED_RETRO", "Name": "Retro LCD", "Style": "RetroLCD", "UnlockCondition": "LEVEL_10" },
+        { "ID": "SPEED_NEON", "Name": "Neon", "Style": "Neon", "UnlockCondition": "LEVEL_20" }
+      ],
+      "Unit": { "Default": "MPH", "Options": ["MPH", "KPH"] },
+      "MaxSpeed": 250,
+      "Positions": ["BottomRight", "BottomCenter", "BottomLeft"],
+      "Sizes": ["Small", "Medium", "Large"]
+    },
+    "Tachometer": {
+      "ID": "ELEM_TACH",
+      "Name": "Tachometer",
+      "Variants": [
+        { "ID": "TACH_DIGITAL", "Name": "Digital", "Style": "Digital" },
+        { "ID": "TACH_ANALOG", "Name": "Analog Gauge", "Style": "Analog" },
+        { "ID": "TACH_BAR", "Name": "Bar Graph", "Style": "Bar" },
+        { "ID": "TACH_RETRO", "Name": "Retro", "Style": "Retro", "UnlockCondition": "LEVEL_10" }
+      ],
+      "RedlineIndicator": true,
+      "ShiftLight": true,
+      "MaxRPM": 10000
+    },
+    "GearIndicator": {
+      "ID": "ELEM_GEAR",
+      "Name": "Gear Indicator",
+      "Variants": [
+        { "ID": "GEAR_NUMBER", "Name": "Number", "Style": "Number" },
+        { "ID": "GEAR_HPATTERN", "Name": "H-Pattern", "Style": "HPattern" },
+        { "ID": "GEAR_SEQUENTIAL", "Name": "Sequential", "Style": "Sequential" }
+      ],
+      "ShowNeutral": true,
+      "ShowReverse": true
+    },
+    "MiniMap": {
+      "ID": "ELEM_MINIMAP",
+      "Name": "Mini Map",
+      "Variants": [
+        { "ID": "MAP_FULL", "Name": "Full Track", "Style": "Full" },
+        { "ID": "MAP_ZOOM", "Name": "Zoomed", "Style": "Zoom" },
+        { "ID": "MAP_ARROW", "Name": "Direction Arrow", "Style": "Arrow" },
+        { "ID": "MAP_3D", "Name": "3D Preview", "Style": "3D", "UnlockCondition": "LEVEL_15" }
+      ],
+      "ShowOpponents": true,
+      "ShowCheckpoints": true,
+      "Rotation": { "Options": ["Fixed", "RotateWithPlayer"], "Default": "RotateWithPlayer" },
+      "Opacity": { "Min": 25, "Max": 100, "Default": 75 }
+    },
+    "RacePosition": {
+      "ID": "ELEM_POSITION",
+      "Name": "Race Position",
+      "ShowTotal": true,
+      "ShowGap": true,
+      "AnimateChange": true,
+      "Variants": [
+        { "ID": "POS_SIMPLE", "Name": "Simple", "Style": "Simple" },
+        { "ID": "POS_DETAILED", "Name": "Detailed", "Style": "Detailed" },
+        { "ID": "POS_TOWER", "Name": "Position Tower", "Style": "Tower" }
+      ]
+    },
+    "LapCounter": {
+      "ID": "ELEM_LAP",
+      "Name": "Lap Counter",
+      "Format": "Current/Total",
+      "ShowBestLap": true,
+      "ShowLastLap": true
+    },
+    "Timer": {
+      "ID": "ELEM_TIMER",
+      "Name": "Race Timer",
+      "Variants": [
+        { "ID": "TIMER_TOTAL", "Name": "Total Time", "Style": "Total" },
+        { "ID": "TIMER_LAP", "Name": "Lap Time", "Style": "Lap" },
+        { "ID": "TIMER_SPLIT", "Name": "Split Times", "Style": "Split" }
+      ],
+      "ShowMilliseconds": true
+    },
+    "NitrousBar": {
+      "ID": "ELEM_NITROUS",
+      "Name": "Nitrous Gauge",
+      "Variants": [
+        { "ID": "NOS_BAR", "Name": "Progress Bar", "Style": "Bar" },
+        { "ID": "NOS_BOTTLES", "Name": "Bottle Icons", "Style": "Bottles" },
+        { "ID": "NOS_FLAMES", "Name": "Flame Meter", "Style": "Flames", "UnlockCondition": "LEVEL_10" }
+      ],
+      "ShowCharges": true,
+      "AnimateRecharge": true
+    },
+    "DriftScore": {
+      "ID": "ELEM_DRIFT",
+      "Name": "Drift Score",
+      "ShowMultiplier": true,
+      "ShowCombo": true,
+      "ShowAngle": true,
+      "PopupOnScore": true,
+      "Variants": [
+        { "ID": "DRIFT_MINIMAL", "Name": "Minimal", "Style": "Minimal" },
+        { "ID": "DRIFT_DETAILED", "Name": "Detailed", "Style": "Detailed" },
+        { "ID": "DRIFT_ARCADE", "Name": "Arcade", "Style": "Arcade" }
+      ]
+    },
+    "SplitTimes": {
+      "ID": "ELEM_SPLITS",
+      "Name": "Split Times",
+      "ShowDelta": true,
+      "ColorCode": true,
+      "CompareAgainst": { "Options": ["BestLap", "Leader", "Rival"], "Default": "BestLap" }
+    },
+    "TireIndicator": {
+      "ID": "ELEM_TIRES",
+      "Name": "Tire Status",
+      "ShowTemperature": true,
+      "ShowWear": true,
+      "ShowGrip": false,
+      "UnlockCondition": "LEVEL_20"
+    },
+    "DamageIndicator": {
+      "ID": "ELEM_DAMAGE",
+      "Name": "Damage Display",
+      "ShowVehicleSilhouette": true,
+      "ShowPercentage": true,
+      "Zones": ["FrontLeft", "FrontRight", "RearLeft", "RearRight", "Front", "Rear"]
+    },
+    "RelativeTimer": {
+      "ID": "ELEM_RELATIVE",
+      "Name": "Relative Positions",
+      "ShowAhead": 3,
+      "ShowBehind": 3,
+      "ShowGaps": true,
+      "UnlockCondition": "LEVEL_25"
+    }
+  },
+
+  "Notifications": {
+    "RaceEvents": {
+      "LapComplete": { "Duration": 2.0, "Position": "TopCenter", "Sound": true },
+      "BestLap": { "Duration": 3.0, "Position": "Center", "Sound": true, "Animation": "GoldFlash" },
+      "PositionChange": { "Duration": 1.5, "Position": "CenterRight", "Sound": true },
+      "FinalLap": { "Duration": 2.5, "Position": "TopCenter", "Sound": true, "Animation": "Pulse" },
+      "Checkpoint": { "Duration": 1.0, "Position": "TopCenter", "Sound": true },
+      "WrongWay": { "Duration": 0, "Position": "Center", "Sound": true, "Persistent": true }
+    },
+    "DriftEvents": {
+      "DriftStart": { "Duration": 0, "Position": "CenterRight", "Sound": false },
+      "DriftEnd": { "Duration": 2.0, "Position": "CenterRight", "Sound": true },
+      "ComboBreak": { "Duration": 1.5, "Position": "CenterRight", "Sound": true },
+      "NewHighScore": { "Duration": 3.0, "Position": "Center", "Sound": true, "Animation": "Celebration" }
+    },
+    "Achievements": {
+      "Duration": 4.0,
+      "Position": "TopRight",
+      "Sound": true,
+      "ShowProgress": true
+    },
+    "LevelUp": {
+      "Duration": 5.0,
+      "Position": "Center",
+      "Sound": true,
+      "Animation": "LevelUpFanfare"
+    },
+    "Rewards": {
+      "Duration": 3.0,
+      "Position": "Center",
+      "Sound": true,
+      "ShowItems": true
+    }
+  },
+
+  "CountdownSequence": {
+    "Style": "Standard",
+    "Styles": {
+      "Standard": {
+        "Numbers": ["3", "2", "1", "GO!"],
+        "Duration": 1.0,
+        "Sound": "SFX_Countdown",
+        "Animation": "ScaleIn"
+      },
+      "Retro": {
+        "Numbers": ["3", "2", "1", "GO!"],
+        "Duration": 1.0,
+        "Sound": "SFX_Countdown_Retro",
+        "Animation": "PixelReveal",
+        "UnlockCondition": "REP_TIER_STREET"
+      },
+      "Dramatic": {
+        "Numbers": ["READY", "SET", "GO!"],
+        "Duration": 1.5,
+        "Sound": "SFX_Countdown_Dramatic",
+        "Animation": "SlowZoom",
+        "UnlockCondition": "REP_TIER_PRO"
+      },
+      "JDM": {
+        "Numbers": ["\u4e09", "\u4e8c", "\u4e00", "GO!"],
+        "Duration": 1.0,
+        "Sound": "SFX_Countdown_JDM",
+        "Animation": "NeonFlash",
+        "UnlockCondition": "WIN_JDM_CHAMPIONSHIP"
+      }
+    },
+    "DragRace": {
+      "TreeType": {
+        "ProTree": {
+          "Staging": ["PreStage", "Stage"],
+          "Yellows": 1,
+          "YellowDuration": 0.4,
+          "GreenDuration": 0.4
+        },
+        "FullTree": {
+          "Staging": ["PreStage", "Stage"],
+          "Yellows": 3,
+          "YellowDuration": 0.5,
+          "GreenDuration": 0.5
+        }
+      },
+      "FalseStartPenalty": "Loss",
+      "ReactionTimeDisplay": true
+    }
+  },
+
+  "ResultsScreen": {
+    "RaceResults": {
+      "ShowPositions": true,
+      "ShowTimes": true,
+      "ShowBestLap": true,
+      "ShowREPEarned": true,
+      "ShowCashEarned": true,
+      "ShowXPProgress": true,
+      "ShowUnlocks": true,
+      "Replay": {
+        "Enabled": true,
+        "HighlightReel": true
+      }
+    },
+    "DriftResults": {
+      "ShowScore": true,
+      "ShowBestCombo": true,
+      "ShowLongestDrift": true,
+      "ShowMaxAngle": true,
+      "ShowLeaderboard": true
+    },
+    "ContinueOptions": ["Rematch", "NextEvent", "ReturnToGarage", "ViewReplay"]
+  },
+
+  "PauseMenu": {
+    "Layout": "Overlay",
+    "BlurBackground": true,
+    "Options": [
+      { "ID": "PAUSE_RESUME", "Name": "Resume", "Action": "Resume" },
+      { "ID": "PAUSE_RESTART", "Name": "Restart Race", "Action": "Restart", "ConfirmRequired": true },
+      { "ID": "PAUSE_SETTINGS", "Name": "Settings", "Action": "OpenSettings" },
+      { "ID": "PAUSE_PHOTOMODE", "Name": "Photo Mode", "Action": "EnterPhotoMode" },
+      { "ID": "PAUSE_EXIT", "Name": "Exit to Garage", "Action": "ExitRace", "ConfirmRequired": true }
+    ],
+    "QuickSettings": ["Volume", "HUD", "Camera"]
+  },
+
+  "LoadingScreens": {
+    "Tips": {
+      "Enabled": true,
+      "Categories": ["Driving", "Drifting", "Tuning", "General"],
+      "Examples": [
+        "Brake before the corner, accelerate through it",
+        "Feather the throttle to maintain long drifts",
+        "Weight reduction improves both acceleration and handling",
+        "Higher gear ratios improve top speed, lower ratios improve acceleration",
+        "Night races offer bonus REP rewards",
+        "Your vehicle's PI affects which events you can enter",
+        "Tandem drifting with friends earns bonus points"
+      ]
+    },
+    "ShowTrackInfo": true,
+    "ShowOpponentInfo": true,
+    "ShowVehicleStats": true,
+    "MiniGame": {
+      "Enabled": true,
+      "Type": "RevMatch",
+      "UnlockCondition": "LEVEL_10"
+    }
+  },
+
+  "Customization": {
+    "HUDEditor": {
+      "Enabled": true,
+      "UnlockCondition": "LEVEL_20",
+      "DragAndDrop": true,
+      "SnapToGrid": true,
+      "GridSize": 10,
+      "PresetSlots": 5,
+      "ImportExport": true
+    },
+    "ColorSchemes": [
+      { "ID": "SCHEME_DEFAULT", "Name": "Default", "Primary": "#FFFFFF", "Secondary": "#00FF00", "Accent": "#FF6B00" },
+      { "ID": "SCHEME_MIDNIGHT", "Name": "Midnight", "Primary": "#00BFFF", "Secondary": "#FF00FF", "Accent": "#00FF00" },
+      { "ID": "SCHEME_NEON", "Name": "Neon", "Primary": "#FF00FF", "Secondary": "#00FFFF", "Accent": "#FFFF00" },
+      { "ID": "SCHEME_RETRO", "Name": "Retro", "Primary": "#00FF00", "Secondary": "#FFFF00", "Accent": "#FF0000" },
+      { "ID": "SCHEME_MINIMAL", "Name": "Minimal", "Primary": "#FFFFFF", "Secondary": "#888888", "Accent": "#FFFFFF" }
+    ],
+    "Opacity": {
+      "Global": { "Min": 25, "Max": 100, "Default": 85 },
+      "PerElement": true
+    },
+    "Scale": {
+      "Global": { "Min": 50, "Max": 150, "Default": 100 },
+      "PerElement": true
+    }
+  },
+
+  "Accessibility": {
+    "HighContrast": {
+      "Enabled": true,
+      "Mode": "Auto"
+    },
+    "LargeText": {
+      "Enabled": true,
+      "ScaleMultiplier": 1.5
+    },
+    "ScreenReader": {
+      "Enabled": true,
+      "AnnouncePosition": true,
+      "AnnounceLaps": true,
+      "AnnounceSpeed": true
+    },
+    "ColorBlindModes": {
+      "Deuteranopia": true,
+      "Protanopia": true,
+      "Tritanopia": true
+    }
+  }
+}

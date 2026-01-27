@@ -13,6 +13,8 @@ class UMGInputRemapSubsystem;
 class UMGSessionSubsystem;
 class UMGChatSubsystem;
 class AMGVehiclePawn;
+struct FMGNearMissEvent;
+struct FMGDriftResult;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -100,6 +102,7 @@ public:
 	AMGPlayerController();
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
@@ -404,4 +407,16 @@ protected:
 	/** Client callback when race ends */
 	UFUNCTION(Client, Reliable)
 	void ClientOnRaceEnded();
+
+	/** Handle wrong-way detection from checkpoint subsystem */
+	UFUNCTION()
+	void OnWrongWayDetected(bool bIsWrongWay);
+
+	/** Handle near miss events from near miss subsystem */
+	UFUNCTION()
+	void OnNearMissDetected(const FMGNearMissEvent& Event, int32 TotalPoints);
+
+	/** Handle drift end events from drift subsystem */
+	UFUNCTION()
+	void OnDriftEnded(const FMGDriftResult& Result);
 };

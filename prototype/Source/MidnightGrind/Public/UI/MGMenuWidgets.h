@@ -203,48 +203,7 @@ protected:
 	void ShowUnsavedChangesDialog();
 };
 
-/**
- * Loading Screen Widget
- */
-UCLASS(Abstract, Blueprintable)
-class MIDNIGHTGRIND_API UMGLoadingScreenWidget : public UUserWidget
-{
-	GENERATED_BODY()
-
-public:
-	/** Set loading text */
-	UFUNCTION(BlueprintCallable, Category = "Loading")
-	void SetLoadingText(const FText& Text);
-
-	/** Set progress (0-1) */
-	UFUNCTION(BlueprintCallable, Category = "Loading")
-	void SetProgress(float Progress);
-
-	/** Set loading tip */
-	UFUNCTION(BlueprintCallable, Category = "Loading")
-	void SetLoadingTip(const FText& Tip);
-
-protected:
-	/** Current loading text */
-	UPROPERTY(BlueprintReadOnly, Category = "Loading")
-	FText LoadingText;
-
-	/** Current progress */
-	UPROPERTY(BlueprintReadOnly, Category = "Loading")
-	float CurrentProgress = 0.0f;
-
-	/** Current tip */
-	UPROPERTY(BlueprintReadOnly, Category = "Loading")
-	FText CurrentTip;
-
-	/** Called when progress updates */
-	UFUNCTION(BlueprintImplementableEvent, Category = "Loading")
-	void OnProgressUpdated(float Progress);
-
-	/** Called when text changes */
-	UFUNCTION(BlueprintImplementableEvent, Category = "Loading")
-	void OnTextChanged(const FText& NewText);
-};
+// NOTE: UMGLoadingScreenWidget moved to MGLoadingScreenWidget.h
 
 /**
  * Results Screen Widget

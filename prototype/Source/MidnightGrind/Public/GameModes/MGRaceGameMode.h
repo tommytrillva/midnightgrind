@@ -481,6 +481,9 @@ protected:
 	/** Update HUD subsystem with player race data */
 	void UpdateHUDSubsystem();
 
+	/** Notify RaceFlowManager for reward processing */
+	void NotifyRaceFlowManager();
+
 private:
 	/** Countdown accumulator */
 	float CountdownAccumulator = 0.0f;

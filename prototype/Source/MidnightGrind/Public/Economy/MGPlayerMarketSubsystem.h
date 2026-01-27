@@ -337,6 +337,10 @@ struct FMGMarketTransaction
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ItemName;
 
+	/** Vehicle model ID for filtering price history (e.g. "KAZE_CIVIC") */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName ModelID;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int64 SalePrice = 0;
 

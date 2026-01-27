@@ -46,7 +46,10 @@ void UMGNotificationWidgetBase::Hide()
 		PlayAnimation(HideAnimation);
 		// Wait for animation then remove
 		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UMGNotificationWidgetBase::OnHideAnimationFinished, HideAnimation->GetEndTime(), false);
+		if (UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().SetTimer(TimerHandle, this, &UMGNotificationWidgetBase::OnHideAnimationFinished, HideAnimation->GetEndTime(), false);
+		}
 	}
 	else
 	{

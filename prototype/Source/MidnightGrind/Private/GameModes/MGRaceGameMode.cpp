@@ -6,6 +6,8 @@
 #include "Core/MGPlayerController.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Track/MGCheckpoint.h"
+#include "GameModes/MGRaceFlowManager.h"
+#include "Fuel/MGFuelSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "EngineUtils.h"
@@ -67,6 +69,18 @@ void AMGRaceGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Only server controls race state
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	// Early exit for idle states - disable tick when not needed
+	if (CurrentRaceState == EMGRaceState::PreRace || CurrentRaceState == EMGRaceState::Finished)
+	{
+		return;
+	}
+
 	switch (CurrentRaceState)
 	{
 	case EMGRaceState::Countdown:
@@ -121,6 +135,11 @@ void AMGRaceGameMode::SetRaceConfig(const FMGRaceConfig& Config)
 
 void AMGRaceGameMode::StartCountdown()
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	if (CurrentRaceState != EMGRaceState::PreRace)
 	{
 		return;
@@ -168,6 +187,11 @@ void AMGRaceGameMode::ResumeRace()
 
 void AMGRaceGameMode::EndRace()
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	if (CurrentRaceState == EMGRaceState::Racing || CurrentRaceState == EMGRaceState::Paused)
 	{
 		// Mark all unfinished racers as DNF
@@ -190,6 +214,11 @@ void AMGRaceGameMode::EndRace()
 
 void AMGRaceGameMode::RestartRace()
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	// Reset all racer data
 	for (FMGRacerData& Racer : Racers)
 	{
@@ -225,6 +254,11 @@ void AMGRaceGameMode::RestartRace()
 
 int32 AMGRaceGameMode::RegisterRacer(AMGVehiclePawn* Vehicle, bool bIsAI, FText DisplayName)
 {
+	if (!HasAuthority())
+	{
+		return -1;
+	}
+
 	if (!Vehicle)
 	{
 		return -1;
@@ -243,6 +277,11 @@ int32 AMGRaceGameMode::RegisterRacer(AMGVehiclePawn* Vehicle, bool bIsAI, FText 
 
 void AMGRaceGameMode::UnregisterRacer(int32 RacerIndex)
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	if (Racers.IsValidIndex(RacerIndex))
 	{
 		Racers.RemoveAt(RacerIndex);
@@ -281,6 +320,11 @@ void AMGRaceGameMode::RegisterCheckpoint(AMGCheckpoint* Checkpoint, int32 Checkp
 
 void AMGRaceGameMode::OnCheckpointPassed(AMGVehiclePawn* Vehicle, int32 CheckpointIndex)
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	if (CurrentRaceState != EMGRaceState::Racing)
 	{
 		return;
@@ -324,6 +368,20 @@ void AMGRaceGameMode::OnCheckpointPassed(AMGVehiclePawn* Vehicle, int32 Checkpoi
 		}
 
 		OnLapCompleted.Broadcast(RacerIndex, Racer.CurrentLapTime);
+
+		// Notify fuel subsystem of lap completion for fuel tracking
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGFuelSubsystem* FuelSubsystem = World->GetSubsystem<UMGFuelSubsystem>())
+			{
+				// Use vehicle name as the fuel system vehicle ID
+				if (AMGVehiclePawn* VehiclePawn = Racer.Vehicle.Get())
+				{
+					FName VehicleID = FName(*VehiclePawn->GetName());
+					FuelSubsystem->OnLapCompleted(VehicleID, Racer.CurrentLap);
+				}
+			}
+		}
 
 		// Reset lap timer
 		Racer.CurrentLapTime = 0.0f;
@@ -406,13 +464,20 @@ void AMGRaceGameMode::UpdateRaceTiming(float DeltaTime)
 {
 	RaceTime += DeltaTime;
 
-	// Update each racer's timing
+	// Update each racer's timing and drift score
 	for (FMGRacerData& Racer : Racers)
 	{
 		if (!Racer.bFinished && !Racer.bDNF)
 		{
 			Racer.CurrentLapTime += DeltaTime;
 			Racer.TotalTime += DeltaTime;
+
+			// Capture drift score from vehicle
+			if (AMGVehiclePawn* Vehicle = Racer.Vehicle.Get())
+			{
+				FMGVehicleRuntimeState VehicleState = Vehicle->GetRuntimeState();
+				Racer.DriftScore = VehicleState.DriftScore;
+			}
 		}
 	}
 
@@ -529,6 +594,12 @@ void AMGRaceGameMode::CheckRaceComplete()
 		CalculateResults();
 		SetRaceState(EMGRaceState::Finished);
 		OnRaceFinished.Broadcast(RaceResults);
+
+		// Notify RaceFlowManager for reward processing
+		NotifyRaceFlowManager();
+
+		// Notify all player controllers that race has ended
+		NotifyPlayersRaceEnded();
 	}
 }
 
@@ -687,5 +758,17 @@ void AMGRaceGameMode::UpdateHUDSubsystem()
 		Status.TotalRaceTime = PlayerData.TotalTime;
 
 		HUDSubsystem->UpdateRaceStatus(Status);
+	}
+}
+
+void AMGRaceGameMode::NotifyRaceFlowManager()
+{
+	// Get RaceFlowManager from GameInstance and notify of race completion
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGRaceFlowManager* FlowManager = GI->GetSubsystem<UMGRaceFlowManager>())
+		{
+			FlowManager->OnRaceFinished(RaceResults);
+		}
 	}
 }

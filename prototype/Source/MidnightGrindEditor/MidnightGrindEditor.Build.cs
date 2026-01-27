@@ -7,7 +7,7 @@ public class MidnightGrindEditor : ModuleRules
 	public MidnightGrindEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-		bEnforceIWYU = true;
+		IWYUSupport = IWYUSupport.Full;
 
 		PublicDependencyModuleNames.AddRange(new string[]
 		{

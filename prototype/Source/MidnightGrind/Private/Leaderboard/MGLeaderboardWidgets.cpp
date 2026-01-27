@@ -1,7 +1,7 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Leaderboard/MGLeaderboardWidgets.h"
-#include "Leaderboard/MGLeaderboardSubsystem.h"
+#include "Social/MGLeaderboardSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
 // ==========================================

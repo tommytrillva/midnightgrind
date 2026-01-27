@@ -1,7 +1,7 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "GameModes/MGRaceModifiers.h"
-#include "Core/MGRaceGameMode.h"
+#include "GameModes/MGRaceGameMode.h"
 #include "Vehicle/MGVehiclePawn.h"
 #include "Vehicle/MGVehicleMovementComponent.h"
 #include "GameFramework/Controller.h"

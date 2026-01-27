@@ -613,7 +613,7 @@ FVector UMGTrafficSubsystem::GetLanePosition(int32 RoadID, int32 LaneIndex, floa
 		CurrentDist += SegmentLength;
 	}
 
-	return Road->SplinePoints.Last();
+	return (Road->SplinePoints.Num() > 0) ? Road->SplinePoints.Last() : FVector::ZeroVector;
 }
 
 EMGTrafficVehicleType UMGTrafficSubsystem::SelectRandomVehicleType() const

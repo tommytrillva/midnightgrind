@@ -1,7 +1,12 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Midnight Grind. All Rights Reserved.
 
 #include "Speedtrap/MGSpeedtrapSubsystem.h"
 #include "TimerManager.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
+#include "HAL/PlatformFileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
 
 void UMGSpeedtrapSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -765,12 +770,152 @@ FText UMGSpeedtrapSubsystem::FormatSpeed(float SpeedMPH, bool bUseMetric) const
 
 void UMGSpeedtrapSubsystem::SaveSpeedtrapData()
 {
-	// Placeholder - would serialize to save game
+	FString DataDir = FPaths::ProjectSavedDir() / TEXT("Speedtraps");
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if (!PlatformFile.DirectoryExists(*DataDir))
+	{
+		PlatformFile.CreateDirectory(*DataDir);
+	}
+
+	FString FilePath = DataDir / TEXT("speedtrap_records.dat");
+
+	FBufferArchive Archive;
+
+	// Write version
+	int32 Version = 1;
+	Archive << Version;
+
+	// Write player stats
+	Archive << PlayerStats.TotalSpeedtrapsFound;
+	Archive << PlayerStats.TotalSpeedtrapCompletions;
+	Archive << PlayerStats.HighestSpeedRecorded;
+	Archive << PlayerStats.TotalPointsEarned;
+	Archive << PlayerStats.TotalDistanceAtSpeed;
+
+	// Write rating counts
+	int32 RatingCount = PlayerStats.RatingCounts.Num();
+	Archive << RatingCount;
+	for (const auto& Pair : PlayerStats.RatingCounts)
+	{
+		int32 RatingInt = static_cast<int32>(Pair.Key);
+		int32 Count = Pair.Value;
+		Archive << RatingInt;
+		Archive << Count;
+	}
+
+	// Write discovered speedtraps
+	Archive << PlayerStats.DiscoveredSpeedtraps;
+
+	// Write records
+	int32 RecordCount = PlayerStats.Records.Num();
+	Archive << RecordCount;
+	for (const auto& Pair : PlayerStats.Records)
+	{
+		FString SpeedtrapId = Pair.Key;
+		const FMGSpeedtrapRecord& Record = Pair.Value;
+
+		Archive << SpeedtrapId;
+		Archive << Record.PersonalBest;
+		Archive << Record.WorldRecord;
+		Archive << Record.TotalAttempts;
+		Archive << Record.SuccessfulAttempts;
+		Archive << Record.TotalPointsEarned;
+		Archive << Record.TotalCompletions;
+		Archive << Record.PersonalBestDate;
+
+		int32 AttemptHistoryCount = FMath::Min(Record.AttemptHistory.Num(), 20); // Cap history
+		Archive << AttemptHistoryCount;
+		for (int32 i = 0; i < AttemptHistoryCount; i++)
+		{
+			Archive << Record.AttemptHistory[i];
+		}
+	}
+
+	FFileHelper::SaveArrayToFile(Archive, *FilePath);
+	Archive.FlushCache();
+	Archive.Empty();
+
+	UE_LOG(LogTemp, Log, TEXT("MGSpeedtrap: Saved %d speedtrap records"), RecordCount);
 }
 
 void UMGSpeedtrapSubsystem::LoadSpeedtrapData()
 {
-	// Placeholder - would deserialize from save game
+	FString DataDir = FPaths::ProjectSavedDir() / TEXT("Speedtraps");
+	FString FilePath = DataDir / TEXT("speedtrap_records.dat");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		// No save file yet
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	// Read version
+	int32 Version;
+	Archive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGSpeedtrap: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Read player stats
+	Archive << PlayerStats.TotalSpeedtrapsFound;
+	Archive << PlayerStats.TotalSpeedtrapCompletions;
+	Archive << PlayerStats.HighestSpeedRecorded;
+	Archive << PlayerStats.TotalPointsEarned;
+	Archive << PlayerStats.TotalDistanceAtSpeed;
+
+	// Read rating counts
+	int32 RatingCount;
+	Archive << RatingCount;
+	for (int32 i = 0; i < RatingCount; i++)
+	{
+		int32 RatingInt;
+		int32 Count;
+		Archive << RatingInt;
+		Archive << Count;
+		PlayerStats.RatingCounts.Add(static_cast<EMGSpeedtrapRating>(RatingInt), Count);
+	}
+
+	// Read discovered speedtraps
+	Archive << PlayerStats.DiscoveredSpeedtraps;
+
+	// Read records
+	int32 RecordCount;
+	Archive << RecordCount;
+	for (int32 i = 0; i < RecordCount; i++)
+	{
+		FString SpeedtrapId;
+		FMGSpeedtrapRecord Record;
+
+		Archive << SpeedtrapId;
+		Archive << Record.PersonalBest;
+		Archive << Record.WorldRecord;
+		Archive << Record.TotalAttempts;
+		Archive << Record.SuccessfulAttempts;
+		Archive << Record.TotalPointsEarned;
+		Archive << Record.TotalCompletions;
+		Archive << Record.PersonalBestDate;
+
+		int32 AttemptHistoryCount;
+		Archive << AttemptHistoryCount;
+		Record.AttemptHistory.Reserve(AttemptHistoryCount);
+		for (int32 j = 0; j < AttemptHistoryCount; j++)
+		{
+			float Attempt;
+			Archive << Attempt;
+			Record.AttemptHistory.Add(Attempt);
+		}
+
+		Record.SpeedtrapId = SpeedtrapId;
+		PlayerStats.Records.Add(SpeedtrapId, Record);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGSpeedtrap: Loaded %d speedtrap records"), RecordCount);
 }
 
 // ============================================================================

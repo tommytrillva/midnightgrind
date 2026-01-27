@@ -740,7 +740,7 @@ void UMGHapticsSubsystem::ApplyIntensityModifiers(float& LeftIntensity, float& R
 	RightIntensity *= Config.GlobalIntensity;
 
 	// Reduce on low battery if enabled
-	if (Config.bReduceOnLowBattery && ControllerBatteryLevel < Config.LowBatteryThreshold)
+	if (Config.bReduceOnLowBattery && Config.LowBatteryThreshold > 0.0f && ControllerBatteryLevel < Config.LowBatteryThreshold)
 	{
 		float BatteryMultiplier = ControllerBatteryLevel / Config.LowBatteryThreshold;
 		LeftIntensity *= BatteryMultiplier;

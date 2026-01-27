@@ -137,7 +137,9 @@ void UMGPhotoModeSubsystem::MoveCamera(FVector Delta)
 	}
 
 	// Transform delta to camera space
-	FVector WorldDelta = CameraRotation.RotateVector(Delta) * CameraMoveSpeed * GetWorld()->GetDeltaSeconds();
+	UWorld* World = GetWorld();
+	float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
+	FVector WorldDelta = CameraRotation.RotateVector(Delta) * CameraMoveSpeed * DeltaSeconds;
 	FVector NewLocation = CameraLocation + WorldDelta;
 
 	// Clamp distance from vehicle
@@ -160,7 +162,9 @@ void UMGPhotoModeSubsystem::RotateCamera(FRotator Delta)
 		return;
 	}
 
-	FRotator ScaledDelta = Delta * CameraRotateSpeed * GetWorld()->GetDeltaSeconds();
+	UWorld* World = GetWorld();
+	float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
+	FRotator ScaledDelta = Delta * CameraRotateSpeed * DeltaSeconds;
 	CameraRotation += ScaledDelta;
 
 	// Clamp pitch
@@ -175,8 +179,10 @@ void UMGPhotoModeSubsystem::OrbitCamera(float YawDelta, float PitchDelta)
 		return;
 	}
 
-	OrbitYaw += YawDelta * OrbitSpeed * GetWorld()->GetDeltaSeconds();
-	OrbitPitch += PitchDelta * OrbitSpeed * GetWorld()->GetDeltaSeconds();
+	UWorld* World = GetWorld();
+	float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
+	OrbitYaw += YawDelta * OrbitSpeed * DeltaSeconds;
+	OrbitPitch += PitchDelta * OrbitSpeed * DeltaSeconds;
 
 	// Clamp pitch
 	OrbitPitch = FMath::Clamp(OrbitPitch, -80.0f, 80.0f);
