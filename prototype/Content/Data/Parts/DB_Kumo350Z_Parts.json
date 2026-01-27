@@ -1,0 +1,192 @@
+{
+  "VehicleID": "KUMO_350Z",
+  "Version": "1.0",
+  "TotalParts": 74,
+
+  "Engine": {
+    "Intake": [
+      { "ID": "INTAKE_STOCK", "Name": "Stock Intake", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "INTAKE_STILLEN", "Name": "Stillen Cold Air", "Power": 10, "Price": 380, "Tier": "Sport" },
+      { "ID": "INTAKE_HKS", "Name": "HKS Racing Intake", "Power": 18, "Price": 850, "Tier": "Race" },
+      { "ID": "INTAKE_FULL_RACE", "Name": "Full Race Intake", "Power": 28, "Price": 2200, "Tier": "Elite" }
+    ],
+    "Exhaust": [
+      { "ID": "EXHAUST_STOCK", "Name": "Stock Exhaust", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "EXHAUST_INVIDIA", "Name": "Invidia Gemini Catback", "Power": 12, "Price": 950, "Tier": "Sport" },
+      { "ID": "EXHAUST_HKS", "Name": "HKS Hi-Power", "Power": 25, "Price": 1800, "Tier": "Race" },
+      { "ID": "EXHAUST_TI", "Name": "Full Ti Race System", "Power": 42, "Price": 4500, "Tier": "Elite" }
+    ],
+    "Cams": [
+      { "ID": "CAMS_STOCK", "Name": "Stock Cams", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "CAMS_JWT", "Name": "JWT S1 Cams", "Power": 15, "Price": 1200, "Tier": "Sport" },
+      { "ID": "CAMS_TOMEI", "Name": "Tomei Poncams", "Power": 25, "Price": 2200, "Tier": "Race" }
+    ],
+    "Headers": [
+      { "ID": "HEADERS_STOCK", "Name": "Stock Headers", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "HEADERS_BERK", "Name": "Berk Headers", "Power": 18, "Price": 1400, "Tier": "Race" },
+      { "ID": "HEADERS_PPE", "Name": "PPE Long Tubes", "Power": 32, "Price": 2800, "Tier": "Elite" }
+    ],
+    "ECU": [
+      { "ID": "ECU_STOCK", "Name": "Stock ECU", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "ECU_STAGE1", "Name": "UpRev Stage 1", "Power": 12, "Price": 500, "Tier": "Sport" },
+      { "ID": "ECU_STAGE2", "Name": "UpRev Stage 2", "Power": 28, "Price": 1000, "Tier": "Race" },
+      { "ID": "ECU_STANDALONE", "Name": "Haltech Elite", "Power": 50, "Price": 3200, "Tier": "Elite" }
+    ],
+    "FuelSystem": [
+      { "ID": "FUEL_STOCK", "Name": "Stock Fuel System", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "FUEL_HIGHFLOW", "Name": "High Flow Pump + Injectors", "Power": 15, "Price": 900, "Tier": "Race" }
+    ]
+  },
+
+  "ForcedInduction": {
+    "Supercharger": [
+      { "ID": "SC_NONE", "Name": "No Supercharger", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "SC_VORTECH", "Name": "Vortech V3 Supercharger", "Power": 125, "Boost": 8, "Price": 6500, "Tier": "Race" },
+      { "ID": "SC_STILLEN", "Name": "Stillen Supercharger", "Power": 160, "Boost": 10, "Price": 9500, "Tier": "Elite" }
+    ],
+    "Turbo": [
+      { "ID": "TURBO_NONE", "Name": "No Turbo", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "TURBO_T3", "Name": "Single T3 Kit", "Power": 130, "Lag": 1.2, "Price": 7000, "Tier": "Race" },
+      { "ID": "TURBO_T4", "Name": "Single T4 Kit", "Power": 200, "Lag": 1.4, "Price": 10000, "Tier": "Elite" },
+      { "ID": "TURBO_TWIN", "Name": "Twin T25 Kit", "Power": 250, "Lag": 1.0, "Price": 15000, "Tier": "Elite" }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "CLUTCH_STOCK", "Name": "Stock Clutch", "Capacity": 310, "Price": 0, "Tier": "Stock" },
+      { "ID": "CLUTCH_SPORT", "Name": "ACT Sport Clutch", "Capacity": 450, "Price": 600, "Tier": "Sport" },
+      { "ID": "CLUTCH_RACING", "Name": "Exedy Twin Plate", "Capacity": 700, "Price": 2000, "Tier": "Race" },
+      { "ID": "CLUTCH_TWIN", "Name": "OS Giken Twin Plate", "Capacity": 900, "Price": 4500, "Tier": "Elite" }
+    ],
+    "Transmission": [
+      { "ID": "TRANS_STOCK", "Name": "Stock 6-Speed", "Price": 0, "Tier": "Stock" },
+      { "ID": "TRANS_CD009", "Name": "CD009 Swap", "Price": 3500, "Tier": "Race" },
+      { "ID": "TRANS_SEQ", "Name": "Sequential Gearbox", "Price": 16000, "Tier": "Elite" }
+    ],
+    "FinalDrive": [
+      { "ID": "FD_STOCK", "Name": "Stock 3.54 Final Drive", "Ratio": 3.54, "Price": 0, "Tier": "Stock" },
+      { "ID": "FD_369", "Name": "3.69 Final Drive", "Ratio": 3.69, "Price": 650, "Tier": "Sport" },
+      { "ID": "FD_390", "Name": "3.90 Final Drive", "Ratio": 3.90, "Price": 850, "Tier": "Race" },
+      { "ID": "FD_408", "Name": "4.08 Final Drive", "Ratio": 4.08, "Price": 1050, "Tier": "Elite" }
+    ],
+    "LSD": [
+      { "ID": "LSD_STOCK", "Name": "Stock Viscous LSD", "LockPercent": 25, "Price": 0, "Tier": "Stock" },
+      { "ID": "LSD_15WAY", "Name": "Cusco 1.5-Way", "LockPercent": 55, "Price": 1400, "Tier": "Sport" },
+      { "ID": "LSD_2WAY", "Name": "Cusco 2-Way", "LockPercent": 80, "Price": 2200, "Tier": "Race" }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "SPRING_STOCK", "Name": "Stock Springs", "Price": 0, "Tier": "Stock" },
+      { "ID": "SPRING_LOW", "Name": "Tein Lowering Springs", "Price": 320, "Tier": "Sport" },
+      { "ID": "SPRING_COIL", "Name": "BC Racing Coilovers", "Price": 1800, "Tier": "Race" },
+      { "ID": "SPRING_RACE", "Name": "Ohlins Road & Track", "Price": 4500, "Tier": "Elite" }
+    ],
+    "Dampers": [
+      { "ID": "DAMP_STOCK", "Name": "Stock Dampers", "Price": 0, "Tier": "Stock" },
+      { "ID": "DAMP_KW", "Name": "KW V3", "Price": 2600, "Tier": "Race" },
+      { "ID": "DAMP_OHLINS", "Name": "Ohlins DFV", "Price": 4800, "Tier": "Elite" }
+    ],
+    "Swaybars": [
+      { "ID": "SWAY_STOCK", "Name": "Stock Sway Bars", "Price": 0, "Tier": "Stock" },
+      { "ID": "SWAY_HOTCHKIS", "Name": "Hotchkis Sport", "Price": 500, "Tier": "Sport" },
+      { "ID": "SWAY_STILLEN", "Name": "Stillen Adjustable", "Price": 1000, "Tier": "Race" }
+    ],
+    "AngleKit": [
+      { "ID": "ANGLE_NONE", "Name": "No Angle Kit", "Angle": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "ANGLE_SPL", "Name": "SPL Angle Kit", "Angle": 12, "Price": 800, "Tier": "Sport" },
+      { "ID": "ANGLE_FULL", "Name": "Full Lock Kit", "Angle": 25, "Price": 1800, "Tier": "Race" }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "PAD_STOCK", "Name": "Stock Brembo Pads", "Price": 0, "Tier": "Stock" },
+      { "ID": "PAD_SPORT", "Name": "Hawk HPS", "Price": 220, "Tier": "Sport" },
+      { "ID": "PAD_TRACK", "Name": "Project Mu HC+", "Price": 400, "Tier": "Race" },
+      { "ID": "PAD_RACE", "Name": "Endless MX72", "Price": 720, "Tier": "Elite" }
+    ],
+    "Rotors": [
+      { "ID": "ROTOR_STOCK", "Name": "Stock Rotors", "Price": 0, "Tier": "Stock" },
+      { "ID": "ROTOR_SLOT", "Name": "Slotted Rotors", "Price": 350, "Tier": "Sport" },
+      { "ID": "ROTOR_2PC", "Name": "2-Piece Rotors", "Price": 1600, "Tier": "Race" }
+    ],
+    "Calipers": [
+      { "ID": "CAL_STOCK", "Name": "Stock Brembo 4-Piston", "Price": 0, "Tier": "Stock" },
+      { "ID": "CAL_AKEBONO", "Name": "Akebono Big Brake Kit", "Price": 3000, "Tier": "Race" },
+      { "ID": "CAL_STOPTECH", "Name": "StopTech ST-60", "Price": 5500, "Tier": "Elite" }
+    ]
+  },
+
+  "Wheels": {
+    "Sets": [
+      { "ID": "WHEEL_STOCK", "Name": "Stock 18\" Wheels", "Size": 18, "Weight": 24, "Price": 0, "Tier": "Stock" },
+      { "ID": "WHEEL_ENKEI", "Name": "Enkei RPF1 18\"", "Size": 18, "Width": 9.5, "Weight": 18, "Price": 2000, "Tier": "Sport" },
+      { "ID": "WHEEL_TE37", "Name": "Volk TE37 18\"", "Size": 18, "Width": 10.0, "Weight": 16, "Price": 4800, "Tier": "Race" },
+      { "ID": "WHEEL_WORK", "Name": "Work Meister S1 19\"", "Size": 19, "Width": 10.5, "Weight": 17, "Price": 6500, "Tier": "Elite" }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "TIRE_SPORT", "Name": "Falken Azenis", "Grip": 1.0, "Price": 900, "Tier": "Sport" },
+      { "ID": "TIRE_SEMISLICK", "Name": "Nitto NT05", "Grip": 1.12, "Price": 1400, "Tier": "Race" },
+      { "ID": "TIRE_SLICK", "Name": "Hoosier A7", "Grip": 1.30, "Price": 2200, "Tier": "Elite" },
+      { "ID": "TIRE_DRIFT", "Name": "Federal RS-RR", "Grip": 0.85, "SlideGrip": 1.2, "Price": 700, "Tier": "Sport" }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "FBUMP_STOCK", "Name": "Stock Front Bumper", "Price": 0, "Tier": "Stock" },
+      { "ID": "FBUMP_NISMO", "Name": "Nismo Front Bumper", "Price": 1200, "Tier": "Sport" },
+      { "ID": "FBUMP_AMUSE", "Name": "Amuse Front", "Downforce": 8, "Price": 2200, "Tier": "Race" },
+      { "ID": "FBUMP_WIDE", "Name": "Widebody Front", "Downforce": 15, "Price": 4000, "Tier": "Elite" }
+    ],
+    "Spoiler": [
+      { "ID": "SPOILER_STOCK", "Name": "Stock Spoiler", "Downforce": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "SPOILER_NISMO", "Name": "Nismo Spoiler", "Downforce": 8, "Price": 800, "Tier": "Sport" },
+      { "ID": "SPOILER_GTWING", "Name": "APR GTC-300", "Downforce": 22, "Price": 2500, "Tier": "Race" },
+      { "ID": "SPOILER_DUCK", "Name": "Ducktail Spoiler", "Downforce": 5, "Price": 600, "Tier": "Sport" }
+    ],
+    "Hood": [
+      { "ID": "HOOD_STOCK", "Name": "Stock Hood", "Weight": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "HOOD_VENT", "Name": "Vented Steel Hood", "Weight": -6, "Price": 550, "Tier": "Sport" },
+      { "ID": "HOOD_CARBON", "Name": "Seibon Carbon Hood", "Weight": -22, "Price": 1600, "Tier": "Race" }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "BODY_STOCK", "Name": "Stock Body", "Price": 0, "Tier": "Stock" },
+      { "ID": "BODY_AMUSE", "Name": "Amuse Wide Body", "Price": 8000, "Tier": "Race" },
+      { "ID": "BODY_RB", "Name": "Rocket Bunny Wide Body", "Price": 14000, "Tier": "Elite" }
+    ]
+  },
+
+  "Packages": {
+    "StreetBuild": {
+      "Name": "Street Fighter Package",
+      "Price": 4500,
+      "Parts": ["INTAKE_STILLEN", "EXHAUST_INVIDIA", "ECU_STAGE1", "SPRING_LOW"],
+      "PowerGain": 34,
+      "Tier": "Sport"
+    },
+    "DriftBuild": {
+      "Name": "Drift Starter Package",
+      "Price": 8000,
+      "Parts": ["EXHAUST_HKS", "LSD_2WAY", "ANGLE_SPL", "SPRING_COIL", "TIRE_DRIFT"],
+      "PowerGain": 25,
+      "Tier": "Race"
+    },
+    "TurboBuild": {
+      "Name": "Turbo Monster Package",
+      "Price": 32000,
+      "Parts": ["TURBO_TWIN", "FUEL_HIGHFLOW", "ECU_STANDALONE", "CLUTCH_TWIN"],
+      "PowerGain": 315,
+      "Tier": "Elite"
+    }
+  }
+}

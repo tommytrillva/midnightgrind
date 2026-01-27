@@ -1,0 +1,190 @@
+{
+  "VehicleID": "HAYATE_WRX",
+  "Version": "1.0",
+  "TotalParts": 80,
+
+  "Engine": {
+    "Intake": [
+      { "ID": "INTAKE_STOCK", "Name": "Stock Intake", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "INTAKE_COBB", "Name": "Cobb SF Intake", "Power": 12, "Price": 400, "Tier": "Sport" },
+      { "ID": "INTAKE_PERRIN", "Name": "Perrin Intake", "Power": 20, "Price": 750, "Tier": "Race" },
+      { "ID": "INTAKE_FULL_RACE", "Name": "Full Race Intake", "Power": 32, "Price": 2200, "Tier": "Elite" }
+    ],
+    "Exhaust": [
+      { "ID": "EXHAUST_STOCK", "Name": "Stock Exhaust", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "EXHAUST_INVIDIA", "Name": "Invidia N1 Catback", "Power": 15, "Price": 950, "Tier": "Sport" },
+      { "ID": "EXHAUST_TOMEI", "Name": "Tomei Ti Expreme", "Power": 32, "Price": 2200, "Tier": "Race" },
+      { "ID": "EXHAUST_TI", "Name": "Full Ti Race System", "Power": 55, "Price": 5000, "Tier": "Elite" }
+    ],
+    "Turbo": [
+      { "ID": "TURBO_STOCK", "Name": "Stock IHI VF48", "Power": 0, "Lag": 1.0, "Price": 0, "Tier": "Stock" },
+      { "ID": "TURBO_VF52", "Name": "IHI VF52 Swap", "Power": 45, "Lag": 0.95, "Price": 1800, "Tier": "Sport" },
+      { "ID": "TURBO_FP_GREEN", "Name": "FP Green Turbo", "Power": 120, "Lag": 1.1, "Price": 4500, "Tier": "Race" },
+      { "ID": "TURBO_BLOUCH", "Name": "Blouch 2.5XTR", "Power": 200, "Lag": 1.25, "Price": 7500, "Tier": "Elite" },
+      { "ID": "TURBO_GTX3076", "Name": "Garrett GTX3076", "Power": 300, "Lag": 1.4, "Price": 12000, "Tier": "Elite" }
+    ],
+    "Intercooler": [
+      { "ID": "IC_STOCK", "Name": "Stock Top Mount IC", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "IC_TMIC_LARGE", "Name": "Large Top Mount IC", "Power": 18, "Price": 800, "Tier": "Sport" },
+      { "ID": "IC_FMIC", "Name": "Front Mount IC", "Power": 35, "Price": 2200, "Tier": "Race" },
+      { "ID": "IC_VMOUNT", "Name": "V-Mount Setup", "Power": 50, "Price": 4000, "Tier": "Elite" }
+    ],
+    "ECU": [
+      { "ID": "ECU_STOCK", "Name": "Stock ECU", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "ECU_COBB_AP", "Name": "Cobb Accessport OTS", "Power": 25, "Price": 650, "Tier": "Sport" },
+      { "ID": "ECU_STAGE2", "Name": "Cobb AP Pro Tune", "Power": 55, "Price": 1200, "Tier": "Race" },
+      { "ID": "ECU_STANDALONE", "Name": "Haltech Elite Standalone", "Power": 90, "Price": 3500, "Tier": "Elite" }
+    ],
+    "FuelSystem": [
+      { "ID": "FUEL_STOCK", "Name": "Stock Fuel System", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "FUEL_HIGHFLOW", "Name": "DW Pump + Injectors", "Power": 25, "Price": 1100, "Tier": "Sport" },
+      { "ID": "FUEL_E85", "Name": "E85 Conversion", "Power": 70, "Price": 2500, "Tier": "Race" },
+      { "ID": "FUEL_FLEX", "Name": "Flex Fuel System", "Power": 85, "Price": 3500, "Tier": "Elite" }
+    ],
+    "Internals": [
+      { "ID": "INT_STOCK", "Name": "Stock Internals", "Power": 0, "Price": 0, "BoostLimit": 20, "Tier": "Stock" },
+      { "ID": "INT_RODS", "Name": "Forged Rods", "Power": 0, "Price": 3000, "BoostLimit": 28, "Tier": "Race" },
+      { "ID": "INT_PISTONS", "Name": "Forged Pistons + Rods", "Power": 0, "Price": 5500, "BoostLimit": 35, "Tier": "Race" },
+      { "ID": "INT_CLOSED", "Name": "Closed Deck Block Build", "Power": 0, "Price": 12000, "BoostLimit": 45, "Tier": "Elite" }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "CLUTCH_STOCK", "Name": "Stock Clutch", "Capacity": 320, "Price": 0, "Tier": "Stock" },
+      { "ID": "CLUTCH_SPORT", "Name": "Exedy Stage 1", "Capacity": 450, "Price": 650, "Tier": "Sport" },
+      { "ID": "CLUTCH_RACING", "Name": "Exedy Twin Plate", "Capacity": 700, "Price": 2200, "Tier": "Race" },
+      { "ID": "CLUTCH_TRIPLE", "Name": "OS Giken Triple Plate", "Capacity": 1000, "Price": 5500, "Tier": "Elite" }
+    ],
+    "Transmission": [
+      { "ID": "TRANS_STOCK", "Name": "Stock 6-Speed", "Price": 0, "Tier": "Stock" },
+      { "ID": "TRANS_PPG", "Name": "PPG Dog Box", "Price": 8500, "Tier": "Race" },
+      { "ID": "TRANS_SEQ", "Name": "Drenth Sequential", "Price": 18000, "Tier": "Elite" }
+    ],
+    "FinalDrive": [
+      { "ID": "FD_STOCK", "Name": "Stock 3.90 Final Drive", "Ratio": 3.90, "Price": 0, "Tier": "Stock" },
+      { "ID": "FD_411", "Name": "4.11 Final Drive", "Ratio": 4.11, "Price": 750, "Tier": "Sport" },
+      { "ID": "FD_444", "Name": "4.44 Final Drive", "Ratio": 4.44, "Price": 1000, "Tier": "Race" }
+    ],
+    "DCCD": [
+      { "ID": "DCCD_STOCK", "Name": "Stock DCCD", "Price": 0, "Tier": "Stock" },
+      { "ID": "DCCD_CONTROLLER", "Name": "DCCD Controller", "Price": 800, "Tier": "Sport" },
+      { "ID": "DCCD_FULL_MANUAL", "Name": "Full Manual DCCD", "Price": 1800, "Tier": "Race" }
+    ],
+    "RearDiff": [
+      { "ID": "RDIFF_STOCK", "Name": "Stock Torsen", "LockPercent": 40, "Price": 0, "Tier": "Stock" },
+      { "ID": "RDIFF_15WAY", "Name": "Cusco 1.5-Way", "LockPercent": 60, "Price": 1600, "Tier": "Sport" },
+      { "ID": "RDIFF_2WAY", "Name": "Cusco 2-Way", "LockPercent": 85, "Price": 2500, "Tier": "Race" }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "SPRING_STOCK", "Name": "Stock Springs", "Price": 0, "Tier": "Stock" },
+      { "ID": "SPRING_LOW", "Name": "Tein Lowering Springs", "Price": 350, "Tier": "Sport" },
+      { "ID": "SPRING_COIL", "Name": "KW V3 Coilovers", "Price": 2800, "Tier": "Race" },
+      { "ID": "SPRING_RALLY", "Name": "Bilstein Rally Coilovers", "Price": 5500, "Tier": "Elite" }
+    ],
+    "Dampers": [
+      { "ID": "DAMP_STOCK", "Name": "Stock Dampers", "Price": 0, "Tier": "Stock" },
+      { "ID": "DAMP_KW", "Name": "KW V3", "Price": 2800, "Tier": "Race" },
+      { "ID": "DAMP_OHLINS", "Name": "Ohlins Road & Track", "Price": 5000, "Tier": "Elite" },
+      { "ID": "DAMP_RALLY", "Name": "Tein Type-Flex Rally", "Price": 4500, "Tier": "Elite" }
+    ],
+    "Swaybars": [
+      { "ID": "SWAY_STOCK", "Name": "Stock Sway Bars", "Price": 0, "Tier": "Stock" },
+      { "ID": "SWAY_WHITELINE", "Name": "Whiteline Adjustable", "Price": 650, "Tier": "Sport" },
+      { "ID": "SWAY_RACE", "Name": "Racing Hollow Set", "Price": 1200, "Tier": "Race" }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "PAD_STOCK", "Name": "Stock Brembo Pads", "Price": 0, "Tier": "Stock" },
+      { "ID": "PAD_SPORT", "Name": "Hawk HPS", "Price": 250, "Tier": "Sport" },
+      { "ID": "PAD_TRACK", "Name": "Project Mu HC+", "Price": 450, "Tier": "Race" },
+      { "ID": "PAD_RACE", "Name": "Endless MX72", "Price": 800, "Tier": "Elite" }
+    ],
+    "Rotors": [
+      { "ID": "ROTOR_STOCK", "Name": "Stock Rotors", "Price": 0, "Tier": "Stock" },
+      { "ID": "ROTOR_SLOT", "Name": "Slotted Rotors", "Price": 380, "Tier": "Sport" },
+      { "ID": "ROTOR_2PC", "Name": "2-Piece Rotors", "Price": 1800, "Tier": "Race" }
+    ],
+    "Calipers": [
+      { "ID": "CAL_STOCK", "Name": "Stock Brembo 4-Piston", "Price": 0, "Tier": "Stock" },
+      { "ID": "CAL_6POT", "Name": "Brembo GT 6-Piston", "Price": 5000, "Tier": "Race" },
+      { "ID": "CAL_8POT", "Name": "StopTech 8-Piston", "Price": 8000, "Tier": "Elite" }
+    ]
+  },
+
+  "Wheels": {
+    "Sets": [
+      { "ID": "WHEEL_STOCK", "Name": "Stock 18\" BBS Wheels", "Size": 18, "Weight": 25, "Price": 0, "Tier": "Stock" },
+      { "ID": "WHEEL_ENKEI", "Name": "Enkei NT03+M 17\"", "Size": 17, "Width": 8.5, "Weight": 18, "Price": 2200, "Tier": "Sport" },
+      { "ID": "WHEEL_TE37", "Name": "Volk TE37 18\"", "Size": 18, "Width": 9.5, "Weight": 16, "Price": 5000, "Tier": "Race" },
+      { "ID": "WHEEL_RALLY", "Name": "Speedline 15\" Rally", "Size": 15, "Width": 7.0, "Weight": 14, "Price": 3000, "Tier": "Race" }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "TIRE_SPORT", "Name": "Dunlop Direzza", "Grip": 1.0, "Price": 1000, "Tier": "Sport" },
+      { "ID": "TIRE_SEMISLICK", "Name": "Toyo R888R", "Grip": 1.12, "Price": 1600, "Tier": "Race" },
+      { "ID": "TIRE_SLICK", "Name": "Hoosier A7", "Grip": 1.30, "Price": 2500, "Tier": "Elite" },
+      { "ID": "TIRE_GRAVEL", "Name": "Pirelli Scorpion Gravel", "Grip": 0.9, "GravelGrip": 1.4, "Price": 1200, "Tier": "Race" }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "FBUMP_STOCK", "Name": "Stock STI Front Bumper", "Price": 0, "Tier": "Stock" },
+      { "ID": "FBUMP_STI", "Name": "STI Lip Spoiler", "Downforce": 5, "Price": 500, "Tier": "Sport" },
+      { "ID": "FBUMP_S204", "Name": "S204 Front Bumper", "Downforce": 10, "Price": 2500, "Tier": "Race" },
+      { "ID": "FBUMP_WIDE", "Name": "Widebody Front", "Downforce": 18, "Price": 4500, "Tier": "Elite" }
+    ],
+    "Spoiler": [
+      { "ID": "SPOILER_STOCK", "Name": "Stock STI Wing", "Downforce": 10, "Price": 0, "Tier": "Stock" },
+      { "ID": "SPOILER_GTWING", "Name": "APR GTC-300", "Downforce": 25, "Price": 2500, "Tier": "Race" },
+      { "ID": "SPOILER_RALLY", "Name": "Rally Wing", "Downforce": 15, "Price": 1500, "Tier": "Race" }
+    ],
+    "Hood": [
+      { "ID": "HOOD_STOCK", "Name": "Stock Hood", "Weight": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "HOOD_VENT", "Name": "Vented Steel Hood", "Weight": -8, "Price": 600, "Tier": "Sport" },
+      { "ID": "HOOD_CARBON", "Name": "Seibon Carbon Hood", "Weight": -25, "Price": 1800, "Tier": "Race" },
+      { "ID": "HOOD_DELETE", "Name": "Scoop Delete Hood", "Weight": -10, "Price": 800, "Tier": "Race" }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "BODY_STOCK", "Name": "Stock Body", "Price": 0, "Tier": "Stock" },
+      { "ID": "BODY_S204", "Name": "S204 Wide Fenders", "Price": 5000, "Tier": "Sport" },
+      { "ID": "BODY_VARIS", "Name": "Varis Wide Body", "Price": 12000, "Tier": "Elite" },
+      { "ID": "BODY_WIDE", "Name": "Full Wide Body Kit", "Price": 16000, "Tier": "Elite" }
+    ]
+  },
+
+  "Packages": {
+    "StreetBuild": {
+      "Name": "Street Beast Package",
+      "Price": 5500,
+      "Parts": ["INTAKE_COBB", "EXHAUST_INVIDIA", "ECU_COBB_AP", "SPRING_LOW"],
+      "PowerGain": 52,
+      "Tier": "Sport"
+    },
+    "StageTwoBuild": {
+      "Name": "Stage 2 Package",
+      "Price": 12000,
+      "Parts": ["TURBO_FP_GREEN", "IC_FMIC", "EXHAUST_TOMEI", "ECU_STAGE2"],
+      "PowerGain": 222,
+      "Tier": "Race"
+    },
+    "FullBuild": {
+      "Name": "500HP Build Package",
+      "Price": 42000,
+      "Parts": ["TURBO_GTX3076", "INT_CLOSED", "FUEL_FLEX", "ECU_STANDALONE", "CLUTCH_TRIPLE"],
+      "PowerGain": 475,
+      "Tier": "Elite"
+    }
+  }
+}

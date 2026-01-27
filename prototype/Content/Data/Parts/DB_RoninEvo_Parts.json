@@ -1,0 +1,187 @@
+{
+  "VehicleID": "RONIN_EVO",
+  "Version": "1.0",
+  "TotalParts": 82,
+
+  "Engine": {
+    "Intake": [
+      { "ID": "INTAKE_STOCK", "Name": "Stock Intake", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "INTAKE_HKS", "Name": "HKS Racing Intake", "Power": 15, "Price": 450, "Tier": "Sport" },
+      { "ID": "INTAKE_AMS", "Name": "AMS Intake", "Power": 25, "Price": 900, "Tier": "Race" },
+      { "ID": "INTAKE_FULL_RACE", "Name": "Full Race Intake", "Power": 38, "Price": 2500, "Tier": "Elite" }
+    ],
+    "Exhaust": [
+      { "ID": "EXHAUST_STOCK", "Name": "Stock Exhaust", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "EXHAUST_CATBACK", "Name": "HKS Hi-Power Catback", "Power": 18, "Price": 1100, "Tier": "Sport" },
+      { "ID": "EXHAUST_TURBOBACK", "Name": "Turbo-Back System", "Power": 40, "Price": 2500, "Tier": "Race" },
+      { "ID": "EXHAUST_TI", "Name": "Full Ti Race System", "Power": 65, "Price": 5500, "Tier": "Elite" }
+    ],
+    "Turbo": [
+      { "ID": "TURBO_STOCK", "Name": "Stock TD05H", "Power": 0, "Lag": 1.0, "Price": 0, "Tier": "Stock" },
+      { "ID": "TURBO_GTX3076", "Name": "Garrett GTX3076", "Power": 180, "Lag": 1.2, "Price": 5500, "Tier": "Race" },
+      { "ID": "TURBO_GTX3582", "Name": "Garrett GTX3582", "Power": 280, "Lag": 1.35, "Price": 8500, "Tier": "Elite" },
+      { "ID": "TURBO_GTX4088", "Name": "Garrett GTX4088", "Power": 420, "Lag": 1.6, "Price": 14000, "Tier": "Elite" }
+    ],
+    "Intercooler": [
+      { "ID": "IC_STOCK", "Name": "Stock Intercooler", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "IC_FMIC", "Name": "GReddy Large FMIC", "Power": 28, "Price": 1600, "Tier": "Sport" },
+      { "ID": "IC_VMOUNT", "Name": "V-Mount Setup", "Power": 48, "Price": 4200, "Tier": "Elite" }
+    ],
+    "ECU": [
+      { "ID": "ECU_STOCK", "Name": "Stock ECU", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "ECU_STAGE1", "Name": "ECUFlash Stage 1", "Power": 30, "Price": 550, "Tier": "Sport" },
+      { "ID": "ECU_STAGE2", "Name": "ECUFlash Stage 2", "Power": 65, "Price": 1100, "Tier": "Race" },
+      { "ID": "ECU_STANDALONE", "Name": "AEM Infinity Standalone", "Power": 110, "Price": 3500, "Tier": "Elite" }
+    ],
+    "FuelSystem": [
+      { "ID": "FUEL_STOCK", "Name": "Stock Fuel System", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "FUEL_HIGHFLOW", "Name": "1000cc Injectors + Pump", "Power": 30, "Price": 1200, "Tier": "Sport" },
+      { "ID": "FUEL_E85", "Name": "E85 Conversion", "Power": 80, "Price": 2600, "Tier": "Race" },
+      { "ID": "FUEL_FLEX", "Name": "Flex Fuel System", "Power": 100, "Price": 3800, "Tier": "Elite" }
+    ],
+    "Internals": [
+      { "ID": "INT_STOCK", "Name": "Stock 4G63 Internals", "Power": 0, "Price": 0, "BoostLimit": 22, "Tier": "Stock" },
+      { "ID": "INT_RODS", "Name": "Eagle Forged Rods", "Power": 0, "Price": 2800, "BoostLimit": 30, "Tier": "Race" },
+      { "ID": "INT_PISTONS", "Name": "Wiseco Pistons + Rods", "Power": 0, "Price": 5500, "BoostLimit": 38, "Tier": "Race" },
+      { "ID": "INT_STROKER", "Name": "2.3L Stroker Build", "Power": 35, "Price": 15000, "BoostLimit": 50, "Tier": "Elite" }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "CLUTCH_STOCK", "Name": "Stock Clutch", "Capacity": 320, "Price": 0, "Tier": "Stock" },
+      { "ID": "CLUTCH_SPORT", "Name": "ACT Sport Clutch", "Capacity": 480, "Price": 700, "Tier": "Sport" },
+      { "ID": "CLUTCH_RACING", "Name": "Exedy Twin Plate", "Capacity": 750, "Price": 2400, "Tier": "Race" },
+      { "ID": "CLUTCH_TRIPLE", "Name": "OS Giken Triple Plate", "Capacity": 1100, "Price": 6000, "Tier": "Elite" }
+    ],
+    "Transmission": [
+      { "ID": "TRANS_STOCK", "Name": "Stock 5-Speed", "Price": 0, "Tier": "Stock" },
+      { "ID": "TRANS_DOG", "Name": "Shepherd Dog Box", "Price": 8000, "Tier": "Race" },
+      { "ID": "TRANS_SEQ", "Name": "Drenth Sequential", "Price": 18000, "Tier": "Elite" }
+    ],
+    "FinalDrive": [
+      { "ID": "FD_STOCK", "Name": "Stock 4.53 Final Drive", "Ratio": 4.53, "Price": 0, "Tier": "Stock" },
+      { "ID": "FD_49", "Name": "4.9 Final Drive", "Ratio": 4.9, "Price": 850, "Tier": "Sport" },
+      { "ID": "FD_51", "Name": "5.1 Final Drive", "Ratio": 5.1, "Price": 1100, "Tier": "Race" }
+    ],
+    "CenterDiff": [
+      { "ID": "CDIFF_STOCK", "Name": "Stock ACD", "Price": 0, "Tier": "Stock" },
+      { "ID": "CDIFF_AGGRESSIVE", "Name": "Aggressive ACD Tune", "Price": 600, "Tier": "Sport" },
+      { "ID": "CDIFF_RALLY", "Name": "Rally ACD Controller", "Price": 1500, "Tier": "Race" }
+    ],
+    "RearDiff": [
+      { "ID": "RDIFF_STOCK", "Name": "Stock AYC", "LockPercent": 45, "Price": 0, "Tier": "Stock" },
+      { "ID": "RDIFF_15WAY", "Name": "Cusco 1.5-Way", "LockPercent": 65, "Price": 1800, "Tier": "Sport" },
+      { "ID": "RDIFF_2WAY", "Name": "Cusco 2-Way", "LockPercent": 90, "Price": 2800, "Tier": "Race" }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "SPRING_STOCK", "Name": "Stock Springs", "Price": 0, "Tier": "Stock" },
+      { "ID": "SPRING_LOW", "Name": "Tein Lowering Springs", "Price": 380, "Tier": "Sport" },
+      { "ID": "SPRING_COIL", "Name": "HKS Hipermax IV GT", "Price": 2800, "Tier": "Race" },
+      { "ID": "SPRING_RALLY", "Name": "Ohlins Rally Coilovers", "Price": 6500, "Tier": "Elite" }
+    ],
+    "Dampers": [
+      { "ID": "DAMP_STOCK", "Name": "Stock Dampers", "Price": 0, "Tier": "Stock" },
+      { "ID": "DAMP_ADJ", "Name": "Ohlins Road & Track", "Price": 3500, "Tier": "Race" },
+      { "ID": "DAMP_RACE", "Name": "MCS Remote Reservoir", "Price": 6500, "Tier": "Elite" },
+      { "ID": "DAMP_RALLY", "Name": "Proflex Rally Dampers", "Price": 5500, "Tier": "Elite" }
+    ],
+    "Swaybars": [
+      { "ID": "SWAY_STOCK", "Name": "Stock Sway Bars", "Price": 0, "Tier": "Stock" },
+      { "ID": "SWAY_SPORT", "Name": "Cusco Sport Set", "Price": 600, "Tier": "Sport" },
+      { "ID": "SWAY_RACE", "Name": "Racing Adjustable Set", "Price": 1300, "Tier": "Race" }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "PAD_STOCK", "Name": "Stock Brembo Pads", "Price": 0, "Tier": "Stock" },
+      { "ID": "PAD_SPORT", "Name": "Hawk HPS", "Price": 260, "Tier": "Sport" },
+      { "ID": "PAD_TRACK", "Name": "Endless MX72", "Price": 500, "Tier": "Race" },
+      { "ID": "PAD_RACE", "Name": "Endless CC-X", "Price": 900, "Tier": "Elite" }
+    ],
+    "Rotors": [
+      { "ID": "ROTOR_STOCK", "Name": "Stock Brembo Rotors", "Price": 0, "Tier": "Stock" },
+      { "ID": "ROTOR_SLOT", "Name": "Slotted Rotors", "Price": 400, "Tier": "Sport" },
+      { "ID": "ROTOR_2PC", "Name": "2-Piece Rotors", "Price": 1900, "Tier": "Race" }
+    ],
+    "Calipers": [
+      { "ID": "CAL_STOCK", "Name": "Stock Brembo 4-Piston", "Price": 0, "Tier": "Stock" },
+      { "ID": "CAL_6POT", "Name": "Brembo GT 6-Piston", "Price": 5500, "Tier": "Race" },
+      { "ID": "CAL_8POT", "Name": "AP Racing 8-Piston", "Price": 9000, "Tier": "Elite" }
+    ]
+  },
+
+  "Wheels": {
+    "Sets": [
+      { "ID": "WHEEL_STOCK", "Name": "Stock 17\" BBS Wheels", "Size": 17, "Weight": 24, "Price": 0, "Tier": "Stock" },
+      { "ID": "WHEEL_ENKEI", "Name": "Enkei RPF1 17\"", "Size": 17, "Width": 9.0, "Weight": 17, "Price": 1800, "Tier": "Sport" },
+      { "ID": "WHEEL_TE37", "Name": "Volk TE37 18\"", "Size": 18, "Width": 9.5, "Weight": 15, "Price": 5200, "Tier": "Race" },
+      { "ID": "WHEEL_RALLY", "Name": "OZ Racing Rally 15\"", "Size": 15, "Width": 7.0, "Weight": 13, "Price": 3200, "Tier": "Race" }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "TIRE_SPORT", "Name": "Yokohama Advan Sport", "Grip": 1.0, "Price": 1100, "Tier": "Sport" },
+      { "ID": "TIRE_SEMISLICK", "Name": "Toyo R888R", "Grip": 1.15, "Price": 1700, "Tier": "Race" },
+      { "ID": "TIRE_SLICK", "Name": "Hoosier A7", "Grip": 1.35, "Price": 2600, "Tier": "Elite" },
+      { "ID": "TIRE_GRAVEL", "Name": "Pirelli Scorpion Gravel", "Grip": 0.9, "GravelGrip": 1.45, "Price": 1300, "Tier": "Race" }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "FBUMP_STOCK", "Name": "Stock Front Bumper", "Price": 0, "Tier": "Stock" },
+      { "ID": "FBUMP_VARIS", "Name": "Varis Front Bumper", "Downforce": 10, "Price": 2200, "Tier": "Sport" },
+      { "ID": "FBUMP_APR", "Name": "APR Front", "Downforce": 18, "Price": 3500, "Tier": "Race" },
+      { "ID": "FBUMP_WIDE", "Name": "Widebody Front", "Downforce": 25, "Price": 5000, "Tier": "Elite" }
+    ],
+    "Spoiler": [
+      { "ID": "SPOILER_STOCK", "Name": "Stock Evo Wing", "Downforce": 12, "Price": 0, "Tier": "Stock" },
+      { "ID": "SPOILER_VARIS", "Name": "Varis Wing", "Downforce": 22, "Price": 2000, "Tier": "Sport" },
+      { "ID": "SPOILER_APR", "Name": "APR GTC-300", "Downforce": 35, "Price": 2800, "Tier": "Race" },
+      { "ID": "SPOILER_RALLY", "Name": "WRC Rally Wing", "Downforce": 20, "Price": 1800, "Tier": "Race" }
+    ],
+    "Hood": [
+      { "ID": "HOOD_STOCK", "Name": "Stock Hood", "Weight": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "HOOD_VENT", "Name": "Vented Steel Hood", "Weight": -8, "Price": 650, "Tier": "Sport" },
+      { "ID": "HOOD_CARBON", "Name": "Seibon Carbon Hood", "Weight": -28, "Price": 1900, "Tier": "Race" }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "BODY_STOCK", "Name": "Stock Body", "Price": 0, "Tier": "Stock" },
+      { "ID": "BODY_VARIS", "Name": "Varis Wide Body", "Price": 10000, "Tier": "Race" },
+      { "ID": "BODY_APR", "Name": "APR Wide Body", "Price": 15000, "Tier": "Elite" }
+    ]
+  },
+
+  "Packages": {
+    "StreetBuild": {
+      "Name": "Street Weapon Package",
+      "Price": 6500,
+      "Parts": ["INTAKE_HKS", "EXHAUST_CATBACK", "ECU_STAGE1", "SPRING_LOW"],
+      "PowerGain": 63,
+      "Tier": "Sport"
+    },
+    "TrackBuild": {
+      "Name": "Track Attack Package",
+      "Price": 22000,
+      "Parts": ["TURBO_GTX3076", "IC_FMIC", "EXHAUST_TURBOBACK", "ECU_STAGE2", "SPRING_COIL"],
+      "PowerGain": 313,
+      "Tier": "Race"
+    },
+    "FullBuild": {
+      "Name": "800HP Build Package",
+      "Price": 65000,
+      "Parts": ["TURBO_GTX4088", "INT_STROKER", "FUEL_FLEX", "ECU_STANDALONE", "CLUTCH_TRIPLE", "TRANS_SEQ"],
+      "PowerGain": 665,
+      "Tier": "Elite"
+    }
+  }
+}
