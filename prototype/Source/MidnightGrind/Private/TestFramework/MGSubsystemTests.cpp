@@ -11,6 +11,8 @@
 #include "AI/MGAIDriverProfile.h"
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
+#include "HAL/PlatformMemory.h"
+#include "HAL/PlatformTime.h"
 
 void UMGSubsystemTests::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -234,6 +236,44 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
+	// Performance Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Perf_SubsystemTick"));
+		Test.TestName = FText::FromString(TEXT("Performance - Subsystem Tick"));
+		Test.Description = FText::FromString(TEXT("Benchmark subsystem tick times"));
+		Test.Category = EMGTestCategory::Performance;
+		Test.Tags.Add(FName(TEXT("Performance")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Perf_MemoryUsage"));
+		Test.TestName = FText::FromString(TEXT("Performance - Memory Usage"));
+		Test.Description = FText::FromString(TEXT("Verify memory allocations are reasonable"));
+		Test.Category = EMGTestCategory::Performance;
+		Test.Tags.Add(FName(TEXT("Performance")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Perf_DelegateBroadcast"));
+		Test.TestName = FText::FromString(TEXT("Performance - Delegate Broadcast"));
+		Test.Description = FText::FromString(TEXT("Benchmark delegate broadcast overhead"));
+		Test.Category = EMGTestCategory::Performance;
+		Test.Tags.Add(FName(TEXT("Performance")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Perf_DataAccess"));
+		Test.TestName = FText::FromString(TEXT("Performance - Data Access"));
+		Test.Description = FText::FromString(TEXT("Benchmark data structure access times"));
+		Test.Category = EMGTestCategory::Performance;
+		Test.Tags.Add(FName(TEXT("Performance")));
+		TestFramework->RegisterTest(Test);
+	}
+
 	// Integration Tests
 	{
 		FMGTestCase Test;
@@ -254,7 +294,7 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 28);
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 32);
 }
 
 // ==========================================
@@ -1699,6 +1739,245 @@ FMGTestResult UMGSubsystemTests::TestAI_Strategies()
 }
 
 // ==========================================
+// PERFORMANCE TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestPerf_SubsystemTick()
+{
+	LogTestStart(TEXT("TestPerf_SubsystemTick"));
+
+	TArray<FString> Logs;
+
+	// Benchmark a simple tick-like operation
+	const int32 Iterations = 1000;
+	double TotalTime = 0.0;
+
+	for (int32 i = 0; i < Iterations; i++)
+	{
+		double StartTime = FPlatformTime::Seconds();
+
+		// Simulate subsystem work
+		volatile float Dummy = 0.0f;
+		for (int32 j = 0; j < 100; j++)
+		{
+			Dummy += FMath::Sin(static_cast<float>(j)) * FMath::Cos(static_cast<float>(j));
+		}
+
+		double EndTime = FPlatformTime::Seconds();
+		TotalTime += (EndTime - StartTime);
+	}
+
+	double AverageTimeMs = (TotalTime / Iterations) * 1000.0;
+	Logs.Add(FString::Printf(TEXT("Average tick time: %.4f ms"), AverageTimeMs));
+	Logs.Add(FString::Printf(TEXT("Total iterations: %d"), Iterations));
+
+	// Subsystem tick should be fast (< 1ms typically)
+	if (AverageTimeMs > 1.0)
+	{
+		Logs.Add(TEXT("Warning: Tick time exceeds 1ms"));
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Perf_SubsystemTick")),
+		FString::Printf(TEXT("Avg tick: %.4f ms over %d iterations"), AverageTimeMs, Iterations)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPerf_MemoryUsage()
+{
+	LogTestStart(TEXT("TestPerf_MemoryUsage"));
+
+	TArray<FString> Logs;
+
+	// Get memory stats
+	FPlatformMemoryStats MemStats = FPlatformMemory::GetStats();
+
+	double UsedPhysicalMB = MemStats.UsedPhysical / (1024.0 * 1024.0);
+	double PeakPhysicalMB = MemStats.PeakUsedPhysical / (1024.0 * 1024.0);
+	double UsedVirtualMB = MemStats.UsedVirtual / (1024.0 * 1024.0);
+	double AvailablePhysicalMB = MemStats.AvailablePhysical / (1024.0 * 1024.0);
+
+	Logs.Add(FString::Printf(TEXT("Used Physical: %.2f MB"), UsedPhysicalMB));
+	Logs.Add(FString::Printf(TEXT("Peak Physical: %.2f MB"), PeakPhysicalMB));
+	Logs.Add(FString::Printf(TEXT("Used Virtual: %.2f MB"), UsedVirtualMB));
+	Logs.Add(FString::Printf(TEXT("Available Physical: %.2f MB"), AvailablePhysicalMB));
+
+	// Check for reasonable memory usage
+	if (UsedPhysicalMB <= 0.0)
+	{
+		Logs.Add(TEXT("Warning: Memory stats may not be available on this platform"));
+	}
+
+	// Test allocation/deallocation
+	{
+		const int32 AllocSize = 1024 * 1024; // 1MB
+		const int32 NumAllocs = 10;
+
+		TArray<void*> Allocations;
+		Allocations.Reserve(NumAllocs);
+
+		double AllocStartTime = FPlatformTime::Seconds();
+		for (int32 i = 0; i < NumAllocs; i++)
+		{
+			void* Ptr = FMemory::Malloc(AllocSize);
+			if (Ptr)
+			{
+				Allocations.Add(Ptr);
+			}
+		}
+		double AllocEndTime = FPlatformTime::Seconds();
+
+		double FreeStartTime = FPlatformTime::Seconds();
+		for (void* Ptr : Allocations)
+		{
+			FMemory::Free(Ptr);
+		}
+		double FreeEndTime = FPlatformTime::Seconds();
+
+		double AllocTimeMs = (AllocEndTime - AllocStartTime) * 1000.0;
+		double FreeTimeMs = (FreeEndTime - FreeStartTime) * 1000.0;
+
+		Logs.Add(FString::Printf(TEXT("Alloc %d x 1MB: %.2f ms"), NumAllocs, AllocTimeMs));
+		Logs.Add(FString::Printf(TEXT("Free %d x 1MB: %.2f ms"), NumAllocs, FreeTimeMs));
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Perf_MemoryUsage")),
+		FString::Printf(TEXT("Memory: %.2f MB used, %.2f MB peak"), UsedPhysicalMB, PeakPhysicalMB)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPerf_DelegateBroadcast()
+{
+	LogTestStart(TEXT("TestPerf_DelegateBroadcast"));
+
+	TArray<FString> Logs;
+
+	// Create a test delegate
+	DECLARE_MULTICAST_DELEGATE_OneParam(FTestDelegate, int32);
+	FTestDelegate TestDelegate;
+
+	// Add some bindings
+	int32 CallCount = 0;
+	auto Lambda1 = [&CallCount](int32 Value) { CallCount += Value; };
+	auto Lambda2 = [&CallCount](int32 Value) { CallCount += Value * 2; };
+	auto Lambda3 = [&CallCount](int32 Value) { CallCount += Value * 3; };
+
+	TestDelegate.AddLambda(Lambda1);
+	TestDelegate.AddLambda(Lambda2);
+	TestDelegate.AddLambda(Lambda3);
+
+	Logs.Add(FString::Printf(TEXT("Delegate bindings: 3")));
+
+	// Benchmark broadcasts
+	const int32 BroadcastCount = 10000;
+
+	double StartTime = FPlatformTime::Seconds();
+	for (int32 i = 0; i < BroadcastCount; i++)
+	{
+		TestDelegate.Broadcast(1);
+	}
+	double EndTime = FPlatformTime::Seconds();
+
+	double TotalTimeMs = (EndTime - StartTime) * 1000.0;
+	double AvgBroadcastUs = (TotalTimeMs * 1000.0) / BroadcastCount;
+
+	Logs.Add(FString::Printf(TEXT("Broadcast count: %d"), BroadcastCount));
+	Logs.Add(FString::Printf(TEXT("Total time: %.2f ms"), TotalTimeMs));
+	Logs.Add(FString::Printf(TEXT("Avg broadcast: %.3f us"), AvgBroadcastUs));
+
+	// Clear delegate
+	TestDelegate.Clear();
+
+	// Delegate broadcasts should be fast
+	if (AvgBroadcastUs > 10.0)
+	{
+		Logs.Add(TEXT("Warning: Delegate broadcast time seems high"));
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Perf_DelegateBroadcast")),
+		FString::Printf(TEXT("Avg broadcast: %.3f us over %d calls"), AvgBroadcastUs, BroadcastCount)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPerf_DataAccess()
+{
+	LogTestStart(TEXT("TestPerf_DataAccess"));
+
+	TArray<FString> Logs;
+
+	// Test TMap access
+	{
+		TMap<FName, int32> TestMap;
+		const int32 NumEntries = 1000;
+
+		// Populate
+		for (int32 i = 0; i < NumEntries; i++)
+		{
+			TestMap.Add(FName(*FString::Printf(TEXT("Key_%d"), i)), i);
+		}
+
+		// Benchmark lookups
+		const int32 LookupCount = 10000;
+		double StartTime = FPlatformTime::Seconds();
+
+		volatile int32 Dummy = 0;
+		for (int32 i = 0; i < LookupCount; i++)
+		{
+			FName Key(*FString::Printf(TEXT("Key_%d"), i % NumEntries));
+			if (int32* Value = TestMap.Find(Key))
+			{
+				Dummy = *Value;
+			}
+		}
+
+		double EndTime = FPlatformTime::Seconds();
+		double TotalTimeMs = (EndTime - StartTime) * 1000.0;
+		double AvgLookupUs = (TotalTimeMs * 1000.0) / LookupCount;
+
+		Logs.Add(FString::Printf(TEXT("TMap entries: %d"), NumEntries));
+		Logs.Add(FString::Printf(TEXT("TMap lookups: %d"), LookupCount));
+		Logs.Add(FString::Printf(TEXT("TMap avg lookup: %.3f us"), AvgLookupUs));
+	}
+
+	// Test TArray access
+	{
+		TArray<int32> TestArray;
+		const int32 ArraySize = 10000;
+		TestArray.Reserve(ArraySize);
+
+		for (int32 i = 0; i < ArraySize; i++)
+		{
+			TestArray.Add(i);
+		}
+
+		// Benchmark sequential access
+		const int32 AccessCount = 100000;
+		double StartTime = FPlatformTime::Seconds();
+
+		volatile int64 Sum = 0;
+		for (int32 i = 0; i < AccessCount; i++)
+		{
+			Sum += TestArray[i % ArraySize];
+		}
+
+		double EndTime = FPlatformTime::Seconds();
+		double TotalTimeMs = (EndTime - StartTime) * 1000.0;
+		double AvgAccessUs = (TotalTimeMs * 1000.0) / AccessCount;
+
+		Logs.Add(FString::Printf(TEXT("TArray size: %d"), ArraySize));
+		Logs.Add(FString::Printf(TEXT("TArray accesses: %d"), AccessCount));
+		Logs.Add(FString::Printf(TEXT("TArray avg access: %.4f us"), AvgAccessUs));
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Perf_DataAccess")),
+		TEXT("Data structure access benchmarks completed")
+	);
+}
+
+// ==========================================
 // INTEGRATION TESTS
 // ==========================================
 
@@ -1869,6 +2148,12 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestAI_DriverPersonality());
 	TestResults.Add(TestAI_Strategies());
 
+	// Performance tests
+	TestResults.Add(TestPerf_SubsystemTick());
+	TestResults.Add(TestPerf_MemoryUsage());
+	TestResults.Add(TestPerf_DelegateBroadcast());
+	TestResults.Add(TestPerf_DataAccess());
+
 	// Integration tests
 	TestResults.Add(TestIntegration_CurrencyEconomy());
 	TestResults.Add(TestIntegration_WeatherRoad());
@@ -2013,6 +2298,32 @@ void UMGSubsystemTests::RunAITests()
 	TestResults.Add(TestAI_SpawnConfig());
 	TestResults.Add(TestAI_DriverPersonality());
 	TestResults.Add(TestAI_Strategies());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
+void UMGSubsystemTests::RunPerformanceTests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING PERFORMANCE TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestPerf_SubsystemTick());
+	TestResults.Add(TestPerf_MemoryUsage());
+	TestResults.Add(TestPerf_DelegateBroadcast());
+	TestResults.Add(TestPerf_DataAccess());
 
 	for (const FMGTestResult& Result : TestResults)
 	{

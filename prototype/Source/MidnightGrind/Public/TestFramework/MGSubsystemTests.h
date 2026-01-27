@@ -169,6 +169,26 @@ public:
 	FMGTestResult TestAI_Strategies();
 
 	// ==========================================
+	// PERFORMANCE TESTS
+	// ==========================================
+
+	/** Test subsystem tick performance */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Performance")
+	FMGTestResult TestPerf_SubsystemTick();
+
+	/** Test memory allocations */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Performance")
+	FMGTestResult TestPerf_MemoryUsage();
+
+	/** Test delegate broadcast overhead */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Performance")
+	FMGTestResult TestPerf_DelegateBroadcast();
+
+	/** Test data structure access times */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Performance")
+	FMGTestResult TestPerf_DataAccess();
+
+	// ==========================================
 	// INTEGRATION TESTS
 	// ==========================================
 
@@ -207,6 +227,10 @@ public:
 	/** Run AI tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunAITests();
+
+	/** Run performance tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunPerformanceTests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
