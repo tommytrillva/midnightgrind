@@ -1,0 +1,262 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Insurance and Protection System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "Optional": true,
+    "AffectsPinkSlips": true,
+    "ClaimLimit": 3,
+    "ClaimCooldown": 86400
+  },
+
+  "InsuranceTiers": {
+    "None": {
+      "ID": "INS_NONE",
+      "Name": "No Insurance",
+      "Premium": 0,
+      "Coverage": 0,
+      "Features": {
+        "RepairCoverage": false,
+        "TotalLossCoverage": false,
+        "TheftProtection": false,
+        "PinkSlipProtection": false
+      },
+      "Risk": "Full"
+    },
+    "Basic": {
+      "ID": "INS_BASIC",
+      "Name": "Basic Coverage",
+      "Premium": { "PercentOfValue": 0.005, "Min": 100 },
+      "Coverage": 0.5,
+      "Features": {
+        "RepairCoverage": { "Percentage": 50 },
+        "TotalLossCoverage": { "Percentage": 30 },
+        "TheftProtection": false,
+        "PinkSlipProtection": false
+      },
+      "Deductible": 0.2
+    },
+    "Standard": {
+      "ID": "INS_STANDARD",
+      "Name": "Standard Coverage",
+      "Premium": { "PercentOfValue": 0.01, "Min": 250 },
+      "Coverage": 0.75,
+      "Features": {
+        "RepairCoverage": { "Percentage": 75 },
+        "TotalLossCoverage": { "Percentage": 60 },
+        "TheftProtection": { "Percentage": 50 },
+        "PinkSlipProtection": false
+      },
+      "Deductible": 0.15
+    },
+    "Premium": {
+      "ID": "INS_PREMIUM",
+      "Name": "Premium Coverage",
+      "Premium": { "PercentOfValue": 0.02, "Min": 500 },
+      "Coverage": 0.9,
+      "Features": {
+        "RepairCoverage": { "Percentage": 90 },
+        "TotalLossCoverage": { "Percentage": 80 },
+        "TheftProtection": { "Percentage": 80 },
+        "PinkSlipProtection": { "Enabled": true, "Cooldown": 604800 }
+      },
+      "Deductible": 0.1
+    },
+    "Elite": {
+      "ID": "INS_ELITE",
+      "Name": "Elite Coverage",
+      "Premium": { "PercentOfValue": 0.035, "Min": 1000 },
+      "Coverage": 1.0,
+      "Features": {
+        "RepairCoverage": { "Percentage": 100 },
+        "TotalLossCoverage": { "Percentage": 100 },
+        "TheftProtection": { "Percentage": 100 },
+        "PinkSlipProtection": { "Enabled": true, "Cooldown": 259200 },
+        "ModificationCoverage": true,
+        "RentalWhileRepaired": true,
+        "PriorityRepairs": true
+      },
+      "Deductible": 0.05
+    }
+  },
+
+  "CoverageTypes": {
+    "Collision": {
+      "Description": "Covers damage from crashes",
+      "Triggers": ["VehicleCollision", "EnvironmentCollision", "RaceDamage"],
+      "Payout": "RepairCost * CoveragePercentage"
+    },
+    "TotalLoss": {
+      "Description": "Covers vehicle if totaled",
+      "Trigger": "DamageExceeds80Percent",
+      "Payout": "VehicleValue * CoveragePercentage",
+      "Options": ["Replacement", "CashOut"]
+    },
+    "Theft": {
+      "Description": "Covers stolen vehicles",
+      "Triggers": ["VehicleStolen", "PartsStolen"],
+      "Payout": "Value * CoveragePercentage",
+      "PoliceReportRequired": true
+    },
+    "PinkSlip": {
+      "Description": "Protects from losing car in pink slip races",
+      "Trigger": "LostPinkSlipRace",
+      "Benefit": "KeepVehicle",
+      "Cooldown": true
+    },
+    "Modifications": {
+      "Description": "Covers aftermarket parts",
+      "Trigger": "PartsDamaged",
+      "Payout": "PartValue * CoveragePercentage",
+      "EliteOnly": true
+    }
+  },
+
+  "PremiumFactors": {
+    "VehicleValue": {
+      "Base": true,
+      "IncludesModifications": true
+    },
+    "DriverHistory": {
+      "CleanRecord": { "Modifier": 0.85 },
+      "MinorIncidents": { "Modifier": 1.0 },
+      "MajorIncidents": { "Modifier": 1.25 },
+      "FrequentClaims": { "Modifier": 1.5 }
+    },
+    "VehicleType": {
+      "Economy": { "Modifier": 0.8 },
+      "Sport": { "Modifier": 1.0 },
+      "SuperCar": { "Modifier": 1.3 },
+      "HyperCar": { "Modifier": 1.5 },
+      "Classic": { "Modifier": 1.4 }
+    },
+    "Usage": {
+      "FreeRoamOnly": { "Modifier": 0.9 },
+      "CasualRacing": { "Modifier": 1.0 },
+      "CompetitiveRacing": { "Modifier": 1.2 },
+      "PinkSlipRacing": { "Modifier": 1.5 }
+    },
+    "Loyalty": {
+      "1Year": { "Discount": 0.05 },
+      "2Years": { "Discount": 0.1 },
+      "5Years": { "Discount": 0.15 }
+    }
+  },
+
+  "Claims": {
+    "Process": {
+      "FileClaim": true,
+      "ReviewPeriod": { "Instant": true },
+      "Payout": "Immediate"
+    },
+    "Limits": {
+      "PerPeriod": { "Count": 3, "Period": "Month" },
+      "Cooldown": { "AfterClaim": 86400 }
+    },
+    "Deductible": {
+      "Applied": true,
+      "Waived": { "Condition": "NoClaims6Months" }
+    },
+    "Fraud": {
+      "Detection": true,
+      "Penalty": "PolicyCancellation"
+    }
+  },
+
+  "PolicyManagement": {
+    "Purchase": {
+      "Location": ["Garage", "Insurance Menu"],
+      "InstantActivation": true
+    },
+    "Duration": {
+      "Options": [30, 90, 365],
+      "AutoRenew": { "Default": true, "Discount": 0.05 }
+    },
+    "Modification": {
+      "Upgrade": { "Prorated": true },
+      "Downgrade": { "AtRenewal": true },
+      "Cancel": { "Refund": "Prorated" }
+    },
+    "MultiVehicle": {
+      "Discount": {
+        "2Vehicles": 0.05,
+        "5Vehicles": 0.1,
+        "10Vehicles": 0.15
+      },
+      "FleetPolicy": { "Available": true }
+    }
+  },
+
+  "SpecialPolicies": {
+    "ClassicCarInsurance": {
+      "ID": "INS_CLASSIC",
+      "Description": "Agreed value for classic vehicles",
+      "AgreedValue": true,
+      "AppreciationCoverage": true,
+      "Requirements": ["VehicleAge25Plus", "LimitedMileage"]
+    },
+    "TrackDayInsurance": {
+      "ID": "INS_TRACK",
+      "Description": "Coverage during organized events",
+      "EventCoverage": true,
+      "Duration": "PerEvent",
+      "Premium": "High"
+    },
+    "StorageInsurance": {
+      "ID": "INS_STORAGE",
+      "Description": "Reduced rate for garaged vehicles",
+      "Requirements": ["NotDriven"],
+      "Coverage": ["Theft", "Fire", "Vandalism"],
+      "Discount": 0.5
+    }
+  },
+
+  "Rewards": {
+    "SafeDriver": {
+      "NoClaimsBonus": {
+        "3Months": { "Discount": 0.05 },
+        "6Months": { "Discount": 0.1 },
+        "12Months": { "Discount": 0.2 }
+      }
+    },
+    "LoyaltyRewards": {
+      "AnniversaryBonus": { "FreeUpgrade": true },
+      "ReferralBonus": { "Discount": 0.05 }
+    }
+  },
+
+  "Integration": {
+    "PinkSlips": {
+      "ProtectionAvailable": true,
+      "ClaimAfterLoss": true,
+      "CooldownEnforced": true
+    },
+    "Marketplace": {
+      "ShowInsuranceStatus": true,
+      "TransferPolicy": false
+    },
+    "Damage": {
+      "AutoClaimPrompt": true,
+      "RepairIntegration": true
+    }
+  },
+
+  "UI": {
+    "InsuranceMenu": {
+      "PolicyOverview": true,
+      "CoverageDetails": true,
+      "ClaimHistory": true,
+      "ComparePolicy": true
+    },
+    "Notifications": {
+      "PolicyExpiring": { "DaysBefore": [7, 1] },
+      "ClaimProcessed": true,
+      "PremiumDue": true
+    },
+    "VehicleCard": {
+      "ShowInsuranceStatus": true,
+      "QuickClaimButton": true
+    }
+  }
+}

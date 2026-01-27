@@ -1,0 +1,324 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Challenge System and Weekly Objectives",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DailyChallenges": 3,
+    "WeeklyChallenges": 7,
+    "MonthlyChallenges": 3,
+    "StackingAllowed": true,
+    "RerollsPerDay": 1
+  },
+
+  "ChallengeCategories": {
+    "Racing": {
+      "ID": "CHAL_RACING",
+      "Name": "Racing Challenges",
+      "Icon": "RacingFlag",
+      "Types": {
+        "WinRaces": {
+          "Variations": ["Any", "Circuit", "Sprint", "Drag", "Drift"],
+          "Counts": [1, 3, 5, 10, 25]
+        },
+        "PlaceTop3": {
+          "Variations": ["Any", "SpecificClass"],
+          "Counts": [3, 5, 10]
+        },
+        "CompleteRaces": {
+          "Variations": ["Any", "Online", "Offline"],
+          "Counts": [5, 10, 20]
+        },
+        "PerfectStart": {
+          "Description": "Launch with perfect timing",
+          "Counts": [1, 3, 5]
+        },
+        "CleanRace": {
+          "Description": "Finish without collisions",
+          "Counts": [1, 3]
+        }
+      }
+    },
+    "Driving": {
+      "ID": "CHAL_DRIVING",
+      "Name": "Driving Challenges",
+      "Icon": "Speedometer",
+      "Types": {
+        "DriveMiles": {
+          "Distances": [10, 50, 100, 500],
+          "Unit": "Miles"
+        },
+        "ReachSpeed": {
+          "Speeds": [150, 200, 250, 300],
+          "Unit": "MPH"
+        },
+        "DriftDistance": {
+          "Distances": [1000, 5000, 10000],
+          "Unit": "Meters"
+        },
+        "DriftScore": {
+          "Scores": [50000, 100000, 500000],
+          "SingleOrCumulative": "Both"
+        },
+        "NearMisses": {
+          "Counts": [10, 25, 50, 100]
+        },
+        "AirTime": {
+          "Seconds": [5, 15, 30],
+          "SingleOrCumulative": "Both"
+        }
+      }
+    },
+    "Police": {
+      "ID": "CHAL_POLICE",
+      "Name": "Police Challenges",
+      "Icon": "Siren",
+      "Types": {
+        "EscapeChase": {
+          "HeatLevels": ["Any", 1, 2, 3, 4, 5],
+          "Counts": [1, 3, 5]
+        },
+        "EvadeTime": {
+          "Minutes": [5, 10, 15],
+          "MinHeat": 3
+        },
+        "RamCops": {
+          "Counts": [5, 10, 25]
+        },
+        "LoseHelicopter": {
+          "Counts": [1, 3]
+        }
+      }
+    },
+    "Customization": {
+      "ID": "CHAL_CUSTOM",
+      "Name": "Customization Challenges",
+      "Icon": "Wrench",
+      "Types": {
+        "ApplyParts": {
+          "Counts": [1, 5, 10]
+        },
+        "CreateLivery": {
+          "Counts": [1, 3]
+        },
+        "VisitTuner": {
+          "Counts": [1, 3, 5]
+        },
+        "MaxOutCar": {
+          "Description": "Fully upgrade any vehicle",
+          "Counts": [1]
+        }
+      }
+    },
+    "Social": {
+      "ID": "CHAL_SOCIAL",
+      "Name": "Social Challenges",
+      "Icon": "People",
+      "Types": {
+        "RaceWithFriends": {
+          "Counts": [1, 3, 5]
+        },
+        "WinAgainstFriends": {
+          "Counts": [1, 3]
+        },
+        "SharePhoto": {
+          "Counts": [1, 3, 5]
+        },
+        "AttendCarMeet": {
+          "Counts": [1, 3]
+        },
+        "HelpCrewmate": {
+          "Counts": [1, 3]
+        }
+      }
+    },
+    "Collection": {
+      "ID": "CHAL_COLLECT",
+      "Name": "Collection Challenges",
+      "Icon": "Star",
+      "Types": {
+        "FindCollectibles": {
+          "Counts": [5, 10, 25]
+        },
+        "DiscoverRoads": {
+          "Percentage": [10, 25, 50]
+        },
+        "CompleteSpeedTraps": {
+          "Counts": [3, 5, 10]
+        },
+        "CompleteDriftZones": {
+          "Counts": [3, 5, 10]
+        }
+      }
+    },
+    "Special": {
+      "ID": "CHAL_SPECIAL",
+      "Name": "Special Challenges",
+      "Icon": "Trophy",
+      "Types": {
+        "UseSpecificCar": {
+          "Description": "Complete objectives with specific vehicle",
+          "Rotating": true
+        },
+        "RaceInRegion": {
+          "Regions": ["Downtown", "Mountain", "Highway", "Industrial"],
+          "Counts": [3, 5]
+        },
+        "TimeOfDay": {
+          "Times": ["Night", "Dawn", "Day"],
+          "Tasks": ["Race", "Drive", "Explore"]
+        },
+        "WeatherCondition": {
+          "Conditions": ["Rain", "Storm"],
+          "Tasks": ["Race", "DriftZone"]
+        }
+      }
+    }
+  },
+
+  "DailyChallenges": {
+    "Count": 3,
+    "Difficulty": ["Easy", "Medium", "Hard"],
+    "Rewards": {
+      "Easy": { "Cash": 2500, "REP": 250 },
+      "Medium": { "Cash": 5000, "REP": 500 },
+      "Hard": { "Cash": 10000, "REP": 1000 }
+    },
+    "CompletionBonus": {
+      "AllThree": { "Cash": 5000, "REP": 500 }
+    },
+    "ResetTime": "00:00 UTC",
+    "Reroll": {
+      "PerDay": 1,
+      "Cost": 0
+    }
+  },
+
+  "WeeklyChallenges": {
+    "Count": 7,
+    "Categories": {
+      "Racing": 2,
+      "Driving": 2,
+      "Special": 2,
+      "Wildcard": 1
+    },
+    "Rewards": {
+      "PerChallenge": { "Cash": 15000, "REP": 1500 },
+      "AllSeven": { "Cash": 50000, "REP": 5000, "Crate": "WeeklyCrate" }
+    },
+    "ResetDay": "Monday",
+    "Reroll": {
+      "PerWeek": 2,
+      "Cost": 2500
+    }
+  },
+
+  "MonthlyChallenges": {
+    "Count": 3,
+    "Difficulty": "Hard",
+    "Examples": {
+      "Win100Races": { "Count": 100 },
+      "Drive1000Miles": { "Count": 1000 },
+      "Earn1MillionCash": { "Count": 1000000 }
+    },
+    "Rewards": {
+      "PerChallenge": { "Cash": 100000, "REP": 10000 },
+      "AllThree": { "Cash": 250000, "REP": 25000, "Item": "ExclusiveCosmetic" }
+    },
+    "NoReroll": true
+  },
+
+  "SeasonalChallenges": {
+    "TiedToSeason": true,
+    "ExclusiveRewards": true,
+    "Types": {
+      "HolidayThemed": true,
+      "EventSpecific": true,
+      "LimitedTime": true
+    },
+    "RewardTier": "Premium"
+  },
+
+  "CommunityChallenge": {
+    "Enabled": true,
+    "Collaborative": true,
+    "GlobalGoal": {
+      "Example": "Community drives 10 million miles",
+      "Progress": "SharedAcrossAllPlayers"
+    },
+    "IndividualContribution": {
+      "Tracked": true,
+      "BonusForTopContributors": true
+    },
+    "Rewards": {
+      "GoalMet": { "AllParticipants": true },
+      "TopContributors": { "ExclusiveReward": true }
+    }
+  },
+
+  "ChallengeChains": {
+    "Enabled": true,
+    "Description": "Multi-step challenges with escalating rewards",
+    "Structure": {
+      "Steps": [3, 5, 7],
+      "EscalatingDifficulty": true,
+      "EscalatingRewards": true
+    },
+    "Examples": {
+      "DriftMaster": {
+        "Step1": { "Task": "Score 10000 drift points", "Reward": { "Cash": 5000 } },
+        "Step2": { "Task": "Score 50000 drift points", "Reward": { "Cash": 15000 } },
+        "Step3": { "Task": "Score 100000 drift points", "Reward": { "Cash": 50000, "Title": "Drift Master" } }
+      }
+    }
+  },
+
+  "Tracking": {
+    "Progress": {
+      "RealTime": true,
+      "Percentage": true,
+      "NotifyOnProgress": [25, 50, 75, 100]
+    },
+    "History": {
+      "CompletedChallenges": true,
+      "TotalEarned": true,
+      "StreakTracking": true
+    }
+  },
+
+  "Multipliers": {
+    "DoubleXPWeekend": {
+      "Enabled": true,
+      "Applies": "ChallengeRewards"
+    },
+    "VIPBonus": {
+      "Silver": 1.1,
+      "Gold": 1.25,
+      "Platinum": 1.5
+    },
+    "StreakBonus": {
+      "7Days": 1.1,
+      "14Days": 1.25,
+      "30Days": 1.5
+    }
+  },
+
+  "UI": {
+    "ChallengeMenu": {
+      "Tabs": ["Daily", "Weekly", "Monthly", "Seasonal", "Community"],
+      "ShowProgress": true,
+      "PinToHUD": { "Max": 3 },
+      "FilterByCategory": true
+    },
+    "HUDWidget": {
+      "CompactView": true,
+      "ShowActive": true,
+      "ProgressBar": true
+    },
+    "Notifications": {
+      "ChallengeComplete": true,
+      "NewChallengesAvailable": true,
+      "AboutToExpire": true
+    }
+  }
+}

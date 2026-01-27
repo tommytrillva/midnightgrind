@@ -1,0 +1,303 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Statistics and Performance Metrics",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DynamicCalculation": true,
+    "WeightAffectsAll": true,
+    "RealisticPhysics": true
+  },
+
+  "CoreStats": {
+    "Power": {
+      "ID": "STAT_POWER",
+      "Name": "Power",
+      "Unit": "HP",
+      "Description": "Engine horsepower output",
+      "Range": { "Min": 80, "Max": 2000 },
+      "AffectedBy": ["Engine", "Turbo", "Supercharger", "ECU", "Exhaust", "Intake"],
+      "Impact": {
+        "Acceleration": 0.4,
+        "TopSpeed": 0.3
+      }
+    },
+    "Torque": {
+      "ID": "STAT_TORQUE",
+      "Name": "Torque",
+      "Unit": "LB-FT",
+      "Description": "Rotational force at wheels",
+      "Range": { "Min": 60, "Max": 1500 },
+      "AffectedBy": ["Engine", "Turbo", "Supercharger", "ECU", "FinalDrive"],
+      "Impact": {
+        "Acceleration": 0.3,
+        "WheelSpin": 0.2
+      }
+    },
+    "Weight": {
+      "ID": "STAT_WEIGHT",
+      "Name": "Weight",
+      "Unit": "LBS",
+      "Description": "Total vehicle mass",
+      "Range": { "Min": 1800, "Max": 5000 },
+      "AffectedBy": ["BodyParts", "InteriorRemoval", "CarbonParts", "RollCage"],
+      "Impact": {
+        "Acceleration": -0.3,
+        "Handling": -0.2,
+        "Braking": -0.15
+      }
+    },
+    "PowerToWeight": {
+      "ID": "STAT_PTW",
+      "Name": "Power-to-Weight",
+      "Unit": "HP/TON",
+      "Description": "Power relative to mass",
+      "Calculated": true,
+      "Formula": "(Power * 2000) / Weight"
+    }
+  },
+
+  "PerformanceStats": {
+    "Acceleration": {
+      "ID": "STAT_ACCEL",
+      "Name": "Acceleration",
+      "Scale": { "Min": 1, "Max": 10 },
+      "Factors": {
+        "Power": 0.35,
+        "Torque": 0.25,
+        "Weight": -0.2,
+        "Traction": 0.15,
+        "GearRatios": 0.05
+      },
+      "Benchmarks": {
+        "0-60": { "Unit": "Seconds", "Range": [2.5, 12] },
+        "0-100": { "Unit": "Seconds", "Range": [5, 25] },
+        "QuarterMile": { "Unit": "Seconds", "Range": [9, 18] }
+      }
+    },
+    "TopSpeed": {
+      "ID": "STAT_SPEED",
+      "Name": "Top Speed",
+      "Unit": "MPH",
+      "Range": { "Min": 100, "Max": 280 },
+      "Factors": {
+        "Power": 0.4,
+        "Aerodynamics": 0.3,
+        "GearRatios": 0.2,
+        "Weight": -0.1
+      }
+    },
+    "Handling": {
+      "ID": "STAT_HANDLE",
+      "Name": "Handling",
+      "Scale": { "Min": 1, "Max": 10 },
+      "Factors": {
+        "Suspension": 0.3,
+        "Tires": 0.25,
+        "Weight": -0.15,
+        "WeightDistribution": 0.15,
+        "Aero": 0.15
+      },
+      "SubStats": {
+        "Cornering": { "Description": "Grip through turns" },
+        "Stability": { "Description": "High-speed composure" },
+        "Responsiveness": { "Description": "Steering reaction" }
+      }
+    },
+    "Braking": {
+      "ID": "STAT_BRAKE",
+      "Name": "Braking",
+      "Scale": { "Min": 1, "Max": 10 },
+      "Factors": {
+        "BrakeKit": 0.4,
+        "Tires": 0.3,
+        "Weight": -0.2,
+        "Aero": 0.1
+      },
+      "Benchmarks": {
+        "60-0": { "Unit": "Feet", "Range": [90, 180] },
+        "100-0": { "Unit": "Feet", "Range": [250, 450] }
+      }
+    }
+  },
+
+  "SpecializedStats": {
+    "Drift": {
+      "ID": "STAT_DRIFT",
+      "Name": "Drift",
+      "Scale": { "Min": 1, "Max": 10 },
+      "Factors": {
+        "PowerToRear": 0.3,
+        "WeightBalance": 0.25,
+        "SuspensionTuning": 0.2,
+        "TireChoice": 0.15,
+        "DifferentialType": 0.1
+      },
+      "Bonuses": {
+        "RWD": 1.3,
+        "LockedDiff": 1.2,
+        "AngleKit": 1.15
+      }
+    },
+    "Launch": {
+      "ID": "STAT_LAUNCH",
+      "Name": "Launch",
+      "Scale": { "Min": 1, "Max": 10 },
+      "Factors": {
+        "Traction": 0.35,
+        "Torque": 0.25,
+        "AWDSystem": 0.2,
+        "LaunchControl": 0.2
+      },
+      "Bonuses": {
+        "AWD": 1.4,
+        "DragTires": 1.3,
+        "LaunchControl": 1.25
+      }
+    },
+    "Offroad": {
+      "ID": "STAT_OFFROAD",
+      "Name": "Off-Road",
+      "Scale": { "Min": 1, "Max": 10 },
+      "Factors": {
+        "Suspension": 0.3,
+        "GroundClearance": 0.25,
+        "TireType": 0.25,
+        "AWD": 0.2
+      }
+    },
+    "Durability": {
+      "ID": "STAT_DURABLE",
+      "Name": "Durability",
+      "Scale": { "Min": 1, "Max": 10 },
+      "Factors": {
+        "BuildQuality": 0.4,
+        "RollCage": 0.3,
+        "ReinforcedParts": 0.3
+      }
+    }
+  },
+
+  "ClassRatings": {
+    "System": "PerformanceIndex",
+    "Range": { "Min": 100, "Max": 999 },
+    "Calculation": {
+      "Power": 0.3,
+      "Acceleration": 0.25,
+      "Handling": 0.2,
+      "Braking": 0.15,
+      "TopSpeed": 0.1
+    },
+    "Classes": {
+      "D": { "Range": [100, 299], "Name": "Street", "Color": "#808080" },
+      "C": { "Range": [300, 449], "Name": "Sport", "Color": "#00AA00" },
+      "B": { "Range": [450, 599], "Name": "Performance", "Color": "#0066FF" },
+      "A": { "Range": [600, 749], "Name": "Super", "Color": "#AA00AA" },
+      "S": { "Range": [750, 899], "Name": "Hyper", "Color": "#FF6600" },
+      "X": { "Range": [900, 999], "Name": "Extreme", "Color": "#FF0000" }
+    }
+  },
+
+  "WeightDistribution": {
+    "Tracking": true,
+    "Impact": {
+      "FrontHeavy": { "Effect": "Understeer", "Threshold": 0.55 },
+      "RearHeavy": { "Effect": "Oversteer", "Threshold": 0.45 },
+      "Balanced": { "Effect": "Neutral", "Range": [0.48, 0.52] }
+    },
+    "AffectedBy": {
+      "EnginePosition": true,
+      "BatteryRelocation": true,
+      "FuelTankPosition": true,
+      "DriverPosition": false
+    }
+  },
+
+  "DrivetrainEfficiency": {
+    "FWD": {
+      "PowerLoss": 0.12,
+      "TractionBonus": 1.1,
+      "DriftPenalty": 0.6
+    },
+    "RWD": {
+      "PowerLoss": 0.15,
+      "TractionBonus": 1.0,
+      "DriftBonus": 1.3
+    },
+    "AWD": {
+      "PowerLoss": 0.2,
+      "TractionBonus": 1.4,
+      "DriftPenalty": 0.8
+    }
+  },
+
+  "DynamicAdjustments": {
+    "Fuel": {
+      "WeightPerGallon": 6,
+      "TankCapacity": { "Min": 10, "Max": 25 },
+      "AffectsWeight": true
+    },
+    "TireDegradation": {
+      "Enabled": true,
+      "AffectsGrip": true,
+      "Rate": "ByTireType"
+    },
+    "Temperature": {
+      "EngineTemp": { "AffectsPower": true },
+      "TireTemp": { "AffectsGrip": true },
+      "BrakeTemp": { "AffectsBraking": true }
+    },
+    "Damage": {
+      "AffectsAllStats": true,
+      "Progressive": true
+    }
+  },
+
+  "Comparison": {
+    "Enabled": true,
+    "Features": {
+      "SideBySide": { "MaxVehicles": 4 },
+      "StatBars": true,
+      "RadarChart": true,
+      "BenchmarkComparison": true,
+      "StockVsModified": true
+    }
+  },
+
+  "Telemetry": {
+    "RealTimeData": {
+      "RPM": true,
+      "Speed": true,
+      "GForce": true,
+      "TireTemps": true,
+      "TirePressure": true,
+      "BrakeTemps": true,
+      "EngineTemp": true,
+      "OilPressure": true
+    },
+    "DataLogging": {
+      "Enabled": true,
+      "SampleRate": 60,
+      "ExportFormat": ["CSV", "JSON"]
+    }
+  },
+
+  "UI": {
+    "StatsDisplay": {
+      "Bars": true,
+      "Numbers": true,
+      "Icons": true,
+      "ColorCoded": true
+    },
+    "GarageStats": {
+      "QuickView": true,
+      "DetailedView": true,
+      "CompareButton": true
+    },
+    "HUDTelemetry": {
+      "MiniDisplay": true,
+      "Customizable": true,
+      "Positions": ["TopLeft", "TopRight", "BottomLeft", "BottomRight"]
+    }
+  }
+}

@@ -1,0 +1,370 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Race Modes and Event Types",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DynamicWeather": true,
+    "TimeOfDayAffects": true,
+    "ClassRestrictions": true,
+    "CustomRulesAllowed": true
+  },
+
+  "StandardModes": {
+    "Circuit": {
+      "ID": "RACE_CIRCUIT",
+      "Name": "Circuit Race",
+      "Description": "Multi-lap races on closed tracks",
+      "Settings": {
+        "Laps": { "Min": 1, "Max": 99, "Default": 3 },
+        "GridSize": { "Min": 2, "Max": 16 },
+        "RollingStart": false,
+        "GridStart": true
+      },
+      "Scoring": "PositionBased",
+      "Rewards": {
+        "BaseMultiplier": 1.0,
+        "LapBonus": true
+      }
+    },
+    "Sprint": {
+      "ID": "RACE_SPRINT",
+      "Name": "Sprint Race",
+      "Description": "Point-to-point races",
+      "Settings": {
+        "Checkpoints": true,
+        "GridSize": { "Min": 2, "Max": 16 },
+        "RollingStart": true
+      },
+      "Scoring": "PositionBased",
+      "Rewards": {
+        "BaseMultiplier": 1.0,
+        "DistanceBonus": true
+      }
+    },
+    "Drag": {
+      "ID": "RACE_DRAG",
+      "Name": "Drag Race",
+      "Description": "Straight-line quarter-mile racing",
+      "Settings": {
+        "Distance": { "Options": ["1/8 Mile", "1/4 Mile", "1/2 Mile", "1 Mile"] },
+        "Lanes": 2,
+        "StagingLights": true,
+        "BracketRacing": true
+      },
+      "Scoring": "TimeBased",
+      "Rewards": {
+        "BaseMultiplier": 0.8,
+        "PerfectLaunchBonus": true
+      }
+    },
+    "Drift": {
+      "ID": "RACE_DRIFT",
+      "Name": "Drift Event",
+      "Description": "Score points by drifting",
+      "Settings": {
+        "ScoringZones": true,
+        "TimeLimit": { "Default": 180 },
+        "MultipleRuns": { "Default": 3 }
+      },
+      "Scoring": {
+        "Angle": 0.3,
+        "Speed": 0.25,
+        "Line": 0.25,
+        "Style": 0.2
+      },
+      "Rewards": {
+        "BaseMultiplier": 1.2,
+        "ComboBonus": true
+      }
+    },
+    "TimeAttack": {
+      "ID": "RACE_TIME",
+      "Name": "Time Attack",
+      "Description": "Beat the clock solo",
+      "Settings": {
+        "GhostRacing": true,
+        "Laps": { "Default": 1 },
+        "UnlimitedAttempts": true
+      },
+      "Scoring": "FastestTime",
+      "Rewards": {
+        "BaseMultiplier": 0.7,
+        "PersonalBestBonus": true,
+        "LeaderboardBonus": true
+      }
+    }
+  },
+
+  "SpecialModes": {
+    "Touge": {
+      "ID": "RACE_TOUGE",
+      "Name": "Touge Battle",
+      "Description": "Mountain pass head-to-head",
+      "Settings": {
+        "TwoDrivers": true,
+        "Downhill": true,
+        "Uphill": true,
+        "LeadFollow": true,
+        "GapBasedScoring": true
+      },
+      "Rules": {
+        "Leader": "SetPace",
+        "Chaser": "KeepUp",
+        "GapWin": { "Distance": 50, "Time": 5 }
+      },
+      "Rewards": {
+        "BaseMultiplier": 1.5,
+        "StyleBonus": true
+      }
+    },
+    "Highway": {
+      "ID": "RACE_HIGHWAY",
+      "Name": "Highway Battle",
+      "Description": "High-speed highway racing",
+      "Settings": {
+        "Traffic": true,
+        "OpenRoad": true,
+        "Checkpoints": true
+      },
+      "Features": {
+        "Slipstream": { "Enhanced": true },
+        "TopSpeedSections": true
+      },
+      "Rewards": {
+        "BaseMultiplier": 1.3,
+        "SpeedBonus": true
+      }
+    },
+    "Elimination": {
+      "ID": "RACE_ELIM",
+      "Name": "Elimination",
+      "Description": "Last place eliminated each lap",
+      "Settings": {
+        "EliminationInterval": { "Default": "PerLap", "Options": ["PerLap", "Timed"] },
+        "MinLaps": 3
+      },
+      "Rules": {
+        "LastPlaceOut": true,
+        "SurvivorWins": true
+      },
+      "Rewards": {
+        "BaseMultiplier": 1.4,
+        "SurvivalBonus": true
+      }
+    },
+    "Knockout": {
+      "ID": "RACE_KNOCKOUT",
+      "Name": "Knockout",
+      "Description": "Fastest lap advances",
+      "Settings": {
+        "Rounds": 3,
+        "PlayersPerRound": { "Default": 4 },
+        "TopAdvance": 2
+      },
+      "Rules": {
+        "BestLapWins": true,
+        "BracketStyle": true
+      },
+      "Rewards": {
+        "BaseMultiplier": 1.5,
+        "RoundBonus": true
+      }
+    },
+    "Infected": {
+      "ID": "RACE_INFECTED",
+      "Name": "Infected",
+      "Description": "Tag-style mode spreading infection",
+      "Settings": {
+        "StartingInfected": 1,
+        "Timer": 300,
+        "TagToInfect": true
+      },
+      "Rules": {
+        "LastSurvivorWins": true,
+        "InfectedGetPoints": true
+      },
+      "Rewards": {
+        "SurvivorBonus": 2.0,
+        "InfectedBonus": 0.5
+      }
+    },
+    "KingOfTheHill": {
+      "ID": "RACE_KOTH",
+      "Name": "King of the Hill",
+      "Description": "Control the zone",
+      "Settings": {
+        "Zone": { "Moving": true },
+        "Timer": 600,
+        "PointsPerSecond": 10
+      },
+      "Rules": {
+        "InZoneEarnsPoints": true,
+        "MultipleInZone": "Split"
+      },
+      "Rewards": {
+        "BaseMultiplier": 1.2
+      }
+    }
+  },
+
+  "TeamModes": {
+    "TeamRace": {
+      "ID": "RACE_TEAM",
+      "Name": "Team Race",
+      "Description": "Combined team positions",
+      "Settings": {
+        "TeamsSize": { "Options": [2, 3, 4] },
+        "ScoringMethod": "CombinedPositions"
+      },
+      "Rules": {
+        "LowestCombinedWins": true,
+        "Tiebreaker": "BestFinisher"
+      }
+    },
+    "Relay": {
+      "ID": "RACE_RELAY",
+      "Name": "Relay Race",
+      "Description": "Tag-team racing",
+      "Settings": {
+        "TeamSize": { "Options": [2, 3, 4] },
+        "LegsPerDriver": 1
+      },
+      "Rules": {
+        "HandoffZones": true,
+        "CumulativeTime": true
+      }
+    },
+    "Pursuit": {
+      "ID": "RACE_PURSUIT",
+      "Name": "Cops vs Racers",
+      "Description": "Team-based chase mode",
+      "Settings": {
+        "CopTeam": true,
+        "RacerTeam": true,
+        "Timer": 600
+      },
+      "Rules": {
+        "RacersEscape": "ReachCheckpoint",
+        "CopsWin": "BustAll"
+      },
+      "Rewards": {
+        "RacerBonus": { "PerEscape": 1.5 },
+        "CopBonus": { "PerBust": 1.2 }
+      }
+    }
+  },
+
+  "EnduranceModes": {
+    "Endurance": {
+      "ID": "RACE_ENDURE",
+      "Name": "Endurance Race",
+      "Description": "Long-distance racing",
+      "Settings": {
+        "Duration": { "Options": [15, 30, 60], "Unit": "Minutes" },
+        "PitStops": { "Enabled": true },
+        "FuelConsumption": true,
+        "TireWear": true
+      },
+      "Features": {
+        "DriverSwaps": { "Multiplayer": true },
+        "Strategy": true
+      },
+      "Rewards": {
+        "BaseMultiplier": 2.0,
+        "DurationBonus": true
+      }
+    },
+    "Marathon": {
+      "ID": "RACE_MARATHON",
+      "Name": "Marathon",
+      "Description": "Cross-map ultra distance",
+      "Settings": {
+        "Checkpoints": { "Many": true },
+        "MultipleStages": true,
+        "RestStops": true
+      },
+      "Rewards": {
+        "BaseMultiplier": 2.5
+      }
+    }
+  },
+
+  "FreestyleModes": {
+    "Gymkhana": {
+      "ID": "RACE_GYMKHANA",
+      "Name": "Gymkhana",
+      "Description": "Trick-based freestyle event",
+      "Settings": {
+        "Course": "Obstacles",
+        "TimeLimit": 120,
+        "Tricks": true
+      },
+      "Scoring": {
+        "Donuts": true,
+        "Drifts": true,
+        "Jumps": true,
+        "Spins": true,
+        "Combos": true
+      }
+    },
+    "FreeRoamRush": {
+      "ID": "RACE_RUSH",
+      "Name": "Free Roam Rush",
+      "Description": "Any route to destination",
+      "Settings": {
+        "Waypoint": true,
+        "AnyRoute": true,
+        "Shortcuts": "Allowed"
+      },
+      "Rules": {
+        "FirstToArrive": true,
+        "NoBoundaries": true
+      }
+    }
+  },
+
+  "RaceSettings": {
+    "Collision": {
+      "Full": { "Description": "Realistic collisions" },
+      "Ghosted": { "Description": "Cars pass through" },
+      "GhostedStart": { "Description": "Ghost at start only" }
+    },
+    "CatchUp": {
+      "Off": { "Description": "Pure racing" },
+      "Mild": { "Boost": 1.05 },
+      "Strong": { "Boost": 1.15 }
+    },
+    "Damage": {
+      "Off": { "Description": "No damage" },
+      "Visual": { "Description": "Visual only" },
+      "Full": { "Description": "Affects performance" }
+    },
+    "ClassRestriction": {
+      "Open": { "Description": "Any car" },
+      "ClassLocked": { "Description": "Specific class" },
+      "PILocked": { "Description": "Max PI rating" }
+    }
+  },
+
+  "UI": {
+    "RaceSelect": {
+      "ModeFilter": true,
+      "QuickPlay": true,
+      "CustomSettings": true,
+      "Preview": true
+    },
+    "PreRace": {
+      "GridView": true,
+      "CarStats": true,
+      "TrackInfo": true,
+      "WeatherPreview": true
+    },
+    "PostRace": {
+      "Results": true,
+      "Replay": true,
+      "Statistics": true,
+      "Rematch": true
+    }
+  }
+}
