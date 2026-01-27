@@ -2252,3 +2252,116 @@ void AMGPlayerController::OnSafetyCarIn()
 		}
 	}
 }
+
+void AMGPlayerController::OnPenaltyIssued(const FMGPenalty& Penalty)
+{
+	// Only show for the player's vehicle
+	if (!ControlledVehicle || Penalty.VehicleID != FName(*ControlledVehicle->GetName()))
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText PenaltyMessage;
+			FLinearColor PenaltyColor;
+			float Duration = 4.0f;
+
+			switch (Penalty.Type)
+			{
+				case EMGPenaltyType::Warning:
+					PenaltyMessage = FText::FromString(TEXT("WARNING ISSUED"));
+					PenaltyColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
+					Duration = 2.5f;
+					break;
+
+				case EMGPenaltyType::TimeAdded:
+					PenaltyMessage = FText::FromString(FString::Printf(TEXT("+%.1f SEC PENALTY"), Penalty.TimeAmount));
+					PenaltyColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+					break;
+
+				case EMGPenaltyType::DriveThrough:
+					PenaltyMessage = FText::FromString(TEXT("DRIVE-THROUGH PENALTY"));
+					PenaltyColor = FLinearColor(1.0f, 0.3f, 0.0f, 1.0f); // Red-orange
+					Duration = 5.0f;
+					break;
+
+				case EMGPenaltyType::StopAndGo:
+					PenaltyMessage = FText::FromString(FString::Printf(TEXT("STOP & GO PENALTY (%ds)"), FMath::RoundToInt(Penalty.TimeAmount)));
+					PenaltyColor = FLinearColor(1.0f, 0.2f, 0.0f, 1.0f); // Red-orange
+					Duration = 5.0f;
+					break;
+
+				case EMGPenaltyType::PositionPenalty:
+					PenaltyMessage = FText::FromString(FString::Printf(TEXT("-%d POSITION PENALTY"), Penalty.PositionAmount));
+					PenaltyColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+					Duration = 5.0f;
+					break;
+
+				case EMGPenaltyType::GridPenalty:
+					PenaltyMessage = FText::FromString(FString::Printf(TEXT("-%d GRID POSITIONS (next race)"), Penalty.PositionAmount));
+					PenaltyColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+					Duration = 5.0f;
+					break;
+
+				case EMGPenaltyType::Disqualification:
+					PenaltyMessage = FText::FromString(TEXT("DISQUALIFIED"));
+					PenaltyColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+					Duration = 6.0f;
+					break;
+
+				case EMGPenaltyType::Exclusion:
+					PenaltyMessage = FText::FromString(TEXT("EXCLUDED FROM SESSION"));
+					PenaltyColor = FLinearColor(0.5f, 0.0f, 0.0f, 1.0f); // Dark red
+					Duration = 6.0f;
+					break;
+
+				case EMGPenaltyType::PointsDeduction:
+					PenaltyMessage = FText::FromString(FString::Printf(TEXT("-%d CHAMPIONSHIP POINTS"), Penalty.PointsAmount));
+					PenaltyColor = FLinearColor(1.0f, 0.0f, 0.5f, 1.0f); // Magenta
+					Duration = 5.0f;
+					break;
+
+				case EMGPenaltyType::FinePenalty:
+					PenaltyMessage = FText::FromString(FString::Printf(TEXT("$%d FINE"), Penalty.FineAmount));
+					PenaltyColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.0f); // Gold
+					Duration = 3.0f;
+					break;
+
+				case EMGPenaltyType::LicensePoints:
+					PenaltyMessage = FText::FromString(FString::Printf(TEXT("+%d LICENSE POINTS"), Penalty.LicensePointsAmount));
+					PenaltyColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+					Duration = 3.0f;
+					break;
+
+				default:
+					PenaltyMessage = FText::FromString(TEXT("PENALTY ISSUED"));
+					PenaltyColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+					break;
+			}
+
+			HUDSubsystem->ShowNotification(PenaltyMessage, Duration, PenaltyColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPenaltyServed(const FMGPenalty& Penalty)
+{
+	// Only show for the player's vehicle
+	if (!ControlledVehicle || Penalty.VehicleID != FName(*ControlledVehicle->GetName()))
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ServedMessage = FText::FromString(TEXT("PENALTY SERVED"));
+			FLinearColor ServedColor = FLinearColor(0.0f, 0.8f, 0.0f, 1.0f); // Green
+			HUDSubsystem->ShowNotification(ServedMessage, 2.5f, ServedColor);
+		}
+	}
+}

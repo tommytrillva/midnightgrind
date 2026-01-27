@@ -43,6 +43,8 @@ enum class EMGWeatherType : uint8;
 enum class EMGCautionType : uint8;
 enum class EMGCautionReason : uint8;
 struct FMGSafetyCarState;
+enum class EMGPenaltyType : uint8;
+struct FMGPenalty;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -646,4 +648,12 @@ protected:
 	/** Handle safety car coming in from caution subsystem */
 	UFUNCTION()
 	void OnSafetyCarIn();
+
+	/** Handle penalty issued from penalty subsystem */
+	UFUNCTION()
+	void OnPenaltyIssued(const FMGPenalty& Penalty);
+
+	/** Handle penalty served from penalty subsystem */
+	UFUNCTION()
+	void OnPenaltyServed(const FMGPenalty& Penalty);
 };

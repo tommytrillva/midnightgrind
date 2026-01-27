@@ -429,7 +429,45 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 46);
+	// Stress Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Stress_HighObjectCount"));
+		Test.TestName = FText::FromString(TEXT("Stress - High Object Count"));
+		Test.Description = FText::FromString(TEXT("Test performance with high object allocations"));
+		Test.Category = EMGTestCategory::Performance;
+		Test.Tags.Add(FName(TEXT("Stress")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Stress_SustainedOperation"));
+		Test.TestName = FText::FromString(TEXT("Stress - Sustained Operation"));
+		Test.Description = FText::FromString(TEXT("Test sustained operation over many iterations"));
+		Test.Category = EMGTestCategory::Performance;
+		Test.Tags.Add(FName(TEXT("Stress")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Stress_MemoryStability"));
+		Test.TestName = FText::FromString(TEXT("Stress - Memory Stability"));
+		Test.Description = FText::FromString(TEXT("Test memory stability under repeated allocations"));
+		Test.Category = EMGTestCategory::Performance;
+		Test.Tags.Add(FName(TEXT("Stress")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Stress_RapidStateChanges"));
+		Test.TestName = FText::FromString(TEXT("Stress - Rapid State Changes"));
+		Test.Description = FText::FromString(TEXT("Test system stability under rapid state changes"));
+		Test.Category = EMGTestCategory::Performance;
+		Test.Tags.Add(FName(TEXT("Stress")));
+		TestFramework->RegisterTest(Test);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 50);
 }
 
 // ==========================================
