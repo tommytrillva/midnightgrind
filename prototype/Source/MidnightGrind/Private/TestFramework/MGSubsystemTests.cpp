@@ -1399,6 +1399,306 @@ FMGTestResult UMGSubsystemTests::TestVehicle_TotaledState()
 }
 
 // ==========================================
+// AI TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestAI_DrivingStates()
+{
+	LogTestStart(TEXT("TestAI_DrivingStates"));
+
+	TArray<FString> Logs;
+
+	// Verify all driving states are defined
+	TArray<EMGAIDrivingState> States = {
+		EMGAIDrivingState::Waiting,
+		EMGAIDrivingState::Racing,
+		EMGAIDrivingState::Overtaking,
+		EMGAIDrivingState::Defending,
+		EMGAIDrivingState::Recovering,
+		EMGAIDrivingState::Caution,
+		EMGAIDrivingState::PushingHard,
+		EMGAIDrivingState::ManagingLead,
+		EMGAIDrivingState::Drafting,
+		EMGAIDrivingState::Finished
+	};
+
+	int32 StateCount = States.Num();
+	Logs.Add(FString::Printf(TEXT("AI driving states defined: %d"), StateCount));
+
+	// Verify states are distinct
+	TSet<int32> UniqueStates;
+	for (EMGAIDrivingState State : States)
+	{
+		UniqueStates.Add(static_cast<int32>(State));
+	}
+
+	if (UniqueStates.Num() != StateCount)
+	{
+		Logs.Add(TEXT("Duplicate state values detected"));
+		return CreateFailResult(
+			FName(TEXT("Test_AI_DrivingStates")),
+			TEXT("Duplicate state values"),
+			Logs
+		);
+	}
+
+	Logs.Add(FString::Printf(TEXT("All %d states are unique"), StateCount));
+
+	return CreatePassResult(
+		FName(TEXT("Test_AI_DrivingStates")),
+		FString::Printf(TEXT("AI has %d distinct driving states"), StateCount)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestAI_SkillParams()
+{
+	LogTestStart(TEXT("TestAI_SkillParams"));
+
+	TArray<FString> Logs;
+
+	// Create default skill params
+	FMGAISkillParams Params;
+
+	Logs.Add(FString::Printf(TEXT("SkillLevel: %.2f"), Params.SkillLevel));
+	Logs.Add(FString::Printf(TEXT("BrakingAccuracy: %.2f"), Params.BrakingAccuracy));
+	Logs.Add(FString::Printf(TEXT("LineAccuracy: %.2f"), Params.LineAccuracy));
+	Logs.Add(FString::Printf(TEXT("ReactionTime: %.2f"), Params.ReactionTime));
+	Logs.Add(FString::Printf(TEXT("Consistency: %.2f"), Params.Consistency));
+	Logs.Add(FString::Printf(TEXT("MistakeFrequency: %.2f"), Params.MistakeFrequency));
+	Logs.Add(FString::Printf(TEXT("RecoverySkill: %.2f"), Params.RecoverySkill));
+	Logs.Add(FString::Printf(TEXT("CornerExitSpeed: %.2f"), Params.CornerExitSpeed));
+
+	// Verify all values are in valid range (0-1 or 0.1-1 for reaction time)
+	bool bAllValid = true;
+	if (Params.SkillLevel < 0.0f || Params.SkillLevel > 1.0f)
+	{
+		Logs.Add(TEXT("SkillLevel out of range"));
+		bAllValid = false;
+	}
+	if (Params.BrakingAccuracy < 0.0f || Params.BrakingAccuracy > 1.0f)
+	{
+		Logs.Add(TEXT("BrakingAccuracy out of range"));
+		bAllValid = false;
+	}
+	if (Params.LineAccuracy < 0.0f || Params.LineAccuracy > 1.0f)
+	{
+		Logs.Add(TEXT("LineAccuracy out of range"));
+		bAllValid = false;
+	}
+	if (Params.ReactionTime < 0.1f || Params.ReactionTime > 1.0f)
+	{
+		Logs.Add(TEXT("ReactionTime out of range"));
+		bAllValid = false;
+	}
+	if (Params.Consistency < 0.0f || Params.Consistency > 1.0f)
+	{
+		Logs.Add(TEXT("Consistency out of range"));
+		bAllValid = false;
+	}
+	if (Params.MistakeFrequency < 0.0f || Params.MistakeFrequency > 1.0f)
+	{
+		Logs.Add(TEXT("MistakeFrequency out of range"));
+		bAllValid = false;
+	}
+
+	if (!bAllValid)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_AI_SkillParams")),
+			TEXT("Skill parameters out of valid range"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_AI_SkillParams")),
+		TEXT("AI skill parameters have valid default values")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestAI_SpawnConfig()
+{
+	LogTestStart(TEXT("TestAI_SpawnConfig"));
+
+	TArray<FString> Logs;
+
+	// Create default spawn config
+	FMGAISpawnConfig Config;
+
+	Logs.Add(FString::Printf(TEXT("RacerCount: %d"), Config.RacerCount));
+	Logs.Add(FString::Printf(TEXT("MinSkill: %.2f"), Config.MinSkill));
+	Logs.Add(FString::Printf(TEXT("MaxSkill: %.2f"), Config.MaxSkill));
+	Logs.Add(FString::Printf(TEXT("DifficultyModifier: %.2f"), Config.DifficultyModifier));
+	Logs.Add(FString::Printf(TEXT("bEnableSkillBasedCatchUp: %s"), Config.bEnableSkillBasedCatchUp ? TEXT("true") : TEXT("false")));
+
+	// Validate config
+	bool bValid = true;
+	if (Config.RacerCount < 0)
+	{
+		Logs.Add(TEXT("RacerCount should be non-negative"));
+		bValid = false;
+	}
+	if (Config.MinSkill < 0.0f || Config.MinSkill > 1.0f)
+	{
+		Logs.Add(TEXT("MinSkill out of range"));
+		bValid = false;
+	}
+	if (Config.MaxSkill < 0.0f || Config.MaxSkill > 1.0f)
+	{
+		Logs.Add(TEXT("MaxSkill out of range"));
+		bValid = false;
+	}
+	if (Config.MinSkill > Config.MaxSkill)
+	{
+		Logs.Add(TEXT("MinSkill should not exceed MaxSkill"));
+		bValid = false;
+	}
+	if (Config.DifficultyModifier < 0.5f || Config.DifficultyModifier > 1.5f)
+	{
+		Logs.Add(TEXT("DifficultyModifier out of range"));
+		bValid = false;
+	}
+
+	if (!bValid)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_AI_SpawnConfig")),
+			TEXT("Spawn configuration has invalid defaults"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_AI_SpawnConfig")),
+		FString::Printf(TEXT("AI spawn config valid: %d racers, skill %.2f-%.2f"), Config.RacerCount, Config.MinSkill, Config.MaxSkill)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestAI_DriverPersonality()
+{
+	LogTestStart(TEXT("TestAI_DriverPersonality"));
+
+	TArray<FString> Logs;
+
+	// Verify all personality types
+	TArray<EMGDriverPersonality> Personalities = {
+		EMGDriverPersonality::Aggressive,
+		EMGDriverPersonality::Defensive,
+		EMGDriverPersonality::Calculated,
+		EMGDriverPersonality::Unpredictable,
+		EMGDriverPersonality::Rookie,
+		EMGDriverPersonality::Veteran,
+		EMGDriverPersonality::Rival
+	};
+
+	int32 PersonalityCount = Personalities.Num();
+	Logs.Add(FString::Printf(TEXT("Personality types defined: %d"), PersonalityCount));
+
+	// Test personality names
+	TArray<FString> PersonalityNames = {
+		TEXT("Aggressive"), TEXT("Defensive"), TEXT("Calculated"),
+		TEXT("Unpredictable"), TEXT("Rookie"), TEXT("Veteran"), TEXT("Rival")
+	};
+
+	for (int32 i = 0; i < PersonalityCount; i++)
+	{
+		Logs.Add(FString::Printf(TEXT("  [%d] %s"), i, *PersonalityNames[i]));
+	}
+
+	// Verify uniqueness
+	TSet<int32> UniquePersonalities;
+	for (EMGDriverPersonality Personality : Personalities)
+	{
+		UniquePersonalities.Add(static_cast<int32>(Personality));
+	}
+
+	if (UniquePersonalities.Num() != PersonalityCount)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_AI_DriverPersonality")),
+			TEXT("Duplicate personality values"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_AI_DriverPersonality")),
+		FString::Printf(TEXT("AI has %d distinct personality types"), PersonalityCount)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestAI_Strategies()
+{
+	LogTestStart(TEXT("TestAI_Strategies"));
+
+	TArray<FString> Logs;
+
+	// Verify overtake strategies
+	TArray<EMGOvertakeStrategy> OvertakeStrategies = {
+		EMGOvertakeStrategy::Patient,
+		EMGOvertakeStrategy::LateBraking,
+		EMGOvertakeStrategy::BetterExit,
+		EMGOvertakeStrategy::AroundOutside,
+		EMGOvertakeStrategy::SlipstreamPass,
+		EMGOvertakeStrategy::Pressure
+	};
+
+	Logs.Add(FString::Printf(TEXT("Overtake strategies: %d"), OvertakeStrategies.Num()));
+
+	// Verify defense strategies
+	TArray<EMGDefenseStrategy> DefenseStrategies = {
+		EMGDefenseStrategy::CoverLine,
+		EMGDefenseStrategy::CoverInside,
+		EMGDefenseStrategy::PaceDefense,
+		EMGDefenseStrategy::DefensiveLine
+	};
+
+	Logs.Add(FString::Printf(TEXT("Defense strategies: %d"), DefenseStrategies.Num()));
+
+	// Verify catch-up modes
+	TArray<EMGCatchUpMode> CatchUpModes = {
+		EMGCatchUpMode::None,
+		EMGCatchUpMode::RiskTaking,
+		EMGCatchUpMode::DraftingFocus,
+		EMGCatchUpMode::MaxEffort,
+		EMGCatchUpMode::Conservation
+	};
+
+	Logs.Add(FString::Printf(TEXT("Catch-up modes: %d"), CatchUpModes.Num()));
+
+	// Calculate total strategic options
+	int32 TotalStrategies = OvertakeStrategies.Num() + DefenseStrategies.Num() + CatchUpModes.Num();
+	Logs.Add(FString::Printf(TEXT("Total strategic options: %d"), TotalStrategies));
+
+	// Verify reasonable number of strategies for variety
+	if (OvertakeStrategies.Num() < 3)
+	{
+		Logs.Add(TEXT("Expected at least 3 overtake strategies for variety"));
+		return CreateFailResult(
+			FName(TEXT("Test_AI_Strategies")),
+			TEXT("Insufficient overtake strategies"),
+			Logs
+		);
+	}
+
+	if (DefenseStrategies.Num() < 2)
+	{
+		Logs.Add(TEXT("Expected at least 2 defense strategies"));
+		return CreateFailResult(
+			FName(TEXT("Test_AI_Strategies")),
+			TEXT("Insufficient defense strategies"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_AI_Strategies")),
+		FString::Printf(TEXT("AI has %d overtake, %d defense, %d catch-up strategies"),
+			OvertakeStrategies.Num(), DefenseStrategies.Num(), CatchUpModes.Num())
+	);
+}
+
+// ==========================================
 // INTEGRATION TESTS
 // ==========================================
 
@@ -1562,6 +1862,13 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestVehicle_PerformanceDegradation());
 	TestResults.Add(TestVehicle_TotaledState());
 
+	// AI tests
+	TestResults.Add(TestAI_DrivingStates());
+	TestResults.Add(TestAI_SkillParams());
+	TestResults.Add(TestAI_SpawnConfig());
+	TestResults.Add(TestAI_DriverPersonality());
+	TestResults.Add(TestAI_Strategies());
+
 	// Integration tests
 	TestResults.Add(TestIntegration_CurrencyEconomy());
 	TestResults.Add(TestIntegration_WeatherRoad());
@@ -1692,6 +1999,33 @@ void UMGSubsystemTests::RunVehicleTests()
 	PrintTestReport();
 }
 
+void UMGSubsystemTests::RunAITests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING AI TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestAI_DrivingStates());
+	TestResults.Add(TestAI_SkillParams());
+	TestResults.Add(TestAI_SpawnConfig());
+	TestResults.Add(TestAI_DriverPersonality());
+	TestResults.Add(TestAI_Strategies());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
 void UMGSubsystemTests::RunSmokeTests()
 {
 	UE_LOG(LogTemp, Log, TEXT("=== RUNNING SMOKE TESTS ==="));
@@ -1707,6 +2041,7 @@ void UMGSubsystemTests::RunSmokeTests()
 	TestResults.Add(TestWeather_SetWeatherType());
 	TestResults.Add(TestWeather_RoadGrip());
 	TestResults.Add(TestVehicle_DamageSystemInit());
+	TestResults.Add(TestAI_DrivingStates());
 
 	for (const FMGTestResult& Result : TestResults)
 	{
