@@ -1,0 +1,285 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Seasonal Content and Battle Pass System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "SeasonDuration": 90,
+    "OffseasonDuration": 7,
+    "MaxSeasonLevel": 100,
+    "BonusLevels": 50,
+    "SeasonReset": true
+  },
+
+  "SeasonStructure": {
+    "CurrentSeason": {
+      "ID": "SEASON_01",
+      "Name": "Midnight Genesis",
+      "Theme": "Origins",
+      "StartDate": "2026-01-01",
+      "EndDate": "2026-03-31",
+      "BackgroundArt": "season_01_bg",
+      "TrailerURL": "season_01_trailer"
+    },
+    "Phases": {
+      "Early": {
+        "Weeks": [1, 2, 3],
+        "Name": "Season Launch",
+        "Content": ["SeasonVehicle", "SeasonTrack", "StarterRewards"]
+      },
+      "Mid": {
+        "Weeks": [4, 5, 6, 7, 8],
+        "Name": "Season Peak",
+        "Content": ["MidSeasonEvent", "LimitedChallenges", "SpecialModes"]
+      },
+      "Late": {
+        "Weeks": [9, 10, 11, 12],
+        "Name": "Final Push",
+        "Content": ["FinalEvent", "BonusXP", "LastChanceRewards"]
+      }
+    }
+  },
+
+  "BattlePass": {
+    "Tiers": {
+      "Free": {
+        "ID": "PASS_FREE",
+        "Name": "Free Track",
+        "RewardsPerLevel": 1,
+        "TotalRewards": 100
+      },
+      "Premium": {
+        "ID": "PASS_PREMIUM",
+        "Name": "Premium Track",
+        "Cost": { "Type": "Token", "Amount": 1000 },
+        "RewardsPerLevel": 2,
+        "TotalRewards": 200,
+        "BonusContent": true,
+        "XPBoost": 1.1
+      },
+      "Ultimate": {
+        "ID": "PASS_ULTIMATE",
+        "Name": "Ultimate Track",
+        "Cost": { "Type": "Token", "Amount": 2500 },
+        "IncludesPremium": true,
+        "BonusLevels": 25,
+        "InstantRewards": 10,
+        "ExclusiveItems": true,
+        "XPBoost": 1.25
+      }
+    },
+    "CanUpgrade": true,
+    "UpgradeDiscount": {
+      "Week1-4": 0,
+      "Week5-8": 0.1,
+      "Week9-12": 0.25
+    }
+  },
+
+  "SeasonXP": {
+    "Sources": {
+      "Race": {
+        "Participation": 50,
+        "Win": 150,
+        "Podium": 100,
+        "PerPosition": 10
+      },
+      "DailyChallenge": {
+        "Complete": 100,
+        "AllDaily": 200
+      },
+      "WeeklyChallenge": {
+        "Complete": 500,
+        "AllWeekly": 1500
+      },
+      "SeasonChallenge": {
+        "Complete": 1000
+      },
+      "FirstPlayOfDay": 200,
+      "Milestones": "Variable"
+    },
+    "XPPerLevel": {
+      "Levels_1_10": 1000,
+      "Levels_11_50": 1500,
+      "Levels_51_100": 2000,
+      "BonusLevels": 2500
+    },
+    "Multipliers": {
+      "DoubleXPWeekend": 2.0,
+      "PremiumPass": 1.1,
+      "UltimatePass": 1.25,
+      "BoosterItem": 1.5
+    }
+  },
+
+  "SeasonRewards": {
+    "FreeTrack": {
+      "Level_1": { "Type": "Cash", "Amount": 5000 },
+      "Level_5": { "Type": "Vinyl", "Item": "Season01_Pattern1" },
+      "Level_10": { "Type": "Wheels", "Item": "Season01_Wheels" },
+      "Level_15": { "Type": "Cash", "Amount": 15000 },
+      "Level_20": { "Type": "Horn", "Item": "Season01_Horn" },
+      "Level_25": { "Type": "Title", "Item": "Season One Racer" },
+      "Level_30": { "Type": "LicensePlate", "Item": "Season01_Plate" },
+      "Level_40": { "Type": "Emote", "Item": "Season01_Emote" },
+      "Level_50": { "Type": "Vehicle", "Item": "Season01_FreeCar" },
+      "Level_60": { "Type": "Cash", "Amount": 50000 },
+      "Level_70": { "Type": "Outfit", "Item": "Season01_Outfit" },
+      "Level_80": { "Type": "REP", "Amount": 10000 },
+      "Level_90": { "Type": "Underglow", "Item": "Season01_Glow" },
+      "Level_100": { "Type": "Badge", "Item": "Season01_Badge" }
+    },
+    "PremiumTrack": {
+      "Level_1": { "Type": "Vehicle", "Item": "Season01_StarterCar" },
+      "Level_5": { "Type": "BodyKit", "Item": "Season01_BodyKit1" },
+      "Level_10": { "Type": "Livery", "Item": "Season01_ExclusiveLivery" },
+      "Level_15": { "Type": "Cash", "Amount": 25000 },
+      "Level_20": { "Type": "Interior", "Item": "Season01_Interior" },
+      "Level_25": { "Type": "Exhaust", "Item": "Season01_Exhaust" },
+      "Level_30": { "Type": "Wings", "Item": "Season01_Wing" },
+      "Level_40": { "Type": "Title", "Item": "Genesis Legend" },
+      "Level_50": { "Type": "Vehicle", "Item": "Season01_PremiumCar" },
+      "Level_60": { "Type": "Helmet", "Item": "Season01_Helmet" },
+      "Level_70": { "Type": "Effects", "Item": "Season01_NitroEffect" },
+      "Level_80": { "Type": "Aura", "Item": "Season01_Aura" },
+      "Level_90": { "Type": "Animation", "Item": "Season01_VictoryPose" },
+      "Level_100": { "Type": "Vehicle", "Item": "Season01_LegendaryCar", "Exclusive": true }
+    },
+    "BonusLevels": {
+      "EveryLevel": { "Type": "Credits", "Amount": 50 },
+      "Every5Levels": { "Type": "CosmeticCrate", "Rarity": "Rare" },
+      "Level_25": { "Type": "Badge", "Item": "Season01_Prestige1" },
+      "Level_50": { "Type": "Badge", "Item": "Season01_Prestige2", "Animated": true }
+    }
+  },
+
+  "SeasonChallenges": {
+    "Daily": {
+      "Count": 3,
+      "RefreshTime": "00:00 UTC",
+      "Examples": [
+        { "Task": "Win 2 races", "XP": 100 },
+        { "Task": "Drift 50,000 points", "XP": 100 },
+        { "Task": "Complete 5 races", "XP": 100 }
+      ],
+      "SkipCost": { "Type": "Token", "Amount": 50 },
+      "RerollCost": { "Type": "Token", "Amount": 25 }
+    },
+    "Weekly": {
+      "Count": 5,
+      "RefreshDay": "Monday",
+      "Examples": [
+        { "Task": "Win 10 races", "XP": 500 },
+        { "Task": "Earn 500,000 cash", "XP": 500 },
+        { "Task": "Complete 25 races", "XP": 500 }
+      ],
+      "CompletionBonus": 1500
+    },
+    "Season": {
+      "Count": 20,
+      "ProgressiveUnlock": true,
+      "Examples": [
+        { "Task": "Win 100 races this season", "XP": 5000 },
+        { "Task": "Reach Level 50", "XP": 3000 },
+        { "Task": "Collect all seasonal vinyls", "XP": 2000 }
+      ]
+    }
+  },
+
+  "SeasonEvents": {
+    "LaunchEvent": {
+      "Name": "Genesis Rising",
+      "Duration": 7,
+      "Rewards": ["ExclusiveLivery", "BonusXP"],
+      "DoubleXP": true
+    },
+    "MidSeasonEvent": {
+      "Name": "Midnight Mayhem",
+      "Duration": 7,
+      "Rewards": ["LimitedVehicle", "SpecialMode"],
+      "SpecialRules": true
+    },
+    "FinalEvent": {
+      "Name": "Last Chance Qualifier",
+      "Duration": 7,
+      "Rewards": ["TripleXP", "FinalRewards"],
+      "LastChance": true
+    },
+    "WeeklyEvents": {
+      "DoubleXPWeekend": {
+        "Frequency": "BiWeekly",
+        "Days": ["Saturday", "Sunday"]
+      }
+    }
+  },
+
+  "SeasonalContent": {
+    "Vehicles": {
+      "Free": 1,
+      "Premium": 2,
+      "Exclusive": 1
+    },
+    "Tracks": 1,
+    "GameModes": 1,
+    "Cosmetics": {
+      "Liveries": 10,
+      "Wheels": 5,
+      "Vinyls": 15,
+      "Outfits": 3,
+      "Emotes": 3
+    }
+  },
+
+  "SeasonRanking": {
+    "Enabled": true,
+    "Divisions": {
+      "Bronze": { "Range": [0, 1000], "Rewards": "BasicCrate" },
+      "Silver": { "Range": [1001, 5000], "Rewards": "SilverCrate" },
+      "Gold": { "Range": [5001, 15000], "Rewards": "GoldCrate" },
+      "Platinum": { "Range": [15001, 50000], "Rewards": "PlatinumCrate" },
+      "Diamond": { "Range": [50001, 100000], "Rewards": "DiamondCrate" },
+      "Champion": { "Range": [100001, "Infinity"], "Rewards": "ChampionCrate" }
+    },
+    "EndOfSeasonRewards": true
+  },
+
+  "CatchUp": {
+    "LateStartBonus": {
+      "Enabled": true,
+      "Week5_XPBonus": 1.25,
+      "Week9_XPBonus": 1.5
+    },
+    "LevelPurchase": {
+      "Enabled": true,
+      "CostPerLevel": { "Type": "Token", "Amount": 150 },
+      "MaxPurchasable": 50
+    }
+  },
+
+  "History": {
+    "PastSeasons": {
+      "Viewable": true,
+      "RewardsArchive": true,
+      "StatsPreserved": true
+    },
+    "MissedRewards": {
+      "Returnability": "Never",
+      "ExclusivityMaintained": true
+    }
+  },
+
+  "UI": {
+    "SeasonHub": {
+      "BattlePassProgress": true,
+      "CurrentChallenges": true,
+      "SeasonTimer": true,
+      "RewardPreview": true
+    },
+    "Notifications": {
+      "LevelUp": true,
+      "RewardClaimed": true,
+      "SeasonEnding": true,
+      "NewChallenges": true
+    }
+  }
+}

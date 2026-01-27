@@ -1,0 +1,416 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Emotes and Expression System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxEquipped": 8,
+    "EmoteWheel": true,
+    "CooldownBetweenEmotes": 2.0,
+    "CancelableEmotes": true
+  },
+
+  "EmoteCategories": {
+    "Victory": {
+      "ID": "EMOTE_CAT_VICTORY",
+      "Name": "Victory",
+      "Icon": "trophy",
+      "UsableAfter": "RaceEnd",
+      "Emotes": {
+        "FistPump": {
+          "ID": "EMOTE_FIST_PUMP",
+          "Name": "Fist Pump",
+          "Animation": "fist_pump_anim",
+          "Duration": 2.5,
+          "Sound": "crowd_cheer",
+          "UnlockMethod": "Default"
+        },
+        "VictoryDance": {
+          "ID": "EMOTE_VICTORY_DANCE",
+          "Name": "Victory Dance",
+          "Animation": "victory_dance_anim",
+          "Duration": 4.0,
+          "Sound": "victory_music",
+          "UnlockLevel": 20
+        },
+        "ChampionPose": {
+          "ID": "EMOTE_CHAMPION",
+          "Name": "Champion Pose",
+          "Animation": "champion_pose_anim",
+          "Duration": 3.0,
+          "Effects": "Confetti",
+          "UnlockMethod": "Achievement_50Wins"
+        },
+        "KneelPoint": {
+          "ID": "EMOTE_KNEEL_POINT",
+          "Name": "Kneel and Point",
+          "Animation": "kneel_point_anim",
+          "Duration": 3.5,
+          "UnlockLevel": 30
+        },
+        "SprayChampagne": {
+          "ID": "EMOTE_CHAMPAGNE",
+          "Name": "Champagne Spray",
+          "Animation": "champagne_spray_anim",
+          "Duration": 4.5,
+          "Effects": "ChampagneParticles",
+          "UnlockLevel": 40
+        }
+      }
+    },
+    "Taunt": {
+      "ID": "EMOTE_CAT_TAUNT",
+      "Name": "Taunts",
+      "Icon": "flame",
+      "UsableAfter": "Overtake",
+      "Emotes": {
+        "Wave": {
+          "ID": "EMOTE_WAVE",
+          "Name": "Bye Bye Wave",
+          "Animation": "taunt_wave_anim",
+          "Duration": 2.0,
+          "UnlockMethod": "Default"
+        },
+        "SlowClap": {
+          "ID": "EMOTE_SLOW_CLAP",
+          "Name": "Slow Clap",
+          "Animation": "slow_clap_anim",
+          "Duration": 3.0,
+          "Sound": "slow_clap_sfx",
+          "UnlockLevel": 15
+        },
+        "Shrug": {
+          "ID": "EMOTE_SHRUG",
+          "Name": "Shrug",
+          "Animation": "shrug_anim",
+          "Duration": 2.0,
+          "UnlockLevel": 10
+        },
+        "DustOff": {
+          "ID": "EMOTE_DUST_OFF",
+          "Name": "Dust Off Shoulders",
+          "Animation": "dust_off_anim",
+          "Duration": 2.5,
+          "UnlockLevel": 25
+        },
+        "Yawn": {
+          "ID": "EMOTE_YAWN",
+          "Name": "Bored Yawn",
+          "Animation": "yawn_anim",
+          "Duration": 3.0,
+          "UnlockLevel": 35
+        }
+      }
+    },
+    "Friendly": {
+      "ID": "EMOTE_CAT_FRIENDLY",
+      "Name": "Friendly",
+      "Icon": "heart",
+      "UsableAnytime": true,
+      "Emotes": {
+        "ThumbsUp": {
+          "ID": "EMOTE_THUMBS_UP",
+          "Name": "Thumbs Up",
+          "Animation": "thumbs_up_anim",
+          "Duration": 1.5,
+          "UnlockMethod": "Default"
+        },
+        "Bow": {
+          "ID": "EMOTE_BOW",
+          "Name": "Respectful Bow",
+          "Animation": "bow_anim",
+          "Duration": 2.5,
+          "UnlockLevel": 10
+        },
+        "Salute": {
+          "ID": "EMOTE_SALUTE",
+          "Name": "Salute",
+          "Animation": "salute_anim",
+          "Duration": 2.0,
+          "UnlockLevel": 15
+        },
+        "Handshake": {
+          "ID": "EMOTE_HANDSHAKE",
+          "Name": "Offer Handshake",
+          "Animation": "handshake_offer_anim",
+          "Duration": 3.0,
+          "Interactive": true,
+          "UnlockLevel": 20
+        },
+        "FistBump": {
+          "ID": "EMOTE_FIST_BUMP",
+          "Name": "Fist Bump",
+          "Animation": "fist_bump_offer_anim",
+          "Duration": 2.0,
+          "Interactive": true,
+          "UnlockLevel": 25
+        }
+      }
+    },
+    "Dance": {
+      "ID": "EMOTE_CAT_DANCE",
+      "Name": "Dances",
+      "Icon": "music",
+      "UsableAnytime": true,
+      "Emotes": {
+        "HeadBob": {
+          "ID": "EMOTE_HEAD_BOB",
+          "Name": "Head Bob",
+          "Animation": "head_bob_anim",
+          "Duration": "Loop",
+          "Loopable": true,
+          "UnlockLevel": 5
+        },
+        "ShuffleDance": {
+          "ID": "EMOTE_SHUFFLE",
+          "Name": "Shuffle",
+          "Animation": "shuffle_anim",
+          "Duration": 4.0,
+          "Loopable": true,
+          "UnlockLevel": 20
+        },
+        "Breakdance": {
+          "ID": "EMOTE_BREAKDANCE",
+          "Name": "Breakdance",
+          "Animation": "breakdance_anim",
+          "Duration": 6.0,
+          "UnlockLevel": 35
+        },
+        "RobotDance": {
+          "ID": "EMOTE_ROBOT",
+          "Name": "Robot",
+          "Animation": "robot_dance_anim",
+          "Duration": 4.0,
+          "Loopable": true,
+          "UnlockLevel": 25
+        },
+        "Moonwalk": {
+          "ID": "EMOTE_MOONWALK",
+          "Name": "Moonwalk",
+          "Animation": "moonwalk_anim",
+          "Duration": 4.0,
+          "UnlockLevel": 40
+        }
+      }
+    },
+    "Reaction": {
+      "ID": "EMOTE_CAT_REACTION",
+      "Name": "Reactions",
+      "Icon": "emoji",
+      "UsableAnytime": true,
+      "Emotes": {
+        "Facepalm": {
+          "ID": "EMOTE_FACEPALM",
+          "Name": "Facepalm",
+          "Animation": "facepalm_anim",
+          "Duration": 2.5,
+          "UnlockLevel": 5
+        },
+        "Laugh": {
+          "ID": "EMOTE_LAUGH",
+          "Name": "Laugh",
+          "Animation": "laugh_anim",
+          "Duration": 3.0,
+          "Sound": "laugh_sfx",
+          "UnlockLevel": 10
+        },
+        "Mindblown": {
+          "ID": "EMOTE_MINDBLOWN",
+          "Name": "Mind Blown",
+          "Animation": "mindblown_anim",
+          "Duration": 3.0,
+          "Effects": "Explosion",
+          "UnlockLevel": 30
+        },
+        "Rage": {
+          "ID": "EMOTE_RAGE",
+          "Name": "Rage",
+          "Animation": "rage_anim",
+          "Duration": 3.5,
+          "Sound": "angry_sfx",
+          "UnlockLevel": 25
+        },
+        "Shocked": {
+          "ID": "EMOTE_SHOCKED",
+          "Name": "Shocked",
+          "Animation": "shocked_anim",
+          "Duration": 2.0,
+          "UnlockLevel": 15
+        }
+      }
+    },
+    "Vehicle": {
+      "ID": "EMOTE_CAT_VEHICLE",
+      "Name": "Vehicle Actions",
+      "Icon": "car",
+      "InVehicle": true,
+      "Emotes": {
+        "Honk": {
+          "ID": "EMOTE_HONK",
+          "Name": "Horn Honk",
+          "Sound": "horn_default",
+          "Duration": 0.5,
+          "Repeatable": true,
+          "UnlockMethod": "Default"
+        },
+        "RevEngine": {
+          "ID": "EMOTE_REV",
+          "Name": "Rev Engine",
+          "Animation": "rev_engine",
+          "Sound": "engine_rev",
+          "Duration": 2.0,
+          "UnlockMethod": "Default"
+        },
+        "Burnout": {
+          "ID": "EMOTE_BURNOUT",
+          "Name": "Burnout",
+          "Animation": "burnout_anim",
+          "Effects": "TireSmoke",
+          "Duration": 4.0,
+          "UnlockLevel": 15
+        },
+        "Donuts": {
+          "ID": "EMOTE_DONUTS",
+          "Name": "Donuts",
+          "Animation": "donut_anim",
+          "Effects": "TireSmoke",
+          "Duration": 5.0,
+          "UnlockLevel": 20
+        },
+        "PopHeadlights": {
+          "ID": "EMOTE_POPUP",
+          "Name": "Pop-Up Headlights",
+          "Animation": "popup_wink",
+          "Duration": 1.5,
+          "VehicleRequired": "PopupHeadlights",
+          "UnlockLevel": 10
+        },
+        "FlashLights": {
+          "ID": "EMOTE_FLASH",
+          "Name": "Flash Lights",
+          "Animation": "flash_lights",
+          "Duration": 1.0,
+          "Repeatable": true,
+          "UnlockMethod": "Default"
+        }
+      }
+    },
+    "Signature": {
+      "ID": "EMOTE_CAT_SIGNATURE",
+      "Name": "Signature Moves",
+      "Icon": "star",
+      "Premium": true,
+      "Emotes": {
+        "LegendPose": {
+          "ID": "EMOTE_LEGEND",
+          "Name": "Legend Pose",
+          "Animation": "legend_pose_anim",
+          "Duration": 4.0,
+          "Effects": "GoldenAura",
+          "UnlockMethod": "LegendaryTier"
+        },
+        "DriftKingEntry": {
+          "ID": "EMOTE_DRIFT_KING",
+          "Name": "Drift King Entry",
+          "Animation": "drift_king_anim",
+          "Duration": 5.0,
+          "Effects": "SmokeEntrance",
+          "UnlockMethod": "Achievement_DriftKing"
+        },
+        "ChampionWalk": {
+          "ID": "EMOTE_CHAMPION_WALK",
+          "Name": "Champion Walk",
+          "Animation": "champion_walk_anim",
+          "Duration": 6.0,
+          "Effects": "Spotlight",
+          "UnlockMethod": "SeasonChampion"
+        }
+      }
+    }
+  },
+
+  "HornCustomization": {
+    "Categories": {
+      "Standard": {
+        "Horns": ["DefaultHorn", "TruckHorn", "SportHorn", "ClassicHorn"],
+        "UnlockMethod": "Default"
+      },
+      "Musical": {
+        "Horns": ["LaBamba", "Dixie", "Godfather", "ChargeTheme"],
+        "UnlockLevel": 15
+      },
+      "Comedy": {
+        "Horns": ["Clown", "Ahooga", "Kazoo", "Airhorn"],
+        "UnlockLevel": 20
+      },
+      "Premium": {
+        "Horns": ["CustomMelody", "VoiceLine", "BeatDrop"],
+        "UnlockLevel": 35
+      }
+    },
+    "Volume": { "Min": 0.5, "Max": 1.0, "Default": 0.8 }
+  },
+
+  "EmoteWheel": {
+    "Slots": 8,
+    "QuickEmotes": 4,
+    "Customizable": true,
+    "CategoryFiltering": true,
+    "RecentlyUsed": {
+      "Enabled": true,
+      "Count": 4
+    }
+  },
+
+  "InteractiveEmotes": {
+    "Enabled": true,
+    "Types": {
+      "Handshake": {
+        "Initiator": "handshake_offer",
+        "Responder": "handshake_accept",
+        "Range": 3
+      },
+      "FistBump": {
+        "Initiator": "fist_bump_offer",
+        "Responder": "fist_bump_accept",
+        "Range": 2
+      },
+      "HighFive": {
+        "Initiator": "high_five_offer",
+        "Responder": "high_five_accept",
+        "Range": 2
+      }
+    },
+    "Timeout": 5.0,
+    "BonusForInteraction": { "REP": 10 }
+  },
+
+  "EmoteRewards": {
+    "ByLevel": {
+      "5": ["HeadBob"],
+      "10": ["Bow", "Facepalm"],
+      "15": ["SlowClap", "Burnout"],
+      "20": ["VictoryDance", "Shuffle", "Donuts"],
+      "25": ["DustOff", "RobotDance", "FistBump"],
+      "30": ["KneelPoint", "Mindblown"],
+      "35": ["Yawn", "Breakdance"],
+      "40": ["Champagne", "Moonwalk"]
+    },
+    "ByAchievement": {
+      "50Wins": "ChampionPose",
+      "DriftKing": "DriftKingEntry",
+      "LegendaryTier": "LegendPose"
+    },
+    "ByPurchase": {
+      "PremiumEmotes": true,
+      "SeasonPass": true
+    }
+  },
+
+  "Settings": {
+    "ShowOtherEmotes": true,
+    "EmoteVolume": { "Min": 0, "Max": 1, "Default": 0.8 },
+    "HideInRace": false,
+    "NotifyOnEmote": false
+  }
+}

@@ -1,0 +1,367 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Nitrous Oxide and Boost System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultCapacity": 100,
+    "RegenerationEnabled": true,
+    "StackableBoosts": false,
+    "MaxActiveBoosts": 1
+  },
+
+  "NitroTypes": {
+    "Standard": {
+      "ID": "NITRO_STANDARD",
+      "Name": "Standard Nitrous",
+      "Description": "Balanced nitro for everyday use",
+      "PowerBoost": 0.15,
+      "Duration": "Continuous",
+      "ConsumptionRate": 10,
+      "Characteristics": {
+        "Activation": "Instant",
+        "Falloff": "Linear",
+        "SoundProfile": "Standard"
+      },
+      "UnlockMethod": "Default"
+    },
+    "Dry": {
+      "ID": "NITRO_DRY",
+      "Name": "Dry Shot",
+      "Description": "Quick burst for NA engines",
+      "PowerBoost": 0.12,
+      "Duration": "Burst",
+      "BurstDuration": 3.0,
+      "Cooldown": 5.0,
+      "Characteristics": {
+        "Activation": "Quick",
+        "EngineStress": "Low",
+        "SoundProfile": "Subtle"
+      },
+      "UnlockLevel": 10
+    },
+    "Wet": {
+      "ID": "NITRO_WET",
+      "Name": "Wet Shot",
+      "Description": "Sustained power with fuel supplement",
+      "PowerBoost": 0.20,
+      "Duration": "Continuous",
+      "ConsumptionRate": 15,
+      "Characteristics": {
+        "Activation": "Smooth",
+        "FuelMixed": true,
+        "SoundProfile": "Deep"
+      },
+      "UnlockLevel": 15
+    },
+    "Direct": {
+      "ID": "NITRO_DIRECT",
+      "Name": "Direct Port",
+      "Description": "Maximum power, direct injection",
+      "PowerBoost": 0.30,
+      "Duration": "Continuous",
+      "ConsumptionRate": 25,
+      "Characteristics": {
+        "Activation": "Aggressive",
+        "EngineStress": "High",
+        "SoundProfile": "Intense"
+      },
+      "UnlockLevel": 25
+    },
+    "Progressive": {
+      "ID": "NITRO_PROGRESSIVE",
+      "Name": "Progressive Controller",
+      "Description": "Adjustable output based on throttle",
+      "PowerBoost": { "Min": 0.05, "Max": 0.25 },
+      "Duration": "Continuous",
+      "ConsumptionRate": { "Min": 5, "Max": 20 },
+      "Characteristics": {
+        "ThrottleLinked": true,
+        "FineTuning": true,
+        "SoundProfile": "Variable"
+      },
+      "UnlockLevel": 30
+    },
+    "Race": {
+      "ID": "NITRO_RACE",
+      "Name": "Race Grade",
+      "Description": "Competition-level nitrous system",
+      "PowerBoost": 0.35,
+      "Duration": "Continuous",
+      "ConsumptionRate": 30,
+      "BottleSize": "Large",
+      "Characteristics": {
+        "Activation": "Explosive",
+        "EngineStress": "Extreme",
+        "RequiresPrep": true,
+        "SoundProfile": "Screaming"
+      },
+      "UnlockLevel": 40
+    }
+  },
+
+  "NitroBottles": {
+    "Small": {
+      "ID": "BOTTLE_SMALL",
+      "Name": "Small Bottle",
+      "Capacity": 75,
+      "Weight": 5,
+      "RefillCost": 500,
+      "UnlockMethod": "Default"
+    },
+    "Standard": {
+      "ID": "BOTTLE_STANDARD",
+      "Name": "Standard Bottle",
+      "Capacity": 100,
+      "Weight": 10,
+      "RefillCost": 750,
+      "UnlockLevel": 5
+    },
+    "Large": {
+      "ID": "BOTTLE_LARGE",
+      "Name": "Large Bottle",
+      "Capacity": 150,
+      "Weight": 15,
+      "RefillCost": 1000,
+      "UnlockLevel": 15
+    },
+    "Racing": {
+      "ID": "BOTTLE_RACING",
+      "Name": "Racing Bottle",
+      "Capacity": 200,
+      "Weight": 20,
+      "RefillCost": 1500,
+      "UnlockLevel": 25
+    },
+    "Dual": {
+      "ID": "BOTTLE_DUAL",
+      "Name": "Dual Bottle Setup",
+      "Capacity": 250,
+      "Weight": 25,
+      "RefillCost": 2000,
+      "UnlockLevel": 35
+    }
+  },
+
+  "Regeneration": {
+    "Modes": {
+      "Off": {
+        "ID": "REGEN_OFF",
+        "Description": "No regeneration - bottles only",
+        "Rate": 0
+      },
+      "Drift": {
+        "ID": "REGEN_DRIFT",
+        "Description": "Regenerate while drifting",
+        "Rate": 5,
+        "Trigger": "DriftAngle > 15",
+        "Multiplier": { "ByAngle": true, "Max": 2.0 }
+      },
+      "Slipstream": {
+        "ID": "REGEN_SLIPSTREAM",
+        "Description": "Regenerate while drafting",
+        "Rate": 3,
+        "Trigger": "InSlipstream",
+        "Multiplier": { "BySpeed": true, "Max": 1.5 }
+      },
+      "NearMiss": {
+        "ID": "REGEN_NEARMISS",
+        "Description": "Regenerate from near misses",
+        "Rate": 10,
+        "Trigger": "NearMiss",
+        "PerEvent": true
+      },
+      "Overtake": {
+        "ID": "REGEN_OVERTAKE",
+        "Description": "Regenerate when overtaking",
+        "Rate": 15,
+        "Trigger": "Overtake",
+        "PerEvent": true
+      },
+      "FullThrottle": {
+        "ID": "REGEN_THROTTLE",
+        "Description": "Slow regeneration at full throttle",
+        "Rate": 1,
+        "Trigger": "Throttle = 100%"
+      },
+      "Combined": {
+        "ID": "REGEN_COMBINED",
+        "Description": "All regeneration methods active",
+        "AllMethods": true,
+        "Multiplier": 0.75
+      }
+    },
+    "Caps": {
+      "MaxPerSecond": 20,
+      "MaxPerRace": "Unlimited",
+      "CooldownBetween": 0.5
+    }
+  },
+
+  "ActivationSettings": {
+    "InputMethods": {
+      "Hold": {
+        "Description": "Hold button to use nitro",
+        "Default": true
+      },
+      "Toggle": {
+        "Description": "Toggle nitro on/off",
+        "Default": false
+      },
+      "Burst": {
+        "Description": "Tap for short bursts",
+        "BurstDuration": 1.0
+      }
+    },
+    "Restrictions": {
+      "MinSpeed": 30,
+      "RequiresGrip": true,
+      "DisabledInAir": true,
+      "DisabledInReverse": true,
+      "ThrottleRequired": 0.5
+    },
+    "Timing": {
+      "ActivationDelay": 0.1,
+      "DeactivationDelay": 0.2,
+      "CooldownAfterEmpty": 1.0
+    }
+  },
+
+  "Effects": {
+    "Visual": {
+      "FlameColor": {
+        "Default": "Blue",
+        "Options": ["Blue", "Purple", "Green", "Red", "Orange", "White", "Rainbow"],
+        "Customizable": true
+      },
+      "FlameLength": {
+        "Normal": 1.0,
+        "ByPower": true,
+        "Max": 2.0
+      },
+      "ScreenEffects": {
+        "SpeedLines": true,
+        "Vignette": true,
+        "ColorShift": true,
+        "FOVIncrease": 5
+      },
+      "VehicleEffects": {
+        "Glow": true,
+        "Backfire": true,
+        "HeatDistortion": true
+      }
+    },
+    "Audio": {
+      "ActivationSound": "nitro_activate",
+      "ActiveLoop": "nitro_loop",
+      "DeactivationSound": "nitro_deactivate",
+      "EmptySound": "nitro_empty",
+      "VolumeByPower": true,
+      "PitchByPower": true
+    },
+    "Gameplay": {
+      "HandlingChange": {
+        "Oversteer": 0.1,
+        "TractionReduction": 0.05
+      },
+      "CameraEffects": {
+        "Shake": 0.1,
+        "Zoom": true
+      }
+    }
+  },
+
+  "Upgrades": {
+    "Purge": {
+      "ID": "UPGRADE_PURGE",
+      "Name": "Purge Kit",
+      "Description": "Clear air from lines for instant activation",
+      "Effect": "RemoveActivationDelay",
+      "VisualEffect": "PurgeFlame",
+      "UnlockLevel": 20
+    },
+    "Warmer": {
+      "ID": "UPGRADE_WARMER",
+      "Name": "Bottle Warmer",
+      "Description": "Maintain optimal bottle temperature",
+      "Effect": "ConsistentPower",
+      "PowerVariation": 0,
+      "UnlockLevel": 15
+    },
+    "Controller": {
+      "ID": "UPGRADE_CONTROLLER",
+      "Name": "Digital Controller",
+      "Description": "Precise nitro delivery control",
+      "Effect": "PreciseDelivery",
+      "UnlockLevel": 25
+    },
+    "QuickFill": {
+      "ID": "UPGRADE_QUICKFILL",
+      "Name": "Quick Fill Valve",
+      "Description": "Faster bottle refills",
+      "Effect": "FasterRefill",
+      "RefillSpeedBonus": 0.5,
+      "UnlockLevel": 10
+    },
+    "RegenBoost": {
+      "ID": "UPGRADE_REGENBOOST",
+      "Name": "Enhanced Regeneration",
+      "Description": "Faster nitro regeneration",
+      "Effect": "RegenMultiplier",
+      "Multiplier": 1.5,
+      "UnlockLevel": 30
+    }
+  },
+
+  "RaceFormats": {
+    "Unlimited": {
+      "BottleCount": "Unlimited",
+      "Regeneration": true,
+      "Description": "Free use of nitro"
+    },
+    "Limited": {
+      "BottleCount": 1,
+      "Regeneration": false,
+      "Description": "Single bottle, use wisely"
+    },
+    "Strategic": {
+      "BottleCount": 3,
+      "Regeneration": false,
+      "Description": "Multiple bottles, no regen"
+    },
+    "RegenOnly": {
+      "BottleCount": 0,
+      "Regeneration": true,
+      "StartEmpty": true,
+      "Description": "Must earn your nitro"
+    },
+    "Disabled": {
+      "BottleCount": 0,
+      "Regeneration": false,
+      "Description": "No nitro allowed"
+    }
+  },
+
+  "Tuning": {
+    "JetSize": {
+      "Description": "Nitro jet sizing affects power and consumption",
+      "Options": ["Small", "Medium", "Large", "Race"],
+      "Effects": {
+        "Small": { "Power": 0.8, "Consumption": 0.7 },
+        "Medium": { "Power": 1.0, "Consumption": 1.0 },
+        "Large": { "Power": 1.2, "Consumption": 1.4 },
+        "Race": { "Power": 1.5, "Consumption": 2.0 }
+      }
+    },
+    "Timing": {
+      "Description": "Adjust activation timing",
+      "Range": { "Early": -0.2, "Late": 0.2 },
+      "Effect": "PowerCurve"
+    },
+    "Mixture": {
+      "Description": "Fuel to nitro ratio",
+      "Range": { "Lean": 0.8, "Rich": 1.2 },
+      "Effect": { "Lean": "MorePowerLessConsumption", "Rich": "SmoothDelivery" }
+    }
+  }
+}

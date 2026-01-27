@@ -1,0 +1,353 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Wheels and Tires Customization System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "SeparateFrontRear": true,
+    "StaggeredSetups": true,
+    "CustomOffsets": true,
+    "SpacersAllowed": true
+  },
+
+  "WheelCategories": {
+    "Stock": {
+      "ID": "WHEEL_STOCK",
+      "Name": "Stock Wheels",
+      "Description": "Factory original wheels",
+      "Count": 25,
+      "Finish": ["Silver", "Black", "Polished"],
+      "SizeRange": { "Min": 15, "Max": 19 },
+      "UnlockMethod": "Default"
+    },
+    "Alloy": {
+      "ID": "WHEEL_ALLOY",
+      "Name": "Alloy Wheels",
+      "Description": "Lightweight alloy designs",
+      "Count": 40,
+      "Finish": ["Silver", "Black", "Gunmetal", "Bronze", "Gold"],
+      "SizeRange": { "Min": 16, "Max": 20 },
+      "UnlockLevel": 5
+    },
+    "Mesh": {
+      "ID": "WHEEL_MESH",
+      "Name": "Mesh Wheels",
+      "Description": "Classic mesh spoke design",
+      "Count": 15,
+      "Finish": ["Chrome", "Polished", "Black Chrome"],
+      "SizeRange": { "Min": 15, "Max": 18 },
+      "Style": "JDM Classic",
+      "UnlockLevel": 10
+    },
+    "MultiSpoke": {
+      "ID": "WHEEL_MULTISPOKE",
+      "Name": "Multi-Spoke",
+      "Description": "High spoke count designs",
+      "Count": 30,
+      "Finish": ["Silver", "Black", "Machined"],
+      "SizeRange": { "Min": 17, "Max": 22 },
+      "UnlockLevel": 15
+    },
+    "DeepDish": {
+      "ID": "WHEEL_DEEPDISH",
+      "Name": "Deep Dish",
+      "Description": "Aggressive concave profiles",
+      "Count": 25,
+      "Finish": ["Chrome", "Black", "Bronze", "Copper"],
+      "SizeRange": { "Min": 18, "Max": 22 },
+      "Style": "Stance",
+      "UnlockLevel": 20
+    },
+    "Forged": {
+      "ID": "WHEEL_FORGED",
+      "Name": "Forged Wheels",
+      "Description": "Premium forged construction",
+      "Count": 20,
+      "Finish": ["Custom"],
+      "SizeRange": { "Min": 18, "Max": 21 },
+      "WeightReduction": 0.15,
+      "UnlockLevel": 30
+    },
+    "Racing": {
+      "ID": "WHEEL_RACING",
+      "Name": "Racing Wheels",
+      "Description": "Competition-grade wheels",
+      "Count": 15,
+      "Finish": ["White", "Gold", "Black"],
+      "SizeRange": { "Min": 17, "Max": 19 },
+      "WeightReduction": 0.20,
+      "UnlockLevel": 35
+    },
+    "Classic": {
+      "ID": "WHEEL_CLASSIC",
+      "Name": "Classic Designs",
+      "Description": "Iconic retro styles",
+      "Count": 20,
+      "Finish": ["Chrome", "Polished", "Silver"],
+      "SizeRange": { "Min": 14, "Max": 17 },
+      "Style": "Vintage",
+      "UnlockLevel": 15
+    },
+    "Drift": {
+      "ID": "WHEEL_DRIFT",
+      "Name": "Drift Wheels",
+      "Description": "Wide and aggressive",
+      "Count": 20,
+      "Finish": ["Matte", "Bronze", "Gold"],
+      "SizeRange": { "Min": 17, "Max": 19 },
+      "WidthOptions": "Extra Wide",
+      "UnlockLevel": 25
+    }
+  },
+
+  "WheelBrands": [
+    { "ID": "BRAND_WORK", "Name": "Work", "Style": "JDM", "Premium": true },
+    { "ID": "BRAND_RAYS", "Name": "Rays", "Style": "JDM", "Premium": true },
+    { "ID": "BRAND_BBS", "Name": "BBS", "Style": "European", "Premium": true },
+    { "ID": "BRAND_ENKEI", "Name": "Enkei", "Style": "Universal", "Premium": false },
+    { "ID": "BRAND_SSR", "Name": "SSR", "Style": "JDM", "Premium": true },
+    { "ID": "BRAND_ADVAN", "Name": "Advan", "Style": "Racing", "Premium": true },
+    { "ID": "BRAND_VOLK", "Name": "Volk Racing", "Style": "Racing", "Premium": true },
+    { "ID": "BRAND_ROTIFORM", "Name": "Rotiform", "Style": "Euro", "Premium": true },
+    { "ID": "BRAND_HRE", "Name": "HRE", "Style": "Luxury", "Premium": true },
+    { "ID": "BRAND_AMERICAN", "Name": "American Racing", "Style": "Muscle", "Premium": false }
+  ],
+
+  "WheelSizing": {
+    "DiameterRange": { "Min": 14, "Max": 24 },
+    "WidthRange": { "Min": 5.0, "Max": 13.0, "Increment": 0.5 },
+    "OffsetRange": { "Min": -40, "Max": 50 },
+    "PCDOptions": ["4x100", "4x114.3", "5x100", "5x112", "5x114.3", "5x120"],
+    "CenterBoreOptions": ["56.1", "60.1", "64.1", "66.6", "72.6", "73.1"],
+    "StaggeredSetup": {
+      "Enabled": true,
+      "FrontRearDifference": { "Width": 2.0, "Diameter": 1 }
+    }
+  },
+
+  "WheelFinishes": {
+    "Standard": {
+      "Chrome": { "Reflectivity": 1.0, "Cost": "Standard" },
+      "Silver": { "Reflectivity": 0.6, "Cost": "Standard" },
+      "Black": { "Reflectivity": 0.1, "Cost": "Standard" },
+      "Gunmetal": { "Reflectivity": 0.3, "Cost": "Standard" }
+    },
+    "Premium": {
+      "Bronze": { "Reflectivity": 0.4, "Cost": "Premium" },
+      "Gold": { "Reflectivity": 0.8, "Cost": "Premium" },
+      "Copper": { "Reflectivity": 0.5, "Cost": "Premium" },
+      "Titanium": { "Reflectivity": 0.4, "Cost": "Premium" }
+    },
+    "Special": {
+      "Matte": { "Reflectivity": 0.05, "Types": ["Black", "White", "Bronze"] },
+      "Machined": { "Reflectivity": 0.7, "TwoTone": true },
+      "Brushed": { "Reflectivity": 0.5, "Texture": true },
+      "HyperColor": { "Reflectivity": 0.6, "ColorShift": true }
+    },
+    "Custom": {
+      "Enabled": true,
+      "ColorPicker": true,
+      "TwoTone": true,
+      "UnlockLevel": 25
+    }
+  },
+
+  "TireCategories": {
+    "Street": {
+      "ID": "TIRE_STREET",
+      "Name": "Street Tires",
+      "Description": "All-season road tires",
+      "Grip": 0.7,
+      "Wear": 0.3,
+      "NoiseLevel": "Low",
+      "WetPerformance": 0.9,
+      "UnlockMethod": "Default"
+    },
+    "Performance": {
+      "ID": "TIRE_PERFORMANCE",
+      "Name": "Performance Tires",
+      "Description": "High-performance summer tires",
+      "Grip": 0.85,
+      "Wear": 0.5,
+      "NoiseLevel": "Medium",
+      "WetPerformance": 0.7,
+      "UnlockLevel": 10
+    },
+    "Sport": {
+      "ID": "TIRE_SPORT",
+      "Name": "Sport Tires",
+      "Description": "Track-focused street legal",
+      "Grip": 0.92,
+      "Wear": 0.7,
+      "NoiseLevel": "Medium-High",
+      "WetPerformance": 0.5,
+      "UnlockLevel": 20
+    },
+    "SemiSlick": {
+      "ID": "TIRE_SEMISLICK",
+      "Name": "Semi-Slick",
+      "Description": "Race compound, road legal",
+      "Grip": 0.97,
+      "Wear": 0.85,
+      "NoiseLevel": "High",
+      "WetPerformance": 0.3,
+      "UnlockLevel": 30
+    },
+    "Slick": {
+      "ID": "TIRE_SLICK",
+      "Name": "Racing Slicks",
+      "Description": "Full racing compound",
+      "Grip": 1.0,
+      "Wear": 0.9,
+      "NoiseLevel": "High",
+      "WetPerformance": 0.1,
+      "TrackOnly": true,
+      "UnlockLevel": 40
+    },
+    "Drift": {
+      "ID": "TIRE_DRIFT",
+      "Name": "Drift Tires",
+      "Description": "Optimized for controlled slides",
+      "Grip": 0.75,
+      "SlideControl": 0.95,
+      "SmokeProduction": "High",
+      "Wear": 0.95,
+      "UnlockLevel": 15
+    },
+    "Rain": {
+      "ID": "TIRE_RAIN",
+      "Name": "Rain Tires",
+      "Description": "Maximum wet weather grip",
+      "Grip": 0.7,
+      "WetPerformance": 1.0,
+      "WaterDispersion": "Maximum",
+      "DryPerformance": 0.6,
+      "UnlockLevel": 20
+    },
+    "AllTerrain": {
+      "ID": "TIRE_ALLTERRAIN",
+      "Name": "All-Terrain",
+      "Description": "Off-road capable",
+      "Grip": 0.65,
+      "OffRoadGrip": 0.9,
+      "Durability": 0.95,
+      "UnlockLevel": 25
+    }
+  },
+
+  "TireBrands": [
+    { "ID": "TBRAND_MICHELIN", "Name": "Michelin", "Specialty": "Performance", "Premium": true },
+    { "ID": "TBRAND_BRIDGESTONE", "Name": "Bridgestone", "Specialty": "Racing", "Premium": true },
+    { "ID": "TBRAND_PIRELLI", "Name": "Pirelli", "Specialty": "Sport", "Premium": true },
+    { "ID": "TBRAND_TOYO", "Name": "Toyo", "Specialty": "Drift", "Premium": false },
+    { "ID": "TBRAND_YOKOHAMA", "Name": "Yokohama", "Specialty": "Street", "Premium": false },
+    { "ID": "TBRAND_FALKEN", "Name": "Falken", "Specialty": "Drift", "Premium": false },
+    { "ID": "TBRAND_NITTO", "Name": "Nitto", "Specialty": "Performance", "Premium": false },
+    { "ID": "TBRAND_FEDERAL", "Name": "Federal", "Specialty": "Drift", "Premium": false }
+  ],
+
+  "TireSizing": {
+    "WidthRange": { "Min": 165, "Max": 345, "Increment": 5 },
+    "ProfileRange": { "Min": 20, "Max": 70, "Increment": 5 },
+    "SpeedRatings": ["H", "V", "W", "Y", "Z"],
+    "StretchedTires": {
+      "Enabled": true,
+      "MaxStretch": 2,
+      "AffectsHandling": true,
+      "RiskLevel": "Indicated"
+    }
+  },
+
+  "TireAppearance": {
+    "Sidewall": {
+      "WhiteLettering": { "Enabled": true, "UnlockLevel": 15 },
+      "ColoredLettering": { "Enabled": true, "Colors": ["Red", "Yellow", "Blue"], "UnlockLevel": 25 },
+      "Stickers": { "Enabled": true, "Designs": 20 }
+    },
+    "TreadPattern": {
+      "Visible": true,
+      "AffectsPerformance": true
+    }
+  },
+
+  "Spacers": {
+    "Enabled": true,
+    "Sizes": [5, 10, 15, 20, 25, 30],
+    "Effects": {
+      "TrackWidth": "Increased",
+      "StabilityBonus": 0.05,
+      "WeightPenalty": 0.01
+    },
+    "FrontRearIndependent": true,
+    "UnlockLevel": 20
+  },
+
+  "FenderMods": {
+    "RolledFenders": {
+      "Enabled": true,
+      "AllowsLowerFitment": true
+    },
+    "PulledFenders": {
+      "Enabled": true,
+      "AllowsWiderWheels": 1
+    },
+    "WidebodyRequired": {
+      "ForWidth": 12,
+      "ForOffset": -20
+    }
+  },
+
+  "Performance": {
+    "WeightImpact": {
+      "LighterWheels": {
+        "AccelerationBonus": 0.02,
+        "BrakingBonus": 0.01,
+        "HandlingBonus": 0.015
+      },
+      "HeavierWheels": {
+        "AccelerationPenalty": -0.03,
+        "BrakingPenalty": -0.02,
+        "DurabilityBonus": 0.1
+      }
+    },
+    "SizeImpact": {
+      "LargerDiameter": {
+        "TopSpeedBonus": 0.01,
+        "AccelerationPenalty": -0.02
+      },
+      "WiderTires": {
+        "GripBonus": 0.03,
+        "DragPenalty": -0.01
+      }
+    }
+  },
+
+  "Presets": {
+    "Street": {
+      "Description": "Balanced street setup",
+      "WheelSize": 18,
+      "TireType": "Performance",
+      "Offset": "Flush"
+    },
+    "Stance": {
+      "Description": "Aggressive fitment",
+      "WheelSize": 19,
+      "TireType": "Stretched",
+      "Offset": "Poke",
+      "Camber": "Negative"
+    },
+    "Track": {
+      "Description": "Race-ready setup",
+      "WheelSize": 18,
+      "TireType": "SemiSlick",
+      "Offset": "Performance",
+      "Lightweight": true
+    },
+    "Drift": {
+      "Description": "Drift-optimized",
+      "WheelSize": 18,
+      "TireType": "Drift",
+      "RearWidth": "Wide"
+    }
+  }
+}
