@@ -1,0 +1,246 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - NPC Dialogue and Character Lines",
+
+  "DialogueSystem": {
+    "Enabled": true,
+    "VoiceActed": true,
+    "Subtitles": true,
+    "SkipEnabled": true,
+    "AutoAdvance": true,
+    "AutoAdvanceDelay": 3.0
+  },
+
+  "Characters": {
+    "Kai": {
+      "ID": "CHAR_KAI",
+      "Name": "Kai",
+      "Role": "Mentor / Tutorial Guide",
+      "Description": "Veteran street racer who takes you under his wing",
+      "VoiceActor": "TBD",
+      "Portrait": "PORT_Kai",
+      "Personality": ["Wise", "Calm", "Encouraging"],
+      "VehicleOfChoice": "SAKURA_GTR"
+    },
+    "Luna": {
+      "ID": "CHAR_LUNA",
+      "Name": "Luna",
+      "Role": "Mechanic",
+      "Description": "Genius mechanic who runs your garage",
+      "VoiceActor": "TBD",
+      "Portrait": "PORT_Luna",
+      "Personality": ["Technical", "Enthusiastic", "Helpful"],
+      "Location": "Garage"
+    },
+    "Vince": {
+      "ID": "CHAR_VINCE",
+      "Name": "Vince",
+      "Role": "Rival",
+      "Description": "Arrogant racer who underestimates you",
+      "VoiceActor": "TBD",
+      "Portrait": "PORT_Vince",
+      "Personality": ["Cocky", "Competitive", "Grudging Respect"],
+      "VehicleOfChoice": "STALLION_GT"
+    },
+    "Maya": {
+      "ID": "CHAR_MAYA",
+      "Name": "Maya",
+      "Role": "Event Coordinator",
+      "Description": "Organizes underground races and events",
+      "VoiceActor": "TBD",
+      "Portrait": "PORT_Maya",
+      "Personality": ["Professional", "Connected", "Mysterious"]
+    },
+    "DJ_Neon": {
+      "ID": "CHAR_DJ_NEON",
+      "Name": "DJ NEON",
+      "Role": "Radio Host",
+      "Description": "Voice of Midnight FM",
+      "VoiceActor": "TBD",
+      "Portrait": "PORT_Neon",
+      "Personality": ["Energetic", "Cool", "Nightlife"]
+    },
+    "Officer_Chen": {
+      "ID": "CHAR_CHEN",
+      "Name": "Officer Chen",
+      "Role": "Antagonist",
+      "Description": "Lead detective of the street racing task force",
+      "VoiceActor": "TBD",
+      "Portrait": "PORT_Chen",
+      "Personality": ["Determined", "By-the-book", "Respectful of skill"]
+    }
+  },
+
+  "TutorialDialogue": {
+    "FirstBoot": [
+      { "Speaker": "Kai", "Line": "So, you want to make a name for yourself on these streets?", "Emotion": "Curious" },
+      { "Speaker": "Kai", "Line": "It's not about the car you drive. It's about how you drive it.", "Emotion": "Wise" },
+      { "Speaker": "Kai", "Line": "Let me show you the basics. After that, you're on your own.", "Emotion": "Determined" }
+    ],
+    "FirstDrive": [
+      { "Speaker": "Kai", "Line": "Feel that? That's the connection between you and the machine.", "Emotion": "Encouraging" },
+      { "Speaker": "Kai", "Line": "Smooth inputs. The car responds to how you treat it.", "Emotion": "Teaching" }
+    ],
+    "FirstWin": [
+      { "Speaker": "Kai", "Line": "Not bad, rookie. Not bad at all.", "Emotion": "Impressed" },
+      { "Speaker": "Kai", "Line": "But one win doesn't make you a legend. Keep pushing.", "Emotion": "Motivating" }
+    ],
+    "FirstLoss": [
+      { "Speaker": "Kai", "Line": "Hey, we all eat dust sometimes. What matters is getting back up.", "Emotion": "Supportive" },
+      { "Speaker": "Kai", "Line": "Analyze what went wrong. Learn. Adapt. Come back stronger.", "Emotion": "Wise" }
+    ],
+    "GarageIntro": [
+      { "Speaker": "Luna", "Line": "Welcome to my workshop! I'm Luna. I keep the machines running.", "Emotion": "Cheerful" },
+      { "Speaker": "Luna", "Line": "Bring me parts, and I'll make your ride sing.", "Emotion": "Excited" },
+      { "Speaker": "Luna", "Line": "Just... don't ask where I learned to do this. Trade secrets.", "Emotion": "Mysterious" }
+    ]
+  },
+
+  "StoryDialogue": {
+    "Chapter1_Intro": {
+      "ID": "STORY_CH1_INTRO",
+      "Context": "Player enters first underground race",
+      "Lines": [
+        { "Speaker": "Maya", "Line": "Fresh face at my event? Interesting.", "Emotion": "Intrigued" },
+        { "Speaker": "Maya", "Line": "The rules are simple: cross the line first, don't die.", "Emotion": "Serious" },
+        { "Speaker": "Vince", "Line": "Another wannabe? This should be quick.", "Emotion": "Dismissive" },
+        { "Speaker": "Player_Internal", "Line": "(I'll show them what I've got.)", "Emotion": "Determined" }
+      ]
+    },
+    "Chapter1_VinceDefeat": {
+      "ID": "STORY_CH1_VINCE",
+      "Context": "Player beats Vince for the first time",
+      "Lines": [
+        { "Speaker": "Vince", "Line": "What the— How did you—", "Emotion": "Shocked" },
+        { "Speaker": "Vince", "Line": "This isn't over. Not by a long shot.", "Emotion": "Angry" },
+        { "Speaker": "Kai", "Line": "You made an enemy tonight. And maybe a little respect.", "Emotion": "Thoughtful" }
+      ]
+    },
+    "Chapter2_PoliceIntro": {
+      "ID": "STORY_CH2_POLICE",
+      "Context": "First encounter with Officer Chen",
+      "Lines": [
+        { "Speaker": "Officer_Chen", "Line": "I've been watching you. You've got talent.", "Emotion": "Calm" },
+        { "Speaker": "Officer_Chen", "Line": "But talent doesn't excuse breaking the law.", "Emotion": "Firm" },
+        { "Speaker": "Officer_Chen", "Line": "One day, you'll have to choose which side you're on.", "Emotion": "Warning" }
+      ]
+    },
+    "Chapter3_CrewInvite": {
+      "ID": "STORY_CH3_CREW",
+      "Context": "Player is invited to join a crew",
+      "Lines": [
+        { "Speaker": "Maya", "Line": "The Midnight Runners want you. That's... rare.", "Emotion": "Surprised" },
+        { "Speaker": "Maya", "Line": "A crew is more than just racing together. It's family.", "Emotion": "Serious" },
+        { "Speaker": "Maya", "Line": "Think about it. This offer won't last forever.", "Emotion": "Pressing" }
+      ]
+    }
+  },
+
+  "ContextualDialogue": {
+    "PreRace": {
+      "Confident": [
+        { "Speaker": "Kai", "Line": "You've got this. Trust your instincts." },
+        { "Speaker": "Luna", "Line": "The car's running perfect. Now it's on you." }
+      ],
+      "Underdog": [
+        { "Speaker": "Kai", "Line": "They're faster on paper. But paper doesn't race." },
+        { "Speaker": "Luna", "Line": "I've tuned her as best I can. Make it count." }
+      ],
+      "Rematch": [
+        { "Speaker": "Vince", "Line": "Back for more? Fine. Let's settle this." },
+        { "Speaker": "Kai", "Line": "Redemption's on the line. Focus." }
+      ]
+    },
+    "PostRace": {
+      "Win": [
+        { "Speaker": "Luna", "Line": "YES! That was incredible!" },
+        { "Speaker": "Kai", "Line": "Clean. Professional. That's how it's done." },
+        { "Speaker": "Maya", "Line": "People are starting to talk about you." }
+      ],
+      "CloseWin": [
+        { "Speaker": "Kai", "Line": "That was too close. Lucky beats good... once." },
+        { "Speaker": "Luna", "Line": "My heart can't take these finishes!" }
+      ],
+      "Loss": [
+        { "Speaker": "Kai", "Line": "Tough break. But there's always next time." },
+        { "Speaker": "Luna", "Line": "Don't beat yourself up. Let's look at what happened." }
+      ],
+      "Dominant": [
+        { "Speaker": "Vince", "Line": "...Okay. I'll admit it. You're good." },
+        { "Speaker": "Maya", "Line": "That wasn't a race. That was a statement." }
+      ]
+    },
+    "Garage": {
+      "NewPart": [
+        { "Speaker": "Luna", "Line": "Ooh, nice pickup! This'll add some serious punch." },
+        { "Speaker": "Luna", "Line": "Let me install this. It'll be ready in no time." }
+      ],
+      "LowFunds": [
+        { "Speaker": "Luna", "Line": "Running a bit tight on cash? Win some races!" },
+        { "Speaker": "Luna", "Line": "I can't work miracles without parts, you know." }
+      ],
+      "NewCar": [
+        { "Speaker": "Luna", "Line": "A new ride? Let me give it a once-over." },
+        { "Speaker": "Luna", "Line": "Nice choice. I've always wanted to work on one of these." }
+      ],
+      "FullyUpgraded": [
+        { "Speaker": "Luna", "Line": "This thing is maxed out. It's a work of art." },
+        { "Speaker": "Luna", "Line": "I don't think there's anything left to add. Perfect." }
+      ]
+    },
+    "Pursuit": {
+      "Spotted": [
+        { "Speaker": "Radio", "Line": "Cops! We've got heat on your tail!" },
+        { "Speaker": "Kai", "Line": "Stay calm. You know these streets better than them." }
+      ],
+      "HighHeat": [
+        { "Speaker": "Radio", "Line": "This is getting serious. Find a way out!" },
+        { "Speaker": "Kai", "Line": "They're not playing around. Time to disappear." }
+      ],
+      "Escaped": [
+        { "Speaker": "Radio", "Line": "You lost them! Nice moves!" },
+        { "Speaker": "Kai", "Line": "Clean getaway. Now lay low for a while." }
+      ],
+      "Busted": [
+        { "Speaker": "Officer_Chen", "Line": "Thought you could outrun us? Think again." },
+        { "Speaker": "Radio", "Line": "That's gonna cost you. Be more careful next time." }
+      ]
+    }
+  },
+
+  "RadioChatter": {
+    "DJ_Neon": {
+      "Intros": [
+        "You're listening to Midnight FM. I'm DJ NEON, and these streets are alive tonight.",
+        "It's 2 AM and you're still grinding. That's what I like to hear.",
+        "The city never sleeps, and neither do we. Let's ride."
+      ],
+      "TrackIntros": [
+        "Here's a track that'll get your engine revving.",
+        "Turn it up. This one's a classic.",
+        "New heat coming at you. Feel that bass."
+      ],
+      "Commentary": [
+        "Word on the street is there's a new racer making waves. That you?",
+        "Police are out in force tonight. Keep your eyes open.",
+        "The underground's buzzing about the race at the docks. You gonna show?"
+      ],
+      "LateNight": [
+        "3 AM. The real ones are still out here.",
+        "The roads are empty. Perfect time to push it.",
+        "If you're hearing this, you're one of us. Respect."
+      ]
+    }
+  },
+
+  "QuickChat": {
+    "Enabled": true,
+    "Categories": {
+      "Greetings": ["Hey!", "What's up?", "Ready to race?", "Let's go!"],
+      "Compliments": ["Nice car!", "Good race!", "You're fast!", "Clean driving!"],
+      "Challenges": ["Think you can beat me?", "Let's settle this", "Rematch?", "You got lucky"],
+      "Reactions": ["GG", "Close one!", "Wow!", "No way!"],
+      "Callouts": ["Cops!", "Shortcut ahead", "Watch left!", "Behind you!"]
+    }
+  }
+}

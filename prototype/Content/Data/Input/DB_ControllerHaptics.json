@@ -1,0 +1,433 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Controller Haptics and Vibration Configuration",
+
+  "HapticsSystem": {
+    "Enabled": true,
+    "MasterIntensity": 1.0,
+    "AdaptiveTriggers": true,
+    "DualSenseSupport": true,
+    "XboxImpulseSupport": true,
+    "FallbackVibration": true
+  },
+
+  "VehicleFeedback": {
+    "Engine": {
+      "Enabled": true,
+      "IdleVibration": {
+        "Intensity": 0.05,
+        "Frequency": "ByRPM",
+        "Location": "Both"
+      },
+      "RevVibration": {
+        "Intensity": 0.15,
+        "ScaleWithRPM": true,
+        "MaxIntensity": 0.4,
+        "Location": "Both"
+      },
+      "Redline": {
+        "Intensity": 0.6,
+        "Pattern": "Pulse",
+        "PulseRate": 20,
+        "Location": "Both"
+      },
+      "GearShift": {
+        "Intensity": 0.3,
+        "Duration": 0.1,
+        "Location": "Right"
+      },
+      "MissedShift": {
+        "Intensity": 0.5,
+        "Duration": 0.2,
+        "Pattern": "Buzz",
+        "Location": "Both"
+      },
+      "EngineStall": {
+        "Intensity": 0.7,
+        "Duration": 0.5,
+        "Pattern": "Descending",
+        "Location": "Both"
+      }
+    },
+    "Tires": {
+      "WheelSpin": {
+        "Intensity": 0.25,
+        "ScaleWithSlip": true,
+        "Location": "Left"
+      },
+      "LockUp": {
+        "Intensity": 0.35,
+        "Pattern": "Stutter",
+        "Location": "Left"
+      },
+      "Drifting": {
+        "Intensity": 0.20,
+        "ScaleWithAngle": true,
+        "MaxIntensity": 0.45,
+        "Location": "Both"
+      },
+      "GripLoss": {
+        "Intensity": 0.30,
+        "Pattern": "Random",
+        "Location": "Both"
+      },
+      "TireBlowout": {
+        "Intensity": 0.9,
+        "Duration": 0.8,
+        "Pattern": "Explosion",
+        "Location": "Both"
+      }
+    },
+    "Surface": {
+      "Asphalt": {
+        "BaseVibration": 0.02,
+        "SpeedScale": true
+      },
+      "Concrete": {
+        "BaseVibration": 0.03,
+        "SpeedScale": true
+      },
+      "Gravel": {
+        "BaseVibration": 0.15,
+        "Pattern": "Rough",
+        "SpeedScale": true
+      },
+      "Dirt": {
+        "BaseVibration": 0.10,
+        "Pattern": "Loose",
+        "SpeedScale": true
+      },
+      "Grass": {
+        "BaseVibration": 0.08,
+        "Pattern": "Soft",
+        "SpeedScale": true
+      },
+      "Rumblestrip": {
+        "Intensity": 0.40,
+        "Pattern": "Staccato",
+        "Frequency": 30
+      },
+      "Kerb": {
+        "Intensity": 0.25,
+        "Pattern": "Bump"
+      },
+      "Puddle": {
+        "Intensity": 0.20,
+        "Duration": 0.3,
+        "Pattern": "Splash"
+      }
+    },
+    "Suspension": {
+      "Bump": {
+        "Intensity": 0.30,
+        "ScaleWithForce": true,
+        "Location": "ByWheel"
+      },
+      "Landing": {
+        "Intensity": 0.50,
+        "ScaleWithForce": true,
+        "MaxIntensity": 0.8,
+        "Duration": 0.3,
+        "Location": "Both"
+      },
+      "BottomOut": {
+        "Intensity": 0.60,
+        "Duration": 0.15,
+        "Location": "Both"
+      }
+    },
+    "Speed": {
+      "WindNoise": {
+        "Enabled": true,
+        "StartSpeed": 100,
+        "MaxIntensity": 0.15,
+        "Frequency": "High",
+        "Location": "Both"
+      },
+      "Aero": {
+        "Enabled": true,
+        "StartSpeed": 120,
+        "Intensity": 0.10,
+        "ScaleWithSpeed": true
+      }
+    }
+  },
+
+  "CollisionFeedback": {
+    "Wall": {
+      "Light": { "Intensity": 0.4, "Duration": 0.15 },
+      "Medium": { "Intensity": 0.6, "Duration": 0.25 },
+      "Heavy": { "Intensity": 0.9, "Duration": 0.4, "Pattern": "Impact" }
+    },
+    "Vehicle": {
+      "Tap": { "Intensity": 0.3, "Duration": 0.1 },
+      "Sideswipe": { "Intensity": 0.5, "Duration": 0.3, "Pattern": "Scrape" },
+      "TBone": { "Intensity": 0.8, "Duration": 0.35, "Pattern": "Impact" },
+      "HeadOn": { "Intensity": 1.0, "Duration": 0.5, "Pattern": "Crash" }
+    },
+    "Object": {
+      "Cone": { "Intensity": 0.15, "Duration": 0.1 },
+      "Sign": { "Intensity": 0.25, "Duration": 0.15 },
+      "Barrier": { "Intensity": 0.45, "Duration": 0.2 },
+      "Destructible": { "Intensity": 0.35, "Duration": 0.25, "Pattern": "Break" }
+    },
+    "DirectionalFeedback": {
+      "Enabled": true,
+      "LeftImpact": "LeftMotor",
+      "RightImpact": "RightMotor",
+      "FrontImpact": "Both",
+      "RearImpact": "BothReversed"
+    }
+  },
+
+  "EffectsFeedback": {
+    "Nitrous": {
+      "Activation": {
+        "Intensity": 0.5,
+        "Duration": 0.3,
+        "Pattern": "Surge",
+        "Location": "Both"
+      },
+      "Active": {
+        "Intensity": 0.25,
+        "Pattern": "Pulse",
+        "PulseRate": 8,
+        "Location": "Both"
+      },
+      "Depletion": {
+        "Intensity": 0.15,
+        "Duration": 0.2,
+        "Pattern": "Fade",
+        "Location": "Both"
+      }
+    },
+    "Turbo": {
+      "SpoolUp": {
+        "Intensity": 0.10,
+        "ScaleWithBoost": true,
+        "MaxIntensity": 0.25,
+        "Location": "Both"
+      },
+      "BlowOff": {
+        "Intensity": 0.20,
+        "Duration": 0.15,
+        "Location": "Both"
+      },
+      "AntiLag": {
+        "Intensity": 0.35,
+        "Pattern": "Crackle",
+        "Location": "Both"
+      }
+    }
+  },
+
+  "RaceFeedback": {
+    "Countdown": {
+      "Beep": {
+        "Intensity": 0.3,
+        "Duration": 0.1,
+        "Location": "Both"
+      },
+      "Go": {
+        "Intensity": 0.6,
+        "Duration": 0.2,
+        "Pattern": "Burst",
+        "Location": "Both"
+      }
+    },
+    "Checkpoint": {
+      "Intensity": 0.25,
+      "Duration": 0.15,
+      "Location": "Both"
+    },
+    "LapComplete": {
+      "Intensity": 0.30,
+      "Duration": 0.2,
+      "Location": "Both"
+    },
+    "FinalLap": {
+      "Intensity": 0.45,
+      "Duration": 0.3,
+      "Pattern": "Alert",
+      "Location": "Both"
+    },
+    "Finish": {
+      "Win": {
+        "Intensity": 0.7,
+        "Duration": 1.0,
+        "Pattern": "Celebration",
+        "Location": "Both"
+      },
+      "Podium": {
+        "Intensity": 0.5,
+        "Duration": 0.6,
+        "Pattern": "Success",
+        "Location": "Both"
+      },
+      "Finish": {
+        "Intensity": 0.3,
+        "Duration": 0.3,
+        "Location": "Both"
+      }
+    },
+    "Overtake": {
+      "Intensity": 0.25,
+      "Duration": 0.15,
+      "Location": "Both"
+    },
+    "Overtaken": {
+      "Intensity": 0.35,
+      "Duration": 0.2,
+      "Pattern": "Alert",
+      "Location": "Both"
+    }
+  },
+
+  "PursuitFeedback": {
+    "Spotted": {
+      "Intensity": 0.40,
+      "Duration": 0.3,
+      "Pattern": "Alert",
+      "Location": "Both"
+    },
+    "HeatIncrease": {
+      "Intensity": 0.50,
+      "Duration": 0.25,
+      "Pattern": "Rising",
+      "Location": "Both"
+    },
+    "Busted": {
+      "Intensity": 0.80,
+      "Duration": 1.0,
+      "Pattern": "Failure",
+      "Location": "Both"
+    },
+    "Escaped": {
+      "Intensity": 0.60,
+      "Duration": 0.8,
+      "Pattern": "Relief",
+      "Location": "Both"
+    },
+    "Spikes": {
+      "Warning": {
+        "Intensity": 0.45,
+        "Pattern": "Pulse",
+        "PulseRate": 4
+      },
+      "Hit": {
+        "Intensity": 0.90,
+        "Duration": 0.5,
+        "Pattern": "Sharp"
+      }
+    }
+  },
+
+  "AdaptiveTriggers": {
+    "Throttle": {
+      "Enabled": true,
+      "Modes": {
+        "Normal": {
+          "Effect": "Resistance",
+          "StartPosition": 0.0,
+          "Strength": 0.3
+        },
+        "WheelSpin": {
+          "Effect": "Vibration",
+          "Frequency": 25,
+          "Strength": 0.5
+        },
+        "TractionControl": {
+          "Effect": "Feedback",
+          "StartPosition": 0.7,
+          "Strength": 0.8
+        },
+        "NitrousReady": {
+          "Effect": "Section",
+          "StartPosition": 0.9,
+          "EndPosition": 1.0,
+          "Strength": 0.4
+        }
+      }
+    },
+    "Brake": {
+      "Enabled": true,
+      "Modes": {
+        "Normal": {
+          "Effect": "Resistance",
+          "StartPosition": 0.0,
+          "EndPosition": 1.0,
+          "StrengthCurve": "Progressive"
+        },
+        "ABS": {
+          "Effect": "Vibration",
+          "Frequency": 15,
+          "Strength": 0.6
+        },
+        "LockUp": {
+          "Effect": "Section",
+          "StartPosition": 0.85,
+          "Strength": 0.9
+        },
+        "FadedBrakes": {
+          "Effect": "Weapon",
+          "StartPosition": 0.0,
+          "Strength": 0.3
+        }
+      }
+    }
+  },
+
+  "DualSenseSpecific": {
+    "SpeakerEffects": {
+      "Enabled": true,
+      "EngineSound": false,
+      "Notifications": true,
+      "TireSqueal": false
+    },
+    "LightBar": {
+      "Enabled": true,
+      "Modes": {
+        "Default": { "Color": "#0000FF" },
+        "Nitrous": { "Color": "#00FFFF", "Pulse": true },
+        "Damage": { "Color": "#FF0000", "FlashOnHit": true },
+        "Pursuit": { "Pattern": "Police", "Colors": ["#FF0000", "#0000FF"] },
+        "Win": { "Color": "#FFD700", "Pulse": true }
+      }
+    }
+  },
+
+  "Presets": {
+    "Immersive": {
+      "MasterIntensity": 1.0,
+      "VehicleFeedback": true,
+      "CollisionFeedback": true,
+      "RaceFeedback": true,
+      "AdaptiveTriggers": true
+    },
+    "Moderate": {
+      "MasterIntensity": 0.6,
+      "VehicleFeedback": true,
+      "CollisionFeedback": true,
+      "RaceFeedback": true,
+      "AdaptiveTriggers": false
+    },
+    "Minimal": {
+      "MasterIntensity": 0.3,
+      "VehicleFeedback": false,
+      "CollisionFeedback": true,
+      "RaceFeedback": true,
+      "AdaptiveTriggers": false
+    },
+    "Off": {
+      "MasterIntensity": 0.0
+    }
+  },
+
+  "Accessibility": {
+    "DisableVibration": false,
+    "DisableAdaptiveTriggers": false,
+    "CustomIntensityScale": 1.0,
+    "FilterHighFrequency": false,
+    "MaxContinuousDuration": 0
+  }
+}

@@ -1,0 +1,317 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Car Meets and Social Gathering Configuration",
+
+  "CarMeetSystem": {
+    "Enabled": true,
+    "UnlockLevel": 5,
+    "MaxParticipants": 32,
+    "MeetDuration": 3600,
+    "AutoEndOnEmpty": true,
+    "EmptyTimeout": 300
+  },
+
+  "MeetLocations": [
+    {
+      "ID": "MEET_DOWNTOWN_GARAGE",
+      "Name": "Downtown Parking Garage",
+      "Description": "Multi-level structure with great lighting",
+      "Location": { "X": 1250, "Y": -3400, "Z": 50 },
+      "Capacity": 32,
+      "Unlocked": true,
+      "Features": ["Rooftop", "MultiLevel", "NeonLighting", "PhotoSpots"],
+      "Ambience": "Urban",
+      "TimeOfDay": "Night",
+      "Weather": "Clear",
+      "ParkingSpots": 40,
+      "PhotoLocations": [
+        { "Name": "Rooftop Skyline", "Position": { "X": 1300, "Y": -3350, "Z": 150 } },
+        { "Name": "Spiral Ramp", "Position": { "X": 1200, "Y": -3420, "Z": 75 } },
+        { "Name": "Neon Corner", "Position": { "X": 1275, "Y": -3380, "Z": 50 } }
+      ]
+    },
+    {
+      "ID": "MEET_HARBOR_DOCKS",
+      "Name": "Harbor Docks",
+      "Description": "Industrial waterfront with container backdrop",
+      "Location": { "X": -2800, "Y": 1500, "Z": 5 },
+      "Capacity": 24,
+      "UnlockCondition": "LEVEL_10",
+      "Features": ["Waterfront", "Containers", "CraneBackdrop", "OpenSpace"],
+      "Ambience": "Industrial",
+      "TimeOfDay": "Sunset",
+      "Weather": "Cloudy",
+      "ParkingSpots": 30,
+      "SpecialFeature": "ShipHornOnHour"
+    },
+    {
+      "ID": "MEET_MOUNTAIN_OVERLOOK",
+      "Name": "Mountain Overlook",
+      "Description": "Scenic viewpoint with city lights below",
+      "Location": { "X": 4500, "Y": 2200, "Z": 850 },
+      "Capacity": 16,
+      "UnlockCondition": "LEVEL_15",
+      "Features": ["CityView", "Sunset", "Scenic", "Intimate"],
+      "Ambience": "Peaceful",
+      "TimeOfDay": "Dusk",
+      "Weather": "Clear",
+      "ParkingSpots": 20,
+      "PhotoLocations": [
+        { "Name": "City Panorama", "Position": { "X": 4520, "Y": 2250, "Z": 855 } },
+        { "Name": "Sunset Silhouette", "Position": { "X": 4480, "Y": 2180, "Z": 852 } }
+      ]
+    },
+    {
+      "ID": "MEET_AIRPORT_RUNWAY",
+      "Name": "Abandoned Airfield",
+      "Description": "Wide open space for showing off",
+      "Location": { "X": 6200, "Y": -1800, "Z": 20 },
+      "Capacity": 48,
+      "UnlockCondition": "REP_TIER_STREET",
+      "Features": ["OpenSpace", "Runway", "Hangar", "DragStrip"],
+      "Ambience": "Abandoned",
+      "TimeOfDay": "Night",
+      "Weather": "Any",
+      "ParkingSpots": 60,
+      "Activities": ["Drag", "Donuts", "Burnouts"]
+    },
+    {
+      "ID": "MEET_MALL_PARKING",
+      "Name": "Mall Parking Lot",
+      "Description": "Classic meet location under the lights",
+      "Location": { "X": 800, "Y": 1200, "Z": 15 },
+      "Capacity": 40,
+      "UnlockCondition": "LEVEL_8",
+      "Features": ["FlatGround", "LightPoles", "FastFood", "Classic"],
+      "Ambience": "Suburban",
+      "TimeOfDay": "LateNight",
+      "Weather": "Clear",
+      "ParkingSpots": 50,
+      "NPCVendors": ["FoodTruck"]
+    },
+    {
+      "ID": "MEET_SHRINE",
+      "Name": "Temple Grounds",
+      "Description": "Traditional meets modern at this serene spot",
+      "Location": { "X": 3200, "Y": 4500, "Z": 120 },
+      "Capacity": 16,
+      "UnlockCondition": "REP_TIER_PRO",
+      "Features": ["Cultural", "Serene", "CherryBlossoms", "JDMVibes"],
+      "Ambience": "Peaceful",
+      "TimeOfDay": "Dawn",
+      "Weather": "Clear",
+      "ParkingSpots": 20,
+      "SeasonalVariant": { "Spring": "CherryBlossoms" }
+    },
+    {
+      "ID": "MEET_UNDERGROUND_GARAGE",
+      "Name": "The Underground",
+      "Description": "Secret location for the elite",
+      "Location": { "X": -500, "Y": -2800, "Z": -30 },
+      "Capacity": 20,
+      "UnlockCondition": "REP_TIER_ELITE",
+      "Features": ["Hidden", "Exclusive", "NeonLit", "Elite"],
+      "Ambience": "Underground",
+      "TimeOfDay": "Any",
+      "Weather": "Indoor",
+      "ParkingSpots": 25,
+      "EntryRequirement": "InviteOnly"
+    }
+  ],
+
+  "MeetActivities": {
+    "PhotoSession": {
+      "ID": "ACT_PHOTO",
+      "Name": "Photo Session",
+      "Description": "Take photos of cars at the meet",
+      "Enabled": true,
+      "RewardPerPhoto": { "REP": 10 },
+      "BonusForFeatured": { "REP": 100, "Cash": 500 }
+    },
+    "RevContest": {
+      "ID": "ACT_REV",
+      "Name": "Rev Contest",
+      "Description": "See who has the loudest exhaust",
+      "Enabled": true,
+      "MinParticipants": 2,
+      "VotingEnabled": true,
+      "Reward": { "Winner": { "REP": 250, "Cash": 1000 } }
+    },
+    "CarShowdown": {
+      "ID": "ACT_SHOWDOWN",
+      "Name": "Car Showdown",
+      "Description": "Vote for the best car at the meet",
+      "Enabled": true,
+      "MinParticipants": 4,
+      "Categories": ["BestOverall", "BestJDM", "BestMuscle", "BestMod", "BestPaint"],
+      "VotingDuration": 300,
+      "Reward": { "Winner": { "REP": 500, "Cash": 2500, "Trophy": "TROPHY_SHOWDOWN" } }
+    },
+    "BurnoutContest": {
+      "ID": "ACT_BURNOUT",
+      "Name": "Burnout Contest",
+      "Description": "Longest burnout wins",
+      "Enabled": true,
+      "MinParticipants": 2,
+      "Metric": "Duration",
+      "Reward": { "Winner": { "REP": 200, "Cash": 750 } },
+      "RequiredSpace": "Large"
+    },
+    "DonutContest": {
+      "ID": "ACT_DONUT",
+      "Name": "Donut Contest",
+      "Description": "Best donuts take the prize",
+      "Enabled": true,
+      "MinParticipants": 2,
+      "Metric": "Style",
+      "JudgingCriteria": ["Consistency", "Smoke", "Control"],
+      "Reward": { "Winner": { "REP": 200, "Cash": 750 } },
+      "RequiredSpace": "Large"
+    },
+    "TunerShowcase": {
+      "ID": "ACT_TUNER",
+      "Name": "Tuner Showcase",
+      "Description": "Show off your build",
+      "Enabled": true,
+      "DisplayStats": true,
+      "DisplayMods": true,
+      "ShareBuild": true,
+      "Reward": { "Participation": { "REP": 50 } }
+    }
+  },
+
+  "MeetTypes": {
+    "Public": {
+      "ID": "MEET_PUBLIC",
+      "Name": "Public Meet",
+      "Description": "Open to everyone",
+      "JoinRequirement": null,
+      "Visibility": "Public",
+      "HostControls": ["KickPlayer", "StartActivity", "EndMeet"]
+    },
+    "Crew": {
+      "ID": "MEET_CREW",
+      "Name": "Crew Meet",
+      "Description": "For crew members only",
+      "JoinRequirement": "SameCrew",
+      "Visibility": "CrewOnly",
+      "HostControls": ["Full"]
+    },
+    "Private": {
+      "ID": "MEET_PRIVATE",
+      "Name": "Private Meet",
+      "Description": "Invite only",
+      "JoinRequirement": "Invite",
+      "Visibility": "Hidden",
+      "MaxInvites": 20,
+      "HostControls": ["Full"]
+    },
+    "Themed": {
+      "ID": "MEET_THEMED",
+      "Name": "Themed Meet",
+      "Description": "Specific theme or vehicle type",
+      "JoinRequirement": "MeetTheme",
+      "Themes": ["JDMOnly", "MuscleOnly", "EuroOnly", "ClassicOnly", "DriftCars", "ShowCars"],
+      "HostControls": ["Full", "EnforceTheme"]
+    }
+  },
+
+  "ScheduledMeets": {
+    "Enabled": true,
+    "Types": [
+      {
+        "ID": "SCHED_FRIDAY_NIGHT",
+        "Name": "Friday Night Meet",
+        "Day": "Friday",
+        "Time": "21:00",
+        "Timezone": "Local",
+        "Location": "MEET_DOWNTOWN_GARAGE",
+        "Duration": 120,
+        "BonusRewards": 1.5
+      },
+      {
+        "ID": "SCHED_SUNDAY_CRUISE",
+        "Name": "Sunday Cruise",
+        "Day": "Sunday",
+        "Time": "18:00",
+        "Timezone": "Local",
+        "Location": "MEET_MOUNTAIN_OVERLOOK",
+        "Duration": 90,
+        "Activity": "GroupCruise"
+      }
+    ]
+  },
+
+  "MeetChat": {
+    "Enabled": true,
+    "TextChat": {
+      "Enabled": true,
+      "MaxLength": 200,
+      "Filter": true,
+      "RateLimit": 5
+    },
+    "VoiceChat": {
+      "Enabled": true,
+      "Proximity": true,
+      "ProximityRange": 50,
+      "GlobalChannel": true
+    },
+    "Emotes": {
+      "Enabled": true,
+      "Types": ["Wave", "Thumbsup", "Clap", "Rev", "Honk", "Headlights"]
+    }
+  },
+
+  "MeetRewards": {
+    "Attendance": {
+      "Per15Minutes": { "REP": 25 },
+      "MaxDuration": 120
+    },
+    "Hosting": {
+      "BaseReward": { "REP": 100 },
+      "PerParticipant": { "REP": 10 },
+      "MaxParticipantBonus": 300
+    },
+    "FirstMeetBonus": {
+      "Cash": 2500,
+      "REP": 250
+    },
+    "WeeklyMeetStreak": {
+      "3Meets": { "Cash": 5000, "REP": 500 },
+      "7Meets": { "Cash": 15000, "REP": 1500, "Part": "RANDOM_SPORT" }
+    }
+  },
+
+  "MeetRules": {
+    "NoCollisions": {
+      "Default": true,
+      "HostOverride": true
+    },
+    "SpeedLimit": {
+      "Enabled": true,
+      "Limit": 25,
+      "EnforcementZone": "ParkingArea"
+    },
+    "NoPolice": {
+      "Default": true,
+      "HostOverride": false
+    },
+    "Reporting": {
+      "Enabled": true,
+      "Reasons": ["Harassment", "Ramming", "InappropriateLivery", "Spam"]
+    }
+  },
+
+  "Spectating": {
+    "Enabled": true,
+    "MaxSpectators": 50,
+    "SpectatorRewards": {
+      "Per15Minutes": { "REP": 10 }
+    },
+    "StreamerMode": {
+      "Enabled": true,
+      "HideNames": true,
+      "HideLicensePlates": true
+    }
+  }
+}

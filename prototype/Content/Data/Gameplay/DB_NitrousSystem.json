@@ -1,0 +1,333 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Nitrous Oxide System Configuration",
+
+  "NitrousSystem": {
+    "Enabled": true,
+    "UnlockLevel": 3,
+    "DefaultType": "WET",
+    "MaxCharges": 5,
+    "RechargeMethod": "Drift",
+    "BaseBoostDuration": 3.0,
+    "BasePowerMultiplier": 1.35
+  },
+
+  "NitrousTypes": {
+    "Wet": {
+      "ID": "NOS_WET",
+      "Name": "Wet Shot",
+      "Description": "Nitrous with additional fuel - safer, consistent power",
+      "PowerMultiplier": 1.30,
+      "Duration": 3.5,
+      "Activation": "Instant",
+      "HeatGeneration": 0.15,
+      "EngineStress": 0.10,
+      "Cost": 2500,
+      "Unlocked": true,
+      "Characteristics": {
+        "Reliability": "High",
+        "PowerDelivery": "Smooth",
+        "BestFor": "Beginners"
+      }
+    },
+    "Dry": {
+      "ID": "NOS_DRY",
+      "Name": "Dry Shot",
+      "Description": "Pure nitrous injection - more power, more risk",
+      "PowerMultiplier": 1.45,
+      "Duration": 2.5,
+      "Activation": "Instant",
+      "HeatGeneration": 0.30,
+      "EngineStress": 0.25,
+      "Cost": 5000,
+      "UnlockCondition": "LEVEL_10",
+      "Characteristics": {
+        "Reliability": "Medium",
+        "PowerDelivery": "Aggressive",
+        "BestFor": "Experienced"
+      }
+    },
+    "Progressive": {
+      "ID": "NOS_PROGRESSIVE",
+      "Name": "Progressive Controller",
+      "Description": "Gradually increases nitrous flow - smooth acceleration",
+      "PowerMultiplier": 1.35,
+      "Duration": 4.0,
+      "Activation": "Ramped",
+      "RampUpTime": 1.0,
+      "HeatGeneration": 0.12,
+      "EngineStress": 0.08,
+      "Cost": 7500,
+      "UnlockCondition": "LEVEL_15",
+      "Characteristics": {
+        "Reliability": "Very High",
+        "PowerDelivery": "Progressive",
+        "BestFor": "Traction Limited"
+      }
+    },
+    "DirectPort": {
+      "ID": "NOS_DIRECT",
+      "Name": "Direct Port",
+      "Description": "Individual injectors per cylinder - maximum efficiency",
+      "PowerMultiplier": 1.50,
+      "Duration": 3.0,
+      "Activation": "Instant",
+      "HeatGeneration": 0.20,
+      "EngineStress": 0.15,
+      "Cost": 15000,
+      "UnlockCondition": "REP_TIER_STREET",
+      "Characteristics": {
+        "Reliability": "High",
+        "PowerDelivery": "Even",
+        "BestFor": "High HP Builds"
+      }
+    },
+    "Staged": {
+      "ID": "NOS_STAGED",
+      "Name": "Staged System",
+      "Description": "Multiple stages for sustained boost",
+      "Stages": [
+        { "Stage": 1, "PowerMultiplier": 1.25, "Duration": 2.0 },
+        { "Stage": 2, "PowerMultiplier": 1.40, "Duration": 2.0 },
+        { "Stage": 3, "PowerMultiplier": 1.55, "Duration": 1.5 }
+      ],
+      "TotalDuration": 5.5,
+      "Activation": "Sequential",
+      "HeatGeneration": 0.25,
+      "EngineStress": 0.20,
+      "Cost": 25000,
+      "UnlockCondition": "REP_TIER_PRO",
+      "Characteristics": {
+        "Reliability": "Medium",
+        "PowerDelivery": "Escalating",
+        "BestFor": "Drag Racing"
+      }
+    }
+  },
+
+  "BottleSizes": {
+    "Small": {
+      "ID": "BOTTLE_SMALL",
+      "Name": "5lb Bottle",
+      "Capacity": 3,
+      "Weight": 5,
+      "Cost": 1000,
+      "Unlocked": true
+    },
+    "Medium": {
+      "ID": "BOTTLE_MEDIUM",
+      "Name": "10lb Bottle",
+      "Capacity": 5,
+      "Weight": 10,
+      "Cost": 2000,
+      "UnlockCondition": "LEVEL_8"
+    },
+    "Large": {
+      "ID": "BOTTLE_LARGE",
+      "Name": "15lb Bottle",
+      "Capacity": 7,
+      "Weight": 15,
+      "Cost": 3500,
+      "UnlockCondition": "LEVEL_15"
+    },
+    "Racing": {
+      "ID": "BOTTLE_RACING",
+      "Name": "20lb Racing Bottle",
+      "Capacity": 10,
+      "Weight": 20,
+      "Cost": 6000,
+      "UnlockCondition": "REP_TIER_STREET"
+    },
+    "DualBottle": {
+      "ID": "BOTTLE_DUAL",
+      "Name": "Dual 15lb Setup",
+      "Capacity": 14,
+      "Weight": 35,
+      "Cost": 10000,
+      "UnlockCondition": "REP_TIER_PRO"
+    }
+  },
+
+  "Recharge": {
+    "Methods": {
+      "Drift": {
+        "ID": "RECHARGE_DRIFT",
+        "Name": "Drift Recharge",
+        "Description": "Recharge by drifting",
+        "PointsPerCharge": 5000,
+        "Enabled": true,
+        "Default": true
+      },
+      "NearMiss": {
+        "ID": "RECHARGE_NEARMISS",
+        "Name": "Near Miss Recharge",
+        "Description": "Recharge by close passes",
+        "PointsPerCharge": 10,
+        "Enabled": true
+      },
+      "Drafting": {
+        "ID": "RECHARGE_DRAFT",
+        "Name": "Slipstream Recharge",
+        "Description": "Recharge while drafting",
+        "SecondsPerCharge": 5.0,
+        "Enabled": true
+      },
+      "Time": {
+        "ID": "RECHARGE_TIME",
+        "Name": "Passive Recharge",
+        "Description": "Slow recharge over time",
+        "SecondsPerCharge": 30.0,
+        "Enabled": false,
+        "EnabledModes": ["FreeRoam"]
+      },
+      "Overtake": {
+        "ID": "RECHARGE_OVERTAKE",
+        "Name": "Overtake Recharge",
+        "Description": "Recharge when passing opponents",
+        "ChargesPerOvertake": 0.5,
+        "Enabled": true
+      }
+    },
+    "Multipliers": {
+      "CleanDrift": 1.5,
+      "ComboActive": 1.25,
+      "FinalLap": 1.5,
+      "Pursuit": 2.0
+    }
+  },
+
+  "Activation": {
+    "MinSpeedMPH": 30,
+    "MinRPMPercentage": 0.5,
+    "GearRestrictions": {
+      "Enabled": true,
+      "MinGear": 2,
+      "MaxGear": 6
+    },
+    "Cooldown": {
+      "BetweenActivations": 1.0,
+      "AfterEmpty": 3.0
+    },
+    "CancelConditions": ["Collision", "Brake", "Clutch", "GearDown"]
+  },
+
+  "Effects": {
+    "Visual": {
+      "BottleFrost": {
+        "Enabled": true,
+        "Intensity": "ByUsage",
+        "FadeTime": 5.0
+      },
+      "Purge": {
+        "Enabled": true,
+        "TriggerOnActivation": true,
+        "Duration": 0.5,
+        "ParticleAsset": "VFX_NOS_Purge"
+      },
+      "ExhaustFlames": {
+        "Enabled": true,
+        "Color": "Blue",
+        "Intensity": 2.0,
+        "ParticleAsset": "VFX_NOS_Flames"
+      },
+      "HoodVents": {
+        "Enabled": true,
+        "SteamEffect": true,
+        "ParticleAsset": "VFX_NOS_Steam"
+      },
+      "ScreenEffect": {
+        "Enabled": true,
+        "FOVIncrease": 5,
+        "MotionBlur": 1.2,
+        "ChromaticAberration": 0.3,
+        "SpeedLines": true
+      }
+    },
+    "Audio": {
+      "ActivationSound": "SFX_NOS_Activate",
+      "LoopSound": "SFX_NOS_Loop",
+      "DeactivateSound": "SFX_NOS_Deactivate",
+      "EmptySound": "SFX_NOS_Empty",
+      "PurgeSound": "SFX_NOS_Purge",
+      "VolumeMultiplier": 1.0,
+      "PitchByPower": true
+    }
+  },
+
+  "Risks": {
+    "Backfire": {
+      "Enabled": true,
+      "Chance": 0.02,
+      "ChanceWhenOverheated": 0.15,
+      "Effect": "PowerLoss",
+      "Duration": 2.0
+    },
+    "EngineBlown": {
+      "Enabled": true,
+      "Chance": 0.001,
+      "ChanceWhenOverheated": 0.05,
+      "ChanceWithDryShot": 0.01,
+      "Effect": "EngineFailure",
+      "RepairCost": 10000
+    },
+    "Overheating": {
+      "Enabled": true,
+      "ThresholdTemperature": 250,
+      "CoolingRate": 5.0,
+      "WarningIndicator": true
+    }
+  },
+
+  "Upgrades": {
+    "Solenoids": {
+      "Stock": { "FlowRate": 1.0, "Reliability": 1.0 },
+      "Sport": { "FlowRate": 1.15, "Reliability": 1.1, "Cost": 1500 },
+      "Race": { "FlowRate": 1.30, "Reliability": 1.2, "Cost": 3500 }
+    },
+    "Lines": {
+      "Stock": { "FlowRate": 1.0, "HeatResistance": 1.0 },
+      "Braided": { "FlowRate": 1.1, "HeatResistance": 1.3, "Cost": 1000 },
+      "Aircraft": { "FlowRate": 1.2, "HeatResistance": 1.5, "Cost": 2500 }
+    },
+    "BottleHeater": {
+      "Enabled": false,
+      "PressureBoost": 1.15,
+      "ConsistentPower": true,
+      "Cost": 2000,
+      "UnlockCondition": "LEVEL_12"
+    },
+    "PurgeKit": {
+      "Enabled": false,
+      "ManualPurge": true,
+      "ShowoffEffect": true,
+      "Cost": 1500,
+      "UnlockCondition": "LEVEL_8"
+    }
+  },
+
+  "RaceRules": {
+    "AllowedModes": ["CircuitRace", "SprintRace", "DragRace", "FreeRoam", "Pursuit", "Drift"],
+    "DisabledModes": ["TimeAttack_Pure"],
+    "ClassRestrictions": {
+      "ClassD": { "MaxType": "Wet", "MaxCharges": 3 },
+      "ClassC": { "MaxType": "Dry", "MaxCharges": 5 },
+      "ClassB": { "MaxType": "DirectPort", "MaxCharges": 7 },
+      "ClassA": { "MaxType": "Staged", "MaxCharges": 10 },
+      "ClassS": { "MaxType": "Any", "MaxCharges": 14 }
+    }
+  },
+
+  "HUD": {
+    "IndicatorPosition": "BottomCenter",
+    "ShowCharges": true,
+    "ShowRechargeProgress": true,
+    "ShowTemperature": true,
+    "WarningFlash": true,
+    "ActiveGlow": true,
+    "Styles": {
+      "Bottles": { "Icon": "ICO_NOS_Bottle" },
+      "Bar": { "Icon": "ICO_NOS_Bar" },
+      "Flames": { "Icon": "ICO_NOS_Flame" }
+    }
+  }
+}
