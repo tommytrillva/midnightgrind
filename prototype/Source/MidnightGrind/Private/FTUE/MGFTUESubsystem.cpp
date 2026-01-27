@@ -2,6 +2,11 @@
 
 #include "FTUE/MGFTUESubsystem.h"
 #include "Currency/MGCurrencySubsystem.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "Misc/Paths.h"
 
 void UMGFTUESubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -156,13 +161,155 @@ void UMGFTUESubsystem::UnlockFeature(FName FeatureID)
 
 void UMGFTUESubsystem::LoadFTUEData()
 {
-	// Would load from local/cloud save
-	// Check if new player
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("FTUE");
+	FString FilePath = SaveDir / TEXT("FTUEProgress.sav");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		// No save file - this is a new player
+		bIsNewPlayer = true;
+		CurrentStage = EMGOnboardingStage::Welcome;
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	int32 Version = 0;
+	Archive << Version;
+
+	if (Version >= 1)
+	{
+		// Load current stage
+		int32 StageInt = 0;
+		Archive << StageInt;
+		CurrentStage = static_cast<EMGOnboardingStage>(StageInt);
+
+		// Load player flags
+		Archive << bIsNewPlayer;
+		Archive << bShowHints;
+
+		// Load completed step stages
+		int32 CompletedCount = 0;
+		Archive << CompletedCount;
+		TSet<int32> CompletedStages;
+		for (int32 i = 0; i < CompletedCount; i++)
+		{
+			int32 CompletedStage;
+			Archive << CompletedStage;
+			CompletedStages.Add(CompletedStage);
+		}
+
+		// Apply completion to steps
+		for (FMGOnboardingStep& Step : OnboardingSteps)
+		{
+			Step.bCompleted = CompletedStages.Contains(static_cast<int32>(Step.Stage));
+		}
+
+		// Load hint data
+		int32 HintCount = 0;
+		Archive << HintCount;
+		for (int32 i = 0; i < HintCount; i++)
+		{
+			FName HintID;
+			int32 ShowCount;
+			bool bDismissed;
+			Archive << HintID;
+			Archive << ShowCount;
+			Archive << bDismissed;
+
+			// Apply to matching hint
+			for (FMGContextualHint& Hint : Hints)
+			{
+				if (Hint.HintID == HintID)
+				{
+					Hint.CurrentShowCount = ShowCount;
+					Hint.bDismissed = bDismissed;
+					break;
+				}
+			}
+		}
+
+		// Load unlocked features
+		int32 FeatureCount = 0;
+		Archive << FeatureCount;
+		for (int32 i = 0; i < FeatureCount; i++)
+		{
+			FName FeatureID;
+			Archive << FeatureID;
+			UnlockedFeatures.Add(FeatureID);
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("FTUE data loaded - Stage: %d, NewPlayer: %s"),
+		static_cast<int32>(CurrentStage), bIsNewPlayer ? TEXT("Yes") : TEXT("No"));
 }
 
 void UMGFTUESubsystem::SaveFTUEData()
 {
-	// Would save progress
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("FTUE");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("FTUEProgress.sav");
+
+	FBufferArchive Archive;
+
+	int32 Version = 1;
+	Archive << Version;
+
+	// Save current stage
+	int32 StageInt = static_cast<int32>(CurrentStage);
+	Archive << StageInt;
+
+	// Save player flags
+	Archive << bIsNewPlayer;
+	Archive << bShowHints;
+
+	// Save completed steps
+	TArray<int32> CompletedStages;
+	for (const FMGOnboardingStep& Step : OnboardingSteps)
+	{
+		if (Step.bCompleted)
+		{
+			CompletedStages.Add(static_cast<int32>(Step.Stage));
+		}
+	}
+	int32 CompletedCount = CompletedStages.Num();
+	Archive << CompletedCount;
+	for (int32 StageVal : CompletedStages)
+	{
+		Archive << StageVal;
+	}
+
+	// Save hint data
+	int32 HintCount = Hints.Num();
+	Archive << HintCount;
+	for (const FMGContextualHint& Hint : Hints)
+	{
+		FName HintID = Hint.HintID;
+		int32 ShowCount = Hint.CurrentShowCount;
+		bool bDismissed = Hint.bDismissed;
+		Archive << HintID;
+		Archive << ShowCount;
+		Archive << bDismissed;
+	}
+
+	// Save unlocked features
+	int32 FeatureCount = UnlockedFeatures.Num();
+	Archive << FeatureCount;
+	for (const FName& FeatureID : UnlockedFeatures)
+	{
+		FName Feature = FeatureID;
+		Archive << Feature;
+	}
+
+	if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("FTUE data saved - Stage: %d"), static_cast<int32>(CurrentStage));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to save FTUE data"));
+	}
 }
 
 void UMGFTUESubsystem::InitializeOnboardingSteps()

@@ -4,6 +4,11 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "Misc/SecureHash.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "Misc/Paths.h"
 
 void UMGABTestingSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -285,18 +290,180 @@ bool UMGABTestingSubsystem::IsInRollout(const FString& FlagID) const
 
 void UMGABTestingSubsystem::LoadConfiguration()
 {
-	// Would fetch from remote config service
-	// For now, use initialized defaults
+	// In production, this would fetch from remote config service
+	// For offline mode, load from cached config file
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("ABTesting");
+	FString FilePath = SaveDir / TEXT("Configuration.json");
+
+	FString JsonContent;
+	if (FFileHelper::LoadFileToString(JsonContent, *FilePath))
+	{
+		// In production, parse JSON config and update experiments/flags
+		UE_LOG(LogTemp, Log, TEXT("Loaded AB testing configuration from cache"));
+	}
 }
 
 void UMGABTestingSubsystem::SaveLocalAssignments()
 {
-	// Would save to local storage
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("ABTesting");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("Assignments.sav");
+
+	FBufferArchive Archive;
+
+	int32 Version = 1;
+	Archive << Version;
+
+	// Save user ID
+	Archive << UserID;
+
+	// Save experiment assignments
+	int32 AssignmentCount = MyAssignments.Num();
+	Archive << AssignmentCount;
+	for (const FMGExperimentAssignment& Assignment : MyAssignments)
+	{
+		FString ExpID = Assignment.ExperimentID;
+		int32 VariantInt = static_cast<int32>(Assignment.AssignedVariant);
+		int64 AssignedAtUnix = Assignment.AssignedAt.ToUnixTimestamp();
+		bool bExposed = Assignment.bExposed;
+		bool bConverted = Assignment.bConverted;
+
+		Archive << ExpID;
+		Archive << VariantInt;
+		Archive << AssignedAtUnix;
+		Archive << bExposed;
+		Archive << bConverted;
+	}
+
+	// Save user segments
+	int32 SegmentCount = UserSegments.Num();
+	Archive << SegmentCount;
+	for (const FString& Segment : UserSegments)
+	{
+		FString SegmentID = Segment;
+		Archive << SegmentID;
+	}
+
+	// Save overrides (for QA)
+	int32 FlagOverrideCount = FlagOverrides.Num();
+	Archive << FlagOverrideCount;
+	for (const auto& Pair : FlagOverrides)
+	{
+		FString FlagID = Pair.Key;
+		bool bEnabled = Pair.Value;
+		Archive << FlagID;
+		Archive << bEnabled;
+	}
+
+	int32 ExpOverrideCount = ExperimentOverrides.Num();
+	Archive << ExpOverrideCount;
+	for (const auto& Pair : ExperimentOverrides)
+	{
+		FString ExpID = Pair.Key;
+		int32 VariantInt = static_cast<int32>(Pair.Value);
+		Archive << ExpID;
+		Archive << VariantInt;
+	}
+
+	if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Saved AB testing assignments: %d experiments, %d segments"),
+			AssignmentCount, SegmentCount);
+	}
 }
 
 void UMGABTestingSubsystem::LoadLocalAssignments()
 {
-	// Would load from local storage
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("ABTesting");
+	FString FilePath = SaveDir / TEXT("Assignments.sav");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	int32 Version = 0;
+	Archive << Version;
+
+	if (Version >= 1)
+	{
+		// Load user ID (preserve if already set)
+		FString SavedUserID;
+		Archive << SavedUserID;
+		if (!SavedUserID.IsEmpty())
+		{
+			UserID = SavedUserID;
+		}
+
+		// Load experiment assignments
+		int32 AssignmentCount;
+		Archive << AssignmentCount;
+		MyAssignments.Empty();
+		for (int32 i = 0; i < AssignmentCount; i++)
+		{
+			FString ExpID;
+			int32 VariantInt;
+			int64 AssignedAtUnix;
+			bool bExposed;
+			bool bConverted;
+
+			Archive << ExpID;
+			Archive << VariantInt;
+			Archive << AssignedAtUnix;
+			Archive << bExposed;
+			Archive << bConverted;
+
+			FMGExperimentAssignment Assignment;
+			Assignment.ExperimentID = ExpID;
+			Assignment.AssignedVariant = static_cast<EMGVariantType>(VariantInt);
+			Assignment.AssignedAt = FDateTime::FromUnixTimestamp(AssignedAtUnix);
+			Assignment.bExposed = bExposed;
+			Assignment.bConverted = bConverted;
+			MyAssignments.Add(Assignment);
+		}
+
+		// Load user segments
+		int32 SegmentCount;
+		Archive << SegmentCount;
+		UserSegments.Empty();
+		for (int32 i = 0; i < SegmentCount; i++)
+		{
+			FString SegmentID;
+			Archive << SegmentID;
+			UserSegments.Add(SegmentID);
+		}
+
+		// Load overrides
+		int32 FlagOverrideCount;
+		Archive << FlagOverrideCount;
+		FlagOverrides.Empty();
+		for (int32 i = 0; i < FlagOverrideCount; i++)
+		{
+			FString FlagID;
+			bool bEnabled;
+			Archive << FlagID;
+			Archive << bEnabled;
+			FlagOverrides.Add(FlagID, bEnabled);
+		}
+
+		int32 ExpOverrideCount;
+		Archive << ExpOverrideCount;
+		ExperimentOverrides.Empty();
+		for (int32 i = 0; i < ExpOverrideCount; i++)
+		{
+			FString ExpID;
+			int32 VariantInt;
+			Archive << ExpID;
+			Archive << VariantInt;
+			ExperimentOverrides.Add(ExpID, static_cast<EMGVariantType>(VariantInt));
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Loaded AB testing assignments: %d experiments, %d segments"),
+			MyAssignments.Num(), UserSegments.Num());
+	}
 }
 
 void UMGABTestingSubsystem::AssignToExperiments()

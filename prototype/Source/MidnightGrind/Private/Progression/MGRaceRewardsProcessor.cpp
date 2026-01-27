@@ -5,6 +5,7 @@
 #include "GameModes/MGRaceGameMode.h"
 #include "Race/MGRaceHistorySubsystem.h"
 #include "Career/MGCareerSubsystem.h"
+#include "Social/MGLeaderboardSubsystem.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -136,7 +137,7 @@ FMGRaceRewards UMGRaceRewardsProcessor::CalculateRewards(const FMGFinalRaceResul
 	// Check for records
 	if (RaceGameMode.IsValid())
 	{
-		FName TrackID = RaceGameMode->GetRaceConfig().TrackID;
+		FName TrackID = RaceGameMode->GetRaceConfig().TrackName;
 		Rewards.bNewPersonalBest = CheckPersonalBest(TrackID, Result.TotalTime);
 		Rewards.bNewTrackRecord = CheckTrackRecord(TrackID, Result.TotalTime);
 	}
@@ -386,14 +387,58 @@ FMGXPBreakdown UMGRaceRewardsProcessor::CalculateXPBreakdown(const FMGFinalRaceR
 
 bool UMGRaceRewardsProcessor::CheckPersonalBest(FName TrackID, float Time) const
 {
-	// Would check against saved personal bests
-	// For now, return false - actual implementation would use save system
+	if (Time <= 0.0f)
+	{
+		return false;
+	}
+
+	// Get leaderboard subsystem to check personal best
+	if (UWorld* World = GetWorld())
+	{
+		if (UGameInstance* GI = World->GetGameInstance())
+		{
+			if (UMGLeaderboardSubsystem* LeaderboardSubsystem = GI->GetSubsystem<UMGLeaderboardSubsystem>())
+			{
+				const FMGTrackRecord TrackRecord = LeaderboardSubsystem->GetTrackRecords(TrackID);
+
+				// Convert time to milliseconds for comparison (scores stored as ms)
+				const int64 TimeMs = static_cast<int64>(Time * 1000.0f);
+				const int64 PersonalBestMs = TrackRecord.PersonalBest.Score;
+
+				// New personal best if no previous record (Score == 0) or faster time
+				return (PersonalBestMs == 0 || TimeMs < PersonalBestMs);
+			}
+		}
+	}
+
 	return false;
 }
 
 bool UMGRaceRewardsProcessor::CheckTrackRecord(FName TrackID, float Time) const
 {
-	// Would check against leaderboard/track records
-	// For now, return false - actual implementation would use leaderboard system
+	if (Time <= 0.0f)
+	{
+		return false;
+	}
+
+	// Get leaderboard subsystem to check track record
+	if (UWorld* World = GetWorld())
+	{
+		if (UGameInstance* GI = World->GetGameInstance())
+		{
+			if (UMGLeaderboardSubsystem* LeaderboardSubsystem = GI->GetSubsystem<UMGLeaderboardSubsystem>())
+			{
+				const FMGTrackRecord TrackRecord = LeaderboardSubsystem->GetTrackRecords(TrackID);
+
+				// Convert time to milliseconds for comparison (scores stored as ms)
+				const int64 TimeMs = static_cast<int64>(Time * 1000.0f);
+				const int64 WorldRecordMs = TrackRecord.WorldRecord.Score;
+
+				// New track record if no existing record (Score == 0) or faster time
+				return (WorldRecordMs == 0 || TimeMs < WorldRecordMs);
+			}
+		}
+	}
+
 	return false;
 }

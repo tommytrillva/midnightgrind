@@ -2,6 +2,11 @@
 
 #include "Career/MGCareerSubsystem.h"
 #include "Currency/MGCurrencySubsystem.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "Misc/Paths.h"
 
 void UMGCareerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -172,13 +177,150 @@ TArray<EMGCareerMilestone> UMGCareerSubsystem::GetPendingMilestones() const
 
 void UMGCareerSubsystem::LoadCareerData()
 {
-	// Would load from cloud save
+	// Initialize defaults
 	Progress.ChapterProgressRequired = 100;
+
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Career");
+	FString FilePath = SaveDir / TEXT("CareerProgress.sav");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("No career save found, starting fresh"));
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	int32 Version = 0;
+	Archive << Version;
+
+	if (Version >= 1)
+	{
+		// Load chapter progress
+		int32 ChapterInt;
+		Archive << ChapterInt;
+		Progress.CurrentChapter = static_cast<EMGCareerChapter>(ChapterInt);
+
+		Archive << Progress.ChapterProgress;
+		Archive << Progress.ChapterProgressRequired;
+		Archive << Progress.TotalReputation;
+
+		// Load completed milestones
+		int32 MilestoneCount;
+		Archive << MilestoneCount;
+		Progress.CompletedMilestones.Empty();
+		for (int32 i = 0; i < MilestoneCount; i++)
+		{
+			int32 MilestoneInt;
+			Archive << MilestoneInt;
+			Progress.CompletedMilestones.Add(static_cast<EMGCareerMilestone>(MilestoneInt));
+		}
+
+		// Load stats
+		Archive << Progress.Stats.TotalRaces;
+		Archive << Progress.Stats.Wins;
+		Archive << Progress.Stats.Podiums;
+		Archive << Progress.Stats.RivalsDefeated;
+		Archive << Progress.Stats.TournamentsWon;
+		Archive << Progress.Stats.TotalDistanceKM;
+		Archive << Progress.Stats.TotalRaceTimeHours;
+		Archive << Progress.Stats.CleanRaces;
+		Archive << Progress.Stats.HighestWinStreak;
+		Archive << Progress.Stats.CurrentWinStreak;
+
+		// Load objective progress
+		int32 ObjectiveCount;
+		Archive << ObjectiveCount;
+		TMap<FName, TPair<int32, bool>> ObjectiveStates;
+		for (int32 i = 0; i < ObjectiveCount; i++)
+		{
+			FName ObjectiveID;
+			int32 CurrentProgress;
+			bool bCompleted;
+			Archive << ObjectiveID;
+			Archive << CurrentProgress;
+			Archive << bCompleted;
+			ObjectiveStates.Add(ObjectiveID, TPair<int32, bool>(CurrentProgress, bCompleted));
+		}
+
+		// Apply objective states after InitializeObjectives is called
+		for (FMGCareerObjective& Objective : Objectives)
+		{
+			if (const TPair<int32, bool>* State = ObjectiveStates.Find(Objective.ObjectiveID))
+			{
+				Objective.CurrentProgress = State->Key;
+				Objective.bCompleted = State->Value;
+			}
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Career data loaded - Chapter: %d, Progress: %d/%d, Reputation: %lld"),
+		static_cast<int32>(Progress.CurrentChapter), Progress.ChapterProgress,
+		Progress.ChapterProgressRequired, Progress.TotalReputation);
 }
 
 void UMGCareerSubsystem::SaveCareerData()
 {
-	// Would save to cloud save
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Career");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("CareerProgress.sav");
+
+	FBufferArchive Archive;
+
+	int32 Version = 1;
+	Archive << Version;
+
+	// Save chapter progress
+	int32 ChapterInt = static_cast<int32>(Progress.CurrentChapter);
+	Archive << ChapterInt;
+	Archive << Progress.ChapterProgress;
+	Archive << Progress.ChapterProgressRequired;
+	Archive << Progress.TotalReputation;
+
+	// Save completed milestones
+	int32 MilestoneCount = Progress.CompletedMilestones.Num();
+	Archive << MilestoneCount;
+	for (EMGCareerMilestone Milestone : Progress.CompletedMilestones)
+	{
+		int32 MilestoneInt = static_cast<int32>(Milestone);
+		Archive << MilestoneInt;
+	}
+
+	// Save stats
+	Archive << Progress.Stats.TotalRaces;
+	Archive << Progress.Stats.Wins;
+	Archive << Progress.Stats.Podiums;
+	Archive << Progress.Stats.RivalsDefeated;
+	Archive << Progress.Stats.TournamentsWon;
+	Archive << Progress.Stats.TotalDistanceKM;
+	Archive << Progress.Stats.TotalRaceTimeHours;
+	Archive << Progress.Stats.CleanRaces;
+	Archive << Progress.Stats.HighestWinStreak;
+	Archive << Progress.Stats.CurrentWinStreak;
+
+	// Save objective progress
+	int32 ObjectiveCount = Objectives.Num();
+	Archive << ObjectiveCount;
+	for (const FMGCareerObjective& Objective : Objectives)
+	{
+		FName ObjectiveID = Objective.ObjectiveID;
+		int32 CurrentProgress = Objective.CurrentProgress;
+		bool bCompleted = Objective.bCompleted;
+		Archive << ObjectiveID;
+		Archive << CurrentProgress;
+		Archive << bCompleted;
+	}
+
+	if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Career data saved - Chapter: %d, Wins: %d"),
+			static_cast<int32>(Progress.CurrentChapter), Progress.Stats.Wins);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to save career data"));
+	}
 }
 
 void UMGCareerSubsystem::InitializeObjectives()

@@ -37,6 +37,8 @@ enum class EMGPrestigeRank : uint8;
 enum class EMGDamageState : uint8;
 struct FMGCheckpointPassage;
 struct FMGLapData;
+struct FMGStuntEvent;
+enum class EMGPowerupType : uint8;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -592,4 +594,28 @@ protected:
 	/** Handle lap completed from checkpoint subsystem */
 	UFUNCTION()
 	void OnLapCompleted(const FMGLapData& LapData, int32 LapsRemaining, bool bIsBestLap);
+
+	/** Handle nitro depleted from nitro boost subsystem */
+	UFUNCTION()
+	void OnNitroDepleted();
+
+	/** Handle nitro overheat from nitro boost subsystem */
+	UFUNCTION()
+	void OnNitroOverheat();
+
+	/** Handle stunt completed from stunt subsystem */
+	UFUNCTION()
+	void OnStuntCompleted(const FMGStuntEvent& Event, int32 TotalPoints);
+
+	/** Handle rampage activated from takedown subsystem */
+	UFUNCTION()
+	void OnRampageActivated(float Duration, float Multiplier);
+
+	/** Handle powerup collected from powerup subsystem */
+	UFUNCTION()
+	void OnPowerupCollected(const FString& PlayerId, EMGPowerupType PowerupType, int32 SlotIndex);
+
+	/** Handle powerup hit from powerup subsystem */
+	UFUNCTION()
+	void OnPowerupHit(const FString& SourceId, const FString& TargetId, EMGPowerupType PowerupType);
 };

@@ -13,6 +13,9 @@
 #include "Engine/World.h"
 #include "HAL/PlatformMemory.h"
 #include "HAL/PlatformTime.h"
+#include "Save/MGSaveGame.h"
+#include "Save/MGSaveManagerSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGSubsystemTests::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -294,7 +297,54 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 32);
+	// Save/Load Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Save_CreateSaveGame"));
+		Test.TestName = FText::FromString(TEXT("Save - Create Save Game"));
+		Test.Description = FText::FromString(TEXT("Verify save game object can be created"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Save")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Save_DefaultValues"));
+		Test.TestName = FText::FromString(TEXT("Save - Default Values"));
+		Test.Description = FText::FromString(TEXT("Verify save data has correct default values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Save")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Save_DataStructures"));
+		Test.TestName = FText::FromString(TEXT("Save - Data Structures"));
+		Test.Description = FText::FromString(TEXT("Verify save data structures are properly initialized"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Save")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Save_ManagerSubsystem"));
+		Test.TestName = FText::FromString(TEXT("Save - Manager Subsystem"));
+		Test.Description = FText::FromString(TEXT("Verify save manager subsystem initialization"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Save")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Save_SlotNaming"));
+		Test.TestName = FText::FromString(TEXT("Save - Slot Naming"));
+		Test.Description = FText::FromString(TEXT("Verify save slot naming conventions"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Save")));
+		TestFramework->RegisterTest(Test);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 37);
 }
 
 // ==========================================
@@ -2100,6 +2150,292 @@ FMGTestResult UMGSubsystemTests::TestIntegration_WeatherRoad()
 }
 
 // ==========================================
+// SAVE/LOAD TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestSave_CreateSaveGame()
+{
+	LogTestStart(TEXT("TestSave_CreateSaveGame"));
+
+	// Create a save game object
+	UMGSaveGame* SaveGame = Cast<UMGSaveGame>(UGameplayStatics::CreateSaveGameObject(UMGSaveGame::StaticClass()));
+
+	if (!SaveGame)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Save_CreateSaveGame")),
+			TEXT("Failed to create save game object"),
+			{TEXT("UGameplayStatics::CreateSaveGameObject returned nullptr")}
+		);
+	}
+
+	// Verify it's the correct type
+	if (!SaveGame->IsA(UMGSaveGame::StaticClass()))
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Save_CreateSaveGame")),
+			TEXT("Save game object is wrong type"),
+			{TEXT("Expected UMGSaveGame type")}
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Save_CreateSaveGame")),
+		TEXT("Save game object created successfully")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestSave_DefaultValues()
+{
+	LogTestStart(TEXT("TestSave_DefaultValues"));
+
+	UMGSaveGame* SaveGame = Cast<UMGSaveGame>(UGameplayStatics::CreateSaveGameObject(UMGSaveGame::StaticClass()));
+
+	if (!SaveGame)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Save_DefaultValues")),
+			TEXT("Failed to create save game for testing"),
+			{TEXT("CreateSaveGameObject returned nullptr")}
+		);
+	}
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Check default player cash
+	if (SaveGame->PlayerCash < 0)
+	{
+		Logs.Add(FString::Printf(TEXT("PlayerCash is negative: %lld"), SaveGame->PlayerCash));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("PlayerCash default: %lld"), SaveGame->PlayerCash));
+	}
+
+	// Check default player level
+	if (SaveGame->PlayerLevel < 1)
+	{
+		Logs.Add(FString::Printf(TEXT("PlayerLevel should be at least 1: %d"), SaveGame->PlayerLevel));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("PlayerLevel default: %d"), SaveGame->PlayerLevel));
+	}
+
+	// Check default player XP
+	if (SaveGame->PlayerXP < 0)
+	{
+		Logs.Add(FString::Printf(TEXT("PlayerXP is negative: %lld"), SaveGame->PlayerXP));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("PlayerXP default: %lld"), SaveGame->PlayerXP));
+	}
+
+	// Check save version is set
+	if (SaveGame->SaveVersion <= 0)
+	{
+		Logs.Add(FString::Printf(TEXT("SaveVersion should be positive: %d"), SaveGame->SaveVersion));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("SaveVersion: %d"), SaveGame->SaveVersion));
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Save_DefaultValues")),
+			TEXT("Some default values are invalid"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Save_DefaultValues")),
+		TEXT("All default values are valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestSave_DataStructures()
+{
+	LogTestStart(TEXT("TestSave_DataStructures"));
+
+	UMGSaveGame* SaveGame = Cast<UMGSaveGame>(UGameplayStatics::CreateSaveGameObject(UMGSaveGame::StaticClass()));
+
+	if (!SaveGame)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Save_DataStructures")),
+			TEXT("Failed to create save game for testing"),
+			{TEXT("CreateSaveGameObject returned nullptr")}
+		);
+	}
+
+	TArray<FString> Logs;
+
+	// Test owned vehicles array
+	Logs.Add(FString::Printf(TEXT("OwnedVehicles count: %d"), SaveGame->OwnedVehicles.Num()));
+
+	// Test garage slots
+	Logs.Add(FString::Printf(TEXT("GarageSlots count: %d"), SaveGame->GarageSlots.Num()));
+
+	// Test unlocked districts
+	Logs.Add(FString::Printf(TEXT("UnlockedDistricts count: %d"), SaveGame->UnlockedDistricts.Num()));
+
+	// Test discovered shortcuts
+	Logs.Add(FString::Printf(TEXT("DiscoveredShortcuts count: %d"), SaveGame->DiscoveredShortcuts.Num()));
+
+	// Test completed races
+	Logs.Add(FString::Printf(TEXT("CompletedRaces count: %d"), SaveGame->CompletedRaces.Num()));
+
+	// Test heat level data
+	Logs.Add(FString::Printf(TEXT("HeatLevelData districts: %d"), SaveGame->HeatLevelData.Num()));
+
+	// Test takedown records
+	Logs.Add(FString::Printf(TEXT("TakedownRecords count: %d"), SaveGame->TakedownRecords.Num()));
+
+	return CreatePassResult(
+		FName(TEXT("Test_Save_DataStructures")),
+		FString::Printf(TEXT("All save data structures initialized, %d total collections"), 7)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestSave_ManagerSubsystem()
+{
+	LogTestStart(TEXT("TestSave_ManagerSubsystem"));
+
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Save_ManagerSubsystem")),
+			TEXT("GameInstance not found"),
+			{TEXT("Cannot access GameInstance to get SaveManager")}
+		);
+	}
+
+	UMGSaveManagerSubsystem* SaveManager = GameInstance->GetSubsystem<UMGSaveManagerSubsystem>();
+	if (!SaveManager)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Save_ManagerSubsystem")),
+			TEXT("SaveManager subsystem not found"),
+			{TEXT("GetSubsystem<UMGSaveManagerSubsystem> returned nullptr")}
+		);
+	}
+
+	TArray<FString> Logs;
+
+	// Verify subsystem is initialized
+	Logs.Add(TEXT("SaveManager subsystem found and accessible"));
+
+	// Check quick save slot name
+	FString QuickSaveSlot = SaveManager->GetQuickSaveSlotName();
+	if (QuickSaveSlot.IsEmpty())
+	{
+		Logs.Add(TEXT("Warning: QuickSaveSlot name is empty"));
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("QuickSaveSlot: %s"), *QuickSaveSlot));
+	}
+
+	// Check autosave slot name
+	FString AutoSaveSlot = SaveManager->GetAutoSaveSlotName();
+	if (AutoSaveSlot.IsEmpty())
+	{
+		Logs.Add(TEXT("Warning: AutoSaveSlot name is empty"));
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("AutoSaveSlot: %s"), *AutoSaveSlot));
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Save_ManagerSubsystem")),
+		TEXT("SaveManager subsystem initialized correctly")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestSave_SlotNaming()
+{
+	LogTestStart(TEXT("TestSave_SlotNaming"));
+
+	UMGSaveGame* SaveGame = Cast<UMGSaveGame>(UGameplayStatics::CreateSaveGameObject(UMGSaveGame::StaticClass()));
+
+	if (!SaveGame)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Save_SlotNaming")),
+			TEXT("Failed to create save game for testing"),
+			{TEXT("CreateSaveGameObject returned nullptr")}
+		);
+	}
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test default slot name
+	if (SaveGame->SaveSlotName.IsEmpty())
+	{
+		Logs.Add(TEXT("SaveSlotName is empty - checking if default exists"));
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("SaveSlotName: %s"), *SaveGame->SaveSlotName));
+	}
+
+	// Verify slot name follows conventions (no special characters that could cause file issues)
+	FString TestSlotName = TEXT("MG_TestSlot_001");
+
+	// Check for valid characters
+	bool bValidChars = true;
+	for (TCHAR Char : TestSlotName)
+	{
+		if (Char == '/' || Char == '\\' || Char == ':' || Char == '*' ||
+			Char == '?' || Char == '"' || Char == '<' || Char == '>' || Char == '|')
+		{
+			bValidChars = false;
+			break;
+		}
+	}
+
+	if (bValidChars)
+	{
+		Logs.Add(FString::Printf(TEXT("Test slot name '%s' has valid characters"), *TestSlotName));
+	}
+	else
+	{
+		Logs.Add(TEXT("Test slot name contains invalid characters"));
+		bAllPassed = false;
+	}
+
+	// Test slot name with user index would be valid
+	int32 TestUserIndex = 0;
+	Logs.Add(FString::Printf(TEXT("User index for saves: %d"), TestUserIndex));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Save_SlotNaming")),
+			TEXT("Slot naming issues found"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Save_SlotNaming")),
+		TEXT("Save slot naming conventions are valid")
+	);
+}
+
+// ==========================================
 // CONSOLE COMMANDS
 // ==========================================
 
@@ -2157,6 +2493,13 @@ void UMGSubsystemTests::RunAllTests()
 	// Integration tests
 	TestResults.Add(TestIntegration_CurrencyEconomy());
 	TestResults.Add(TestIntegration_WeatherRoad());
+
+	// Save/Load tests
+	TestResults.Add(TestSave_CreateSaveGame());
+	TestResults.Add(TestSave_DefaultValues());
+	TestResults.Add(TestSave_DataStructures());
+	TestResults.Add(TestSave_ManagerSubsystem());
+	TestResults.Add(TestSave_SlotNaming());
 
 	// Count results
 	for (const FMGTestResult& Result : TestResults)

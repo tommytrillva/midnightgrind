@@ -61,7 +61,7 @@ void UMGProceduralContentSubsystem::InitializeDefaultSettings()
 
 void UMGProceduralContentSubsystem::LoadSavedContent()
 {
-    // Initialize stats with sample data
+    // Initialize defaults first
     ContentStats.TotalTracksGenerated = 0;
     ContentStats.TotalEnvironmentsGenerated = 0;
     ContentStats.TotalChallengesGenerated = 0;
@@ -72,17 +72,246 @@ void UMGProceduralContentSubsystem::LoadSavedContent()
     ContentStats.FavoritedTracks = 0;
     ContentStats.SharedTracks = 0;
 
-    // Theme usage stats
     ContentStats.ThemeUsageCounts.Add(TEXT("UrbanDowntown"), 0);
     ContentStats.ThemeUsageCounts.Add(TEXT("NeonAlley"), 0);
     ContentStats.ThemeUsageCounts.Add(TEXT("Y2KMall"), 0);
     ContentStats.ThemeUsageCounts.Add(TEXT("IndustrialDistrict"), 0);
+
+    // Load from file
+    FString SaveDir = FPaths::ProjectSavedDir() / TEXT("ProceduralContent");
+    FString FilePath = SaveDir / TEXT("ProceduralContent.sav");
+
+    TArray<uint8> FileData;
+    if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+    {
+        UE_LOG(LogTemp, Log, TEXT("No saved procedural content found, using defaults"));
+        return;
+    }
+
+    FMemoryReader Archive(FileData, true);
+
+    // Read version
+    int32 Version = 0;
+    Archive << Version;
+
+    if (Version >= 1)
+    {
+        // Load master seed
+        Archive << CurrentMasterSeed;
+
+        // Load content stats
+        Archive << ContentStats.TotalTracksGenerated;
+        Archive << ContentStats.TotalEnvironmentsGenerated;
+        Archive << ContentStats.TotalChallengesGenerated;
+        Archive << ContentStats.TotalShortcutsDiscovered;
+        Archive << ContentStats.TotalSecretAreasFound;
+        Archive << ContentStats.AverageGenerationTime;
+        Archive << ContentStats.TotalPlayTimeOnGenerated;
+        Archive << ContentStats.FavoritedTracks;
+        Archive << ContentStats.SharedTracks;
+
+        // Load theme usage counts
+        int32 ThemeCount = 0;
+        Archive << ThemeCount;
+        for (int32 i = 0; i < ThemeCount; i++)
+        {
+            FString ThemeName;
+            int32 Count;
+            Archive << ThemeName;
+            Archive << Count;
+            ContentStats.ThemeUsageCounts.FindOrAdd(ThemeName) = Count;
+        }
+
+        // Load saved tracks
+        int32 SavedTrackCount = 0;
+        Archive << SavedTrackCount;
+        for (int32 i = 0; i < SavedTrackCount; i++)
+        {
+            FProceduralTrack Track;
+
+            // Serialize track data
+            Archive << Track.TrackId;
+            Archive << Track.TrackName;
+            Archive << Track.Seed.MasterSeed;
+            Archive << Track.Seed.TrackSeed;
+            Archive << Track.Seed.EnvironmentSeed;
+            Archive << Track.Seed.SeedCode;
+            Archive << Track.TotalLength;
+            Archive << Track.EstimatedLapTime;
+            Archive << Track.DifficultyScore;
+            Archive << Track.JumpCount;
+            Archive << Track.DriftZoneCount;
+            Archive << Track.ShortcutCount;
+            Archive << Track.bIsCircuit;
+
+            int32 ThemeInt;
+            Archive << ThemeInt;
+            Track.Theme = static_cast<EEnvironmentTheme>(ThemeInt);
+
+            int32 DiffInt;
+            Archive << DiffInt;
+            Track.Difficulty = static_cast<EGenerationDifficulty>(DiffInt);
+
+            SavedTracks.Add(Track.TrackId, Track);
+        }
+
+        // Load favorite track IDs
+        int32 FavoriteCount = 0;
+        Archive << FavoriteCount;
+        for (int32 i = 0; i < FavoriteCount; i++)
+        {
+            FGuid TrackId;
+            Archive << TrackId;
+            if (SavedTracks.Contains(TrackId))
+            {
+                FavoriteTracks.Add(TrackId, SavedTracks[TrackId]);
+            }
+        }
+
+        // Load discovered shortcut IDs
+        int32 ShortcutCount = 0;
+        Archive << ShortcutCount;
+        for (int32 i = 0; i < ShortcutCount; i++)
+        {
+            FGuid ShortcutId;
+            Archive << ShortcutId;
+            DiscoveredShortcutIds.Add(ShortcutId);
+        }
+
+        // Load track playtimes
+        int32 PlaytimeCount = 0;
+        Archive << PlaytimeCount;
+        for (int32 i = 0; i < PlaytimeCount; i++)
+        {
+            FGuid TrackId;
+            float Playtime;
+            Archive << TrackId;
+            Archive << Playtime;
+            TrackPlaytimes.Add(TrackId, Playtime);
+        }
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("Loaded procedural content: %d tracks, %d favorites"),
+        SavedTracks.Num(), FavoriteTracks.Num());
 }
 
 void UMGProceduralContentSubsystem::SaveContentToStorage()
 {
-    // Placeholder for save game integration
-    UE_LOG(LogTemp, Log, TEXT("Saving procedural content - %d tracks saved"), SavedTracks.Num());
+    FString SaveDir = FPaths::ProjectSavedDir() / TEXT("ProceduralContent");
+    IFileManager::Get().MakeDirectory(*SaveDir, true);
+
+    FString FilePath = SaveDir / TEXT("ProceduralContent.sav");
+
+    FBufferArchive Archive;
+
+    // Write version
+    int32 Version = 1;
+    Archive << Version;
+
+    // Save master seed
+    Archive << CurrentMasterSeed;
+
+    // Save content stats
+    Archive << ContentStats.TotalTracksGenerated;
+    Archive << ContentStats.TotalEnvironmentsGenerated;
+    Archive << ContentStats.TotalChallengesGenerated;
+    Archive << ContentStats.TotalShortcutsDiscovered;
+    Archive << ContentStats.TotalSecretAreasFound;
+    Archive << ContentStats.AverageGenerationTime;
+    Archive << ContentStats.TotalPlayTimeOnGenerated;
+    Archive << ContentStats.FavoritedTracks;
+    Archive << ContentStats.SharedTracks;
+
+    // Save theme usage counts
+    int32 ThemeCount = ContentStats.ThemeUsageCounts.Num();
+    Archive << ThemeCount;
+    for (const auto& Pair : ContentStats.ThemeUsageCounts)
+    {
+        FString ThemeName = Pair.Key;
+        int32 Count = Pair.Value;
+        Archive << ThemeName;
+        Archive << Count;
+    }
+
+    // Save tracks
+    int32 SavedTrackCount = SavedTracks.Num();
+    Archive << SavedTrackCount;
+    for (const auto& Pair : SavedTracks)
+    {
+        const FProceduralTrack& Track = Pair.Value;
+
+        FGuid TrackId = Track.TrackId;
+        FString TrackName = Track.TrackName;
+        int64 MasterSeed = Track.Seed.MasterSeed;
+        int32 TrackSeed = Track.Seed.TrackSeed;
+        int32 EnvironmentSeed = Track.Seed.EnvironmentSeed;
+        FString SeedCode = Track.Seed.SeedCode;
+        float TotalLength = Track.TotalLength;
+        float EstimatedLapTime = Track.EstimatedLapTime;
+        float DifficultyScore = Track.DifficultyScore;
+        int32 JumpCount = Track.JumpCount;
+        int32 DriftZoneCount = Track.DriftZoneCount;
+        int32 ShortcutCount = Track.ShortcutCount;
+        bool bIsCircuit = Track.bIsCircuit;
+        int32 ThemeInt = static_cast<int32>(Track.Theme);
+        int32 DiffInt = static_cast<int32>(Track.Difficulty);
+
+        Archive << TrackId;
+        Archive << TrackName;
+        Archive << MasterSeed;
+        Archive << TrackSeed;
+        Archive << EnvironmentSeed;
+        Archive << SeedCode;
+        Archive << TotalLength;
+        Archive << EstimatedLapTime;
+        Archive << DifficultyScore;
+        Archive << JumpCount;
+        Archive << DriftZoneCount;
+        Archive << ShortcutCount;
+        Archive << bIsCircuit;
+        Archive << ThemeInt;
+        Archive << DiffInt;
+    }
+
+    // Save favorite track IDs
+    int32 FavoriteCount = FavoriteTracks.Num();
+    Archive << FavoriteCount;
+    for (const auto& Pair : FavoriteTracks)
+    {
+        FGuid TrackId = Pair.Key;
+        Archive << TrackId;
+    }
+
+    // Save discovered shortcut IDs
+    int32 ShortcutCount = DiscoveredShortcutIds.Num();
+    Archive << ShortcutCount;
+    for (const FGuid& ShortcutId : DiscoveredShortcutIds)
+    {
+        FGuid Id = ShortcutId;
+        Archive << Id;
+    }
+
+    // Save track playtimes
+    int32 PlaytimeCount = TrackPlaytimes.Num();
+    Archive << PlaytimeCount;
+    for (const auto& Pair : TrackPlaytimes)
+    {
+        FGuid TrackId = Pair.Key;
+        float Playtime = Pair.Value;
+        Archive << TrackId;
+        Archive << Playtime;
+    }
+
+    // Write to file
+    if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+    {
+        UE_LOG(LogTemp, Log, TEXT("Saved procedural content: %d tracks, %d favorites to %s"),
+            SavedTracks.Num(), FavoriteTracks.Num(), *FilePath);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to save procedural content to %s"), *FilePath);
+    }
 }
 
 // ============================================================================

@@ -641,8 +641,11 @@ void UMGWeatherSubsystem::UpdateTimeProgression(float DeltaTime)
 	}
 
 	// Advance game time
-	float GameMinutesToAdd = DeltaTime / TimeScale;
-	SetGameTime(GameTimeMinutes + GameMinutesToAdd);
+	if (TimeScale > 0.0f)
+	{
+		float GameMinutesToAdd = DeltaTime / TimeScale;
+		SetGameTime(GameTimeMinutes + GameMinutesToAdd);
+	}
 }
 
 void UMGWeatherSubsystem::UpdateLightingTransition(float DeltaTime)
@@ -653,7 +656,14 @@ void UMGWeatherSubsystem::UpdateLightingTransition(float DeltaTime)
 	}
 
 	// Update progress
-	LightingTransitionProgress += DeltaTime / LightingTransitionDuration;
+	if (LightingTransitionDuration > 0.0f)
+	{
+		LightingTransitionProgress += DeltaTime / LightingTransitionDuration;
+	}
+	else
+	{
+		LightingTransitionProgress = 1.0f;
+	}
 	LightingTransitionProgress = FMath::Min(LightingTransitionProgress, 1.0f);
 
 	// Blend lighting

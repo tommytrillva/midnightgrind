@@ -11,6 +11,8 @@ class UMGWeatherSubsystem;
 class UMGEconomySubsystem;
 class UMGVehicleDamageSystem;
 class UMGAIDriverProfile;
+class UMGSaveManagerSubsystem;
+class UMGSaveGame;
 
 /**
  * Subsystem Unit Tests
@@ -187,6 +189,30 @@ public:
 	/** Test data structure access times */
 	UFUNCTION(BlueprintCallable, Category = "Tests|Performance")
 	FMGTestResult TestPerf_DataAccess();
+
+	// ==========================================
+	// SAVE/LOAD TESTS
+	// ==========================================
+
+	/** Test save game object creation */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Save")
+	FMGTestResult TestSave_CreateSaveGame();
+
+	/** Test save data default values */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Save")
+	FMGTestResult TestSave_DefaultValues();
+
+	/** Test save data structures */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Save")
+	FMGTestResult TestSave_DataStructures();
+
+	/** Test save manager subsystem */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Save")
+	FMGTestResult TestSave_ManagerSubsystem();
+
+	/** Test save slot naming */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Save")
+	FMGTestResult TestSave_SlotNaming();
 
 	// ==========================================
 	// INTEGRATION TESTS

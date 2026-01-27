@@ -23,6 +23,10 @@
 #include "Achievements/MGAchievementSubsystem.h"
 #include "Streak/MGStreakSubsystem.h"
 #include "Prestige/MGPrestigeSubsystem.h"
+#include "NitroBoost/MGNitroBoostSubsystem.h"
+#include "Stunt/MGStuntSubsystem.h"
+#include "Takedown/MGTakedownSubsystem.h"
+#include "Powerup/MGPowerupSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -185,6 +189,32 @@ void AMGPlayerController::BeginPlay()
 				PrestigeSubsystem->OnPrestigeRankUp.AddDynamic(this, &AMGPlayerController::OnPrestigeRankUp);
 				PrestigeSubsystem->OnPrestigeLevelUp.AddDynamic(this, &AMGPlayerController::OnPrestigeLevelUp);
 			}
+
+			// Bind to nitro boost subsystem for nitro feedback
+			if (UMGNitroBoostSubsystem* NitroSubsystem = GI->GetSubsystem<UMGNitroBoostSubsystem>())
+			{
+				NitroSubsystem->OnNitroDepleted.AddDynamic(this, &AMGPlayerController::OnNitroDepleted);
+				NitroSubsystem->OnNitroOverheat.AddDynamic(this, &AMGPlayerController::OnNitroOverheat);
+			}
+
+			// Bind to stunt subsystem for stunt completion feedback
+			if (UMGStuntSubsystem* StuntSubsystem = GI->GetSubsystem<UMGStuntSubsystem>())
+			{
+				StuntSubsystem->OnStuntCompleted.AddDynamic(this, &AMGPlayerController::OnStuntCompleted);
+			}
+
+			// Bind to takedown subsystem for rampage notifications
+			if (UMGTakedownSubsystem* TakedownSubsystem = GI->GetSubsystem<UMGTakedownSubsystem>())
+			{
+				TakedownSubsystem->OnRampageActivated.AddDynamic(this, &AMGPlayerController::OnRampageActivated);
+			}
+
+			// Bind to powerup subsystem for pickup/hit feedback
+			if (UMGPowerupSubsystem* PowerupSubsystem = GI->GetSubsystem<UMGPowerupSubsystem>())
+			{
+				PowerupSubsystem->OnPowerupCollected.AddDynamic(this, &AMGPlayerController::OnPowerupCollected);
+				PowerupSubsystem->OnPowerupHit.AddDynamic(this, &AMGPlayerController::OnPowerupHit);
+			}
 		}
 	}
 }
@@ -303,6 +333,28 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		{
 			PrestigeSubsystem->OnPrestigeRankUp.RemoveDynamic(this, &AMGPlayerController::OnPrestigeRankUp);
 			PrestigeSubsystem->OnPrestigeLevelUp.RemoveDynamic(this, &AMGPlayerController::OnPrestigeLevelUp);
+		}
+
+		if (UMGNitroBoostSubsystem* NitroSubsystem = GI->GetSubsystem<UMGNitroBoostSubsystem>())
+		{
+			NitroSubsystem->OnNitroDepleted.RemoveDynamic(this, &AMGPlayerController::OnNitroDepleted);
+			NitroSubsystem->OnNitroOverheat.RemoveDynamic(this, &AMGPlayerController::OnNitroOverheat);
+		}
+
+		if (UMGStuntSubsystem* StuntSubsystem = GI->GetSubsystem<UMGStuntSubsystem>())
+		{
+			StuntSubsystem->OnStuntCompleted.RemoveDynamic(this, &AMGPlayerController::OnStuntCompleted);
+		}
+
+		if (UMGTakedownSubsystem* TakedownSubsystem = GI->GetSubsystem<UMGTakedownSubsystem>())
+		{
+			TakedownSubsystem->OnRampageActivated.RemoveDynamic(this, &AMGPlayerController::OnRampageActivated);
+		}
+
+		if (UMGPowerupSubsystem* PowerupSubsystem = GI->GetSubsystem<UMGPowerupSubsystem>())
+		{
+			PowerupSubsystem->OnPowerupCollected.RemoveDynamic(this, &AMGPlayerController::OnPowerupCollected);
+			PowerupSubsystem->OnPowerupHit.RemoveDynamic(this, &AMGPlayerController::OnPowerupHit);
 		}
 	}
 
@@ -1865,6 +1917,131 @@ void AMGPlayerController::OnLapCompleted(const FMGLapData& LapData, int32 LapsRe
 				// Race finished
 				FText FinishMessage = FText::FromString(TEXT("RACE COMPLETE!"));
 				HUDSubsystem->ShowNotification(FinishMessage, 5.0f, FLinearColor(1.0f, 0.84f, 0.0f, 1.0f)); // Gold
+			}
+		}
+	}
+}
+
+void AMGPlayerController::OnNitroDepleted()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText NitroMessage = FText::FromString(TEXT("NITRO DEPLETED"));
+			FLinearColor NitroColor = FLinearColor(0.5f, 0.5f, 0.5f, 1.0f); // Gray
+			HUDSubsystem->ShowNotification(NitroMessage, 1.5f, NitroColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnNitroOverheat()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText OverheatMessage = FText::FromString(TEXT("NITRO OVERHEAT!"));
+			FLinearColor OverheatColor = FLinearColor(1.0f, 0.3f, 0.0f, 1.0f); // Red-orange
+			HUDSubsystem->ShowNotification(OverheatMessage, 2.0f, OverheatColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnStuntCompleted(const FMGStuntEvent& Event, int32 TotalPoints)
+{
+	if (TotalPoints <= 0)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText StuntMessage = FText::FromString(FString::Printf(TEXT("STUNT! +%d"), TotalPoints));
+			FLinearColor StuntColor = FLinearColor(0.0f, 1.0f, 1.0f, 1.0f); // Cyan
+			HUDSubsystem->ShowNotification(StuntMessage, 2.5f, StuntColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnRampageActivated(float Duration, float Multiplier)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText RampageMessage = FText::FromString(FString::Printf(TEXT("RAMPAGE! %.1fx MULTIPLIER"), Multiplier));
+			FLinearColor RampageColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+			HUDSubsystem->ShowNotification(RampageMessage, 3.0f, RampageColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPowerupCollected(const FString& PlayerId, EMGPowerupType PowerupType, int32 SlotIndex)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString PowerupName;
+			switch (PowerupType)
+			{
+				case EMGPowerupType::SpeedBoost: PowerupName = TEXT("SPEED BOOST"); break;
+				case EMGPowerupType::Shield: PowerupName = TEXT("SHIELD"); break;
+				case EMGPowerupType::Nitro: PowerupName = TEXT("NITRO"); break;
+				case EMGPowerupType::Missile: PowerupName = TEXT("MISSILE"); break;
+				case EMGPowerupType::EMPBlast: PowerupName = TEXT("EMP BLAST"); break;
+				case EMGPowerupType::OilSlick: PowerupName = TEXT("OIL SLICK"); break;
+				case EMGPowerupType::SpikeStrip: PowerupName = TEXT("SPIKE STRIP"); break;
+				case EMGPowerupType::Shockwave: PowerupName = TEXT("SHOCKWAVE"); break;
+				case EMGPowerupType::Repair: PowerupName = TEXT("REPAIR"); break;
+				case EMGPowerupType::RocketBoost: PowerupName = TEXT("ROCKET BOOST"); break;
+				default: PowerupName = TEXT("POWERUP"); break;
+			}
+
+			FText PowerupMessage = FText::FromString(FString::Printf(TEXT("COLLECTED: %s"), *PowerupName));
+			FLinearColor PowerupColor = FLinearColor(0.0f, 0.8f, 1.0f, 1.0f); // Light blue
+			HUDSubsystem->ShowNotification(PowerupMessage, 1.5f, PowerupColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPowerupHit(const FString& SourceId, const FString& TargetId, EMGPowerupType PowerupType)
+{
+	FString LocalPlayerId = GetLocalPlayerId();
+
+	// Show when we hit someone
+	if (SourceId == LocalPlayerId && TargetId != LocalPlayerId)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+			{
+				FText HitMessage = FText::FromString(TEXT("HIT!"));
+				FLinearColor HitColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green
+				HUDSubsystem->ShowNotification(HitMessage, 1.5f, HitColor);
+			}
+		}
+	}
+	// Show when we get hit
+	else if (TargetId == LocalPlayerId && SourceId != LocalPlayerId)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+			{
+				FText HitMessage = FText::FromString(TEXT("INCOMING!"));
+				FLinearColor HitColor = FLinearColor(1.0f, 0.3f, 0.0f, 1.0f); // Red-orange
+				HUDSubsystem->ShowNotification(HitMessage, 1.5f, HitColor);
 			}
 		}
 	}

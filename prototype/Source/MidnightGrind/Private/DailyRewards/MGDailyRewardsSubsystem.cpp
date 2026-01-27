@@ -3,6 +3,11 @@
 #include "DailyRewards/MGDailyRewardsSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "Misc/Paths.h"
 
 void UMGDailyRewardsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -329,12 +334,126 @@ bool UMGDailyRewardsSubsystem::IsNewDay() const
 
 void UMGDailyRewardsSubsystem::SaveLoginData()
 {
-	// Save to player save game system
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("DailyRewards");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("LoginData.sav");
+
+	FBufferArchive Archive;
+
+	int32 Version = 1;
+	Archive << Version;
+
+	// Save login timestamps
+	int64 LastLoginUnix = PlayerLoginData.LastLoginDate.ToUnixTimestamp();
+	int64 LastClaimUnix = PlayerLoginData.LastClaimDate.ToUnixTimestamp();
+	Archive << LastLoginUnix;
+	Archive << LastClaimUnix;
+
+	// Save streak data
+	Archive << PlayerLoginData.CurrentStreak;
+	Archive << PlayerLoginData.LongestStreak;
+	Archive << PlayerLoginData.TotalLogins;
+	Archive << PlayerLoginData.CurrentCalendarDay;
+	Archive << PlayerLoginData.MissedDays;
+	Archive << PlayerLoginData.bHasClaimedToday;
+
+	// Save claimed days
+	int32 ClaimedDayCount = PlayerLoginData.ClaimedDays.Num();
+	Archive << ClaimedDayCount;
+	for (int32 Day : PlayerLoginData.ClaimedDays)
+	{
+		Archive << Day;
+	}
+
+	// Save claimed milestones
+	int32 MilestoneCount = PlayerLoginData.ClaimedMilestones.Num();
+	Archive << MilestoneCount;
+	for (EMGStreakMilestone Milestone : PlayerLoginData.ClaimedMilestones)
+	{
+		int32 MilestoneInt = static_cast<int32>(Milestone);
+		Archive << MilestoneInt;
+	}
+
+	// Save active calendar ID
+	FName CalendarID = ActiveCalendar.CalendarID;
+	Archive << CalendarID;
+
+	if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Daily rewards data saved - Streak: %d, Logins: %d"),
+			PlayerLoginData.CurrentStreak, PlayerLoginData.TotalLogins);
+	}
 }
 
 void UMGDailyRewardsSubsystem::LoadLoginData()
 {
-	// Load from player save game system
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("DailyRewards");
+	FString FilePath = SaveDir / TEXT("LoginData.sav");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		// No save found, start fresh
+		PlayerLoginData = FMGPlayerLoginData();
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	int32 Version = 0;
+	Archive << Version;
+
+	if (Version >= 1)
+	{
+		// Load login timestamps
+		int64 LastLoginUnix;
+		int64 LastClaimUnix;
+		Archive << LastLoginUnix;
+		Archive << LastClaimUnix;
+		PlayerLoginData.LastLoginDate = FDateTime::FromUnixTimestamp(LastLoginUnix);
+		PlayerLoginData.LastClaimDate = FDateTime::FromUnixTimestamp(LastClaimUnix);
+
+		// Load streak data
+		Archive << PlayerLoginData.CurrentStreak;
+		Archive << PlayerLoginData.LongestStreak;
+		Archive << PlayerLoginData.TotalLogins;
+		Archive << PlayerLoginData.CurrentCalendarDay;
+		Archive << PlayerLoginData.MissedDays;
+		Archive << PlayerLoginData.bHasClaimedToday;
+
+		// Load claimed days
+		int32 ClaimedDayCount;
+		Archive << ClaimedDayCount;
+		PlayerLoginData.ClaimedDays.Empty();
+		for (int32 i = 0; i < ClaimedDayCount; i++)
+		{
+			int32 Day;
+			Archive << Day;
+			PlayerLoginData.ClaimedDays.Add(Day);
+		}
+
+		// Load claimed milestones
+		int32 MilestoneCount;
+		Archive << MilestoneCount;
+		PlayerLoginData.ClaimedMilestones.Empty();
+		for (int32 i = 0; i < MilestoneCount; i++)
+		{
+			int32 MilestoneInt;
+			Archive << MilestoneInt;
+			PlayerLoginData.ClaimedMilestones.Add(static_cast<EMGStreakMilestone>(MilestoneInt));
+		}
+
+		// Load active calendar ID and set it
+		FName CalendarID;
+		Archive << CalendarID;
+		if (!CalendarID.IsNone() && Calendars.Contains(CalendarID))
+		{
+			ActiveCalendar = Calendars[CalendarID];
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Daily rewards data loaded - Streak: %d, Longest: %d, Logins: %d"),
+			PlayerLoginData.CurrentStreak, PlayerLoginData.LongestStreak, PlayerLoginData.TotalLogins);
+	}
 }
 
 void UMGDailyRewardsSubsystem::UpdateStreak()
