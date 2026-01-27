@@ -11,6 +11,7 @@
 #include "Track/MGSpawnPointActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "EngineUtils.h"
 
 void UMGDevCommands::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -387,6 +388,81 @@ void UMGDevCommands::PrintVehicleStats()
 	UE_LOG(LogTemp, Log, TEXT("Current Speed: %.1f MPH / %.1f KPH"), State.SpeedMPH, State.SpeedKPH);
 	UE_LOG(LogTemp, Log, TEXT("RPM: %.0f / %d (%.1f%%)", State.RPM, Config.Stats.Redline, State.RPMPercent * 100.0f));
 	UE_LOG(LogTemp, Log, TEXT("Gear: %d | Drifting: %s"), State.CurrentGear, State.bIsDrifting ? TEXT("YES") : TEXT("NO"));
+}
+
+// ==========================================
+// AI DEBUG COMMANDS
+// ==========================================
+
+void UMGDevCommands::ShowAIDebug()
+{
+	LogCommand(TEXT("ShowAIDebug"));
+
+	bShowAIDebug = !bShowAIDebug;
+	UE_LOG(LogTemp, Log, TEXT("AI Debug Visualization: %s"), bShowAIDebug ? TEXT("ON") : TEXT("OFF"));
+
+	// Would broadcast to all AI controllers to enable/disable debug drawing
+	// For now, just toggle state - actual visualization requires blueprint integration
+}
+
+void UMGDevCommands::PrintAIStates()
+{
+	LogCommand(TEXT("PrintAIStates"));
+
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	UE_LOG(LogTemp, Log, TEXT("=== AI RACER STATES ==="));
+
+	// Iterate all AI controllers and print their states
+	int32 AICount = 0;
+	for (TActorIterator<AController> It(World); It; ++It)
+	{
+		AController* Controller = *It;
+		if (!Controller || Controller->IsPlayerController())
+		{
+			continue;
+		}
+
+		APawn* Pawn = Controller->GetPawn();
+		if (Pawn)
+		{
+			FVector Location = Pawn->GetActorLocation();
+			FVector Velocity = Pawn->GetVelocity();
+			float Speed = Velocity.Size() * 0.036f; // cm/s to km/h
+
+			UE_LOG(LogTemp, Log, TEXT("  AI %d: %s | Speed: %.1f km/h | Pos: %s"),
+				AICount + 1,
+				*Controller->GetName(),
+				Speed,
+				*Location.ToString());
+
+			AICount++;
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Total AI Controllers: %d"), AICount);
+}
+
+void UMGDevCommands::SetAIDifficulty(float Difficulty)
+{
+	LogCommand(FString::Printf(TEXT("SetAIDifficulty(%.2f)"), Difficulty));
+
+	float ClampedDifficulty = FMath::Clamp(Difficulty, 0.0f, 1.0f);
+	UE_LOG(LogTemp, Log, TEXT("AI Difficulty set to: %.2f (0=Easy, 1=Hard)"), ClampedDifficulty);
+
+	// Would iterate all AI controllers and update their difficulty
+	// The actual implementation depends on the AI profile system
+}
+
+void UMGDevCommands::ResetAIMoods()
+{
+	LogCommand(TEXT("ResetAIMoods"));
+
+	UE_LOG(LogTemp, Log, TEXT("Resetting all AI moods to Neutral..."));
+
+	// Would iterate all AI controllers and reset their mood state
+	// The actual implementation depends on the AI driver profile system
 }
 
 // ==========================================

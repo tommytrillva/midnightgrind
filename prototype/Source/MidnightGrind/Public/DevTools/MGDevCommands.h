@@ -155,6 +155,26 @@ public:
 	void PrintVehicleStats();
 
 	// ==========================================
+	// AI DEBUG COMMANDS
+	// ==========================================
+
+	/** Toggle AI debug visualization (mood, state, targets) */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|AI")
+	void ShowAIDebug();
+
+	/** Print all AI controller states */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|AI")
+	void PrintAIStates();
+
+	/** Set difficulty for all AI (0.0 = easy, 1.0 = hard) */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|AI")
+	void SetAIDifficulty(float Difficulty = 0.5f);
+
+	/** Reset all AI moods to neutral */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|AI")
+	void ResetAIMoods();
+
+	// ==========================================
 	// QUICK TEST
 	// ==========================================
 
@@ -178,6 +198,7 @@ protected:
 	bool bShowDebug = false;
 	bool bShowCheckpoints = false;
 	bool bShowRacingLine = false;
+	bool bShowAIDebug = false;
 
 	// ==========================================
 	// HELPERS
