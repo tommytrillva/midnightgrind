@@ -1,0 +1,207 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Daily Rewards and Login Bonus System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "ResetTime": "00:00 UTC",
+    "StreakEnabled": true,
+    "CatchUpEnabled": false,
+    "MaxMissedDays": 2
+  },
+
+  "DailyLoginRewards": {
+    "Week1": {
+      "Day1": { "Cash": 1000, "REP": 100 },
+      "Day2": { "Cash": 1500, "REP": 150 },
+      "Day3": { "Cash": 2000, "REP": 200, "Item": "RandomPart" },
+      "Day4": { "Cash": 2500, "REP": 250 },
+      "Day5": { "Cash": 3000, "REP": 300 },
+      "Day6": { "Cash": 4000, "REP": 400, "Item": "CosmeticCrate" },
+      "Day7": { "Cash": 10000, "REP": 1000, "Special": "WeeklyBonus" }
+    },
+    "Week2": {
+      "Day8": { "Cash": 2000, "REP": 200 },
+      "Day9": { "Cash": 2500, "REP": 250 },
+      "Day10": { "Cash": 3000, "REP": 300, "Item": "RandomPart" },
+      "Day11": { "Cash": 3500, "REP": 350 },
+      "Day12": { "Cash": 4000, "REP": 400 },
+      "Day13": { "Cash": 5000, "REP": 500, "Item": "RareCrate" },
+      "Day14": { "Cash": 15000, "REP": 1500, "Special": "BiWeeklyBonus" }
+    },
+    "Week3": {
+      "Day15": { "Cash": 3000, "REP": 300 },
+      "Day16": { "Cash": 3500, "REP": 350 },
+      "Day17": { "Cash": 4000, "REP": 400, "Item": "RandomPart" },
+      "Day18": { "Cash": 4500, "REP": 450 },
+      "Day19": { "Cash": 5000, "REP": 500 },
+      "Day20": { "Cash": 6000, "REP": 600, "Item": "EpicCrate" },
+      "Day21": { "Cash": 20000, "REP": 2000, "Special": "ThreeWeekBonus" }
+    },
+    "Week4": {
+      "Day22": { "Cash": 4000, "REP": 400 },
+      "Day23": { "Cash": 4500, "REP": 450 },
+      "Day24": { "Cash": 5000, "REP": 500, "Item": "RandomPart" },
+      "Day25": { "Cash": 5500, "REP": 550 },
+      "Day26": { "Cash": 6000, "REP": 600 },
+      "Day27": { "Cash": 7500, "REP": 750, "Item": "LegendaryCrate" },
+      "Day28": { "Cash": 50000, "REP": 5000, "Vehicle": "MonthlyRewardCar", "Special": "MonthlyBonus" }
+    }
+  },
+
+  "StreakBonuses": {
+    "3DayStreak": {
+      "Multiplier": 1.1,
+      "Description": "10% bonus on all rewards"
+    },
+    "7DayStreak": {
+      "Multiplier": 1.25,
+      "Description": "25% bonus on all rewards",
+      "BonusItem": "SmallCrate"
+    },
+    "14DayStreak": {
+      "Multiplier": 1.5,
+      "Description": "50% bonus on all rewards",
+      "BonusItem": "MediumCrate"
+    },
+    "21DayStreak": {
+      "Multiplier": 1.75,
+      "Description": "75% bonus on all rewards",
+      "BonusItem": "LargeCrate"
+    },
+    "28DayStreak": {
+      "Multiplier": 2.0,
+      "Description": "Double all rewards",
+      "BonusItem": "PremiumCrate",
+      "Title": "Dedicated Racer"
+    }
+  },
+
+  "StreakProtection": {
+    "Enabled": true,
+    "GracePeriod": 24,
+    "ProtectionTokens": {
+      "Earned": { "Per7Days": 1 },
+      "Max": 3,
+      "AutoUse": false
+    },
+    "MissedDayPenalty": {
+      "1Day": "NoStreakLoss",
+      "2Days": "StreakResetTo7",
+      "3Days": "StreakReset"
+    }
+  },
+
+  "FirstTimeBonus": {
+    "FirstLogin": {
+      "Cash": 5000,
+      "REP": 500,
+      "Description": "Welcome bonus for new players"
+    },
+    "ReturnPlayer": {
+      "DaysAway": 30,
+      "Cash": 10000,
+      "REP": 1000,
+      "Description": "Welcome back bonus"
+    }
+  },
+
+  "HourlyBonus": {
+    "Enabled": true,
+    "Requirements": {
+      "ActivePlay": true,
+      "MinActivity": 15
+    },
+    "Rewards": {
+      "SmallBonus": { "Cash": 250, "Frequency": "Common" },
+      "MediumBonus": { "Cash": 500, "Frequency": "Uncommon" },
+      "LargeBonus": { "Cash": 1000, "Frequency": "Rare" },
+      "JackpotBonus": { "Cash": 5000, "Frequency": "VeryRare" }
+    },
+    "MaxPerDay": 5
+  },
+
+  "WeeklyMilestones": {
+    "Enabled": true,
+    "Categories": {
+      "RacesCompleted": {
+        "Tier1": { "Requirement": 5, "Reward": { "Cash": 2500 } },
+        "Tier2": { "Requirement": 15, "Reward": { "Cash": 5000 } },
+        "Tier3": { "Requirement": 30, "Reward": { "Cash": 10000, "Item": "Crate" } }
+      },
+      "WinsEarned": {
+        "Tier1": { "Requirement": 3, "Reward": { "REP": 500 } },
+        "Tier2": { "Requirement": 10, "Reward": { "REP": 1500 } },
+        "Tier3": { "Requirement": 20, "Reward": { "REP": 5000, "Item": "Crate" } }
+      },
+      "CashEarned": {
+        "Tier1": { "Requirement": 50000, "Reward": { "Cash": 5000 } },
+        "Tier2": { "Requirement": 200000, "Reward": { "Cash": 15000 } },
+        "Tier3": { "Requirement": 500000, "Reward": { "Cash": 50000, "Item": "Crate" } }
+      },
+      "DriftScore": {
+        "Tier1": { "Requirement": 100000, "Reward": { "REP": 500 } },
+        "Tier2": { "Requirement": 500000, "Reward": { "REP": 1500 } },
+        "Tier3": { "Requirement": 1000000, "Reward": { "REP": 5000, "Item": "DriftCrate" } }
+      }
+    },
+    "AllComplete": {
+      "Reward": { "Cash": 25000, "REP": 5000, "Item": "WeeklyMasterCrate" }
+    }
+  },
+
+  "SpecialDays": {
+    "Weekend": {
+      "Days": ["Saturday", "Sunday"],
+      "Multiplier": 1.5,
+      "Description": "Weekend bonus rewards"
+    },
+    "Holiday": {
+      "Multiplier": 2.0,
+      "SpecialItems": true,
+      "Description": "Holiday special rewards"
+    },
+    "Anniversary": {
+      "AccountCreationDate": true,
+      "Reward": { "Cash": 50000, "REP": 10000, "Item": "AnniversaryCrate" }
+    }
+  },
+
+  "Crates": {
+    "SmallCrate": {
+      "Contents": { "Common": 0.7, "Uncommon": 0.25, "Rare": 0.05 },
+      "Items": ["Cash", "REP", "Part", "Cosmetic"]
+    },
+    "MediumCrate": {
+      "Contents": { "Common": 0.4, "Uncommon": 0.4, "Rare": 0.15, "Epic": 0.05 },
+      "Items": ["Cash", "REP", "Part", "Cosmetic", "Vinyl"]
+    },
+    "LargeCrate": {
+      "Contents": { "Uncommon": 0.4, "Rare": 0.35, "Epic": 0.2, "Legendary": 0.05 },
+      "Items": ["Cash", "REP", "Part", "Cosmetic", "Wheels"]
+    },
+    "PremiumCrate": {
+      "Contents": { "Rare": 0.4, "Epic": 0.4, "Legendary": 0.2 },
+      "Items": ["Cash", "REP", "Part", "Cosmetic", "ExclusiveItem"]
+    }
+  },
+
+  "UI": {
+    "Calendar": {
+      "ShowMonthView": true,
+      "HighlightToday": true,
+      "ShowUpcoming": true,
+      "ShowStreakProgress": true
+    },
+    "Notifications": {
+      "DailyRewardAvailable": true,
+      "StreakAtRisk": true,
+      "MilestoneProgress": true
+    },
+    "ClaimScreen": {
+      "Animation": true,
+      "PreviewRewards": true,
+      "ShowStreak": true
+    }
+  }
+}

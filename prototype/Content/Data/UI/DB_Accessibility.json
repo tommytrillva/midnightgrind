@@ -1,0 +1,318 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Accessibility Features and Options",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultsOptimized": true,
+    "QuickToggle": true,
+    "ProfileSaving": true
+  },
+
+  "VisualAccessibility": {
+    "ColorBlindModes": {
+      "Enabled": true,
+      "Types": {
+        "Deuteranopia": {
+          "ID": "CB_DEUTAN",
+          "Name": "Deuteranopia (Green-blind)",
+          "Description": "Adjusts green color perception",
+          "Intensity": { "Min": 0, "Max": 1, "Default": 0.5 }
+        },
+        "Protanopia": {
+          "ID": "CB_PROTAN",
+          "Name": "Protanopia (Red-blind)",
+          "Description": "Adjusts red color perception",
+          "Intensity": { "Min": 0, "Max": 1, "Default": 0.5 }
+        },
+        "Tritanopia": {
+          "ID": "CB_TRITAN",
+          "Name": "Tritanopia (Blue-blind)",
+          "Description": "Adjusts blue color perception",
+          "Intensity": { "Min": 0, "Max": 1, "Default": 0.5 }
+        },
+        "Achromatopsia": {
+          "ID": "CB_ACHRO",
+          "Name": "Achromatopsia (Monochrome)",
+          "Description": "Grayscale mode",
+          "Intensity": { "Min": 0, "Max": 1, "Default": 1.0 }
+        }
+      },
+      "SimulationMode": {
+        "Enabled": true,
+        "Description": "Preview colorblind modes before applying"
+      }
+    },
+    "Contrast": {
+      "HighContrast": {
+        "Enabled": true,
+        "UIElements": true,
+        "HUDElements": true,
+        "TextOutlines": true
+      },
+      "ContrastLevel": {
+        "Min": 0.5,
+        "Max": 2.0,
+        "Default": 1.0
+      }
+    },
+    "TextSettings": {
+      "Size": {
+        "Options": ["Small", "Medium", "Large", "ExtraLarge"],
+        "Default": "Medium",
+        "Scale": { "Small": 0.8, "Medium": 1.0, "Large": 1.25, "ExtraLarge": 1.5 }
+      },
+      "Font": {
+        "DyslexiaFriendly": {
+          "Enabled": true,
+          "Font": "OpenDyslexic"
+        }
+      },
+      "BackgroundOpacity": {
+        "Min": 0,
+        "Max": 1,
+        "Default": 0.8
+      }
+    },
+    "ScreenEffects": {
+      "ReducedMotion": {
+        "Enabled": false,
+        "DisablesScreenShake": true,
+        "DisablesMotionBlur": true,
+        "DisablesCameraEffects": true,
+        "ReducesParticles": true
+      },
+      "FlashingReduction": {
+        "Enabled": false,
+        "NoStrobeEffects": true,
+        "ReducedLightning": true,
+        "DimmedFlashes": true
+      }
+    },
+    "UIScale": {
+      "Min": 0.75,
+      "Max": 1.5,
+      "Default": 1.0,
+      "AffectsAll": true
+    },
+    "HUDCustomization": {
+      "ElementPositioning": true,
+      "ElementVisibility": true,
+      "ElementSize": true,
+      "Opacity": { "Min": 0.3, "Max": 1.0 }
+    }
+  },
+
+  "AudioAccessibility": {
+    "Subtitles": {
+      "Enabled": true,
+      "Default": true,
+      "Options": {
+        "DialogueOnly": { "Description": "Voice lines only" },
+        "Full": { "Description": "All audio including sound effects" },
+        "ExtendedDescriptions": { "Description": "Includes audio descriptions" }
+      },
+      "Appearance": {
+        "Size": ["Small", "Medium", "Large", "ExtraLarge"],
+        "BackgroundOpacity": { "Min": 0, "Max": 1 },
+        "SpeakerName": true,
+        "Position": ["Bottom", "Top"]
+      }
+    },
+    "ClosedCaptions": {
+      "Enabled": true,
+      "SoundDescriptions": true,
+      "DirectionalIndicators": true,
+      "ImportantSounds": true
+    },
+    "AudioCues": {
+      "VisualIndicators": {
+        "Enabled": true,
+        "ShowSoundDirection": true,
+        "ShowSoundType": true,
+        "OnScreen": true
+      },
+      "ReplacesAudio": false
+    },
+    "MonoAudio": {
+      "Enabled": false,
+      "Description": "Combines stereo to single channel"
+    },
+    "VolumeBalance": {
+      "LeftRight": { "Min": -100, "Max": 100, "Default": 0 }
+    }
+  },
+
+  "ControlsAccessibility": {
+    "RemappingFull": {
+      "Enabled": true,
+      "AllInputs": true,
+      "MultipleBindings": true,
+      "QuickProfiles": 5
+    },
+    "OneHandedMode": {
+      "Enabled": true,
+      "Presets": {
+        "LeftHand": { "Description": "All controls on left side" },
+        "RightHand": { "Description": "All controls on right side" }
+      }
+    },
+    "HoldVsToggle": {
+      "Accelerate": { "Options": ["Hold", "Toggle"], "Default": "Hold" },
+      "Brake": { "Options": ["Hold", "Toggle"], "Default": "Hold" },
+      "Nitro": { "Options": ["Hold", "Toggle"], "Default": "Hold" },
+      "Handbrake": { "Options": ["Hold", "Toggle"], "Default": "Hold" }
+    },
+    "InputSensitivity": {
+      "Steering": { "Min": 0.1, "Max": 2.0, "Default": 1.0 },
+      "Throttle": { "Min": 0.1, "Max": 2.0, "Default": 1.0 },
+      "Brake": { "Min": 0.1, "Max": 2.0, "Default": 1.0 }
+    },
+    "DeadZones": {
+      "Enabled": true,
+      "Inner": { "Min": 0, "Max": 0.5, "Default": 0.1 },
+      "Outer": { "Min": 0.5, "Max": 1.0, "Default": 0.95 }
+    },
+    "AssistedControls": {
+      "AutoAccelerate": { "Enabled": false },
+      "AutoBrake": { "Enabled": false },
+      "SteeringAssist": { "Enabled": true, "Level": ["Off", "Low", "High"] }
+    }
+  },
+
+  "GameplayAccessibility": {
+    "DifficultyModifiers": {
+      "AISpeed": { "Min": 0.5, "Max": 1.5, "Default": 1.0 },
+      "AIAggression": { "Min": 0.5, "Max": 1.5, "Default": 1.0 },
+      "DamageReceived": { "Min": 0, "Max": 1.5, "Default": 1.0 },
+      "RewardMultiplier": { "Min": 0.5, "Max": 1.0, "Default": 1.0 }
+    },
+    "DrivingAssists": {
+      "TractionControl": true,
+      "StabilityControl": true,
+      "ABS": true,
+      "AutomaticGears": true,
+      "BrakingAssist": true,
+      "SteeringAssist": true,
+      "RacingLine": true
+    },
+    "TimeExtensions": {
+      "Enabled": true,
+      "Multiplier": { "Min": 1.0, "Max": 2.0 },
+      "AppliesToTimeLimits": true
+    },
+    "SkipOptions": {
+      "SkipTutorials": true,
+      "SkipCutscenes": true,
+      "SkipDifficultSections": false
+    }
+  },
+
+  "CognitiveAccessibility": {
+    "TutorialOptions": {
+      "ExtendedTutorials": true,
+      "RepeatableTutorials": true,
+      "SlowerPacing": true,
+      "AdditionalHints": true
+    },
+    "ObjectiveReminders": {
+      "Enabled": true,
+      "Frequency": ["Rarely", "Sometimes", "Often"],
+      "OnScreenMarkers": true
+    },
+    "Simplification": {
+      "SimplifiedMenus": true,
+      "ReducedOptions": true,
+      "ClearLabeling": true
+    },
+    "PauseAnytime": {
+      "Enabled": true,
+      "DuringCutscenes": true,
+      "DuringEvents": true
+    }
+  },
+
+  "CommunicationAccessibility": {
+    "TextToSpeech": {
+      "Enabled": true,
+      "MenuNavigation": true,
+      "ChatMessages": true,
+      "Speed": { "Min": 0.5, "Max": 2.0, "Default": 1.0 }
+    },
+    "SpeechToText": {
+      "Enabled": true,
+      "VoiceChat": true,
+      "Commands": true
+    },
+    "QuickPhrases": {
+      "Enabled": true,
+      "CustomPhrases": true,
+      "MaxPhrases": 20
+    },
+    "PingSystem": {
+      "Enabled": true,
+      "Types": ["Location", "Warning", "Request", "Affirmative"],
+      "VisualIndicators": true,
+      "AudioIndicators": true
+    }
+  },
+
+  "Presets": {
+    "Default": {
+      "ID": "ACCESS_DEFAULT",
+      "Description": "Standard settings"
+    },
+    "LowVision": {
+      "ID": "ACCESS_LOWVISION",
+      "Description": "Optimized for low vision",
+      "Settings": {
+        "TextSize": "ExtraLarge",
+        "HighContrast": true,
+        "UIScale": 1.25,
+        "Subtitles": "Full"
+      }
+    },
+    "HearingImpaired": {
+      "ID": "ACCESS_HEARING",
+      "Description": "Optimized for hearing impairment",
+      "Settings": {
+        "Subtitles": "ExtendedDescriptions",
+        "ClosedCaptions": true,
+        "VisualIndicators": true,
+        "MonoAudio": true
+      }
+    },
+    "MotorImpaired": {
+      "ID": "ACCESS_MOTOR",
+      "Description": "Optimized for motor impairment",
+      "Settings": {
+        "AllToggle": true,
+        "ExtendedTimers": true,
+        "MaxAssists": true
+      }
+    },
+    "PhotosensitivitySafe": {
+      "ID": "ACCESS_PHOTO",
+      "Description": "Reduces flashing and motion",
+      "Settings": {
+        "ReducedMotion": true,
+        "FlashingReduction": true,
+        "NoStrobe": true
+      }
+    }
+  },
+
+  "UI": {
+    "AccessibilityMenu": {
+      "QuickAccess": true,
+      "SearchFunction": true,
+      "Categorized": true,
+      "PreviewChanges": true
+    },
+    "Notifications": {
+      "SettingsSaved": true,
+      "PresetApplied": true,
+      "RecommendationPrompts": true
+    }
+  }
+}
