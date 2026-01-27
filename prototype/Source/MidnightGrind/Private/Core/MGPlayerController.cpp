@@ -20,6 +20,9 @@
 #include "Destruction/MGDestructionSubsystem.h"
 #include "Aerodynamics/MGAerodynamicsSubsystem.h"
 #include "Scoring/MGScoringSubsystem.h"
+#include "Achievements/MGAchievementSubsystem.h"
+#include "Streak/MGStreakSubsystem.h"
+#include "Prestige/MGPrestigeSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -159,6 +162,26 @@ void AMGPlayerController::BeginPlay()
 				ScoringSubsystem->OnScoreEvent.AddDynamic(this, &AMGPlayerController::OnScoreEvent);
 				ScoringSubsystem->OnChainExtended.AddDynamic(this, &AMGPlayerController::OnChainExtended);
 			}
+
+			// Bind to achievement subsystem for unlock notifications
+			if (UMGAchievementSubsystem* AchievementSubsystem = GI->GetSubsystem<UMGAchievementSubsystem>())
+			{
+				AchievementSubsystem->OnAchievementUnlocked.AddDynamic(this, &AMGPlayerController::OnAchievementUnlocked);
+			}
+
+			// Bind to streak subsystem for streak notifications
+			if (UMGStreakSubsystem* StreakSubsystem = GI->GetSubsystem<UMGStreakSubsystem>())
+			{
+				StreakSubsystem->OnStreakTierUp.AddDynamic(this, &AMGPlayerController::OnStreakTierUp);
+				StreakSubsystem->OnNewStreakRecord.AddDynamic(this, &AMGPlayerController::OnNewStreakRecord);
+			}
+
+			// Bind to prestige subsystem for rank up notifications
+			if (UMGPrestigeSubsystem* PrestigeSubsystem = GI->GetSubsystem<UMGPrestigeSubsystem>())
+			{
+				PrestigeSubsystem->OnPrestigeRankUp.AddDynamic(this, &AMGPlayerController::OnPrestigeRankUp);
+				PrestigeSubsystem->OnPrestigeLevelUp.AddDynamic(this, &AMGPlayerController::OnPrestigeLevelUp);
+			}
 		}
 	}
 }
@@ -257,6 +280,23 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		{
 			ScoringSubsystem->OnScoreEvent.RemoveDynamic(this, &AMGPlayerController::OnScoreEvent);
 			ScoringSubsystem->OnChainExtended.RemoveDynamic(this, &AMGPlayerController::OnChainExtended);
+		}
+
+		if (UMGAchievementSubsystem* AchievementSubsystem = GI->GetSubsystem<UMGAchievementSubsystem>())
+		{
+			AchievementSubsystem->OnAchievementUnlocked.RemoveDynamic(this, &AMGPlayerController::OnAchievementUnlocked);
+		}
+
+		if (UMGStreakSubsystem* StreakSubsystem = GI->GetSubsystem<UMGStreakSubsystem>())
+		{
+			StreakSubsystem->OnStreakTierUp.RemoveDynamic(this, &AMGPlayerController::OnStreakTierUp);
+			StreakSubsystem->OnNewStreakRecord.RemoveDynamic(this, &AMGPlayerController::OnNewStreakRecord);
+		}
+
+		if (UMGPrestigeSubsystem* PrestigeSubsystem = GI->GetSubsystem<UMGPrestigeSubsystem>())
+		{
+			PrestigeSubsystem->OnPrestigeRankUp.RemoveDynamic(this, &AMGPlayerController::OnPrestigeRankUp);
+			PrestigeSubsystem->OnPrestigeLevelUp.RemoveDynamic(this, &AMGPlayerController::OnPrestigeLevelUp);
 		}
 	}
 
@@ -1540,4 +1580,144 @@ FString AMGPlayerController::GetLocalPlayerId() const
 		return PlayerState->GetPlayerName();
 	}
 	return FString();
+}
+
+void AMGPlayerController::OnAchievementUnlocked(const FMGAchievementDefinition& Achievement, int32 TierUnlocked)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString TierStr;
+			if (TierUnlocked > 1)
+			{
+				TierStr = FString::Printf(TEXT(" (Tier %d)"), TierUnlocked);
+			}
+
+			FText AchievementMessage = FText::FromString(FString::Printf(TEXT("ACHIEVEMENT UNLOCKED: %s%s"), *Achievement.DisplayName.ToString(), *TierStr));
+			FLinearColor AchievementColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+			HUDSubsystem->ShowNotification(AchievementMessage, 5.0f, AchievementColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnStreakTierUp(const FString& PlayerId, EMGStreakType Type, EMGStreakTier NewTier)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString TierStr;
+			FLinearColor TierColor;
+
+			switch (NewTier)
+			{
+				case EMGStreakTier::Bronze:
+					TierStr = TEXT("BRONZE");
+					TierColor = FLinearColor(0.8f, 0.5f, 0.2f, 1.0f);
+					break;
+				case EMGStreakTier::Silver:
+					TierStr = TEXT("SILVER");
+					TierColor = FLinearColor(0.75f, 0.75f, 0.75f, 1.0f);
+					break;
+				case EMGStreakTier::Gold:
+					TierStr = TEXT("GOLD");
+					TierColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f);
+					break;
+				case EMGStreakTier::Platinum:
+					TierStr = TEXT("PLATINUM");
+					TierColor = FLinearColor(0.9f, 0.95f, 1.0f, 1.0f);
+					break;
+				case EMGStreakTier::Diamond:
+					TierStr = TEXT("DIAMOND");
+					TierColor = FLinearColor(0.6f, 0.85f, 1.0f, 1.0f);
+					break;
+				case EMGStreakTier::Champion:
+					TierStr = TEXT("CHAMPION");
+					TierColor = FLinearColor(1.0f, 0.2f, 0.2f, 1.0f);
+					break;
+				case EMGStreakTier::Legend:
+					TierStr = TEXT("LEGEND");
+					TierColor = FLinearColor(1.0f, 0.0f, 1.0f, 1.0f);
+					break;
+				default:
+					TierStr = TEXT("");
+					TierColor = FLinearColor::White;
+					break;
+			}
+
+			if (!TierStr.IsEmpty())
+			{
+				FText TierMessage = FText::FromString(FString::Printf(TEXT("STREAK TIER UP! %s"), *TierStr));
+				HUDSubsystem->ShowNotification(TierMessage, 3.0f, TierColor);
+			}
+		}
+	}
+}
+
+void AMGPlayerController::OnNewStreakRecord(const FString& PlayerId, EMGStreakType Type)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText RecordMessage = FText::FromString(TEXT("NEW PERSONAL BEST STREAK!"));
+			FLinearColor RecordColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f); // Green
+			HUDSubsystem->ShowNotification(RecordMessage, 3.0f, RecordColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPrestigeRankUp(const FString& PlayerId, EMGPrestigeRank OldRank, EMGPrestigeRank NewRank)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText RankUpMessage = FText::FromString(TEXT("PRESTIGE RANK UP!"));
+			FLinearColor RankUpColor = FLinearColor(1.0f, 0.0f, 1.0f, 1.0f); // Magenta
+			HUDSubsystem->ShowNotification(RankUpMessage, 5.0f, RankUpColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPrestigeLevelUp(const FString& PlayerId, int32 OldLevel, int32 NewLevel)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText LevelUpMessage = FText::FromString(FString::Printf(TEXT("LEVEL UP! %d"), NewLevel));
+			FLinearColor LevelUpColor = FLinearColor(0.5f, 0.8f, 1.0f, 1.0f); // Light blue
+			HUDSubsystem->ShowNotification(LevelUpMessage, 3.0f, LevelUpColor);
+		}
+	}
 }

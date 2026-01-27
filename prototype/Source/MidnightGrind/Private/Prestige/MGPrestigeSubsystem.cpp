@@ -161,6 +161,9 @@ void UMGPrestigeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		ExpMilestone.RequiredTotalExperience = 1000000;
 		Milestones.Add(ExpMilestone.MilestoneId, ExpMilestone);
 	}
+
+	// Load saved data
+	LoadPrestigeData();
 }
 
 void UMGPrestigeSubsystem::Deinitialize()
@@ -1167,10 +1170,251 @@ void UMGPrestigeSubsystem::UpdateLeaderboard()
 // Persistence
 void UMGPrestigeSubsystem::SavePrestigeData()
 {
-	// Save implementation would persist prestige data
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Prestige");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("prestige_data.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save player prestige data
+	int32 NumPlayers = PlayerPrestigeData.Num();
+	SaveArchive << NumPlayers;
+
+	for (const auto& PrestigePair : PlayerPrestigeData)
+	{
+		FString PlayerId = PrestigePair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGPlayerPrestige& Prestige = PrestigePair.Value;
+		int32 RankInt = static_cast<int32>(Prestige.CurrentRank);
+		int32 Level = Prestige.CurrentLevel;
+		int64 Experience = Prestige.CurrentExperience;
+		int64 TotalExp = Prestige.TotalExperienceEarned;
+		int32 Times = Prestige.TimesPrestiged;
+		float Multiplier = Prestige.PrestigeMultiplier;
+		int64 LastPrestigeTicks = Prestige.LastPrestigeDate.GetTicks();
+		int64 FirstPrestigeTicks = Prestige.FirstPrestigeDate.GetTicks();
+
+		SaveArchive << RankInt;
+		SaveArchive << Level;
+		SaveArchive << Experience;
+		SaveArchive << TotalExp;
+		SaveArchive << Times;
+		SaveArchive << Multiplier;
+		SaveArchive << LastPrestigeTicks;
+		SaveArchive << FirstPrestigeTicks;
+
+		// Save unlocked rewards
+		int32 NumUnlocks = Prestige.UnlockedRewards.Num();
+		SaveArchive << NumUnlocks;
+		for (const FString& RewardId : Prestige.UnlockedRewards)
+		{
+			FString Id = RewardId;
+			SaveArchive << Id;
+		}
+	}
+
+	// Save player stats
+	int32 NumStats = PlayerStats.Num();
+	SaveArchive << NumStats;
+
+	for (const auto& StatPair : PlayerStats)
+	{
+		FString PlayerId = StatPair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGPrestigePlayerStats& Stats = StatPair.Value;
+		int32 TotalTimes = Stats.TotalTimesPrestiged;
+		int64 TotalExpAll = Stats.TotalExperienceAllTime;
+		int32 HighestLevel = Stats.HighestLevelReached;
+		int32 HighestRankInt = static_cast<int32>(Stats.HighestRankAchieved);
+		int32 TokensEarned = Stats.TotalTokensEarned;
+		int32 TokensSpent = Stats.TotalTokensSpent;
+		int32 Milestones = Stats.MilestonesCompleted;
+		int32 Rewards = Stats.RewardsUnlocked;
+		float FastestPrestige = Stats.FastestPrestige;
+
+		SaveArchive << TotalTimes;
+		SaveArchive << TotalExpAll;
+		SaveArchive << HighestLevel;
+		SaveArchive << HighestRankInt;
+		SaveArchive << TokensEarned;
+		SaveArchive << TokensSpent;
+		SaveArchive << Milestones;
+		SaveArchive << Rewards;
+		SaveArchive << FastestPrestige;
+
+		// Save category prestige counts
+		int32 NumCats = Stats.CategoryPrestigeCounts.Num();
+		SaveArchive << NumCats;
+		for (const auto& CatPair : Stats.CategoryPrestigeCounts)
+		{
+			int32 CatInt = static_cast<int32>(CatPair.Key);
+			int32 Count = CatPair.Value;
+			SaveArchive << CatInt;
+			SaveArchive << Count;
+		}
+	}
+
+	// Save achieved milestones per player
+	int32 NumAchieved = AchievedMilestones.Num();
+	SaveArchive << NumAchieved;
+
+	for (const auto& AchievedPair : AchievedMilestones)
+	{
+		FString PlayerId = AchievedPair.Key;
+		SaveArchive << PlayerId;
+
+		int32 NumMilestones = AchievedPair.Value.Num();
+		SaveArchive << NumMilestones;
+
+		for (const FString& MilestoneId : AchievedPair.Value)
+		{
+			FString Id = MilestoneId;
+			SaveArchive << Id;
+		}
+	}
+
+	// Write to file
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGPrestigeSubsystem: Saved prestige data for %d players"), NumPlayers);
 }
 
 void UMGPrestigeSubsystem::LoadPrestigeData()
 {
-	// Load implementation would restore prestige data
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Prestige") / TEXT("prestige_data.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("MGPrestigeSubsystem: No saved prestige data found"));
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGPrestigeSubsystem: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Load player prestige data
+	int32 NumPlayers;
+	LoadArchive << NumPlayers;
+
+	for (int32 i = 0; i < NumPlayers; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGPlayerPrestige Prestige;
+		Prestige.PlayerId = PlayerId;
+
+		int32 RankInt;
+		int64 LastPrestigeTicks;
+		int64 FirstPrestigeTicks;
+
+		LoadArchive << RankInt;
+		LoadArchive << Prestige.CurrentLevel;
+		LoadArchive << Prestige.CurrentExperience;
+		LoadArchive << Prestige.TotalExperienceEarned;
+		LoadArchive << Prestige.TimesPrestiged;
+		LoadArchive << Prestige.PrestigeMultiplier;
+		LoadArchive << LastPrestigeTicks;
+		LoadArchive << FirstPrestigeTicks;
+
+		Prestige.CurrentRank = static_cast<EMGPrestigeRank>(RankInt);
+		Prestige.LastPrestigeDate = FDateTime(LastPrestigeTicks);
+		Prestige.FirstPrestigeDate = FDateTime(FirstPrestigeTicks);
+
+		// Load unlocked rewards
+		int32 NumUnlocks;
+		LoadArchive << NumUnlocks;
+		for (int32 j = 0; j < NumUnlocks; ++j)
+		{
+			FString RewardId;
+			LoadArchive << RewardId;
+			Prestige.UnlockedRewards.Add(RewardId);
+		}
+
+		PlayerPrestigeData.Add(PlayerId, Prestige);
+	}
+
+	// Load player stats
+	int32 NumStats;
+	LoadArchive << NumStats;
+
+	for (int32 i = 0; i < NumStats; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGPrestigePlayerStats Stats;
+		Stats.PlayerId = PlayerId;
+
+		int32 HighestRankInt;
+
+		LoadArchive << Stats.TotalTimesPrestiged;
+		LoadArchive << Stats.TotalExperienceAllTime;
+		LoadArchive << Stats.HighestLevelReached;
+		LoadArchive << HighestRankInt;
+		LoadArchive << Stats.TotalTokensEarned;
+		LoadArchive << Stats.TotalTokensSpent;
+		LoadArchive << Stats.MilestonesCompleted;
+		LoadArchive << Stats.RewardsUnlocked;
+		LoadArchive << Stats.FastestPrestige;
+
+		Stats.HighestRankAchieved = static_cast<EMGPrestigeRank>(HighestRankInt);
+
+		// Load category prestige counts
+		int32 NumCats;
+		LoadArchive << NumCats;
+		for (int32 j = 0; j < NumCats; ++j)
+		{
+			int32 CatInt;
+			int32 Count;
+			LoadArchive << CatInt;
+			LoadArchive << Count;
+			Stats.CategoryPrestigeCounts.Add(static_cast<EMGPrestigeCategory>(CatInt), Count);
+		}
+
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	// Load achieved milestones per player
+	int32 NumAchieved;
+	LoadArchive << NumAchieved;
+
+	for (int32 i = 0; i < NumAchieved; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		int32 NumMilestones;
+		LoadArchive << NumMilestones;
+
+		TSet<FString> MilestoneSet;
+		for (int32 j = 0; j < NumMilestones; ++j)
+		{
+			FString MilestoneId;
+			LoadArchive << MilestoneId;
+			MilestoneSet.Add(MilestoneId);
+		}
+
+		AchievedMilestones.Add(PlayerId, MilestoneSet);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGPrestigeSubsystem: Loaded prestige data for %d players"), NumPlayers);
 }

@@ -332,6 +332,100 @@ struct FMGAIRacecraftParams
 };
 
 /**
+ * AI weather sensitivity parameters
+ * Controls how AI adapts to various weather conditions
+ */
+USTRUCT(BlueprintType)
+struct FMGAIWeatherParams
+{
+	GENERATED_BODY()
+
+	/**
+	 * Overall weather adaptation skill (0-1)
+	 * Higher values = better performance in adverse conditions
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float WeatherAdaptation = 0.5f;
+
+	/**
+	 * Wet weather driving skill (0-1)
+	 * Affects grip utilization and throttle control in rain
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float WetWeatherSkill = 0.5f;
+
+	/**
+	 * Night driving skill (0-1)
+	 * Affects confidence and speed in low visibility
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float NightDrivingSkill = 0.5f;
+
+	/**
+	 * Fog driving skill (0-1)
+	 * Affects perception and reaction time in fog
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float FogDrivingSkill = 0.5f;
+
+	/**
+	 * Wind compensation skill (0-1)
+	 * Affects ability to counter crosswind effects
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float WindCompensation = 0.5f;
+
+	/**
+	 * Caution multiplier in bad weather (0.5-2.0)
+	 * Lower = more cautious, Higher = more aggressive despite conditions
+	 * 1.0 = standard caution, 0.5 = very cautious, 2.0 = ignores weather risks
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.5", ClampMax = "2.0"))
+	float WeatherRiskTolerance = 1.0f;
+
+	/**
+	 * Aquaplaning recovery skill (0-1)
+	 * How well the AI recovers from losing grip in puddles
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float AquaplaningRecovery = 0.5f;
+
+	/**
+	 * Get effective skill modifier for current weather
+	 * @param WeatherDifficulty Weather difficulty (1-5)
+	 * @return Skill modifier (0.5-1.2)
+	 */
+	float GetWeatherSkillModifier(int32 WeatherDifficulty) const
+	{
+		// Higher adaptation = less penalty in bad weather
+		const float DifficultyFactor = (WeatherDifficulty - 1) / 4.0f; // 0-1
+		const float Penalty = DifficultyFactor * (1.0f - WeatherAdaptation) * 0.4f;
+		return FMath::Clamp(1.0f - Penalty, 0.5f, 1.2f);
+	}
+
+	/**
+	 * Get caution adjustment for weather
+	 * @param WeatherDifficulty Weather difficulty (1-5)
+	 * @return Caution multiplier for speed calculations
+	 */
+	float GetWeatherCautionMultiplier(int32 WeatherDifficulty) const
+	{
+		if (WeatherDifficulty <= 1)
+		{
+			return 1.0f; // No caution needed in clear weather
+		}
+
+		// Base caution increases with difficulty
+		const float BaseCaution = 0.05f * (WeatherDifficulty - 1);
+
+		// Risk tolerance affects how much caution is applied
+		const float AdjustedCaution = BaseCaution / WeatherRiskTolerance;
+
+		return 1.0f - FMath::Clamp(AdjustedCaution, 0.0f, 0.3f);
+	}
+};
+
+/**
  * AI speed parameters
  */
 USTRUCT(BlueprintType)
@@ -539,6 +633,10 @@ public:
 	/** Speed parameters */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Parameters")
 	FMGAISpeedParams Speed;
+
+	/** Weather sensitivity parameters */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Parameters")
+	FMGAIWeatherParams Weather;
 
 	// ==========================================
 	// PREFERENCES

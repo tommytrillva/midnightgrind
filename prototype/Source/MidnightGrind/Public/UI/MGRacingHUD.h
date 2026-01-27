@@ -73,6 +73,14 @@ struct FMGHUDConfig
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
 	bool bShowMinimap = true;
 
+	/** Show weather indicator */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	bool bShowWeatherIndicator = true;
+
+	/** Show hazard warning when conditions are dangerous */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	bool bShowHazardWarning = true;
+
 	/** Use MPH (false = KPH) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
 	bool bUseMPH = true;
@@ -236,6 +244,50 @@ public:
 	float GetDriftMultiplier() const;
 
 	// ==========================================
+	// WEATHER DATA
+	// ==========================================
+
+	/** Get weather difficulty rating (1-5) */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	int32 GetWeatherDifficulty() const;
+
+	/** Get weather difficulty as text (Easy, Moderate, Challenging, Severe, Extreme) */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	FText GetWeatherDifficultyText() const;
+
+	/** Get weather type display name */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	FText GetWeatherTypeText() const;
+
+	/** Get current grip level (0-1, for grip indicator) */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	float GetCurrentGripLevel() const;
+
+	/** Get grip level as text percentage */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	FText GetGripLevelText() const;
+
+	/** Are conditions currently hazardous? */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	bool AreConditionsHazardous() const;
+
+	/** Get hazard warning text (if conditions are hazardous) */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	FText GetHazardWarningText() const;
+
+	/** Get visibility percentage (0-1) */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	float GetVisibilityPercent() const;
+
+	/** Get weather icon name for UI (for icon selection in Blueprint) */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	FName GetWeatherIconName() const;
+
+	/** Get weather indicator color based on difficulty */
+	UFUNCTION(BlueprintPure, Category = "HUD|Weather")
+	FLinearColor GetWeatherIndicatorColor() const;
+
+	// ==========================================
 	// VISUAL HELPERS
 	// ==========================================
 
@@ -396,6 +448,18 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Colors")
 	FLinearColor NegativeColor = FLinearColor(1.0f, 0.2f, 0.2f, 1.0f); // Red
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Colors")
+	FLinearColor WeatherSafeColor = FLinearColor(0.3f, 0.8f, 0.3f, 1.0f); // Green
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Colors")
+	FLinearColor WeatherCautionColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.0f); // Yellow
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Colors")
+	FLinearColor WeatherDangerColor = FLinearColor(1.0f, 0.3f, 0.0f, 1.0f); // Orange
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Colors")
+	FLinearColor WeatherExtremeColor = FLinearColor(1.0f, 0.0f, 0.2f, 1.0f); // Red
 
 private:
 	/** Cached vehicle reference */

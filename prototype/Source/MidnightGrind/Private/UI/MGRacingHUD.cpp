@@ -2,6 +2,7 @@
 
 #include "UI/MGRacingHUD.h"
 #include "Vehicle/MGVehiclePawn.h"
+#include "Weather/MGWeatherSubsystem.h"
 #include "Kismet/KismetTextLibrary.h"
 
 UMGRacingHUD::UMGRacingHUD(const FObjectInitializer& ObjectInitializer)
@@ -370,4 +371,212 @@ void UMGRacingHUD::ShowCountdown(int32 CountdownValue)
 void UMGRacingHUD::ShowGoSignal()
 {
 	OnRaceStart();
+}
+
+// ==========================================
+// WEATHER DATA
+// ==========================================
+
+int32 UMGRacingHUD::GetWeatherDifficulty() const
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			return WeatherSubsystem->GetWeatherDifficultyRating();
+		}
+	}
+	return 1; // Default to easy if no weather system
+}
+
+FText UMGRacingHUD::GetWeatherDifficultyText() const
+{
+	const int32 Difficulty = GetWeatherDifficulty();
+
+	switch (Difficulty)
+	{
+	case 1:
+		return NSLOCTEXT("HUD", "Weather_Easy", "Clear");
+	case 2:
+		return NSLOCTEXT("HUD", "Weather_Moderate", "Moderate");
+	case 3:
+		return NSLOCTEXT("HUD", "Weather_Challenging", "Challenging");
+	case 4:
+		return NSLOCTEXT("HUD", "Weather_Severe", "Severe");
+	case 5:
+	default:
+		return NSLOCTEXT("HUD", "Weather_Extreme", "Extreme");
+	}
+}
+
+FText UMGRacingHUD::GetWeatherTypeText() const
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			return UMGWeatherSubsystem::GetWeatherDisplayName(WeatherSubsystem->GetCurrentWeatherType());
+		}
+	}
+	return NSLOCTEXT("HUD", "Weather_Unknown", "Unknown");
+}
+
+float UMGRacingHUD::GetCurrentGripLevel() const
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			// Get grip at vehicle location if available
+			FVector Location = FVector::ZeroVector;
+			float SpeedKPH = 0.0f;
+
+			if (TargetVehicle.IsValid())
+			{
+				Location = TargetVehicle->GetActorLocation();
+				// Assume cached state has speed in some form
+				SpeedKPH = GetCurrentSpeed() * (HUDConfig.bUseMPH ? 1.60934f : 1.0f);
+			}
+
+			return WeatherSubsystem->GetUnifiedGripMultiplier(Location, SpeedKPH);
+		}
+	}
+	return 1.0f;
+}
+
+FText UMGRacingHUD::GetGripLevelText() const
+{
+	const float Grip = GetCurrentGripLevel();
+	const int32 GripPercent = FMath::RoundToInt(Grip * 100.0f);
+
+	return FText::Format(
+		NSLOCTEXT("HUD", "GripFormat", "{0}%"),
+		FText::AsNumber(GripPercent)
+	);
+}
+
+bool UMGRacingHUD::AreConditionsHazardous() const
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			return WeatherSubsystem->AreConditionsHazardous();
+		}
+	}
+	return false;
+}
+
+FText UMGRacingHUD::GetHazardWarningText() const
+{
+	if (!AreConditionsHazardous())
+	{
+		return FText::GetEmpty();
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			const float Grip = GetCurrentGripLevel();
+			const float Visibility = WeatherSubsystem->GetUnifiedVisibilityDistance();
+
+			// Prioritize the most severe warning
+			if (Grip < 0.4f)
+			{
+				return NSLOCTEXT("HUD", "Hazard_LowGrip", "LOW GRIP");
+			}
+			else if (Visibility < 200.0f)
+			{
+				return NSLOCTEXT("HUD", "Hazard_LowVis", "LOW VISIBILITY");
+			}
+			else if (WeatherSubsystem->GetCurrentWeather().WindSpeed > 30.0f)
+			{
+				return NSLOCTEXT("HUD", "Hazard_StrongWind", "STRONG WIND");
+			}
+			else
+			{
+				return NSLOCTEXT("HUD", "Hazard_Caution", "CAUTION");
+			}
+		}
+	}
+
+	return NSLOCTEXT("HUD", "Hazard_Caution", "CAUTION");
+}
+
+float UMGRacingHUD::GetVisibilityPercent() const
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			// Max visibility is around 15000m (clear day)
+			const float Visibility = WeatherSubsystem->GetUnifiedVisibilityDistance();
+			return FMath::Clamp(Visibility / 10000.0f, 0.0f, 1.0f);
+		}
+	}
+	return 1.0f;
+}
+
+FName UMGRacingHUD::GetWeatherIconName() const
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			const EMGWeatherType Type = WeatherSubsystem->GetCurrentWeatherType();
+
+			switch (Type)
+			{
+			case EMGWeatherType::Clear:
+				return FName(TEXT("Weather_Clear"));
+			case EMGWeatherType::PartlyCloudy:
+				return FName(TEXT("Weather_PartlyCloudy"));
+			case EMGWeatherType::Overcast:
+				return FName(TEXT("Weather_Cloudy"));
+			case EMGWeatherType::LightRain:
+				return FName(TEXT("Weather_LightRain"));
+			case EMGWeatherType::HeavyRain:
+				return FName(TEXT("Weather_HeavyRain"));
+			case EMGWeatherType::Thunderstorm:
+				return FName(TEXT("Weather_Storm"));
+			case EMGWeatherType::Fog:
+			case EMGWeatherType::HeavyFog:
+				return FName(TEXT("Weather_Fog"));
+			case EMGWeatherType::Snow:
+				return FName(TEXT("Weather_Snow"));
+			case EMGWeatherType::Blizzard:
+				return FName(TEXT("Weather_Blizzard"));
+			case EMGWeatherType::DustStorm:
+				return FName(TEXT("Weather_Dust"));
+			case EMGWeatherType::NightClear:
+				return FName(TEXT("Weather_NightClear"));
+			case EMGWeatherType::NightRain:
+				return FName(TEXT("Weather_NightRain"));
+			default:
+				return FName(TEXT("Weather_Unknown"));
+			}
+		}
+	}
+	return FName(TEXT("Weather_Unknown"));
+}
+
+FLinearColor UMGRacingHUD::GetWeatherIndicatorColor() const
+{
+	const int32 Difficulty = GetWeatherDifficulty();
+
+	switch (Difficulty)
+	{
+	case 1:
+		return WeatherSafeColor;
+	case 2:
+		return FMath::Lerp(WeatherSafeColor, WeatherCautionColor, 0.5f);
+	case 3:
+		return WeatherCautionColor;
+	case 4:
+		return WeatherDangerColor;
+	case 5:
+	default:
+		return WeatherExtremeColor;
+	}
 }

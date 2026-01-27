@@ -1257,35 +1257,30 @@ float AMGAIRacerController::CalculateTargetSpeed()
 	// Apply grip level from track surface
 	BaseSpeed *= CurrentPoint.GripLevel;
 
-	// Apply weather conditions - AI respects weather physics like players
+	// Apply weather conditions using unified weather API
+	// This combines road grip, aquaplaning, temperature, and precipitation effects
 	if (UWorld* World = GetWorld())
 	{
 		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
 		{
-			// Get road grip multiplier based on weather (dry=1.0, wet=0.7, icy=0.4, etc.)
-			const float WeatherGrip = WeatherSubsystem->GetRoadGripMultiplier();
-			BaseSpeed *= WeatherGrip;
+			// Get unified grip multiplier (includes road condition, aquaplaning, weather intensity)
+			const FVector VehicleLocation = VehiclePawn ? VehiclePawn->GetActorLocation() : FVector::ZeroVector;
+			const float CurrentSpeedKPH = CurrentSpeed / AIConstants::MetersToUnits * 3.6f;
+			const float UnifiedGrip = WeatherSubsystem->GetUnifiedGripMultiplier(VehicleLocation, CurrentSpeedKPH);
+			BaseSpeed *= UnifiedGrip;
 
-			// Additional caution in poor visibility conditions
-			const EMGWeatherType WeatherType = WeatherSubsystem->GetCurrentWeatherType();
-			if (WeatherType == EMGWeatherType::HeavyFog ||
-				WeatherType == EMGWeatherType::Blizzard ||
-				WeatherType == EMGWeatherType::Thunderstorm)
+			// AI perception-based caution (visibility, fog, night combined)
+			// Lower perception = more caution needed
+			const float AIPerception = WeatherSubsystem->GetUnifiedAIPerceptionMultiplier();
+			if (AIPerception < 0.8f)
 			{
-				// Reduce speed further due to visibility concerns
+				// Reduce speed based on perception loss
 				// Skill level affects how much caution is taken
+				const float PerceptionLoss = 1.0f - AIPerception;
 				const float VisibilityCaution = DriverProfile ?
-					FMath::Lerp(0.15f, 0.05f, DriverProfile->Skill.SkillLevel) : 0.10f;
+					FMath::Lerp(PerceptionLoss * 0.3f, PerceptionLoss * 0.1f, DriverProfile->Skill.SkillLevel) :
+					PerceptionLoss * 0.2f;
 				BaseSpeed *= (1.0f - VisibilityCaution);
-			}
-
-			// Check hydroplaning risk for standing water
-			const float HydroplaningRisk = WeatherSubsystem->GetHydroplaningRisk();
-			if (HydroplaningRisk > 0.3f)
-			{
-				// Skilled drivers slow down appropriately for hydroplaning
-				const float HydroCaution = HydroplaningRisk * 0.2f;
-				BaseSpeed *= (1.0f - HydroCaution);
 			}
 		}
 	}
@@ -1419,31 +1414,27 @@ bool AMGAIRacerController::ShouldAttemptOvertake() const
 	}
 
 	// Weather caution - less likely to attempt risky overtakes in poor conditions
+	// Uses unified weather difficulty rating for consistent behavior
 	if (UWorld* World = GetWorld())
 	{
 		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
 		{
-			const EMGRoadCondition RoadCondition = WeatherSubsystem->GetRoadCondition();
-			if (RoadCondition == EMGRoadCondition::Wet)
+			// Use weather difficulty rating (1-5) to scale overtake willingness
+			const int32 Difficulty = WeatherSubsystem->GetWeatherDifficultyRating();
+
+			// Difficulty 1 = clear (no penalty)
+			// Difficulty 2-3 = moderate (30-50% reduction)
+			// Difficulty 4-5 = severe (60-80% reduction)
+			if (Difficulty >= 2)
 			{
-				OvertakeChance *= 0.7f; // 30% less likely to overtake in wet
-			}
-			else if (RoadCondition == EMGRoadCondition::StandingWater)
-			{
-				OvertakeChance *= 0.5f; // 50% less likely in standing water
-			}
-			else if (RoadCondition == EMGRoadCondition::Icy || RoadCondition == EMGRoadCondition::Snowy)
-			{
-				OvertakeChance *= 0.3f; // 70% less likely on ice/snow
+				const float DifficultyPenalty = FMath::Lerp(0.7f, 0.2f, (Difficulty - 2) / 3.0f);
+				OvertakeChance *= DifficultyPenalty;
 			}
 
-			// Poor visibility also reduces overtaking attempts
-			const EMGWeatherType WeatherType = WeatherSubsystem->GetCurrentWeatherType();
-			if (WeatherType == EMGWeatherType::HeavyFog ||
-				WeatherType == EMGWeatherType::Thunderstorm ||
-				WeatherType == EMGWeatherType::Blizzard)
+			// Additional penalty for hazardous conditions (aquaplaning, severe weather)
+			if (WeatherSubsystem->AreConditionsHazardous())
 			{
-				OvertakeChance *= 0.6f; // 40% less likely in poor visibility
+				OvertakeChance *= 0.5f; // 50% additional reduction in hazardous conditions
 			}
 		}
 	}
@@ -1913,28 +1904,28 @@ float AMGAIRacerController::CalculateBrakingDistance(float CurrentSpeed, float T
 		Deceleration *= (0.8f + 0.4f * DriverProfile->Skill.BrakingAccuracy * EffectiveSkill);
 	}
 
-	// Apply weather conditions to braking
-	// Wet/icy conditions significantly increase braking distance
+	// Apply weather conditions to braking using unified weather API
+	// Combines road grip, aquaplaning, temperature effects
 	if (UWorld* World = GetWorld())
 	{
 		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
 		{
+			// Get unified grip multiplier (includes all weather effects)
+			const FVector VehicleLocation = VehiclePawn ? VehiclePawn->GetActorLocation() : FVector::ZeroVector;
+			const float CurrentSpeedKPH = CurrentSpeed / AIConstants::MetersToUnits * 3.6f;
+			const float UnifiedGrip = WeatherSubsystem->GetUnifiedGripMultiplier(VehicleLocation, CurrentSpeedKPH);
+
 			// Grip affects braking effectiveness
-			// Dry = 1.0x, Wet = 0.7x grip means 1/0.7 = 1.43x braking distance
-			const float GripMultiplier = WeatherSubsystem->GetRoadGripMultiplier();
-			if (GripMultiplier > 0.01f)
+			// Lower grip = reduced deceleration capability
+			if (UnifiedGrip > 0.01f)
 			{
-				Deceleration *= GripMultiplier;
+				Deceleration *= UnifiedGrip;
 			}
 
-			// Skilled drivers start braking earlier in bad conditions
-			const EMGRoadCondition RoadCondition = WeatherSubsystem->GetRoadCondition();
-			if (RoadCondition == EMGRoadCondition::Wet ||
-				RoadCondition == EMGRoadCondition::StandingWater ||
-				RoadCondition == EMGRoadCondition::Icy)
+			// Add safety margin in hazardous conditions
+			// Skilled drivers need smaller margins due to better vehicle control
+			if (WeatherSubsystem->AreConditionsHazardous())
 			{
-				// Add safety margin for reduced grip - more skilled = smaller margin needed
-				// Effective skill factors in mood: confident AI uses smaller margins
 				const float SafetyMargin = DriverProfile ?
 					FMath::Lerp(1.3f, 1.1f, DriverProfile->GetEffectiveSkill()) : 1.2f;
 				Deceleration /= SafetyMargin;
