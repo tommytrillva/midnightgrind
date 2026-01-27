@@ -304,8 +304,13 @@ float UMGVehicleMovementComponent::GetSpeedMPH() const
 {
 	// Get forward velocity in cm/s, convert to MPH
 	// 1 mph = 44.704 cm/s
-	const FVector Velocity = GetOwner()->GetVelocity();
-	const float ForwardSpeed = FVector::DotProduct(Velocity, GetOwner()->GetActorForwardVector());
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return 0.0f;
+	}
+	const FVector Velocity = Owner->GetVelocity();
+	const float ForwardSpeed = FVector::DotProduct(Velocity, Owner->GetActorForwardVector());
 	return FMath::Abs(ForwardSpeed) / 44.704f;
 }
 
@@ -702,9 +707,14 @@ void UMGVehicleMovementComponent::UpdateBoostSimulation(float DeltaTime)
 
 void UMGVehicleMovementComponent::UpdateDriftPhysics(float DeltaTime)
 {
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return;
+	}
 	// Calculate vehicle slip angle
-	const FVector Velocity = GetOwner()->GetVelocity();
-	const FVector Forward = GetOwner()->GetActorForwardVector();
+	const FVector Velocity = Owner->GetVelocity();
+	const FVector Forward = Owner->GetActorForwardVector();
 
 	if (Velocity.SizeSquared() > 100.0f) // Minimum speed
 	{
@@ -804,8 +814,14 @@ void UMGVehicleMovementComponent::ApplyAntiFlipForce(float DeltaTime)
 		return;
 	}
 
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return;
+	}
+
 	// Check roll angle
-	const FRotator Rotation = GetOwner()->GetActorRotation();
+	const FRotator Rotation = Owner->GetActorRotation();
 	const float RollAngle = FMath::Abs(Rotation.Roll);
 
 	if (RollAngle > 45.0f && RollAngle < 135.0f)
@@ -817,7 +833,7 @@ void UMGVehicleMovementComponent::ApplyAntiFlipForce(float DeltaTime)
 
 			// Apply roll correction torque in local space
 			const FVector LocalTorque = FVector(AntiFlipTorque * FlipDir * DeltaTime, 0.0f, 0.0f);
-			const FVector WorldTorque = GetOwner()->GetActorRotation().RotateVector(LocalTorque);
+			const FVector WorldTorque = Rotation.RotateVector(LocalTorque);
 			MeshPrimitive->AddTorqueInRadians(WorldTorque, NAME_None, true);
 		}
 	}
