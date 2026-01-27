@@ -1068,13 +1068,14 @@ void UMGVehicleMovementComponent::UpdateWeightTransfer(float DeltaTime)
 
 	const FVector LocalAccel = GetOwner()->GetActorTransform().InverseTransformVector(Acceleration);
 
-	// Calculate target weight transfer
+	// Calculate target weight transfer using documented physics constants
+	// See MGPhysicsConstants.h for detailed explanation of these values
 	// Positive X = accelerating forward = weight shifts rear
 	// Positive Y = accelerating right = weight shifts left
-	const float TargetLongitudinal = -LocalAccel.X * LongitudinalTransferFactor * 0.0001f;
-	const float TargetLateral = -LocalAccel.Y * LateralTransferFactor * 0.0001f;
+	const float TargetLongitudinal = -LocalAccel.X * LongitudinalTransferFactor * MGPhysicsConstants::WeightTransfer::ACCEL_TO_TRANSFER;
+	const float TargetLateral = -LocalAccel.Y * LateralTransferFactor * MGPhysicsConstants::WeightTransfer::ACCEL_TO_TRANSFER;
 
-	// Smooth interpolation
+	// Smooth interpolation using handling mode's transfer rate
 	WeightTransferState.LongitudinalTransfer = FMath::FInterpTo(
 		WeightTransferState.LongitudinalTransfer,
 		FMath::Clamp(TargetLongitudinal, -1.0f, 1.0f),
