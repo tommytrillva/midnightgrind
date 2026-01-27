@@ -1,0 +1,348 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Leaderboards and Rankings System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "RefreshRate": 60,
+    "MaxEntriesDisplayed": 100,
+    "PlayerPositionAlwaysVisible": true,
+    "AntiCheatIntegration": true
+  },
+
+  "LeaderboardTypes": {
+    "Global": {
+      "ID": "LB_GLOBAL",
+      "Name": "Global Rankings",
+      "Scope": "AllPlayers",
+      "Categories": {
+        "OverallRanking": {
+          "ID": "LB_OVERALL",
+          "Name": "Overall Rank",
+          "Metric": "CompositScore",
+          "Factors": ["Wins", "REP", "SkillRating"],
+          "UpdateFrequency": "Daily"
+        },
+        "TotalWins": {
+          "ID": "LB_WINS",
+          "Name": "Total Wins",
+          "Metric": "RaceWins",
+          "AllTime": true
+        },
+        "WinRate": {
+          "ID": "LB_WINRATE",
+          "Name": "Win Rate",
+          "Metric": "WinPercentage",
+          "MinRaces": 50
+        },
+        "TotalREP": {
+          "ID": "LB_REP",
+          "Name": "Reputation",
+          "Metric": "REPTotal"
+        },
+        "TotalEarnings": {
+          "ID": "LB_EARNINGS",
+          "Name": "Career Earnings",
+          "Metric": "CashEarned"
+        },
+        "SkillRating": {
+          "ID": "LB_SKILL",
+          "Name": "Skill Rating",
+          "Metric": "TrueSkillRating"
+        }
+      }
+    },
+    "Track": {
+      "ID": "LB_TRACK",
+      "Name": "Track Records",
+      "Scope": "PerTrack",
+      "Categories": {
+        "LapTime": {
+          "ID": "LB_LAPTIME",
+          "Name": "Fastest Lap",
+          "Metric": "BestLapTime",
+          "ShowDelta": true
+        },
+        "RaceTime": {
+          "ID": "LB_RACETIME",
+          "Name": "Best Race Time",
+          "Metric": "TotalRaceTime",
+          "ByLapCount": true
+        },
+        "DriftScore": {
+          "ID": "LB_DRIFT_TRACK",
+          "Name": "Best Drift Score",
+          "Metric": "HighestDriftScore"
+        },
+        "TopSpeed": {
+          "ID": "LB_SPEED_TRACK",
+          "Name": "Top Speed",
+          "Metric": "MaxSpeed"
+        }
+      },
+      "Filters": {
+        "VehicleClass": true,
+        "Weather": true,
+        "TimeOfDay": true,
+        "Assists": true
+      }
+    },
+    "Vehicle": {
+      "ID": "LB_VEHICLE",
+      "Name": "Vehicle Rankings",
+      "Scope": "PerVehicle",
+      "Categories": {
+        "FastestWithVehicle": {
+          "ID": "LB_VEHICLE_FAST",
+          "Name": "Fastest Times",
+          "PerTrack": true
+        },
+        "MostWins": {
+          "ID": "LB_VEHICLE_WINS",
+          "Name": "Most Wins",
+          "Metric": "WinsWithVehicle"
+        },
+        "MostUsed": {
+          "ID": "LB_VEHICLE_USED",
+          "Name": "Most Driven",
+          "Metric": "DistanceDriven"
+        }
+      }
+    },
+    "Weekly": {
+      "ID": "LB_WEEKLY",
+      "Name": "Weekly Rankings",
+      "ResetDay": "Monday",
+      "Categories": {
+        "WeeklyWins": {
+          "ID": "LB_WEEKLY_WINS",
+          "Name": "Wins This Week"
+        },
+        "WeeklyREP": {
+          "ID": "LB_WEEKLY_REP",
+          "Name": "REP Earned This Week"
+        },
+        "WeeklyDrift": {
+          "ID": "LB_WEEKLY_DRIFT",
+          "Name": "Drift Score This Week"
+        }
+      },
+      "Rewards": {
+        "Top10": { "REP": 10000, "Cash": 100000 },
+        "Top100": { "REP": 5000, "Cash": 50000 },
+        "Top1000": { "REP": 1000, "Cash": 10000 }
+      }
+    },
+    "Seasonal": {
+      "ID": "LB_SEASONAL",
+      "Name": "Season Rankings",
+      "Duration": "Season",
+      "Categories": {
+        "SeasonPoints": {
+          "ID": "LB_SEASON_POINTS",
+          "Name": "Season Points"
+        },
+        "ChampionshipStanding": {
+          "ID": "LB_CHAMPIONSHIP",
+          "Name": "Championship"
+        }
+      },
+      "Rewards": {
+        "Champion": { "Title": "Season Champion", "ExclusiveVehicle": true },
+        "Top10": { "Title": "Elite Racer", "Badge": true },
+        "Top100": { "Title": "Top Contender", "REP": 50000 }
+      }
+    },
+    "Friends": {
+      "ID": "LB_FRIENDS",
+      "Name": "Friends Leaderboard",
+      "Scope": "FriendsOnly",
+      "Categories": ["AllGlobal", "AllTrack"],
+      "Comparison": true
+    },
+    "Crew": {
+      "ID": "LB_CREW",
+      "Name": "Crew Rankings",
+      "Scope": "Crews",
+      "Categories": {
+        "CrewRanking": {
+          "ID": "LB_CREW_RANK",
+          "Name": "Crew Ranking",
+          "Metric": "CombinedREP"
+        },
+        "CrewWins": {
+          "ID": "LB_CREW_WINS",
+          "Name": "Crew Wins"
+        }
+      }
+    }
+  },
+
+  "SpecialLeaderboards": {
+    "Drift": {
+      "SingleDrift": {
+        "ID": "LB_SINGLE_DRIFT",
+        "Name": "Single Drift Score",
+        "Metric": "HighestSingleDrift"
+      },
+      "DriftZone": {
+        "ID": "LB_DRIFT_ZONE",
+        "Name": "Drift Zone Scores",
+        "PerZone": true
+      },
+      "TandemMaster": {
+        "ID": "LB_TANDEM",
+        "Name": "Tandem Battles Won"
+      }
+    },
+    "Speed": {
+      "TopSpeedEver": {
+        "ID": "LB_TOP_SPEED",
+        "Name": "Highest Speed Recorded"
+      },
+      "SpeedTraps": {
+        "ID": "LB_SPEED_TRAPS",
+        "Name": "Speed Trap Records",
+        "PerTrap": true
+      },
+      "AverageSpeed": {
+        "ID": "LB_AVG_SPEED",
+        "Name": "Highest Average Speed"
+      }
+    },
+    "Bounty": {
+      "BountiesClaimed": {
+        "ID": "LB_BOUNTY_CLAIMED",
+        "Name": "Bounties Claimed"
+      },
+      "HighestBounty": {
+        "ID": "LB_HIGHEST_BOUNTY",
+        "Name": "Highest Bounty Claimed"
+      },
+      "BountySurvived": {
+        "ID": "LB_BOUNTY_SURVIVED",
+        "Name": "Longest Bounty Survival"
+      }
+    },
+    "Streaks": {
+      "WinStreak": {
+        "ID": "LB_WIN_STREAK",
+        "Name": "Longest Win Streak"
+      },
+      "CleanStreak": {
+        "ID": "LB_CLEAN_STREAK",
+        "Name": "Longest Clean Race Streak"
+      }
+    }
+  },
+
+  "RankingSystem": {
+    "SkillRating": {
+      "System": "TrueSkill",
+      "InitialRating": 1000,
+      "KFactor": {
+        "New": 50,
+        "Established": 32,
+        "Veteran": 16
+      },
+      "Decay": {
+        "Enabled": true,
+        "InactivityDays": 14,
+        "DecayPerDay": 5,
+        "MinimumRating": 800
+      }
+    },
+    "Divisions": {
+      "Bronze": { "Range": [0, 999], "Icon": "bronze_icon" },
+      "Silver": { "Range": [1000, 1499], "Icon": "silver_icon" },
+      "Gold": { "Range": [1500, 1999], "Icon": "gold_icon" },
+      "Platinum": { "Range": [2000, 2499], "Icon": "platinum_icon" },
+      "Diamond": { "Range": [2500, 2999], "Icon": "diamond_icon" },
+      "Champion": { "Range": [3000, 3499], "Icon": "champion_icon" },
+      "Legend": { "Range": [3500, 9999], "Icon": "legend_icon" }
+    },
+    "Placement": {
+      "MatchesRequired": 10,
+      "ProvisionalVariance": "High"
+    }
+  },
+
+  "GhostLeaderboards": {
+    "Enabled": true,
+    "DownloadGhosts": {
+      "Top3": true,
+      "NearPlayer": true,
+      "Friends": true
+    },
+    "ChallengeGhost": true,
+    "UploadGhost": {
+      "OnNewRecord": true,
+      "Manual": true
+    }
+  },
+
+  "Verification": {
+    "AntiCheat": {
+      "Enabled": true,
+      "PhysicsValidation": true,
+      "ReplayValidation": true
+    },
+    "SuspiciousFlags": {
+      "ImpossibleTime": true,
+      "AbnormalInputs": true,
+      "ModifiedFiles": true
+    },
+    "ManualReview": {
+      "TopRecords": true,
+      "FlaggedEntries": true
+    },
+    "Penalties": {
+      "InvalidEntry": "Removal",
+      "CheatingConfirmed": "Ban"
+    }
+  },
+
+  "Display": {
+    "PlayerCard": {
+      "ShowRank": true,
+      "ShowTime": true,
+      "ShowVehicle": true,
+      "ShowDelta": true,
+      "ShowCountry": true
+    },
+    "Animations": {
+      "RankChange": true,
+      "NewRecord": true,
+      "TopTen": true
+    },
+    "Filters": {
+      "Platform": true,
+      "Region": true,
+      "VehicleClass": true,
+      "TimeFrame": ["AllTime", "Month", "Week", "Day"]
+    }
+  },
+
+  "Notifications": {
+    "NewPersonalBest": true,
+    "RankChanged": true,
+    "FriendBeatYou": true,
+    "TopTenAchieved": true,
+    "RecordBroken": true
+  },
+
+  "Rewards": {
+    "FirstTopTen": {
+      "REP": 5000,
+      "Achievement": "Breaking Into Top 10"
+    },
+    "FirstWorldRecord": {
+      "REP": 25000,
+      "Title": "World Record Holder",
+      "Badge": "WR_Badge"
+    },
+    "MaintainTopTen": {
+      "PerWeek": { "REP": 1000 }
+    }
+  }
+}

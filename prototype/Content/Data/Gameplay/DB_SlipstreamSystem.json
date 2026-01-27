@@ -1,0 +1,263 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Slipstream and Drafting System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "VisualizationEnabled": true,
+    "PhysicsAccurate": true,
+    "AffectedByWeather": true
+  },
+
+  "SlipstreamMechanics": {
+    "Core": {
+      "TriggerDistance": 50,
+      "OptimalDistance": { "Min": 5, "Max": 25 },
+      "MaxEffectDistance": 50,
+      "ConeAngle": 15,
+      "BuildUpTime": 1.5,
+      "DecayTime": 0.5
+    },
+    "SpeedBonus": {
+      "MinBonus": 0.02,
+      "MaxBonus": 0.08,
+      "DistanceCurve": "Exponential",
+      "DurationMultiplier": true
+    },
+    "BreakConditions": {
+      "LateralOffset": 3,
+      "AngleDeviation": 20,
+      "SpeedDifferential": 30,
+      "Braking": true
+    }
+  },
+
+  "SlipstreamTiers": {
+    "Light": {
+      "ID": "SLIP_LIGHT",
+      "Distance": { "Min": 35, "Max": 50 },
+      "SpeedBonus": 0.02,
+      "DragReduction": 0.15,
+      "Indicator": "Faint"
+    },
+    "Moderate": {
+      "ID": "SLIP_MODERATE",
+      "Distance": { "Min": 20, "Max": 35 },
+      "SpeedBonus": 0.04,
+      "DragReduction": 0.30,
+      "Indicator": "Visible"
+    },
+    "Strong": {
+      "ID": "SLIP_STRONG",
+      "Distance": { "Min": 10, "Max": 20 },
+      "SpeedBonus": 0.06,
+      "DragReduction": 0.50,
+      "Indicator": "Clear"
+    },
+    "Maximum": {
+      "ID": "SLIP_MAX",
+      "Distance": { "Min": 3, "Max": 10 },
+      "SpeedBonus": 0.08,
+      "DragReduction": 0.70,
+      "Indicator": "Intense"
+    }
+  },
+
+  "VehicleFactors": {
+    "AerodynamicProfile": {
+      "LowDrag": {
+        "SlipstreamProvided": 1.2,
+        "SlipstreamReceived": 0.9,
+        "Examples": ["Hypercars", "Streamlined Sports"]
+      },
+      "StandardDrag": {
+        "SlipstreamProvided": 1.0,
+        "SlipstreamReceived": 1.0,
+        "Examples": ["Sports Cars", "Coupes"]
+      },
+      "HighDrag": {
+        "SlipstreamProvided": 0.8,
+        "SlipstreamReceived": 1.1,
+        "Examples": ["Muscle Cars", "Trucks"]
+      }
+    },
+    "DownforceEffect": {
+      "HighDownforce": {
+        "SlipstreamBonus": 0.9,
+        "CorneringInSlipstream": "Reduced"
+      },
+      "LowDownforce": {
+        "SlipstreamBonus": 1.1,
+        "CorneringInSlipstream": "Normal"
+      }
+    },
+    "SizeClass": {
+      "Compact": { "WakeWidth": 2.5, "WakeLength": 40 },
+      "Standard": { "WakeWidth": 3.0, "WakeLength": 45 },
+      "Large": { "WakeWidth": 3.5, "WakeLength": 50 },
+      "Supercar": { "WakeWidth": 3.0, "WakeLength": 55 }
+    }
+  },
+
+  "EnvironmentalEffects": {
+    "Weather": {
+      "Clear": { "Effectiveness": 1.0 },
+      "LightRain": { "Effectiveness": 0.9, "SprayEffect": true },
+      "HeavyRain": { "Effectiveness": 0.75, "SprayEffect": true, "VisibilityReduced": true },
+      "Fog": { "Effectiveness": 0.95, "VisualIndicatorReduced": true },
+      "Wind": {
+        "Headwind": { "Effectiveness": 1.2, "BonusIncreased": true },
+        "Tailwind": { "Effectiveness": 0.8 },
+        "Crosswind": { "ConeAngleReduced": true, "Effectiveness": 0.85 }
+      }
+    },
+    "TrackType": {
+      "Straight": { "FullEffect": true },
+      "Corner": { "ReducedEffect": 0.5 },
+      "Tunnel": { "IncreasedEffect": 1.15 },
+      "OpenAir": { "StandardEffect": true }
+    }
+  },
+
+  "SlingshotManeuver": {
+    "Enabled": true,
+    "Mechanics": {
+      "ChargeTime": 2.0,
+      "MaxCharge": 3.0,
+      "BoostOnExit": {
+        "MinCharge": { "SpeedBoost": 0.05, "Duration": 1.5 },
+        "MaxCharge": { "SpeedBoost": 0.12, "Duration": 2.5 }
+      },
+      "Cooldown": 5.0
+    },
+    "Execution": {
+      "OptimalTiming": "PullOutAtPeak",
+      "AngleBonua": { "Enabled": true, "MaxAngle": 30 }
+    },
+    "Indicators": {
+      "ChargeBar": true,
+      "OptimalZone": true,
+      "SoundCue": true
+    }
+  },
+
+  "VisualEffects": {
+    "AirDistortion": {
+      "Enabled": true,
+      "Quality": ["Off", "Low", "Medium", "High"],
+      "IntensityByTier": true
+    },
+    "SpeedLines": {
+      "Enabled": true,
+      "InSlipstream": true,
+      "ColorByIntensity": true
+    },
+    "WindParticles": {
+      "Enabled": true,
+      "DensityBySpeed": true,
+      "DirectionalFlow": true
+    },
+    "CameraEffects": {
+      "FOVIncrease": { "InSlipstream": 2, "OnSlingshot": 5 },
+      "Shake": { "Enabled": false, "Optional": true }
+    },
+    "VehicleEffects": {
+      "SuspensionCompression": true,
+      "BodyMovement": true
+    }
+  },
+
+  "AudioEffects": {
+    "WindNoise": {
+      "Enabled": true,
+      "VolumeByTier": true,
+      "PitchBySpeed": true
+    },
+    "AerodynamicWhine": {
+      "Enabled": true,
+      "FrequencyByDistance": true
+    },
+    "SlingshotWhoosh": {
+      "Enabled": true,
+      "OnExitSlipstream": true
+    },
+    "EngineBoost": {
+      "PitchIncrease": true,
+      "VolumeBoost": true
+    }
+  },
+
+  "HUDIndicators": {
+    "SlipstreamMeter": {
+      "Enabled": true,
+      "Position": "Center",
+      "ShowDistance": true,
+      "ShowBonus": true,
+      "ShowChargeLevel": true
+    },
+    "DirectionalIndicator": {
+      "ShowSlipstreamAhead": true,
+      "Range": 100
+    },
+    "SlinghotIndicator": {
+      "ChargeBar": true,
+      "OptimalZone": { "Color": "Green" },
+      "MaxCharge": { "Color": "Gold", "Flash": true }
+    }
+  },
+
+  "GameModeVariants": {
+    "Standard": {
+      "Description": "Normal slipstream rules",
+      "AllMechanics": true
+    },
+    "Enhanced": {
+      "Description": "Stronger slipstream effects",
+      "SpeedBonusMultiplier": 1.5,
+      "SlingshotMultiplier": 1.5
+    },
+    "Minimal": {
+      "Description": "Reduced slipstream effects",
+      "SpeedBonusMultiplier": 0.5,
+      "SlingshotDisabled": true
+    },
+    "Disabled": {
+      "Description": "No slipstream effects",
+      "AllMechanics": false
+    }
+  },
+
+  "Scoring": {
+    "DraftPoints": {
+      "Enabled": true,
+      "PerSecondInDraft": 10,
+      "TierMultiplier": {
+        "Light": 1.0,
+        "Moderate": 1.5,
+        "Strong": 2.0,
+        "Maximum": 3.0
+      }
+    },
+    "SlingshotBonus": {
+      "Enabled": true,
+      "OnSuccessfulSlingshot": 100,
+      "OnOvertake": 250
+    },
+    "DraftMasterBonus": {
+      "TotalDraftTime": { "Per30Seconds": 500 }
+    }
+  },
+
+  "Tuning": {
+    "PlayerAdjustable": {
+      "Sensitivity": { "Min": 0.5, "Max": 1.5, "Default": 1.0 },
+      "VisualIntensity": { "Min": 0, "Max": 1, "Default": 0.8 }
+    },
+    "VehicleParts": {
+      "AeroParts": {
+        "SplitterEffect": { "SlipstreamProvided": 0.95 },
+        "WingEffect": { "SlipstreamReceived": 1.05 }
+      }
+    }
+  }
+}

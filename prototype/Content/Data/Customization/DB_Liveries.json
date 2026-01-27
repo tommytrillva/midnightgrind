@@ -1,0 +1,371 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Livery and Wrap Customization System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxLayers": 1000,
+    "MaxDecals": 500,
+    "UndoHistory": 50,
+    "AutoSave": true,
+    "CloudSync": true
+  },
+
+  "EditorModes": {
+    "Simple": {
+      "ID": "EDITOR_SIMPLE",
+      "Name": "Simple Editor",
+      "Description": "Quick preset-based customization",
+      "Features": {
+        "PresetWraps": true,
+        "ColorChange": true,
+        "DecalPlacement": true,
+        "TextAdding": false,
+        "LayerControl": false
+      },
+      "UnlockMethod": "Default"
+    },
+    "Advanced": {
+      "ID": "EDITOR_ADVANCED",
+      "Name": "Advanced Editor",
+      "Description": "Full livery creation tools",
+      "Features": {
+        "AllSimpleFeatures": true,
+        "LayerControl": true,
+        "TextAdding": true,
+        "VectorShapes": true,
+        "Masking": true,
+        "Gradients": true
+      },
+      "UnlockLevel": 10
+    },
+    "Pro": {
+      "ID": "EDITOR_PRO",
+      "Name": "Pro Editor",
+      "Description": "Professional livery design",
+      "Features": {
+        "AllAdvancedFeatures": true,
+        "NodeEditing": true,
+        "CustomBrushes": true,
+        "AdvancedBlending": true,
+        "ProProjection": true
+      },
+      "UnlockLevel": 25
+    }
+  },
+
+  "PaintTypes": {
+    "Solid": {
+      "ID": "PAINT_SOLID",
+      "Name": "Solid",
+      "Description": "Standard solid color",
+      "Finish": ["Gloss", "Matte", "Satin"],
+      "UnlockMethod": "Default"
+    },
+    "Metallic": {
+      "ID": "PAINT_METALLIC",
+      "Name": "Metallic",
+      "Description": "Metal flake paint",
+      "FlakeSize": ["Fine", "Medium", "Coarse"],
+      "FlakeDensity": { "Min": 0.1, "Max": 1.0 },
+      "UnlockLevel": 5
+    },
+    "Pearlescent": {
+      "ID": "PAINT_PEARL",
+      "Name": "Pearlescent",
+      "Description": "Color-shifting pearl effect",
+      "BaseColor": true,
+      "PearlColor": true,
+      "Intensity": { "Min": 0.1, "Max": 1.0 },
+      "UnlockLevel": 15
+    },
+    "Chameleon": {
+      "ID": "PAINT_CHAMELEON",
+      "Name": "Chameleon",
+      "Description": "Multi-angle color shift",
+      "ColorCount": 3,
+      "ShiftAngle": "Variable",
+      "UnlockLevel": 30
+    },
+    "Chrome": {
+      "ID": "PAINT_CHROME",
+      "Name": "Chrome",
+      "Description": "Mirror chrome finish",
+      "Variants": ["Silver", "Gold", "Black", "Colored"],
+      "UnlockLevel": 35
+    },
+    "Matte": {
+      "ID": "PAINT_MATTE",
+      "Name": "Matte",
+      "Description": "Non-reflective finish",
+      "Variants": ["Standard", "Satin", "Frozen"],
+      "UnlockLevel": 10
+    },
+    "Candy": {
+      "ID": "PAINT_CANDY",
+      "Name": "Candy",
+      "Description": "Deep translucent color over metallic base",
+      "BaseRequired": "Metallic",
+      "Depth": { "Min": 0.1, "Max": 1.0 },
+      "UnlockLevel": 25
+    },
+    "Carbon": {
+      "ID": "PAINT_CARBON",
+      "Name": "Carbon Fiber",
+      "Description": "Carbon fiber weave pattern",
+      "Weaves": ["Standard", "Forged", "Honeycomb"],
+      "Tint": true,
+      "UnlockLevel": 20
+    }
+  },
+
+  "Vinyls": {
+    "Categories": {
+      "Geometric": {
+        "ID": "VINYL_GEO",
+        "Count": 100,
+        "Shapes": ["Lines", "Triangles", "Circles", "Polygons"]
+      },
+      "Racing": {
+        "ID": "VINYL_RACING",
+        "Count": 75,
+        "Styles": ["Stripes", "Numbers", "Logos", "Flames"]
+      },
+      "JDM": {
+        "ID": "VINYL_JDM",
+        "Count": 50,
+        "Styles": ["Kanji", "Anime", "Traditional"]
+      },
+      "Tribal": {
+        "ID": "VINYL_TRIBAL",
+        "Count": 40,
+        "Styles": ["Classic", "Modern", "Fusion"]
+      },
+      "Nature": {
+        "ID": "VINYL_NATURE",
+        "Count": 35,
+        "Styles": ["Animals", "Flames", "Water", "Lightning"]
+      },
+      "Abstract": {
+        "ID": "VINYL_ABSTRACT",
+        "Count": 60,
+        "Styles": ["Splatter", "Grunge", "Digital", "Organic"]
+      },
+      "Text": {
+        "ID": "VINYL_TEXT",
+        "Count": 30,
+        "Styles": ["Block", "Script", "Graffiti", "Stencil"]
+      },
+      "Seasonal": {
+        "ID": "VINYL_SEASONAL",
+        "Count": 25,
+        "RotatingContent": true
+      },
+      "Premium": {
+        "ID": "VINYL_PREMIUM",
+        "Count": 50,
+        "UnlockMethod": "Purchase",
+        "Exclusive": true
+      }
+    },
+    "Properties": {
+      "Color": true,
+      "Opacity": { "Min": 0, "Max": 1 },
+      "Size": { "Min": 0.01, "Max": 10 },
+      "Rotation": { "Min": 0, "Max": 360 },
+      "Skew": { "X": true, "Y": true },
+      "Flip": { "Horizontal": true, "Vertical": true },
+      "Mirror": true
+    }
+  },
+
+  "Decals": {
+    "SponsorLogos": {
+      "Count": 100,
+      "Categories": ["Racing", "Automotive", "Lifestyle", "Fictional"],
+      "Placement": "Authentic"
+    },
+    "Numbers": {
+      "Fonts": 20,
+      "Styles": ["Plain", "Outlined", "3D", "Distressed"],
+      "Customizable": true
+    },
+    "Flags": {
+      "Countries": "All",
+      "Racing": ["Checkered", "Waved", "Vintage"]
+    },
+    "Symbols": {
+      "Count": 150,
+      "Categories": ["Warning", "Status", "Decorative"]
+    }
+  },
+
+  "TextTool": {
+    "Enabled": true,
+    "Fonts": {
+      "Racing": 15,
+      "Graffiti": 10,
+      "Japanese": 8,
+      "Classic": 12,
+      "Modern": 10
+    },
+    "Properties": {
+      "Color": true,
+      "Outline": { "Color": true, "Width": { "Min": 0, "Max": 10 } },
+      "Shadow": { "Color": true, "Offset": true, "Blur": true },
+      "Kerning": true,
+      "Curve": true,
+      "3DEffect": true
+    },
+    "MaxCharacters": 50
+  },
+
+  "PresetWraps": {
+    "Factory": {
+      "Count": 30,
+      "PerVehicle": true,
+      "Authentic": true
+    },
+    "Racing": {
+      "Count": 50,
+      "Styles": ["GT", "Touring", "Rally", "Drift"]
+    },
+    "Street": {
+      "Count": 40,
+      "Styles": ["Urban", "Show", "Sleeper"]
+    },
+    "Themed": {
+      "Count": 25,
+      "Styles": ["Anime", "Games", "Movies"]
+    },
+    "Seasonal": {
+      "Rotating": true,
+      "LimitedTime": true
+    }
+  },
+
+  "SharingSystem": {
+    "Upload": {
+      "Enabled": true,
+      "MaxFileSize": "10MB",
+      "Categories": true,
+      "Tags": { "Max": 10 },
+      "Preview": true
+    },
+    "Download": {
+      "Enabled": true,
+      "Free": true,
+      "Attribution": true
+    },
+    "Marketplace": {
+      "Enabled": true,
+      "Pricing": { "Min": 0, "Max": 10000 },
+      "CreatorRevenue": 0.7,
+      "Ratings": true,
+      "Downloads": true
+    },
+    "Featured": {
+      "CuratedPicks": true,
+      "TopDownloads": true,
+      "NewArrivals": true,
+      "StaffPicks": true
+    },
+    "Search": {
+      "ByVehicle": true,
+      "ByCreator": true,
+      "ByTag": true,
+      "ByRating": true,
+      "ByDownloads": true
+    }
+  },
+
+  "ProjectionModes": {
+    "Standard": {
+      "Description": "Standard UV mapping"
+    },
+    "Panel": {
+      "Description": "Per-panel application",
+      "Panels": ["Hood", "Roof", "Doors", "Fenders", "Bumpers", "Trunk"]
+    },
+    "Wrap": {
+      "Description": "Continuous wrap around vehicle"
+    },
+    "Mask": {
+      "Description": "Apply through custom masks"
+    }
+  },
+
+  "SpecialEffects": {
+    "Weathering": {
+      "Enabled": true,
+      "Types": ["Dust", "Dirt", "Scratches", "Rust", "Faded"],
+      "Intensity": { "Min": 0, "Max": 1 },
+      "UnlockLevel": 20
+    },
+    "Patterns": {
+      "Carbon": true,
+      "Camo": { "Types": ["Military", "Urban", "Digital", "Custom"] },
+      "Stripes": { "Types": ["Pin", "Racing", "Gradient"] },
+      "Dots": { "Size": "Variable", "Density": "Variable" }
+    },
+    "SpecialFinish": {
+      "Holographic": { "UnlockLevel": 40 },
+      "Glow": { "UnlockLevel": 35, "Colors": "RGB" },
+      "Animated": { "UnlockLevel": 50, "Premium": true }
+    }
+  },
+
+  "VehicleZones": {
+    "Exterior": {
+      "Body": ["Hood", "Roof", "Doors", "Fenders", "Quarter Panels", "Trunk"],
+      "Bumpers": ["Front", "Rear"],
+      "Trim": ["Mirrors", "Handles", "Grille", "Lights"]
+    },
+    "Interior": {
+      "Dashboard": true,
+      "Seats": true,
+      "Trim": true,
+      "SteeringWheel": true
+    },
+    "Wheels": {
+      "Faces": true,
+      "Lips": true,
+      "Calipers": true
+    }
+  },
+
+  "SaveSystem": {
+    "LocalSaves": {
+      "MaxSlots": 50,
+      "AutoSave": true
+    },
+    "CloudSaves": {
+      "Enabled": true,
+      "MaxSlots": 100,
+      "Sync": "Automatic"
+    },
+    "Templates": {
+      "Save": true,
+      "Share": true,
+      "Import": true
+    }
+  },
+
+  "Unlocks": {
+    "ByLevel": {
+      "5": ["Metallic"],
+      "10": ["Matte", "AdvancedEditor"],
+      "15": ["Pearlescent"],
+      "20": ["Carbon", "Weathering"],
+      "25": ["Candy", "ProEditor"],
+      "30": ["Chameleon"],
+      "35": ["Chrome", "Glow"],
+      "40": ["Holographic"],
+      "50": ["Animated"]
+    },
+    "ByAchievement": {
+      "LiveryMaster": "ExclusiveVinyls",
+      "SharerPro": "MarketplaceAccess"
+    }
+  }
+}

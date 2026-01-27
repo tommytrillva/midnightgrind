@@ -1,0 +1,286 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Photo Mode and Virtual Photography",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "PauseGameplay": true,
+    "MaxPhotos": 1000,
+    "AutoSaveGallery": true,
+    "HighResCapture": true
+  },
+
+  "CameraControls": {
+    "Movement": {
+      "Speed": { "Min": 0.1, "Max": 10, "Default": 1.0 },
+      "Range": { "Min": 0.5, "Max": 100, "Default": 50 },
+      "Height": { "Min": -10, "Max": 30 },
+      "Smoothing": { "Enabled": true, "Amount": 0.5 }
+    },
+    "Rotation": {
+      "Pitch": { "Min": -90, "Max": 90 },
+      "Yaw": { "Min": -180, "Max": 180 },
+      "Roll": { "Min": -180, "Max": 180 },
+      "Sensitivity": { "Min": 0.1, "Max": 2.0, "Default": 1.0 }
+    },
+    "Orbit": {
+      "Enabled": true,
+      "AroundVehicle": true,
+      "AroundPoint": true,
+      "Speed": { "Min": 0.1, "Max": 5.0 }
+    },
+    "Presets": {
+      "FrontView": { "Distance": 5, "Height": 1.5, "Angle": 0 },
+      "RearView": { "Distance": 5, "Height": 1.5, "Angle": 180 },
+      "SideView": { "Distance": 5, "Height": 1.5, "Angle": 90 },
+      "TopDown": { "Distance": 15, "Height": 15, "Angle": 0 },
+      "Dramatic": { "Distance": 3, "Height": 0.5, "Angle": 45 },
+      "Rolling": { "FollowMovement": true }
+    }
+  },
+
+  "LensSettings": {
+    "FocalLength": {
+      "Min": 12,
+      "Max": 400,
+      "Default": 50,
+      "Presets": {
+        "UltraWide": 12,
+        "Wide": 24,
+        "Standard": 50,
+        "Portrait": 85,
+        "Telephoto": 200,
+        "SuperTelephoto": 400
+      }
+    },
+    "Aperture": {
+      "Min": 1.2,
+      "Max": 22,
+      "Default": 5.6,
+      "AffectsDoF": true
+    },
+    "FocusDistance": {
+      "Min": 0.5,
+      "Max": 1000,
+      "AutoFocus": true,
+      "TapToFocus": true,
+      "FocusPeaking": true
+    },
+    "DepthOfField": {
+      "Enabled": true,
+      "Shape": ["Circle", "Hexagon", "Octagon"],
+      "Intensity": { "Min": 0, "Max": 1 },
+      "BokehQuality": ["Low", "Medium", "High", "Cinematic"]
+    }
+  },
+
+  "Exposure": {
+    "Mode": {
+      "Auto": { "Enabled": true, "Default": true },
+      "Manual": { "Enabled": true }
+    },
+    "Settings": {
+      "Brightness": { "Min": -3, "Max": 3, "Default": 0 },
+      "Contrast": { "Min": -100, "Max": 100, "Default": 0 },
+      "Highlights": { "Min": -100, "Max": 100, "Default": 0 },
+      "Shadows": { "Min": -100, "Max": 100, "Default": 0 },
+      "Whites": { "Min": -100, "Max": 100, "Default": 0 },
+      "Blacks": { "Min": -100, "Max": 100, "Default": 0 }
+    }
+  },
+
+  "ColorGrading": {
+    "WhiteBalance": {
+      "Temperature": { "Min": 2000, "Max": 12000, "Default": 5500 },
+      "Tint": { "Min": -100, "Max": 100, "Default": 0 }
+    },
+    "Saturation": { "Min": -100, "Max": 100, "Default": 0 },
+    "Vibrance": { "Min": -100, "Max": 100, "Default": 0 },
+    "Hue": { "Min": -180, "Max": 180, "Default": 0 },
+    "SplitToning": {
+      "Enabled": true,
+      "Highlights": { "Hue": true, "Saturation": true },
+      "Shadows": { "Hue": true, "Saturation": true },
+      "Balance": { "Min": -100, "Max": 100 }
+    },
+    "ColorChannels": {
+      "Red": { "Hue": true, "Saturation": true, "Luminance": true },
+      "Orange": { "Hue": true, "Saturation": true, "Luminance": true },
+      "Yellow": { "Hue": true, "Saturation": true, "Luminance": true },
+      "Green": { "Hue": true, "Saturation": true, "Luminance": true },
+      "Cyan": { "Hue": true, "Saturation": true, "Luminance": true },
+      "Blue": { "Hue": true, "Saturation": true, "Luminance": true },
+      "Purple": { "Hue": true, "Saturation": true, "Luminance": true },
+      "Magenta": { "Hue": true, "Saturation": true, "Luminance": true }
+    }
+  },
+
+  "Filters": {
+    "Presets": {
+      "None": { "ID": "FILTER_NONE" },
+      "Vintage": { "ID": "FILTER_VINTAGE", "Style": "Retro film look" },
+      "CinematicWarm": { "ID": "FILTER_CINE_WARM", "Style": "Orange and teal" },
+      "CinematicCool": { "ID": "FILTER_CINE_COOL", "Style": "Blue tones" },
+      "Noir": { "ID": "FILTER_NOIR", "Style": "Black and white contrast" },
+      "Neon": { "ID": "FILTER_NEON", "Style": "Cyberpunk colors" },
+      "Sunset": { "ID": "FILTER_SUNSET", "Style": "Golden hour warmth" },
+      "Night": { "ID": "FILTER_NIGHT", "Style": "Dark moody tones" },
+      "Racing": { "ID": "FILTER_RACING", "Style": "High contrast action" },
+      "JDM": { "ID": "FILTER_JDM", "Style": "Japanese street style" },
+      "Magazine": { "ID": "FILTER_MAGAZINE", "Style": "Editorial look" },
+      "Drift": { "ID": "FILTER_DRIFT", "Style": "Dynamic action feel" }
+    },
+    "Intensity": { "Min": 0, "Max": 100, "Default": 100 },
+    "CustomFilters": { "Save": true, "Share": true, "Max": 20 }
+  },
+
+  "Effects": {
+    "Vignette": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "Size": { "Min": 0, "Max": 100 },
+      "Roundness": { "Min": 0, "Max": 100 }
+    },
+    "FilmGrain": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "Size": { "Min": 0.5, "Max": 3.0 }
+    },
+    "ChromaticAberration": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 }
+    },
+    "LensFlare": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "AutoFromLights": true
+    },
+    "LensDirt": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "Pattern": ["Subtle", "Moderate", "Heavy"]
+    },
+    "MotionBlur": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "Quality": ["Low", "Medium", "High"]
+    },
+    "RadialBlur": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "Center": { "X": 0.5, "Y": 0.5 }
+    },
+    "Sharpening": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 }
+    }
+  },
+
+  "EnvironmentControl": {
+    "TimeOfDay": {
+      "Adjustable": true,
+      "Range": { "Min": 0, "Max": 24 },
+      "Increment": 0.25
+    },
+    "Weather": {
+      "Adjustable": true,
+      "Options": ["Clear", "Cloudy", "Overcast", "Rain", "Storm", "Fog", "Snow"]
+    },
+    "Lighting": {
+      "SunPosition": { "Adjustable": true },
+      "SunIntensity": { "Min": 0, "Max": 200 },
+      "AmbientLight": { "Min": 0, "Max": 200 }
+    },
+    "Traffic": {
+      "Toggle": true,
+      "Freeze": true
+    },
+    "HideElements": {
+      "UI": true,
+      "OtherVehicles": true,
+      "Pedestrians": true,
+      "Props": false
+    }
+  },
+
+  "VehicleShowcase": {
+    "Position": {
+      "Freeze": true,
+      "Rotate": true,
+      "RotationSpeed": { "Min": 0, "Max": 10 }
+    },
+    "Components": {
+      "Doors": { "Open": true, "Angle": { "Min": 0, "Max": 90 } },
+      "Hood": { "Open": true },
+      "Trunk": { "Open": true },
+      "Windows": { "Down": true },
+      "PopupLights": { "Toggle": true }
+    },
+    "Lights": {
+      "Headlights": { "Toggle": true },
+      "TailLights": { "Toggle": true },
+      "InteriorLights": { "Toggle": true },
+      "Underglow": { "Toggle": true }
+    },
+    "Driver": {
+      "Visible": true,
+      "Pose": ["Driving", "Leaning", "Standing", "Custom"]
+    }
+  },
+
+  "OutputSettings": {
+    "Resolution": {
+      "Options": ["Native", "2x", "4x", "8K"],
+      "Custom": true,
+      "MaxWidth": 7680,
+      "MaxHeight": 4320
+    },
+    "Format": {
+      "Options": ["JPEG", "PNG", "TIFF"],
+      "Default": "PNG",
+      "Quality": { "JPEG": { "Min": 70, "Max": 100, "Default": 95 } }
+    },
+    "Metadata": {
+      "IncludeSettings": true,
+      "IncludeVehicleInfo": true,
+      "IncludeLocation": true
+    },
+    "Watermark": {
+      "Enabled": false,
+      "Position": ["BottomLeft", "BottomRight", "Custom"],
+      "Custom": true
+    }
+  },
+
+  "Gallery": {
+    "Organization": {
+      "Folders": true,
+      "Tags": true,
+      "Favorites": true,
+      "SortBy": ["Date", "Vehicle", "Location", "Rating"]
+    },
+    "Editing": {
+      "ReEditSettings": true,
+      "Delete": true,
+      "Rename": true
+    },
+    "Sharing": {
+      "InGame": true,
+      "Export": true,
+      "SocialMedia": ["Twitter", "Instagram", "Discord"],
+      "Community": true
+    },
+    "Slideshow": {
+      "Enabled": true,
+      "Interval": { "Min": 2, "Max": 30, "Default": 5 },
+      "Transitions": ["Fade", "Slide", "Zoom"]
+    }
+  },
+
+  "Tutorials": {
+    "BasicControls": true,
+    "CompositionTips": true,
+    "LightingGuide": true,
+    "AdvancedTechniques": true
+  }
+}
