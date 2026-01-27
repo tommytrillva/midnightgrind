@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "HAL/PlatformMemory.h"
 
 void UMGDevCommands::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -613,6 +614,111 @@ void UMGDevCommands::PrintTransactions(int32 Count)
 
 	// Would iterate transaction history from economy subsystem
 	UE_LOG(LogTemp, Log, TEXT("(Transaction history requires EconomySubsystem integration)"));
+}
+
+// ==========================================
+// WEATHER DEBUG COMMANDS
+// ==========================================
+
+void UMGDevCommands::SetWeather(int32 WeatherType)
+{
+	LogCommand(FString::Printf(TEXT("SetWeather(%d)"), WeatherType));
+
+	static const TCHAR* WeatherNames[] = {
+		TEXT("Clear"),
+		TEXT("Cloudy"),
+		TEXT("Rain"),
+		TEXT("Storm"),
+		TEXT("Fog"),
+		TEXT("Snow")
+	};
+
+	int32 ClampedType = FMath::Clamp(WeatherType, 0, 5);
+	UE_LOG(LogTemp, Log, TEXT("Weather set to: %s"), WeatherNames[ClampedType]);
+
+	// Would call weather subsystem to change weather
+	// UMGWeatherSubsystem::SetWeatherType(static_cast<EMGWeatherType>(ClampedType));
+}
+
+void UMGDevCommands::SetTimeOfDay(float Hour)
+{
+	LogCommand(FString::Printf(TEXT("SetTimeOfDay(%.1f)"), Hour));
+
+	float ClampedHour = FMath::Fmod(Hour, 24.0f);
+	if (ClampedHour < 0) ClampedHour += 24.0f;
+
+	int32 DisplayHour = FMath::FloorToInt(ClampedHour);
+	int32 DisplayMinute = FMath::FloorToInt((ClampedHour - DisplayHour) * 60.0f);
+
+	UE_LOG(LogTemp, Log, TEXT("Time of day set to: %02d:%02d"), DisplayHour, DisplayMinute);
+
+	// Would call time of day subsystem
+	// UMGTimeOfDaySubsystem::SetTimeOfDay(ClampedHour);
+}
+
+void UMGDevCommands::PrintWeatherState()
+{
+	LogCommand(TEXT("PrintWeatherState"));
+
+	UE_LOG(LogTemp, Log, TEXT("=== WEATHER STATE ==="));
+	UE_LOG(LogTemp, Log, TEXT("(Weather state requires WeatherSubsystem integration)"));
+
+	// Would query weather subsystem for current state
+	// Print: Weather type, intensity, road condition, visibility, time of day
+}
+
+void UMGDevCommands::ToggleInstantWeather()
+{
+	LogCommand(TEXT("ToggleInstantWeather"));
+
+	bInstantWeather = !bInstantWeather;
+	UE_LOG(LogTemp, Log, TEXT("Instant Weather Transitions: %s"), bInstantWeather ? TEXT("ON") : TEXT("OFF"));
+}
+
+// ==========================================
+// PERFORMANCE DEBUG COMMANDS
+// ==========================================
+
+void UMGDevCommands::PrintTickTimes()
+{
+	LogCommand(TEXT("PrintTickTimes"));
+
+	UE_LOG(LogTemp, Log, TEXT("=== SUBSYSTEM TICK TIMES ==="));
+
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	// Would iterate registered subsystems and print their tick times
+	// This requires a performance tracking system to be in place
+	UE_LOG(LogTemp, Log, TEXT("(Tick time profiling requires stat instrumentation)"));
+	UE_LOG(LogTemp, Log, TEXT("Use 'stat game' or 'stat subsystem' for built-in profiling"));
+}
+
+void UMGDevCommands::PrintMemoryUsage()
+{
+	LogCommand(TEXT("PrintMemoryUsage"));
+
+	UE_LOG(LogTemp, Log, TEXT("=== MEMORY USAGE ==="));
+
+	// Print basic memory stats
+	FPlatformMemoryStats MemStats = FPlatformMemory::GetStats();
+	UE_LOG(LogTemp, Log, TEXT("Used Physical: %.2f MB"), MemStats.UsedPhysical / (1024.0f * 1024.0f));
+	UE_LOG(LogTemp, Log, TEXT("Peak Physical: %.2f MB"), MemStats.PeakUsedPhysical / (1024.0f * 1024.0f));
+	UE_LOG(LogTemp, Log, TEXT("Used Virtual: %.2f MB"), MemStats.UsedVirtual / (1024.0f * 1024.0f));
+	UE_LOG(LogTemp, Log, TEXT("Peak Virtual: %.2f MB"), MemStats.PeakUsedVirtual / (1024.0f * 1024.0f));
+
+	UE_LOG(LogTemp, Log, TEXT("Use 'memreport -full' for detailed breakdown"));
+}
+
+void UMGDevCommands::ShowPerformance()
+{
+	LogCommand(TEXT("ShowPerformance"));
+
+	bShowPerformance = !bShowPerformance;
+	UE_LOG(LogTemp, Log, TEXT("Performance Overlay: %s"), bShowPerformance ? TEXT("ON") : TEXT("OFF"));
+
+	// Would toggle performance HUD overlay
+	// Or enable stat fps, stat unit, etc.
 }
 
 // ==========================================

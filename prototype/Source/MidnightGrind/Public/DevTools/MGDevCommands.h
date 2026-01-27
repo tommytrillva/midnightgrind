@@ -211,6 +211,42 @@ public:
 	void PrintTransactions(int32 Count = 10);
 
 	// ==========================================
+	// WEATHER DEBUG COMMANDS
+	// ==========================================
+
+	/** Set weather type (0=Clear, 1=Cloudy, 2=Rain, 3=Storm, 4=Fog, 5=Snow) */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Weather")
+	void SetWeather(int32 WeatherType = 0);
+
+	/** Set time of day (0-24 hours) */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Weather")
+	void SetTimeOfDay(float Hour = 12.0f);
+
+	/** Print current weather state */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Weather")
+	void PrintWeatherState();
+
+	/** Toggle weather transitions (instant vs gradual) */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Weather")
+	void ToggleInstantWeather();
+
+	// ==========================================
+	// PERFORMANCE DEBUG COMMANDS
+	// ==========================================
+
+	/** Print subsystem tick times */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Performance")
+	void PrintTickTimes();
+
+	/** Print memory usage by category */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Performance")
+	void PrintMemoryUsage();
+
+	/** Toggle performance overlay */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Performance")
+	void ShowPerformance();
+
+	// ==========================================
 	// QUICK TEST
 	// ==========================================
 
@@ -236,6 +272,8 @@ protected:
 	bool bShowRacingLine = false;
 	bool bShowAIDebug = false;
 	bool bShowTireDebug = false;
+	bool bInstantWeather = false;
+	bool bShowPerformance = false;
 
 	// ==========================================
 	// HELPERS
