@@ -2,7 +2,9 @@
 
 #include "Progression/MGRaceRewardsProcessor.h"
 #include "Progression/MGPlayerProgression.h"
-#include "Core/MGRaceGameMode.h"
+#include "GameModes/MGRaceGameMode.h"
+#include "Race/MGRaceHistorySubsystem.h"
+#include "Career/MGCareerSubsystem.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -11,9 +13,12 @@ void UMGRaceRewardsProcessor::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 
 	// Get player progression
-	if (UGameInstance* GI = GetWorld()->GetGameInstance())
+	if (UWorld* World = GetWorld())
 	{
-		PlayerProgression = GI->GetSubsystem<UMGPlayerProgression>();
+		if (UGameInstance* GI = World->GetGameInstance())
+		{
+			PlayerProgression = GI->GetSubsystem<UMGPlayerProgression>();
+		}
 	}
 
 	// Try to bind to race game mode
@@ -219,6 +224,53 @@ void UMGRaceRewardsProcessor::GrantRewards(const FMGRaceRewards& Rewards)
 	for (int32 i = 0; i < NewUnlocks.Num(); i++)
 	{
 		OnNewUnlockFromRace.Broadcast(NewUnlocks[i], i);
+	}
+
+	// Record to race history subsystem
+	if (UWorld* World = GetWorld())
+	{
+		if (UGameInstance* GI = World->GetGameInstance())
+		{
+			// Record to race history
+			if (UMGRaceHistorySubsystem* RaceHistory = GI->GetSubsystem<UMGRaceHistorySubsystem>())
+			{
+				FMGRaceResult HistoryResult;
+				HistoryResult.RaceId = FGuid::NewGuid();
+
+				if (RaceGameMode.IsValid())
+				{
+					FMGRaceConfig Config = RaceGameMode->GetRaceConfig();
+					HistoryResult.TrackId = Config.TrackName.ToString();
+					HistoryResult.TrackName = FText::FromName(Config.TrackName);
+					HistoryResult.RaceType = FName(*UEnum::GetValueAsString(Config.RaceType));
+					HistoryResult.TotalRacers = RaceGameMode->GetRacerCount();
+				}
+
+				HistoryResult.Position = CurrentPerformance.FinalPosition;
+				HistoryResult.bDNF = !CurrentPerformance.bFinished;
+				HistoryResult.bWasCleanRace = CurrentPerformance.IsCleanRace();
+				HistoryResult.DistanceM = CurrentPerformance.DistanceKm * 1000.0f;
+				HistoryResult.TopSpeedKPH = CurrentPerformance.MaxSpeedMPH * 1.60934f;
+				HistoryResult.CashEarned = Rewards.CreditsEarned;
+				HistoryResult.ReputationEarned = Rewards.ReputationEarned;
+				HistoryResult.XPEarned = static_cast<int32>(Rewards.XPBreakdown.TotalXP);
+				HistoryResult.Timestamp = FDateTime::Now();
+
+				RaceHistory->RecordRaceResult(HistoryResult);
+			}
+
+			// Notify career subsystem
+			if (UMGCareerSubsystem* Career = GI->GetSubsystem<UMGCareerSubsystem>())
+			{
+				TArray<FString> DefeatedRivals; // Would be populated from race results
+				Career->OnRaceCompleted(
+					CurrentPerformance.FinalPosition,
+					RaceGameMode.IsValid() ? RaceGameMode->GetRacerCount() : 1,
+					CurrentPerformance.IsCleanRace(),
+					DefeatedRivals
+				);
+			}
+		}
 	}
 
 	// Update last rewards with post-grant state
