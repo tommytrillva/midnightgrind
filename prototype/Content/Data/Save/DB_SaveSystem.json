@@ -1,0 +1,297 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Save System Configuration",
+
+  "SaveSystem": {
+    "Enabled": true,
+    "AutoSaveEnabled": true,
+    "CloudSaveEnabled": true,
+    "MaxLocalSlots": 5,
+    "CompressionEnabled": true,
+    "EncryptionEnabled": true
+  },
+
+  "AutoSave": {
+    "Enabled": true,
+    "Triggers": {
+      "AfterRace": true,
+      "AfterPurchase": true,
+      "AfterCustomization": true,
+      "AfterLevelUp": true,
+      "AfterAchievement": true,
+      "ExitingGarage": true,
+      "IntervalMinutes": 15
+    },
+    "ShowIndicator": true,
+    "IndicatorDuration": 2.0,
+    "IndicatorPosition": "TopRight",
+    "PreventDuringRace": true,
+    "PreventDuringPursuit": true
+  },
+
+  "SaveSlots": {
+    "Local": {
+      "MaxSlots": 5,
+      "SlotInfo": {
+        "ThumbnailEnabled": true,
+        "ShowPlayTime": true,
+        "ShowLevel": true,
+        "ShowCarCount": true,
+        "ShowCompletion": true,
+        "ShowLastPlayed": true
+      }
+    },
+    "Cloud": {
+      "Provider": "Platform",
+      "ConflictResolution": "PromptUser",
+      "SyncOnStartup": true,
+      "SyncOnClose": true,
+      "MaxCloudSlots": 5
+    }
+  },
+
+  "SaveDataContents": {
+    "PlayerProgress": {
+      "Level": true,
+      "REP": true,
+      "REPTier": true,
+      "Cash": true,
+      "TotalPlayTime": true,
+      "StoryProgress": true,
+      "TutorialFlags": true
+    },
+    "Garage": {
+      "OwnedVehicles": true,
+      "VehicleCustomizations": true,
+      "VehicleTunings": true,
+      "InstalledParts": true,
+      "VehicleConditions": true,
+      "FavoriteVehicle": true,
+      "GarageLayout": true
+    },
+    "Inventory": {
+      "OwnedParts": true,
+      "Consumables": true,
+      "Vinyls": true,
+      "Horns": true,
+      "LicensePlates": true
+    },
+    "WorldState": {
+      "DiscoveredPOIs": true,
+      "CompletedEvents": true,
+      "SpeedTrapRecords": true,
+      "DriftZoneRecords": true,
+      "BarnFindsDiscovered": true,
+      "BarnFindsRestored": true,
+      "CollectiblesFound": true
+    },
+    "Statistics": {
+      "RacesWon": true,
+      "RacesLost": true,
+      "TotalDistance": true,
+      "TopSpeed": true,
+      "DriftScore": true,
+      "PursuitStats": true,
+      "VehicleStats": true
+    },
+    "Achievements": {
+      "Unlocked": true,
+      "Progress": true,
+      "Titles": true,
+      "Trophies": true
+    },
+    "Social": {
+      "CrewMembership": true,
+      "Friends": false,
+      "BlockedPlayers": false
+    },
+    "Settings": {
+      "SaveWithProfile": true,
+      "Audio": true,
+      "Video": true,
+      "Controls": true,
+      "Accessibility": true,
+      "HUD": true
+    },
+    "OnlineSync": {
+      "Leaderboards": "ServerSide",
+      "DailyRewards": "ServerSide",
+      "Events": "ServerSide"
+    }
+  },
+
+  "SaveFileStructure": {
+    "Header": {
+      "Version": "string",
+      "GameVersion": "string",
+      "Platform": "string",
+      "CreatedAt": "timestamp",
+      "ModifiedAt": "timestamp",
+      "PlayTime": "duration",
+      "Checksum": "hash"
+    },
+    "Compression": {
+      "Algorithm": "LZ4",
+      "Level": "Fast"
+    },
+    "Encryption": {
+      "Algorithm": "AES-256",
+      "KeyDerivation": "Platform"
+    }
+  },
+
+  "NewGamePlus": {
+    "Enabled": true,
+    "UnlockCondition": "CompleteStory",
+    "Carries": {
+      "Vehicles": true,
+      "Parts": true,
+      "Cash": true,
+      "REP": "Reset_To_Tier_Floor",
+      "Achievements": true,
+      "Statistics": true,
+      "BarnFinds": false,
+      "Collectibles": false,
+      "SpeedTrapRecords": true
+    },
+    "Bonuses": {
+      "StartingCash": 50000,
+      "DifficultyOptions": ["Harder_AI", "Increased_Police"],
+      "ExclusiveContent": ["NG+_Vehicles", "NG+_Parts"]
+    }
+  },
+
+  "CrossSave": {
+    "Enabled": true,
+    "Platforms": ["PC", "PlayStation", "Xbox"],
+    "TransferMethod": "CloudSync",
+    "Requirements": {
+      "LinkedAccounts": true,
+      "SameRegion": false
+    },
+    "Limitations": {
+      "DLC_Required": true,
+      "PlatformExclusives": "NotTransferable"
+    }
+  },
+
+  "BackupSystem": {
+    "Enabled": true,
+    "AutoBackup": {
+      "Enabled": true,
+      "MaxBackups": 5,
+      "BackupBeforeMajorEvents": true
+    },
+    "ManualBackup": {
+      "Enabled": true,
+      "ExportEnabled": true,
+      "ExportFormat": "Encrypted"
+    },
+    "Recovery": {
+      "CorruptionDetection": true,
+      "AutoRecovery": true,
+      "RecoveryPrompt": true
+    }
+  },
+
+  "DataValidation": {
+    "Enabled": true,
+    "ChecksumValidation": true,
+    "RangeValidation": true,
+    "IntegrityChecks": {
+      "OnLoad": true,
+      "OnSave": true,
+      "Periodic": false
+    },
+    "AntiCheat": {
+      "Enabled": true,
+      "ValidateValues": true,
+      "ServerVerification": true,
+      "Flags": {
+        "ImpossibleMoney": { "Threshold": 999999999 },
+        "ImpossibleREP": { "Threshold": 999999999 },
+        "ImpossibleSpeed": { "Threshold": 500 },
+        "ImpossibleTime": { "Threshold": 0 }
+      }
+    }
+  },
+
+  "Migration": {
+    "Enabled": true,
+    "VersionHandling": {
+      "UpgradeSupported": true,
+      "DowngradeSupported": false,
+      "MigrationScripts": true
+    },
+    "BreakingChanges": {
+      "NotifyUser": true,
+      "CreateBackup": true,
+      "FallbackBehavior": "ResetAffectedData"
+    }
+  },
+
+  "ImportExport": {
+    "Enabled": true,
+    "ExportFormats": ["Encrypted", "JSON_Debug"],
+    "ImportValidation": "Strict",
+    "ShareTunings": {
+      "Enabled": true,
+      "Format": "TuningCode",
+      "CodeLength": 12
+    },
+    "ShareLiveries": {
+      "Enabled": true,
+      "Format": "LiveryCode",
+      "CodeLength": 12
+    }
+  },
+
+  "OfflineMode": {
+    "Enabled": true,
+    "LocalOnlyFeatures": {
+      "FreeroamEnabled": true,
+      "SinglePlayerRaces": true,
+      "GarageAccess": true,
+      "CustomizationAccess": true
+    },
+    "DisabledFeatures": {
+      "Multiplayer": true,
+      "Leaderboards": true,
+      "DailyRewards": true,
+      "CommunityEvents": true
+    },
+    "SyncOnReconnect": true
+  },
+
+  "ErrorHandling": {
+    "SaveFailure": {
+      "RetryCount": 3,
+      "RetryDelay": 1000,
+      "NotifyUser": true,
+      "Fallback": "LocalEmergencySave"
+    },
+    "LoadFailure": {
+      "RetryCount": 3,
+      "AttemptRecovery": true,
+      "LoadBackup": true,
+      "NotifyUser": true
+    },
+    "CorruptionDetected": {
+      "NotifyUser": true,
+      "OfferRecovery": true,
+      "ReportToServer": true
+    }
+  },
+
+  "DebugFeatures": {
+    "Enabled": false,
+    "DevOnly": true,
+    "Features": {
+      "QuickSave": "F5",
+      "QuickLoad": "F9",
+      "SaveDump": true,
+      "CorruptionSimulation": true,
+      "TimeTravel": true
+    }
+  }
+}

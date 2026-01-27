@@ -1,0 +1,400 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Speed Traps and Speed Zone Configuration",
+
+  "SpeedTrapSystem": {
+    "Enabled": true,
+    "ShowOnMap": true,
+    "ShowOnHUD": true,
+    "LeaderboardsEnabled": true,
+    "GhostRacing": true
+  },
+
+  "SpeedTraps": [
+    {
+      "ID": "TRAP_HIGHWAY_101_NORTH",
+      "Name": "Highway 101 - North Bound",
+      "Location": { "X": 5000, "Y": 0, "Z": 25 },
+      "Direction": "North",
+      "Length": 500,
+      "TargetSpeed": 150,
+      "Category": "Highway",
+      "Difficulty": "Easy",
+      "Records": {
+        "Bronze": 155,
+        "Silver": 175,
+        "Gold": 200,
+        "Platinum": 225
+      },
+      "Rewards": {
+        "Bronze": { "Cash": 500, "REP": 25 },
+        "Silver": { "Cash": 1000, "REP": 50 },
+        "Gold": { "Cash": 2500, "REP": 100 },
+        "Platinum": { "Cash": 5000, "REP": 250 }
+      },
+      "Unlocked": true
+    },
+    {
+      "ID": "TRAP_HIGHWAY_101_SOUTH",
+      "Name": "Highway 101 - South Bound",
+      "Location": { "X": 5000, "Y": 0, "Z": 25 },
+      "Direction": "South",
+      "Length": 500,
+      "TargetSpeed": 150,
+      "Category": "Highway",
+      "Difficulty": "Easy",
+      "Records": {
+        "Bronze": 155,
+        "Silver": 175,
+        "Gold": 200,
+        "Platinum": 225
+      },
+      "Unlocked": true
+    },
+    {
+      "ID": "TRAP_TUNNEL_RUN",
+      "Name": "Tunnel Run",
+      "Location": { "X": -2000, "Y": 3000, "Z": -20 },
+      "Direction": "Both",
+      "Length": 800,
+      "TargetSpeed": 180,
+      "Category": "Tunnel",
+      "Difficulty": "Medium",
+      "Records": {
+        "Bronze": 185,
+        "Silver": 210,
+        "Gold": 240,
+        "Platinum": 270
+      },
+      "Rewards": {
+        "Bronze": { "Cash": 750, "REP": 35 },
+        "Silver": { "Cash": 1500, "REP": 75 },
+        "Gold": { "Cash": 3500, "REP": 150 },
+        "Platinum": { "Cash": 7500, "REP": 375 }
+      },
+      "SpecialCondition": "Echo bonus - engine sounds louder",
+      "UnlockCondition": "LEVEL_5"
+    },
+    {
+      "ID": "TRAP_BRIDGE_BLAST",
+      "Name": "Bridge Blast",
+      "Location": { "X": -3500, "Y": 0, "Z": 55 },
+      "Direction": "Both",
+      "Length": 600,
+      "TargetSpeed": 160,
+      "Category": "Bridge",
+      "Difficulty": "Medium",
+      "Records": {
+        "Bronze": 165,
+        "Silver": 190,
+        "Gold": 220,
+        "Platinum": 250
+      },
+      "SpecialCondition": "Scenic view bonus for photos",
+      "UnlockCondition": "LEVEL_8"
+    },
+    {
+      "ID": "TRAP_DOWNTOWN_STRAIGHT",
+      "Name": "Downtown Straight",
+      "Location": { "X": 800, "Y": -500, "Z": 10 },
+      "Direction": "East",
+      "Length": 400,
+      "TargetSpeed": 120,
+      "Category": "Urban",
+      "Difficulty": "Hard",
+      "Records": {
+        "Bronze": 125,
+        "Silver": 145,
+        "Gold": 170,
+        "Platinum": 195
+      },
+      "TrafficDensity": "High",
+      "SpecialCondition": "Weave through traffic",
+      "UnlockCondition": "LEVEL_10"
+    },
+    {
+      "ID": "TRAP_HARBOR_STRETCH",
+      "Name": "Harbor Stretch",
+      "Location": { "X": -2800, "Y": 1200, "Z": 5 },
+      "Direction": "West",
+      "Length": 550,
+      "TargetSpeed": 140,
+      "Category": "Industrial",
+      "Difficulty": "Medium",
+      "Records": {
+        "Bronze": 145,
+        "Silver": 165,
+        "Gold": 190,
+        "Platinum": 215
+      },
+      "UnlockCondition": "LEVEL_6"
+    },
+    {
+      "ID": "TRAP_MOUNTAIN_STRAIGHT",
+      "Name": "Mountain Overlook Run",
+      "Location": { "X": 4200, "Y": 2000, "Z": 600 },
+      "Direction": "Up",
+      "Length": 700,
+      "TargetSpeed": 130,
+      "Category": "Mountain",
+      "Difficulty": "Hard",
+      "Records": {
+        "Bronze": 135,
+        "Silver": 155,
+        "Gold": 180,
+        "Platinum": 205
+      },
+      "Elevation": "Uphill",
+      "SpecialCondition": "Altitude affects naturally aspirated cars",
+      "UnlockCondition": "LEVEL_15"
+    },
+    {
+      "ID": "TRAP_AIRPORT_RUNWAY",
+      "Name": "Runway Sprint",
+      "Location": { "X": 6200, "Y": -1800, "Z": 20 },
+      "Direction": "Both",
+      "Length": 1200,
+      "TargetSpeed": 200,
+      "Category": "Airfield",
+      "Difficulty": "Expert",
+      "Records": {
+        "Bronze": 210,
+        "Silver": 245,
+        "Gold": 280,
+        "Platinum": 315
+      },
+      "Rewards": {
+        "Bronze": { "Cash": 1500, "REP": 75 },
+        "Silver": { "Cash": 3000, "REP": 150 },
+        "Gold": { "Cash": 7500, "REP": 350 },
+        "Platinum": { "Cash": 15000, "REP": 750 }
+      },
+      "SpecialCondition": "Perfect surface, no traffic",
+      "UnlockCondition": "REP_TIER_STREET"
+    },
+    {
+      "ID": "TRAP_NEON_DISTRICT",
+      "Name": "Neon Boulevard",
+      "Location": { "X": -1000, "Y": -2000, "Z": 8 },
+      "Direction": "South",
+      "Length": 450,
+      "TargetSpeed": 110,
+      "Category": "Urban",
+      "Difficulty": "Hard",
+      "Records": {
+        "Bronze": 115,
+        "Silver": 135,
+        "Gold": 155,
+        "Platinum": 175
+      },
+      "TimeRestriction": "NightOnly",
+      "SpecialCondition": "Night only - neon lighting active",
+      "UnlockCondition": "LEVEL_12"
+    },
+    {
+      "ID": "TRAP_COASTAL_HIGHWAY",
+      "Name": "Coastal Highway",
+      "Location": { "X": -4500, "Y": 2800, "Z": 15 },
+      "Direction": "North",
+      "Length": 900,
+      "TargetSpeed": 170,
+      "Category": "Coastal",
+      "Difficulty": "Medium",
+      "Records": {
+        "Bronze": 175,
+        "Silver": 200,
+        "Gold": 230,
+        "Platinum": 260
+      },
+      "SpecialCondition": "Scenic coastal views",
+      "UnlockCondition": "LEVEL_8"
+    }
+  ],
+
+  "DriftZones": [
+    {
+      "ID": "DRIFT_ZONE_ALPHA",
+      "Name": "Drift Zone Alpha",
+      "Location": { "X": 1500, "Y": -3000, "Z": 10 },
+      "Length": 400,
+      "CornerCount": 3,
+      "Category": "Street",
+      "Difficulty": "Easy",
+      "ScoringMultiplier": 1.0,
+      "Records": {
+        "Bronze": 15000,
+        "Silver": 35000,
+        "Gold": 65000,
+        "Platinum": 100000
+      },
+      "Rewards": {
+        "Bronze": { "Cash": 500, "REP": 25 },
+        "Silver": { "Cash": 1000, "REP": 50 },
+        "Gold": { "Cash": 2500, "REP": 100 },
+        "Platinum": { "Cash": 5000, "REP": 250 }
+      },
+      "Unlocked": true
+    },
+    {
+      "ID": "DRIFT_ZONE_HARBOR",
+      "Name": "Harbor Slide",
+      "Location": { "X": -2800, "Y": 1800, "Z": 5 },
+      "Length": 350,
+      "CornerCount": 2,
+      "Category": "Industrial",
+      "Difficulty": "Medium",
+      "ScoringMultiplier": 1.25,
+      "Records": {
+        "Bronze": 20000,
+        "Silver": 50000,
+        "Gold": 90000,
+        "Platinum": 140000
+      },
+      "SpecialCondition": "Wet surface near water",
+      "UnlockCondition": "LEVEL_8"
+    },
+    {
+      "ID": "DRIFT_ZONE_MOUNTAIN",
+      "Name": "Mountain Touge",
+      "Location": { "X": 3800, "Y": 3200, "Z": 350 },
+      "Length": 600,
+      "CornerCount": 5,
+      "Category": "Mountain",
+      "Difficulty": "Hard",
+      "ScoringMultiplier": 1.75,
+      "Records": {
+        "Bronze": 40000,
+        "Silver": 100000,
+        "Gold": 180000,
+        "Platinum": 280000
+      },
+      "Elevation": "Downhill",
+      "SpecialCondition": "Legendary mountain pass",
+      "UnlockCondition": "LEVEL_15"
+    },
+    {
+      "ID": "DRIFT_ZONE_DOCKS",
+      "Name": "Container Drift",
+      "Location": { "X": -3200, "Y": 900, "Z": 5 },
+      "Length": 500,
+      "CornerCount": 4,
+      "Category": "Industrial",
+      "Difficulty": "Medium",
+      "ScoringMultiplier": 1.5,
+      "Records": {
+        "Bronze": 30000,
+        "Silver": 75000,
+        "Gold": 135000,
+        "Platinum": 200000
+      },
+      "SpecialCondition": "Narrow paths between containers",
+      "UnlockCondition": "LEVEL_10"
+    },
+    {
+      "ID": "DRIFT_ZONE_PARKING",
+      "Name": "Garage Spiral",
+      "Location": { "X": 1250, "Y": -3400, "Z": 50 },
+      "Length": 450,
+      "CornerCount": 8,
+      "Category": "Urban",
+      "Difficulty": "Expert",
+      "ScoringMultiplier": 2.0,
+      "Records": {
+        "Bronze": 50000,
+        "Silver": 125000,
+        "Gold": 225000,
+        "Platinum": 350000
+      },
+      "SpecialCondition": "Tight spiral descent",
+      "UnlockCondition": "REP_TIER_STREET"
+    },
+    {
+      "ID": "DRIFT_ZONE_CIRCUIT",
+      "Name": "Figure Eight",
+      "Location": { "X": 5500, "Y": -2200, "Z": 18 },
+      "Length": 700,
+      "CornerCount": 6,
+      "Category": "Track",
+      "Difficulty": "Expert",
+      "ScoringMultiplier": 2.25,
+      "Records": {
+        "Bronze": 75000,
+        "Silver": 175000,
+        "Gold": 300000,
+        "Platinum": 450000
+      },
+      "SpecialCondition": "Link drifts through the crossover",
+      "UnlockCondition": "REP_TIER_PRO"
+    }
+  ],
+
+  "SpeedTrapChallenges": {
+    "Weekly": {
+      "Enabled": true,
+      "RotationDay": "Monday",
+      "FeaturedTraps": 3,
+      "BonusMultiplier": 2.0,
+      "ExtraReward": { "Cash": 10000, "REP": 500 }
+    },
+    "Rivals": {
+      "Enabled": true,
+      "MatchmakingBased": "PI_Class",
+      "GhostVisible": true,
+      "RewardForBeating": { "REP": 100 }
+    },
+    "DailyChallenge": {
+      "Enabled": true,
+      "RandomTrap": true,
+      "TargetBeat": "Personal_Best",
+      "Reward": { "Cash": 5000, "REP": 250 }
+    }
+  },
+
+  "LeaderboardConfig": {
+    "Categories": ["Overall", "ByClass", "ByVehicle", "Friends", "Crew"],
+    "DisplayCount": 100,
+    "RefreshInterval": 60,
+    "CheaterDetection": true,
+    "PhotoProof": {
+      "Enabled": true,
+      "AutoCapture": true,
+      "ForTopScores": true
+    }
+  },
+
+  "SpeedTrapEffects": {
+    "SpeedDisplay": {
+      "ShowLive": true,
+      "ShowDelta": true,
+      "FlashOnPB": true,
+      "SlowMoOnRecord": { "Enabled": true, "Duration": 1.0 }
+    },
+    "Audio": {
+      "ApproachWarning": "SFX_Trap_Approach",
+      "Trigger": "SFX_Trap_Trigger",
+      "NewRecord": "SFX_Trap_Record",
+      "Medal": {
+        "Bronze": "SFX_Medal_Bronze",
+        "Silver": "SFX_Medal_Silver",
+        "Gold": "SFX_Medal_Gold",
+        "Platinum": "SFX_Medal_Platinum"
+      }
+    },
+    "Visual": {
+      "ZoneHighlight": true,
+      "SpeedLines": true,
+      "TrailEffect": "Speed_Blur"
+    }
+  },
+
+  "AggregateStats": {
+    "TotalSpeedTraps": 10,
+    "TotalDriftZones": 6,
+    "CompletionRewards": {
+      "AllBronze": { "Cash": 25000, "REP": 1000 },
+      "AllSilver": { "Cash": 75000, "REP": 3000 },
+      "AllGold": { "Cash": 200000, "REP": 10000, "Title": "TITLE_SPEEDSTER" },
+      "AllPlatinum": { "Cash": 500000, "REP": 25000, "Vehicle": "VEH_SPEED_DEMON", "Title": "TITLE_SPEED_LEGEND" }
+    }
+  }
+}

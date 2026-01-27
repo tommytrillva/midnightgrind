@@ -1,0 +1,477 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Story Mode Missions and Campaign Structure",
+
+  "StorySystem": {
+    "Enabled": true,
+    "TotalChapters": 5,
+    "ReplayEnabled": true,
+    "SkipCutscenesAfterFirst": true,
+    "DifficultySetting": "Adaptive"
+  },
+
+  "Prologue": {
+    "ID": "STORY_PROLOGUE",
+    "Name": "New Blood",
+    "Description": "Your journey into the underground begins",
+    "UnlockCondition": "GameStart",
+    "Missions": [
+      {
+        "ID": "PROLOGUE_01",
+        "Name": "First Contact",
+        "Type": "Cutscene",
+        "Description": "You receive word about an underground meet",
+        "Location": "Downtown",
+        "Duration": 120,
+        "Skippable": false,
+        "Characters": ["Kai"]
+      },
+      {
+        "ID": "PROLOGUE_02",
+        "Name": "Prove Yourself",
+        "Type": "Race",
+        "Description": "Show Kai what you're made of",
+        "Location": "Downtown_Circuit",
+        "RaceType": "Circuit",
+        "Laps": 3,
+        "Opponents": 3,
+        "Difficulty": "Tutorial",
+        "RequiredPosition": 3,
+        "Rewards": {
+          "Cash": 2500,
+          "REP": 150,
+          "Unlock": "GARAGE_ACCESS"
+        },
+        "TutorialElements": ["Steering", "Acceleration", "Braking", "Nitrous"]
+      },
+      {
+        "ID": "PROLOGUE_03",
+        "Name": "The Garage",
+        "Type": "Tutorial",
+        "Description": "Luna shows you around your new workspace",
+        "Location": "Garage",
+        "Characters": ["Luna"],
+        "TutorialElements": ["GarageNavigation", "BasicCustomization", "PartInstall"]
+      }
+    ],
+    "CompletionReward": {
+      "Cash": 5000,
+      "REP": 500,
+      "Vehicle": "STARTER_VEHICLE_UPGRADE"
+    }
+  },
+
+  "Chapter1": {
+    "ID": "STORY_CH1",
+    "Name": "Street Level",
+    "Description": "Make a name for yourself in the local scene",
+    "UnlockCondition": "COMPLETE_PROLOGUE",
+    "REPTierRequired": "Rookie",
+    "Missions": [
+      {
+        "ID": "CH1_01",
+        "Name": "The Circuit",
+        "Type": "Race",
+        "Description": "Enter your first underground race",
+        "Location": "Docks_Circuit",
+        "RaceType": "Circuit",
+        "Laps": 4,
+        "Opponents": 5,
+        "Difficulty": "Easy",
+        "RequiredPosition": 4,
+        "Rewards": { "Cash": 3500, "REP": 200 },
+        "Cutscenes": {
+          "Pre": "SCENE_CH1_01_PRE",
+          "Post": "SCENE_CH1_01_POST"
+        },
+        "Characters": ["Maya", "Vince"]
+      },
+      {
+        "ID": "CH1_02",
+        "Name": "Point to Point",
+        "Type": "Race",
+        "Description": "A sprint race through downtown",
+        "Location": "Downtown_Sprint_01",
+        "RaceType": "Sprint",
+        "Opponents": 3,
+        "Difficulty": "Easy",
+        "RequiredPosition": 2,
+        "Rewards": { "Cash": 4000, "REP": 250 }
+      },
+      {
+        "ID": "CH1_03",
+        "Name": "Drift Initiation",
+        "Type": "Drift",
+        "Description": "Learn the art of controlled chaos",
+        "Location": "Drift_Zone_Alpha",
+        "TargetScore": 25000,
+        "Difficulty": "Easy",
+        "Rewards": { "Cash": 3000, "REP": 200 },
+        "TutorialElements": ["DriftInitiation", "DriftMaintain", "DriftChain"]
+      },
+      {
+        "ID": "CH1_04",
+        "Name": "Rival's Challenge",
+        "Type": "Race",
+        "Description": "Vince wants to see what you've got",
+        "Location": "Highway_Sprint_01",
+        "RaceType": "Sprint",
+        "Opponents": 1,
+        "OpponentForced": "Vince",
+        "Difficulty": "Medium",
+        "RequiredPosition": 1,
+        "Rewards": {
+          "Cash": 7500,
+          "REP": 500,
+          "Achievement": "ACH_BEAT_VINCE_1"
+        },
+        "Cutscenes": {
+          "Pre": "SCENE_VINCE_CHALLENGE",
+          "Post_Win": "SCENE_VINCE_DEFEAT",
+          "Post_Lose": "SCENE_VINCE_MOCK"
+        }
+      },
+      {
+        "ID": "CH1_05",
+        "Name": "Street Cred",
+        "Type": "Checkpoint",
+        "Description": "Complete a checkpoint race to prove your skills",
+        "Location": "City_Checkpoint_01",
+        "TimeLimit": 180,
+        "Checkpoints": 12,
+        "Difficulty": "Medium",
+        "Rewards": { "Cash": 4500, "REP": 300 }
+      }
+    ],
+    "CompletionReward": {
+      "Cash": 15000,
+      "REP": 1500,
+      "Title": "TITLE_STREET_RACER",
+      "Unlock": "REP_TIER_STREET"
+    }
+  },
+
+  "Chapter2": {
+    "ID": "STORY_CH2",
+    "Name": "Heat Rising",
+    "Description": "The police are starting to take notice",
+    "UnlockCondition": "COMPLETE_CH1",
+    "REPTierRequired": "Street",
+    "Missions": [
+      {
+        "ID": "CH2_01",
+        "Name": "Unwanted Attention",
+        "Type": "Pursuit",
+        "Description": "Escape the police after a race gone wrong",
+        "Location": "Downtown",
+        "PursuitLevel": 2,
+        "ObjectiveType": "Escape",
+        "TimeLimit": 300,
+        "Difficulty": "Medium",
+        "Rewards": { "Cash": 5000, "REP": 400 },
+        "Cutscenes": {
+          "Pre": "SCENE_COPS_ARRIVE",
+          "Post": "SCENE_SAFE_HOUSE"
+        }
+      },
+      {
+        "ID": "CH2_02",
+        "Name": "Task Force",
+        "Type": "Cutscene",
+        "Description": "Officer Chen makes his presence known",
+        "Characters": ["Officer_Chen"],
+        "Duration": 90
+      },
+      {
+        "ID": "CH2_03",
+        "Name": "Nightfall Escape",
+        "Type": "Sprint",
+        "Description": "Race to safety before the patrol closes in",
+        "Location": "Harbor_Escape_Route",
+        "TimeLimit": 120,
+        "PolicePursuit": "Active",
+        "Difficulty": "Hard",
+        "Rewards": { "Cash": 6500, "REP": 450 }
+      },
+      {
+        "ID": "CH2_04",
+        "Name": "Underground Tournament",
+        "Type": "Tournament",
+        "Description": "A three-race series to climb the ranks",
+        "Races": [
+          { "Location": "Industrial_Circuit", "Laps": 3, "Opponents": 5 },
+          { "Location": "Docks_Sprint", "Opponents": 5 },
+          { "Location": "Downtown_Night_Circuit", "Laps": 4, "Opponents": 5 }
+        ],
+        "PointSystem": { "1st": 10, "2nd": 7, "3rd": 5, "4th": 3, "5th": 2, "6th": 1 },
+        "RequiredPoints": 15,
+        "Difficulty": "Hard",
+        "Rewards": {
+          "Cash": 20000,
+          "REP": 1000,
+          "Part": "PART_TURBO_SPORT"
+        }
+      },
+      {
+        "ID": "CH2_05",
+        "Name": "The Sting",
+        "Type": "Pursuit",
+        "Description": "Chen set a trap - outrun his task force",
+        "Location": "City_Wide",
+        "PursuitLevel": 4,
+        "ObjectiveType": "Escape",
+        "TimeLimit": 420,
+        "Difficulty": "Hard",
+        "Rewards": {
+          "Cash": 12000,
+          "REP": 800,
+          "Achievement": "ACH_ESCAPE_STING"
+        },
+        "Cutscenes": {
+          "Post": "SCENE_CHEN_RESPECT"
+        }
+      }
+    ],
+    "CompletionReward": {
+      "Cash": 35000,
+      "REP": 3500,
+      "Vehicle": "VEH_REWARD_SAKURA_R34",
+      "Unlock": "CHAPTER_3"
+    }
+  },
+
+  "Chapter3": {
+    "ID": "STORY_CH3",
+    "Name": "The Crew",
+    "Description": "Join forces with the Midnight Runners",
+    "UnlockCondition": "COMPLETE_CH2",
+    "REPTierRequired": "Pro",
+    "Missions": [
+      {
+        "ID": "CH3_01",
+        "Name": "Initiation",
+        "Type": "Crew_Race",
+        "Description": "Race alongside the Midnight Runners",
+        "Location": "Highway_Team_Race",
+        "RaceType": "Team_Sprint",
+        "Teammates": 2,
+        "Opponents": 3,
+        "Difficulty": "Medium",
+        "Rewards": { "Cash": 8000, "REP": 600 },
+        "Cutscenes": {
+          "Pre": "SCENE_CREW_INVITE"
+        }
+      },
+      {
+        "ID": "CH3_02",
+        "Name": "Crew Challenge",
+        "Type": "Crew_Battle",
+        "Description": "Take on a rival crew",
+        "Location": "Industrial_Zone",
+        "CrewSize": 4,
+        "EnemyCrew": "CREW_SPEED_DEMONS",
+        "Rounds": 3,
+        "Difficulty": "Hard",
+        "Rewards": { "Cash": 15000, "REP": 1000 }
+      },
+      {
+        "ID": "CH3_03",
+        "Name": "Legendary Drift",
+        "Type": "Drift",
+        "Description": "Conquer the mountain touge",
+        "Location": "Mountain_Touge",
+        "TargetScore": 150000,
+        "Difficulty": "Expert",
+        "Rewards": {
+          "Cash": 10000,
+          "REP": 750,
+          "Part": "PART_DRIFT_SUSPENSION"
+        }
+      },
+      {
+        "ID": "CH3_04",
+        "Name": "Betrayal",
+        "Type": "Cutscene",
+        "Description": "Someone leaked your location to the cops",
+        "Characters": ["Kai", "Maya", "Officer_Chen"],
+        "Duration": 180,
+        "PlotPoint": "Major"
+      },
+      {
+        "ID": "CH3_05",
+        "Name": "Escape the Ambush",
+        "Type": "Pursuit",
+        "Description": "Fight your way out of a police ambush",
+        "Location": "Industrial_Ambush",
+        "PursuitLevel": 5,
+        "ObjectiveType": "Survive_Then_Escape",
+        "SurviveTime": 180,
+        "Difficulty": "Expert",
+        "Rewards": {
+          "Cash": 25000,
+          "REP": 2000,
+          "Achievement": "ACH_SURVIVED_AMBUSH"
+        }
+      }
+    ],
+    "CompletionReward": {
+      "Cash": 75000,
+      "REP": 7500,
+      "CrewAccess": "CREW_MIDNIGHT_RUNNERS",
+      "Unlock": "CHAPTER_4"
+    }
+  },
+
+  "Chapter4": {
+    "ID": "STORY_CH4",
+    "Name": "The Championship",
+    "Description": "Compete in the ultimate underground championship",
+    "UnlockCondition": "COMPLETE_CH3",
+    "REPTierRequired": "Elite",
+    "Missions": [
+      {
+        "ID": "CH4_01",
+        "Name": "Qualifier",
+        "Type": "Tournament",
+        "Description": "Qualify for the Midnight Championship",
+        "Races": [
+          { "Location": "Championship_Track_01", "Laps": 4 },
+          { "Location": "Championship_Track_02", "Laps": 3 },
+          { "Location": "Championship_Track_03", "Laps": 5 }
+        ],
+        "RequiredPosition": "Top3_Overall",
+        "Difficulty": "Expert",
+        "Rewards": { "Cash": 30000, "REP": 2000 }
+      },
+      {
+        "ID": "CH4_02",
+        "Name": "Vince Returns",
+        "Type": "Race",
+        "Description": "Your old rival wants redemption",
+        "Location": "Bridge_Circuit",
+        "RaceType": "Circuit",
+        "Laps": 5,
+        "Opponents": 1,
+        "OpponentForced": "Vince_Upgraded",
+        "Difficulty": "Expert",
+        "Rewards": {
+          "Cash": 20000,
+          "REP": 1500,
+          "Achievement": "ACH_BEAT_VINCE_FINAL"
+        },
+        "Cutscenes": {
+          "Pre": "SCENE_VINCE_RESPECT",
+          "Post_Win": "SCENE_VINCE_ALLY"
+        }
+      },
+      {
+        "ID": "CH4_03",
+        "Name": "Championship Round 1",
+        "Type": "Championship_Race",
+        "Description": "First round of the Midnight Championship",
+        "Location": "Championship_Final_Track_01",
+        "Laps": 6,
+        "Opponents": 7,
+        "Difficulty": "Expert",
+        "Rewards": { "Cash": 40000, "REP": 3000 }
+      },
+      {
+        "ID": "CH4_04",
+        "Name": "Championship Round 2",
+        "Type": "Championship_Race",
+        "Description": "Second round of the Midnight Championship",
+        "Location": "Championship_Final_Track_02",
+        "Laps": 5,
+        "Opponents": 7,
+        "Difficulty": "Expert",
+        "Rewards": { "Cash": 45000, "REP": 3500 }
+      },
+      {
+        "ID": "CH4_05",
+        "Name": "The Final Race",
+        "Type": "Championship_Finale",
+        "Description": "Everything comes down to this",
+        "Location": "Championship_Grand_Finale",
+        "Laps": 8,
+        "Opponents": 7,
+        "RequiredPosition": 1,
+        "Difficulty": "Master",
+        "Rewards": {
+          "Cash": 100000,
+          "REP": 10000,
+          "Vehicle": "VEH_CHAMPION_CAR",
+          "Title": "TITLE_MIDNIGHT_CHAMPION",
+          "Achievement": "ACH_CHAMPION"
+        },
+        "Cutscenes": {
+          "Pre": "SCENE_FINAL_PREP",
+          "Post": "SCENE_VICTORY_CELEBRATION"
+        }
+      }
+    ],
+    "CompletionReward": {
+      "Cash": 250000,
+      "REP": 25000,
+      "Unlock": "EPILOGUE",
+      "Achievement": "ACH_STORY_COMPLETE"
+    }
+  },
+
+  "Epilogue": {
+    "ID": "STORY_EPILOGUE",
+    "Name": "Legend",
+    "Description": "Your legacy continues",
+    "UnlockCondition": "COMPLETE_CH4",
+    "Type": "Freeplay",
+    "Features": {
+      "NewGamePlusUnlock": true,
+      "LegendMissionsUnlock": true,
+      "SecretContentUnlock": true
+    },
+    "Cutscene": "SCENE_LEGEND_STATUS",
+    "PostCredits": "SCENE_TEASER_DLC"
+  },
+
+  "SideMissions": {
+    "Enabled": true,
+    "Categories": {
+      "Delivery": {
+        "Description": "Time-based delivery missions",
+        "RewardMultiplier": 1.0,
+        "Count": 20
+      },
+      "Rival_Challenges": {
+        "Description": "Beat specific rivals in 1v1 races",
+        "RewardMultiplier": 1.5,
+        "Count": 15
+      },
+      "Photo_Missions": {
+        "Description": "Capture specific photos",
+        "RewardMultiplier": 0.75,
+        "Count": 25
+      },
+      "Collection": {
+        "Description": "Find collectibles and secrets",
+        "RewardMultiplier": 0.5,
+        "Count": 50
+      }
+    }
+  },
+
+  "DifficultySettings": {
+    "Adaptive": {
+      "Enabled": true,
+      "AdjustAfterLosses": 3,
+      "AdjustAfterWins": 5
+    },
+    "Manual": {
+      "Options": ["Easy", "Normal", "Hard", "Expert"],
+      "RewardMultiplier": {
+        "Easy": 0.75,
+        "Normal": 1.0,
+        "Hard": 1.25,
+        "Expert": 1.5
+      }
+    }
+  }
+}

@@ -619,7 +619,7 @@ FMGVehicleStats UMGCustomizationWidget::GetPreviewVehicleStats() const
 		}
 
 		// Recalculate derived stats
-		Stats.PowerToWeightRatio = Stats.Horsepower / (Stats.WeightKG * 2.20462f) * 1000.0f;
+		Stats.PowerToWeightRatio = (Stats.WeightKG > 0.0f) ? (Stats.Horsepower / (Stats.WeightKG * 2.20462f) * 1000.0f) : 0.0f;
 		Stats.PerformanceIndex = UMGStatCalculator::CalculatePerformanceIndex(Stats);
 		Stats.PerformanceClass = UMGStatCalculator::GetPerformanceClass(Stats.PerformanceIndex);
 	}

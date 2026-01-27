@@ -45,6 +45,10 @@ enum class EMGCautionReason : uint8;
 struct FMGSafetyCarState;
 enum class EMGPenaltyType : uint8;
 struct FMGPenalty;
+enum class EMGHeatLevel : uint8;
+struct FMGBountyCompletionResult;
+struct FMGRaceEvent;
+enum class EMGRaceEventType : uint8;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -656,4 +660,40 @@ protected:
 	/** Handle penalty served from penalty subsystem */
 	UFUNCTION()
 	void OnPenaltyServed(const FMGPenalty& Penalty);
+
+	/** Handle heat level changed from heat level subsystem */
+	UFUNCTION()
+	void OnHeatLevelChanged(EMGHeatLevel OldLevel, EMGHeatLevel NewLevel);
+
+	/** Handle pursuit evaded from heat level subsystem */
+	UFUNCTION()
+	void OnPursuitEvaded(float Duration, int32 BountyEarned);
+
+	/** Handle player busted from heat level subsystem */
+	UFUNCTION()
+	void OnPlayerBusted(int32 TotalCost, float PursuitDuration);
+
+	/** Handle helicopter deployed from heat level subsystem */
+	UFUNCTION()
+	void OnHelicopterDeployed();
+
+	/** Handle bounty completed from bounty subsystem */
+	UFUNCTION()
+	void OnBountyCompleted(const FString& PlayerId, const FMGBountyCompletionResult& Result);
+
+	/** Handle bounty failed from bounty subsystem */
+	UFUNCTION()
+	void OnBountyFailed(const FString& PlayerId, const FString& BountyId, const FString& Reason);
+
+	/** Handle bounty objective completed from bounty subsystem */
+	UFUNCTION()
+	void OnBountyObjectiveCompleted(const FString& PlayerId, const FString& BountyId, const FString& ObjectiveId);
+
+	/** Handle dramatic moment from race director */
+	UFUNCTION()
+	void OnDramaticMoment(const FMGRaceEvent& Event);
+
+	/** Handle lead change from race director */
+	UFUNCTION()
+	void OnLeadChange(const FGuid& NewLeaderId, int32 TotalChanges);
 };

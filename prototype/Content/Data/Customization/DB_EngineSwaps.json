@@ -1,0 +1,295 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Engine Swap and Powertrain Conversion System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "AffectsHandling": true,
+    "RequiresFabrication": true,
+    "UnlockLevel": 25,
+    "BalanceAdjustments": true
+  },
+
+  "SwapCategories": {
+    "DirectSwap": {
+      "ID": "SWAP_DIRECT",
+      "Name": "Direct Swap",
+      "Description": "Same family engine, minimal modifications",
+      "Cost": "Low",
+      "InstallTime": "Short",
+      "Difficulty": "Easy"
+    },
+    "PlatformSwap": {
+      "ID": "SWAP_PLATFORM",
+      "Name": "Platform Swap",
+      "Description": "Same manufacturer, different platform",
+      "Cost": "Medium",
+      "InstallTime": "Medium",
+      "Difficulty": "Medium"
+    },
+    "UniversalSwap": {
+      "ID": "SWAP_UNIVERSAL",
+      "Name": "Universal Swap",
+      "Description": "Cross-manufacturer engine installation",
+      "Cost": "High",
+      "InstallTime": "Long",
+      "Difficulty": "Hard",
+      "RequiresCustomFab": true
+    },
+    "ExoticSwap": {
+      "ID": "SWAP_EXOTIC",
+      "Name": "Exotic Swap",
+      "Description": "Rare or unusual engine conversions",
+      "Cost": "VeryHigh",
+      "InstallTime": "VeryLong",
+      "Difficulty": "Expert",
+      "RequiresSpecialist": true
+    }
+  },
+
+  "EngineOptions": {
+    "JDM": {
+      "2JZ-GTE": {
+        "ID": "ENGINE_2JZ",
+        "Name": "2JZ-GTE",
+        "Origin": "Toyota",
+        "Type": "I6 Twin Turbo",
+        "Displacement": 3.0,
+        "BasePower": 320,
+        "MaxPower": 1500,
+        "RedlineRPM": 8000,
+        "Weight": 250,
+        "SoundProfile": "2JZ",
+        "SwapCompatibility": ["Supra", "IS300", "Universal"]
+      },
+      "RB26DETT": {
+        "ID": "ENGINE_RB26",
+        "Name": "RB26DETT",
+        "Origin": "Nissan",
+        "Type": "I6 Twin Turbo",
+        "Displacement": 2.6,
+        "BasePower": 280,
+        "MaxPower": 1200,
+        "RedlineRPM": 8500,
+        "Weight": 260,
+        "SoundProfile": "RB26",
+        "SwapCompatibility": ["Skyline", "Z", "Universal"]
+      },
+      "SR20DET": {
+        "ID": "ENGINE_SR20",
+        "Name": "SR20DET",
+        "Origin": "Nissan",
+        "Type": "I4 Turbo",
+        "Displacement": 2.0,
+        "BasePower": 205,
+        "MaxPower": 600,
+        "RedlineRPM": 8000,
+        "Weight": 150,
+        "SoundProfile": "SR20",
+        "SwapCompatibility": ["240SX", "Silvia", "Compact"]
+      },
+      "K20A": {
+        "ID": "ENGINE_K20",
+        "Name": "K20A",
+        "Origin": "Honda",
+        "Type": "I4 NA/Turbo",
+        "Displacement": 2.0,
+        "BasePower": 220,
+        "MaxPower": 500,
+        "RedlineRPM": 8600,
+        "Weight": 130,
+        "SoundProfile": "K20",
+        "SwapCompatibility": ["Civic", "Integra", "Compact"]
+      },
+      "13B-REW": {
+        "ID": "ENGINE_13B",
+        "Name": "13B-REW",
+        "Origin": "Mazda",
+        "Type": "Rotary Twin Turbo",
+        "Displacement": 1.3,
+        "BasePower": 255,
+        "MaxPower": 700,
+        "RedlineRPM": 9000,
+        "Weight": 140,
+        "SoundProfile": "Rotary",
+        "SwapCompatibility": ["RX-7", "RX-8", "Compact"]
+      },
+      "EJ257": {
+        "ID": "ENGINE_EJ25",
+        "Name": "EJ257",
+        "Origin": "Subaru",
+        "Type": "Flat-4 Turbo",
+        "Displacement": 2.5,
+        "BasePower": 305,
+        "MaxPower": 700,
+        "RedlineRPM": 8000,
+        "Weight": 180,
+        "SoundProfile": "Boxer",
+        "SwapCompatibility": ["WRX", "STI", "Universal"]
+      }
+    },
+    "American": {
+      "LS3": {
+        "ID": "ENGINE_LS3",
+        "Name": "LS3 6.2L",
+        "Origin": "GM",
+        "Type": "V8 NA",
+        "Displacement": 6.2,
+        "BasePower": 430,
+        "MaxPower": 600,
+        "RedlineRPM": 6600,
+        "Weight": 200,
+        "SoundProfile": "LSx",
+        "SwapCompatibility": ["Universal", "All"]
+      },
+      "Coyote": {
+        "ID": "ENGINE_COYOTE",
+        "Name": "5.0 Coyote",
+        "Origin": "Ford",
+        "Type": "V8 NA",
+        "Displacement": 5.0,
+        "BasePower": 460,
+        "MaxPower": 850,
+        "RedlineRPM": 7500,
+        "Weight": 210,
+        "SoundProfile": "Coyote",
+        "SwapCompatibility": ["Mustang", "Universal"]
+      },
+      "Hellcat": {
+        "ID": "ENGINE_HELLCAT",
+        "Name": "6.2L Hellcat",
+        "Origin": "Dodge",
+        "Type": "V8 Supercharged",
+        "Displacement": 6.2,
+        "BasePower": 707,
+        "MaxPower": 1000,
+        "RedlineRPM": 6200,
+        "Weight": 280,
+        "SoundProfile": "Hellcat",
+        "SwapCompatibility": ["Muscle", "Universal"]
+      }
+    },
+    "European": {
+      "S54": {
+        "ID": "ENGINE_S54",
+        "Name": "S54 3.2L",
+        "Origin": "BMW",
+        "Type": "I6 NA",
+        "Displacement": 3.2,
+        "BasePower": 333,
+        "MaxPower": 450,
+        "RedlineRPM": 8000,
+        "Weight": 190,
+        "SoundProfile": "S54",
+        "SwapCompatibility": ["E46", "Z3", "E30"]
+      },
+      "N54": {
+        "ID": "ENGINE_N54",
+        "Name": "N54 Twin Turbo",
+        "Origin": "BMW",
+        "Type": "I6 Twin Turbo",
+        "Displacement": 3.0,
+        "BasePower": 300,
+        "MaxPower": 800,
+        "RedlineRPM": 7000,
+        "Weight": 220,
+        "SoundProfile": "N54",
+        "SwapCompatibility": ["BMW", "Universal"]
+      }
+    },
+    "Electric": {
+      "TeslaMotor": {
+        "ID": "ENGINE_TESLA",
+        "Name": "Tesla Drive Unit",
+        "Origin": "Tesla",
+        "Type": "Electric",
+        "BasePower": 450,
+        "MaxPower": 800,
+        "Weight": 150,
+        "Torque": "Instant",
+        "SoundProfile": "Electric",
+        "SwapCompatibility": ["Universal"],
+        "RequiresBatteryPack": true
+      }
+    }
+  },
+
+  "Requirements": {
+    "DirectSwap": {
+      "Cost": { "Base": 5000, "Labor": 2500 },
+      "Parts": ["Mounts", "Wiring"],
+      "Time": 4
+    },
+    "PlatformSwap": {
+      "Cost": { "Base": 15000, "Labor": 7500 },
+      "Parts": ["Mounts", "Wiring", "Transmission", "Driveshaft"],
+      "Time": 8
+    },
+    "UniversalSwap": {
+      "Cost": { "Base": 35000, "Labor": 20000 },
+      "Parts": ["CustomMounts", "Wiring", "Transmission", "Driveshaft", "Subframe"],
+      "Time": 16
+    },
+    "ExoticSwap": {
+      "Cost": { "Base": 75000, "Labor": 50000 },
+      "Parts": ["FullCustomFab", "CustomECU", "FullRewire"],
+      "Time": 40
+    }
+  },
+
+  "TransmissionOptions": {
+    "Manual": {
+      "T56": { "Gears": 6, "Strength": "High", "Cost": 3000 },
+      "CD009": { "Gears": 6, "Strength": "VeryHigh", "Cost": 4500 },
+      "Tremec": { "Gears": 6, "Strength": "Maximum", "Cost": 8000 }
+    },
+    "Sequential": {
+      "DogBox": { "Gears": 6, "ShiftTime": 0.05, "Cost": 15000 },
+      "Race": { "Gears": 6, "ShiftTime": 0.03, "Cost": 25000 }
+    },
+    "Automatic": {
+      "4L80E": { "Gears": 4, "Strength": "High", "Cost": 2000 },
+      "TH400": { "Gears": 3, "Strength": "Maximum", "Cost": 3000 }
+    },
+    "DCT": {
+      "PDK": { "Gears": 7, "ShiftTime": 0.05, "Cost": 20000 },
+      "DSG": { "Gears": 7, "ShiftTime": 0.06, "Cost": 12000 }
+    }
+  },
+
+  "Effects": {
+    "Performance": {
+      "PowerChange": "EngineSpec",
+      "WeightChange": "EngineDelta",
+      "BalanceChange": "EnginePosition"
+    },
+    "Handling": {
+      "WeightDistribution": "Recalculated",
+      "CenterOfGravity": "Adjusted",
+      "Polar Moment": "Changed"
+    },
+    "Sound": {
+      "NewSoundProfile": true,
+      "ExhaustCompatibility": true
+    }
+  },
+
+  "Specialists": {
+    "Required": {
+      "ExoticSwaps": true,
+      "ElectricConversions": true
+    },
+    "Locations": {
+      "TunerShop": { "SwapTypes": ["Direct", "Platform"] },
+      "PerformanceShop": { "SwapTypes": ["Direct", "Platform", "Universal"] },
+      "SpecialistShop": { "SwapTypes": ["All"] }
+    }
+  },
+
+  "Unlocks": {
+    "Level25": ["DirectSwap"],
+    "Level35": ["PlatformSwap"],
+    "Level45": ["UniversalSwap"],
+    "Achievement": ["ExoticSwap"]
+  }
+}

@@ -3096,6 +3096,341 @@ FMGTestResult UMGSubsystemTests::TestPhysics_WearConstants()
 }
 
 // ==========================================
+// STRESS TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestStress_HighObjectCount()
+{
+	LogTestStart(TEXT("TestStress_HighObjectCount"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test allocating and manipulating many objects
+	const int32 ObjectCount = 10000;
+
+	double StartTime = FPlatformTime::Seconds();
+
+	// Allocate many FStrings (simulates data structures)
+	TArray<FString> Strings;
+	Strings.Reserve(ObjectCount);
+
+	for (int32 i = 0; i < ObjectCount; i++)
+	{
+		Strings.Add(FString::Printf(TEXT("TestObject_%d"), i));
+	}
+
+	double AllocTime = FPlatformTime::Seconds();
+	double AllocMs = (AllocTime - StartTime) * 1000.0;
+
+	// Test TMap with many entries
+	TMap<FName, int32> TestMap;
+	for (int32 i = 0; i < ObjectCount; i++)
+	{
+		TestMap.Add(FName(*FString::Printf(TEXT("Key_%d"), i)), i);
+	}
+
+	double MapTime = FPlatformTime::Seconds();
+	double MapMs = (MapTime - AllocTime) * 1000.0;
+
+	// Perform lookups
+	volatile int32 LookupSum = 0;
+	for (int32 i = 0; i < ObjectCount; i++)
+	{
+		if (int32* Value = TestMap.Find(FName(*FString::Printf(TEXT("Key_%d"), i))))
+		{
+			LookupSum += *Value;
+		}
+	}
+
+	double LookupTime = FPlatformTime::Seconds();
+	double LookupMs = (LookupTime - MapTime) * 1000.0;
+
+	Logs.Add(FString::Printf(TEXT("Objects: %d"), ObjectCount));
+	Logs.Add(FString::Printf(TEXT("Array alloc: %.2f ms"), AllocMs));
+	Logs.Add(FString::Printf(TEXT("Map build: %.2f ms"), MapMs));
+	Logs.Add(FString::Printf(TEXT("Map lookup: %.2f ms"), LookupMs));
+	Logs.Add(FString::Printf(TEXT("Total: %.2f ms"), AllocMs + MapMs + LookupMs));
+
+	// Check for reasonable performance (< 1000ms total)
+	double TotalMs = AllocMs + MapMs + LookupMs;
+	if (TotalMs > 1000.0)
+	{
+		Logs.Add(TEXT("WARNING: Operations taking > 1 second"));
+	}
+
+	// Verify all operations completed
+	if (Strings.Num() != ObjectCount)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Expected %d strings, got %d"), ObjectCount, Strings.Num()));
+		bAllPassed = false;
+	}
+
+	if (TestMap.Num() != ObjectCount)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Expected %d map entries, got %d"), ObjectCount, TestMap.Num()));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Stress_HighObjectCount")),
+			TEXT("High object count test failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Stress_HighObjectCount")),
+		FString::Printf(TEXT("Handled %d objects in %.2f ms"), ObjectCount, TotalMs)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestStress_SustainedOperation()
+{
+	LogTestStart(TEXT("TestStress_SustainedOperation"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test many iterations of typical operations
+	const int32 Iterations = 100000;
+
+	double StartTime = FPlatformTime::Seconds();
+
+	// Simulate sustained computation
+	volatile float Result = 0.0f;
+	for (int32 i = 0; i < Iterations; i++)
+	{
+		// Typical game calculations
+		float Angle = FMath::DegreesToRadians((float)i);
+		Result += FMath::Sin(Angle) * FMath::Cos(Angle);
+
+		// Vector operations
+		FVector V1(i * 0.1f, i * 0.2f, i * 0.3f);
+		FVector V2(i * 0.3f, i * 0.2f, i * 0.1f);
+		Result += FVector::DotProduct(V1.GetSafeNormal(), V2.GetSafeNormal());
+	}
+
+	double EndTime = FPlatformTime::Seconds();
+	double TotalMs = (EndTime - StartTime) * 1000.0;
+	double AvgUs = (TotalMs * 1000.0) / Iterations;
+
+	Logs.Add(FString::Printf(TEXT("Iterations: %d"), Iterations));
+	Logs.Add(FString::Printf(TEXT("Total time: %.2f ms"), TotalMs));
+	Logs.Add(FString::Printf(TEXT("Avg per iteration: %.4f us"), AvgUs));
+
+	// Check for reasonable performance
+	if (TotalMs > 5000.0)
+	{
+		Logs.Add(TEXT("WARNING: Sustained operation > 5 seconds"));
+	}
+
+	// Verify computation completed (volatile prevents optimization)
+	if (FMath::IsNaN(Result))
+	{
+		Logs.Add(TEXT("FAIL: Computation resulted in NaN"));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Stress_SustainedOperation")),
+			TEXT("Sustained operation test failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Stress_SustainedOperation")),
+		FString::Printf(TEXT("Completed %d iterations in %.2f ms (%.4f us/iter)"), Iterations, TotalMs, AvgUs)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestStress_MemoryStability()
+{
+	LogTestStart(TEXT("TestStress_MemoryStability"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test repeated alloc/dealloc cycles
+	const int32 Cycles = 100;
+	const int32 ObjectsPerCycle = 1000;
+
+	SIZE_T StartMem = FPlatformMemory::GetStats().UsedPhysical;
+
+	for (int32 Cycle = 0; Cycle < Cycles; Cycle++)
+	{
+		// Allocate
+		TArray<TSharedPtr<FString>> Objects;
+		Objects.Reserve(ObjectsPerCycle);
+
+		for (int32 i = 0; i < ObjectsPerCycle; i++)
+		{
+			Objects.Add(MakeShared<FString>(FString::Printf(TEXT("Cycle%d_Object%d"), Cycle, i)));
+		}
+
+		// Validate
+		if (Objects.Num() != ObjectsPerCycle)
+		{
+			Logs.Add(FString::Printf(TEXT("FAIL: Cycle %d - Expected %d objects, got %d"), Cycle, ObjectsPerCycle, Objects.Num()));
+			bAllPassed = false;
+			break;
+		}
+
+		// Objects deallocated when TArray goes out of scope
+	}
+
+	SIZE_T EndMem = FPlatformMemory::GetStats().UsedPhysical;
+	int64 MemDelta = (int64)EndMem - (int64)StartMem;
+
+	Logs.Add(FString::Printf(TEXT("Cycles: %d"), Cycles));
+	Logs.Add(FString::Printf(TEXT("Objects per cycle: %d"), ObjectsPerCycle));
+	Logs.Add(FString::Printf(TEXT("Total allocations: %d"), Cycles * ObjectsPerCycle));
+	Logs.Add(FString::Printf(TEXT("Memory delta: %lld bytes"), MemDelta));
+
+	// Check for memory leaks (allow some variance from other processes)
+	// Significant leak would be > 10MB growth
+	if (MemDelta > 10 * 1024 * 1024)
+	{
+		Logs.Add(TEXT("WARNING: Significant memory growth detected (> 10MB)"));
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Stress_MemoryStability")),
+			TEXT("Memory stability test failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Stress_MemoryStability")),
+		FString::Printf(TEXT("Completed %d alloc/dealloc cycles, memory delta: %lld bytes"), Cycles, MemDelta)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestStress_RapidStateChanges()
+{
+	LogTestStart(TEXT("TestStress_RapidStateChanges"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test rapid state machine transitions
+	const int32 Transitions = 10000;
+
+	// Simulate enum state machine
+	enum class ETestState : uint8
+	{
+		Idle,
+		Starting,
+		Running,
+		Paused,
+		Stopping,
+		Stopped
+	};
+
+	double StartTime = FPlatformTime::Seconds();
+
+	ETestState CurrentState = ETestState::Idle;
+	int32 StateChanges = 0;
+
+	for (int32 i = 0; i < Transitions; i++)
+	{
+		// Cycle through all states
+		switch (CurrentState)
+		{
+		case ETestState::Idle:
+			CurrentState = ETestState::Starting;
+			break;
+		case ETestState::Starting:
+			CurrentState = ETestState::Running;
+			break;
+		case ETestState::Running:
+			CurrentState = ETestState::Paused;
+			break;
+		case ETestState::Paused:
+			CurrentState = ETestState::Stopping;
+			break;
+		case ETestState::Stopping:
+			CurrentState = ETestState::Stopped;
+			break;
+		case ETestState::Stopped:
+			CurrentState = ETestState::Idle;
+			break;
+		}
+		StateChanges++;
+	}
+
+	double EndTime = FPlatformTime::Seconds();
+	double TotalMs = (EndTime - StartTime) * 1000.0;
+	double AvgNs = (TotalMs * 1000000.0) / Transitions;
+
+	Logs.Add(FString::Printf(TEXT("State transitions: %d"), StateChanges));
+	Logs.Add(FString::Printf(TEXT("Total time: %.2f ms"), TotalMs));
+	Logs.Add(FString::Printf(TEXT("Avg per transition: %.2f ns"), AvgNs));
+
+	// Verify all transitions occurred
+	if (StateChanges != Transitions)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Expected %d transitions, got %d"), Transitions, StateChanges));
+		bAllPassed = false;
+	}
+
+	// Test rapid weather state changes (if subsystem available)
+	UMGWeatherSubsystem* Weather = GetWeatherSubsystem();
+	if (Weather)
+	{
+		double WeatherStart = FPlatformTime::Seconds();
+		const int32 WeatherChanges = 1000;
+
+		TArray<EMGWeatherType> WeatherTypes = {
+			EMGWeatherType::Clear,
+			EMGWeatherType::Cloudy,
+			EMGWeatherType::LightRain,
+			EMGWeatherType::HeavyRain,
+			EMGWeatherType::Fog
+		};
+
+		for (int32 i = 0; i < WeatherChanges; i++)
+		{
+			Weather->SetWeatherInstant(WeatherTypes[i % WeatherTypes.Num()]);
+		}
+
+		double WeatherEnd = FPlatformTime::Seconds();
+		double WeatherMs = (WeatherEnd - WeatherStart) * 1000.0;
+
+		Logs.Add(FString::Printf(TEXT("Weather changes: %d in %.2f ms"), WeatherChanges, WeatherMs));
+
+		// Reset to clear
+		Weather->SetWeatherInstant(EMGWeatherType::Clear);
+	}
+	else
+	{
+		Logs.Add(TEXT("Weather subsystem not available for state change test"));
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Stress_RapidStateChanges")),
+			TEXT("Rapid state changes test failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Stress_RapidStateChanges")),
+		FString::Printf(TEXT("Completed %d state transitions in %.2f ms"), StateChanges, TotalMs)
+	);
+}
+
+// ==========================================
 // CONSOLE COMMANDS
 // ==========================================
 
@@ -3171,6 +3506,12 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestPhysics_GeometryConstants());
 	TestResults.Add(TestPhysics_DifferentialConstants());
 	TestResults.Add(TestPhysics_WearConstants());
+
+	// Stress tests
+	TestResults.Add(TestStress_HighObjectCount());
+	TestResults.Add(TestStress_SustainedOperation());
+	TestResults.Add(TestStress_MemoryStability());
+	TestResults.Add(TestStress_RapidStateChanges());
 
 	// Count results
 	for (const FMGTestResult& Result : TestResults)
@@ -3396,6 +3737,32 @@ void UMGSubsystemTests::RunPhysicsTests()
 	TestResults.Add(TestPhysics_GeometryConstants());
 	TestResults.Add(TestPhysics_DifferentialConstants());
 	TestResults.Add(TestPhysics_WearConstants());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
+void UMGSubsystemTests::RunStressTests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING STRESS TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestStress_HighObjectCount());
+	TestResults.Add(TestStress_SustainedOperation());
+	TestResults.Add(TestStress_MemoryStability());
+	TestResults.Add(TestStress_RapidStateChanges());
 
 	for (const FMGTestResult& Result : TestResults)
 	{

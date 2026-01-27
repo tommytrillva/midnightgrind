@@ -1,0 +1,302 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Matchmaking and Online Session Configuration",
+
+  "MatchmakingSystem": {
+    "Enabled": true,
+    "ServerRegions": ["NA_East", "NA_West", "EU_West", "EU_East", "Asia_Pacific", "South_America"],
+    "CrossPlatform": true,
+    "MaxSearchTime": 120,
+    "QueueRefreshRate": 5
+  },
+
+  "MatchmakingFactors": {
+    "Skill": {
+      "Enabled": true,
+      "Weight": 0.4,
+      "System": "ELO",
+      "InitialRating": 1200,
+      "KFactor": {
+        "New": 40,
+        "Established": 20,
+        "Veteran": 10
+      },
+      "RatingFloor": 800,
+      "RatingCeiling": 3000
+    },
+    "VehiclePerformance": {
+      "Enabled": true,
+      "Weight": 0.3,
+      "MatchByClass": true,
+      "PITolerance": 50
+    },
+    "Connection": {
+      "Enabled": true,
+      "Weight": 0.2,
+      "MaxPing": 150,
+      "PreferredPing": 50,
+      "RegionPriority": "Same"
+    },
+    "WaitTime": {
+      "Enabled": true,
+      "Weight": 0.1,
+      "ExpandSearchAfter": 30,
+      "MaxExpansion": 3
+    }
+  },
+
+  "GameModes": {
+    "QuickRace": {
+      "ID": "MODE_QUICK",
+      "Name": "Quick Race",
+      "Description": "Jump into a random race",
+      "MinPlayers": 2,
+      "MaxPlayers": 8,
+      "MatchType": "Random",
+      "TrackSelection": "Vote",
+      "Classes": "Any",
+      "Ranked": false,
+      "RewardMultiplier": 1.0
+    },
+    "RankedRacing": {
+      "ID": "MODE_RANKED",
+      "Name": "Ranked Racing",
+      "Description": "Competitive racing with skill-based matchmaking",
+      "MinPlayers": 4,
+      "MaxPlayers": 8,
+      "MatchType": "SkillBased",
+      "TrackSelection": "Rotation",
+      "ClassRestriction": true,
+      "Ranked": true,
+      "SeasonEnabled": true,
+      "RewardMultiplier": 1.5,
+      "RankTiers": {
+        "Bronze": { "Min": 800, "Max": 1199 },
+        "Silver": { "Min": 1200, "Max": 1499 },
+        "Gold": { "Min": 1500, "Max": 1799 },
+        "Platinum": { "Min": 1800, "Max": 2099 },
+        "Diamond": { "Min": 2100, "Max": 2499 },
+        "Champion": { "Min": 2500, "Max": 2799 },
+        "Legend": { "Min": 2800, "Max": 3000 }
+      }
+    },
+    "DriftBattle": {
+      "ID": "MODE_DRIFT",
+      "Name": "Drift Battle",
+      "Description": "Head-to-head drift competitions",
+      "MinPlayers": 2,
+      "MaxPlayers": 8,
+      "MatchType": "Tournament",
+      "Format": "Bracket",
+      "Rounds": 3,
+      "ScoringType": "DriftScore",
+      "RewardMultiplier": 1.25
+    },
+    "Pursuit": {
+      "ID": "MODE_PURSUIT",
+      "Name": "Pursuit Mode",
+      "Description": "Cops vs Racers multiplayer",
+      "MinPlayers": 4,
+      "MaxPlayers": 12,
+      "Teams": {
+        "Racers": { "Min": 2, "Max": 8 },
+        "Cops": { "Min": 2, "Max": 4 }
+      },
+      "Duration": 600,
+      "ObjectiveType": "Survive_Or_Bust",
+      "RewardMultiplier": 1.25
+    },
+    "Elimination": {
+      "ID": "MODE_ELIM",
+      "Name": "Elimination",
+      "Description": "Last car standing wins",
+      "MinPlayers": 4,
+      "MaxPlayers": 12,
+      "EliminationInterval": 30,
+      "FinalLap": true,
+      "RewardMultiplier": 1.5
+    },
+    "TimeAttack": {
+      "ID": "MODE_TIME",
+      "Name": "Time Attack",
+      "Description": "Set the fastest time on selected track",
+      "MinPlayers": 1,
+      "MaxPlayers": 16,
+      "Simultaneous": false,
+      "Attempts": 3,
+      "LeaderboardEnabled": true,
+      "GhostRacing": true,
+      "RewardMultiplier": 1.0
+    },
+    "FreeroamOnline": {
+      "ID": "MODE_FREEROAM",
+      "Name": "Online Free Roam",
+      "Description": "Explore the city with other players",
+      "MinPlayers": 1,
+      "MaxPlayers": 16,
+      "SessionType": "Persistent",
+      "Activities": ["SpeedTraps", "DriftZones", "Meets", "Challenges"],
+      "RewardMultiplier": 0.75
+    },
+    "CustomRace": {
+      "ID": "MODE_CUSTOM",
+      "Name": "Custom Race",
+      "Description": "Create your own race rules",
+      "MinPlayers": 2,
+      "MaxPlayers": 16,
+      "HostControls": true,
+      "Customizable": {
+        "Track": true,
+        "Laps": true,
+        "Class": true,
+        "Traffic": true,
+        "Weather": true,
+        "TimeOfDay": true,
+        "Collision": true,
+        "CatchUp": true
+      },
+      "Ranked": false,
+      "RewardMultiplier": 0.5
+    }
+  },
+
+  "PrivateSessions": {
+    "Enabled": true,
+    "MaxPlayers": 16,
+    "InviteOnly": true,
+    "HostMigration": true,
+    "Features": {
+      "CustomRules": true,
+      "Spectating": true,
+      "Recording": true,
+      "Streaming": true
+    }
+  },
+
+  "PartySystem": {
+    "Enabled": true,
+    "MaxPartySize": 4,
+    "PartyLeaderControls": true,
+    "MatchAsGroup": true,
+    "VoiceChat": true,
+    "CrossPlatformParty": true,
+    "JoinInProgress": true
+  },
+
+  "LobbySystem": {
+    "PreRaceLobby": {
+      "Duration": 60,
+      "ShowPlayerCards": true,
+      "ShowVehicles": true,
+      "VotingEnabled": true,
+      "ChatEnabled": true,
+      "ReadySystem": true,
+      "CountdownAfterReady": 15
+    },
+    "VotingOptions": {
+      "TrackVoting": {
+        "Enabled": true,
+        "Options": 3,
+        "RandomOption": true,
+        "VetoEnabled": true
+      },
+      "ClassVoting": {
+        "Enabled": true,
+        "MajorityRequired": 0.6
+      }
+    },
+    "BackfillEnabled": true,
+    "BackfillCutoff": 30
+  },
+
+  "SessionSettings": {
+    "Migration": {
+      "HostMigration": true,
+      "MigrationTimeout": 30,
+      "SaveProgressOnMigration": true
+    },
+    "Disconnection": {
+      "ReconnectWindow": 120,
+      "KeepSlot": true,
+      "AITakeover": true
+    },
+    "Spectating": {
+      "Enabled": true,
+      "MaxSpectators": 10,
+      "DelaySeconds": 30,
+      "CameraOptions": ["Free", "FollowPlayer", "TrackCameras"]
+    }
+  },
+
+  "AntiCheat": {
+    "Enabled": true,
+    "ClientSideValidation": true,
+    "ServerSideValidation": true,
+    "ReplayVerification": true,
+    "Checks": {
+      "SpeedValidation": true,
+      "PositionValidation": true,
+      "TimeValidation": true,
+      "CollisionValidation": true,
+      "InputValidation": true
+    },
+    "Penalties": {
+      "FirstOffense": "Warning",
+      "SecondOffense": "MatchBan_24h",
+      "ThirdOffense": "SeasonBan",
+      "FlaggedForReview": "PermanentBan"
+    }
+  },
+
+  "Rewards": {
+    "ParticipationRewards": {
+      "Enabled": true,
+      "MinTimeInMatch": 60,
+      "BaseReward": { "Cash": 500, "REP": 50 }
+    },
+    "PlacementRewards": {
+      "1st": { "Cash": 5000, "REP": 500 },
+      "2nd": { "Cash": 3500, "REP": 350 },
+      "3rd": { "Cash": 2500, "REP": 250 },
+      "4th": { "Cash": 1500, "REP": 150 },
+      "5th": { "Cash": 1000, "REP": 100 },
+      "6th-8th": { "Cash": 750, "REP": 75 }
+    },
+    "Bonuses": {
+      "CleanRace": { "Multiplier": 1.25 },
+      "FirstPlace": { "Bonus": { "REP": 100 } },
+      "WinStreak": { "PerWin": { "REP": 50 }, "MaxStack": 5 },
+      "Underdog": { "Multiplier": 1.5 }
+    }
+  },
+
+  "Reporting": {
+    "Enabled": true,
+    "Categories": [
+      "Cheating",
+      "Unsportsmanlike_Conduct",
+      "Offensive_Content",
+      "Griefing",
+      "AFK_Abuse"
+    ],
+    "ReviewProcess": "Manual",
+    "FeedbackToReporter": true
+  },
+
+  "CrossPlatform": {
+    "Enabled": true,
+    "InputBasedMatchmaking": {
+      "Enabled": true,
+      "Groups": {
+        "Controller": ["PlayStation", "Xbox", "PC_Controller"],
+        "Keyboard": ["PC_Keyboard"],
+        "Wheel": ["PC_Wheel", "Console_Wheel"]
+      },
+      "MixedAllowed": true,
+      "PreferSameInput": true
+    },
+    "PlatformIcons": true,
+    "CrossPlatformChat": true,
+    "CrossPlatformInvites": true
+  }
+}

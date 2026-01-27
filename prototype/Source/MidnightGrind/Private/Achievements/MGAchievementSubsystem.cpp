@@ -1,6 +1,11 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Achievements/MGAchievementSubsystem.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "Misc/Paths.h"
 
 void UMGAchievementSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -968,10 +973,137 @@ void UMGAchievementSubsystem::ApplyRewards(const FMGAchievementReward& Reward)
 
 void UMGAchievementSubsystem::LoadProgress()
 {
-	// Would load from save system
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Achievements");
+	FString FilePath = SaveDir / TEXT("AchievementProgress.sav");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("No achievement save found, starting fresh"));
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	int32 Version = 0;
+	Archive << Version;
+
+	if (Version >= 1)
+	{
+		// Load achievement progress
+		int32 ProgressCount;
+		Archive << ProgressCount;
+		for (int32 i = 0; i < ProgressCount; i++)
+		{
+			FName AchievementID;
+			int32 CurrentProgress;
+			bool bUnlocked;
+			int64 UnlockTimestamp;
+
+			Archive << AchievementID;
+			Archive << CurrentProgress;
+			Archive << bUnlocked;
+			Archive << UnlockTimestamp;
+
+			if (FMGAchievementProgress* Progress = AchievementProgressMap.Find(AchievementID))
+			{
+				Progress->CurrentProgress = CurrentProgress;
+				Progress->bUnlocked = bUnlocked;
+				Progress->UnlockTime = FDateTime::FromUnixTimestamp(UnlockTimestamp);
+			}
+			else
+			{
+				FMGAchievementProgress NewProgress;
+				NewProgress.AchievementID = AchievementID;
+				NewProgress.CurrentProgress = CurrentProgress;
+				NewProgress.bUnlocked = bUnlocked;
+				NewProgress.UnlockTime = FDateTime::FromUnixTimestamp(UnlockTimestamp);
+				AchievementProgressMap.Add(AchievementID, NewProgress);
+			}
+		}
+
+		// Load stat values
+		int32 StatCount;
+		Archive << StatCount;
+		for (int32 i = 0; i < StatCount; i++)
+		{
+			int32 StatTypeInt;
+			int32 Value;
+			Archive << StatTypeInt;
+			Archive << Value;
+			StatValues.Add(static_cast<EMGAchievementStatType>(StatTypeInt), Value);
+		}
+
+		// Load equipped title
+		Archive << EquippedTitleID;
+
+		// Load equipped badge slots
+		int32 SlotCount;
+		Archive << SlotCount;
+		EquippedBadgeSlots.SetNum(FMath::Max(SlotCount, MaxBadgeSlots));
+		for (int32 i = 0; i < SlotCount; i++)
+		{
+			Archive << EquippedBadgeSlots[i];
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Achievement progress loaded - %d achievements, %d stats"),
+			ProgressCount, StatCount);
+	}
 }
 
 void UMGAchievementSubsystem::SaveProgress()
 {
-	// Would save to save system
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Achievements");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("AchievementProgress.sav");
+
+	FBufferArchive Archive;
+
+	int32 Version = 1;
+	Archive << Version;
+
+	// Save achievement progress
+	int32 ProgressCount = AchievementProgressMap.Num();
+	Archive << ProgressCount;
+	for (const auto& Pair : AchievementProgressMap)
+	{
+		FName AchievementID = Pair.Key;
+		int32 CurrentProgress = Pair.Value.CurrentProgress;
+		bool bUnlocked = Pair.Value.bUnlocked;
+		int64 UnlockTimestamp = Pair.Value.UnlockTime.ToUnixTimestamp();
+
+		Archive << AchievementID;
+		Archive << CurrentProgress;
+		Archive << bUnlocked;
+		Archive << UnlockTimestamp;
+	}
+
+	// Save stat values
+	int32 StatCount = StatValues.Num();
+	Archive << StatCount;
+	for (const auto& Pair : StatValues)
+	{
+		int32 StatTypeInt = static_cast<int32>(Pair.Key);
+		int32 Value = Pair.Value;
+		Archive << StatTypeInt;
+		Archive << Value;
+	}
+
+	// Save equipped title
+	Archive << EquippedTitleID;
+
+	// Save equipped badge slots
+	int32 SlotCount = EquippedBadgeSlots.Num();
+	Archive << SlotCount;
+	for (const FName& SlotID : EquippedBadgeSlots)
+	{
+		FName ID = SlotID;
+		Archive << ID;
+	}
+
+	if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Achievement progress saved - %d achievements, %d stats"),
+			ProgressCount, StatCount);
+	}
 }

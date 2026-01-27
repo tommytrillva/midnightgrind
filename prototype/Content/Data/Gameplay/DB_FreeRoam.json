@@ -1,0 +1,293 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Free Roam World and Activities",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "TrafficEnabled": true,
+    "PoliceEnabled": true,
+    "DynamicEvents": true,
+    "MultiplayerCapacity": 32,
+    "PersistentWorld": true
+  },
+
+  "WorldMap": {
+    "Regions": {
+      "Downtown": {
+        "ID": "REGION_DOWNTOWN",
+        "Name": "Downtown",
+        "Description": "Urban jungle of high-rises and tight streets",
+        "Style": "Urban",
+        "TrafficDensity": "High",
+        "PoliceDensity": "High",
+        "RaceTypes": ["Sprint", "Circuit", "Drift"],
+        "PointsOfInterest": 15
+      },
+      "Industrial": {
+        "ID": "REGION_INDUSTRIAL",
+        "Name": "Industrial District",
+        "Description": "Warehouses, docks, and wide open spaces",
+        "Style": "Industrial",
+        "TrafficDensity": "Low",
+        "PoliceDensity": "Medium",
+        "RaceTypes": ["Drag", "Sprint"],
+        "PointsOfInterest": 10
+      },
+      "Suburbs": {
+        "ID": "REGION_SUBURBS",
+        "Name": "Suburbs",
+        "Description": "Residential areas with winding roads",
+        "Style": "Residential",
+        "TrafficDensity": "Medium",
+        "PoliceDensity": "Medium",
+        "RaceTypes": ["Circuit", "Sprint"],
+        "PointsOfInterest": 12
+      },
+      "Highway": {
+        "ID": "REGION_HIGHWAY",
+        "Name": "Highway",
+        "Description": "High-speed highway system",
+        "Style": "Highway",
+        "TrafficDensity": "Medium",
+        "PoliceDensity": "Low",
+        "RaceTypes": ["Sprint", "Highway"],
+        "PointsOfInterest": 8
+      },
+      "Mountain": {
+        "ID": "REGION_MOUNTAIN",
+        "Name": "Mountain Pass",
+        "Description": "Twisty mountain roads with elevation changes",
+        "Style": "Mountain",
+        "TrafficDensity": "VeryLow",
+        "PoliceDensity": "VeryLow",
+        "RaceTypes": ["Touge", "Drift", "Hill Climb"],
+        "PointsOfInterest": 10
+      },
+      "Beach": {
+        "ID": "REGION_BEACH",
+        "Name": "Coastal Road",
+        "Description": "Scenic coastal highways",
+        "Style": "Coastal",
+        "TrafficDensity": "Low",
+        "PoliceDensity": "Low",
+        "RaceTypes": ["Sprint", "Cruise"],
+        "PointsOfInterest": 8
+      }
+    },
+    "TotalArea": "100 km²",
+    "RoadNetwork": "500 km"
+  },
+
+  "Activities": {
+    "SpeedTraps": {
+      "ID": "ACT_SPEEDTRAP",
+      "Description": "Record your top speed",
+      "Count": 30,
+      "Rewards": {
+        "FirstComplete": { "Cash": 500, "REP": 50 },
+        "BeatRecord": { "REP": 100 },
+        "TopThree": { "REP": 250 }
+      },
+      "Leaderboard": true
+    },
+    "DriftZones": {
+      "ID": "ACT_DRIFTZONE",
+      "Description": "Score points while drifting",
+      "Count": 25,
+      "Rewards": {
+        "FirstComplete": { "Cash": 750, "REP": 75 },
+        "BeatRecord": { "REP": 150 }
+      },
+      "Leaderboard": true
+    },
+    "SpeedRuns": {
+      "ID": "ACT_SPEEDRUN",
+      "Description": "Point-to-point time trials",
+      "Count": 20,
+      "Rewards": {
+        "Bronze": { "Cash": 500 },
+        "Silver": { "Cash": 1000, "REP": 100 },
+        "Gold": { "Cash": 2500, "REP": 250 }
+      },
+      "Leaderboard": true
+    },
+    "JumpSpots": {
+      "ID": "ACT_JUMPS",
+      "Description": "Big air challenges",
+      "Count": 15,
+      "Rewards": {
+        "FirstComplete": { "Cash": 500 },
+        "DistanceRecord": { "REP": 200 }
+      },
+      "Metrics": ["Distance", "Airtime", "Landing"]
+    },
+    "PhotoSpots": {
+      "ID": "ACT_PHOTO",
+      "Description": "Scenic photography locations",
+      "Count": 20,
+      "Rewards": {
+        "FirstVisit": { "REP": 50 },
+        "QualityPhoto": { "REP": 100 }
+      },
+      "PhotoMode": true
+    },
+    "Collectibles": {
+      "ID": "ACT_COLLECT",
+      "Description": "Hidden items across the map",
+      "Types": {
+        "Parts": { "Count": 50, "Reward": "RandomPart" },
+        "Blueprints": { "Count": 20, "Reward": "VehicleUnlock" },
+        "HistoryMarkers": { "Count": 30, "Reward": "Lore" }
+      }
+    }
+  },
+
+  "DynamicEvents": {
+    "RandomEncounters": {
+      "RivalAppearance": {
+        "ID": "EVENT_RIVAL",
+        "Description": "Rival challenges you to a race",
+        "Trigger": "Proximity",
+        "Frequency": "Uncommon",
+        "Rewards": { "Cash": 5000, "REP": 500 }
+      },
+      "StreetRace": {
+        "ID": "EVENT_STREETRACE",
+        "Description": "Impromptu street race",
+        "Trigger": "NearStartLine",
+        "Frequency": "Common",
+        "Rewards": { "Cash": 2500, "REP": 250 }
+      },
+      "PoliceChase": {
+        "ID": "EVENT_POLICE",
+        "Description": "Nearby pursuit you can join",
+        "Trigger": "PoliceNearby",
+        "Frequency": "Common",
+        "Rewards": { "REP": 500 }
+      },
+      "CarMeet": {
+        "ID": "EVENT_MEET",
+        "Description": "Pop-up car meet nearby",
+        "Trigger": "Timer",
+        "Frequency": "Uncommon",
+        "Rewards": { "REP": 100 }
+      }
+    },
+    "ScheduledEvents": {
+      "NightRun": {
+        "ID": "SCHEDULED_NIGHT",
+        "Time": "22:00-02:00",
+        "Description": "Night racing with bonus rewards",
+        "REPMultiplier": 1.5
+      },
+      "RushHour": {
+        "ID": "SCHEDULED_RUSH",
+        "Time": "07:00-09:00, 17:00-19:00",
+        "Description": "Heavy traffic challenges",
+        "TrafficMultiplier": 2.0
+      }
+    }
+  },
+
+  "Locations": {
+    "Garages": {
+      "Count": 5,
+      "Functions": ["Storage", "Customization", "Repairs"],
+      "Upgradeable": true,
+      "Capacity": { "Base": 5, "Max": 25 }
+    },
+    "Shops": {
+      "PartShops": { "Count": 3, "Specialty": true },
+      "TuningShops": { "Count": 2, "ServiceBays": true },
+      "BodyShops": { "Count": 2, "Customization": true }
+    },
+    "MeetSpots": {
+      "Count": 8,
+      "Activities": ["Showcase", "Vote", "Trade"],
+      "ScheduledEvents": true
+    },
+    "SafeHouses": {
+      "Count": 6,
+      "HeatCooldown": true,
+      "QuickSave": true
+    },
+    "GasStations": {
+      "Count": 10,
+      "Refuel": true,
+      "QuickRepair": true
+    },
+    "HiddenLocations": {
+      "SecretGarage": { "Unlock": "FindAllParts" },
+      "AbandonedTrack": { "Unlock": "Story" },
+      "DevRoom": { "Unlock": "EasterEgg" }
+    }
+  },
+
+  "TrafficSystem": {
+    "Density": {
+      "VeryLow": 5,
+      "Low": 15,
+      "Medium": 30,
+      "High": 50,
+      "VeryHigh": 75
+    },
+    "Behavior": {
+      "NormalDriving": true,
+      "ReactToPlayer": true,
+      "UseHorns": true,
+      "ReportToPolice": true
+    },
+    "TimeOfDay": {
+      "Day": { "Multiplier": 1.2 },
+      "Rush": { "Multiplier": 2.0 },
+      "Night": { "Multiplier": 0.5 },
+      "LateNight": { "Multiplier": 0.2 }
+    }
+  },
+
+  "MultiplayerFreeroam": {
+    "Sessions": {
+      "MaxPlayers": 32,
+      "InstancingEnabled": true,
+      "SeamlessJoin": true
+    },
+    "Interaction": {
+      "ProximityVoice": true,
+      "QuickRace": true,
+      "Trade": true,
+      "Follow": true
+    },
+    "CrewZones": {
+      "TerritoryControl": true,
+      "CrewBonus": true
+    }
+  },
+
+  "ProgressTracking": {
+    "Exploration": {
+      "RoadsDiscovered": { "Percentage": true },
+      "LocationsFound": { "Count": true },
+      "RegionsComplete": { "Count": true }
+    },
+    "Completion": {
+      "AllSpeedTraps": { "Reward": { "REP": 10000, "Title": "Speed Hunter" } },
+      "AllDriftZones": { "Reward": { "REP": 10000, "Title": "Drift Explorer" } },
+      "AllCollectibles": { "Reward": { "REP": 25000, "Vehicle": "Exclusive" } },
+      "FullMap": { "Reward": { "REP": 50000, "Title": "Completionist" } }
+    }
+  },
+
+  "UI": {
+    "Map": {
+      "FilterByCategory": true,
+      "ShowActivities": true,
+      "ShowPlayers": true,
+      "CustomWaypoints": 5
+    },
+    "HUD": {
+      "MiniMap": true,
+      "NearbyActivities": true,
+      "EventNotifications": true
+    }
+  }
+}

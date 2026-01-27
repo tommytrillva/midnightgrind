@@ -31,6 +31,12 @@
 #include "Weather/MGWeatherSubsystem.h"
 #include "Caution/MGCautionSubsystem.h"
 #include "Penalty/MGPenaltySubsystem.h"
+#include "HeatLevel/MGHeatLevelSubsystem.h"
+#include "Bounty/MGBountySubsystem.h"
+#include "RaceDirector/MGRaceDirectorSubsystem.h"
+#include "License/MGLicenseSubsystem.h"
+#include "Contract/MGContractSubsystem.h"
+#include "Challenges/MGChallengeSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -247,6 +253,51 @@ void AMGPlayerController::BeginPlay()
 				PenaltySubsystem->OnPenaltyIssued.AddDynamic(this, &AMGPlayerController::OnPenaltyIssued);
 				PenaltySubsystem->OnPenaltyServed.AddDynamic(this, &AMGPlayerController::OnPenaltyServed);
 			}
+
+			// Bind to heat level subsystem for police pursuit notifications
+			if (UMGHeatLevelSubsystem* HeatSubsystem = GI->GetSubsystem<UMGHeatLevelSubsystem>())
+			{
+				HeatSubsystem->OnHeatLevelChanged.AddDynamic(this, &AMGPlayerController::OnHeatLevelChanged);
+				HeatSubsystem->OnPursuitEvaded.AddDynamic(this, &AMGPlayerController::OnPursuitEvaded);
+				HeatSubsystem->OnPlayerBusted.AddDynamic(this, &AMGPlayerController::OnPlayerBusted);
+				HeatSubsystem->OnHelicopterDeployed.AddDynamic(this, &AMGPlayerController::OnHelicopterDeployed);
+			}
+
+			// Bind to bounty subsystem for bounty progress
+			if (UMGBountySubsystem* BountySubsystem = GI->GetSubsystem<UMGBountySubsystem>())
+			{
+				BountySubsystem->OnBountyCompleted.AddDynamic(this, &AMGPlayerController::OnBountyCompleted);
+				BountySubsystem->OnBountyFailed.AddDynamic(this, &AMGPlayerController::OnBountyFailed);
+				BountySubsystem->OnBountyObjectiveCompleted.AddDynamic(this, &AMGPlayerController::OnBountyObjectiveCompleted);
+			}
+
+			// Bind to race director for dramatic moments
+			if (UMGRaceDirectorSubsystem* DirectorSubsystem = GI->GetSubsystem<UMGRaceDirectorSubsystem>())
+			{
+				DirectorSubsystem->OnDramaticMoment.AddDynamic(this, &AMGPlayerController::OnDramaticMoment);
+				DirectorSubsystem->OnLeadChange.AddDynamic(this, &AMGPlayerController::OnLeadChange);
+			}
+
+			// Bind to license subsystem for license upgrades
+			if (UMGLicenseSubsystem* LicenseSubsystem = GI->GetSubsystem<UMGLicenseSubsystem>())
+			{
+				LicenseSubsystem->OnLicenseUpgraded.AddDynamic(this, &AMGPlayerController::OnLicenseUpgraded);
+				LicenseSubsystem->OnTestCompleted.AddDynamic(this, &AMGPlayerController::OnLicenseTestCompleted);
+			}
+
+			// Bind to contract subsystem for mission progress
+			if (UMGContractSubsystem* ContractSubsystem = GI->GetSubsystem<UMGContractSubsystem>())
+			{
+				ContractSubsystem->OnContractCompleted.AddDynamic(this, &AMGPlayerController::OnContractCompleted);
+				ContractSubsystem->OnObjectiveCompleted.AddDynamic(this, &AMGPlayerController::OnContractObjectiveCompleted);
+				ContractSubsystem->OnSponsorLevelUp.AddDynamic(this, &AMGPlayerController::OnSponsorLevelUp);
+			}
+
+			// Bind to challenge subsystem for challenge notifications
+			if (UMGChallengeSubsystem* ChallengeSubsystem = GI->GetSubsystem<UMGChallengeSubsystem>())
+			{
+				ChallengeSubsystem->OnChallengeCompleted.AddDynamic(this, &AMGPlayerController::OnChallengeCompleted);
+			}
 		}
 	}
 }
@@ -411,6 +462,27 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		{
 			PenaltySubsystem->OnPenaltyIssued.RemoveDynamic(this, &AMGPlayerController::OnPenaltyIssued);
 			PenaltySubsystem->OnPenaltyServed.RemoveDynamic(this, &AMGPlayerController::OnPenaltyServed);
+		}
+
+		if (UMGHeatLevelSubsystem* HeatSubsystem = GI->GetSubsystem<UMGHeatLevelSubsystem>())
+		{
+			HeatSubsystem->OnHeatLevelChanged.RemoveDynamic(this, &AMGPlayerController::OnHeatLevelChanged);
+			HeatSubsystem->OnPursuitEvaded.RemoveDynamic(this, &AMGPlayerController::OnPursuitEvaded);
+			HeatSubsystem->OnPlayerBusted.RemoveDynamic(this, &AMGPlayerController::OnPlayerBusted);
+			HeatSubsystem->OnHelicopterDeployed.RemoveDynamic(this, &AMGPlayerController::OnHelicopterDeployed);
+		}
+
+		if (UMGBountySubsystem* BountySubsystem = GI->GetSubsystem<UMGBountySubsystem>())
+		{
+			BountySubsystem->OnBountyCompleted.RemoveDynamic(this, &AMGPlayerController::OnBountyCompleted);
+			BountySubsystem->OnBountyFailed.RemoveDynamic(this, &AMGPlayerController::OnBountyFailed);
+			BountySubsystem->OnBountyObjectiveCompleted.RemoveDynamic(this, &AMGPlayerController::OnBountyObjectiveCompleted);
+		}
+
+		if (UMGRaceDirectorSubsystem* DirectorSubsystem = GI->GetSubsystem<UMGRaceDirectorSubsystem>())
+		{
+			DirectorSubsystem->OnDramaticMoment.RemoveDynamic(this, &AMGPlayerController::OnDramaticMoment);
+			DirectorSubsystem->OnLeadChange.RemoveDynamic(this, &AMGPlayerController::OnLeadChange);
 		}
 	}
 
@@ -2362,6 +2434,236 @@ void AMGPlayerController::OnPenaltyServed(const FMGPenalty& Penalty)
 			FText ServedMessage = FText::FromString(TEXT("PENALTY SERVED"));
 			FLinearColor ServedColor = FLinearColor(0.0f, 0.8f, 0.0f, 1.0f); // Green
 			HUDSubsystem->ShowNotification(ServedMessage, 2.5f, ServedColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnHeatLevelChanged(EMGHeatLevel OldLevel, EMGHeatLevel NewLevel)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText HeatMessage;
+			FLinearColor HeatColor;
+			float Duration = 3.0f;
+
+			switch (NewLevel)
+			{
+				case EMGHeatLevel::None:
+					// Going from heat to no heat
+					HeatMessage = FText::FromString(TEXT("HEAT LEVEL CLEARED"));
+					HeatColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green
+					break;
+
+				case EMGHeatLevel::Low:
+					HeatMessage = FText::FromString(TEXT("HEAT LEVEL 1 - PATROL ALERT"));
+					HeatColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
+					break;
+
+				case EMGHeatLevel::Medium:
+					HeatMessage = FText::FromString(TEXT("HEAT LEVEL 2 - UNITS DISPATCHED"));
+					HeatColor = FLinearColor(1.0f, 0.6f, 0.0f, 1.0f); // Orange
+					break;
+
+				case EMGHeatLevel::High:
+					HeatMessage = FText::FromString(TEXT("HEAT LEVEL 3 - AGGRESSIVE PURSUIT"));
+					HeatColor = FLinearColor(1.0f, 0.3f, 0.0f, 1.0f); // Red-orange
+					Duration = 4.0f;
+					break;
+
+				case EMGHeatLevel::Critical:
+					HeatMessage = FText::FromString(TEXT("HEAT LEVEL 4 - FEDERAL RESPONSE"));
+					HeatColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+					Duration = 5.0f;
+					break;
+
+				case EMGHeatLevel::Maximum:
+					HeatMessage = FText::FromString(TEXT("HEAT LEVEL 5 - MOST WANTED"));
+					HeatColor = FLinearColor(0.8f, 0.0f, 0.8f, 1.0f); // Purple
+					Duration = 5.0f;
+					break;
+
+				default:
+					return;
+			}
+
+			HUDSubsystem->ShowNotification(HeatMessage, Duration, HeatColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPursuitEvaded(float Duration, int32 BountyEarned)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			int32 Minutes = FMath::FloorToInt(Duration / 60.0f);
+			int32 Seconds = FMath::FloorToInt(FMath::Fmod(Duration, 60.0f));
+
+			FText EvadeMessage;
+			if (BountyEarned > 0)
+			{
+				EvadeMessage = FText::FromString(FString::Printf(TEXT("EVADED! %d:%02d - $%d BOUNTY"), Minutes, Seconds, BountyEarned));
+			}
+			else
+			{
+				EvadeMessage = FText::FromString(FString::Printf(TEXT("EVADED! %d:%02d"), Minutes, Seconds));
+			}
+
+			FLinearColor EvadeColor = FLinearColor(0.0f, 1.0f, 0.3f, 1.0f); // Green
+			HUDSubsystem->ShowNotification(EvadeMessage, 5.0f, EvadeColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPlayerBusted(int32 TotalCost, float PursuitDuration)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText BustedMessage = FText::FromString(FString::Printf(TEXT("BUSTED! -$%d"), TotalCost));
+			FLinearColor BustedColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+			HUDSubsystem->ShowNotification(BustedMessage, 6.0f, BustedColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnHelicopterDeployed()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText HelicopterMessage = FText::FromString(TEXT("HELICOPTER DEPLOYED!"));
+			FLinearColor HelicopterColor = FLinearColor(1.0f, 0.0f, 0.5f, 1.0f); // Magenta
+			HUDSubsystem->ShowNotification(HelicopterMessage, 4.0f, HelicopterColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnBountyCompleted(const FString& PlayerId, const FMGBountyCompletionResult& Result)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText CompleteMessage = FText::FromString(FString::Printf(TEXT("BOUNTY COMPLETE! +$%d"), Result.RewardAmount));
+			FLinearColor CompleteColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+			HUDSubsystem->ShowNotification(CompleteMessage, 5.0f, CompleteColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnBountyFailed(const FString& PlayerId, const FString& BountyId, const FString& Reason)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText FailedMessage = FText::FromString(TEXT("BOUNTY FAILED"));
+			FLinearColor FailedColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+			HUDSubsystem->ShowNotification(FailedMessage, 4.0f, FailedColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnBountyObjectiveCompleted(const FString& PlayerId, const FString& BountyId, const FString& ObjectiveId)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ObjectiveMessage = FText::FromString(TEXT("OBJECTIVE COMPLETE"));
+			FLinearColor ObjectiveColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f); // Cyan-green
+			HUDSubsystem->ShowNotification(ObjectiveMessage, 2.5f, ObjectiveColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnDramaticMoment(const FMGRaceEvent& Event)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText DramaMessage;
+			FLinearColor DramaColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
+
+			switch (Event.Type)
+			{
+				case EMGRaceEventType::PhotoFinish:
+					DramaMessage = FText::FromString(TEXT("PHOTO FINISH!"));
+					DramaColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+					break;
+
+				case EMGRaceEventType::CloseBattle:
+					DramaMessage = FText::FromString(TEXT("CLOSE BATTLE!"));
+					DramaColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+					break;
+
+				case EMGRaceEventType::MajorOvertake:
+					DramaMessage = FText::FromString(TEXT("MAJOR OVERTAKE!"));
+					DramaColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f); // Cyan-green
+					break;
+
+				case EMGRaceEventType::LastLapDrama:
+					DramaMessage = FText::FromString(TEXT("FINAL LAP - IT'S CLOSE!"));
+					DramaColor = FLinearColor(1.0f, 0.0f, 0.5f, 1.0f); // Magenta
+					break;
+
+				case EMGRaceEventType::UnexpectedFinish:
+					DramaMessage = FText::FromString(TEXT("WHAT A FINISH!"));
+					DramaColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+					break;
+
+				default:
+					return;
+			}
+
+			HUDSubsystem->ShowNotification(DramaMessage, 4.0f, DramaColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnLeadChange(const FGuid& NewLeaderId, int32 TotalChanges)
+{
+	// Only show if there have been multiple lead changes
+	if (TotalChanges < 2)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText LeadMessage = FText::FromString(FString::Printf(TEXT("LEAD CHANGE! (%d total)"), TotalChanges));
+			FLinearColor LeadColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
+			HUDSubsystem->ShowNotification(LeadMessage, 2.5f, LeadColor);
 		}
 	}
 }

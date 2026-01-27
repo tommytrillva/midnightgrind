@@ -1,6 +1,11 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "LiveService/MGLiveEventsSubsystem.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "Misc/Paths.h"
 
 void UMGLiveEventsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -884,10 +889,144 @@ void UMGLiveEventsSubsystem::CreateMockEvents()
 
 void UMGLiveEventsSubsystem::SaveProgress()
 {
-	// Would save to server/local storage
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("LiveEvents");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("LiveEventsProgress.sav");
+
+	FBufferArchive Archive;
+
+	int32 Version = 1;
+	Archive << Version;
+
+	// Save daily streak
+	Archive << DailyStreak;
+	int64 LastCompletionUnix = LastDailyCompletion.ToUnixTimestamp();
+	Archive << LastCompletionUnix;
+
+	// Save daily challenge completion status
+	int32 ChallengeCount = DailyChallenges.Challenges.Num();
+	Archive << ChallengeCount;
+	for (const FMGDailyChallenge& Challenge : DailyChallenges.Challenges)
+	{
+		FName ChallengeID = Challenge.ChallengeID;
+		int32 Progress = Challenge.CurrentProgress;
+		bool bCompleted = Challenge.bCompleted;
+		bool bRewardClaimed = Challenge.bRewardClaimed;
+
+		Archive << ChallengeID;
+		Archive << Progress;
+		Archive << bCompleted;
+		Archive << bRewardClaimed;
+	}
+
+	// Save event participation progress
+	int32 EventCount = AllEvents.Num();
+	Archive << EventCount;
+	for (const FMGLiveEvent& Event : AllEvents)
+	{
+		FName EventID = Event.EventID;
+		int32 Progress = Event.PlayerProgress;
+		bool bParticipating = Event.bIsParticipating;
+		bool bCompleted = Event.bCompleted;
+
+		Archive << EventID;
+		Archive << Progress;
+		Archive << bParticipating;
+		Archive << bCompleted;
+	}
+
+	if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Live events progress saved - Streak: %d, Events: %d"),
+			DailyStreak, EventCount);
+	}
 }
 
 void UMGLiveEventsSubsystem::LoadProgress()
 {
-	// Would load from server/local storage
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("LiveEvents");
+	FString FilePath = SaveDir / TEXT("LiveEventsProgress.sav");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	int32 Version = 0;
+	Archive << Version;
+
+	if (Version >= 1)
+	{
+		// Load daily streak
+		Archive << DailyStreak;
+		int64 LastCompletionUnix;
+		Archive << LastCompletionUnix;
+		LastDailyCompletion = FDateTime::FromUnixTimestamp(LastCompletionUnix);
+
+		// Load daily challenge progress
+		int32 ChallengeCount;
+		Archive << ChallengeCount;
+		TMap<FName, TPair<TPair<int32, bool>, bool>> ChallengeData;
+		for (int32 i = 0; i < ChallengeCount; i++)
+		{
+			FName ChallengeID;
+			int32 Progress;
+			bool bCompleted;
+			bool bRewardClaimed;
+
+			Archive << ChallengeID;
+			Archive << Progress;
+			Archive << bCompleted;
+			Archive << bRewardClaimed;
+
+			ChallengeData.Add(ChallengeID, TPair<TPair<int32, bool>, bool>(TPair<int32, bool>(Progress, bCompleted), bRewardClaimed));
+		}
+
+		// Apply to daily challenges
+		for (FMGDailyChallenge& Challenge : DailyChallenges.Challenges)
+		{
+			if (const auto* Data = ChallengeData.Find(Challenge.ChallengeID))
+			{
+				Challenge.CurrentProgress = Data->Key.Key;
+				Challenge.bCompleted = Data->Key.Value;
+				Challenge.bRewardClaimed = Data->Value;
+			}
+		}
+
+		// Load event progress
+		int32 EventCount;
+		Archive << EventCount;
+		TMap<FName, FVector4> EventData;
+		for (int32 i = 0; i < EventCount; i++)
+		{
+			FName EventID;
+			int32 Progress;
+			bool bParticipating;
+			bool bCompleted;
+
+			Archive << EventID;
+			Archive << Progress;
+			Archive << bParticipating;
+			Archive << bCompleted;
+
+			EventData.Add(EventID, FVector4(Progress, bParticipating ? 1.0f : 0.0f, bCompleted ? 1.0f : 0.0f, 0.0f));
+		}
+
+		// Apply to events
+		for (FMGLiveEvent& Event : AllEvents)
+		{
+			if (const FVector4* Data = EventData.Find(Event.EventID))
+			{
+				Event.PlayerProgress = static_cast<int32>(Data->X);
+				Event.bIsParticipating = Data->Y > 0.5f;
+				Event.bCompleted = Data->Z > 0.5f;
+			}
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Live events progress loaded - Streak: %d, Challenges: %d, Events: %d"),
+			DailyStreak, ChallengeCount, EventCount);
+	}
 }

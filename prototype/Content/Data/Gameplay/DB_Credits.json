@@ -1,0 +1,288 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Credits and Attribution Configuration",
+
+  "CreditsSystem": {
+    "Enabled": true,
+    "AutoPlayAfterStory": true,
+    "AccessFromMenu": true,
+    "Skippable": true,
+    "SkipAfterFirstView": true,
+    "InteractiveMode": true,
+    "Duration": 300
+  },
+
+  "CreditsSequence": {
+    "OpeningAnimation": {
+      "Type": "Logo_Reveal",
+      "Duration": 5.0,
+      "Asset": "ANIM_Credits_Open"
+    },
+    "Background": {
+      "Type": "Dynamic",
+      "Content": ["HighlightReel", "CommunityPhotos", "ConceptArt"],
+      "Music": "MUS_Credits_Theme"
+    },
+    "ScrollSpeed": {
+      "Default": 50,
+      "FastForward": 200,
+      "Adjustable": true
+    }
+  },
+
+  "DepartmentSections": [
+    {
+      "ID": "CREDITS_LEADERSHIP",
+      "Title": "LEADERSHIP",
+      "Order": 1,
+      "Roles": [
+        { "Title": "Creative Director", "Names": ["[Name TBD]"] },
+        { "Title": "Game Director", "Names": ["[Name TBD]"] },
+        { "Title": "Technical Director", "Names": ["[Name TBD]"] },
+        { "Title": "Art Director", "Names": ["[Name TBD]"] },
+        { "Title": "Audio Director", "Names": ["[Name TBD]"] },
+        { "Title": "Executive Producer", "Names": ["[Name TBD]"] },
+        { "Title": "Producer", "Names": ["[Name TBD]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_DESIGN",
+      "Title": "GAME DESIGN",
+      "Order": 2,
+      "Roles": [
+        { "Title": "Lead Game Designer", "Names": ["[Name TBD]"] },
+        { "Title": "Systems Designer", "Names": ["[Name TBD]"] },
+        { "Title": "Level Designers", "Names": ["[Name TBD]", "[Name TBD]"] },
+        { "Title": "Vehicle Designer", "Names": ["[Name TBD]"] },
+        { "Title": "Economy Designer", "Names": ["[Name TBD]"] },
+        { "Title": "UI/UX Designer", "Names": ["[Name TBD]"] },
+        { "Title": "Narrative Designer", "Names": ["[Name TBD]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_ENGINEERING",
+      "Title": "ENGINEERING",
+      "Order": 3,
+      "Roles": [
+        { "Title": "Lead Engineer", "Names": ["[Name TBD]"] },
+        { "Title": "Vehicle Physics Programmer", "Names": ["[Name TBD]"] },
+        { "Title": "Gameplay Programmers", "Names": ["[Name TBD]", "[Name TBD]"] },
+        { "Title": "Graphics Programmer", "Names": ["[Name TBD]"] },
+        { "Title": "AI Programmer", "Names": ["[Name TBD]"] },
+        { "Title": "Network Programmer", "Names": ["[Name TBD]"] },
+        { "Title": "Tools Programmer", "Names": ["[Name TBD]"] },
+        { "Title": "UI Programmer", "Names": ["[Name TBD]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_ART",
+      "Title": "ART",
+      "Order": 4,
+      "Roles": [
+        { "Title": "Lead Artist", "Names": ["[Name TBD]"] },
+        { "Title": "Vehicle Artists", "Names": ["[Name TBD]", "[Name TBD]", "[Name TBD]"] },
+        { "Title": "Environment Artists", "Names": ["[Name TBD]", "[Name TBD]"] },
+        { "Title": "Character Artist", "Names": ["[Name TBD]"] },
+        { "Title": "VFX Artists", "Names": ["[Name TBD]", "[Name TBD]"] },
+        { "Title": "Technical Artist", "Names": ["[Name TBD]"] },
+        { "Title": "Concept Artists", "Names": ["[Name TBD]", "[Name TBD]"] },
+        { "Title": "UI Artist", "Names": ["[Name TBD]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_AUDIO",
+      "Title": "AUDIO",
+      "Order": 5,
+      "Roles": [
+        { "Title": "Lead Sound Designer", "Names": ["[Name TBD]"] },
+        { "Title": "Sound Designers", "Names": ["[Name TBD]", "[Name TBD]"] },
+        { "Title": "Vehicle Audio Specialist", "Names": ["[Name TBD]"] },
+        { "Title": "Composer", "Names": ["[Name TBD]"] },
+        { "Title": "Music Supervisor", "Names": ["[Name TBD]"] },
+        { "Title": "Voice Director", "Names": ["[Name TBD]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_QA",
+      "Title": "QUALITY ASSURANCE",
+      "Order": 6,
+      "Roles": [
+        { "Title": "QA Lead", "Names": ["[Name TBD]"] },
+        { "Title": "QA Testers", "Names": ["[Name TBD]", "[Name TBD]", "[Name TBD]", "[Name TBD]"] },
+        { "Title": "Compliance Testers", "Names": ["[Name TBD]", "[Name TBD]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_PRODUCTION",
+      "Title": "PRODUCTION",
+      "Order": 7,
+      "Roles": [
+        { "Title": "Associate Producer", "Names": ["[Name TBD]"] },
+        { "Title": "Production Coordinator", "Names": ["[Name TBD]"] },
+        { "Title": "Project Manager", "Names": ["[Name TBD]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_COMMUNITY",
+      "Title": "COMMUNITY",
+      "Order": 8,
+      "Roles": [
+        { "Title": "Community Manager", "Names": ["[Name TBD]"] },
+        { "Title": "Social Media Manager", "Names": ["[Name TBD]"] },
+        { "Title": "Customer Support Lead", "Names": ["[Name TBD]"] }
+      ]
+    }
+  ],
+
+  "VoiceCast": {
+    "Title": "VOICE CAST",
+    "Order": 9,
+    "Characters": [
+      { "Character": "Kai", "VoiceActor": "[Voice Actor TBD]" },
+      { "Character": "Luna", "VoiceActor": "[Voice Actor TBD]" },
+      { "Character": "Vince", "VoiceActor": "[Voice Actor TBD]" },
+      { "Character": "Maya", "VoiceActor": "[Voice Actor TBD]" },
+      { "Character": "DJ NEON", "VoiceActor": "[Voice Actor TBD]" },
+      { "Character": "Officer Chen", "VoiceActor": "[Voice Actor TBD]" },
+      { "Character": "Additional Voices", "VoiceActor": "[Various]" }
+    ]
+  },
+
+  "MusicCredits": {
+    "Title": "MUSIC",
+    "Order": 10,
+    "OriginalScore": {
+      "Composer": "[Composer TBD]",
+      "Orchestration": "[TBD]",
+      "Recording": "[Studio TBD]"
+    },
+    "LicensedMusic": {
+      "Note": "Licensed tracks listed by station",
+      "Stations": [
+        {
+          "Station": "Midnight FM",
+          "Tracks": ["Track 1 - Artist 1", "Track 2 - Artist 2"]
+        },
+        {
+          "Station": "Drift Wave",
+          "Tracks": ["Track 1 - Artist 1", "Track 2 - Artist 2"]
+        },
+        {
+          "Station": "Underground Bass",
+          "Tracks": ["Track 1 - Artist 1", "Track 2 - Artist 2"]
+        }
+      ]
+    },
+    "MusicSupervisor": "[Name TBD]",
+    "MusicCoordinator": "[Name TBD]"
+  },
+
+  "SpecialThanks": {
+    "Title": "SPECIAL THANKS",
+    "Order": 11,
+    "Sections": [
+      {
+        "Category": "Inspiration",
+        "Names": ["The Racing Game Community", "Car Culture Worldwide", "Night City Drivers"]
+      },
+      {
+        "Category": "Technical Partners",
+        "Names": ["Epic Games - Unreal Engine", "Platform Partners"]
+      },
+      {
+        "Category": "Friends & Family",
+        "Names": ["All our families for their support", "The coffee that kept us going"]
+      },
+      {
+        "Category": "Community",
+        "Names": ["Our Beta Testers", "Discord Community", "Content Creators"]
+      }
+    ]
+  },
+
+  "LegalCredits": {
+    "Title": "LEGAL",
+    "Order": 12,
+    "Sections": [
+      {
+        "Category": "Middleware",
+        "Items": [
+          "Unreal Engine - Epic Games, Inc.",
+          "Wwise - Audiokinetic Inc.",
+          "FMOD - Firelight Technologies"
+        ]
+      },
+      {
+        "Category": "Trademarks",
+        "Text": "All trademarks are the property of their respective owners."
+      },
+      {
+        "Category": "Disclaimer",
+        "Text": "This is a work of fiction. Any resemblance to real persons, vehicles, or events is purely coincidental."
+      }
+    ]
+  },
+
+  "InteractiveCredits": {
+    "Enabled": true,
+    "Features": {
+      "DrivableScene": {
+        "Enabled": true,
+        "Vehicle": "PlayerFavorite",
+        "Environment": "CreditsWorld"
+      },
+      "ClickableNames": {
+        "Enabled": true,
+        "ShowBio": true,
+        "ShowFavoriteCar": true
+      },
+      "EasterEgg": {
+        "Enabled": true,
+        "Trigger": "WatchFullCredits",
+        "Reward": { "Cash": 10000, "Achievement": "ACH_CREDITS_WATCHER" }
+      }
+    }
+  },
+
+  "PostCreditsScene": {
+    "Enabled": true,
+    "Content": "Teaser_DLC",
+    "ShowAfter": "FirstCompletion"
+  },
+
+  "CommunityContributors": {
+    "Title": "COMMUNITY CONTRIBUTORS",
+    "Order": 13,
+    "Description": "Players who contributed to the game",
+    "Categories": [
+      {
+        "Category": "Top Photo Mode Artists",
+        "FetchFromServer": true,
+        "MaxDisplay": 20
+      },
+      {
+        "Category": "Beta Testing Heroes",
+        "FetchFromServer": true,
+        "MaxDisplay": 50
+      },
+      {
+        "Category": "Bug Hunters",
+        "FetchFromServer": true,
+        "MaxDisplay": 25
+      }
+    ]
+  },
+
+  "InMemoriam": {
+    "Enabled": false,
+    "Title": "IN MEMORIAM",
+    "Names": []
+  },
+
+  "ClosingCard": {
+    "Message": "Thank you for playing MIDNIGHT GRIND",
+    "Subtext": "See you on the streets",
+    "Duration": 5.0,
+    "Asset": "IMG_Credits_Closing"
+  }
+}

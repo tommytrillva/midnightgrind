@@ -645,6 +645,11 @@ void UMGInputBufferSubsystem::ResetAllComboProgress()
 
 void UMGInputBufferSubsystem::StartTimingWindow(const FName& WindowName, float Duration, EMGInputAction ExpectedAction)
 {
+    if (Duration <= 0.0f)
+    {
+        return;
+    }
+
     FMGTimingWindow Window;
     Window.WindowName = WindowName;
     Window.StartTime = CurrentTime;
