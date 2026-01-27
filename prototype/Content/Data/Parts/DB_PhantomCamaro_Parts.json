@@ -1,0 +1,186 @@
+{
+  "VehicleID": "PHANTOM_CAMARO",
+  "Version": "1.0",
+  "TotalParts": 78,
+
+  "Engine": {
+    "Intake": [
+      { "ID": "INTAKE_STOCK", "Name": "Stock Intake", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "INTAKE_KN", "Name": "K&N Cold Air Intake", "Power": 15, "Price": 400, "Tier": "Sport" },
+      { "ID": "INTAKE_VARARAM", "Name": "Vararam Intake", "Power": 25, "Price": 850, "Tier": "Race" },
+      { "ID": "INTAKE_FULL_RACE", "Name": "Full Race ITB", "Power": 40, "Price": 4800, "Tier": "Elite" }
+    ],
+    "Exhaust": [
+      { "ID": "EXHAUST_STOCK", "Name": "Stock Exhaust", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "EXHAUST_BORLA", "Name": "Borla ATAK Catback", "Power": 18, "Price": 1400, "Tier": "Sport" },
+      { "ID": "EXHAUST_KOOKS", "Name": "Kooks Full System", "Power": 45, "Price": 3200, "Tier": "Race" },
+      { "ID": "EXHAUST_HEADERS", "Name": "Kooks Long Tube Headers + X-Pipe", "Power": 75, "Price": 5500, "Tier": "Elite" }
+    ],
+    "Supercharger": [
+      { "ID": "SC_STOCK", "Name": "Stock 1.7L Supercharger", "Power": 0, "Boost": 9.4, "Price": 0, "Tier": "Stock" },
+      { "ID": "SC_23L", "Name": "2.3L Supercharger Upgrade", "Power": 80, "Boost": 12, "Price": 3500, "Tier": "Sport" },
+      { "ID": "SC_265L", "Name": "2.65L Supercharger Upgrade", "Power": 140, "Boost": 15, "Price": 6000, "Tier": "Race" },
+      { "ID": "SC_TWINSCREW", "Name": "Whipple 3.0L Twin Screw", "Power": 220, "Boost": 18, "Price": 12000, "Tier": "Elite" }
+    ],
+    "Intercooler": [
+      { "ID": "IC_STOCK", "Name": "Stock Heat Exchanger", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "IC_LARGE", "Name": "Large Brick Heat Exchanger", "Power": 20, "Price": 1200, "Tier": "Sport" },
+      { "ID": "IC_DUALPASS", "Name": "Dual Pass System", "Power": 40, "Price": 2800, "Tier": "Elite" }
+    ],
+    "ECU": [
+      { "ID": "ECU_STOCK", "Name": "Stock ECU", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "ECU_STAGE1", "Name": "HP Tuners Stage 1", "Power": 30, "Price": 600, "Tier": "Sport" },
+      { "ID": "ECU_STAGE2", "Name": "HP Tuners Stage 2", "Power": 65, "Price": 1200, "Tier": "Race" },
+      { "ID": "ECU_STANDALONE", "Name": "Holley Terminator X", "Power": 100, "Price": 3800, "Tier": "Elite" }
+    ],
+    "FuelSystem": [
+      { "ID": "FUEL_STOCK", "Name": "Stock Fuel System", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "FUEL_HIGHFLOW", "Name": "High Flow Pump + Injectors", "Power": 25, "Price": 1000, "Tier": "Sport" },
+      { "ID": "FUEL_E85", "Name": "E85 Conversion Kit", "Power": 70, "Price": 2200, "Tier": "Race" },
+      { "ID": "FUEL_FLEX", "Name": "Flex Fuel System", "Power": 85, "Price": 3500, "Tier": "Elite" }
+    ],
+    "Internals": [
+      { "ID": "INT_STOCK", "Name": "Stock Internals", "Power": 0, "Price": 0, "BoostLimit": 12, "Tier": "Stock" },
+      { "ID": "INT_RODS", "Name": "Forged Rods", "Power": 0, "Price": 3000, "BoostLimit": 18, "Tier": "Race" },
+      { "ID": "INT_PISTONS", "Name": "Forged Pistons + Rods", "Power": 0, "Price": 5500, "BoostLimit": 22, "Tier": "Race" },
+      { "ID": "INT_FORGED", "Name": "Full Forged Build", "Power": 0, "Price": 12000, "BoostLimit": 28, "Tier": "Elite" }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "CLUTCH_STOCK", "Name": "Stock Clutch", "Capacity": 650, "Price": 0, "Tier": "Stock" },
+      { "ID": "CLUTCH_SPORT", "Name": "Mantic Sport Clutch", "Capacity": 850, "Price": 900, "Tier": "Sport" },
+      { "ID": "CLUTCH_RACING", "Name": "McLeod RXT", "Capacity": 1100, "Price": 2500, "Tier": "Race" },
+      { "ID": "CLUTCH_TWIN", "Name": "Mantic Twin Disc", "Capacity": 1400, "Price": 5000, "Tier": "Elite" }
+    ],
+    "Transmission": [
+      { "ID": "TRANS_STOCK", "Name": "Stock TR6060 6-Speed", "Price": 0, "Tier": "Stock" },
+      { "ID": "TRANS_T56", "Name": "Built T56 Magnum", "Price": 4000, "Tier": "Race" },
+      { "ID": "TRANS_TR6060_BUILT", "Name": "Built TR6060", "Price": 5500, "Tier": "Race" },
+      { "ID": "TRANS_SEQ", "Name": "Sequential Gearbox", "Price": 18000, "Tier": "Elite" }
+    ],
+    "FinalDrive": [
+      { "ID": "FD_STOCK", "Name": "Stock 3.73 Final Drive", "Ratio": 3.73, "Price": 0, "Tier": "Stock" },
+      { "ID": "FD_391", "Name": "3.91 Final Drive", "Ratio": 3.91, "Price": 750, "Tier": "Sport" },
+      { "ID": "FD_410", "Name": "4.10 Final Drive", "Ratio": 4.10, "Price": 900, "Tier": "Race" },
+      { "ID": "FD_456", "Name": "4.56 Final Drive", "Ratio": 4.56, "Price": 1100, "Tier": "Elite" }
+    ],
+    "LSD": [
+      { "ID": "LSD_STOCK", "Name": "Stock Open Diff", "LockPercent": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "LSD_15WAY", "Name": "Eaton Posi", "LockPercent": 50, "Price": 1200, "Tier": "Sport" },
+      { "ID": "LSD_2WAY", "Name": "Wavetrac LSD", "LockPercent": 80, "Price": 2200, "Tier": "Race" },
+      { "ID": "LSD_SPOOL", "Name": "Spool Diff", "LockPercent": 100, "Price": 600, "Tier": "Race" }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "SPRING_STOCK", "Name": "Stock Springs", "Price": 0, "Tier": "Stock" },
+      { "ID": "SPRING_LOW", "Name": "BMR Lowering Springs", "Price": 350, "Tier": "Sport" },
+      { "ID": "SPRING_COIL", "Name": "Penske Coilovers", "Price": 3500, "Tier": "Race" },
+      { "ID": "SPRING_DRAG", "Name": "BMR Drag Springs", "Price": 600, "Tier": "Race" }
+    ],
+    "Dampers": [
+      { "ID": "DAMP_STOCK", "Name": "Stock MagRide", "Price": 0, "Tier": "Stock" },
+      { "ID": "DAMP_ADJ", "Name": "Koni FSD", "Price": 1800, "Tier": "Race" },
+      { "ID": "DAMP_RACE", "Name": "Ohlins Road & Track", "Price": 4500, "Tier": "Elite" }
+    ],
+    "Swaybars": [
+      { "ID": "SWAY_STOCK", "Name": "Stock Sway Bars", "Price": 0, "Tier": "Stock" },
+      { "ID": "SWAY_SPORT", "Name": "BMR Sport Set", "Price": 550, "Tier": "Sport" },
+      { "ID": "SWAY_RACE", "Name": "BMR Adjustable Set", "Price": 1100, "Tier": "Race" }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "PAD_STOCK", "Name": "Stock Pads", "Price": 0, "Tier": "Stock" },
+      { "ID": "PAD_SPORT", "Name": "Hawk HPS 5.0", "Price": 280, "Tier": "Sport" },
+      { "ID": "PAD_TRACK", "Name": "Hawk DTC-70", "Price": 500, "Tier": "Race" },
+      { "ID": "PAD_RACE", "Name": "Carbotech XP12", "Price": 850, "Tier": "Elite" }
+    ],
+    "Rotors": [
+      { "ID": "ROTOR_STOCK", "Name": "Stock Rotors", "Price": 0, "Tier": "Stock" },
+      { "ID": "ROTOR_SLOT", "Name": "Slotted Rotors", "Price": 450, "Tier": "Sport" },
+      { "ID": "ROTOR_2PC", "Name": "2-Piece Rotors", "Price": 2000, "Tier": "Race" },
+      { "ID": "ROTOR_CARBON", "Name": "Carbon Ceramic", "Price": 9000, "Tier": "Elite" }
+    ],
+    "Calipers": [
+      { "ID": "CAL_STOCK", "Name": "Stock Brembo", "Price": 0, "Tier": "Stock" },
+      { "ID": "CAL_6POT", "Name": "Brembo GT 6-Piston", "Price": 5000, "Tier": "Race" },
+      { "ID": "CAL_8POT", "Name": "Brembo GT-R 8-Piston", "Price": 8500, "Tier": "Elite" }
+    ]
+  },
+
+  "Wheels": {
+    "Sets": [
+      { "ID": "WHEEL_STOCK", "Name": "Stock 19/20\" Wheels", "Size": 20, "Weight": 32, "Price": 0, "Tier": "Stock" },
+      { "ID": "WHEEL_FORGED", "Name": "Forgeline GA3 19\"", "Size": 19, "Weight": 24, "Price": 5500, "Tier": "Race" },
+      { "ID": "WHEEL_DRAG", "Name": "Weld RT-S 17\" Drag", "Size": 17, "Weight": 20, "Price": 3500, "Tier": "Race" },
+      { "ID": "WHEEL_LIGHT", "Name": "HRE P101 20\"", "Size": 20, "Weight": 22, "Price": 8000, "Tier": "Elite" }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "TIRE_SPORT", "Name": "Michelin Pilot Sport 4S", "Grip": 1.0, "Price": 1400, "Tier": "Sport" },
+      { "ID": "TIRE_SEMISLICK", "Name": "Nitto NT05R", "Grip": 1.18, "Price": 1800, "Tier": "Race" },
+      { "ID": "TIRE_SLICK", "Name": "Hoosier A7", "Grip": 1.40, "Price": 3000, "Tier": "Elite" },
+      { "ID": "TIRE_DRAG", "Name": "Mickey Thompson ET Street R", "Grip": 1.55, "Price": 1600, "Tier": "Elite" }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "FBUMP_STOCK", "Name": "Stock Front Bumper", "Price": 0, "Tier": "Stock" },
+      { "ID": "FBUMP_ZL1", "Name": "ZL1 Front Bumper", "Price": 1800, "Tier": "Sport" },
+      { "ID": "FBUMP_1LE", "Name": "1LE Track Package", "Price": 2800, "Tier": "Race" },
+      { "ID": "FBUMP_WIDE", "Name": "Widebody Front", "Price": 5500, "Tier": "Elite" }
+    ],
+    "Spoiler": [
+      { "ID": "SPOILER_STOCK", "Name": "Stock Spoiler", "Downforce": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "SPOILER_ZL1", "Name": "ZL1 Spoiler", "Downforce": 10, "Price": 900, "Tier": "Sport" },
+      { "ID": "SPOILER_HIGH", "Name": "ZL1 1LE High Wing", "Downforce": 28, "Price": 2200, "Tier": "Race" },
+      { "ID": "SPOILER_APR", "Name": "APR GTC-500", "Downforce": 45, "Price": 4800, "Tier": "Elite" }
+    ],
+    "Hood": [
+      { "ID": "HOOD_STOCK", "Name": "Stock Hood", "Weight": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "HOOD_VENT", "Name": "Vented Hood", "Weight": -8, "Price": 700, "Tier": "Sport" },
+      { "ID": "HOOD_COWL", "Name": "Cowl Induction Hood", "Weight": -5, "Power": 10, "Price": 1200, "Tier": "Race" },
+      { "ID": "HOOD_CARBON", "Name": "Carbon Fiber Hood", "Weight": -35, "Price": 2500, "Tier": "Elite" }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "BODY_STOCK", "Name": "Stock Body", "Price": 0, "Tier": "Stock" },
+      { "ID": "BODY_ZL1", "Name": "ZL1 Wide", "Price": 4500, "Tier": "Sport" },
+      { "ID": "BODY_WIDE", "Name": "Full Widebody Kit", "Price": 12000, "Tier": "Elite" }
+    ]
+  },
+
+  "Packages": {
+    "StreetBuild": {
+      "Name": "Street Beast Package",
+      "Price": 6500,
+      "Parts": ["INTAKE_KN", "EXHAUST_BORLA", "ECU_STAGE1", "SPRING_LOW"],
+      "PowerGain": 63,
+      "Tier": "Sport"
+    },
+    "TrackBuild": {
+      "Name": "Track Attack Package",
+      "Price": 22000,
+      "Parts": ["SC_265L", "EXHAUST_KOOKS", "ECU_STAGE2", "SPRING_COIL", "PAD_TRACK", "WHEEL_FORGED"],
+      "PowerGain": 250,
+      "Tier": "Race"
+    },
+    "DragBuild": {
+      "Name": "Drag Monster Package",
+      "Price": 35000,
+      "Parts": ["SC_TWINSCREW", "INT_FORGED", "FUEL_E85", "LSD_SPOOL", "SPRING_DRAG", "TIRE_DRAG"],
+      "PowerGain": 360,
+      "Tier": "Elite"
+    }
+  }
+}

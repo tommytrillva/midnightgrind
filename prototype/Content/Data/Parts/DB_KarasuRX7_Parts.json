@@ -1,0 +1,192 @@
+{
+  "VehicleID": "KARASU_RX7",
+  "Version": "1.0",
+  "TotalParts": 82,
+
+  "Engine": {
+    "Intake": [
+      { "ID": "INTAKE_STOCK", "Name": "Stock Intake", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "INTAKE_HKS", "Name": "HKS Racing Intake", "Power": 10, "Price": 400, "Tier": "Sport" },
+      { "ID": "INTAKE_REAMEMIYA", "Name": "RE Amemiya Intake", "Power": 18, "Price": 950, "Tier": "Race" },
+      { "ID": "INTAKE_FULL_RACE", "Name": "Full Race Intake", "Power": 28, "Price": 2200, "Tier": "Elite" }
+    ],
+    "Exhaust": [
+      { "ID": "EXHAUST_STOCK", "Name": "Stock Exhaust", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "EXHAUST_CATBACK", "Name": "HKS Catback", "Power": 12, "Price": 1000, "Tier": "Sport" },
+      { "ID": "EXHAUST_TURBOBACK", "Name": "Turbo-Back System", "Power": 30, "Price": 2400, "Tier": "Race" },
+      { "ID": "EXHAUST_TI_RACE", "Name": "Ti Full Race System", "Power": 48, "Price": 5500, "Tier": "Elite" }
+    ],
+    "Turbo": [
+      { "ID": "TURBO_STOCK_TWINS", "Name": "Stock Sequential Twins", "Power": 0, "Price": 0, "Lag": 1.0, "Tier": "Stock" },
+      { "ID": "TURBO_SINGLE_T04", "Name": "Single T04S", "Power": 120, "Price": 5500, "Lag": 1.2, "Tier": "Sport" },
+      { "ID": "TURBO_SINGLE_T78", "Name": "Single T78", "Power": 220, "Price": 9000, "Lag": 1.4, "Tier": "Race" },
+      { "ID": "TURBO_3ROTOR", "Name": "3-Rotor 20B Swap", "Power": 350, "Price": 35000, "Lag": 0.9, "Tier": "Elite" }
+    ],
+    "Intercooler": [
+      { "ID": "IC_STOCK", "Name": "Stock Intercooler", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "IC_FMIC", "Name": "FMIC Kit", "Power": 18, "Price": 1500, "Tier": "Sport" },
+      { "ID": "IC_VMOUNT", "Name": "V-Mount Setup", "Power": 35, "Price": 3800, "Tier": "Elite" }
+    ],
+    "Porting": [
+      { "ID": "PORT_STOCK", "Name": "Stock Ports", "Power": 0, "RPMLimit": 8500, "Price": 0, "Tier": "Stock" },
+      { "ID": "PORT_STREET", "Name": "Street Port", "Power": 30, "RPMLimit": 9000, "Price": 2500, "Tier": "Sport" },
+      { "ID": "PORT_BRIDGE", "Name": "Bridge Port", "Power": 55, "RPMLimit": 9500, "Price": 5000, "Tier": "Race" },
+      { "ID": "PORT_PERIPHERAL", "Name": "Peripheral Port", "Power": 90, "RPMLimit": 10000, "Price": 12000, "Tier": "Elite" }
+    ],
+    "ECU": [
+      { "ID": "ECU_STOCK", "Name": "Stock ECU", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "ECU_STAGE1", "Name": "Stage 1 Tune", "Power": 20, "Price": 500, "Tier": "Sport" },
+      { "ID": "ECU_STAGE2", "Name": "Stage 2 Tune", "Power": 45, "Price": 1100, "Tier": "Race" },
+      { "ID": "ECU_STANDALONE", "Name": "Haltech Elite Standalone", "Power": 85, "Price": 3200, "Tier": "Elite" }
+    ],
+    "FuelSystem": [
+      { "ID": "FUEL_STOCK", "Name": "Stock Fuel System", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "FUEL_HIGHFLOW", "Name": "High Flow Injectors + Pump", "Power": 25, "Price": 1100, "Tier": "Sport" },
+      { "ID": "FUEL_SECONDARY", "Name": "Secondary Injector Kit", "Power": 60, "Price": 2800, "Tier": "Elite" }
+    ],
+    "RotarySpecific": [
+      { "ID": "APEX_STOCK", "Name": "Stock Apex Seals", "Reliability": 1.0, "Price": 0, "Tier": "Stock" },
+      { "ID": "APEX_CERAMIC", "Name": "Ceramic Apex Seals", "Reliability": 1.3, "Price": 800, "Tier": "Sport" },
+      { "ID": "APEX_RACING", "Name": "Racing Apex Seals", "Reliability": 0.8, "Power": 15, "Price": 1500, "Tier": "Race" }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "CLUTCH_STOCK", "Name": "Stock Clutch", "Capacity": 300, "Price": 0, "Tier": "Stock" },
+      { "ID": "CLUTCH_SPORT", "Name": "ACT Sport Clutch", "Capacity": 450, "Price": 700, "Tier": "Sport" },
+      { "ID": "CLUTCH_RACING", "Name": "Exedy Twin Plate", "Capacity": 700, "Price": 2000, "Tier": "Race" },
+      { "ID": "CLUTCH_TWIN", "Name": "OS Giken Twin Plate", "Capacity": 900, "Price": 4500, "Tier": "Elite" }
+    ],
+    "Transmission": [
+      { "ID": "TRANS_STOCK", "Name": "Stock 5-Speed", "Price": 0, "Tier": "Stock" },
+      { "ID": "TRANS_SHORT", "Name": "Short Throw Kit", "Price": 350, "Tier": "Sport" },
+      { "ID": "TRANS_6SPEED", "Name": "6-Speed Swap", "Price": 4800, "Tier": "Race" }
+    ],
+    "FinalDrive": [
+      { "ID": "FD_STOCK", "Name": "Stock 4.10 Final Drive", "Ratio": 4.10, "Price": 0, "Tier": "Stock" },
+      { "ID": "FD_43", "Name": "4.3 Final Drive", "Ratio": 4.3, "Price": 700, "Tier": "Sport" },
+      { "ID": "FD_45", "Name": "4.5 Final Drive", "Ratio": 4.5, "Price": 900, "Tier": "Race" }
+    ],
+    "LSD": [
+      { "ID": "LSD_STOCK", "Name": "Stock Viscous LSD", "LockPercent": 25, "Price": 0, "Tier": "Stock" },
+      { "ID": "LSD_15WAY", "Name": "1.5-Way LSD", "LockPercent": 55, "Price": 1400, "Tier": "Sport" },
+      { "ID": "LSD_2WAY", "Name": "Cusco 2-Way", "LockPercent": 85, "Price": 2400, "Tier": "Race" }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "SPRING_STOCK", "Name": "Stock Springs", "Price": 0, "Tier": "Stock" },
+      { "ID": "SPRING_LOW", "Name": "Tein Lowering Springs", "Price": 380, "Tier": "Sport" },
+      { "ID": "SPRING_COIL", "Name": "KW V3 Coilovers", "Price": 2600, "Tier": "Race" },
+      { "ID": "SPRING_RACE", "Name": "Ohlins Road & Track", "Price": 4800, "Tier": "Elite" }
+    ],
+    "Dampers": [
+      { "ID": "DAMP_STOCK", "Name": "Stock Dampers", "Price": 0, "Tier": "Stock" },
+      { "ID": "DAMP_ADJ", "Name": "Bilstein B16", "Price": 2200, "Tier": "Race" },
+      { "ID": "DAMP_RACE", "Name": "Ohlins TTX", "Price": 5500, "Tier": "Elite" }
+    ],
+    "Swaybars": [
+      { "ID": "SWAY_STOCK", "Name": "Stock Sway Bars", "Price": 0, "Tier": "Stock" },
+      { "ID": "SWAY_SPORT", "Name": "RE Amemiya Set", "Price": 600, "Tier": "Sport" },
+      { "ID": "SWAY_RACE", "Name": "Racing Hollow Set", "Price": 1200, "Tier": "Race" }
+    ],
+    "AngleKit": [
+      { "ID": "ANGLE_NONE", "Name": "No Angle Kit", "Angle": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "ANGLE_BASIC", "Name": "Basic Angle Kit", "Angle": 10, "Price": 800, "Tier": "Sport" },
+      { "ID": "ANGLE_PRO", "Name": "Pro Angle Kit", "Angle": 20, "Price": 1800, "Tier": "Race" }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "PAD_STOCK", "Name": "Stock Pads", "Price": 0, "Tier": "Stock" },
+      { "ID": "PAD_SPORT", "Name": "Hawk HPS", "Price": 220, "Tier": "Sport" },
+      { "ID": "PAD_TRACK", "Name": "Project Mu HC+", "Price": 400, "Tier": "Race" },
+      { "ID": "PAD_RACE", "Name": "Endless MX72", "Price": 750, "Tier": "Elite" }
+    ],
+    "Rotors": [
+      { "ID": "ROTOR_STOCK", "Name": "Stock Rotors", "Price": 0, "Tier": "Stock" },
+      { "ID": "ROTOR_SLOT", "Name": "Slotted Rotors", "Price": 350, "Tier": "Sport" },
+      { "ID": "ROTOR_2PC", "Name": "2-Piece Rotors", "Price": 1600, "Tier": "Race" }
+    ],
+    "Calipers": [
+      { "ID": "CAL_STOCK", "Name": "Stock Calipers", "Price": 0, "Tier": "Stock" },
+      { "ID": "CAL_4POT", "Name": "Brembo 4-Piston", "Price": 2800, "Tier": "Sport" },
+      { "ID": "CAL_6POT", "Name": "Endless 6-Piston", "Price": 5500, "Tier": "Elite" }
+    ]
+  },
+
+  "Wheels": {
+    "Sets": [
+      { "ID": "WHEEL_STOCK", "Name": "Stock 16\" Wheels", "Size": 16, "Width": 8.0, "Weight": 24, "Price": 0, "Tier": "Stock" },
+      { "ID": "WHEEL_WORK", "Name": "Work Emotion CR 17\"", "Size": 17, "Width": 9.0, "Weight": 19, "Price": 3500, "Tier": "Sport" },
+      { "ID": "WHEEL_TE37", "Name": "Volk TE37 17\"", "Size": 17, "Width": 9.5, "Weight": 17, "Price": 5000, "Tier": "Race" },
+      { "ID": "WHEEL_RE30", "Name": "Volk RE30 18\"", "Size": 18, "Width": 10.0, "Weight": 15, "Price": 6500, "Tier": "Elite" }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "TIRE_SPORT", "Name": "Bridgestone Potenza", "Grip": 1.0, "Wear": 1.0, "Price": 1000, "Tier": "Sport" },
+      { "ID": "TIRE_SEMISLICK", "Name": "Advan A052", "Grip": 1.12, "Wear": 0.7, "Price": 1600, "Tier": "Race" },
+      { "ID": "TIRE_SLICK", "Name": "Hoosier R7", "Grip": 1.30, "Wear": 0.4, "Price": 2400, "Tier": "Elite" },
+      { "ID": "TIRE_DRIFT", "Name": "Federal 595RS-RR", "Grip": 0.85, "SlideGrip": 1.2, "Price": 800, "Tier": "Sport" }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "FBUMP_STOCK", "Name": "Stock Front Bumper", "Price": 0, "Tier": "Stock" },
+      { "ID": "FBUMP_REAMEMIYA", "Name": "RE Amemiya AD", "Price": 2800, "Tier": "Sport" },
+      { "ID": "FBUMP_FEED", "Name": "Feed Afflux", "Price": 3500, "Tier": "Race" },
+      { "ID": "FBUMP_WIDE", "Name": "Widebody Front", "Price": 5000, "Tier": "Elite" }
+    ],
+    "Spoiler": [
+      { "ID": "SPOILER_STOCK", "Name": "Stock Spoiler", "Downforce": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "SPOILER_REAMEMIYA", "Name": "RE Amemiya AD", "Downforce": 12, "Price": 1500, "Tier": "Sport" },
+      { "ID": "SPOILER_GTWING", "Name": "APR GTC-300", "Downforce": 28, "Price": 2600, "Tier": "Race" },
+      { "ID": "SPOILER_KAZAMA", "Name": "Kazama Auto GT", "Downforce": 38, "Price": 4200, "Tier": "Elite" }
+    ],
+    "Hood": [
+      { "ID": "HOOD_STOCK", "Name": "Stock Hood", "Weight": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "HOOD_VENT", "Name": "Vented Steel Hood", "Weight": -4, "Price": 500, "Tier": "Sport" },
+      { "ID": "HOOD_CARBON", "Name": "Seibon Carbon", "Weight": -22, "Price": 1600, "Tier": "Race" },
+      { "ID": "HOOD_REAMEMIYA", "Name": "RE Amemiya Carbon", "Weight": -28, "Price": 3200, "Tier": "Elite" }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "BODY_STOCK", "Name": "Stock Body", "Price": 0, "Tier": "Stock" },
+      { "ID": "BODY_REAMEMIYA", "Name": "RE Amemiya Wide", "Price": 8500, "Tier": "Sport" },
+      { "ID": "BODY_TCP", "Name": "TCP Magic Wide", "Price": 14000, "Tier": "Race" },
+      { "ID": "BODY_FEED", "Name": "Feed Afflux Wide", "Price": 22000, "Tier": "Elite" }
+    ]
+  },
+
+  "Packages": {
+    "DriftBuild": {
+      "Name": "Drift Starter Package",
+      "Price": 6500,
+      "Parts": ["EXHAUST_CATBACK", "ECU_STAGE1", "LSD_2WAY", "ANGLE_BASIC", "TIRE_DRIFT"],
+      "PowerGain": 32,
+      "Tier": "Sport"
+    },
+    "TougeBuild": {
+      "Name": "Touge Attack Package",
+      "Price": 22000,
+      "Parts": ["TURBO_SINGLE_T04", "PORT_STREET", "EXHAUST_TURBOBACK", "SPRING_COIL", "WHEEL_TE37"],
+      "PowerGain": 192,
+      "Tier": "Race"
+    },
+    "FullBuild": {
+      "Name": "3-Rotor Monster Package",
+      "Price": 65000,
+      "Parts": ["TURBO_3ROTOR", "PORT_PERIPHERAL", "ECU_STANDALONE", "CLUTCH_TWIN"],
+      "PowerGain": 540,
+      "Tier": "Elite"
+    }
+  }
+}

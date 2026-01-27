@@ -1,0 +1,202 @@
+{
+  "VehicleID": "DEMON_CHALLENGER",
+  "Version": "1.0",
+  "TotalParts": 75,
+
+  "Engine": {
+    "Intake": [
+      { "ID": "INTAKE_STOCK", "Name": "Stock Air Grabber Intake", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "INTAKE_SRT", "Name": "SRT Cold Air Intake", "Power": 18, "Price": 500, "Tier": "Sport" },
+      { "ID": "INTAKE_LEGMAKER", "Name": "Legmaker Intake", "Power": 32, "Price": 1100, "Tier": "Race" },
+      { "ID": "INTAKE_FULL_RACE", "Name": "Full Race Intake System", "Power": 55, "Price": 3500, "Tier": "Elite" }
+    ],
+    "Exhaust": [
+      { "ID": "EXHAUST_STOCK", "Name": "Stock Exhaust", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "EXHAUST_BORLA", "Name": "Borla ATAK", "Power": 22, "Price": 1600, "Tier": "Sport" },
+      { "ID": "EXHAUST_KOOKS", "Name": "Kooks Full System", "Power": 55, "Price": 3800, "Tier": "Race" },
+      { "ID": "EXHAUST_HEADERS", "Name": "Kooks Long Tubes + Race X-Pipe", "Power": 95, "Price": 6500, "Tier": "Elite" }
+    ],
+    "Supercharger": [
+      { "ID": "SC_STOCK", "Name": "Stock 2.7L IHI Supercharger", "Power": 0, "Boost": 14.5, "Price": 0, "Tier": "Stock" },
+      { "ID": "SC_PORTED", "Name": "2.7L Ported Supercharger", "Power": 70, "Boost": 17, "Price": 3000, "Tier": "Sport" },
+      { "ID": "SC_30L", "Name": "3.0L Pulley Upgrade", "Power": 130, "Boost": 20, "Price": 5500, "Tier": "Race" },
+      { "ID": "SC_WHIPPLE", "Name": "Whipple 3.8L Swap", "Power": 260, "Boost": 25, "Price": 15000, "Tier": "Elite" }
+    ],
+    "Intercooler": [
+      { "ID": "IC_STOCK", "Name": "Stock Chiller System", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "IC_LARGE", "Name": "Large Heat Exchanger", "Power": 25, "Price": 1400, "Tier": "Sport" },
+      { "ID": "IC_CHILLER", "Name": "Power Chiller Upgrade", "Power": 50, "Price": 3200, "Tier": "Elite" }
+    ],
+    "ECU": [
+      { "ID": "ECU_STOCK", "Name": "Stock ECU", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "ECU_STAGE1", "Name": "Diablo Stage 1", "Power": 35, "Price": 650, "Tier": "Sport" },
+      { "ID": "ECU_STAGE2", "Name": "Diablo Stage 2", "Power": 80, "Price": 1400, "Tier": "Race" },
+      { "ID": "ECU_STANDALONE", "Name": "Holley Dominator EFI", "Power": 130, "Price": 4500, "Tier": "Elite" }
+    ],
+    "FuelSystem": [
+      { "ID": "FUEL_STOCK", "Name": "Stock Fuel System", "Power": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "FUEL_HIGHFLOW", "Name": "High Flow Pump + Injectors", "Power": 30, "Price": 1200, "Tier": "Sport" },
+      { "ID": "FUEL_E85", "Name": "E85 Conversion", "Power": 85, "Price": 2800, "Tier": "Race" },
+      { "ID": "FUEL_METH", "Name": "Methanol Injection", "Power": 140, "Price": 4500, "Tier": "Elite" }
+    ],
+    "Internals": [
+      { "ID": "INT_STOCK", "Name": "Stock HEMI Internals", "Power": 0, "Price": 0, "BoostLimit": 16, "Tier": "Stock" },
+      { "ID": "INT_RODS", "Name": "Forged Rods", "Power": 0, "Price": 3500, "BoostLimit": 22, "Tier": "Race" },
+      { "ID": "INT_PISTONS", "Name": "Forged Pistons + Rods", "Power": 0, "Price": 6500, "BoostLimit": 28, "Tier": "Race" },
+      { "ID": "INT_426", "Name": "426 Stroker Build", "Power": 50, "Price": 18000, "BoostLimit": 35, "Tier": "Elite" }
+    ]
+  },
+
+  "Drivetrain": {
+    "TorqueConverter": [
+      { "ID": "TC_STOCK", "Name": "Stock Torque Converter", "StallSpeed": 2400, "Price": 0, "Tier": "Stock" },
+      { "ID": "TC_HIGH_STALL", "Name": "3000 RPM Stall", "StallSpeed": 3000, "Price": 1200, "Tier": "Sport" },
+      { "ID": "TC_PRO_STALL", "Name": "3500 RPM Pro Stall", "StallSpeed": 3500, "Price": 2500, "Tier": "Race" }
+    ],
+    "Transmission": [
+      { "ID": "TRANS_STOCK", "Name": "Stock ZF 8-Speed", "Price": 0, "Tier": "Stock" },
+      { "ID": "TRANS_BUILT", "Name": "Built 8HP90", "Price": 5500, "Tier": "Race" },
+      { "ID": "TRANS_RACE", "Name": "Race Prepped 8HP90", "Price": 12000, "Tier": "Elite" }
+    ],
+    "FinalDrive": [
+      { "ID": "FD_STOCK", "Name": "Stock 3.09 Final Drive", "Ratio": 3.09, "Price": 0, "Tier": "Stock" },
+      { "ID": "FD_325", "Name": "3.25 Final Drive", "Ratio": 3.25, "Price": 800, "Tier": "Sport" },
+      { "ID": "FD_373", "Name": "3.73 Final Drive", "Ratio": 3.73, "Price": 1000, "Tier": "Race" },
+      { "ID": "FD_410", "Name": "4.10 Final Drive", "Ratio": 4.10, "Price": 1200, "Tier": "Elite" }
+    ],
+    "LSD": [
+      { "ID": "LSD_STOCK", "Name": "Stock eLSD", "LockPercent": 45, "Price": 0, "Tier": "Stock" },
+      { "ID": "LSD_15WAY", "Name": "1.5-Way LSD", "LockPercent": 65, "Price": 1500, "Tier": "Sport" },
+      { "ID": "LSD_2WAY", "Name": "2-Way LSD", "LockPercent": 85, "Price": 2500, "Tier": "Race" },
+      { "ID": "LSD_SPOOL", "Name": "Spool Diff", "LockPercent": 100, "Price": 700, "Tier": "Race" }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "SPRING_STOCK", "Name": "Stock Demon Springs", "Price": 0, "Tier": "Stock" },
+      { "ID": "SPRING_DRAG", "Name": "BMR Drag Springs", "Price": 500, "Tier": "Sport" },
+      { "ID": "SPRING_COIL", "Name": "Penske Drag Coilovers", "Price": 3200, "Tier": "Race" }
+    ],
+    "Dampers": [
+      { "ID": "DAMP_STOCK", "Name": "Stock Dampers", "Price": 0, "Tier": "Stock" },
+      { "ID": "DAMP_ADJ", "Name": "Strange Drag Shocks", "Price": 1500, "Tier": "Race" },
+      { "ID": "DAMP_DRAG", "Name": "Menscer Drag Package", "Price": 3800, "Tier": "Elite" }
+    ],
+    "Swaybars": [
+      { "ID": "SWAY_STOCK", "Name": "Stock Sway Bars", "Price": 0, "Tier": "Stock" },
+      { "ID": "SWAY_SPORT", "Name": "BMR Sport Set", "Price": 500, "Tier": "Sport" },
+      { "ID": "SWAY_DELETE", "Name": "Sway Bar Delete", "Price": 100, "Tier": "Race" }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "PAD_STOCK", "Name": "Stock Brembo Pads", "Price": 0, "Tier": "Stock" },
+      { "ID": "PAD_SPORT", "Name": "Hawk HPS 5.0", "Price": 300, "Tier": "Sport" },
+      { "ID": "PAD_TRACK", "Name": "Hawk DTC-70", "Price": 550, "Tier": "Race" },
+      { "ID": "PAD_RACE", "Name": "Carbotech XP12", "Price": 900, "Tier": "Elite" }
+    ],
+    "Rotors": [
+      { "ID": "ROTOR_STOCK", "Name": "Stock Rotors", "Price": 0, "Tier": "Stock" },
+      { "ID": "ROTOR_SLOT", "Name": "Slotted Rotors", "Price": 500, "Tier": "Sport" },
+      { "ID": "ROTOR_2PC", "Name": "2-Piece Rotors", "Price": 2200, "Tier": "Race" }
+    ],
+    "Calipers": [
+      { "ID": "CAL_STOCK", "Name": "Stock Brembo 6-Piston", "Price": 0, "Tier": "Stock" },
+      { "ID": "CAL_8POT", "Name": "Brembo GT-R 8-Piston", "Price": 7500, "Tier": "Elite" }
+    ],
+    "LineLock": [
+      { "ID": "LL_STOCK", "Name": "Stock Line Lock", "Price": 0, "Tier": "Stock" },
+      { "ID": "LL_UPGRADED", "Name": "Performance Line Lock", "Price": 350, "Tier": "Sport" }
+    ]
+  },
+
+  "Wheels": {
+    "Sets": [
+      { "ID": "WHEEL_STOCK", "Name": "Stock 18\" Wheels", "Size": 18, "Weight": 35, "Price": 0, "Tier": "Stock" },
+      { "ID": "WHEEL_DRAG", "Name": "Weld S71 Drag Wheels", "Size": 17, "Width": 12.0, "Weight": 22, "Price": 3000, "Tier": "Race" },
+      { "ID": "WHEEL_SKINNY", "Name": "Weld 15\" Skinnies Front", "Size": 15, "Width": 4.0, "Weight": 12, "Price": 1500, "Tier": "Race" },
+      { "ID": "WHEEL_BEADLOCK", "Name": "Weld Beadlock Rears", "Size": 17, "Width": 15.0, "Weight": 28, "Price": 4500, "Tier": "Elite" }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "TIRE_STREET", "Name": "Pirelli P Zero", "Grip": 1.0, "Price": 1200, "Tier": "Stock" },
+      { "ID": "TIRE_DRAG_RADIAL", "Name": "Mickey Thompson ET Street R", "Grip": 1.5, "Price": 1500, "Tier": "Sport" },
+      { "ID": "TIRE_SLICK", "Name": "Mickey Thompson Pro Drag", "Grip": 1.8, "Price": 2500, "Tier": "Elite" },
+      { "ID": "TIRE_SKINNY", "Name": "Front Runner Skinnies", "Grip": 0.6, "Weight": -20, "Price": 400, "Tier": "Race" }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "FBUMP_STOCK", "Name": "Stock Demon Front", "Price": 0, "Tier": "Stock" },
+      { "ID": "FBUMP_WIDE", "Name": "Widebody Front", "Price": 4500, "Tier": "Elite" }
+    ],
+    "Spoiler": [
+      { "ID": "SPOILER_STOCK", "Name": "Stock Spoiler", "Price": 0, "Tier": "Stock" },
+      { "ID": "SPOILER_HIGH", "Name": "High Drag Spoiler", "Price": 1200, "Tier": "Sport" },
+      { "ID": "SPOILER_DELETE", "Name": "Spoiler Delete", "Weight": -5, "Price": 50, "Tier": "Race" }
+    ],
+    "Hood": [
+      { "ID": "HOOD_STOCK", "Name": "Stock Air Grabber Hood", "Price": 0, "Tier": "Stock" },
+      { "ID": "HOOD_COWL", "Name": "Cowl Induction Hood", "Power": 12, "Price": 1500, "Tier": "Race" }
+    ]
+  },
+
+  "Body": {
+    "Widebody": [
+      { "ID": "BODY_STOCK", "Name": "Stock Wide Body", "Price": 0, "Tier": "Stock" },
+      { "ID": "BODY_WIDER", "Name": "Extended Widebody", "Price": 8000, "Tier": "Elite" }
+    ],
+    "WeightReduction": [
+      { "ID": "WEIGHT_STOCK", "Name": "Stock Weight", "Weight": 0, "Price": 0, "Tier": "Stock" },
+      { "ID": "WEIGHT_STAGE1", "Name": "Interior Strip", "Weight": -150, "Price": 500, "Tier": "Sport" },
+      { "ID": "WEIGHT_STAGE2", "Name": "Full Strip + Lexan", "Weight": -300, "Price": 2500, "Tier": "Race" }
+    ]
+  },
+
+  "DragSpecific": {
+    "TransBrake": [
+      { "ID": "TB_STOCK", "Name": "Stock TransBrake", "Price": 0, "Tier": "Stock" },
+      { "ID": "TB_UPGRADED", "Name": "Competition TransBrake", "Price": 1200, "Tier": "Race" }
+    ],
+    "RollCage": [
+      { "ID": "CAGE_NONE", "Name": "No Roll Cage", "Price": 0, "Tier": "Stock" },
+      { "ID": "CAGE_4PT", "Name": "4-Point Roll Bar", "Price": 1500, "Tier": "Sport" },
+      { "ID": "CAGE_8PT", "Name": "8-Point Roll Cage", "Price": 4500, "Tier": "Race" },
+      { "ID": "CAGE_FULL", "Name": "NHRA Certified Cage", "Price": 8000, "Tier": "Elite" }
+    ],
+    "Parachute": [
+      { "ID": "CHUTE_NONE", "Name": "No Parachute", "Price": 0, "Tier": "Stock" },
+      { "ID": "CHUTE_SINGLE", "Name": "Single Parachute", "Price": 800, "Tier": "Race" },
+      { "ID": "CHUTE_DUAL", "Name": "Dual Parachutes", "Price": 1800, "Tier": "Elite" }
+    ]
+  },
+
+  "Packages": {
+    "StreetBuild": {
+      "Name": "Street Monster Package",
+      "Price": 8500,
+      "Parts": ["INTAKE_SRT", "EXHAUST_BORLA", "ECU_STAGE1", "TC_HIGH_STALL"],
+      "PowerGain": 75,
+      "Tier": "Sport"
+    },
+    "DragBuild": {
+      "Name": "Drag Strip Package",
+      "Price": 28000,
+      "Parts": ["SC_30L", "EXHAUST_KOOKS", "ECU_STAGE2", "TC_PRO_STALL", "LSD_SPOOL", "TIRE_DRAG_RADIAL"],
+      "PowerGain": 265,
+      "Tier": "Race"
+    },
+    "FullBuild": {
+      "Name": "9-Second Build Package",
+      "Price": 65000,
+      "Parts": ["SC_WHIPPLE", "INT_426", "FUEL_METH", "ECU_STANDALONE", "TRANS_RACE", "CAGE_FULL", "CHUTE_DUAL"],
+      "PowerGain": 480,
+      "Tier": "Elite"
+    }
+  }
+}
