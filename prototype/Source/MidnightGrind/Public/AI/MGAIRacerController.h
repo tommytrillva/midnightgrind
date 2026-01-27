@@ -687,6 +687,9 @@ protected:
 	/** Current race position */
 	int32 CurrentRacePosition = 0;
 
+	/** Last known race position (for mood/learning delta tracking) */
+	int32 LastKnownPosition = 0;
+
 	/** Total racers in current race */
 	int32 TotalRacersInRace = 0;
 

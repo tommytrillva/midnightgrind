@@ -14,7 +14,7 @@
 #include "AI/MGAIRacerController.h"
 #include "AI/MGAIDriverProfile.h"
 #include "Track/MGTrackSubsystem.h"
-#include "Core/MGRaceGameMode.h"
+#include "GameModes/MGRaceGameMode.h"
 #include "Weather/MGWeatherSubsystem.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
@@ -1955,7 +1955,6 @@ void AMGAIRacerController::UpdateMoodAndLearning(float DeltaTime)
 	}
 
 	// Track position changes for mood updates
-	static int32 LastKnownPosition = CurrentRacePosition;
 	float PositionDelta = static_cast<float>(LastKnownPosition - CurrentRacePosition);
 
 	// TODO: Track damage (needs vehicle damage system integration)
