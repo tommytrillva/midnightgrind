@@ -39,6 +39,7 @@ struct FMGCheckpointPassage;
 struct FMGLapData;
 struct FMGStuntEvent;
 enum class EMGPowerupType : uint8;
+enum class EMGWeatherType : uint8;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -618,4 +619,12 @@ protected:
 	/** Handle powerup hit from powerup subsystem */
 	UFUNCTION()
 	void OnPowerupHit(const FString& SourceId, const FString& TargetId, EMGPowerupType PowerupType);
+
+	/** Handle engine overheat from vehicle wear subsystem */
+	UFUNCTION()
+	void OnEngineOverheat(FGuid VehicleID);
+
+	/** Handle weather transition from weather subsystem */
+	UFUNCTION()
+	void OnWeatherTransitionStarted(EMGWeatherType FromType, EMGWeatherType ToType);
 };

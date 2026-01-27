@@ -1,0 +1,435 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - World Points of Interest and Landmarks",
+
+  "POISystem": {
+    "Enabled": true,
+    "ShowOnMap": true,
+    "ShowOnCompass": true,
+    "DiscoverySystem": true,
+    "DiscoveryRadius": 50
+  },
+
+  "Categories": {
+    "Shops": {
+      "Icon": "ICO_POI_Shop",
+      "Color": "#00FF00",
+      "MapLayer": "Services"
+    },
+    "Events": {
+      "Icon": "ICO_POI_Event",
+      "Color": "#FF6600",
+      "MapLayer": "Activities"
+    },
+    "Landmarks": {
+      "Icon": "ICO_POI_Landmark",
+      "Color": "#FFFF00",
+      "MapLayer": "Landmarks"
+    },
+    "SafeHouses": {
+      "Icon": "ICO_POI_Safe",
+      "Color": "#00FFFF",
+      "MapLayer": "Services"
+    },
+    "Secrets": {
+      "Icon": "ICO_POI_Secret",
+      "Color": "#FF00FF",
+      "MapLayer": "Hidden",
+      "HiddenUntilDiscovered": true
+    },
+    "SpeedZones": {
+      "Icon": "ICO_POI_Speed",
+      "Color": "#FF0000",
+      "MapLayer": "Activities"
+    },
+    "PhotoSpots": {
+      "Icon": "ICO_POI_Photo",
+      "Color": "#FF69B4",
+      "MapLayer": "Activities"
+    }
+  },
+
+  "Shops": [
+    {
+      "ID": "POI_SHOP_MIDNIGHT",
+      "Name": "Midnight Performance",
+      "Category": "Shops",
+      "SubType": "PartShop",
+      "Location": { "X": 250, "Y": -150, "Z": 10 },
+      "Description": "Your main parts supplier",
+      "Services": ["Parts", "Install", "Tuning"],
+      "Hours": "24/7",
+      "Discovered": true
+    },
+    {
+      "ID": "POI_SHOP_GRIP",
+      "Name": "Grip Masters",
+      "Category": "Shops",
+      "SubType": "TireShop",
+      "Location": { "X": -1200, "Y": 800, "Z": 5 },
+      "Description": "Tire and wheel specialists",
+      "Services": ["Tires", "Wheels", "Alignment"],
+      "Hours": "08:00-22:00",
+      "UnlockCondition": "LEVEL_5"
+    },
+    {
+      "ID": "POI_SHOP_BOOST",
+      "Name": "Boost Brothers",
+      "Category": "Shops",
+      "SubType": "TunerShop",
+      "Location": { "X": 2100, "Y": -2400, "Z": 15 },
+      "Description": "Turbo and engine specialists",
+      "Services": ["Turbo", "Supercharger", "ECU"],
+      "Hours": "10:00-02:00",
+      "UnlockCondition": "REP_TIER_STREET"
+    },
+    {
+      "ID": "POI_SHOP_CLEAN",
+      "Name": "Clean Lines Customs",
+      "Category": "Shops",
+      "SubType": "BodyShop",
+      "Location": { "X": -500, "Y": 2200, "Z": 8 },
+      "Description": "Body kits and visual mods",
+      "Services": ["BodyKits", "Paint", "Vinyl"],
+      "Hours": "09:00-21:00",
+      "UnlockCondition": "LEVEL_8"
+    },
+    {
+      "ID": "POI_SHOP_BACKROOM",
+      "Name": "The Back Room",
+      "Category": "Shops",
+      "SubType": "BlackMarket",
+      "Location": { "X": 3500, "Y": -800, "Z": -10 },
+      "Description": "Rare and illegal parts",
+      "Services": ["RareParts", "NOS"],
+      "Hours": "22:00-04:00",
+      "UnlockCondition": "REP_TIER_PRO",
+      "Hidden": true
+    }
+  ],
+
+  "Dealers": [
+    {
+      "ID": "POI_DEALER_MAIN",
+      "Name": "Underground Motors",
+      "Category": "Shops",
+      "SubType": "Dealer",
+      "Location": { "X": 1800, "Y": 600, "Z": 12 },
+      "Description": "Your main vehicle source",
+      "Services": ["Buy", "Sell", "Trade"],
+      "Inventory": "Mixed",
+      "Discovered": true
+    },
+    {
+      "ID": "POI_DEALER_JDM",
+      "Name": "Rising Sun Imports",
+      "Category": "Shops",
+      "SubType": "Dealer",
+      "Location": { "X": -2800, "Y": -1500, "Z": 8 },
+      "Description": "JDM specialist",
+      "Services": ["Buy"],
+      "Inventory": "JDM",
+      "UnlockCondition": "REP_TIER_STREET"
+    },
+    {
+      "ID": "POI_DEALER_MUSCLE",
+      "Name": "American Thunder",
+      "Category": "Shops",
+      "SubType": "Dealer",
+      "Location": { "X": 4200, "Y": 1800, "Z": 10 },
+      "Description": "American muscle specialist",
+      "Services": ["Buy", "Sell"],
+      "Inventory": "Muscle",
+      "UnlockCondition": "REP_TIER_STREET"
+    },
+    {
+      "ID": "POI_DEALER_EXOTIC",
+      "Name": "Velocity Exotics",
+      "Category": "Shops",
+      "SubType": "Dealer",
+      "Location": { "X": -800, "Y": 4500, "Z": 25 },
+      "Description": "High-end performance vehicles",
+      "Services": ["Buy"],
+      "Inventory": "Exotic",
+      "UnlockCondition": "REP_TIER_ELITE"
+    }
+  ],
+
+  "SafeHouses": [
+    {
+      "ID": "POI_SAFE_GARAGE",
+      "Name": "Your Garage",
+      "Category": "SafeHouses",
+      "SubType": "Primary",
+      "Location": { "X": 0, "Y": 0, "Z": 5 },
+      "Description": "Home base",
+      "Services": ["Save", "Customize", "Store"],
+      "ClearsHeat": true,
+      "Discovered": true
+    },
+    {
+      "ID": "POI_SAFE_PAYNSPRAY_1",
+      "Name": "Pay 'N' Spray - Downtown",
+      "Category": "SafeHouses",
+      "SubType": "PayNSpray",
+      "Location": { "X": 1200, "Y": -800, "Z": 8 },
+      "Description": "Quick repairs and heat removal",
+      "Services": ["Repair", "ClearHeat", "QuickPaint"],
+      "Cost": 500,
+      "ClearsHeat": true
+    },
+    {
+      "ID": "POI_SAFE_PAYNSPRAY_2",
+      "Name": "Pay 'N' Spray - Harbor",
+      "Category": "SafeHouses",
+      "SubType": "PayNSpray",
+      "Location": { "X": -2500, "Y": 1200, "Z": 5 },
+      "Description": "Quick repairs and heat removal",
+      "Services": ["Repair", "ClearHeat", "QuickPaint"],
+      "Cost": 500,
+      "ClearsHeat": true
+    },
+    {
+      "ID": "POI_SAFE_PAYNSPRAY_3",
+      "Name": "Pay 'N' Spray - Industrial",
+      "Category": "SafeHouses",
+      "SubType": "PayNSpray",
+      "Location": { "X": 3800, "Y": -2200, "Z": 12 },
+      "Description": "Quick repairs and heat removal",
+      "Services": ["Repair", "ClearHeat", "QuickPaint"],
+      "Cost": 500,
+      "ClearsHeat": true
+    },
+    {
+      "ID": "POI_SAFE_UNDERGROUND_1",
+      "Name": "Underground Parking - Central",
+      "Category": "SafeHouses",
+      "SubType": "Hideout",
+      "Location": { "X": 500, "Y": 500, "Z": -15 },
+      "Description": "Hidden parking structure",
+      "Services": ["Hide"],
+      "ClearsHeat": true,
+      "UnlockCondition": "REP_TIER_STREET"
+    }
+  ],
+
+  "Landmarks": [
+    {
+      "ID": "POI_LAND_TOWER",
+      "Name": "Neo Tower",
+      "Category": "Landmarks",
+      "Location": { "X": 0, "Y": 1500, "Z": 0 },
+      "Description": "The city's tallest building",
+      "PhotoBonus": 1.5,
+      "DiscoveryREP": 100
+    },
+    {
+      "ID": "POI_LAND_BRIDGE",
+      "Name": "Midnight Bridge",
+      "Category": "Landmarks",
+      "Location": { "X": -3500, "Y": 0, "Z": 50 },
+      "Description": "Iconic suspension bridge",
+      "PhotoBonus": 1.75,
+      "DiscoveryREP": 150,
+      "SpeedTrapLocation": true
+    },
+    {
+      "ID": "POI_LAND_STADIUM",
+      "Name": "Thunder Dome",
+      "Category": "Landmarks",
+      "Location": { "X": 2800, "Y": 2800, "Z": 10 },
+      "Description": "Sports and events stadium",
+      "PhotoBonus": 1.25,
+      "DiscoveryREP": 75
+    },
+    {
+      "ID": "POI_LAND_TEMPLE",
+      "Name": "Sakura Temple",
+      "Category": "Landmarks",
+      "Location": { "X": 3200, "Y": 4500, "Z": 120 },
+      "Description": "Traditional temple on the hillside",
+      "PhotoBonus": 2.0,
+      "DiscoveryREP": 200,
+      "SeasonalVariant": "CherryBlossoms_Spring"
+    },
+    {
+      "ID": "POI_LAND_LIGHTHOUSE",
+      "Name": "Harbor Lighthouse",
+      "Category": "Landmarks",
+      "Location": { "X": -4200, "Y": 2500, "Z": 35 },
+      "Description": "Historic lighthouse overlooking the bay",
+      "PhotoBonus": 1.5,
+      "DiscoveryREP": 125
+    },
+    {
+      "ID": "POI_LAND_NEON",
+      "Name": "Neon District",
+      "Category": "Landmarks",
+      "Location": { "X": -1000, "Y": -2000, "Z": 8 },
+      "Description": "Heart of the nightlife district",
+      "PhotoBonus": 1.75,
+      "DiscoveryREP": 100,
+      "NightOnly": true
+    }
+  ],
+
+  "SpeedZones": [
+    {
+      "ID": "POI_SPEED_HIGHWAY_1",
+      "Name": "Highway 101 Sprint",
+      "Category": "SpeedZones",
+      "SubType": "SpeedTrap",
+      "Location": { "X": 5000, "Y": 0, "Z": 25 },
+      "Length": 500,
+      "Direction": "Both",
+      "Records": { "Personal": null, "Friends": [], "Global": null },
+      "Reward": { "PerMPHOverTarget": 10, "Target": 150 }
+    },
+    {
+      "ID": "POI_SPEED_TUNNEL",
+      "Name": "Tunnel Run",
+      "Category": "SpeedZones",
+      "SubType": "SpeedTrap",
+      "Location": { "X": -2000, "Y": 3000, "Z": -20 },
+      "Length": 800,
+      "Direction": "Both",
+      "Records": { "Personal": null, "Friends": [], "Global": null },
+      "Reward": { "PerMPHOverTarget": 15, "Target": 180 }
+    },
+    {
+      "ID": "POI_SPEED_BRIDGE",
+      "Name": "Bridge Blast",
+      "Category": "SpeedZones",
+      "SubType": "SpeedTrap",
+      "Location": { "X": -3500, "Y": 0, "Z": 55 },
+      "Length": 600,
+      "Direction": "Both",
+      "Records": { "Personal": null, "Friends": [], "Global": null },
+      "Reward": { "PerMPHOverTarget": 12, "Target": 160 }
+    },
+    {
+      "ID": "POI_SPEED_DRIFT_1",
+      "Name": "Drift Zone Alpha",
+      "Category": "SpeedZones",
+      "SubType": "DriftZone",
+      "Location": { "X": 1500, "Y": -3000, "Z": 10 },
+      "Length": 400,
+      "ScoringMultiplier": 1.5,
+      "Records": { "Personal": null, "Friends": [], "Global": null }
+    },
+    {
+      "ID": "POI_SPEED_DRIFT_2",
+      "Name": "Harbor Slide",
+      "Category": "SpeedZones",
+      "SubType": "DriftZone",
+      "Location": { "X": -2800, "Y": 1800, "Z": 5 },
+      "Length": 350,
+      "ScoringMultiplier": 1.75,
+      "Records": { "Personal": null, "Friends": [], "Global": null }
+    }
+  ],
+
+  "PhotoSpots": [
+    {
+      "ID": "POI_PHOTO_SKYLINE",
+      "Name": "Skyline Vista",
+      "Category": "PhotoSpots",
+      "Location": { "X": 4500, "Y": 2200, "Z": 850 },
+      "Description": "Best city view at sunset",
+      "OptimalTime": "Sunset",
+      "PhotoBonus": 2.0,
+      "DiscoveryREP": 50
+    },
+    {
+      "ID": "POI_PHOTO_NEON",
+      "Name": "Neon Alley",
+      "Category": "PhotoSpots",
+      "Location": { "X": -1050, "Y": -2100, "Z": 8 },
+      "Description": "Colorful neon backdrop",
+      "OptimalTime": "Night",
+      "PhotoBonus": 1.75,
+      "DiscoveryREP": 50
+    },
+    {
+      "ID": "POI_PHOTO_GARAGE",
+      "Name": "Parking Structure Top",
+      "Category": "PhotoSpots",
+      "Location": { "X": 1250, "Y": -3400, "Z": 150 },
+      "Description": "Urban rooftop setting",
+      "OptimalTime": "Any",
+      "PhotoBonus": 1.5,
+      "DiscoveryREP": 50
+    },
+    {
+      "ID": "POI_PHOTO_TEMPLE",
+      "Name": "Temple Steps",
+      "Category": "PhotoSpots",
+      "Location": { "X": 3180, "Y": 4520, "Z": 125 },
+      "Description": "Traditional Japanese aesthetic",
+      "OptimalTime": "Dawn",
+      "PhotoBonus": 2.25,
+      "DiscoveryREP": 75,
+      "SeasonalBonus": { "Spring": 1.5 }
+    },
+    {
+      "ID": "POI_PHOTO_TUNNEL",
+      "Name": "Tunnel Entrance",
+      "Category": "PhotoSpots",
+      "Location": { "X": -1900, "Y": 2950, "Z": -15 },
+      "Description": "Dramatic lighting contrast",
+      "OptimalTime": "Any",
+      "PhotoBonus": 1.5,
+      "DiscoveryREP": 50
+    }
+  ],
+
+  "Secrets": [
+    {
+      "ID": "POI_SECRET_BARN",
+      "Name": "Abandoned Barn",
+      "Category": "Secrets",
+      "Location": { "X": 6500, "Y": 4000, "Z": 80 },
+      "Description": "Something's hidden here...",
+      "Reward": { "Type": "BarnFind", "Vehicle": "SECRET_BARN_FIND_1" },
+      "Hint": "Follow the old dirt road past the farmhouse"
+    },
+    {
+      "ID": "POI_SECRET_CAVE",
+      "Name": "Coastal Cave",
+      "Category": "Secrets",
+      "Location": { "X": -5000, "Y": 3500, "Z": 5 },
+      "Description": "A hidden entrance...",
+      "Reward": { "Type": "Cash", "Amount": 25000 },
+      "Hint": "Where the waves meet the cliffs"
+    },
+    {
+      "ID": "POI_SECRET_ROOFTOP",
+      "Name": "Hidden Rooftop",
+      "Category": "Secrets",
+      "Location": { "X": 100, "Y": 1600, "Z": 200 },
+      "Description": "How did a car get up here?",
+      "Reward": { "Type": "Achievement", "ID": "ACH_SECRET_HEIGHT" },
+      "Hint": "Look for the ramp nobody talks about"
+    },
+    {
+      "ID": "POI_SECRET_WAREHOUSE",
+      "Name": "Abandoned Warehouse",
+      "Category": "Secrets",
+      "Location": { "X": 3200, "Y": -1500, "Z": 8 },
+      "Description": "The legends say there's something special inside",
+      "Reward": { "Type": "Part", "ID": "PART_LEGENDARY_TURBO" },
+      "Hint": "Industrial district, look for the broken fence"
+    }
+  ],
+
+  "Discovery": {
+    "Enabled": true,
+    "TotalPOIs": 45,
+    "Rewards": {
+      "25Percent": { "Cash": 10000, "REP": 500 },
+      "50Percent": { "Cash": 25000, "REP": 1000, "Title": "TITLE_EXPLORER" },
+      "75Percent": { "Cash": 50000, "REP": 2000 },
+      "100Percent": { "Cash": 100000, "REP": 5000, "Vehicle": "VEHICLE_EXPLORER_SPECIAL", "Title": "TITLE_CARTOGRAPHER" }
+    }
+  }
+}

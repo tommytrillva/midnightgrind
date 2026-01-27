@@ -238,6 +238,30 @@ public:
 	FMGTestResult TestIntegration_WeatherRoad();
 
 	// ==========================================
+	// PHYSICS TESTS
+	// ==========================================
+
+	/** Test tire compound grip coefficients */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
+	FMGTestResult TestPhysics_TireCompoundGrip();
+
+	/** Test wet grip modifiers */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
+	FMGTestResult TestPhysics_WetGripModifiers();
+
+	/** Test weight transfer constants */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
+	FMGTestResult TestPhysics_WeightTransferConstants();
+
+	/** Test tire temperature constants */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
+	FMGTestResult TestPhysics_TireTemperatureConstants();
+
+	/** Test physics handling mode settings */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Physics")
+	FMGTestResult TestPhysics_HandlingModeSettings();
+
+	// ==========================================
 	// CONSOLE COMMANDS
 	// ==========================================
 

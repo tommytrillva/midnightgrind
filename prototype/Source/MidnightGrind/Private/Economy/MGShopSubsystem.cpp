@@ -3,6 +3,11 @@
 #include "Economy/MGShopSubsystem.h"
 #include "Misc/DateTime.h"
 #include "Misc/Guid.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "Misc/Paths.h"
 
 void UMGShopSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -550,16 +555,85 @@ FText UMGShopSubsystem::GetCategoryDisplayName(EMGShopCategory Category)
 
 void UMGShopSubsystem::LoadShopData()
 {
-	// Would load from save file
-	// Initialize with starting money
+	// Initialize with starting values
 	Wallet.Cash = 25000;
 	Wallet.Gold = 100;
 	Wallet.Reputation = 0;
+	Wallet.SeasonTokens = 0;
+	Wallet.CrewTokens = 0;
+
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Shop");
+	FString FilePath = SaveDir / TEXT("ShopData.sav");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("No shop save found, using starting wallet"));
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	int32 Version = 0;
+	Archive << Version;
+
+	if (Version >= 1)
+	{
+		// Load wallet
+		Archive << Wallet.Cash;
+		Archive << Wallet.Gold;
+		Archive << Wallet.Reputation;
+		Archive << Wallet.SeasonTokens;
+		Archive << Wallet.CrewTokens;
+
+		// Load owned items
+		int32 OwnedCount;
+		Archive << OwnedCount;
+		OwnedItems.Empty();
+		for (int32 i = 0; i < OwnedCount; i++)
+		{
+			FName ItemID;
+			Archive << ItemID;
+			OwnedItems.Add(ItemID);
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Shop data loaded - Cash: %lld, Gold: %d, Owned: %d items"),
+			Wallet.Cash, Wallet.Gold, OwnedItems.Num());
+	}
 }
 
 void UMGShopSubsystem::SaveShopData()
 {
-	// Would save to persistent storage
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Shop");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("ShopData.sav");
+
+	FBufferArchive Archive;
+
+	int32 Version = 1;
+	Archive << Version;
+
+	// Save wallet
+	Archive << Wallet.Cash;
+	Archive << Wallet.Gold;
+	Archive << Wallet.Reputation;
+	Archive << Wallet.SeasonTokens;
+	Archive << Wallet.CrewTokens;
+
+	// Save owned items
+	int32 OwnedCount = OwnedItems.Num();
+	Archive << OwnedCount;
+	for (const FName& ItemID : OwnedItems)
+	{
+		FName ID = ItemID;
+		Archive << ID;
+	}
+
+	if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Shop data saved - Cash: %lld, Gold: %d, Owned: %d items"),
+			Wallet.Cash, Wallet.Gold, OwnedItems.Num());
+	}
 }
 
 void UMGShopSubsystem::GenerateDailyDeals()

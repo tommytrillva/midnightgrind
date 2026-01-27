@@ -27,6 +27,8 @@
 #include "Stunt/MGStuntSubsystem.h"
 #include "Takedown/MGTakedownSubsystem.h"
 #include "Powerup/MGPowerupSubsystem.h"
+#include "Vehicle/MGVehicleWearSubsystem.h"
+#include "Weather/MGWeatherSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -74,6 +76,18 @@ void AMGPlayerController::BeginPlay()
 			if (UMGNearMissSubsystem* NearMissSubsystem = World->GetSubsystem<UMGNearMissSubsystem>())
 			{
 				NearMissSubsystem->OnNearMissOccurred.AddDynamic(this, &AMGPlayerController::OnNearMissDetected);
+			}
+
+			// Bind to vehicle wear subsystem for engine warnings
+			if (UMGVehicleWearSubsystem* WearSubsystem = World->GetSubsystem<UMGVehicleWearSubsystem>())
+			{
+				WearSubsystem->OnEngineOverheat.AddDynamic(this, &AMGPlayerController::OnEngineOverheat);
+			}
+
+			// Bind to weather subsystem for weather change notifications
+			if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+			{
+				WeatherSubsystem->OnWeatherTransitionStarted.AddDynamic(this, &AMGPlayerController::OnWeatherTransitionStarted);
 			}
 		}
 
@@ -234,6 +248,16 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		if (UMGNearMissSubsystem* NearMissSubsystem = World->GetSubsystem<UMGNearMissSubsystem>())
 		{
 			NearMissSubsystem->OnNearMissOccurred.RemoveDynamic(this, &AMGPlayerController::OnNearMissDetected);
+		}
+
+		if (UMGVehicleWearSubsystem* WearSubsystem = World->GetSubsystem<UMGVehicleWearSubsystem>())
+		{
+			WearSubsystem->OnEngineOverheat.RemoveDynamic(this, &AMGPlayerController::OnEngineOverheat);
+		}
+
+		if (UMGWeatherSubsystem* WeatherSubsystem = World->GetSubsystem<UMGWeatherSubsystem>())
+		{
+			WeatherSubsystem->OnWeatherTransitionStarted.RemoveDynamic(this, &AMGPlayerController::OnWeatherTransitionStarted);
 		}
 	}
 
@@ -2043,6 +2067,75 @@ void AMGPlayerController::OnPowerupHit(const FString& SourceId, const FString& T
 				FLinearColor HitColor = FLinearColor(1.0f, 0.3f, 0.0f, 1.0f); // Red-orange
 				HUDSubsystem->ShowNotification(HitMessage, 1.5f, HitColor);
 			}
+		}
+	}
+}
+
+void AMGPlayerController::OnEngineOverheat(FGuid VehicleID)
+{
+	// Only show for the player's vehicle
+	if (!ControlledVehicle)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText OverheatMessage = FText::FromString(TEXT("ENGINE OVERHEATING!"));
+			FLinearColor OverheatColor = FLinearColor(1.0f, 0.2f, 0.0f, 1.0f); // Red
+			HUDSubsystem->ShowNotification(OverheatMessage, 3.0f, OverheatColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnWeatherTransitionStarted(EMGWeatherType FromType, EMGWeatherType ToType)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString WeatherName;
+			FLinearColor WeatherColor = FLinearColor::White;
+
+			switch (ToType)
+			{
+				case EMGWeatherType::Clear:
+					WeatherName = TEXT("CLEAR SKIES");
+					WeatherColor = FLinearColor(1.0f, 0.95f, 0.5f, 1.0f); // Sunny yellow
+					break;
+				case EMGWeatherType::PartlyCloudy:
+					WeatherName = TEXT("PARTLY CLOUDY");
+					WeatherColor = FLinearColor(0.8f, 0.85f, 0.9f, 1.0f); // Light gray
+					break;
+				case EMGWeatherType::Overcast:
+					WeatherName = TEXT("OVERCAST");
+					WeatherColor = FLinearColor(0.6f, 0.65f, 0.7f, 1.0f); // Gray
+					break;
+				case EMGWeatherType::LightRain:
+					WeatherName = TEXT("LIGHT RAIN - SLIPPERY CONDITIONS");
+					WeatherColor = FLinearColor(0.4f, 0.6f, 0.9f, 1.0f); // Blue
+					break;
+				case EMGWeatherType::HeavyRain:
+					WeatherName = TEXT("HEAVY RAIN - REDUCED GRIP!");
+					WeatherColor = FLinearColor(0.2f, 0.4f, 0.8f, 1.0f); // Dark blue
+					break;
+				case EMGWeatherType::Thunderstorm:
+					WeatherName = TEXT("THUNDERSTORM - CAUTION!");
+					WeatherColor = FLinearColor(0.5f, 0.3f, 0.7f, 1.0f); // Purple
+					break;
+				case EMGWeatherType::Fog:
+					WeatherName = TEXT("FOG - REDUCED VISIBILITY!");
+					WeatherColor = FLinearColor(0.7f, 0.75f, 0.8f, 1.0f); // Foggy gray
+					break;
+				default:
+					WeatherName = TEXT("WEATHER CHANGING");
+					break;
+			}
+
+			FText WeatherMessage = FText::FromString(WeatherName);
+			HUDSubsystem->ShowNotification(WeatherMessage, 4.0f, WeatherColor);
 		}
 	}
 }

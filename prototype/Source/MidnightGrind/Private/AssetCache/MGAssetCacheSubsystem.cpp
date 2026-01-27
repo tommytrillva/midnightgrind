@@ -1135,21 +1135,26 @@ void UMGAssetCacheSubsystem::ProcessLoadQueue()
             CurrentlyLoading.Add(AssetPath);
 
             // Start async load
+            TWeakObjectPtr<UMGAssetCacheSubsystem> WeakThis(this);
             TSharedPtr<FStreamableHandle> Handle = StreamableManager.RequestAsyncLoad(
                 AssetPath,
-                [this, AssetPath]()
+                [WeakThis, AssetPath]()
                 {
+                    if (!WeakThis.IsValid())
+                    {
+                        return;
+                    }
                     // Load complete callback
-                    CurrentlyLoading.Remove(AssetPath);
+                    WeakThis->CurrentlyLoading.Remove(AssetPath);
 
                     UObject* LoadedAsset = AssetPath.ResolveObject();
                     if (LoadedAsset)
                     {
-                        HandleAssetLoadComplete(AssetPath, LoadedAsset);
+                        WeakThis->HandleAssetLoadComplete(AssetPath, LoadedAsset);
                     }
                     else
                     {
-                        HandleAssetLoadFailed(AssetPath, TEXT("Failed to resolve asset"));
+                        WeakThis->HandleAssetLoadFailed(AssetPath, TEXT("Failed to resolve asset"));
                     }
                 },
                 FStreamableManager::AsyncLoadHighPriority
