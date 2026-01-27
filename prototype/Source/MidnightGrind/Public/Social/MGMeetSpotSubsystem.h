@@ -700,6 +700,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnHornPlayed, const FGuid&, Inst
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnRespectGiven, const FGuid&, FromPlayerID, const FGuid&, ToPlayerID, int32, TotalRespect);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnVibeChanged, const FGuid&, InstanceID, int32, NewVibeLevel);
 
+// New delegates for TODO resolution
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnVendorInteraction, const FGuid&, PlayerID, const FGuid&, VendorID, EMGVendorType, VendorType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnRaceLaunchRequested, const FGuid&, InstanceID, const FMGRaceChallenge&, Challenge, const TArray<FGuid>&, Participants, FName, RaceType, FName, TrackID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnChallengeIntent, const FGuid&, ChallengerID, const FGuid&, TargetID, FName, SignalType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEngineRevAudio, const FGuid&, InstanceID, const FGuid&, PlayerID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnProximityMessage, const FGuid&, InstanceID, const FGuid&, SenderID, const FString&, Message, const TArray<FGuid>&, Recipients);
+
 /**
  * @class UMGMeetSpotSubsystem
  * @brief Meet Spot Social Hub Subsystem
@@ -1307,6 +1314,26 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "MeetSpot|Events")
 	FOnVibeChanged OnVibeChanged;
 
+	/** Called when a player interacts with a vendor (UI should respond) */
+	UPROPERTY(BlueprintAssignable, Category = "MeetSpot|Events")
+	FOnVendorInteraction OnVendorInteraction;
+
+	/** Called when a race should be launched (race system should respond) */
+	UPROPERTY(BlueprintAssignable, Category = "MeetSpot|Events")
+	FOnRaceLaunchRequested OnRaceLaunchRequested;
+
+	/** Called when a player signals challenge intent (horn/headlights) */
+	UPROPERTY(BlueprintAssignable, Category = "MeetSpot|Events")
+	FOnChallengeIntent OnChallengeIntent;
+
+	/** Called when engine rev audio should play */
+	UPROPERTY(BlueprintAssignable, Category = "MeetSpot|Events")
+	FOnEngineRevAudio OnEngineRevAudio;
+
+	/** Called when a proximity message is sent */
+	UPROPERTY(BlueprintAssignable, Category = "MeetSpot|Events")
+	FOnProximityMessage OnProximityMessage;
+
 protected:
 	/** Active meet spot instances */
 	UPROPERTY()
@@ -1400,4 +1427,13 @@ protected:
 
 	/** Calculate vibe boost from player count and activity */
 	int32 CalculateVibeLevel(const FMGMeetSpotInstance& Instance) const;
+
+	/** Check if player has moderator permissions (crew leader or instance organizer) */
+	bool HasModeratorPermissions(FGuid PlayerID, FGuid InstanceID) const;
+
+	/** Find nearest player that this player is facing */
+	FGuid FindNearestFacingPlayer(FGuid PlayerID, FGuid InstanceID, float MaxDistance = 1500.0f) const;
+
+	/** Get players within range of a position */
+	TArray<FGuid> GetPlayersInRange(FGuid InstanceID, FVector Position, float Range) const;
 };

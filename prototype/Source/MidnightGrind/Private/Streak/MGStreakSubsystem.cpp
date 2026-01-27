@@ -141,9 +141,13 @@ void UMGStreakSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start streak tick
 	if (UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().SetTimer(StreakTickTimer, [this]()
+		TWeakObjectPtr<UMGStreakSubsystem> WeakThis(this);
+		World->GetTimerManager().SetTimer(StreakTickTimer, [WeakThis]()
 		{
-			TickStreaks(0.033f);
+			if (WeakThis.IsValid())
+			{
+				WeakThis->TickStreaks(0.033f);
+			}
 		}, 0.033f, true);
 	}
 }

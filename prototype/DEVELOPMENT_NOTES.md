@@ -1115,9 +1115,60 @@ New specialists added for:
 
 ---
 
-### Stage 65.1: Content Summary
+### Stage 65.1: Extended Polish Content
 
-**Total Content Files: 96 JSON files**
+**Player Profile System (DB_PlayerProfile.json):**
+- Profile banners (default, REP tier, achievement, seasonal, special)
+- Titles (50+ unlockable titles by career, specialization, vehicle affinity)
+- Avatars (default + unlockable from bosses and vehicles)
+- Nameplates (7 styles from simple to legendary with borders and colors)
+- Emblems (shapes, icons, custom emblem creator)
+- Statistics display and showcase options
+
+**NPC Crews System (DB_NPCCrews.json):**
+- 8 complete NPC crews with full rosters:
+  - Midnight Runners (neutral, street racing, Downtown/Entertainment)
+  - Neon Vipers (aggressive, high stakes, Neon District/Industrial)
+  - Canyon Kings (honorable, touge racing, Mountains/Canyon)
+  - Highway Devils (competitive, highway racing, Highway/Harbor)
+  - The Old Guard (legendary veterans, Old Town/Suburbs)
+  - Drift Syndicate (pure drifting, Industrial/Docks)
+  - Euro Elite (exclusive European cars, Uptown/Business)
+  - Street Rats (underdog budget builds, Slums/Outskirts)
+- Each crew has: Leader, Officers (2-3), Members (2-4), backstories
+- Territory control bonuses and join requirements
+- Story integration with boss battles per chapter
+
+**Rewards Database (DB_Rewards.json):**
+- Daily login rewards (7-day cycle with streak bonuses up to 100 days)
+- First win of the day bonuses per race type
+- Weekly race milestones (5/10/20/35/50 races)
+- Level up rewards with milestone unlocks
+- REP tier rewards with exclusive unlocks
+- Career milestone rewards per chapter
+- Race reward calculations (position, type, class, conditions, bonuses)
+- Drift score thresholds and grade rewards
+- Loot tables (parts by tier, vehicles by class)
+- Mystery crates (Standard, Premium, Legendary)
+- Wheel spin rewards with weighted segments
+
+**Localization System (DB_Strings_EN.json):**
+- 500+ English UI strings
+- Categories: Main Menu, Garage, Shop, Race, Drift, PinkSlip, Police, Crew, Social
+- HUD strings, notifications, tutorials
+- Vehicle and parts terminology
+- Events, achievements, REP tiers
+- Error messages and settings labels
+- Loading messages and credits
+
+**Commits:**
+- Stage 65.1: Add player profiles, NPC crews, rewards, and localization
+
+---
+
+### Content Summary (Updated)
+
+**Total Content Files: 100 JSON files**
 
 | Category | Files | Description |
 |----------|-------|-------------|
@@ -1127,9 +1178,9 @@ New specialists added for:
 | AI | 2 | Profiles + rival drivers |
 | Career | 1 | Chapter system |
 | Events | 2 | Race events + challenges |
-| Progression | 2 | Progression + achievements |
-| Social | 1 | Meet spots |
-| Crews | 1 | Territories |
+| Progression | 3 | Progression + achievements + rewards |
+| Social | 2 | Meet spots + player profiles |
+| Crews | 2 | Territories + NPC crews |
 | Tutorial | 1 | Sequence |
 | Seasons | 1 | Battle pass |
 | Police | 1 | Configuration |
@@ -1144,6 +1195,7 @@ New specialists added for:
 | UI | 2 | HUD + loading tips |
 | Input | 4 | Mappings + wheel profiles |
 | Economy | 1 | Balance config |
+| Localization | 1 | English strings |
 
 **Phase 4 Status: In Progress**
 

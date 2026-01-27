@@ -176,6 +176,16 @@ void UMGRaceHUDSubsystem::ShowDriftScorePopup(int32 Score, float Multiplier)
 	}
 }
 
+void UMGRaceHUDSubsystem::ShowAirtimePopup(float AirtimeSeconds, int32 Score)
+{
+	UE_LOG(LogTemp, Log, TEXT("MGRaceHUD: Airtime! %.2fs +%d"), AirtimeSeconds, Score);
+}
+
+void UMGRaceHUDSubsystem::ShowTrickPopup(const FText& TrickName, int32 Score)
+{
+	UE_LOG(LogTemp, Log, TEXT("MGRaceHUD: Trick! %s +%d"), *TrickName.ToString(), Score);
+}
+
 void UMGRaceHUDSubsystem::ShowNotification(const FText& Message, float Duration, FLinearColor Color)
 {
 	UE_LOG(LogTemp, Log, TEXT("MGRaceHUD: %s"), *Message.ToString());

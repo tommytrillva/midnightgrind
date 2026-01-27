@@ -60,6 +60,13 @@ void AMGCheckpointActor::BeginPlay()
 
 void AMGCheckpointActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	// Unbind overlap events
+	if (TriggerBox)
+	{
+		TriggerBox->OnComponentBeginOverlap.RemoveDynamic(this, &AMGCheckpointActor::OnTriggerOverlapBegin);
+		TriggerBox->OnComponentEndOverlap.RemoveDynamic(this, &AMGCheckpointActor::OnTriggerOverlapEnd);
+	}
+
 	UnregisterFromTrackSubsystem();
 
 	Super::EndPlay(EndPlayReason);

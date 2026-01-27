@@ -1,0 +1,523 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Police and Heat System Configuration",
+
+  "HeatSystem": {
+    "Enabled": true,
+    "EnabledModes": ["FreeRoam", "SprintRace", "StreetRace"],
+    "DisabledModes": ["CircuitRace", "DriftAttack", "Drag", "TimeAttack"],
+    "MaxHeatLevel": 5,
+    "HeatDecayEnabled": true,
+
+    "HeatLevels": [
+      {
+        "Level": 0,
+        "Name": "Clean",
+        "Description": "No police attention",
+        "ResponseUnits": 0,
+        "Tactics": [],
+        "Bounty": 0,
+        "DecayTime": 0
+      },
+      {
+        "Level": 1,
+        "Name": "Noticed",
+        "Description": "Patrol cars investigating",
+        "ResponseUnits": 1,
+        "UnitTypes": ["Patrol"],
+        "Tactics": ["Follow", "LightsPursue"],
+        "Bounty": 500,
+        "DecayTime": 30,
+        "TriggerThreshold": 100
+      },
+      {
+        "Level": 2,
+        "Name": "Pursuit",
+        "Description": "Active pursuit engaged",
+        "ResponseUnits": 2,
+        "UnitTypes": ["Patrol", "Interceptor"],
+        "Tactics": ["Chase", "RadioBackup", "RollingBlock"],
+        "Bounty": 1500,
+        "DecayTime": 60,
+        "TriggerThreshold": 300
+      },
+      {
+        "Level": 3,
+        "Name": "Intense",
+        "Description": "Multiple units, aggressive tactics",
+        "ResponseUnits": 4,
+        "UnitTypes": ["Patrol", "Interceptor", "Helicopter"],
+        "Tactics": ["PIT", "Roadblock", "AerialTracking"],
+        "Bounty": 5000,
+        "DecayTime": 120,
+        "TriggerThreshold": 600
+      },
+      {
+        "Level": 4,
+        "Name": "Extreme",
+        "Description": "Full department response",
+        "ResponseUnits": 6,
+        "UnitTypes": ["Patrol", "Interceptor", "Helicopter", "SUV"],
+        "Tactics": ["SpikesStrip", "MultipleRoadblocks", "BoxIn"],
+        "Bounty": 15000,
+        "DecayTime": 180,
+        "TriggerThreshold": 1000
+      },
+      {
+        "Level": 5,
+        "Name": "Most Wanted",
+        "Description": "Federal response - nowhere is safe",
+        "ResponseUnits": 8,
+        "UnitTypes": ["Patrol", "Interceptor", "Helicopter", "SUV", "Rhino"],
+        "Tactics": ["AllTactics", "CrossJurisdiction", "Relentless"],
+        "Bounty": 50000,
+        "DecayTime": 300,
+        "TriggerThreshold": 2000
+      }
+    ]
+  },
+
+  "HeatGeneration": {
+    "Infractions": [
+      {
+        "ID": "INFRACT_SPEEDING",
+        "Name": "Speeding",
+        "HeatPoints": 5,
+        "Condition": "SpeedOver",
+        "Threshold": 80,
+        "CooldownSeconds": 5,
+        "PolicePresenceRequired": true
+      },
+      {
+        "ID": "INFRACT_SPEEDING_EXTREME",
+        "Name": "Extreme Speeding",
+        "HeatPoints": 15,
+        "Condition": "SpeedOver",
+        "Threshold": 120,
+        "CooldownSeconds": 3,
+        "PolicePresenceRequired": true
+      },
+      {
+        "ID": "INFRACT_RECKLESS",
+        "Name": "Reckless Driving",
+        "HeatPoints": 10,
+        "Condition": "NearMissTraffic",
+        "Distance": 3,
+        "CooldownSeconds": 2,
+        "PolicePresenceRequired": true
+      },
+      {
+        "ID": "INFRACT_WRONG_WAY",
+        "Name": "Wrong Way",
+        "HeatPoints": 20,
+        "Condition": "DrivingWrongWay",
+        "DurationSeconds": 3,
+        "CooldownSeconds": 10,
+        "PolicePresenceRequired": false
+      },
+      {
+        "ID": "INFRACT_HIT_TRAFFIC",
+        "Name": "Hit & Run",
+        "HeatPoints": 25,
+        "Condition": "CollisionWithTraffic",
+        "CooldownSeconds": 5,
+        "PolicePresenceRequired": false
+      },
+      {
+        "ID": "INFRACT_HIT_POLICE",
+        "Name": "Assault on Officer",
+        "HeatPoints": 100,
+        "Condition": "CollisionWithPolice",
+        "CooldownSeconds": 0,
+        "PolicePresenceRequired": true
+      },
+      {
+        "ID": "INFRACT_DESTRUCTION",
+        "Name": "Property Destruction",
+        "HeatPoints": 30,
+        "Condition": "DestroyProp",
+        "CooldownSeconds": 3,
+        "PolicePresenceRequired": false
+      },
+      {
+        "ID": "INFRACT_EVADE",
+        "Name": "Evading Arrest",
+        "HeatPoints": 50,
+        "Condition": "FleeFromPursuit",
+        "CooldownSeconds": 30,
+        "PolicePresenceRequired": true
+      },
+      {
+        "ID": "INFRACT_ROADBLOCK",
+        "Name": "Running Roadblock",
+        "HeatPoints": 75,
+        "Condition": "BreakThroughRoadblock",
+        "CooldownSeconds": 0,
+        "PolicePresenceRequired": true
+      }
+    ],
+    "Multipliers": {
+      "TimeOfDay": {
+        "Night": 0.8,
+        "LateNight": 0.6,
+        "Day": 1.0
+      },
+      "Location": {
+        "Highway": 0.7,
+        "Downtown": 1.2,
+        "Industrial": 0.8,
+        "Residential": 1.1
+      },
+      "CurrentHeatLevel": {
+        "0": 1.0,
+        "1": 1.2,
+        "2": 1.4,
+        "3": 1.6,
+        "4": 1.8,
+        "5": 2.0
+      }
+    }
+  },
+
+  "HeatDecay": {
+    "OutOfSight": {
+      "DecayRate": 10,
+      "IntervalSeconds": 5,
+      "RequiredDuration": 30
+    },
+    "SafeZones": {
+      "Enabled": true,
+      "Types": ["Garage", "SafeHouse", "PayNSpray"],
+      "InstantClear": false,
+      "DecayMultiplier": 5.0,
+      "MinTimeInZone": 10
+    },
+    "CooldownSpots": {
+      "Enabled": true,
+      "Locations": "Dynamic",
+      "RevealOnMap": true,
+      "RevealCondition": "HeatLevel >= 2",
+      "BonusDecay": 3.0
+    }
+  },
+
+  "PoliceUnits": {
+    "Patrol": {
+      "ID": "UNIT_PATROL",
+      "Name": "Patrol Car",
+      "Vehicle": "Police_Sedan",
+      "TopSpeed": 130,
+      "Acceleration": "Medium",
+      "Handling": "Medium",
+      "Aggression": 0.3,
+      "SpawnDistance": 500,
+      "MaxActive": 4
+    },
+    "Interceptor": {
+      "ID": "UNIT_INTERCEPTOR",
+      "Name": "Interceptor",
+      "Vehicle": "Police_Muscle",
+      "TopSpeed": 160,
+      "Acceleration": "High",
+      "Handling": "Medium",
+      "Aggression": 0.6,
+      "SpawnDistance": 800,
+      "MaxActive": 2,
+      "UnlockHeatLevel": 2
+    },
+    "SUV": {
+      "ID": "UNIT_SUV",
+      "Name": "Police SUV",
+      "Vehicle": "Police_SUV",
+      "TopSpeed": 120,
+      "Acceleration": "Medium",
+      "Handling": "Low",
+      "Aggression": 0.7,
+      "SpawnDistance": 600,
+      "MaxActive": 2,
+      "UnlockHeatLevel": 4,
+      "SpecialAbility": "Ramming"
+    },
+    "Helicopter": {
+      "ID": "UNIT_HELI",
+      "Name": "Police Helicopter",
+      "Vehicle": "Police_Helicopter",
+      "TopSpeed": 180,
+      "TrackingRange": 1000,
+      "SpotlightEnabled": true,
+      "MaxActive": 1,
+      "UnlockHeatLevel": 3,
+      "CannotBeLost": true,
+      "LosCondition": "EnterTunnel"
+    },
+    "Rhino": {
+      "ID": "UNIT_RHINO",
+      "Name": "Rhino Unit",
+      "Vehicle": "Police_APC",
+      "TopSpeed": 80,
+      "Acceleration": "Low",
+      "Handling": "Low",
+      "Aggression": 1.0,
+      "SpawnDistance": 400,
+      "MaxActive": 1,
+      "UnlockHeatLevel": 5,
+      "SpecialAbility": "NearlyIndestructible",
+      "Description": "Armored pursuit vehicle"
+    }
+  },
+
+  "PoliceTactics": {
+    "Follow": {
+      "ID": "TACTIC_FOLLOW",
+      "Description": "Police follows at distance",
+      "UnlockHeatLevel": 1,
+      "Aggression": 0.2
+    },
+    "Chase": {
+      "ID": "TACTIC_CHASE",
+      "Description": "Active pursuit",
+      "UnlockHeatLevel": 2,
+      "Aggression": 0.5
+    },
+    "PIT": {
+      "ID": "TACTIC_PIT",
+      "Name": "PIT Maneuver",
+      "Description": "Attempt to spin out the player",
+      "UnlockHeatLevel": 3,
+      "Aggression": 0.7,
+      "SuccessChance": 0.3,
+      "CooldownSeconds": 20
+    },
+    "RollingBlock": {
+      "ID": "TACTIC_ROLLING_BLOCK",
+      "Description": "Multiple units box in the player",
+      "UnlockHeatLevel": 2,
+      "RequiredUnits": 2,
+      "Aggression": 0.6
+    },
+    "BoxIn": {
+      "ID": "TACTIC_BOX_IN",
+      "Description": "Surround and slow down",
+      "UnlockHeatLevel": 4,
+      "RequiredUnits": 4,
+      "Aggression": 0.8
+    },
+    "Roadblock": {
+      "ID": "TACTIC_ROADBLOCK",
+      "Description": "Static roadblock ahead",
+      "UnlockHeatLevel": 3,
+      "VehicleCount": { "Min": 2, "Max": 4 },
+      "SpawnAheadDistance": 500,
+      "BreakthroughDamage": 20
+    },
+    "SpikeStrip": {
+      "ID": "TACTIC_SPIKES",
+      "Description": "Deploy tire-destroying spike strips",
+      "UnlockHeatLevel": 4,
+      "DeployAheadDistance": 300,
+      "TireDamage": 100,
+      "DetectionDistance": 150,
+      "Avoidable": true
+    },
+    "AerialTracking": {
+      "ID": "TACTIC_AERIAL",
+      "Description": "Helicopter maintains visual",
+      "UnlockHeatLevel": 3,
+      "PreventsHeatDecay": true,
+      "CounterMeasure": "EnterCoveredArea"
+    }
+  },
+
+  "Pursuits": {
+    "InitiationDistance": 100,
+    "EscapeConditions": {
+      "OutOfSight": {
+        "Duration": 30,
+        "NoHelicopter": true
+      },
+      "SafeZone": {
+        "TimeInZone": 10
+      },
+      "Distance": {
+        "MinDistance": 1000,
+        "NoHelicopter": true
+      }
+    },
+    "BustedConditions": {
+      "SpeedBelow": 5,
+      "Duration": 5,
+      "SurroundedBy": 2
+    },
+    "BustedPenalties": {
+      "CashFine": {
+        "Percentage": 0.1,
+        "MinFine": 1000,
+        "MaxFine": 50000
+      },
+      "VehicleImpound": {
+        "Enabled": true,
+        "RetrievalCost": 5000,
+        "RetrievalTime": 0
+      },
+      "REPLoss": {
+        "Enabled": true,
+        "Amount": 100,
+        "Multiplier": "HeatLevel"
+      },
+      "CooldownPeriod": {
+        "Enabled": true,
+        "Duration": 300,
+        "Description": "Cannot enter high-risk areas"
+      }
+    },
+    "EscapeRewards": {
+      "CashBonus": {
+        "BaseAmount": 500,
+        "PerHeatLevel": 1000
+      },
+      "REPBonus": {
+        "BaseAmount": 50,
+        "PerHeatLevel": 100
+      },
+      "BountyCollection": true,
+      "AchievementProgress": true
+    }
+  },
+
+  "Bounty": {
+    "Enabled": true,
+    "Persistence": "Session",
+    "MaxBounty": 100000,
+    "Collection": {
+      "OnEscape": 1.0,
+      "OnBusted": 0.0
+    },
+    "MilestoneRewards": [
+      { "Amount": 5000, "Reward": { "Cash": 2500, "REP": 100 } },
+      { "Amount": 25000, "Reward": { "Cash": 10000, "REP": 500 } },
+      { "Amount": 50000, "Reward": { "Cash": 25000, "REP": 1000, "Unlock": "VINYL_WANTED" } },
+      { "Amount": 100000, "Reward": { "Cash": 50000, "REP": 2500, "Unlock": "ACHIEVEMENT_MOST_WANTED" } }
+    ]
+  },
+
+  "SafeHouses": {
+    "Enabled": true,
+    "Locations": [
+      {
+        "ID": "SAFE_GARAGE",
+        "Name": "Your Garage",
+        "Type": "Primary",
+        "AlwaysAvailable": true,
+        "ClearHeat": true,
+        "Services": ["Repair", "Customize", "SaveGame"]
+      },
+      {
+        "ID": "SAFE_PAYNSPRAY",
+        "Name": "Pay 'N' Spray",
+        "Type": "PayNSpray",
+        "Cost": 500,
+        "ClearHeat": true,
+        "ChangeAppearance": true,
+        "Locations": "Multiple"
+      },
+      {
+        "ID": "SAFE_UNDERGROUND",
+        "Name": "Underground Parking",
+        "Type": "Hideout",
+        "UnlockCondition": "REP_TIER_STREET",
+        "ClearHeat": true,
+        "Services": ["Hide"],
+        "Locations": "Limited"
+      }
+    ]
+  },
+
+  "DifficultyScaling": {
+    "Easy": {
+      "HeatGenerationMultiplier": 0.5,
+      "PoliceAggressionMultiplier": 0.5,
+      "BustedTimerMultiplier": 2.0,
+      "EscapeDistanceMultiplier": 0.7
+    },
+    "Normal": {
+      "HeatGenerationMultiplier": 1.0,
+      "PoliceAggressionMultiplier": 1.0,
+      "BustedTimerMultiplier": 1.0,
+      "EscapeDistanceMultiplier": 1.0
+    },
+    "Hard": {
+      "HeatGenerationMultiplier": 1.5,
+      "PoliceAggressionMultiplier": 1.3,
+      "BustedTimerMultiplier": 0.7,
+      "EscapeDistanceMultiplier": 1.3
+    },
+    "Expert": {
+      "HeatGenerationMultiplier": 2.0,
+      "PoliceAggressionMultiplier": 1.5,
+      "BustedTimerMultiplier": 0.5,
+      "EscapeDistanceMultiplier": 1.5
+    }
+  },
+
+  "Events": {
+    "PursuitEvents": [
+      {
+        "ID": "EVENT_HIGHWAY_CHASE",
+        "Name": "Highway Chase",
+        "Description": "Escape police on the highway",
+        "StartHeatLevel": 2,
+        "Location": "Highway",
+        "Rewards": { "Cash": 5000, "REP": 300 }
+      },
+      {
+        "ID": "EVENT_DOWNTOWN_ESCAPE",
+        "Name": "Downtown Escape",
+        "Description": "Lose the cops in tight city streets",
+        "StartHeatLevel": 3,
+        "Location": "Downtown",
+        "Rewards": { "Cash": 10000, "REP": 500 }
+      },
+      {
+        "ID": "EVENT_MOST_WANTED",
+        "Name": "Most Wanted Challenge",
+        "Description": "Survive maximum heat for 5 minutes",
+        "StartHeatLevel": 5,
+        "Duration": 300,
+        "Rewards": { "Cash": 50000, "REP": 2000, "Unlock": "VEHICLE_POLICE_INTERCEPTOR" }
+      }
+    ]
+  },
+
+  "Achievements": [
+    {
+      "ID": "ACH_FIRST_ESCAPE",
+      "Name": "Clean Getaway",
+      "Description": "Escape your first pursuit",
+      "Reward": { "REP": 100 }
+    },
+    {
+      "ID": "ACH_HEAT_5_ESCAPE",
+      "Name": "Untouchable",
+      "Description": "Escape from Heat Level 5",
+      "Reward": { "Cash": 25000, "REP": 1000 }
+    },
+    {
+      "ID": "ACH_NO_DAMAGE_ESCAPE",
+      "Name": "Ghost",
+      "Description": "Escape a pursuit without taking damage",
+      "Reward": { "Cash": 10000, "REP": 500 }
+    },
+    {
+      "ID": "ACH_ROADBLOCK_MASTER",
+      "Name": "Roadblock Runner",
+      "Description": "Break through 50 roadblocks",
+      "Reward": { "Cash": 15000, "REP": 750 }
+    },
+    {
+      "ID": "ACH_TOTAL_BOUNTY",
+      "Name": "Public Enemy",
+      "Description": "Accumulate $1,000,000 in total bounty",
+      "Reward": { "Cash": 100000, "REP": 5000, "Unlock": "TITLE_MOST_WANTED" }
+    }
+  ]
+}

@@ -652,11 +652,12 @@ void UMGMemoryManagerSubsystem::SetGCFrequency(float IntervalSeconds)
     if (UWorld* World = GetWorld())
     {
         World->GetTimerManager().ClearTimer(GCTimer);
-        World->GetTimerManager().SetTimer(GCTimer, [this]()
+        TWeakObjectPtr<UMGMemoryManagerSubsystem> WeakThis(this);
+        World->GetTimerManager().SetTimer(GCTimer, [WeakThis]()
         {
-            if (CurrentPressureLevel >= EMemoryPressureLevel::Medium)
+            if (WeakThis.IsValid() && WeakThis->CurrentPressureLevel >= EMemoryPressureLevel::Medium)
             {
-                RequestGarbageCollection(false);
+                WeakThis->RequestGarbageCollection(false);
             }
         }, IntervalSeconds, true);
     }

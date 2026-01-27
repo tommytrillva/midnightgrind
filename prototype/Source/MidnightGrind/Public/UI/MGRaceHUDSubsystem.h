@@ -340,6 +340,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
 	void ShowDriftScorePopup(int32 Score, float Multiplier);
 
+	/** Show airtime/jump popup */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
+	void ShowAirtimePopup(float AirtimeSeconds, int32 Score);
+
+	/** Show trick completed popup */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
+	void ShowTrickPopup(const FText& TrickName, int32 Score);
+
 	/** Show generic notification */
 	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
 	void ShowNotification(const FText& Message, float Duration = 2.0f, FLinearColor Color = FLinearColor::White);

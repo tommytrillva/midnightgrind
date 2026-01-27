@@ -1,0 +1,500 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Tutorial and Onboarding System",
+
+  "FirstTimeExperience": {
+    "Enabled": true,
+    "SkippableAfterFirst": true,
+    "Sequence": [
+      {
+        "ID": "FTUE_INTRO",
+        "Name": "Welcome to Midnight Grind",
+        "Type": "Cinematic",
+        "Duration": 30,
+        "Skippable": true,
+        "Content": {
+          "VideoAsset": "V_IntroSequence",
+          "Narration": true,
+          "Subtitles": true
+        }
+      },
+      {
+        "ID": "FTUE_CREATE_PROFILE",
+        "Name": "Create Profile",
+        "Type": "Interactive",
+        "Steps": [
+          { "Action": "EnterName", "Prompt": "What do they call you on the streets?" },
+          { "Action": "SelectStarter", "Prompt": "Pick your first ride" }
+        ]
+      },
+      {
+        "ID": "FTUE_STARTER_SELECTION",
+        "Name": "Starter Vehicle",
+        "Type": "Selection",
+        "Vehicles": [
+          {
+            "ID": "BEATER_SEDAN",
+            "Name": "Beater Sedan",
+            "Description": "Cheap and reliable. Perfect for learning the ropes.",
+            "Stats": { "Power": "C", "Handling": "C", "Drift": "D" },
+            "StartingCash": 5000
+          },
+          {
+            "ID": "KAZE_CIVIC",
+            "Name": "Kaze Civic",
+            "Description": "The people's champion. Small but mighty.",
+            "Stats": { "Power": "D", "Handling": "B", "Drift": "C" },
+            "StartingCash": 3000
+          }
+        ],
+        "AllowChange": false
+      },
+      {
+        "ID": "FTUE_FIRST_DRIVE",
+        "Name": "First Drive",
+        "Type": "Tutorial",
+        "Track": "L_Tutorial_Track",
+        "Objectives": [
+          { "ID": "OBJ_ACCELERATE", "Action": "Accelerate", "Prompt": "Hold the throttle to accelerate" },
+          { "ID": "OBJ_BRAKE", "Action": "Brake", "Prompt": "Press brake to slow down" },
+          { "ID": "OBJ_STEER", "Action": "Steer", "Prompt": "Turn left and right to steer" },
+          { "ID": "OBJ_COMPLETE_LAP", "Action": "CompleteLap", "Prompt": "Complete a lap around the track" }
+        ],
+        "Reward": { "REP": 100, "Cash": 500 }
+      },
+      {
+        "ID": "FTUE_FIRST_RACE",
+        "Name": "First Race",
+        "Type": "Race",
+        "Event": "EVENT_TUTORIAL_RACE",
+        "Opponents": 3,
+        "AILevel": "Rookie",
+        "Guaranteed": "Top3",
+        "Reward": { "REP": 250, "Cash": 1500 }
+      },
+      {
+        "ID": "FTUE_GARAGE_INTRO",
+        "Name": "Your Garage",
+        "Type": "TourGuided",
+        "Locations": [
+          { "ID": "LOC_CAR_DISPLAY", "Name": "Vehicle Display", "Description": "This is where your car lives" },
+          { "ID": "LOC_PARTS_SHOP", "Name": "Parts Shop", "Description": "Buy upgrades to make your car faster" },
+          { "ID": "LOC_PAINT_BOOTH", "Name": "Paint Booth", "Description": "Customize your car's look" },
+          { "ID": "LOC_MAP", "Name": "City Map", "Description": "Find races and events here" }
+        ]
+      },
+      {
+        "ID": "FTUE_FIRST_UPGRADE",
+        "Name": "First Upgrade",
+        "Type": "GuidedPurchase",
+        "FreeUpgrade": {
+          "Part": "PART_INTAKE_SPORT",
+          "Vehicle": "PlayerStarter"
+        },
+        "Steps": [
+          { "Action": "OpenShop", "Prompt": "Open the parts shop" },
+          { "Action": "SelectCategory", "Prompt": "Select Engine parts" },
+          { "Action": "SelectPart", "Prompt": "Choose the Sport Air Intake" },
+          { "Action": "InstallPart", "Prompt": "Install the part" }
+        ]
+      },
+      {
+        "ID": "FTUE_COMPLETE",
+        "Name": "Welcome to the Underground",
+        "Type": "Completion",
+        "Reward": {
+          "REP": 500,
+          "Cash": 2500,
+          "Unlock": "FREE_ROAM"
+        },
+        "Message": "You're ready to start your journey. Build your reputation, upgrade your ride, and become a legend."
+      }
+    ]
+  },
+
+  "Tutorials": {
+    "DrivingBasics": {
+      "ID": "TUT_DRIVING",
+      "Name": "Driving Fundamentals",
+      "Description": "Master the basics of vehicle control",
+      "UnlockCondition": "FTUE_COMPLETE",
+      "Chapters": [
+        {
+          "ID": "TUT_DRIVE_ACCEL",
+          "Name": "Acceleration",
+          "Duration": 60,
+          "Objectives": [
+            { "Action": "AccelerateTo", "Speed": 60, "Unit": "MPH" },
+            { "Action": "AccelerateTo", "Speed": 100, "Unit": "MPH" }
+          ],
+          "Tips": [
+            "Ease onto the throttle to prevent wheel spin",
+            "In lower gears, too much throttle causes wheelspin"
+          ]
+        },
+        {
+          "ID": "TUT_DRIVE_BRAKE",
+          "Name": "Braking",
+          "Duration": 90,
+          "Objectives": [
+            { "Action": "BrakeToStop", "FromSpeed": 60 },
+            { "Action": "BrakeToSpeed", "FromSpeed": 100, "ToSpeed": 40 },
+            { "Action": "TrailBrake", "Corner": "Turn1" }
+          ],
+          "Tips": [
+            "Brake in a straight line before the corner",
+            "Release the brake gradually as you turn in",
+            "Trail braking shifts weight to the front for better turn-in"
+          ]
+        },
+        {
+          "ID": "TUT_DRIVE_CORNER",
+          "Name": "Cornering",
+          "Duration": 120,
+          "Objectives": [
+            { "Action": "TakeCorner", "Corner": "SlowHairpin", "IdealLine": true },
+            { "Action": "TakeCorner", "Corner": "FastSweeper", "IdealLine": true },
+            { "Action": "CompleteLap", "Track": "L_Tutorial_Track", "CleanLap": true }
+          ],
+          "Tips": [
+            "Slow in, fast out - enter slower, exit faster",
+            "Look ahead to where you want to go",
+            "Use the full width of the track"
+          ]
+        }
+      ],
+      "Reward": { "REP": 200, "Achievement": "ACH_DRIVING_BASICS" }
+    },
+    "DriftingBasics": {
+      "ID": "TUT_DRIFT",
+      "Name": "Introduction to Drifting",
+      "Description": "Learn the art of controlled oversteer",
+      "UnlockCondition": "LEVEL_3",
+      "Chapters": [
+        {
+          "ID": "TUT_DRIFT_INITIATE",
+          "Name": "Initiating a Drift",
+          "Duration": 120,
+          "Objectives": [
+            { "Action": "HandbrakeDrift", "Duration": 2 },
+            { "Action": "PowerOverDrift", "Duration": 2 },
+            { "Action": "ClutchKickDrift", "Duration": 2 }
+          ],
+          "Tips": [
+            "Handbrake: Pull while turning to break rear traction",
+            "Power over: Floor it mid-corner to spin the rear",
+            "Clutch kick: Blip throttle to upset balance"
+          ]
+        },
+        {
+          "ID": "TUT_DRIFT_MAINTAIN",
+          "Name": "Maintaining the Drift",
+          "Duration": 120,
+          "Objectives": [
+            { "Action": "MaintainDrift", "Duration": 5 },
+            { "Action": "MaintainAngle", "Angle": 30, "Duration": 3 },
+            { "Action": "CounterSteer", "Times": 5 }
+          ],
+          "Tips": [
+            "Use counter-steer to control your angle",
+            "Modulate throttle to control drift angle",
+            "Look where you want to go, not where you're pointing"
+          ]
+        },
+        {
+          "ID": "TUT_DRIFT_TRANSITION",
+          "Name": "Transitions",
+          "Duration": 150,
+          "Objectives": [
+            { "Action": "TransitionDrift", "Type": "Manji" },
+            { "Action": "LinkCorners", "Corners": 2 },
+            { "Action": "CompleteDriftZone", "Zone": "Tutorial_S_Curves" }
+          ],
+          "Tips": [
+            "Flick the steering quickly to transition direction",
+            "Use weight transfer to link drifts",
+            "Scandinavian flick: turn opposite first, then snap back"
+          ]
+        }
+      ],
+      "Reward": { "REP": 500, "Cash": 2000, "Achievement": "ACH_DRIFT_SCHOOL" }
+    },
+    "DragRacing": {
+      "ID": "TUT_DRAG",
+      "Name": "Drag Racing 101",
+      "Description": "Straight-line speed and launch techniques",
+      "UnlockCondition": "LEVEL_5",
+      "Chapters": [
+        {
+          "ID": "TUT_DRAG_LAUNCH",
+          "Name": "The Launch",
+          "Duration": 90,
+          "Objectives": [
+            { "Action": "PerfectReaction", "Tolerance": 0.1 },
+            { "Action": "NoWheelSpin", "Launch": true },
+            { "Action": "LaunchUnder", "Time": 2.0, "Distance": "60ft" }
+          ],
+          "Tips": [
+            "Watch the Christmas tree lights",
+            "Too much throttle causes wheelspin and slower times",
+            "Perfect reaction time is 0.000 - but don't red light!"
+          ]
+        },
+        {
+          "ID": "TUT_DRAG_SHIFT",
+          "Name": "Shifting",
+          "Duration": 90,
+          "Objectives": [
+            { "Action": "PerfectShift", "Times": 3 },
+            { "Action": "NoMissedShifts", "Run": true },
+            { "Action": "OptimalShiftRPM", "Times": 3 }
+          ],
+          "Tips": [
+            "Shift at peak power RPM for best acceleration",
+            "Early shifts waste power, late shifts bounce off limiter",
+            "Each gear has an optimal shift point"
+          ]
+        }
+      ],
+      "Reward": { "REP": 300, "Achievement": "ACH_DRAG_READY" }
+    },
+    "VehicleTuning": {
+      "ID": "TUT_TUNE",
+      "Name": "Tuning Your Ride",
+      "Description": "Learn how parts affect performance",
+      "UnlockCondition": "LEVEL_8",
+      "Chapters": [
+        {
+          "ID": "TUT_TUNE_ENGINE",
+          "Name": "Engine Upgrades",
+          "Type": "InfoGraphic",
+          "Topics": [
+            { "Part": "Intake", "Effect": "Slight power increase, better throttle response" },
+            { "Part": "Exhaust", "Effect": "Power increase across RPM range" },
+            { "Part": "ECU", "Effect": "Optimizes fuel and timing for more power" },
+            { "Part": "Turbo", "Effect": "Major power increase, adds lag" },
+            { "Part": "Supercharger", "Effect": "Linear power increase, no lag" }
+          ]
+        },
+        {
+          "ID": "TUT_TUNE_SUSPENSION",
+          "Name": "Suspension Setup",
+          "Type": "Interactive",
+          "Adjustments": [
+            { "Setting": "RideHeight", "Low": "Better aero, less travel", "High": "More travel, worse aero" },
+            { "Setting": "SpringRate", "Soft": "More grip, more body roll", "Stiff": "Less roll, easier to lose grip" },
+            { "Setting": "Damping", "Soft": "Absorbs bumps, slower response", "Stiff": "Quick response, harsh ride" },
+            { "Setting": "Camber", "Negative": "Better cornering grip", "Positive": "Unusual, rarely used" },
+            { "Setting": "Toe", "ToeIn": "Stability, slower turn-in", "ToeOut": "Quick turn-in, less stable" }
+          ]
+        },
+        {
+          "ID": "TUT_TUNE_GEARS",
+          "Name": "Gear Ratios",
+          "Type": "Interactive",
+          "Concepts": [
+            { "Ratio": "Shorter", "Effect": "Faster acceleration, lower top speed" },
+            { "Ratio": "Longer", "Effect": "Higher top speed, slower acceleration" },
+            { "Ratio": "FinalDrive", "Effect": "Affects all gears proportionally" }
+          ]
+        }
+      ],
+      "Reward": { "REP": 400, "Cash": 3000, "Achievement": "ACH_TUNER" }
+    },
+    "MultiplayerGuide": {
+      "ID": "TUT_ONLINE",
+      "Name": "Going Online",
+      "Description": "Introduction to multiplayer racing",
+      "UnlockCondition": "LEVEL_10",
+      "Chapters": [
+        {
+          "ID": "TUT_ONLINE_LOBBY",
+          "Name": "Finding Races",
+          "Type": "Walkthrough",
+          "Steps": [
+            "Access the Online menu from the garage",
+            "Choose Quick Match for fast matchmaking",
+            "Or browse Custom Lobbies for specific events",
+            "Join a lobby and wait for the race to start"
+          ]
+        },
+        {
+          "ID": "TUT_ONLINE_ETIQUETTE",
+          "Name": "Racing Etiquette",
+          "Type": "InfoGraphic",
+          "Rules": [
+            "Don't intentionally ram other players",
+            "If you cause a collision, let them recover",
+            "Respect the racing line when being overtaken",
+            "Use quick chat for communication"
+          ]
+        },
+        {
+          "ID": "TUT_ONLINE_RANKED",
+          "Name": "Ranked Racing",
+          "Type": "InfoGraphic",
+          "Explanation": [
+            "Ranked matches affect your competitive rating",
+            "Win to climb the ranks from Bronze to Legend",
+            "Season rewards are based on your peak rank",
+            "Play placement matches to get your initial rank"
+          ]
+        }
+      ],
+      "Reward": { "REP": 200 }
+    }
+  },
+
+  "ContextualHints": {
+    "Enabled": true,
+    "MaxPerSession": 5,
+    "CooldownMinutes": 10,
+    "Hints": [
+      {
+        "ID": "HINT_WHEELSPIN",
+        "Trigger": "ExcessiveWheelspin",
+        "Message": "Ease onto the throttle to reduce wheelspin",
+        "ShowOnce": false,
+        "MaxShows": 3
+      },
+      {
+        "ID": "HINT_CORNER_SPEED",
+        "Trigger": "CornerCrash",
+        "Message": "Try braking earlier and carrying less speed into corners",
+        "ShowOnce": false,
+        "MaxShows": 3
+      },
+      {
+        "ID": "HINT_DRIFT_COUNTERSTEER",
+        "Trigger": "DriftSpinout",
+        "Message": "Counter-steer to control your drift angle",
+        "ShowOnce": false,
+        "MaxShows": 3
+      },
+      {
+        "ID": "HINT_NITROUS",
+        "Trigger": "NitrousAvailable",
+        "Condition": "NeverUsedNitrous",
+        "Message": "Press [Nitrous] to use your nitrous boost!",
+        "ShowOnce": true
+      },
+      {
+        "ID": "HINT_UPGRADE",
+        "Trigger": "LostRaceByMargin",
+        "Margin": 5,
+        "Message": "Upgrades might help! Visit the Parts Shop to improve your car",
+        "ShowOnce": true
+      },
+      {
+        "ID": "HINT_ASSISTS",
+        "Trigger": "MultipleSpinouts",
+        "Count": 5,
+        "Message": "Struggling? Try enabling some driving assists in Settings",
+        "ShowOnce": true
+      },
+      {
+        "ID": "HINT_MANUAL_TRANS",
+        "Trigger": "ReachLevel",
+        "Level": 15,
+        "Condition": "UsingAutomatic",
+        "Message": "Ready for more control? Try switching to Manual transmission",
+        "ShowOnce": true
+      }
+    ]
+  },
+
+  "LoadingTips": {
+    "Enabled": true,
+    "Categories": {
+      "Driving": [
+        "Smooth inputs lead to faster lap times",
+        "The racing line isn't always the fastest - experiment!",
+        "Weight transfer is key - brake to load the front, throttle to load the rear",
+        "Look ahead, not at your hood",
+        "In rain, grip levels drop significantly - adjust your braking points"
+      ],
+      "Drifting": [
+        "Maintain throttle to keep the drift going",
+        "Counter-steer quickly but smoothly",
+        "Rear-wheel drive cars are easiest to drift",
+        "More angle = more points, but harder to control",
+        "Link drifts together for massive combo multipliers"
+      ],
+      "Tuning": [
+        "Softer suspension = more grip but more body roll",
+        "Weight reduction helps everything - acceleration, braking, handling",
+        "Wider tires = more grip but more drag",
+        "Turbo adds power but introduces lag - plan your shifts",
+        "Lower ride height improves aero but watch for bottoming out"
+      ],
+      "Strategy": [
+        "Save nitrous for straights where you can use all the power",
+        "Draft behind opponents to save nitrous",
+        "Sometimes it's faster to brake late and pass on corner exit",
+        "Know when to push and when to preserve your car"
+      ],
+      "Economy": [
+        "Winning races earns more than just finishing",
+        "Higher REP tiers unlock better parts and vehicles",
+        "Sell unused parts to fund upgrades",
+        "Daily challenges offer bonus rewards",
+        "Crew membership provides discounts and bonuses"
+      ]
+    }
+  },
+
+  "ProgressiveUnlocks": {
+    "Explanation": {
+      "PartShop": { "Level": 1, "FirstVisit": "FTUE_FIRST_UPGRADE" },
+      "Tuning": { "Level": 10, "Tutorial": "TUT_TUNE" },
+      "OnlineRacing": { "Level": 5, "Tutorial": "TUT_ONLINE" },
+      "Crews": { "Level": 10, "PopupExplanation": true },
+      "Auctions": { "Level": 20, "PopupExplanation": true },
+      "PhotoMode": { "Level": 5, "QuickTip": true },
+      "PinkSlips": { "REPTier": "STREET", "WarningPopup": true }
+    }
+  },
+
+  "NewPlayerProtection": {
+    "Enabled": true,
+    "DurationLevels": 5,
+    "Protections": {
+      "MatchmakingBoost": {
+        "Enabled": true,
+        "Description": "Matched with other new players when possible"
+      },
+      "AIRubberband": {
+        "Enabled": true,
+        "Description": "AI opponents are more forgiving"
+      },
+      "CrashRecovery": {
+        "Enabled": true,
+        "Description": "Faster respawn after crashes"
+      },
+      "BonusRewards": {
+        "Enabled": true,
+        "Multiplier": 1.25,
+        "Description": "25% bonus REP and Cash for early levels"
+      }
+    }
+  },
+
+  "Settings": {
+    "TutorialReset": {
+      "Enabled": true,
+      "Description": "Reset all tutorials to replay them"
+    },
+    "HintsEnabled": {
+      "Default": true,
+      "Configurable": true
+    },
+    "LoadingTipsEnabled": {
+      "Default": true,
+      "Configurable": true
+    },
+    "ShowButtonPrompts": {
+      "Default": true,
+      "Options": ["Always", "FirstTimeOnly", "Never"]
+    }
+  }
+}

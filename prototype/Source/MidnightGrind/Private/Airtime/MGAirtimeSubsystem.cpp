@@ -128,9 +128,13 @@ void UMGAirtimeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start airtime tick
 	if (UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().SetTimer(AirtimeTickTimer, [this]()
+		TWeakObjectPtr<UMGAirtimeSubsystem> WeakThis(this);
+		World->GetTimerManager().SetTimer(AirtimeTickTimer, [WeakThis]()
 		{
-			TickAirtime(0.033f);
+			if (WeakThis.IsValid())
+			{
+				WeakThis->TickAirtime(0.033f);
+			}
 		}, 0.033f, true);
 	}
 }

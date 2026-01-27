@@ -1,0 +1,402 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Controller Haptic and Vibration Profiles",
+
+  "GlobalSettings": {
+    "MasterIntensity": 1.0,
+    "Enabled": true,
+    "AdaptiveTriggers": true,
+    "HDHaptics": true
+  },
+
+  "EngineVibration": {
+    "Enabled": true,
+    "IntensityBase": 0.15,
+    "RPMScaling": {
+      "Enabled": true,
+      "MinRPM": 1000,
+      "MaxRPM": 9000,
+      "MinIntensity": 0.1,
+      "MaxIntensity": 0.35
+    },
+    "RedlineVibration": {
+      "Enabled": true,
+      "Threshold": 0.95,
+      "Intensity": 0.6,
+      "Frequency": 25
+    },
+    "GearShift": {
+      "Enabled": true,
+      "UpshiftPulse": 0.4,
+      "DownshiftPulse": 0.35,
+      "Duration": 0.08
+    },
+    "EngineTypes": {
+      "I4": { "BaseFrequency": 40, "Smoothness": 0.7 },
+      "I6": { "BaseFrequency": 45, "Smoothness": 0.85 },
+      "V6": { "BaseFrequency": 50, "Smoothness": 0.75 },
+      "V8": { "BaseFrequency": 30, "Smoothness": 0.6 },
+      "V10": { "BaseFrequency": 55, "Smoothness": 0.8 },
+      "V12": { "BaseFrequency": 60, "Smoothness": 0.9 },
+      "Rotary": { "BaseFrequency": 65, "Smoothness": 0.95 },
+      "Flat4": { "BaseFrequency": 35, "Smoothness": 0.7 },
+      "Flat6": { "BaseFrequency": 38, "Smoothness": 0.75 }
+    }
+  },
+
+  "SurfaceVibration": {
+    "Enabled": true,
+    "Surfaces": {
+      "Asphalt": {
+        "BaseIntensity": 0.05,
+        "Frequency": 100,
+        "SpeedScaling": 0.002
+      },
+      "Concrete": {
+        "BaseIntensity": 0.08,
+        "Frequency": 80,
+        "SpeedScaling": 0.003
+      },
+      "Gravel": {
+        "BaseIntensity": 0.25,
+        "Frequency": 40,
+        "SpeedScaling": 0.004
+      },
+      "Dirt": {
+        "BaseIntensity": 0.15,
+        "Frequency": 50,
+        "SpeedScaling": 0.003
+      },
+      "Grass": {
+        "BaseIntensity": 0.20,
+        "Frequency": 45,
+        "SpeedScaling": 0.004
+      },
+      "Sand": {
+        "BaseIntensity": 0.18,
+        "Frequency": 55,
+        "SpeedScaling": 0.003
+      },
+      "Rumblestrip": {
+        "BaseIntensity": 0.40,
+        "Frequency": 20,
+        "SpeedScaling": 0.006,
+        "Pulsing": true
+      },
+      "Curb": {
+        "BaseIntensity": 0.35,
+        "Frequency": 25,
+        "SpeedScaling": 0.005
+      },
+      "Wet": {
+        "IntensityMultiplier": 0.7,
+        "FrequencyMultiplier": 1.2
+      },
+      "Icy": {
+        "IntensityMultiplier": 0.3,
+        "FrequencyMultiplier": 2.0
+      }
+    }
+  },
+
+  "TireVibration": {
+    "Enabled": true,
+    "TireSlip": {
+      "Enabled": true,
+      "MinSlipRatio": 0.1,
+      "MaxSlipRatio": 1.0,
+      "MinIntensity": 0.1,
+      "MaxIntensity": 0.5,
+      "Frequency": 60
+    },
+    "LockUp": {
+      "Enabled": true,
+      "Intensity": 0.6,
+      "Frequency": 30,
+      "Pulsing": true
+    },
+    "WheelSpin": {
+      "Enabled": true,
+      "Intensity": 0.4,
+      "Frequency": 70
+    },
+    "Drift": {
+      "Enabled": true,
+      "BaseIntensity": 0.25,
+      "AngleScaling": 0.005,
+      "MaxIntensity": 0.55
+    },
+    "TireWear": {
+      "Enabled": true,
+      "WornTireVibrationBonus": 0.15
+    }
+  },
+
+  "ImpactVibration": {
+    "Enabled": true,
+    "Collision": {
+      "Wall": {
+        "MinSpeed": 10,
+        "Intensity": 0.8,
+        "Duration": 0.15,
+        "SpeedScaling": 0.01
+      },
+      "Vehicle": {
+        "MinSpeed": 5,
+        "Intensity": 0.6,
+        "Duration": 0.12,
+        "SpeedScaling": 0.008
+      },
+      "Traffic": {
+        "MinSpeed": 5,
+        "Intensity": 0.5,
+        "Duration": 0.10,
+        "SpeedScaling": 0.007
+      },
+      "Object": {
+        "MinSpeed": 3,
+        "Intensity": 0.3,
+        "Duration": 0.08,
+        "SpeedScaling": 0.005
+      },
+      "Cone": {
+        "MinSpeed": 1,
+        "Intensity": 0.1,
+        "Duration": 0.05
+      }
+    },
+    "Landing": {
+      "Enabled": true,
+      "MinHeight": 0.5,
+      "IntensityPerMeter": 0.2,
+      "MaxIntensity": 0.9,
+      "Duration": 0.2
+    },
+    "Bottoming": {
+      "Enabled": true,
+      "Intensity": 0.5,
+      "Duration": 0.1
+    }
+  },
+
+  "NitrousVibration": {
+    "Enabled": true,
+    "Activation": {
+      "Intensity": 0.5,
+      "Duration": 0.15
+    },
+    "Active": {
+      "Intensity": 0.3,
+      "Frequency": 80
+    },
+    "Depletion": {
+      "PulseWarning": true,
+      "WarningThreshold": 0.2,
+      "PulseIntensity": 0.4,
+      "PulseInterval": 0.5
+    }
+  },
+
+  "AdaptiveTriggers": {
+    "Enabled": true,
+    "Platform": "PS5",
+    "Throttle": {
+      "EngineResistance": {
+        "Enabled": true,
+        "BaseResistance": 0.2,
+        "RPMScaling": true,
+        "MaxResistance": 0.7
+      },
+      "WheelSpin": {
+        "Enabled": true,
+        "Vibration": true,
+        "VibrationFrequency": 40
+      },
+      "TractionLoss": {
+        "Enabled": true,
+        "Resistance": 0.1
+      }
+    },
+    "Brake": {
+      "ABSPulsing": {
+        "Enabled": true,
+        "Frequency": 15,
+        "Intensity": 0.6
+      },
+      "Pressure": {
+        "Enabled": true,
+        "BaseResistance": 0.3,
+        "MaxResistance": 0.9,
+        "ProgressiveResistance": true
+      },
+      "BrakeFade": {
+        "Enabled": true,
+        "FadedResistance": 0.1
+      },
+      "LockUp": {
+        "Enabled": true,
+        "Vibration": true,
+        "VibrationFrequency": 25
+      }
+    }
+  },
+
+  "EventFeedback": {
+    "RaceStart": {
+      "Countdown": {
+        "Enabled": true,
+        "PulseIntensity": 0.3,
+        "PulseDuration": 0.1
+      },
+      "Go": {
+        "Enabled": true,
+        "Intensity": 0.7,
+        "Duration": 0.2
+      }
+    },
+    "Checkpoint": {
+      "Enabled": true,
+      "Intensity": 0.2,
+      "Duration": 0.1
+    },
+    "FinalLap": {
+      "Enabled": true,
+      "Intensity": 0.4,
+      "Duration": 0.3
+    },
+    "Win": {
+      "Enabled": true,
+      "Intensity": 0.6,
+      "Duration": 0.5,
+      "Pulsing": true,
+      "PulseCount": 3
+    },
+    "Lose": {
+      "Enabled": true,
+      "Intensity": 0.3,
+      "Duration": 0.3
+    },
+    "PinkSlipWin": {
+      "Enabled": true,
+      "Intensity": 0.8,
+      "Duration": 0.8,
+      "Pulsing": true,
+      "PulseCount": 5
+    },
+    "PinkSlipLose": {
+      "Enabled": true,
+      "Intensity": 0.7,
+      "Duration": 1.0,
+      "Pattern": "Descending"
+    }
+  },
+
+  "PoliceVibration": {
+    "Enabled": true,
+    "SirenProximity": {
+      "Enabled": true,
+      "MinDistance": 200,
+      "MaxDistance": 50,
+      "MinIntensity": 0.05,
+      "MaxIntensity": 0.25,
+      "Pulsing": true,
+      "PulseFrequency": 2
+    },
+    "Spotlight": {
+      "Enabled": true,
+      "Intensity": 0.15,
+      "Pulsing": true
+    },
+    "Busted": {
+      "Enabled": true,
+      "Intensity": 0.9,
+      "Duration": 1.5
+    },
+    "Escaped": {
+      "Enabled": true,
+      "Intensity": 0.4,
+      "Duration": 0.5
+    }
+  },
+
+  "DriftFeedback": {
+    "Enabled": true,
+    "ChainStart": {
+      "Intensity": 0.3,
+      "Duration": 0.1
+    },
+    "ComboMilestones": {
+      "1000": { "Intensity": 0.2, "Duration": 0.05 },
+      "5000": { "Intensity": 0.3, "Duration": 0.08 },
+      "10000": { "Intensity": 0.4, "Duration": 0.10 },
+      "25000": { "Intensity": 0.5, "Duration": 0.12 },
+      "50000": { "Intensity": 0.6, "Duration": 0.15 }
+    },
+    "GradeAchieved": {
+      "S": { "Intensity": 0.5, "Duration": 0.2 },
+      "SS": { "Intensity": 0.6, "Duration": 0.25 },
+      "SSS": { "Intensity": 0.8, "Duration": 0.3, "Pulsing": true }
+    },
+    "ChainBroken": {
+      "Intensity": 0.4,
+      "Duration": 0.15
+    }
+  },
+
+  "Presets": {
+    "Realistic": {
+      "Description": "Maximum feedback for immersion",
+      "MasterIntensity": 1.0,
+      "EngineVibration": 1.0,
+      "SurfaceVibration": 1.0,
+      "TireVibration": 1.0,
+      "ImpactVibration": 1.0
+    },
+    "Balanced": {
+      "Description": "Good balance of feedback",
+      "MasterIntensity": 0.75,
+      "EngineVibration": 0.8,
+      "SurfaceVibration": 0.7,
+      "TireVibration": 0.8,
+      "ImpactVibration": 0.9
+    },
+    "Subtle": {
+      "Description": "Reduced feedback for comfort",
+      "MasterIntensity": 0.5,
+      "EngineVibration": 0.5,
+      "SurfaceVibration": 0.4,
+      "TireVibration": 0.6,
+      "ImpactVibration": 0.7
+    },
+    "Minimal": {
+      "Description": "Events only",
+      "MasterIntensity": 0.3,
+      "EngineVibration": 0.0,
+      "SurfaceVibration": 0.0,
+      "TireVibration": 0.3,
+      "ImpactVibration": 0.5
+    },
+    "Off": {
+      "Description": "No vibration",
+      "MasterIntensity": 0.0
+    }
+  },
+
+  "Accessibility": {
+    "IndividualControl": true,
+    "Categories": [
+      { "ID": "Engine", "Name": "Engine Vibration", "Default": true },
+      { "ID": "Surface", "Name": "Surface Feedback", "Default": true },
+      { "ID": "Tires", "Name": "Tire Feedback", "Default": true },
+      { "ID": "Impacts", "Name": "Collision Feedback", "Default": true },
+      { "ID": "Events", "Name": "Event Feedback", "Default": true },
+      { "ID": "Triggers", "Name": "Adaptive Triggers", "Default": true }
+    ],
+    "IntensitySlider": {
+      "Min": 0,
+      "Max": 200,
+      "Default": 100,
+      "Step": 10
+    }
+  }
+}

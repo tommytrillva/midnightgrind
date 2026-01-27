@@ -1,0 +1,401 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Replay System Configuration",
+
+  "Recording": {
+    "Enabled": true,
+    "AutoRecord": {
+      "Races": true,
+      "Drifts": true,
+      "Pursuits": true,
+      "PinkSlips": true,
+      "Achievements": true
+    },
+    "BufferDuration": 300,
+    "BufferDurationUnit": "seconds",
+    "MaxRecordingLength": 600,
+    "DataCaptured": {
+      "VehiclePosition": 60,
+      "VehicleRotation": 60,
+      "VehicleVelocity": 60,
+      "WheelRotation": 30,
+      "SuspensionState": 30,
+      "EngineRPM": 30,
+      "GearState": 30,
+      "InputState": 30,
+      "CameraPosition": 30,
+      "Weather": 10,
+      "TrafficPositions": 10,
+      "PolicePositions": 30
+    },
+    "DataCapturedUnit": "Hz",
+    "Compression": {
+      "Enabled": true,
+      "Level": "Medium",
+      "InterpolationKeyframes": 60
+    }
+  },
+
+  "Storage": {
+    "LocalReplays": {
+      "MaxCount": 50,
+      "MaxSizeMB": 500,
+      "AutoDelete": {
+        "Enabled": true,
+        "KeepFavorites": true,
+        "KeepHighlights": true,
+        "OlderThanDays": 30
+      }
+    },
+    "CloudReplays": {
+      "Enabled": true,
+      "MaxCount": 25,
+      "MaxSizeMB": 250,
+      "SyncOnSave": false
+    },
+    "FileFormat": {
+      "Extension": ".mgrpl",
+      "Version": 1,
+      "IncludesMetadata": true
+    }
+  },
+
+  "Playback": {
+    "Controls": {
+      "Play": true,
+      "Pause": true,
+      "FastForward": [2, 4, 8, 16],
+      "Rewind": [2, 4, 8, 16],
+      "SlowMotion": [0.5, 0.25, 0.1],
+      "FrameByFrame": true,
+      "Scrubbing": true,
+      "JumpToEvent": true
+    },
+    "Timeline": {
+      "ShowEvents": true,
+      "EventMarkers": ["Overtake", "Crash", "DriftChain", "NearMiss", "PhotoFinish", "Checkpoint"],
+      "Thumbnails": {
+        "Enabled": true,
+        "Interval": 10,
+        "IntervalUnit": "seconds"
+      }
+    },
+    "HUD": {
+      "ShowSpeed": true,
+      "ShowGear": true,
+      "ShowRPM": true,
+      "ShowTime": true,
+      "ShowPosition": true,
+      "ShowDriftScore": true,
+      "Toggleable": true
+    }
+  },
+
+  "Cameras": {
+    "Default": "ChaseCamera",
+    "Available": [
+      {
+        "ID": "CAM_CHASE",
+        "Name": "Chase Camera",
+        "Description": "Dynamic camera following the vehicle",
+        "Settings": {
+          "Distance": 8.0,
+          "Height": 2.5,
+          "Smoothing": 0.15,
+          "LookAhead": 0.5
+        }
+      },
+      {
+        "ID": "CAM_BUMPER",
+        "Name": "Bumper Camera",
+        "Description": "First-person perspective",
+        "Settings": {
+          "Height": 1.0,
+          "FOV": 90
+        }
+      },
+      {
+        "ID": "CAM_HOOD",
+        "Name": "Hood Camera",
+        "Description": "On the hood looking forward",
+        "Settings": {
+          "Height": 0.8,
+          "FOV": 80
+        }
+      },
+      {
+        "ID": "CAM_COCKPIT",
+        "Name": "Cockpit Camera",
+        "Description": "Driver's seat view",
+        "Settings": {
+          "HeadBob": true,
+          "FOV": 75
+        }
+      },
+      {
+        "ID": "CAM_ORBIT",
+        "Name": "Orbit Camera",
+        "Description": "Free rotating camera around vehicle",
+        "Settings": {
+          "Distance": 10.0,
+          "RotationSpeed": 30.0,
+          "AutoOrbit": true,
+          "OrbitSpeed": 5.0
+        }
+      },
+      {
+        "ID": "CAM_FREE",
+        "Name": "Free Camera",
+        "Description": "Fully controllable detached camera",
+        "Settings": {
+          "MoveSpeed": 50.0,
+          "FastSpeed": 200.0,
+          "RotationSpeed": 60.0,
+          "FOVRange": [15, 120]
+        }
+      },
+      {
+        "ID": "CAM_CINEMATIC",
+        "Name": "Cinematic Camera",
+        "Description": "AI-directed dramatic angles",
+        "Settings": {
+          "AutoCut": true,
+          "CutInterval": [3, 8],
+          "PrioritizeAction": true,
+          "SmoothTransitions": true
+        }
+      },
+      {
+        "ID": "CAM_TRACKSIDE",
+        "Name": "Trackside Camera",
+        "Description": "Fixed positions along the track",
+        "Settings": {
+          "AutoSwitch": true,
+          "TrackingEnabled": true,
+          "ZoomOnApproach": true
+        }
+      },
+      {
+        "ID": "CAM_HELICOPTER",
+        "Name": "Helicopter Camera",
+        "Description": "Aerial following shot",
+        "Settings": {
+          "Height": 50.0,
+          "Distance": 30.0,
+          "Tilt": 45.0,
+          "Smoothing": 0.3
+        }
+      },
+      {
+        "ID": "CAM_WHEEL",
+        "Name": "Wheel Camera",
+        "Description": "Close-up on wheel and suspension",
+        "Settings": {
+          "WheelIndex": 0,
+          "Distance": 0.5,
+          "TrackWheel": true
+        }
+      }
+    ],
+    "CameraSwitch": {
+      "Transition": "Cut",
+      "TransitionOptions": ["Cut", "Fade", "Blend"],
+      "BlendDuration": 0.5
+    }
+  },
+
+  "Effects": {
+    "SlowMotion": {
+      "Enabled": true,
+      "MotionBlur": true,
+      "DOFIntensity": 1.5,
+      "AudioPitch": true
+    },
+    "ActionCam": {
+      "Enabled": true,
+      "TriggerEvents": ["BigCrash", "PhotoFinish", "DriftSSS", "NearMiss"],
+      "Duration": 3.0,
+      "SlowMotionIntensity": 0.25
+    },
+    "PostProcess": {
+      "Override": true,
+      "Bloom": 1.2,
+      "ChromaticAberration": 0.5,
+      "FilmGrain": 0.3,
+      "Vignette": 0.4
+    },
+    "AudioFocus": {
+      "Enabled": true,
+      "FocusOnSubject": true,
+      "AmbienceReduction": 0.3
+    }
+  },
+
+  "Editing": {
+    "Enabled": true,
+    "UnlockLevel": 20,
+    "Features": {
+      "Trimming": {
+        "Enabled": true,
+        "MinLength": 5,
+        "MaxLength": 120
+      },
+      "Splicing": {
+        "Enabled": true,
+        "MaxClips": 10
+      },
+      "CameraKeyframes": {
+        "Enabled": true,
+        "MaxKeyframes": 50,
+        "Interpolation": ["Linear", "EaseIn", "EaseOut", "EaseInOut", "Bezier"]
+      },
+      "SpeedRamping": {
+        "Enabled": true,
+        "Range": [0.1, 4.0]
+      },
+      "MusicOverlay": {
+        "Enabled": true,
+        "GameMusic": true,
+        "CustomMusic": false
+      },
+      "TextOverlay": {
+        "Enabled": true,
+        "MaxOverlays": 5,
+        "Fonts": ["Racing", "Clean", "Bold", "Script"],
+        "Effects": ["None", "Shadow", "Outline", "Glow"]
+      },
+      "Filters": {
+        "Enabled": true,
+        "Available": ["None", "Cinematic", "Vintage", "Noir", "Neon", "PS1"]
+      }
+    }
+  },
+
+  "Export": {
+    "Enabled": true,
+    "Formats": [
+      {
+        "ID": "EXPORT_1080P",
+        "Name": "1080p HD",
+        "Resolution": [1920, 1080],
+        "FPS": 60,
+        "Bitrate": 20000,
+        "UnlockLevel": 1
+      },
+      {
+        "ID": "EXPORT_1440P",
+        "Name": "1440p QHD",
+        "Resolution": [2560, 1440],
+        "FPS": 60,
+        "Bitrate": 35000,
+        "UnlockLevel": 20
+      },
+      {
+        "ID": "EXPORT_4K",
+        "Name": "4K UHD",
+        "Resolution": [3840, 2160],
+        "FPS": 60,
+        "Bitrate": 60000,
+        "UnlockLevel": 35
+      },
+      {
+        "ID": "EXPORT_VERTICAL",
+        "Name": "Vertical (9:16)",
+        "Resolution": [1080, 1920],
+        "FPS": 60,
+        "Bitrate": 20000,
+        "UnlockLevel": 10
+      }
+    ],
+    "Codec": "H.264",
+    "Container": "MP4",
+    "AudioCodec": "AAC",
+    "AudioBitrate": 320,
+    "Watermark": {
+      "Enabled": true,
+      "Optional": true,
+      "Position": "BottomRight",
+      "Opacity": 50
+    },
+    "MaxExportsPerDay": 10
+  },
+
+  "Sharing": {
+    "Platforms": [
+      {
+        "ID": "SHARE_COMMUNITY",
+        "Name": "Community Gallery",
+        "Enabled": true,
+        "MaxLengthSeconds": 60
+      },
+      {
+        "ID": "SHARE_SAVE",
+        "Name": "Save to Device",
+        "Enabled": true
+      }
+    ],
+    "CommunityGallery": {
+      "Browse": true,
+      "Like": true,
+      "Download": true,
+      "Report": true,
+      "Featured": {
+        "Daily": 5,
+        "Weekly": 20
+      },
+      "Contests": {
+        "Enabled": true,
+        "Themes": ["Best Drift", "Closest Race", "Best Edit", "Most Creative"],
+        "Rewards": {
+          "Winner": { "Cash": 50000, "REP": 2000 },
+          "TopTen": { "Cash": 10000, "REP": 500 }
+        }
+      }
+    }
+  },
+
+  "Highlights": {
+    "AutoCapture": {
+      "Enabled": true,
+      "Events": [
+        { "Type": "Win", "Duration": 15 },
+        { "Type": "PhotoFinish", "Duration": 10 },
+        { "Type": "BigOvertake", "Duration": 8 },
+        { "Type": "DriftSSS", "Duration": 10 },
+        { "Type": "PerfectStart", "Duration": 5 },
+        { "Type": "BigCrash", "Duration": 8 },
+        { "Type": "NearMiss", "Duration": 5 },
+        { "Type": "PoliceEscape", "Duration": 15 },
+        { "Type": "PinkSlipWin", "Duration": 20 }
+      ]
+    },
+    "MaxHighlights": 100,
+    "AutoCompiledReel": {
+      "Enabled": true,
+      "Weekly": true,
+      "MaxLength": 120
+    }
+  },
+
+  "GhostRacing": {
+    "Enabled": true,
+    "Sources": {
+      "PersonalBest": true,
+      "Friends": true,
+      "Leaderboard": true,
+      "Rivals": true
+    },
+    "Display": {
+      "Transparency": 0.5,
+      "Color": "#00FF00",
+      "ShowName": true,
+      "ShowTimeDiff": true
+    },
+    "MaxGhosts": 5,
+    "DownloadGhosts": {
+      "Enabled": true,
+      "FromLeaderboard": true,
+      "TopN": 100
+    }
+  }
+}

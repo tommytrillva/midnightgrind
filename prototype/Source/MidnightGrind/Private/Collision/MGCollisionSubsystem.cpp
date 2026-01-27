@@ -1,7 +1,12 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Midnight Grind. All Rights Reserved.
 
 #include "Collision/MGCollisionSubsystem.h"
 #include "TimerManager.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
+#include "HAL/PlatformFileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
 
 void UMGCollisionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -871,12 +876,139 @@ void UMGCollisionSubsystem::UpdateCollisionSystem(float DeltaTime)
 
 void UMGCollisionSubsystem::SaveCollisionData()
 {
-	// Placeholder - would serialize to save game
+	FString DataDir = FPaths::ProjectSavedDir() / TEXT("Collision");
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if (!PlatformFile.DirectoryExists(*DataDir))
+	{
+		PlatformFile.CreateDirectory(*DataDir);
+	}
+
+	FString FilePath = DataDir / TEXT("collision_stats.dat");
+
+	FBufferArchive Archive;
+
+	// Write version
+	int32 Version = 1;
+	Archive << Version;
+
+	// Write player stats
+	int32 PlayerCount = PlayerStats.Num();
+	Archive << PlayerCount;
+
+	for (const auto& Pair : PlayerStats)
+	{
+		FString PlayerId = Pair.Key;
+		const FMGCollisionStats& Stats = Pair.Value;
+
+		Archive << PlayerId;
+		Archive << Stats.TotalCollisions;
+		Archive << Stats.TakedownsDealt;
+		Archive << Stats.TakedownsReceived;
+		Archive << Stats.TotalDamageDealt;
+		Archive << Stats.TotalDamageReceived;
+		Archive << Stats.BestTakedownChain;
+		Archive << Stats.TotalRevenges;
+
+		// Write collision type counts
+		int32 TypeCount = Stats.CollisionsByType.Num();
+		Archive << TypeCount;
+		for (const auto& TypePair : Stats.CollisionsByType)
+		{
+			int32 TypeInt = static_cast<int32>(TypePair.Key);
+			int32 Count = TypePair.Value;
+			Archive << TypeInt;
+			Archive << Count;
+		}
+
+		// Write severity counts
+		int32 SevCount = Stats.CollisionsBySeverity.Num();
+		Archive << SevCount;
+		for (const auto& SevPair : Stats.CollisionsBySeverity)
+		{
+			int32 SevInt = static_cast<int32>(SevPair.Key);
+			int32 Count = SevPair.Value;
+			Archive << SevInt;
+			Archive << Count;
+		}
+	}
+
+	FFileHelper::SaveArrayToFile(Archive, *FilePath);
+	Archive.FlushCache();
+	Archive.Empty();
+
+	UE_LOG(LogTemp, Log, TEXT("MGCollision: Saved collision stats for %d players"), PlayerCount);
 }
 
 void UMGCollisionSubsystem::LoadCollisionData()
 {
-	// Placeholder - would deserialize from save game
+	FString DataDir = FPaths::ProjectSavedDir() / TEXT("Collision");
+	FString FilePath = DataDir / TEXT("collision_stats.dat");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	// Read version
+	int32 Version;
+	Archive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGCollision: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Read player stats
+	int32 PlayerCount;
+	Archive << PlayerCount;
+
+	for (int32 i = 0; i < PlayerCount; i++)
+	{
+		FString PlayerId;
+		FMGCollisionStats Stats;
+
+		Archive << PlayerId;
+		Archive << Stats.TotalCollisions;
+		Archive << Stats.TakedownsDealt;
+		Archive << Stats.TakedownsReceived;
+		Archive << Stats.TotalDamageDealt;
+		Archive << Stats.TotalDamageReceived;
+		Archive << Stats.BestTakedownChain;
+		Archive << Stats.TotalRevenges;
+
+		// Read collision type counts
+		int32 TypeCount;
+		Archive << TypeCount;
+		for (int32 j = 0; j < TypeCount; j++)
+		{
+			int32 TypeInt;
+			int32 Count;
+			Archive << TypeInt;
+			Archive << Count;
+			Stats.CollisionsByType.Add(static_cast<EMGCollisionType>(TypeInt), Count);
+		}
+
+		// Read severity counts
+		int32 SevCount;
+		Archive << SevCount;
+		for (int32 j = 0; j < SevCount; j++)
+		{
+			int32 SevInt;
+			int32 Count;
+			Archive << SevInt;
+			Archive << Count;
+			Stats.CollisionsBySeverity.Add(static_cast<EMGCollisionSeverity>(SevInt), Count);
+		}
+
+		Stats.PlayerId = PlayerId;
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGCollision: Loaded collision stats for %d players"), PlayerCount);
 }
 
 // ============================================================================

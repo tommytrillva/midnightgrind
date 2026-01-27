@@ -9,6 +9,7 @@
 #include "Checkpoint/MGCheckpointSubsystem.h"
 #include "NearMiss/MGNearMissSubsystem.h"
 #include "Drift/MGDriftSubsystem.h"
+#include "Airtime/MGAirtimeSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -64,6 +65,13 @@ void AMGPlayerController::BeginPlay()
 			{
 				DriftSubsystem->OnDriftEnded.AddDynamic(this, &AMGPlayerController::OnDriftEnded);
 			}
+
+			// Bind to airtime subsystem for jump/trick popups
+			if (UMGAirtimeSubsystem* AirtimeSubsystem = GI->GetSubsystem<UMGAirtimeSubsystem>())
+			{
+				AirtimeSubsystem->OnJumpEnded.AddDynamic(this, &AMGPlayerController::OnJumpEnded);
+				AirtimeSubsystem->OnTrickCompleted.AddDynamic(this, &AMGPlayerController::OnTrickCompleted);
+			}
 		}
 	}
 }
@@ -89,6 +97,12 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		if (UMGDriftSubsystem* DriftSubsystem = GI->GetSubsystem<UMGDriftSubsystem>())
 		{
 			DriftSubsystem->OnDriftEnded.RemoveDynamic(this, &AMGPlayerController::OnDriftEnded);
+		}
+
+		if (UMGAirtimeSubsystem* AirtimeSubsystem = GI->GetSubsystem<UMGAirtimeSubsystem>())
+		{
+			AirtimeSubsystem->OnJumpEnded.RemoveDynamic(this, &AMGPlayerController::OnJumpEnded);
+			AirtimeSubsystem->OnTrickCompleted.RemoveDynamic(this, &AMGPlayerController::OnTrickCompleted);
 		}
 	}
 
@@ -653,6 +667,46 @@ void AMGPlayerController::OnDriftEnded(const FMGDriftResult& Result)
 			if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
 			{
 				HUDSubsystem->ShowDriftScorePopup(Result.TotalPoints, Result.Multiplier);
+			}
+		}
+	}
+}
+
+void AMGPlayerController::OnJumpEnded(const FString& PlayerId, const FMGJumpResult& Result)
+{
+	// Forward jump result to HUD subsystem
+	if (Result.TotalScore > 0)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+			{
+				HUDSubsystem->ShowAirtimePopup(Result.AirtimeDuration, Result.TotalScore);
+			}
+		}
+	}
+}
+
+void AMGPlayerController::OnTrickCompleted(const FString& PlayerId, EMGTrickType Trick, int32 Score)
+{
+	// Forward trick to HUD subsystem
+	if (Score > 0)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+			{
+				// Convert trick type to display name
+				FText TrickName;
+				switch (Trick)
+				{
+					case EMGTrickType::Flip: TrickName = FText::FromString(TEXT("FLIP")); break;
+					case EMGTrickType::Barrel: TrickName = FText::FromString(TEXT("BARREL ROLL")); break;
+					case EMGTrickType::Spin: TrickName = FText::FromString(TEXT("SPIN")); break;
+					case EMGTrickType::Corkscrew: TrickName = FText::FromString(TEXT("CORKSCREW")); break;
+					default: TrickName = FText::FromString(TEXT("TRICK")); break;
+				}
+				HUDSubsystem->ShowTrickPopup(TrickName, Score);
 			}
 		}
 	}

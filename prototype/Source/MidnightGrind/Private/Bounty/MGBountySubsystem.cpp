@@ -157,9 +157,13 @@ void UMGBountySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start bounty tick
 	if (UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().SetTimer(BountyTickTimer, [this]()
+		TWeakObjectPtr<UMGBountySubsystem> WeakThis(this);
+		World->GetTimerManager().SetTimer(BountyTickTimer, [WeakThis]()
 		{
-			TickBounties(1.0f);
+			if (WeakThis.IsValid())
+			{
+				WeakThis->TickBounties(1.0f);
+			}
 		}, 1.0f, true);
 	}
 }

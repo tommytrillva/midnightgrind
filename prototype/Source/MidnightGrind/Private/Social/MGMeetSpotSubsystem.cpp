@@ -16,6 +16,8 @@
 #include "Reputation/MGReputationSubsystem.h"
 #include "Crew/MGCrewSubsystem.h"
 #include "Engine/GameInstance.h"
+#include "GameModes/MGRaceFlowManager.h"
+#include "EngineAudio/MGEngineAudioSubsystem.h"
 
 void UMGMeetSpotSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -566,7 +568,11 @@ bool UMGMeetSpotSubsystem::GetCurrentShowcase(FGuid InstanceID, FMGMeetSpotPlaye
 
 void UMGMeetSpotSubsystem::SkipCurrentShowcase(FGuid ModeratorID, FGuid InstanceID)
 {
-	// TODO: Verify moderator permissions
+	// Verify moderator permissions (crew leader, event organizer, or instance creator)
+	if (!HasModeratorPermissions(ModeratorID, InstanceID))
+	{
+		return;
+	}
 
 	FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
 	if (Instance)
@@ -682,7 +688,12 @@ bool UMGMeetSpotSubsystem::InteractWithVendor(FGuid PlayerID, FGuid VendorID)
 	{
 		if (Vendor.VendorID == VendorID && Vendor.bAvailable)
 		{
-			// TODO: Open appropriate shop UI based on vendor type
+			// Broadcast vendor interaction event for UI system to handle
+			OnVendorInteraction.Broadcast(PlayerID, VendorID, Vendor.Type);
+
+			// Award small social reputation for engaging with vendors
+			AwardSocialReputation(PlayerID, TEXT("VendorInteraction"));
+
 			return true;
 		}
 	}
@@ -1011,9 +1022,46 @@ bool UMGMeetSpotSubsystem::LaunchChallengeRace(FGuid ChallengerID, FGuid Challen
 				return false;
 			}
 
-			// TODO: Integrate with race management subsystem
-			// Create race session with challenge parameters
-			// Transfer all accepted participants to race
+			// Integrate with race management subsystem
+			if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+			{
+				if (UMGRaceFlowManager* RaceFlowManager = GI->GetSubsystem<UMGRaceFlowManager>())
+				{
+					// Build race config from challenge parameters
+					FMGRaceConfig RaceConfig;
+					RaceConfig.RaceType = Challenge.RaceType;
+					RaceConfig.TrackID = Challenge.TrackID;
+					RaceConfig.MaxParticipants = Challenge.MaxParticipants;
+					RaceConfig.PILimit = Challenge.PILimit;
+					RaceConfig.bIsPinkSlip = (Challenge.ChallengeType == EMGRaceChallengeType::PinkSlip);
+					RaceConfig.WagerAmount = Challenge.WagerAmount;
+
+					// Get track map path (would be looked up from track registry in production)
+					FSoftObjectPath TrackMapPath;
+					if (Challenge.TrackID != NAME_None)
+					{
+						// Format: /Game/Maps/Tracks/{TrackID}/{TrackID}
+						FString TrackPath = FString::Printf(TEXT("/Game/Maps/Tracks/%s/%s"), *Challenge.TrackID.ToString(), *Challenge.TrackID.ToString());
+						TrackMapPath = FSoftObjectPath(TrackPath);
+					}
+
+					// Get challenger's vehicle ID for race initialization
+					const FMGMeetSpotPlayer* Challenger = FindPlayerConst(InstanceID, ChallengerID);
+					FName PlayerVehicleID = Challenger ? *Challenger->VehicleID.ToString() : NAME_None;
+
+					// Begin race load via race flow manager
+					RaceFlowManager->BeginRaceLoad(TrackMapPath, RaceConfig, PlayerVehicleID);
+				}
+			}
+
+			// Also broadcast event for any other listeners
+			OnRaceLaunchRequested.Broadcast(
+				InstanceID,
+				Challenge,
+				Challenge.AcceptedParticipants,
+				Challenge.RaceType,
+				Challenge.TrackID
+			);
 
 			// Remove challenge after launch
 			Instance->ActiveChallenges.RemoveAt(i);
@@ -1256,7 +1304,12 @@ void UMGMeetSpotSubsystem::UseHorn(FGuid PlayerID, EMGHornPattern Pattern)
 	// Double short honk is a challenge signal
 	if (Pattern == EMGHornPattern::DoubleShort)
 	{
-		// TODO: Find nearest player facing and signal challenge intent
+		// Find nearest player we're facing and signal challenge intent
+		FGuid TargetID = FindNearestFacingPlayer(PlayerID, InstanceID);
+		if (TargetID.IsValid())
+		{
+			OnChallengeIntent.Broadcast(PlayerID, TargetID, TEXT("Horn"));
+		}
 	}
 
 	OnHornPlayed.Broadcast(InstanceID, PlayerID, Pattern);
@@ -1272,7 +1325,12 @@ void UMGMeetSpotSubsystem::FlashHeadlights(FGuid PlayerID)
 	}
 
 	// Flashing headlights = challenge signal per street racing culture
-	// TODO: If facing another vehicle, send race challenge notification
+	// Find nearest vehicle we're facing and send challenge notification
+	FGuid TargetID = FindNearestFacingPlayer(PlayerID, InstanceID);
+	if (TargetID.IsValid())
+	{
+		OnChallengeIntent.Broadcast(PlayerID, TargetID, TEXT("Headlights"));
+	}
 
 	// Award small social reputation
 	AwardSocialReputation(PlayerID, TEXT("FlashLights"));
@@ -1286,7 +1344,9 @@ void UMGMeetSpotSubsystem::RevEngine(FGuid PlayerID)
 		return;
 	}
 
-	// TODO: Trigger engine rev audio
+	// Broadcast engine rev audio event for audio system to handle
+	OnEngineRevAudio.Broadcast(InstanceID, PlayerID);
+
 	// Award tiny social reputation for engagement
 	AwardSocialReputation(PlayerID, TEXT("RevEngine"));
 }
@@ -1377,8 +1437,14 @@ void UMGMeetSpotSubsystem::SendProximityMessage(FGuid SenderID, const FString& M
 		return;
 	}
 
-	// TODO: Broadcast message to players within range
-	// For now, we just have the structure in place
+	// Get all players within range of sender
+	TArray<FGuid> Recipients = GetPlayersInRange(InstanceID, Sender->CurrentLocation, Range);
+
+	// Broadcast message to players within range
+	if (Recipients.Num() > 0)
+	{
+		OnProximityMessage.Broadcast(InstanceID, SenderID, Message, Recipients);
+	}
 }
 
 // ==========================================
@@ -2056,4 +2122,145 @@ int32 UMGMeetSpotSubsystem::CalculateVibeLevel(const FMGMeetSpotInstance& Instan
 	float ChallengeBonus = FMath::Min(10.0f, Instance.ActiveChallenges.Num() * 2.0f);
 
 	return FMath::RoundToInt(PlayerContribution + EventBonus + ShowcaseBonus + ChallengeBonus);
+}
+
+bool UMGMeetSpotSubsystem::HasModeratorPermissions(FGuid PlayerID, FGuid InstanceID) const
+{
+	const FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return false;
+	}
+
+	// Check if player is event organizer
+	if (Instance->CurrentEvent.EventID.IsValid() && Instance->CurrentEvent.OrganizerID == PlayerID)
+	{
+		return true;
+	}
+
+	// Check if player is a crew leader present in the meet spot
+	if (UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld()))
+	{
+		if (UMGCrewSubsystem* CrewSubsystem = GI->GetSubsystem<UMGCrewSubsystem>())
+		{
+			if (CrewSubsystem->IsInCrew())
+			{
+				const FMGCrewInfo& CurrentCrew = CrewSubsystem->GetCurrentCrew();
+
+				// Check if this player is the crew leader
+				FName PlayerIDName(*PlayerID.ToString());
+				if (CurrentCrew.LeaderID == PlayerIDName)
+				{
+					return true;
+				}
+
+				// Check if player is an officer or higher rank
+				FMGCrewMember Member = CrewSubsystem->GetMember(PlayerIDName);
+				if (Member.Rank >= EMGCrewRank::Officer)
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+FGuid UMGMeetSpotSubsystem::FindNearestFacingPlayer(FGuid PlayerID, FGuid InstanceID, float MaxDistance) const
+{
+	const FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return FGuid();
+	}
+
+	const FMGMeetSpotPlayer* Player = FindPlayerConst(InstanceID, PlayerID);
+	if (!Player)
+	{
+		return FGuid();
+	}
+
+	FGuid NearestID;
+	float NearestDistSq = MaxDistance * MaxDistance;
+
+	// Get player's parking spot for direction
+	int32 SpotIndex = Player->ParkingSpotIndex;
+	FVector PlayerLocation = Player->CurrentLocation;
+	FVector ForwardDir = FVector::ForwardVector;
+
+	// If in a parking spot, use the spot's rotation for forward direction
+	if (SpotIndex >= 0 && SpotIndex < Instance->ParkingSpots.Num())
+	{
+		ForwardDir = Instance->ParkingSpots[SpotIndex].Rotation.Vector();
+		PlayerLocation = Instance->ParkingSpots[SpotIndex].Location;
+	}
+
+	for (const FMGMeetSpotPlayer& OtherPlayer : Instance->Players)
+	{
+		if (OtherPlayer.PlayerID == PlayerID)
+		{
+			continue;
+		}
+
+		FVector OtherLocation = OtherPlayer.CurrentLocation;
+
+		// If other player is in a parking spot, use spot location
+		if (OtherPlayer.ParkingSpotIndex >= 0 && OtherPlayer.ParkingSpotIndex < Instance->ParkingSpots.Num())
+		{
+			OtherLocation = Instance->ParkingSpots[OtherPlayer.ParkingSpotIndex].Location;
+		}
+
+		FVector ToOther = OtherLocation - PlayerLocation;
+		float DistSq = ToOther.SizeSquared();
+
+		// Check distance
+		if (DistSq > NearestDistSq)
+		{
+			continue;
+		}
+
+		// Check if facing (within 45 degrees)
+		ToOther.Normalize();
+		float DotProduct = FVector::DotProduct(ForwardDir, ToOther);
+		if (DotProduct > 0.707f) // cos(45 degrees)
+		{
+			NearestDistSq = DistSq;
+			NearestID = OtherPlayer.PlayerID;
+		}
+	}
+
+	return NearestID;
+}
+
+TArray<FGuid> UMGMeetSpotSubsystem::GetPlayersInRange(FGuid InstanceID, FVector Position, float Range) const
+{
+	TArray<FGuid> PlayersInRange;
+
+	const FMGMeetSpotInstance* Instance = ActiveInstances.Find(InstanceID);
+	if (!Instance)
+	{
+		return PlayersInRange;
+	}
+
+	float RangeSq = Range * Range;
+
+	for (const FMGMeetSpotPlayer& Player : Instance->Players)
+	{
+		FVector PlayerLocation = Player.CurrentLocation;
+
+		// If in a parking spot, use spot location
+		if (Player.ParkingSpotIndex >= 0 && Player.ParkingSpotIndex < Instance->ParkingSpots.Num())
+		{
+			PlayerLocation = Instance->ParkingSpots[Player.ParkingSpotIndex].Location;
+		}
+
+		float DistSq = FVector::DistSquared(Position, PlayerLocation);
+		if (DistSq <= RangeSq)
+		{
+			PlayersInRange.Add(Player.PlayerID);
+		}
+	}
+
+	return PlayersInRange;
 }

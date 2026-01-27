@@ -206,9 +206,13 @@ void UMGShowdownSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start showdown tick
 	if (UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().SetTimer(ShowdownTickTimer, [this]()
+		TWeakObjectPtr<UMGShowdownSubsystem> WeakThis(this);
+		World->GetTimerManager().SetTimer(ShowdownTickTimer, [WeakThis]()
 		{
-			TickShowdowns(0.1f);
+			if (WeakThis.IsValid())
+			{
+				WeakThis->TickShowdowns(0.1f);
+			}
 		}, 0.1f, true);
 	}
 }

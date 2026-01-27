@@ -16,28 +16,38 @@ Content/Data/
 │   └── CareerChapters.json           # Story mode chapter definitions
 ├── Crews/
 │   └── CrewTerritories.json          # Crew system territories
+├── Customization/
+│   └── DB_VisualCustomization.json   # Paint, wheels, vinyls, body kits
 ├── Economy/
 │   └── EconomyBalanceConfig.json     # Currency, payouts, pricing, REP system
 ├── Environment/
 │   └── DB_WeatherAtmosphere.json     # Weather, time of day, retro effects
 ├── Events/
 │   ├── DailyWeeklyChallenges.json    # Daily/weekly event rotation
-│   └── DB_RaceEvents.json            # 48 race events across 6 chapters
+│   └── DB_RaceEvents.json            # 66 race events across 6 chapters
+├── Features/
+│   └── DB_PhotoMode.json             # Photo mode configuration
+├── Gameplay/
+│   └── DB_PoliceHeatSystem.json      # Police pursuits and heat levels
 ├── Input/
 │   ├── InputMappingDefaults.json     # Controller/keyboard bindings
 │   └── WheelProfiles/                # Racing wheel configurations
+├── Multiplayer/
+│   └── DB_MultiplayerConfig.json     # Online, matchmaking, ranked, crews
 ├── Parts/
 │   ├── DB_BeaterSedan_Parts.json     # Beater Sedan upgrades (68 parts)
 │   ├── DB_KazeCivic_Parts.json       # Kaze Civic upgrades (72 parts)
 │   ├── DB_SakuraGTR_Parts.json       # Sakura GTR upgrades (85 parts)
 │   ├── DB_StallionGT_Parts.json      # Stallion GT upgrades (82 parts)
 │   └── DB_Tenshi240_Parts.json       # Tenshi 240 upgrades (78 parts)
-├── Police/
-│   └── PoliceConfiguration.json      # Police chase configuration
 ├── Progression/
 │   └── DB_ProgressionSystem.json     # REP tiers, achievements, prestige
 ├── Seasons/
 │   └── SeasonPassStructure.json      # Seasonal content structure
+├── Settings/
+│   └── DB_DifficultyAccessibility.json # Difficulty and accessibility options
+├── Shop/
+│   └── DB_GarageShop.json            # Garage, dealers, part shops, auctions
 ├── Tracks/
 │   ├── L_HarunaPass_Layout.json      # Mountain pass track
 │   ├── L_IndustrialDocks_Layout.json # Industrial area track
@@ -45,10 +55,10 @@ Content/Data/
 │   └── L_WanganHighway_Layout.json   # Highway racing track
 ├── Tuning/
 │   └── TuningPresets.json            # Pre-built tuning configurations
-├── Tutorial/
-│   └── TutorialSequence.json         # Tutorial flow definition
+├── Tutorials/
+│   └── DB_TutorialOnboarding.json    # Tutorials, FTUE, contextual hints
 ├── UI/
-│   └── HUDConfiguration.json         # HUD styles and element positions
+│   └── DB_HUDConfiguration.json      # HUD profiles, elements, notifications
 ├── Vehicles/
 │   ├── DA_BeaterSedan.json           # Starter vehicle specification
 │   ├── DA_KazeCivic.json             # Entry JDM hatchback
@@ -59,7 +69,7 @@ Content/Data/
 └── README.md                          # This file
 ```
 
-**Total: 35 JSON data files defining complete game systems**
+**Total: 42 JSON data files defining complete game systems**
 
 ## Key File Descriptions
 
@@ -85,8 +95,43 @@ Content/Data/
 
 ### Events/DB_RaceEvents.json
 - **Purpose:** All race event definitions
-- **Contains:** 48 events across 6 story chapters, 8 event types, boss races, weekly/seasonal events
+- **Contains:** 66 events across 6 story chapters, 8 event types, boss races, track-specific events
 - **Used by:** MGRaceManagerSubsystem, MGCareerSubsystem
+
+### Features/DB_PhotoMode.json
+- **Purpose:** Complete photo mode configuration
+- **Contains:** Camera controls, filters, effects, stickers, borders, output settings, gallery, sharing, challenges
+- **Used by:** MGPhotoModeSubsystem, MGSharingSubsystem
+
+### Gameplay/DB_PoliceHeatSystem.json
+- **Purpose:** Police pursuit and heat system
+- **Contains:** 5 heat levels, police unit types, pursuit tactics, bounty system, safe houses, escape rewards
+- **Used by:** MGPoliceSubsystem, MGPursuitSubsystem
+
+### Multiplayer/DB_MultiplayerConfig.json
+- **Purpose:** All online and multiplayer configuration
+- **Contains:** Network settings, matchmaking, 15 game modes, ranked system, crews, voice chat, anti-cheat
+- **Used by:** MGOnlineSubsystem, MGMatchmakingSubsystem, MGCrewSubsystem
+
+### Settings/DB_DifficultyAccessibility.json
+- **Purpose:** Difficulty and accessibility options
+- **Contains:** 4 difficulty presets, driving assists, colorblind modes, input profiles, UI scaling
+- **Used by:** MGSettingsSubsystem, MGAccessibilitySubsystem
+
+### Shop/DB_GarageShop.json
+- **Purpose:** Garage features and shop configuration
+- **Contains:** Garage slots, 5 dealers, 5 part shops, transactions, auctions, maintenance
+- **Used by:** MGGarageSubsystem, MGShopSubsystem, MGAuctionSubsystem
+
+### Tutorials/DB_TutorialOnboarding.json
+- **Purpose:** Tutorial and new player experience
+- **Contains:** FTUE sequence, driving/drifting/tuning tutorials, contextual hints, loading tips
+- **Used by:** MGTutorialSubsystem, MGOnboardingSubsystem
+
+### UI/DB_HUDConfiguration.json
+- **Purpose:** HUD layout and display configuration
+- **Contains:** 5 HUD profiles, element variants, notifications, countdown styles, customization
+- **Used by:** MGHUDSubsystem, MGWidgetManager
 
 ### Parts/DB_*_Parts.json (5 files)
 - **Purpose:** Vehicle-specific upgrade catalogs
