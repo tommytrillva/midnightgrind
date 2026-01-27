@@ -17,18 +17,29 @@ class UMGSaveGame;
 /**
  * Subsystem Unit Tests
  * Provides actual test implementations for core subsystems
+ * Total Tests: 37
  *
  * Test Categories:
- * - Currency: Earning, spending, balance tracking
- * - Weather: State changes, transitions, road conditions
- * - Economy: Shop purchases, transaction pipeline
- * - Vehicle: Physics calculations, damage states
+ * - Currency (6): Earning, spending, balance tracking, multipliers
+ * - Weather (6): State changes, transitions, road conditions, visibility
+ * - Economy (3): Shop purchases, transaction pipeline
+ * - Vehicle (6): Damage system, repair, performance degradation
+ * - AI (5): Driving states, skills, personality, strategies
+ * - Performance (4): Tick time, memory, delegates, data access
+ * - Save/Load (5): Save game creation, data structures, slot naming
+ * - Integration (2): Cross-system verification
  *
  * Console Commands:
- * - MG.RunAllTests - Run all registered tests
- * - MG.RunCurrencyTests - Run currency subsystem tests
- * - MG.RunWeatherTests - Run weather subsystem tests
+ * - MG.RunAllTests - Run all 37 tests
+ * - MG.RunCurrencyTests - Run 6 currency subsystem tests
+ * - MG.RunWeatherTests - Run 6 weather subsystem tests
+ * - MG.RunEconomyTests - Run 3 economy tests
+ * - MG.RunVehicleTests - Run 6 vehicle tests
+ * - MG.RunAITests - Run 5 AI tests
+ * - MG.RunPerformanceTests - Run 4 performance tests
+ * - MG.RunSaveTests - Run 5 save/load tests
  * - MG.RunSmokeTests - Run quick smoke tests
+ * - MG.PrintTestReport - Print last test report
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGSubsystemTests : public UGameInstanceSubsystem
@@ -257,6 +268,10 @@ public:
 	/** Run performance tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunPerformanceTests();
+
+	/** Run save/load tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunSaveTests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")

@@ -2680,6 +2680,33 @@ void UMGSubsystemTests::RunPerformanceTests()
 	PrintTestReport();
 }
 
+void UMGSubsystemTests::RunSaveTests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING SAVE/LOAD TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestSave_CreateSaveGame());
+	TestResults.Add(TestSave_DefaultValues());
+	TestResults.Add(TestSave_DataStructures());
+	TestResults.Add(TestSave_ManagerSubsystem());
+	TestResults.Add(TestSave_SlotNaming());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
 void UMGSubsystemTests::RunSmokeTests()
 {
 	UE_LOG(LogTemp, Log, TEXT("=== RUNNING SMOKE TESTS ==="));
