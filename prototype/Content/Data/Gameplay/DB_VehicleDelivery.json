@@ -1,0 +1,215 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Delivery and First Drive Experience",
+
+  "DeliverySystem": {
+    "Enabled": true,
+    "CinematicEnabled": true,
+    "SkipOption": true,
+    "PhotoOpportunity": true
+  },
+
+  "DeliveryTypes": {
+    "Standard": {
+      "ID": "DELIVERY_STANDARD",
+      "Name": "Standard Delivery",
+      "Description": "Vehicle delivered to your garage",
+      "Location": "PlayerGarage",
+      "CinematicType": "GarageDoorReveal",
+      "Duration": 15,
+      "Cost": 0
+    },
+    "ShowroomPickup": {
+      "ID": "DELIVERY_SHOWROOM",
+      "Name": "Showroom Pickup",
+      "Description": "Pick up your new ride from the dealer",
+      "Location": "DealerShowroom",
+      "CinematicType": "ShowroomWalkthrough",
+      "Duration": 30,
+      "DriveHomeEnabled": true,
+      "Cost": 0
+    },
+    "StreetDelivery": {
+      "ID": "DELIVERY_STREET",
+      "Name": "Street Delivery",
+      "Description": "Vehicle delivered to your current location",
+      "Location": "PlayerPosition",
+      "CinematicType": "FlatbedArrival",
+      "Duration": 20,
+      "Cost": 500
+    },
+    "ExpressDelivery": {
+      "ID": "DELIVERY_EXPRESS",
+      "Name": "Express Delivery",
+      "Description": "Immediate delivery anywhere",
+      "Location": "PlayerPosition",
+      "CinematicType": "QuickReveal",
+      "Duration": 10,
+      "Cost": 2000
+    },
+    "BarnFindRecovery": {
+      "ID": "DELIVERY_BARN",
+      "Name": "Barn Find Recovery",
+      "Description": "Vehicle towed to garage for restoration",
+      "Location": "PlayerGarage",
+      "CinematicType": "BarnFindTowIn",
+      "Duration": 45,
+      "ShowCondition": true,
+      "Cost": 0
+    },
+    "AuctionWin": {
+      "ID": "DELIVERY_AUCTION",
+      "Name": "Auction Delivery",
+      "Description": "Your auction win arrives",
+      "Location": "PlayerGarage",
+      "CinematicType": "CoveredReveal",
+      "Duration": 25,
+      "Cost": 0
+    },
+    "GiftReceived": {
+      "ID": "DELIVERY_GIFT",
+      "Name": "Gift Delivery",
+      "Description": "A gift from a friend",
+      "Location": "PlayerGarage",
+      "CinematicType": "SurpriseReveal",
+      "Duration": 20,
+      "ShowGifter": true,
+      "Cost": 0
+    },
+    "SeasonReward": {
+      "ID": "DELIVERY_SEASON",
+      "Name": "Season Reward",
+      "Description": "Your season pass reward vehicle",
+      "Location": "PlayerGarage",
+      "CinematicType": "SpecialReveal",
+      "Duration": 35,
+      "Fanfare": true,
+      "Cost": 0
+    }
+  },
+
+  "CinematicSequences": {
+    "GarageDoorReveal": {
+      "Stages": [
+        { "Camera": "GarageExterior", "Duration": 3.0, "Action": "Approach" },
+        { "Camera": "GarageDoor", "Duration": 4.0, "Action": "DoorOpening", "Sound": "SFX_Garage_Door" },
+        { "Camera": "VehicleReveal", "Duration": 5.0, "Action": "LightsOn", "Sound": "SFX_Reveal_Sting" },
+        { "Camera": "VehicleOrbit", "Duration": 3.0, "Action": "ShowVehicle" }
+      ]
+    },
+    "ShowroomWalkthrough": {
+      "Stages": [
+        { "Camera": "ShowroomEntrance", "Duration": 3.0, "Action": "PlayerEnters" },
+        { "Camera": "VehicleSpotlight", "Duration": 4.0, "Action": "SpotlightOn" },
+        { "Camera": "VehicleDetail_Front", "Duration": 2.0, "Action": "PanDetails" },
+        { "Camera": "VehicleDetail_Side", "Duration": 2.0, "Action": "PanDetails" },
+        { "Camera": "VehicleDetail_Rear", "Duration": 2.0, "Action": "PanDetails" },
+        { "Camera": "KeyHandover", "Duration": 3.0, "Action": "ReceiveKeys", "Sound": "SFX_Keys_Jingle" },
+        { "Camera": "PlayerEntersVehicle", "Duration": 4.0, "Action": "GetIn", "Sound": "SFX_Door_Open" }
+      ]
+    },
+    "FlatbedArrival": {
+      "Stages": [
+        { "Camera": "Wide_Street", "Duration": 4.0, "Action": "FlatbedArrives", "Sound": "SFX_Truck_Arrival" },
+        { "Camera": "Ramp_Deploy", "Duration": 3.0, "Action": "LowerRamp" },
+        { "Camera": "Vehicle_Unload", "Duration": 5.0, "Action": "DriveOff", "Sound": "Engine_Start" },
+        { "Camera": "Ground_Level", "Duration": 3.0, "Action": "VehicleReady" }
+      ]
+    },
+    "BarnFindTowIn": {
+      "Stages": [
+        { "Camera": "GarageWide", "Duration": 3.0, "Action": "Wait" },
+        { "Camera": "TowTruckArrival", "Duration": 4.0, "Action": "TruckArrives", "Sound": "SFX_Truck_Approach" },
+        { "Camera": "VehicleOnHook", "Duration": 3.0, "Action": "ShowDustyVehicle" },
+        { "Camera": "UnloadSequence", "Duration": 5.0, "Action": "LowerVehicle" },
+        { "Camera": "DustyReveal", "Duration": 4.0, "Action": "ShowCondition", "Effect": "DustParticles" },
+        { "Camera": "InspectionAngle", "Duration": 3.0, "Action": "ShowDetails" }
+      ]
+    },
+    "CoveredReveal": {
+      "Stages": [
+        { "Camera": "GarageWide", "Duration": 3.0, "Action": "ShowCover" },
+        { "Camera": "CoverDetail", "Duration": 2.0, "Action": "BuildAnticipation" },
+        { "Camera": "PullCover", "Duration": 4.0, "Action": "RemoveCover", "Sound": "SFX_Cloth_Pull" },
+        { "Camera": "VehicleReveal", "Duration": 5.0, "Action": "FullReveal", "Sound": "SFX_Reveal_Sting" }
+      ]
+    },
+    "SpecialReveal": {
+      "Stages": [
+        { "Camera": "DarkGarage", "Duration": 2.0, "Action": "Darkness" },
+        { "Camera": "SpotlightDown", "Duration": 3.0, "Action": "LightBeam", "Sound": "SFX_Light_On" },
+        { "Camera": "VehicleSilhouette", "Duration": 2.0, "Action": "ShowShadow" },
+        { "Camera": "FullLights", "Duration": 4.0, "Action": "AllLightsOn", "Sound": "SFX_Epic_Reveal" },
+        { "Camera": "360Orbit", "Duration": 5.0, "Action": "OrbitVehicle" },
+        { "Camera": "DetailShots", "Duration": 4.0, "Action": "ShowFeatures" }
+      ]
+    }
+  },
+
+  "FirstDriveExperience": {
+    "Enabled": true,
+    "PromptPlayer": true,
+    "Sequence": {
+      "StartEngine": {
+        "CameraShake": true,
+        "RevEngine": true,
+        "ShowStats": true,
+        "Duration": 5.0
+      },
+      "ExitGarage": {
+        "SlowMotion": true,
+        "SpeedLines": false,
+        "Duration": 3.0
+      },
+      "FreeRoamTutorial": {
+        "ShowControls": true,
+        "ShowMinimap": true,
+        "Duration": 10.0
+      }
+    },
+    "PhotoPrompt": {
+      "Enabled": true,
+      "Message": "Want to take a photo of your new ride?",
+      "BonusREP": 50
+    }
+  },
+
+  "DeliveryNotifications": {
+    "OnPurchase": {
+      "Title": "Vehicle Purchased!",
+      "Message": "Your {VehicleName} is on its way",
+      "Sound": "SFX_Purchase_Complete"
+    },
+    "OnDelivery": {
+      "Title": "Delivery Complete",
+      "Message": "{VehicleName} has arrived at your garage",
+      "Sound": "SFX_Notification_Positive"
+    },
+    "GiftReceived": {
+      "Title": "You Received a Gift!",
+      "Message": "{GifterName} sent you a {VehicleName}",
+      "Sound": "SFX_Gift_Received"
+    }
+  },
+
+  "VehicleInspection": {
+    "Enabled": true,
+    "AutoRotate": true,
+    "ManualControls": true,
+    "Angles": ["Front", "Rear", "LeftSide", "RightSide", "Interior", "Engine"],
+    "ShowSpecs": true,
+    "ShowCondition": true,
+    "ShowHistory": true
+  },
+
+  "SocialSharing": {
+    "Enabled": true,
+    "Options": {
+      "Photo": true,
+      "Video": true,
+      "Stats": true
+    },
+    "Platforms": ["InGame", "Twitter", "Instagram", "Facebook"],
+    "Watermark": true
+  }
+}

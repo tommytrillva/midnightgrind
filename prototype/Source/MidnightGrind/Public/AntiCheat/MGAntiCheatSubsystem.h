@@ -1,31 +1,71 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGAntiCheatSubsystem.h
+ * @brief Anti-Cheat Subsystem for Midnight Grind
+ *
+ * This subsystem provides comprehensive cheat detection and prevention for the game.
+ * It operates as a client-side first line of defense, working in conjunction with
+ * server-side validation (see MGServerAuthSubsystem) to maintain fair play.
+ *
+ * Key Responsibilities:
+ * - Real-time validation of player movement, speed, and race results
+ * - Detection of common cheating methods (speed hacks, teleportation, memory manipulation)
+ * - File and memory integrity verification to detect tampering
+ * - Player trust scoring system to flag suspicious accounts
+ * - Player report management for community-driven moderation
+ * - Automatic penalty application for confirmed violations
+ *
+ * Architecture Overview:
+ * The subsystem uses a layered approach to cheat detection:
+ * 1. Real-time validation - Checks game state changes as they happen
+ * 2. Statistical analysis - Detects anomalies over time
+ * 3. Integrity checks - Periodic verification of game files and memory
+ * 4. Trust system - Long-term reputation tracking per player
+ *
+ * Integration Notes:
+ * - This subsystem automatically initializes with the game instance
+ * - Validation functions should be called from gameplay code at appropriate points
+ * - Violations are automatically reported to the backend server
+ * - Works alongside MGServerAuthSubsystem for server-authoritative validation
+ *
+ * @see UMGServerAuthSubsystem for server-side validation
+ * @see FMGViolationRecord for violation data structure
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MGAntiCheatSubsystem.generated.h"
 
+// ============================================================================
+// ENUMERATIONS
+// ============================================================================
+
 /**
- * Violation Type
+ * @brief Types of cheating violations that can be detected
+ *
+ * Each violation type corresponds to a specific cheating method. The anti-cheat
+ * system uses these to categorize detected issues and apply appropriate penalties.
  */
 UENUM(BlueprintType)
 enum class EMGViolationType : uint8
 {
-	SpeedHack			UMETA(DisplayName = "Speed Hack"),
-	TeleportHack		UMETA(DisplayName = "Teleport Hack"),
-	WallHack			UMETA(DisplayName = "Wall Hack"),
-	TimerManipulation	UMETA(DisplayName = "Timer Manipulation"),
-	ResourceHack		UMETA(DisplayName = "Resource Hack"),
-	MemoryManipulation	UMETA(DisplayName = "Memory Manipulation"),
-	PacketManipulation	UMETA(DisplayName = "Packet Manipulation"),
-	ImpossibleStats		UMETA(DisplayName = "Impossible Stats"),
-	AnomalousInput		UMETA(DisplayName = "Anomalous Input"),
-	ModifiedFiles		UMETA(DisplayName = "Modified Files"),
-	Exploit				UMETA(DisplayName = "Exploit"),
-	Botting				UMETA(DisplayName = "Botting"),
-	RubberBanding		UMETA(DisplayName = "Rubber Banding"),
-	Unknown				UMETA(DisplayName = "Unknown")
+	SpeedHack			UMETA(DisplayName = "Speed Hack"),			///< Player moving faster than physically possible
+	TeleportHack		UMETA(DisplayName = "Teleport Hack"),		///< Instant position changes bypassing normal movement
+	WallHack			UMETA(DisplayName = "Wall Hack"),			///< Passing through collision geometry
+	TimerManipulation	UMETA(DisplayName = "Timer Manipulation"),	///< Altering game time or race timers
+	ResourceHack		UMETA(DisplayName = "Resource Hack"),		///< Illegitimate currency or XP gains
+	MemoryManipulation	UMETA(DisplayName = "Memory Manipulation"),	///< Direct memory editing detected
+	PacketManipulation	UMETA(DisplayName = "Packet Manipulation"),	///< Altered network packets
+	ImpossibleStats		UMETA(DisplayName = "Impossible Stats"),	///< Stats that exceed game limits
+	AnomalousInput		UMETA(DisplayName = "Anomalous Input"),		///< Inhuman input patterns (bots, macros)
+	ModifiedFiles		UMETA(DisplayName = "Modified Files"),		///< Game files altered from expected state
+	Exploit				UMETA(DisplayName = "Exploit"),				///< Abusing game bugs for unfair advantage
+	Botting				UMETA(DisplayName = "Botting"),				///< Automated gameplay detected
+	RubberBanding		UMETA(DisplayName = "Rubber Banding"),		///< Suspicious position corrections
+	Unknown				UMETA(DisplayName = "Unknown")				///< Unclassified suspicious behavior
 };
 
 /**

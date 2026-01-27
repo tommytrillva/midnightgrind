@@ -1,5 +1,45 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGGameStateSubsystem.h
+ * @brief Game State Subsystem - Controls overall game flow and state transitions
+ *
+ * This subsystem manages the high-level game state machine for Midnight Grind.
+ * It controls transitions between major game states (menus, garage, racing, etc.)
+ * and handles level loading coordination.
+ *
+ * @section Overview
+ * The Game State Subsystem is a GameInstanceSubsystem, meaning it persists across
+ * level transitions and exists for the entire lifetime of the game session. Use this
+ * subsystem when you need to:
+ * - Navigate between game screens (main menu, garage, lobby browser, etc.)
+ * - Check what state the game is currently in
+ * - Listen for state changes to update UI or other systems
+ * - Manage level loading with proper state coordination
+ *
+ * @section Usage
+ * Access this subsystem through the GameInstance:
+ * @code
+ * UMGGameStateSubsystem* StateSubsystem = GameInstance->GetSubsystem<UMGGameStateSubsystem>();
+ * if (StateSubsystem->GetCurrentState() == EMGGameState::MainMenu)
+ * {
+ *     StateSubsystem->GoToGarage();
+ * }
+ * @endcode
+ *
+ * @section StateFlow State Flow
+ * Common state transitions:
+ * - Boot -> MainMenu (initial startup)
+ * - MainMenu -> Garage, LobbyBrowser, Settings, Leaderboards
+ * - Garage -> LobbyBrowser, MainMenu
+ * - LobbyBrowser -> InLobby
+ * - InLobby -> Loading -> PreRace -> Racing -> PostRace
+ * - Racing -> PhotoMode, Replay (can return to Racing)
+ *
+ * @see UMGGameInstance For the parent game instance
+ * @see EMGGameState For the list of all game states
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

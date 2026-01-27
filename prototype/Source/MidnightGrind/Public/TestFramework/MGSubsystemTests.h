@@ -17,7 +17,7 @@ class UMGSaveGame;
 /**
  * Subsystem Unit Tests
  * Provides actual test implementations for core subsystems
- * Total Tests: 50
+ * Total Tests: 55
  *
  * Test Categories:
  * - Currency (6): Earning, spending, balance tracking, multipliers
@@ -29,10 +29,11 @@ class UMGSaveGame;
  * - Save/Load (5): Save game creation, data structures, slot naming
  * - Physics (9): Tire grip, wet modifiers, weight transfer, handling modes, surface, geometry, differential, wear
  * - Stress (4): High object count, sustained operation, memory stability, rapid state changes
+ * - UI Data (5): HUD data, race status, telemetry, HUD modes, data provider
  * - Integration (2): Cross-system verification
  *
  * Console Commands:
- * - MG.RunAllTests - Run all 50 tests
+ * - MG.RunAllTests - Run all 55 tests
  * - MG.RunCurrencyTests - Run 6 currency subsystem tests
  * - MG.RunWeatherTests - Run 6 weather subsystem tests
  * - MG.RunEconomyTests - Run 3 economy tests
@@ -42,6 +43,7 @@ class UMGSaveGame;
  * - MG.RunSaveTests - Run 5 save/load tests
  * - MG.RunPhysicsTests - Run 9 physics tests
  * - MG.RunStressTests - Run 4 stress tests
+ * - MG.RunUIDataTests - Run 5 UI data tests
  * - MG.RunSmokeTests - Run quick smoke tests
  * - MG.PrintTestReport - Print last test report
  */
@@ -302,6 +304,30 @@ public:
 	FMGTestResult TestStress_RapidStateChanges();
 
 	// ==========================================
+	// UI DATA TESTS
+	// ==========================================
+
+	/** Test HUD data structure defaults */
+	UFUNCTION(BlueprintCallable, Category = "Tests|UIData")
+	FMGTestResult TestUIData_HUDDataDefaults();
+
+	/** Test race status structure defaults */
+	UFUNCTION(BlueprintCallable, Category = "Tests|UIData")
+	FMGTestResult TestUIData_RaceStatusDefaults();
+
+	/** Test vehicle telemetry structure defaults */
+	UFUNCTION(BlueprintCallable, Category = "Tests|UIData")
+	FMGTestResult TestUIData_TelemetryDefaults();
+
+	/** Test HUD mode enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|UIData")
+	FMGTestResult TestUIData_HUDModes();
+
+	/** Test HUD data provider subsystem */
+	UFUNCTION(BlueprintCallable, Category = "Tests|UIData")
+	FMGTestResult TestUIData_DataProvider();
+
+	// ==========================================
 	// CONSOLE COMMANDS
 	// ==========================================
 
@@ -344,6 +370,10 @@ public:
 	/** Run stress tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunStressTests();
+
+	/** Run UI data tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunUIDataTests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")

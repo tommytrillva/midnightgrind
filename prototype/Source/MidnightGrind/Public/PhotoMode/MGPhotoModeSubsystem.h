@@ -1,30 +1,69 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGPhotoModeSubsystem.h
+ * @brief Photo Mode Subsystem for in-game photography and image capture.
+ *
+ * This subsystem provides a comprehensive photo mode feature that allows players
+ * to pause the game, position a free-moving camera, apply visual filters and effects,
+ * and capture high-quality screenshots. The system supports multiple camera modes
+ * (free, orbit, track, locked), various filter presets, depth of field controls,
+ * and customizable overlays.
+ *
+ * Key Features:
+ * - Multiple camera modes for flexible shot composition
+ * - Real-time filter and post-processing adjustments
+ * - Depth of field with adjustable focal distance and aperture
+ * - Logo watermarks, frames, and informational overlays
+ * - Photo gallery management with save/delete/share functionality
+ * - High-resolution capture support up to 4K
+ *
+ * Usage:
+ * @code
+ * UMGPhotoModeSubsystem* PhotoMode = GetWorld()->GetSubsystem<UMGPhotoModeSubsystem>();
+ * PhotoMode->EnterPhotoMode();
+ * PhotoMode->SetFilter(EMGPhotoFilter::Noir);
+ * PhotoMode->CapturePhoto();
+ * @endcode
+ *
+ * @see UWorldSubsystem
+ * @see EMGPhotoCamera
+ * @see EMGPhotoFilter
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "MGPhotoModeSubsystem.generated.h"
 
-class APlayerController;
-class UCameraComponent;
-class USceneCaptureComponent2D;
-class UTextureRenderTarget2D;
-class UMaterialInstanceDynamic;
+// Forward declarations
+class APlayerController;      ///< Player controller for input handling
+class UCameraComponent;       ///< Camera component for view management
+class USceneCaptureComponent2D; ///< Scene capture for rendering photos
+class UTextureRenderTarget2D; ///< Render target for photo output
+class UMaterialInstanceDynamic; ///< Dynamic material for filter effects
+
+// ============================================================================
+// ENUMERATIONS - Camera and Filter Types
+// ============================================================================
 
 /**
- * Photo mode camera mode
+ * @brief Photo mode camera movement modes.
+ *
+ * Defines how the camera behaves and moves while in photo mode. Each mode
+ * offers different creative control for composing shots.
  */
 UENUM(BlueprintType)
 enum class EMGPhotoCamera : uint8
 {
-	/** Free camera */
+	/** Free camera - Full 6DOF movement, player has complete control over position and rotation */
 	Free,
-	/** Orbit around vehicle */
+	/** Orbit around vehicle - Camera rotates around the target vehicle at a fixed distance */
 	Orbit,
-	/** Track vehicle */
+	/** Track vehicle - Camera follows vehicle movement while maintaining relative position */
 	Track,
-	/** Locked to vehicle */
+	/** Locked to vehicle - Camera is rigidly attached to the vehicle, moves with it */
 	Locked
 };
 

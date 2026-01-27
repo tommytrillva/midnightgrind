@@ -1,0 +1,219 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Leaderboard System Configuration",
+
+  "LeaderboardSystem": {
+    "Enabled": true,
+    "ServerBased": true,
+    "RefreshInterval": 60,
+    "CacheDuration": 300,
+    "AntiCheatEnabled": true
+  },
+
+  "LeaderboardTypes": {
+    "Global": {
+      "ID": "LB_GLOBAL",
+      "Name": "Global Leaderboards",
+      "Description": "Compete against all players worldwide",
+      "Scope": "AllPlayers",
+      "DisplayLimit": 1000,
+      "YourRankAlways": true
+    },
+    "Friends": {
+      "ID": "LB_FRIENDS",
+      "Name": "Friends Leaderboards",
+      "Description": "Compare with your friends",
+      "Scope": "FriendsList",
+      "DisplayLimit": 100,
+      "ShowDelta": true
+    },
+    "Crew": {
+      "ID": "LB_CREW",
+      "Name": "Crew Leaderboards",
+      "Description": "Compete within your crew",
+      "Scope": "CrewMembers",
+      "DisplayLimit": 50
+    },
+    "Regional": {
+      "ID": "LB_REGIONAL",
+      "Name": "Regional Leaderboards",
+      "Description": "Compete in your region",
+      "Scope": "SameRegion",
+      "DisplayLimit": 500,
+      "Regions": ["NA", "EU", "APAC", "SA"]
+    },
+    "VehicleClass": {
+      "ID": "LB_CLASS",
+      "Name": "Class Leaderboards",
+      "Description": "Best times per vehicle class",
+      "Scope": "ByClass",
+      "Classes": ["D", "C", "B", "A", "S", "S+"],
+      "DisplayLimit": 100
+    }
+  },
+
+  "Categories": {
+    "Races": {
+      "ID": "CAT_RACES",
+      "Name": "Race Times",
+      "Subcategories": {
+        "Track": {
+          "PerTrack": true,
+          "Metric": "BestLapTime",
+          "DisplayFormat": "Time"
+        },
+        "Sprint": {
+          "PerRoute": true,
+          "Metric": "TotalTime",
+          "DisplayFormat": "Time"
+        }
+      }
+    },
+    "SpeedTraps": {
+      "ID": "CAT_SPEED",
+      "Name": "Speed Traps",
+      "Subcategories": {
+        "PerTrap": true,
+        "Metric": "TopSpeed",
+        "DisplayFormat": "MPH"
+      }
+    },
+    "DriftZones": {
+      "ID": "CAT_DRIFT",
+      "Name": "Drift Zones",
+      "Subcategories": {
+        "PerZone": true,
+        "Metric": "HighScore",
+        "DisplayFormat": "Points"
+      }
+    },
+    "Overall": {
+      "ID": "CAT_OVERALL",
+      "Name": "Overall Stats",
+      "Subcategories": {
+        "TotalWins": { "Metric": "RacesWon", "DisplayFormat": "Count" },
+        "TotalREP": { "Metric": "REPEarned", "DisplayFormat": "Count" },
+        "TotalDistance": { "Metric": "MilesDriven", "DisplayFormat": "Miles" },
+        "TotalDriftScore": { "Metric": "DriftPointsTotal", "DisplayFormat": "Points" },
+        "PursuitEscapes": { "Metric": "PoliceEscapes", "DisplayFormat": "Count" }
+      }
+    },
+    "Weekly": {
+      "ID": "CAT_WEEKLY",
+      "Name": "Weekly Challenge",
+      "ResetDay": "Monday",
+      "Subcategories": {
+        "CurrentChallenge": {
+          "Dynamic": true,
+          "Metric": "ChallengeScore",
+          "DisplayFormat": "Points"
+        }
+      }
+    },
+    "Seasonal": {
+      "ID": "CAT_SEASON",
+      "Name": "Season Rankings",
+      "ResetOnSeasonEnd": true,
+      "Subcategories": {
+        "SeasonWins": { "Metric": "SeasonRaceWins", "DisplayFormat": "Count" },
+        "SeasonREP": { "Metric": "SeasonREP", "DisplayFormat": "Count" },
+        "RankedRating": { "Metric": "ELO", "DisplayFormat": "Rating" }
+      }
+    }
+  },
+
+  "RivalSystem": {
+    "Enabled": true,
+    "AutoAssign": true,
+    "RivalsCount": 5,
+    "Criteria": {
+      "SimilarRank": true,
+      "RankTolerance": 100,
+      "SimilarPlayTime": true
+    },
+    "Challenges": {
+      "BeatRivalTime": { "Reward": { "REP": 100 } },
+      "BeatAllRivals": { "Reward": { "REP": 500, "Cash": 2500 } }
+    },
+    "GhostRacing": true
+  },
+
+  "GhostData": {
+    "Enabled": true,
+    "AutoDownload": true,
+    "Types": {
+      "PersonalBest": { "AlwaysAvailable": true },
+      "GlobalTop": { "DownloadTop": 10 },
+      "FriendBest": { "AllFriends": true },
+      "RivalGhosts": { "AllRivals": true },
+      "WorldRecord": { "AlwaysAvailable": true }
+    },
+    "VisualizationOptions": {
+      "Opacity": { "Min": 0.1, "Max": 1.0, "Default": 0.5 },
+      "Color": { "Personal": "#00FF00", "Friend": "#00FFFF", "Rival": "#FF0000", "WorldRecord": "#FFD700" },
+      "ShowName": true,
+      "ShowDelta": true
+    }
+  },
+
+  "RewardMilestones": {
+    "FirstPlace": {
+      "Track": { "REP": 500, "Title": "TITLE_TRACK_MASTER" },
+      "SpeedTrap": { "REP": 250 },
+      "DriftZone": { "REP": 250 }
+    },
+    "Top10": {
+      "Track": { "REP": 250 },
+      "SpeedTrap": { "REP": 100 },
+      "DriftZone": { "REP": 100 }
+    },
+    "Top100": {
+      "Track": { "REP": 100 },
+      "SpeedTrap": { "REP": 50 },
+      "DriftZone": { "REP": 50 }
+    },
+    "WorldRecords": {
+      "FirstEver": { "REP": 2500, "Cash": 25000, "Achievement": "ACH_WORLD_RECORD", "Title": "TITLE_RECORD_HOLDER" },
+      "BeatExisting": { "REP": 1000, "Cash": 10000 }
+    }
+  },
+
+  "AntiCheat": {
+    "ValidationChecks": {
+      "TimeValidation": true,
+      "SpeedValidation": true,
+      "PathValidation": true,
+      "InputValidation": true,
+      "ReplayVerification": true
+    },
+    "FlaggedScores": {
+      "AutoRemove": false,
+      "ManualReview": true,
+      "NotifyPlayer": true
+    },
+    "Penalties": {
+      "InvalidScore": "ScoreRemoved",
+      "RepeatedViolations": "LeaderboardBan"
+    }
+  },
+
+  "DisplayOptions": {
+    "ShowVehicle": true,
+    "ShowSetup": false,
+    "ShowCountry": true,
+    "ShowPlatform": true,
+    "ShowDate": true,
+    "ShowReplay": true,
+    "Pagination": {
+      "EntriesPerPage": 25,
+      "QuickJump": [1, 10, 50, 100, 500]
+    }
+  },
+
+  "Notifications": {
+    "RankImproved": { "Enabled": true, "Sound": "SFX_Rank_Up" },
+    "BeatenByFriend": { "Enabled": true, "Sound": "SFX_Challenge" },
+    "BeatenByRival": { "Enabled": true, "Sound": "SFX_Rival" },
+    "NewWorldRecord": { "Enabled": true, "Sound": "SFX_WorldRecord", "GlobalAnnounce": true }
+  }
+}

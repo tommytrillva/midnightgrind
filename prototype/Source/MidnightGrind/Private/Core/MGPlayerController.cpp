@@ -317,6 +317,29 @@ void AMGPlayerController::BeginPlay()
 				DailyRewardsSubsystem->OnDailyRewardClaimed.AddDynamic(this, &AMGPlayerController::OnDailyRewardClaimed);
 				DailyRewardsSubsystem->OnMilestoneReached.AddDynamic(this, &AMGPlayerController::OnStreakMilestoneReached);
 			}
+
+			// Bind to reputation subsystem for tier unlocks
+			if (UMGReputationSubsystem* RepSubsystem = GI->GetSubsystem<UMGReputationSubsystem>())
+			{
+				RepSubsystem->OnTierReached.AddDynamic(this, &AMGPlayerController::OnReputationTierReached);
+				RepSubsystem->OnUnlockEarned.AddDynamic(this, &AMGPlayerController::OnReputationUnlockEarned);
+			}
+
+			// Bind to ghost subsystem for personal bests
+			if (UMGGhostSubsystem* GhostSubsystem = GI->GetSubsystem<UMGGhostSubsystem>())
+			{
+				GhostSubsystem->OnNewPersonalBest.AddDynamic(this, &AMGPlayerController::OnGhostNewPersonalBest);
+				GhostSubsystem->OnGhostComparison.AddDynamic(this, &AMGPlayerController::OnGhostComparison);
+			}
+
+			// Bind to shortcut subsystem for shortcut feedback
+			if (UMGShortcutSubsystem* ShortcutSubsystem = GI->GetSubsystem<UMGShortcutSubsystem>())
+			{
+				ShortcutSubsystem->OnShortcutDiscovered.AddDynamic(this, &AMGPlayerController::OnShortcutDiscovered);
+				ShortcutSubsystem->OnShortcutCompleted.AddDynamic(this, &AMGPlayerController::OnShortcutCompleted);
+				ShortcutSubsystem->OnShortcutMastered.AddDynamic(this, &AMGPlayerController::OnShortcutMastered);
+				ShortcutSubsystem->OnSecretShortcutFound.AddDynamic(this, &AMGPlayerController::OnSecretShortcutFound);
+			}
 		}
 	}
 }
@@ -532,6 +555,26 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		{
 			DailyRewardsSubsystem->OnDailyRewardClaimed.RemoveDynamic(this, &AMGPlayerController::OnDailyRewardClaimed);
 			DailyRewardsSubsystem->OnMilestoneReached.RemoveDynamic(this, &AMGPlayerController::OnStreakMilestoneReached);
+		}
+
+		if (UMGReputationSubsystem* RepSubsystem = GI->GetSubsystem<UMGReputationSubsystem>())
+		{
+			RepSubsystem->OnTierReached.RemoveDynamic(this, &AMGPlayerController::OnReputationTierReached);
+			RepSubsystem->OnUnlockEarned.RemoveDynamic(this, &AMGPlayerController::OnReputationUnlockEarned);
+		}
+
+		if (UMGGhostSubsystem* GhostSubsystem = GI->GetSubsystem<UMGGhostSubsystem>())
+		{
+			GhostSubsystem->OnNewPersonalBest.RemoveDynamic(this, &AMGPlayerController::OnGhostNewPersonalBest);
+			GhostSubsystem->OnGhostComparison.RemoveDynamic(this, &AMGPlayerController::OnGhostComparison);
+		}
+
+		if (UMGShortcutSubsystem* ShortcutSubsystem = GI->GetSubsystem<UMGShortcutSubsystem>())
+		{
+			ShortcutSubsystem->OnShortcutDiscovered.RemoveDynamic(this, &AMGPlayerController::OnShortcutDiscovered);
+			ShortcutSubsystem->OnShortcutCompleted.RemoveDynamic(this, &AMGPlayerController::OnShortcutCompleted);
+			ShortcutSubsystem->OnShortcutMastered.RemoveDynamic(this, &AMGPlayerController::OnShortcutMastered);
+			ShortcutSubsystem->OnSecretShortcutFound.RemoveDynamic(this, &AMGPlayerController::OnSecretShortcutFound);
 		}
 	}
 
@@ -2965,6 +3008,188 @@ void AMGPlayerController::OnStreakMilestoneReached(EMGStreakMilestone Milestone,
 
 			FText MilestoneMessage = FText::FromString(MilestoneStr);
 			HUDSubsystem->ShowNotification(MilestoneMessage, 5.0f, MilestoneColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnReputationTierReached(EMGReputationCategory Category, EMGReputationTier Tier)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString CategoryStr;
+			switch (Category)
+			{
+				case EMGReputationCategory::Street: CategoryStr = TEXT("STREET"); break;
+				case EMGReputationCategory::Drift: CategoryStr = TEXT("DRIFT"); break;
+				case EMGReputationCategory::Drag: CategoryStr = TEXT("DRAG"); break;
+				case EMGReputationCategory::Circuit: CategoryStr = TEXT("CIRCUIT"); break;
+				case EMGReputationCategory::Outlaw: CategoryStr = TEXT("OUTLAW"); break;
+				default: CategoryStr = TEXT(""); break;
+			}
+
+			FString TierStr;
+			FLinearColor TierColor;
+			switch (Tier)
+			{
+				case EMGReputationTier::Rookie:
+					TierStr = TEXT("ROOKIE");
+					TierColor = FLinearColor(0.6f, 0.6f, 0.6f, 1.0f);
+					break;
+				case EMGReputationTier::Amateur:
+					TierStr = TEXT("AMATEUR");
+					TierColor = FLinearColor(0.8f, 0.5f, 0.2f, 1.0f);
+					break;
+				case EMGReputationTier::Skilled:
+					TierStr = TEXT("SKILLED");
+					TierColor = FLinearColor(0.75f, 0.75f, 0.75f, 1.0f);
+					break;
+				case EMGReputationTier::Expert:
+					TierStr = TEXT("EXPERT");
+					TierColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f);
+					break;
+				case EMGReputationTier::Master:
+					TierStr = TEXT("MASTER");
+					TierColor = FLinearColor(0.9f, 0.95f, 1.0f, 1.0f);
+					break;
+				case EMGReputationTier::Legend:
+					TierStr = TEXT("LEGEND");
+					TierColor = FLinearColor(1.0f, 0.0f, 1.0f, 1.0f);
+					break;
+				default:
+					TierStr = TEXT("");
+					TierColor = FLinearColor::White;
+					break;
+			}
+
+			FText TierMessage = FText::FromString(FString::Printf(TEXT("%s REP: %s TIER!"), *CategoryStr, *TierStr));
+			HUDSubsystem->ShowNotification(TierMessage, 5.0f, TierColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnReputationUnlockEarned(const FMGReputationUnlock& Unlock)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText UnlockMessage = FText::FromString(FString::Printf(TEXT("UNLOCKED: %s"), *Unlock.DisplayName.ToString()));
+			FLinearColor UnlockColor = FLinearColor(0.0f, 1.0f, 0.8f, 1.0f); // Cyan
+			HUDSubsystem->ShowNotification(UnlockMessage, 4.0f, UnlockColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnGhostNewPersonalBest(FName TrackID, float NewTime)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			int32 Minutes = FMath::FloorToInt(NewTime / 60.0f);
+			float Seconds = FMath::Fmod(NewTime, 60.0f);
+
+			FText PBMessage = FText::FromString(FString::Printf(TEXT("NEW PERSONAL BEST! %d:%05.2f"), Minutes, Seconds));
+			FLinearColor PBColor = FLinearColor(1.0f, 0.0f, 1.0f, 1.0f); // Magenta
+			HUDSubsystem->ShowNotification(PBMessage, 5.0f, PBColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnGhostComparison(const FMGGhostComparator& Comparison, EMGGhostComparison Status)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText CompareMessage;
+			FLinearColor CompareColor;
+
+			switch (Status)
+			{
+				case EMGGhostComparison::Ahead:
+					CompareMessage = FText::FromString(FString::Printf(TEXT("AHEAD: -%.2fs"), FMath::Abs(Comparison.TimeDelta)));
+					CompareColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green
+					break;
+				case EMGGhostComparison::Behind:
+					CompareMessage = FText::FromString(FString::Printf(TEXT("BEHIND: +%.2fs"), Comparison.TimeDelta));
+					CompareColor = FLinearColor(1.0f, 0.3f, 0.0f, 1.0f); // Red-orange
+					break;
+				case EMGGhostComparison::Even:
+					CompareMessage = FText::FromString(TEXT("EVEN WITH GHOST"));
+					CompareColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f); // White
+					break;
+				default:
+					return;
+			}
+
+			HUDSubsystem->ShowNotification(CompareMessage, 2.0f, CompareColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnShortcutDiscovered(const FString& ShortcutId, int32 DiscoveryPoints)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText DiscoverMessage = FText::FromString(FString::Printf(TEXT("SHORTCUT DISCOVERED! +%d"), DiscoveryPoints));
+			FLinearColor DiscoverColor = FLinearColor(0.0f, 1.0f, 1.0f, 1.0f); // Cyan
+			HUDSubsystem->ShowNotification(DiscoverMessage, 3.0f, DiscoverColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnShortcutCompleted(const FString& ShortcutId, float TimeTaken, float TimeSaved)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ShortcutMessage;
+			FLinearColor ShortcutColor;
+
+			if (TimeSaved > 0.0f)
+			{
+				ShortcutMessage = FText::FromString(FString::Printf(TEXT("SHORTCUT! -%.1fs"), TimeSaved));
+				ShortcutColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green
+			}
+			else
+			{
+				ShortcutMessage = FText::FromString(FString::Printf(TEXT("SHORTCUT! +%.1fs"), FMath::Abs(TimeSaved)));
+				ShortcutColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange (slower route)
+			}
+
+			HUDSubsystem->ShowNotification(ShortcutMessage, 2.5f, ShortcutColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnShortcutMastered(const FString& ShortcutId, int32 BonusPoints)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText MasteredMessage = FText::FromString(FString::Printf(TEXT("SHORTCUT MASTERED! +%d"), BonusPoints));
+			FLinearColor MasteredColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+			HUDSubsystem->ShowNotification(MasteredMessage, 4.0f, MasteredColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSecretShortcutFound(const FString& ShortcutId, int32 BonusPoints)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText SecretMessage = FText::FromString(FString::Printf(TEXT("SECRET SHORTCUT! +%d"), BonusPoints));
+			FLinearColor SecretColor = FLinearColor(1.0f, 0.0f, 1.0f, 1.0f); // Magenta
+			HUDSubsystem->ShowNotification(SecretMessage, 4.0f, SecretColor);
 		}
 	}
 }

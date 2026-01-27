@@ -1,5 +1,52 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGGameState.h
+ * @brief Game State - Replicated race state visible to all connected clients
+ *
+ * The AMGGameState class manages the authoritative, replicated state of a race
+ * session. Unlike UMGGameStateSubsystem (which handles local game flow), this
+ * class specifically handles multiplayer race synchronization.
+ *
+ * @section Overview
+ * GameState is spawned by the server and replicated to all clients. It contains
+ * the "source of truth" for race phase, positions, timing, and settings that
+ * all players need to see consistently.
+ *
+ * @section KeyConcepts Key Concepts
+ * - **Race Phase**: The global phase of the race (Lobby, Countdown, Racing, etc.)
+ *   All clients see the same phase, controlled by the server.
+ * - **Positions**: The current race standings, updated by the server and replicated.
+ * - **Race Settings**: Track, lap count, game mode, etc. - set by host, visible to all.
+ * - **Timing**: Server-authoritative race time and countdown synchronization.
+ *
+ * @section Authority Server Authority
+ * Only the server (Authority) can modify game state. All "Auth" prefixed functions
+ * should only be called on the server. Clients receive updates via replication.
+ *
+ * @section Events
+ * Subscribe to events for race state changes:
+ * - OnRacePhaseChanged: When race transitions between phases
+ * - OnCountdownUpdate: Each second tick during countdown
+ * - OnRaceStart: When GO! happens
+ * - OnRacerFinished: When any player crosses the finish line
+ * - OnPositionsUpdated: When race positions change
+ *
+ * @section Usage
+ * Access from any Actor:
+ * @code
+ * AMGGameState* GameState = GetWorld()->GetGameState<AMGGameState>();
+ * if (GameState && GameState->IsRaceInProgress())
+ * {
+ *     TArray<FMGRacePositionEntry> Positions = GameState->GetPositions();
+ *     float RaceTime = GameState->GetRaceTime();
+ * }
+ * @endcode
+ *
+ * @see AMGPlayerState For individual player race data
+ * @see UMGGameStateSubsystem For local (non-replicated) game flow
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

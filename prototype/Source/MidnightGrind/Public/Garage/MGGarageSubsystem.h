@@ -1,5 +1,55 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGGarageSubsystem.h
+ * @brief Core garage management subsystem for player vehicle collection
+ *
+ * The Garage Subsystem is the central hub for all player vehicle ownership and
+ * customization in Midnight Grind. It manages the player's collection of vehicles,
+ * tracks installed parts, handles paint configurations, and calculates performance
+ * statistics.
+ *
+ * ## Key Responsibilities
+ * - **Vehicle Collection**: Adding, removing, selling, and selecting vehicles
+ * - **Parts Management**: Installing/removing aftermarket parts with compatibility checks
+ * - **Paint System**: Managing multi-layer paint configurations (primary, secondary, accent)
+ * - **Statistics**: Calculating Performance Index (PI) and performance class (D-X)
+ * - **Vehicle Health**: Tracking wear and damage across all components
+ * - **Build Export/Import**: Sharing vehicle configurations via JSON or build codes
+ *
+ * ## Architecture
+ * This is a GameInstanceSubsystem, meaning it persists across level loads and
+ * maintains state for the entire game session. Vehicle data is marked with SaveGame
+ * for persistence.
+ *
+ * ## Usage Example
+ * @code
+ * UMGGarageSubsystem* Garage = GetGameInstance()->GetSubsystem<UMGGarageSubsystem>();
+ *
+ * // Add a new vehicle
+ * FGuid NewVehicleId;
+ * FMGGarageResult Result = Garage->AddVehicle(VehicleModelData, NewVehicleId);
+ *
+ * // Install a part
+ * if (Garage->IsPartCompatible(NewVehicleId, TurboPart))
+ * {
+ *     Garage->InstallPart(NewVehicleId, TurboPart);
+ * }
+ *
+ * // Get performance stats
+ * FMGVehicleStats Stats = Garage->GetVehicleStats(NewVehicleId);
+ * @endcode
+ *
+ * ## Related Subsystems
+ * - UMGTuningSubsystem: Fine-tuning vehicle parameters (suspension, gearing, etc.)
+ * - UMGPartsCatalogSubsystem: Part database and pricing lookups
+ * - UMGDynoSubsystem: Power measurement and verification
+ * - UMGLiveryEditorSubsystem: Visual customization beyond paint
+ *
+ * @see FMGOwnedVehicle for the primary vehicle data structure
+ * @see EMGPartSlot for available customization slots
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -13,13 +63,34 @@ class AMGVehiclePawn;
 class UMGVehicleModelData;
 class UMGPartData;
 
+// ============================================================================
+// PART SLOT ENUMERATION
+// ============================================================================
+
 /**
- * Part slot enumeration for vehicle customization
+ * @enum EMGPartSlot
+ * @brief Defines all available slots where aftermarket parts can be installed
+ *
+ * Part slots are organized by vehicle system (engine, drivetrain, suspension, etc.).
+ * Each slot can hold exactly one part at a time. Some parts may require other
+ * parts to be installed first (prerequisites).
+ *
+ * ## Slot Categories
+ * - **Engine**: Core power-producing components (block, head, camshaft, intake, exhaust)
+ * - **Forced Induction**: Turbo/supercharger systems for boost
+ * - **Drivetrain**: Power delivery (clutch, transmission, differential)
+ * - **Suspension**: Handling components (springs, dampers, sway bars)
+ * - **Brakes**: Stopping power (rotors, calipers, lines)
+ * - **Wheels & Tires**: Contact patch and wheel setup
+ * - **Aero**: Downforce and drag management
+ * - **Body**: Visual and weight reduction parts
+ * - **Special**: Nitrous, roll cage, and other unique systems
  */
 UENUM(BlueprintType)
 enum class EMGPartSlot : uint8
 {
-	// Engine
+	// ----- Engine Components -----
+	/// The main engine block - determines displacement and base power potential
 	EngineBlock			UMETA(DisplayName = "Engine Block"),
 	CylinderHead		UMETA(DisplayName = "Cylinder Head"),
 	Camshaft			UMETA(DisplayName = "Camshaft"),

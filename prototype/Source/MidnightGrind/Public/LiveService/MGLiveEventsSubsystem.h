@@ -1,5 +1,38 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGLiveEventsSubsystem.h
+ * @brief Live Events Subsystem for managing time-limited events, challenges, and community goals.
+ *
+ * This subsystem is the central hub for all live service event functionality in Midnight Grind.
+ * It handles the lifecycle of time-limited events, tracks player progress through challenges,
+ * manages community-wide goals, and coordinates featured playlists with bonus multipliers.
+ *
+ * ## Key Concepts for Entry-Level Developers:
+ *
+ * **Live Events**: Time-limited gameplay experiences that appear on a schedule. Events can be
+ * weekend specials, weekly challenges, holiday celebrations, or flash events lasting only hours.
+ *
+ * **Challenges**: Specific objectives players must complete within an event (e.g., "Win 5 races",
+ * "Drift 10,000 meters"). Each challenge tracks progress and awards rewards upon completion.
+ *
+ * **Community Goals**: Server-wide objectives where all players contribute to a shared target.
+ * These create a sense of collective achievement and unlock tiered rewards for everyone.
+ *
+ * **Featured Playlists**: Curated collections of tracks/races with bonus XP and cash multipliers
+ * to incentivize players to try specific content during events.
+ *
+ * ## Typical Usage Flow:
+ * 1. Call RefreshEvents() at startup and periodically to sync with server
+ * 2. Use GetActiveEvents() to display current events to players
+ * 3. Call ReportChallengeProgress() after races to update challenge completion
+ * 4. Listen to OnChallengeCompleted to notify players and show claim UI
+ * 5. Call ClaimChallengeReward() when player acknowledges completion
+ *
+ * @see UMGSeasonPassSubsystem for season pass progression
+ * @see UMGEventCalendarSubsystem for event scheduling
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,84 +41,74 @@
 
 class UTexture2D;
 
+// ============================================================================
+// ENUMERATIONS - Event Classification Types
+// ============================================================================
+
 /**
- * Event type
+ * @brief Categorizes live events by their duration and purpose.
+ *
+ * Event types determine default durations, UI styling, and notification behavior.
+ * The game designer configures these in the backend, and the client uses them
+ * to appropriately display and track each event.
  */
 UENUM(BlueprintType)
 enum class EMGEventType : uint8
 {
-	/** Weekend special event */
-	Weekend,
-	/** Weekly challenge */
-	Weekly,
-	/** Daily challenge */
-	Daily,
-	/** Limited time event */
-	LimitedTime,
-	/** Community goal */
-	CommunityGoal,
-	/** Holiday event */
-	Holiday,
-	/** Collaboration event */
-	Collaboration,
-	/** Flash event (few hours) */
-	Flash
+	Weekend,        ///< Weekend special events (Friday-Sunday), typically with bonus rewards
+	Weekly,         ///< Weekly challenges that reset every Monday, core engagement driver
+	Daily,          ///< Daily challenges refreshing at midnight UTC, quick tasks
+	LimitedTime,    ///< Special events lasting days to weeks, often with exclusive rewards
+	CommunityGoal,  ///< Server-wide collaborative events where all players contribute
+	Holiday,        ///< Seasonal celebrations (Halloween, Christmas, etc.) with themed content
+	Collaboration,  ///< Cross-promotion events with other brands or games
+	Flash           ///< Ultra-short events (2-6 hours), creates urgency and excitement
 };
 
 /**
- * Event status
+ * @brief Tracks the current lifecycle state of an event.
+ *
+ * Events progress through states automatically based on time. The UI uses these
+ * states to show appropriate messaging (e.g., countdown timers, "ending soon" warnings).
  */
 UENUM(BlueprintType)
 enum class EMGEventStatus : uint8
 {
-	/** Not yet started */
-	Upcoming,
-	/** Currently active */
-	Active,
-	/** Ending soon */
-	EndingSoon,
-	/** Completed */
-	Completed,
-	/** Expired (missed) */
-	Expired
+	Upcoming,    ///< Event scheduled but not started; show "Coming Soon" in UI
+	Active,      ///< Event is live and players can participate normally
+	EndingSoon,  ///< Less than 1 hour remaining; show urgent countdown timer
+	Completed,   ///< Player finished the event; rewards claimed or pending
+	Expired      ///< Event ended without player completion; no rewards available
 };
 
 /**
- * Challenge type
+ * @brief Defines what type of gameplay action a challenge tracks.
+ *
+ * Challenge types map to specific game statistics and determine how progress
+ * is calculated. When reporting progress via ReportChallengeProgress(), the
+ * subsystem matches the type to update relevant objectives.
+ *
+ * Design Note: New challenge types require corresponding tracking code in
+ * the race results system and the UpdateObjectiveProgress() method.
  */
 UENUM(BlueprintType)
 enum class EMGChallengeType : uint8
 {
-	/** Win races */
-	WinRaces,
-	/** Complete races */
-	CompleteRaces,
-	/** Achieve position */
-	AchievePosition,
-	/** Beat lap time */
-	BeatLapTime,
-	/** Drive distance */
-	DriveDistance,
-	/** Reach top speed */
-	ReachTopSpeed,
-	/** Drift distance */
-	DriftDistance,
-	/** Near misses */
-	NearMisses,
-	/** Overtakes */
-	Overtakes,
-	/** Use specific vehicle */
-	UseVehicle,
-	/** Race on specific track */
-	RaceOnTrack,
-	/** Win streak */
-	WinStreak,
-	/** Perfect laps */
-	PerfectLaps,
-	/** Earn currency */
-	EarnCurrency,
-	/** Community total */
-	CommunityTotal
+	WinRaces,        ///< Count of first-place finishes
+	CompleteRaces,   ///< Count of races finished (any position)
+	AchievePosition, ///< Finish at or above a target position (e.g., top 3)
+	BeatLapTime,     ///< Complete a lap faster than target time (in seconds)
+	DriveDistance,   ///< Cumulative distance driven (in meters)
+	ReachTopSpeed,   ///< Hit target speed at any point during race (km/h)
+	DriftDistance,   ///< Cumulative meters drifted while sideways
+	NearMisses,      ///< Count of close passes to obstacles/other cars
+	Overtakes,       ///< Count of successful passes of opponent vehicles
+	UseVehicle,      ///< Complete races using a specific vehicle ID
+	RaceOnTrack,     ///< Complete races on a specific track ID
+	WinStreak,       ///< Consecutive wins without losing (resets on loss)
+	PerfectLaps,     ///< Laps completed without hitting walls/objects
+	EarnCurrency,    ///< Cumulative in-game currency earned from races
+	CommunityTotal   ///< Aggregates contributions from all players server-wide
 };
 
 /**

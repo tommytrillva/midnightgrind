@@ -1,0 +1,285 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Driver Assists and Gameplay Assistance Configuration",
+
+  "AssistSystem": {
+    "Enabled": true,
+    "ShowIndicators": true,
+    "Presets": ["Simulation", "Sport", "Standard", "Casual", "Custom"],
+    "DefaultPreset": "Standard"
+  },
+
+  "Presets": {
+    "Simulation": {
+      "ID": "PRESET_SIM",
+      "Name": "Simulation",
+      "Description": "No assists - pure driving skill required",
+      "Assists": {
+        "TractionControl": "Off",
+        "StabilityControl": "Off",
+        "ABS": "Off",
+        "SteeringAssist": "Off",
+        "BrakingAssist": "Off",
+        "RacingLine": "Off",
+        "GearAssist": "Manual_Clutch",
+        "DamageType": "Full",
+        "Rewind": "Off"
+      },
+      "RewardMultiplier": 1.5,
+      "REPMultiplier": 1.5
+    },
+    "Sport": {
+      "ID": "PRESET_SPORT",
+      "Name": "Sport",
+      "Description": "Minimal assists for experienced drivers",
+      "Assists": {
+        "TractionControl": "Low",
+        "StabilityControl": "Off",
+        "ABS": "On",
+        "SteeringAssist": "Off",
+        "BrakingAssist": "Off",
+        "RacingLine": "Off",
+        "GearAssist": "Manual",
+        "DamageType": "Full",
+        "Rewind": "Limited"
+      },
+      "RewardMultiplier": 1.25,
+      "REPMultiplier": 1.25
+    },
+    "Standard": {
+      "ID": "PRESET_STANDARD",
+      "Name": "Standard",
+      "Description": "Balanced assists for most players",
+      "Assists": {
+        "TractionControl": "Medium",
+        "StabilityControl": "Low",
+        "ABS": "On",
+        "SteeringAssist": "Low",
+        "BrakingAssist": "Off",
+        "RacingLine": "Corners",
+        "GearAssist": "Auto",
+        "DamageType": "Visual",
+        "Rewind": "Standard"
+      },
+      "RewardMultiplier": 1.0,
+      "REPMultiplier": 1.0
+    },
+    "Casual": {
+      "ID": "PRESET_CASUAL",
+      "Name": "Casual",
+      "Description": "Full assists for a relaxed experience",
+      "Assists": {
+        "TractionControl": "High",
+        "StabilityControl": "High",
+        "ABS": "On",
+        "SteeringAssist": "Medium",
+        "BrakingAssist": "Low",
+        "RacingLine": "Full",
+        "GearAssist": "Auto",
+        "DamageType": "Off",
+        "Rewind": "Unlimited"
+      },
+      "RewardMultiplier": 0.75,
+      "REPMultiplier": 0.75
+    }
+  },
+
+  "IndividualAssists": {
+    "TractionControl": {
+      "ID": "ASSIST_TC",
+      "Name": "Traction Control",
+      "Description": "Prevents wheelspin by limiting power",
+      "Options": ["Off", "Low", "Medium", "High"],
+      "Default": "Medium",
+      "Effect": {
+        "Off": { "ThrottleCut": 0.0 },
+        "Low": { "ThrottleCut": 0.2, "Threshold": 0.15 },
+        "Medium": { "ThrottleCut": 0.4, "Threshold": 0.10 },
+        "High": { "ThrottleCut": 0.6, "Threshold": 0.05 }
+      },
+      "VisualIndicator": true,
+      "Sound": "SFX_TC_Active"
+    },
+    "StabilityControl": {
+      "ID": "ASSIST_SC",
+      "Name": "Stability Control",
+      "Description": "Prevents spin-outs by applying selective braking",
+      "Options": ["Off", "Low", "Medium", "High"],
+      "Default": "Low",
+      "Effect": {
+        "Off": { "Intervention": 0.0 },
+        "Low": { "Intervention": 0.3, "SlipThreshold": 25 },
+        "Medium": { "Intervention": 0.5, "SlipThreshold": 15 },
+        "High": { "Intervention": 0.7, "SlipThreshold": 10 }
+      },
+      "VisualIndicator": true,
+      "Sound": "SFX_SC_Active"
+    },
+    "ABS": {
+      "ID": "ASSIST_ABS",
+      "Name": "Anti-lock Braking",
+      "Description": "Prevents wheel lockup under braking",
+      "Options": ["Off", "On"],
+      "Default": "On",
+      "Effect": {
+        "Off": { "LockupPrevention": false },
+        "On": { "LockupPrevention": true, "Threshold": 0.98 }
+      },
+      "VisualIndicator": true,
+      "Sound": "SFX_ABS_Pulse"
+    },
+    "SteeringAssist": {
+      "ID": "ASSIST_STEER",
+      "Name": "Steering Assist",
+      "Description": "Helps maintain control during slides",
+      "Options": ["Off", "Low", "Medium", "High"],
+      "Default": "Low",
+      "Effect": {
+        "Off": { "CounterSteerHelp": 0.0, "SpeedSensitivity": 0.0 },
+        "Low": { "CounterSteerHelp": 0.2, "SpeedSensitivity": 0.1 },
+        "Medium": { "CounterSteerHelp": 0.4, "SpeedSensitivity": 0.2 },
+        "High": { "CounterSteerHelp": 0.6, "SpeedSensitivity": 0.3 }
+      }
+    },
+    "BrakingAssist": {
+      "ID": "ASSIST_BRAKE",
+      "Name": "Braking Assist",
+      "Description": "Automatically applies brakes for corners",
+      "Options": ["Off", "Low", "Medium", "High"],
+      "Default": "Off",
+      "Effect": {
+        "Off": { "AutoBrake": false },
+        "Low": { "AutoBrake": true, "BrakePoint": 0.7, "MaxBrake": 0.4 },
+        "Medium": { "AutoBrake": true, "BrakePoint": 0.8, "MaxBrake": 0.6 },
+        "High": { "AutoBrake": true, "BrakePoint": 0.9, "MaxBrake": 0.8 }
+      }
+    },
+    "RacingLine": {
+      "ID": "ASSIST_LINE",
+      "Name": "Racing Line",
+      "Description": "Shows the optimal racing path",
+      "Options": ["Off", "Corners", "Full"],
+      "Default": "Corners",
+      "Effect": {
+        "Off": { "ShowLine": false },
+        "Corners": { "ShowLine": true, "CornersOnly": true, "BrakingColors": true },
+        "Full": { "ShowLine": true, "CornersOnly": false, "BrakingColors": true }
+      },
+      "Colors": {
+        "Accelerate": "#00FF00",
+        "Brake": "#FF0000",
+        "Coast": "#FFFF00"
+      }
+    },
+    "GearAssist": {
+      "ID": "ASSIST_GEAR",
+      "Name": "Transmission",
+      "Description": "Choose how gear changes are handled",
+      "Options": ["Auto", "Manual", "Manual_Clutch"],
+      "Default": "Auto",
+      "Effect": {
+        "Auto": { "AutoShift": true, "OptimalShift": true },
+        "Manual": { "AutoShift": false, "ClutchRequired": false },
+        "Manual_Clutch": { "AutoShift": false, "ClutchRequired": true, "BlipRequired": true }
+      },
+      "RewardBonus": {
+        "Manual": 1.1,
+        "Manual_Clutch": 1.2
+      }
+    },
+    "DamageType": {
+      "ID": "ASSIST_DAMAGE",
+      "Name": "Damage",
+      "Description": "Choose how damage affects your vehicle",
+      "Options": ["Off", "Visual", "Performance", "Full"],
+      "Default": "Visual",
+      "Effect": {
+        "Off": { "VisualDamage": false, "PerformanceEffect": false },
+        "Visual": { "VisualDamage": true, "PerformanceEffect": false },
+        "Performance": { "VisualDamage": true, "PerformanceEffect": true, "Severity": 0.5 },
+        "Full": { "VisualDamage": true, "PerformanceEffect": true, "Severity": 1.0, "Mechanical": true }
+      }
+    },
+    "Rewind": {
+      "ID": "ASSIST_REWIND",
+      "Name": "Rewind",
+      "Description": "Rewind time to undo mistakes",
+      "Options": ["Off", "Limited", "Standard", "Unlimited"],
+      "Default": "Standard",
+      "Effect": {
+        "Off": { "Enabled": false },
+        "Limited": { "Enabled": true, "Uses": 3, "MaxRewindTime": 10 },
+        "Standard": { "Enabled": true, "Uses": 10, "MaxRewindTime": 15 },
+        "Unlimited": { "Enabled": true, "Uses": -1, "MaxRewindTime": 20 }
+      },
+      "CooldownSeconds": 5,
+      "DisabledIn": ["Online", "Ranked"]
+    }
+  },
+
+  "AdvancedOptions": {
+    "CatchUpRubberBanding": {
+      "ID": "ASSIST_CATCHUP",
+      "Name": "Catch-Up",
+      "Description": "AI slows down when you fall behind",
+      "Options": ["Off", "On"],
+      "Default": "On",
+      "AffectsAI": true
+    },
+    "CollisionAssist": {
+      "ID": "ASSIST_COLLISION",
+      "Name": "Collision Avoidance",
+      "Description": "Reduce impact of minor collisions",
+      "Options": ["Off", "On"],
+      "Default": "Off",
+      "Effect": { "ImpactReduction": 0.5, "SpinRecovery": true }
+    },
+    "AutoRecovery": {
+      "ID": "ASSIST_RECOVERY",
+      "Name": "Auto Recovery",
+      "Description": "Automatically reset when stuck or flipped",
+      "Options": ["Off", "Prompt", "Auto"],
+      "Default": "Prompt",
+      "Delay": 5.0
+    },
+    "DrivingPath": {
+      "ID": "ASSIST_PATH",
+      "Name": "Navigation Path",
+      "Description": "Shows path to destination in free roam",
+      "Options": ["Off", "Minimal", "Full"],
+      "Default": "Full"
+    }
+  },
+
+  "OnlineRestrictions": {
+    "RankedMode": {
+      "AllowedAssists": {
+        "TractionControl": ["Off", "Low"],
+        "StabilityControl": ["Off"],
+        "ABS": ["Off", "On"],
+        "SteeringAssist": ["Off"],
+        "BrakingAssist": ["Off"],
+        "RacingLine": ["Off"],
+        "GearAssist": ["Manual", "Manual_Clutch"],
+        "Rewind": ["Off"]
+      },
+      "MaxRewardMultiplier": 1.0
+    },
+    "UnrankedMode": {
+      "AllowedAssists": "All",
+      "RewardPenalty": true
+    }
+  },
+
+  "TutorialRecommendations": {
+    "NewPlayer": {
+      "Preset": "Casual",
+      "Message": "We recommend starting with full assists while you learn"
+    },
+    "ReduceAssistsPrompt": {
+      "Enabled": true,
+      "AfterWins": 10,
+      "Message": "You're doing great! Try reducing assists for more rewards"
+    }
+  }
+}

@@ -1,5 +1,57 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGGameInstance.h
+ * @brief Game Instance - Central manager for game-wide state and subsystem orchestration
+ *
+ * The MGGameInstance is the root manager for Midnight Grind, responsible for
+ * initializing platform services (Steam, Epic, consoles), managing player profiles,
+ * coordinating subsystems, and handling network connectivity state.
+ *
+ * @section Overview
+ * The Game Instance lives for the entire duration of the application and is the
+ * first game-specific class initialized during startup. It serves as the central
+ * hub for accessing game-wide functionality and subsystems.
+ *
+ * @section Responsibilities
+ * - Platform Detection: Identifies which platform (Steam, Epic, PlayStation, Xbox, Switch)
+ * - Steam/Platform Integration: Initializes Steam API, handles login callbacks
+ * - Subsystem Orchestration: Initializes and coordinates all game subsystems
+ * - Player Profile: Manages local player identity, level, crew membership
+ * - Network State: Tracks online/offline status with automatic reconnection
+ * - Save/Load: Coordinates saving and loading across all subsystems
+ *
+ * @section Subsystems Available Subsystems
+ * Access subsystems through convenience getters or generic GetSubsystem<T>():
+ * - UMGGameStateSubsystem: Game flow state machine
+ * - UMGSessionSubsystem: Multiplayer session management
+ * - UMGAccountLinkSubsystem: Cross-platform account linking
+ * - UMGProgressionSubsystem: Player progression and unlocks
+ * - UMGCurrencySubsystem: In-game currency management
+ * - UMGVehicleManagerSubsystem: Vehicle collection and customization
+ * - UMGInputRemapSubsystem: Input remapping
+ * - UMGAccessibilitySubsystem: Accessibility features
+ * - UMGCloudSaveSubsystem: Cloud save synchronization
+ * - UMGAnalyticsSubsystem: Analytics and telemetry
+ * - UMGAntiCheatSubsystem: Anti-cheat validation
+ * - UMGAudioMixSubsystem: Audio mixing
+ * - UMGLocalizationSubsystem: Localization
+ *
+ * @section Usage
+ * Access the game instance from anywhere:
+ * @code
+ * UMGGameInstance* GameInstance = Cast<UMGGameInstance>(GetGameInstance());
+ * if (GameInstance && GameInstance->IsOnline())
+ * {
+ *     FString PlayerName = GameInstance->GetDisplayName();
+ *     UMGSessionSubsystem* Sessions = GameInstance->GetSessionSubsystem();
+ * }
+ * @endcode
+ *
+ * @see UMGGameStateSubsystem For game flow control
+ * @see UMGSessionSubsystem For multiplayer session management
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

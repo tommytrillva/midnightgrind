@@ -1,5 +1,60 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGPlayerState.h
+ * @brief Player State - Replicated per-player data visible to all clients
+ *
+ * AMGPlayerState stores and replicates individual player information during
+ * a multiplayer session. Each connected player (and AI racer) has a PlayerState
+ * that tracks their identity, vehicle selection, ready state, and race performance.
+ *
+ * @section Overview
+ * PlayerState is the multiplayer-aware representation of a player. It's spawned
+ * when a player joins and persists throughout their session. All players can see
+ * each other's PlayerState data (names, positions, vehicles, etc.).
+ *
+ * @section KeyData Key Data Tracked
+ * - **Identity**: Platform ID, display name, profile level, crew/club membership
+ * - **Lobby State**: Ready/not ready status for pre-race coordination
+ * - **Vehicle Selection**: Which car and livery the player has selected
+ * - **Race Performance**: Position, lap, checkpoint, lap times, finish status
+ *
+ * @section Replication Replication Flow
+ * - Clients call Server RPCs (ServerToggleReady, ServerSelectVehicle) to request changes
+ * - Server validates and applies changes via "Auth" functions
+ * - Changes replicate automatically to all clients via RepNotify
+ * - Clients receive OnRep_ callbacks and broadcast events for UI updates
+ *
+ * @section Events
+ * Subscribe to track player changes:
+ * - OnReadyStateChanged: Player toggled ready in lobby
+ * - OnRaceStatusChanged: Player started racing, finished, DNF'd, etc.
+ * - OnPositionChanged: Player's race position changed
+ * - OnLapChanged: Player completed a lap
+ *
+ * @section Usage
+ * Get a player's state:
+ * @code
+ * // From a PlayerController
+ * AMGPlayerState* MyState = GetPlayerState<AMGPlayerState>();
+ *
+ * // Get all player states from GameState
+ * AMGGameState* GS = GetWorld()->GetGameState<AMGGameState>();
+ * TArray<AMGPlayerState*> AllPlayers = GS->GetMGPlayerStates();
+ *
+ * // Check race status
+ * if (PlayerState->HasFinished())
+ * {
+ *     int32 FinalPosition = PlayerState->GetFinishPosition();
+ *     float TotalTime = PlayerState->GetTotalRaceTime();
+ * }
+ * @endcode
+ *
+ * @see AMGGameState For global race state
+ * @see FMGVehicleSelection For vehicle customization data
+ * @see FMGRaceSnapshot For detailed race performance data
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

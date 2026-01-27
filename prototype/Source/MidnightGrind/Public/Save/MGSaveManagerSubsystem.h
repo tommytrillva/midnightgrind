@@ -1,5 +1,45 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGSaveManagerSubsystem.h
+ * @brief Central Save Manager Subsystem for Midnight Grind
+ *
+ * This subsystem serves as the primary coordinator for all save/load operations
+ * in the game. It manages persistence of game state across play sessions,
+ * handling both synchronous and asynchronous save operations.
+ *
+ * ## Overview
+ * The Save Manager acts as a central hub that:
+ * - Coordinates data collection from various game subsystems (profile, garage, progression, etc.)
+ * - Manages save slots and quick save functionality
+ * - Provides autosave capabilities with configurable intervals
+ * - Handles async operations to prevent frame hitches during save/load
+ *
+ * ## Usage Example
+ * @code
+ * // Get the save manager from the game instance
+ * UMGSaveManagerSubsystem* SaveManager = GameInstance->GetSubsystem<UMGSaveManagerSubsystem>();
+ *
+ * // Save to a specific slot
+ * SaveManager->SaveGame("Slot_01");
+ *
+ * // Or use quick save for the default slot
+ * SaveManager->QuickSave();
+ *
+ * // Load game data
+ * SaveManager->LoadGame("Slot_01");
+ * @endcode
+ *
+ * ## Architecture Notes
+ * - Inherits from UGameInstanceSubsystem, so it persists across level transitions
+ * - Works in conjunction with UMGCloudSaveSubsystem for cloud synchronization
+ * - Broadcasts delegates when save/load operations complete
+ *
+ * @see UMGCloudSaveSubsystem For cloud save synchronization
+ * @see UMGSaveGame For the save data structure
+ * @see UMGProfileManagerSubsystem For player profile data
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,12 +47,28 @@
 #include "MGSaveGame.h"
 #include "MGSaveManagerSubsystem.generated.h"
 
+// ============================================================================
+// DELEGATE DECLARATIONS
+// ============================================================================
+
+/// Delegate broadcast when a save operation completes (success or failure)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveCompleted, bool, bSuccess);
+/// Delegate broadcast when a load operation completes (success or failure)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoadCompleted, bool, bSuccess);
 
 /**
- * Central save/load manager for all game systems
- * Coordinates persistence across all subsystems
+ * @class UMGSaveManagerSubsystem
+ * @brief Central save/load manager that coordinates persistence across all game subsystems.
+ *
+ * This subsystem is the main entry point for all save/load operations. It gathers data
+ * from various game systems, serializes it to disk, and restores it when loading.
+ *
+ * Key responsibilities:
+ * - Managing save slots and their metadata
+ * - Coordinating data collection from other subsystems
+ * - Handling synchronous and asynchronous save/load operations
+ * - Managing autosave functionality
+ * - Validating save data integrity
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGSaveManagerSubsystem : public UGameInstanceSubsystem
@@ -20,78 +76,193 @@ class MIDNIGHTGRIND_API UMGSaveManagerSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	/// @brief Initialize the subsystem. Called automatically by the engine.
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	/// @brief Cleanup the subsystem. Called automatically by the engine.
 	virtual void Deinitialize() override;
 
-	// ==========================================
+	// ============================================================================
 	// SAVE OPERATIONS
-	// ==========================================
+	// ============================================================================
+	// Functions for persisting game state to disk. Use synchronous versions for
+	// critical saves (e.g., after purchases) and async versions for regular saves
+	// to avoid frame hitches.
+	// ============================================================================
 
-	/** Save all game data to slot */
+	/**
+	 * @brief Saves all game data to the specified slot synchronously.
+	 *
+	 * This is a blocking operation that will cause a brief hitch. Use SaveGameAsync()
+	 * for non-critical saves to maintain smooth gameplay.
+	 *
+	 * @param SlotName The name of the save slot. Empty string uses the current/default slot.
+	 * @return true if the save was successful, false otherwise.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool SaveGame(const FString& SlotName = TEXT(""));
 
-	/** Save game asynchronously */
+	/**
+	 * @brief Saves game data asynchronously without blocking the game thread.
+	 *
+	 * Preferred method for regular saves. The OnSaveCompleted delegate will fire
+	 * when the operation completes.
+	 *
+	 * @param SlotName The name of the save slot. Empty string uses the current/default slot.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	void SaveGameAsync(const FString& SlotName = TEXT(""));
 
-	/** Quick save to default slot */
+	/**
+	 * @brief Performs a quick save to the default slot.
+	 *
+	 * Convenience function that saves to the predefined quick save slot.
+	 * Useful for binding to a hotkey (e.g., F5).
+	 *
+	 * @return true if the quick save was successful.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool QuickSave();
 
-	// ==========================================
+	// ============================================================================
 	// LOAD OPERATIONS
-	// ==========================================
+	// ============================================================================
+	// Functions for restoring game state from disk. After loading, data is
+	// automatically distributed to all relevant subsystems.
+	// ============================================================================
 
-	/** Load game from slot */
+	/**
+	 * @brief Loads game data from the specified slot synchronously.
+	 *
+	 * This is a blocking operation. After loading, the data is distributed to
+	 * all game subsystems automatically.
+	 *
+	 * @param SlotName The name of the save slot to load from. Empty uses current/default.
+	 * @return true if the load was successful, false if the file doesn't exist or is corrupted.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool LoadGame(const FString& SlotName = TEXT(""));
 
-	/** Load game asynchronously */
+	/**
+	 * @brief Loads game data asynchronously without blocking the game thread.
+	 *
+	 * The OnLoadCompleted delegate will fire when the operation completes.
+	 * Use IsSaving() to check if a load is in progress.
+	 *
+	 * @param SlotName The name of the save slot to load from.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	void LoadGameAsync(const FString& SlotName = TEXT(""));
 
-	/** Quick load from default slot */
+	/**
+	 * @brief Performs a quick load from the default quick save slot.
+	 *
+	 * Convenience function for loading the quick save. Useful for binding
+	 * to a hotkey (e.g., F9).
+	 *
+	 * @return true if the quick load was successful.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool QuickLoad();
 
-	// ==========================================
+	// ============================================================================
 	// SAVE MANAGEMENT
-	// ==========================================
+	// ============================================================================
+	// Functions for managing save slots: checking existence, deletion, listing,
+	// and creating new games. Use these to build save slot selection UI.
+	// ============================================================================
 
-	/** Check if save exists */
+	/**
+	 * @brief Checks whether a save file exists for the given slot.
+	 *
+	 * Use this to determine which slots to display as occupied in the UI
+	 * and to validate before attempting a load operation.
+	 *
+	 * @param SlotName The save slot name to check. Empty checks the current slot.
+	 * @return true if a save file exists for this slot.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Save")
 	bool DoesSaveExist(const FString& SlotName = TEXT("")) const;
 
-	/** Delete save slot */
+	/**
+	 * @brief Permanently deletes a save slot.
+	 *
+	 * WARNING: This operation cannot be undone. Consider prompting the user
+	 * for confirmation before calling this.
+	 *
+	 * @param SlotName The save slot to delete.
+	 * @return true if the save was deleted successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool DeleteSave(const FString& SlotName);
 
-	/** Get list of all save slots */
+	/**
+	 * @brief Retrieves a list of all available save slot names.
+	 *
+	 * Use this to populate a save slot selection screen.
+	 *
+	 * @return Array of save slot names that have existing save data.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Save")
 	TArray<FString> GetAllSaveSlots() const;
 
-	/** Create new game save */
+	/**
+	 * @brief Creates a fresh save for a new game.
+	 *
+	 * Initializes default values for all game systems and saves to the specified slot.
+	 * Call this when the player starts a new game from the main menu.
+	 *
+	 * @param SlotName The slot to create the new game in. Empty uses the default slot.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	void CreateNewGame(const FString& SlotName = TEXT(""));
 
-	// ==========================================
+	// ============================================================================
 	// DATA ACCESS
-	// ==========================================
+	// ============================================================================
+	// Functions for accessing the current save data in memory. Use GetCurrentSaveData()
+	// for read-only access and GetSaveDataMutable() when modifications are needed.
+	// ============================================================================
 
-	/** Get current save data (read-only) */
+	/**
+	 * @brief Gets the current save data for read-only access.
+	 *
+	 * Use this when you need to inspect save data without modifying it.
+	 * Returns nullptr if no save is currently loaded.
+	 *
+	 * @return Const pointer to the current save game data.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Save")
 	const UMGSaveGame* GetCurrentSaveData() const { return CurrentSaveGame; }
 
-	/** Get current save data (modifiable) */
+	/**
+	 * @brief Gets the current save data for modification.
+	 *
+	 * Use this when you need to update save data. Remember to call SaveGame()
+	 * or SaveGameAsync() after making changes to persist them.
+	 *
+	 * @return Mutable pointer to the current save game data.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	UMGSaveGame* GetSaveDataMutable() { return CurrentSaveGame; }
 
-	/** Check if currently loading */
+	/**
+	 * @brief Checks if a load operation is currently in progress.
+	 *
+	 * Useful for showing loading indicators and preventing conflicting operations.
+	 *
+	 * @return true if an async load is in progress.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Save")
 	bool IsLoading() const { return bIsLoading; }
 
-	/** Check if currently saving */
+	/**
+	 * @brief Checks if a save operation is currently in progress.
+	 *
+	 * Useful for showing saving indicators and preventing conflicting operations.
+	 *
+	 * @return true if an async save is in progress.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Save")
 	bool IsSaving() const { return bIsSaving; }
 
