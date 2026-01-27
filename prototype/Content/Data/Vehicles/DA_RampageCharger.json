@@ -1,0 +1,273 @@
+{
+  "VehicleID": "RAMPAGE_CHARGER",
+  "DisplayName": "Rampage Charger R/T",
+  "Manufacturer": "Rampage Motors",
+  "Year": 2019,
+  "Country": "USA",
+  "Class": "B",
+  "Category": "Muscle",
+  "Description": "The Rampage Charger R/T is American muscle with room for the whole crew. That 5.7L HEMI V8 makes 370 horsepower and sounds like thunder rolling through the streets. Four doors, rear-wheel drive, and a trunk big enough for whatever you need to transport. It's the getaway car, the family hauler, and the highway cruiser all in one intimidating package.",
+
+  "BaseStats": {
+    "Power": 370,
+    "PowerUnit": "HP",
+    "Torque": 395,
+    "TorqueUnit": "lb-ft",
+    "Weight": 4200,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 54,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 5700,
+    "DisplacementUnit": "cc",
+    "Cylinders": 8,
+    "Configuration": "V",
+    "Redline": 6400,
+    "IdleRPM": 650,
+    "TopSpeed": 155,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 5.1,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 620,
+    "Class": "B",
+    "MaxPotential": 880
+  },
+
+  "Engine": {
+    "Code": "HEMI_5.7",
+    "Type": "V8 NA",
+    "Block": {
+      "Material": "Cast Iron",
+      "BoostLimit": 14,
+      "MaxPowerPotential": 700
+    },
+    "Head": {
+      "Type": "OHV 16V",
+      "ValvesPerCylinder": 2,
+      "TotalValves": 16
+    },
+    "MDS": true,
+    "VVT": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 65, "Torque": 220 },
+      { "RPM": 1500, "HP": 120, "Torque": 310 },
+      { "RPM": 2000, "HP": 175, "Torque": 365 },
+      { "RPM": 2500, "HP": 225, "Torque": 390 },
+      { "RPM": 3000, "HP": 275, "Torque": 395 },
+      { "RPM": 3500, "HP": 315, "Torque": 390 },
+      { "RPM": 4000, "HP": 345, "Torque": 380 },
+      { "RPM": 4500, "HP": 365, "Torque": 365 },
+      { "RPM": 5000, "HP": 370, "Torque": 348 },
+      { "RPM": 5500, "HP": 365, "Torque": 328 },
+      { "RPM": 6000, "HP": 355, "Torque": 305 },
+      { "RPM": 6400, "HP": 340, "Torque": 285 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Automatic",
+    "Gears": 8,
+    "GearRatios": [4.71, 3.14, 2.10, 1.67, 1.29, 1.00, 0.84, 0.67],
+    "FinalDrive": 3.07,
+    "ReverseRatio": 3.30,
+    "PaddleShift": true
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 340,
+    "RearSpringRate": 320,
+    "FrontDamping": 0.58,
+    "RearDamping": 0.55,
+    "FrontAntiRollBar": 28,
+    "RearAntiRollBar": 22,
+    "RideHeight": 5.2,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 350,
+    "RearDiameter": 338,
+    "DiameterUnit": "mm",
+    "BrakeBias": 60,
+    "ABSEquipped": true,
+    "Brembo_Available": true
+  },
+
+  "Tires": {
+    "FrontWidth": 245,
+    "FrontAspectRatio": 45,
+    "FrontDiameter": 20,
+    "RearWidth": 275,
+    "RearAspectRatio": 40,
+    "RearDiameter": 20,
+    "Compound": "Sport",
+    "GripMultiplier": 0.98
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.35,
+    "FrontalArea": 2.35,
+    "DownforceMultiplier": 0.85,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 5042,
+    "Width": 1905,
+    "Height": 1478,
+    "Wheelbase": 3052,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Sedan",
+    "Doors": 4,
+    "DefaultColor": {
+      "Primary": "#0A0A0A",
+      "Secondary": "#000000",
+      "Accent": "#CC0000"
+    },
+    "AvailableColors": [
+      { "Name": "Pitch Black", "Hex": "#0A0A0A" },
+      { "Name": "TorRed", "Hex": "#CC0000" },
+      { "Name": "B5 Blue", "Hex": "#4169E1" },
+      { "Name": "White Knuckle", "Hex": "#FFFFFF" },
+      { "Name": "Destroyer Grey", "Hex": "#4A4A4A" },
+      { "Name": "F8 Green", "Hex": "#228B22" },
+      { "Name": "Octane Red", "Hex": "#8B0000" },
+      { "Name": "Go Mango", "Hex": "#FF6600" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V8_HEMI_NA",
+    "ExhaustProfile": "American_Rumble",
+    "HEMIBurble": true,
+    "BackfireOnShift": true,
+    "IdleRumble": true,
+    "ActiveExhaust_Available": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 16.0,
+    "TurnRadius": 6.0,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.38,
+    "OversteerTendency": 0.42,
+    "DriftCapability": 0.58,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "LaunchControl": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 90,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 6,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 38000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "B",
+    "MaintenanceCostMultiplier": 1.0,
+    "PartsPriceMultiplier": 0.9,
+    "StreetValue": 48000,
+    "LegendaryValue": 110000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "REGULAR",
+    "RequiredLevel": 12,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "K&N", "Hellcat", "Full Race"],
+      "Exhaust": ["Stock", "Corsa", "Borla", "Full Race"],
+      "Headers": ["Stock", "Long Tube", "Kooks"],
+      "Cam": ["Stock", "Performance", "Race"],
+      "ECU": ["Stock", "DiabloSport", "HP Tuners", "Standalone"],
+      "Internals": ["Stock", "Pistons", "Full Build"]
+    },
+    "ForcedInduction": {
+      "Supercharger": ["None", "ProCharger", "Whipple", "Hellcat Swap"],
+      "Turbo": ["None", "Single", "Twin"]
+    },
+    "EngineSwap": {
+      "Options": ["Stock 5.7 HEMI", "6.4 392 HEMI", "6.2 Hellcat"]
+    },
+    "Drivetrain": {
+      "TorqueConverter": ["Stock", "High Stall"],
+      "Transmission": ["Stock 8HP", "Built", "Manual Swap"],
+      "FinalDrive": ["Stock", "3.27", "3.55", "3.92"],
+      "LSD": ["Stock eLSD", "Mechanical"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover"],
+      "Dampers": ["Stock", "Bilstein", "KW"],
+      "Swaybars": ["Stock", "SRT", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock", "Brembo", "6-Piston"]
+    },
+    "Wheels": {
+      "Size": [20, 22],
+      "Width": [9.0, 9.5, 10.0, 10.5, 11.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Drag Radial"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "SRT", "Widebody"],
+      "RearBumper": ["Stock", "SRT"],
+      "Spoiler": ["Stock", "SRT", "Lip", "GT Wing"],
+      "Hood": ["Stock", "SRT", "Hellcat", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Widebody"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "Smoked", "LED"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 700,
+    "MaxTorque": 680,
+    "MinWeight": 3900,
+    "MaxTopSpeed": 185,
+    "MaxPI": 880
+  },
+
+  "Tags": ["American", "RWD", "HEMI", "V8", "Charger", "Muscle", "Sedan", "Four Door"],
+
+  "Lore": {
+    "Backstory": "The Rampage Charger R/T is the modern incarnation of American muscle excess. Four doors because sometimes you need to bring friends. A 5.7L HEMI because anything less isn't American enough. That rumbling V8 idle announces your presence before you even arrive. On the highway, it's a comfortable cruiser. On the street, it's intimidation on wheels. In the hands of a skilled driver, that big sedan can hang with cars half its weight. This is the car for people who want everything - space, power, presence, and the ability to outrun most of what's on the road.",
+    "FamousOwners": ["The Highway King", "Four Door Fury", "Midnight Cruiser"],
+    "RivalVehicles": ["CTS-V", "M5", "SS Sedan"]
+  },
+
+  "SpecialFeatures": {
+    "HEMI_5.7": true,
+    "FourDoorMuscle": true,
+    "MDS_CylinderDeactivation": true,
+    "LaunchControl": true
+  }
+}

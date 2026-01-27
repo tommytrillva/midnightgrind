@@ -177,16 +177,16 @@
   "Phase4_ContentScale": {
     "Count": 20,
     "AdditionalVehicles": [
-      { "ID": "SHOGUN_NSX", "Class": "A", "Category": "JDM", "Inspiration": "NA1 NSX" },
-      { "ID": "LIGHTNING_86", "Class": "D", "Category": "JDM", "Inspiration": "AE86" },
-      { "ID": "DRIFT_KING_SILVIA", "Class": "C", "Category": "JDM", "Inspiration": "S15 Silvia" },
-      { "ID": "THUNDER_370Z", "Class": "B", "Category": "JDM", "Inspiration": "370Z Nismo" },
-      { "ID": "STORM_GTI", "Class": "D", "Category": "Euro", "Inspiration": "MK7 GTI" },
-      { "ID": "BLITZ_M4", "Class": "A", "Category": "Euro", "Inspiration": "F82 M4" },
-      { "ID": "APEX_CAYMAN", "Class": "B", "Category": "Euro", "Inspiration": "981 Cayman GT4" },
-      { "ID": "INFERNO_FOCUS", "Class": "C", "Category": "Euro", "Inspiration": "Focus RS" },
-      { "ID": "TITAN_CTS", "Class": "A", "Category": "Muscle", "Inspiration": "CTS-V" },
-      { "ID": "RAMPAGE_CHARGER", "Class": "B", "Category": "Muscle", "Inspiration": "Charger R/T" }
+      { "ID": "SHOGUN_NSX", "Class": "A", "Category": "JDM", "Inspiration": "NA1 NSX", "Status": "Spec Complete" },
+      { "ID": "LIGHTNING_86", "Class": "D", "Category": "JDM", "Inspiration": "AE86", "Status": "Spec Complete" },
+      { "ID": "DRIFT_KING_SILVIA", "Class": "C", "Category": "JDM", "Inspiration": "S15 Silvia", "Status": "Spec Complete" },
+      { "ID": "THUNDER_370Z", "Class": "B", "Category": "JDM", "Inspiration": "370Z Nismo", "Status": "Spec Complete" },
+      { "ID": "STORM_GTI", "Class": "D", "Category": "Euro", "Inspiration": "MK7 GTI", "Status": "Spec Complete" },
+      { "ID": "BLITZ_M4", "Class": "A", "Category": "Euro", "Inspiration": "F82 M4", "Status": "Spec Complete" },
+      { "ID": "APEX_CAYMAN", "Class": "B", "Category": "Euro", "Inspiration": "981 Cayman GT4", "Status": "Spec Complete" },
+      { "ID": "INFERNO_FOCUS", "Class": "C", "Category": "Euro", "Inspiration": "Focus RS", "Status": "Spec Complete" },
+      { "ID": "TITAN_CTS", "Class": "A", "Category": "Muscle", "Inspiration": "CTS-V", "Status": "Spec Complete" },
+      { "ID": "RAMPAGE_CHARGER", "Class": "B", "Category": "Muscle", "Inspiration": "Charger R/T", "Status": "Spec Complete" }
     ]
   },
 

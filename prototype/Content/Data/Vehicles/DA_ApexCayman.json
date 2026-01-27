@@ -1,0 +1,266 @@
+{
+  "VehicleID": "APEX_CAYMAN",
+  "DisplayName": "Apex Cayman GT4",
+  "Manufacturer": "Apex Motors",
+  "Year": 2016,
+  "Country": "Germany",
+  "Class": "B",
+  "Category": "Euro",
+  "Description": "The Apex Cayman GT4 is what happens when Porsche stops holding back. That 3.8L flat-six from the 911 GT3 sits right behind you, screaming to 7800 RPM. Mid-engine balance gives it cornering ability that embarrasses supercars. No turbos, no tricks - just perfect engineering and a driver's manual gearbox. This is the purist's choice.",
+
+  "BaseStats": {
+    "Power": 385,
+    "PowerUnit": "HP",
+    "Torque": 310,
+    "TorqueUnit": "lb-ft",
+    "Weight": 2960,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 44,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Mid",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 3800,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "Flat",
+    "Redline": 7800,
+    "IdleRPM": 800,
+    "TopSpeed": 183,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 4.2,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 740,
+    "Class": "B",
+    "MaxPotential": 900
+  },
+
+  "Engine": {
+    "Code": "MA123",
+    "Type": "Flat-6 NA",
+    "Block": {
+      "Material": "Aluminum",
+      "MaxPowerPotential": 520
+    },
+    "Head": {
+      "Type": "DOHC 24V VVT",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24
+    },
+    "NaturallyAspirated": true,
+    "DrySum": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 60, "Torque": 150 },
+      { "RPM": 2000, "HP": 130, "Torque": 230 },
+      { "RPM": 3000, "HP": 205, "Torque": 280 },
+      { "RPM": 4000, "HP": 275, "Torque": 305 },
+      { "RPM": 4500, "HP": 310, "Torque": 310 },
+      { "RPM": 5000, "HP": 345, "Torque": 308 },
+      { "RPM": 5500, "HP": 365, "Torque": 302 },
+      { "RPM": 6000, "HP": 380, "Torque": 295 },
+      { "RPM": 6500, "HP": 385, "Torque": 285 },
+      { "RPM": 7000, "HP": 382, "Torque": 272 },
+      { "RPM": 7500, "HP": 375, "Torque": 258 },
+      { "RPM": 7800, "HP": 365, "Torque": 245 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [3.91, 2.32, 1.61, 1.28, 1.08, 0.88],
+    "FinalDrive": 3.89,
+    "ReverseRatio": 3.55
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MacPhersonStrut",
+    "FrontSpringRate": 400,
+    "RearSpringRate": 420,
+    "FrontDamping": 0.68,
+    "RearDamping": 0.70,
+    "FrontAntiRollBar": 28,
+    "RearAntiRollBar": 26,
+    "RideHeight": 4.0,
+    "RideHeightUnit": "inches",
+    "GT4Suspension": true
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 380,
+    "RearDiameter": 380,
+    "DiameterUnit": "mm",
+    "BrakeBias": 55,
+    "ABSEquipped": true,
+    "PCCB_Available": true
+  },
+
+  "Tires": {
+    "FrontWidth": 245,
+    "FrontAspectRatio": 35,
+    "FrontDiameter": 20,
+    "RearWidth": 295,
+    "RearAspectRatio": 30,
+    "RearDiameter": 20,
+    "Compound": "Sport",
+    "GripMultiplier": 1.12
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.32,
+    "FrontalArea": 1.95,
+    "DownforceMultiplier": 1.25,
+    "HasActiveSpoiler": false,
+    "FixedRearWing": true
+  },
+
+  "Dimensions": {
+    "Length": 4438,
+    "Width": 1801,
+    "Height": 1266,
+    "Wheelbase": 2484,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#FFD700",
+      "Secondary": "#000000",
+      "Accent": "#FFFFFF"
+    },
+    "AvailableColors": [
+      { "Name": "Racing Yellow", "Hex": "#FFD700" },
+      { "Name": "GT Silver", "Hex": "#C0C0C0" },
+      { "Name": "Carrara White", "Hex": "#FFFFFF" },
+      { "Name": "Jet Black", "Hex": "#0A0A0A" },
+      { "Name": "Guards Red", "Hex": "#CC0000" },
+      { "Name": "Sapphire Blue", "Hex": "#003366" },
+      { "Name": "Viper Green", "Hex": "#228B22" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "Flat6_NA_HighRev",
+    "ExhaustProfile": "Euro_Porsche",
+    "NaturallyAspiratedSnarl": true,
+    "BackfireOnShift": true,
+    "HighRevWail": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 13.5,
+    "TurnRadius": 5.2,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.18,
+    "OversteerTendency": 0.48,
+    "DriftCapability": 0.55,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "MidEngineBalance": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 95,
+    "PowerBoostUnit": "HP",
+    "Duration": 3.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 6,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 92000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "A",
+    "MaintenanceCostMultiplier": 1.5,
+    "PartsPriceMultiplier": 1.4,
+    "StreetValue": 115000,
+    "LegendaryValue": 220000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "RESPECTED",
+    "RequiredLevel": 22,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "IPD", "Full Race"],
+      "Exhaust": ["Stock", "Akrapovic", "GMG", "Race Headers"],
+      "ECU": ["Stock", "GIAC", "Cobb", "Standalone"],
+      "Cams": ["Stock", "Sport", "Race"],
+      "Internals": ["Stock", "Rods", "Full Build"]
+    },
+    "ForcedInduction": {
+      "Supercharger": ["None", "VF Engineering", "Softronic"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing"],
+      "Transmission": ["Stock", "Short Throw", "Sequential"],
+      "FinalDrive": ["Stock", "4.00", "4.18"],
+      "LSD": ["Stock", "Guard", "Wavetrac"]
+    },
+    "Suspension": {
+      "Springs": ["Stock GT4", "Track", "Race"],
+      "Dampers": ["Stock", "Bilstein", "Ohlins"],
+      "Swaybars": ["Stock", "Tarett", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "PCCB"],
+      "Calipers": ["Stock", "6-Piston"]
+    },
+    "Wheels": {
+      "Size": [20],
+      "Width": [8.5, 9.0, 9.5, 10.0, 11.0, 12.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Cup 2", "Slick"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock GT4", "Clubsport", "Manthey"],
+      "RearBumper": ["Stock"],
+      "Spoiler": ["Stock GT4 Wing", "Adjustable", "Swan Neck"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "LED"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 520,
+    "MaxTorque": 380,
+    "MinWeight": 2850,
+    "MaxTopSpeed": 198,
+    "MaxPI": 900
+  },
+
+  "Tags": ["Euro", "RWD", "MidEngine", "Flat6", "NA", "Porsche", "GT4", "Track"],
+
+  "Lore": {
+    "Backstory": "The Apex Cayman GT4 is Porsche's open secret - the car they had to make worse on purpose so it wouldn't embarrass the 911. Even hobbled, it's stunning. The 3.8L flat-six sits behind you, singing its naturally aspirated song. The mid-engine layout gives it balance that front-engine cars can only dream of. On a track, it's a scalpel. On a mountain road, it's the perfect partner. This is what happens when engineers get to build the car they actually want to drive.",
+    "FamousOwners": ["Track Day Surgeon", "Canyon Carver King", "The Engineer's Choice"],
+    "RivalVehicles": ["Corvette", "M4", "AMG GT"]
+  },
+
+  "SpecialFeatures": {
+    "MidEngineLayout": true,
+    "GT3DerivedEngine": true,
+    "FixedRearWing": true,
+    "ManualOnly": true
+  }
+}

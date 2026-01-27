@@ -1,0 +1,276 @@
+{
+  "VehicleID": "INFERNO_FOCUS",
+  "DisplayName": "Inferno Focus RS",
+  "Manufacturer": "Inferno Motors",
+  "Year": 2017,
+  "Country": "Germany",
+  "Class": "C",
+  "Category": "Euro",
+  "Description": "The Inferno Focus RS is the hot hatch that went to engineering school and came back with a PhD in hooliganism. That 2.3L EcoBoost makes 350 horsepower and sends it through an AWD system with a Drift Mode button. Yes, a factory drift button. It's practical enough for daily use, fast enough to embarrass sports cars, and comes with Ford's blessing to slide it sideways.",
+
+  "BaseStats": {
+    "Power": 350,
+    "PowerUnit": "HP",
+    "Torque": 350,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3434,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 60,
+    "Drivetrain": "AWD",
+    "EnginePosition": "Front",
+    "Aspiration": "Turbocharged",
+    "Displacement": 2300,
+    "DisplacementUnit": "cc",
+    "Cylinders": 4,
+    "Configuration": "Inline",
+    "Redline": 6800,
+    "IdleRPM": 850,
+    "TopSpeed": 165,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 4.6,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 640,
+    "Class": "C",
+    "MaxPotential": 850
+  },
+
+  "Engine": {
+    "Code": "EcoBoost_2.3",
+    "Type": "Inline-4 Turbo",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 30,
+      "MaxPowerPotential": 550
+    },
+    "Head": {
+      "Type": "DOHC 16V",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 16
+    },
+    "Turbo": {
+      "Type": "Single Twin-Scroll",
+      "SpoolRPM": 2500,
+      "MaxBoost": 23
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 55, "Torque": 150 },
+      { "RPM": 2000, "HP": 145, "Torque": 290 },
+      { "RPM": 2500, "HP": 210, "Torque": 345 },
+      { "RPM": 3000, "HP": 270, "Torque": 350 },
+      { "RPM": 3500, "HP": 310, "Torque": 348 },
+      { "RPM": 4000, "HP": 340, "Torque": 340 },
+      { "RPM": 4500, "HP": 350, "Torque": 325 },
+      { "RPM": 5000, "HP": 348, "Torque": 308 },
+      { "RPM": 5500, "HP": 340, "Torque": 285 },
+      { "RPM": 6000, "HP": 325, "Torque": 262 },
+      { "RPM": 6800, "HP": 305, "Torque": 235 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [4.24, 2.52, 1.66, 1.19, 1.00, 0.82],
+    "FinalDrive": 3.82,
+    "ReverseRatio": 3.82
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "IndependentMultiLink",
+    "FrontSpringRate": 380,
+    "RearSpringRate": 340,
+    "FrontDamping": 0.62,
+    "RearDamping": 0.58,
+    "FrontAntiRollBar": 26,
+    "RearAntiRollBar": 20,
+    "RideHeight": 4.8,
+    "RideHeightUnit": "inches"
+  },
+
+  "AWDSystem": {
+    "Type": "TwinClutchRearDrive",
+    "FrontBias": 0,
+    "RearBias": 70,
+    "TorqueVectoring": true,
+    "DriftMode": true
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 350,
+    "RearDiameter": 302,
+    "DiameterUnit": "mm",
+    "BrakeBias": 60,
+    "ABSEquipped": true,
+    "Brembo": true
+  },
+
+  "Tires": {
+    "FrontWidth": 235,
+    "FrontAspectRatio": 35,
+    "FrontDiameter": 19,
+    "RearWidth": 235,
+    "RearAspectRatio": 35,
+    "RearDiameter": 19,
+    "Compound": "Sport",
+    "GripMultiplier": 1.05
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.35,
+    "FrontalArea": 2.1,
+    "DownforceMultiplier": 0.95,
+    "HasActiveSpoiler": false,
+    "RearSpoiler": true
+  },
+
+  "Dimensions": {
+    "Length": 4390,
+    "Width": 1823,
+    "Height": 1470,
+    "Wheelbase": 2648,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Hatchback",
+    "Doors": 5,
+    "DefaultColor": {
+      "Primary": "#0066CC",
+      "Secondary": "#000000",
+      "Accent": "#FFFFFF"
+    },
+    "AvailableColors": [
+      { "Name": "Nitrous Blue", "Hex": "#0066CC" },
+      { "Name": "Shadow Black", "Hex": "#0A0A0A" },
+      { "Name": "Frozen White", "Hex": "#FFFFFF" },
+      { "Name": "Race Red", "Hex": "#CC0000" },
+      { "Name": "Stealth Grey", "Hex": "#4A4A4A" },
+      { "Name": "Magnetic", "Hex": "#555555" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineFour_Turbo_EcoBoost",
+    "ExhaustProfile": "Euro_RS",
+    "TurboWhine": true,
+    "BlowoffValve": true,
+    "BackfireOnShift": true,
+    "AntiBangBang": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 14.5,
+    "TurnRadius": 5.5,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.22,
+    "OversteerTendency": 0.55,
+    "DriftCapability": 0.75,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "DriftMode": true,
+    "TorqueVectoring": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 85,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 7,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 42000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "C",
+    "MaintenanceCostMultiplier": 1.15,
+    "PartsPriceMultiplier": 1.1,
+    "StreetValue": 52000,
+    "LegendaryValue": 110000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "RESPECTED",
+    "RequiredLevel": 15,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Mountune", "Full Race"],
+      "Exhaust": ["Stock", "Mountune", "Milltek", "Full Race"],
+      "Turbo": ["Stock", "Mountune", "Hybrid", "Big Turbo"],
+      "Intercooler": ["Stock", "FMIC", "Wagner"],
+      "ECU": ["Stock", "Mountune", "Cobb", "Standalone"],
+      "FuelSystem": ["Stock", "PI", "E85"],
+      "Internals": ["Stock", "Rods", "Full Build"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing"],
+      "Transmission": ["Stock", "Short Throw", "Quaife"],
+      "FinalDrive": ["Stock", "4.06", "4.25"],
+      "RearDiff": ["Stock RDU", "Quaife", "Wavetrac"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Mountune", "Coilover"],
+      "Dampers": ["Stock", "KW", "Ohlins"],
+      "Swaybars": ["Stock", "Mountune", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock Brembo", "6-Piston"]
+    },
+    "Wheels": {
+      "Size": [19, 20],
+      "Width": [8.0, 8.5, 9.0, 9.5]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Rally"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Mountune", "Rally", "Wide"],
+      "RearBumper": ["Stock", "Mountune"],
+      "Spoiler": ["Stock", "Larger", "GT Wing"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Wide Fenders"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "Rally Pods"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 550,
+    "MaxTorque": 500,
+    "MinWeight": 3200,
+    "MaxTopSpeed": 185,
+    "MaxPI": 850
+  },
+
+  "Tags": ["Euro", "AWD", "Turbo", "Focus", "RS", "Hot Hatch", "Rally", "Drift Mode"],
+
+  "Lore": {
+    "Backstory": "The Inferno Focus RS is Ford's answer to every question about hot hatches. Can they drift? With drift mode, yes. Can they rally? The AWD system was born in WRC. Can they do track days? Those Brembo brakes say yes. The 2.3L EcoBoost is the same engine from the Mustang, detuned just enough to not destroy the front wheels. This is a practical car that happens to be insane. A family hatch that wants to slide sideways. Ford's gift to hooligans who need back seats.",
+    "FamousOwners": ["Rally Cross Competitor", "Drift Mode Enthusiast", "The Practical Hooligan"],
+    "RivalVehicles": ["Golf R", "Civic Type R", "WRX STI"]
+  },
+
+  "SpecialFeatures": {
+    "DriftMode": true,
+    "TorqueVectoring": true,
+    "AWDRearBias": true,
+    "RallyDNA": true
+  }
+}

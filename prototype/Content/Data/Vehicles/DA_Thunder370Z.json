@@ -1,0 +1,271 @@
+{
+  "VehicleID": "THUNDER_370Z",
+  "DisplayName": "Thunder 370Z",
+  "Manufacturer": "Thunder Motors",
+  "Year": 2019,
+  "Country": "Japan",
+  "Class": "B",
+  "Category": "JDM",
+  "Description": "The Thunder 370Z Nismo is the S-chassis successor's final form. That 3.7L VQ makes 350 horsepower and revs with the urgency of a Japanese sports car should. The Nismo treatment adds real aero, better brakes, and a suspension tuned for attack. It's the car for those who want modern JDM without turbos - pure naturally aspirated fury.",
+
+  "BaseStats": {
+    "Power": 350,
+    "PowerUnit": "HP",
+    "Torque": 276,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3330,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 54,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 3700,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "V",
+    "Redline": 7500,
+    "IdleRPM": 750,
+    "TopSpeed": 168,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 4.7,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 680,
+    "Class": "B",
+    "MaxPotential": 920
+  },
+
+  "Engine": {
+    "Code": "VQ37VHR",
+    "Type": "V6 DOHC",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 12,
+      "MaxPowerPotential": 700
+    },
+    "Head": {
+      "Type": "DOHC 24V VVEL",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24
+    },
+    "VVEL": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 55, "Torque": 140 },
+      { "RPM": 2000, "HP": 120, "Torque": 210 },
+      { "RPM": 3000, "HP": 190, "Torque": 255 },
+      { "RPM": 4000, "HP": 255, "Torque": 270 },
+      { "RPM": 4500, "HP": 290, "Torque": 276 },
+      { "RPM": 5000, "HP": 320, "Torque": 274 },
+      { "RPM": 5500, "HP": 340, "Torque": 268 },
+      { "RPM": 6000, "HP": 350, "Torque": 260 },
+      { "RPM": 6500, "HP": 348, "Torque": 248 },
+      { "RPM": 7000, "HP": 340, "Torque": 232 },
+      { "RPM": 7500, "HP": 325, "Torque": 215 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [3.79, 2.32, 1.62, 1.27, 1.00, 0.79],
+    "FinalDrive": 3.69,
+    "ReverseRatio": 3.28,
+    "SynchroRev": true
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 360,
+    "RearSpringRate": 340,
+    "FrontDamping": 0.62,
+    "RearDamping": 0.60,
+    "FrontAntiRollBar": 26,
+    "RearAntiRollBar": 20,
+    "RideHeight": 4.8,
+    "RideHeightUnit": "inches",
+    "NismoTuning": true
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 355,
+    "RearDiameter": 350,
+    "DiameterUnit": "mm",
+    "BrakeBias": 58,
+    "ABSEquipped": true,
+    "NismoBrakes": true
+  },
+
+  "Tires": {
+    "FrontWidth": 245,
+    "FrontAspectRatio": 40,
+    "FrontDiameter": 19,
+    "RearWidth": 285,
+    "RearAspectRatio": 35,
+    "RearDiameter": 19,
+    "Compound": "Sport",
+    "GripMultiplier": 1.02
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.32,
+    "FrontalArea": 2.0,
+    "DownforceMultiplier": 1.05,
+    "HasActiveSpoiler": false,
+    "NismoAero": true
+  },
+
+  "Dimensions": {
+    "Length": 4310,
+    "Width": 1845,
+    "Height": 1315,
+    "Wheelbase": 2550,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#CC0000",
+      "Secondary": "#000000",
+      "Accent": "#FFFFFF"
+    },
+    "AvailableColors": [
+      { "Name": "Solid Red", "Hex": "#CC0000" },
+      { "Name": "Pearl White", "Hex": "#FFFFFF" },
+      { "Name": "Magnetic Black", "Hex": "#0A0A0A" },
+      { "Name": "Gun Metallic", "Hex": "#4A4A4A" },
+      { "Name": "Brilliant Silver", "Hex": "#C0C0C0" },
+      { "Name": "Deep Blue Pearl", "Hex": "#003366" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V6_NA_HighRev",
+    "ExhaustProfile": "JDM_VQ",
+    "VQRasp": true,
+    "BackfireOnShift": true,
+    "HighRevScream": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.0,
+    "TurnRadius": 5.4,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.28,
+    "OversteerTendency": 0.58,
+    "DriftCapability": 0.72,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "SynchroRevMatch": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 85,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 7,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 48000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "B",
+    "MaintenanceCostMultiplier": 1.1,
+    "PartsPriceMultiplier": 1.0,
+    "StreetValue": 58000,
+    "LegendaryValue": 130000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "RESPECTED",
+    "RequiredLevel": 18,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Stillen", "Z1", "Full Race"],
+      "Exhaust": ["Stock", "Motordyne", "Fast Intentions", "Full Race"],
+      "Headers": ["Stock", "Tomei", "PPE"],
+      "ECU": ["Stock", "UpRev", "Ecutek", "Standalone"],
+      "Cams": ["Stock", "Brian Crower", "Jim Wolf"],
+      "Internals": ["Stock", "Rods", "Full Build"]
+    },
+    "ForcedInduction": {
+      "Supercharger": ["None", "Stillen", "AAM"],
+      "Turbo": ["None", "JWT", "GTX3076", "Twin Turbo"]
+    },
+    "EngineSwap": {
+      "Options": ["Stock VQ37", "VR38DETT"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Twin Disc"],
+      "Transmission": ["Stock", "CD009", "Sequential"],
+      "FinalDrive": ["Stock", "3.90", "4.08"],
+      "LSD": ["Stock VLSD", "Nismo 1.5Way", "OS Giken"]
+    },
+    "Suspension": {
+      "Springs": ["Stock Nismo", "Lowering", "Coilover"],
+      "Dampers": ["Stock", "KW", "Ohlins"],
+      "Swaybars": ["Stock", "Hotchkis", "Racing"],
+      "AngleKit": ["None", "Basic", "Pro"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock Nismo", "Akebono", "StopTech"]
+    },
+    "Wheels": {
+      "Size": [19, 20],
+      "Width": [9.0, 9.5, 10.0, 10.5, 11.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Drift"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock Nismo", "Amuse", "Wide"],
+      "RearBumper": ["Stock Nismo", "Amuse"],
+      "Spoiler": ["Stock Nismo", "GT Wing", "Duck"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Rocket Bunny", "LB Works"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "LED", "Smoked"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 700,
+    "MaxTorque": 550,
+    "MinWeight": 3100,
+    "MaxTopSpeed": 200,
+    "MaxPI": 920
+  },
+
+  "Tags": ["JDM", "RWD", "VQ", "370Z", "Nismo", "NA", "Drift", "Track"],
+
+  "Lore": {
+    "Backstory": "The Thunder 370Z Nismo represents Nissan's dedication to naturally aspirated performance in a turbocharged world. Where others added boost, the VQ37 got variable valve timing and higher compression. The result is an engine that rewards revs and rewards skill. The Nismo package adds genuine track credentials - better brakes, stiffer suspension, real aero. It's the last of a breed - a modern sports car that still believes in the connection between driver and machine.",
+    "FamousOwners": ["Time Attack Specialist", "Drift Crossover Star", "NA Purist"],
+    "RivalVehicles": ["Mustang GT", "Camaro SS", "Supra"]
+  },
+
+  "SpecialFeatures": {
+    "VQ37VHR": true,
+    "NismoPackage": true,
+    "SynchroRevMatch": true,
+    "VVEL": true
+  }
+}
