@@ -3,6 +3,7 @@
 #include "DevTools/MGDevCommands.h"
 #include "Vehicle/MGVehiclePawn.h"
 #include "Vehicle/MGVehicleMovementComponent.h"
+#include "Vehicle/MGVehicleDamageSystem.h"
 #include "Vehicle/MGVehicleFactory.h"
 #include "GameModes/MGRaceGameMode.h"
 #include "Race/MGRaceFlowSubsystem.h"
@@ -463,6 +464,155 @@ void UMGDevCommands::ResetAIMoods()
 
 	// Would iterate all AI controllers and reset their mood state
 	// The actual implementation depends on the AI driver profile system
+}
+
+// ==========================================
+// VEHICLE DEBUG COMMANDS
+// ==========================================
+
+void UMGDevCommands::PrintDamageState()
+{
+	LogCommand(TEXT("PrintDamageState"));
+
+	AMGVehiclePawn* Vehicle = GetPlayerVehicle();
+	if (!Vehicle)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No player vehicle found"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("=== VEHICLE DAMAGE STATE ==="));
+
+	// Get damage system info
+	if (UMGVehicleDamageSystem* DamageSystem = Vehicle->VehicleDamageSystem)
+	{
+		float OverallDamage = DamageSystem->GetOverallDamagePercent();
+		UE_LOG(LogTemp, Log, TEXT("Overall Damage: %.1f%%"), OverallDamage);
+
+		// Would print component damage details
+		UE_LOG(LogTemp, Log, TEXT("Engine: %.1f%%"), DamageSystem->GetComponentPerformance(EMGVehicleComponent::Engine) * 100.0f);
+		UE_LOG(LogTemp, Log, TEXT("Transmission: %.1f%%"), DamageSystem->GetComponentPerformance(EMGVehicleComponent::Transmission) * 100.0f);
+		UE_LOG(LogTemp, Log, TEXT("Suspension: %.1f%%"), DamageSystem->GetComponentPerformance(EMGVehicleComponent::Suspension) * 100.0f);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No damage system found"));
+	}
+}
+
+void UMGDevCommands::PrintPhysicsState()
+{
+	LogCommand(TEXT("PrintPhysicsState"));
+
+	AMGVehiclePawn* Vehicle = GetPlayerVehicle();
+	if (!Vehicle)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No player vehicle found"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("=== VEHICLE PHYSICS STATE ==="));
+
+	if (UMGVehicleMovementComponent* Movement = Vehicle->GetMGVehicleMovement())
+	{
+		FVector Velocity = Vehicle->GetVelocity();
+		float SpeedKPH = Velocity.Size() * 0.036f;
+
+		UE_LOG(LogTemp, Log, TEXT("Speed: %.1f km/h"), SpeedKPH);
+		UE_LOG(LogTemp, Log, TEXT("Velocity: %s"), *Velocity.ToString());
+		UE_LOG(LogTemp, Log, TEXT("Brake Temp: %.1f C"), Movement->GetBrakeTemperature());
+
+		// Would print suspension, weight transfer, grip info
+	}
+}
+
+void UMGDevCommands::ShowTireDebug()
+{
+	LogCommand(TEXT("ShowTireDebug"));
+
+	bShowTireDebug = !bShowTireDebug;
+	UE_LOG(LogTemp, Log, TEXT("Tire Debug Visualization: %s"), bShowTireDebug ? TEXT("ON") : TEXT("OFF"));
+}
+
+void UMGDevCommands::RepairVehicle()
+{
+	LogCommand(TEXT("RepairVehicle"));
+
+	AMGVehiclePawn* Vehicle = GetPlayerVehicle();
+	if (!Vehicle)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No player vehicle found"));
+		return;
+	}
+
+	if (UMGVehicleDamageSystem* DamageSystem = Vehicle->VehicleDamageSystem)
+	{
+		DamageSystem->FullRepair();
+		UE_LOG(LogTemp, Log, TEXT("Vehicle fully repaired"));
+	}
+}
+
+// ==========================================
+// ECONOMY DEBUG COMMANDS
+// ==========================================
+
+void UMGDevCommands::PrintEconomyState()
+{
+	LogCommand(TEXT("PrintEconomyState"));
+
+	UE_LOG(LogTemp, Log, TEXT("=== PLAYER ECONOMY STATE ==="));
+
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGEconomySubsystem* Economy = GI->GetSubsystem<UMGEconomySubsystem>())
+		{
+			int32 Credits = Economy->GetPlayerCredits();
+			int32 TotalEarned = Economy->GetTotalEarned();
+			int32 TotalSpent = Economy->GetTotalSpent();
+
+			UE_LOG(LogTemp, Log, TEXT("Current Credits: $%d"), Credits);
+			UE_LOG(LogTemp, Log, TEXT("Total Earned: $%d"), TotalEarned);
+			UE_LOG(LogTemp, Log, TEXT("Total Spent: $%d"), TotalSpent);
+			UE_LOG(LogTemp, Log, TEXT("Net Earnings: $%d"), TotalEarned - TotalSpent);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Economy subsystem not found"));
+		}
+	}
+}
+
+void UMGDevCommands::SimulatePurchase(int32 Amount)
+{
+	LogCommand(FString::Printf(TEXT("SimulatePurchase(%d)"), Amount));
+
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGEconomySubsystem* Economy = GI->GetSubsystem<UMGEconomySubsystem>())
+		{
+			int32 CurrentCredits = Economy->GetPlayerCredits();
+			bool bCanAfford = CurrentCredits >= Amount;
+
+			UE_LOG(LogTemp, Log, TEXT("=== PURCHASE SIMULATION ==="));
+			UE_LOG(LogTemp, Log, TEXT("Current Credits: $%d"), CurrentCredits);
+			UE_LOG(LogTemp, Log, TEXT("Purchase Amount: $%d"), Amount);
+			UE_LOG(LogTemp, Log, TEXT("Can Afford: %s"), bCanAfford ? TEXT("YES") : TEXT("NO"));
+			if (bCanAfford)
+			{
+				UE_LOG(LogTemp, Log, TEXT("After Purchase: $%d"), CurrentCredits - Amount);
+			}
+		}
+	}
+}
+
+void UMGDevCommands::PrintTransactions(int32 Count)
+{
+	LogCommand(FString::Printf(TEXT("PrintTransactions(%d)"), Count));
+
+	UE_LOG(LogTemp, Log, TEXT("=== RECENT TRANSACTIONS (Last %d) ==="), Count);
+
+	// Would iterate transaction history from economy subsystem
+	UE_LOG(LogTemp, Log, TEXT("(Transaction history requires EconomySubsystem integration)"));
 }
 
 // ==========================================

@@ -1,0 +1,332 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Rewards and Loot System Configuration",
+
+  "DailyRewards": {
+    "Enabled": true,
+    "ResetTime": "00:00",
+    "Timezone": "UTC",
+    "Streak": {
+      "Enabled": true,
+      "MaxStreak": 30,
+      "ResetOnMiss": false,
+      "GracePeriodHours": 24
+    },
+    "Calendar": [
+      { "Day": 1, "Reward": { "Type": "Cash", "Amount": 1000 } },
+      { "Day": 2, "Reward": { "Type": "REP", "Amount": 100 } },
+      { "Day": 3, "Reward": { "Type": "Part", "Tier": "Sport", "Random": true } },
+      { "Day": 4, "Reward": { "Type": "Cash", "Amount": 2000 } },
+      { "Day": 5, "Reward": { "Type": "REP", "Amount": 200 } },
+      { "Day": 6, "Reward": { "Type": "Vinyl", "Random": true } },
+      { "Day": 7, "Reward": { "Type": "MysteryBox", "Tier": "Silver" } },
+      { "Day": 8, "Reward": { "Type": "Cash", "Amount": 2500 } },
+      { "Day": 9, "Reward": { "Type": "REP", "Amount": 250 } },
+      { "Day": 10, "Reward": { "Type": "Part", "Tier": "Race", "Random": true } },
+      { "Day": 11, "Reward": { "Type": "Cash", "Amount": 3000 } },
+      { "Day": 12, "Reward": { "Type": "REP", "Amount": 300 } },
+      { "Day": 13, "Reward": { "Type": "Paint", "Type": "Metallic", "Random": true } },
+      { "Day": 14, "Reward": { "Type": "MysteryBox", "Tier": "Gold" } },
+      { "Day": 15, "Reward": { "Type": "Cash", "Amount": 5000 } },
+      { "Day": 16, "Reward": { "Type": "REP", "Amount": 400 } },
+      { "Day": 17, "Reward": { "Type": "Part", "Tier": "Race", "Random": true } },
+      { "Day": 18, "Reward": { "Type": "Cash", "Amount": 5000 } },
+      { "Day": 19, "Reward": { "Type": "REP", "Amount": 500 } },
+      { "Day": 20, "Reward": { "Type": "Wheel", "Random": true } },
+      { "Day": 21, "Reward": { "Type": "MysteryBox", "Tier": "Gold" } },
+      { "Day": 22, "Reward": { "Type": "Cash", "Amount": 7500 } },
+      { "Day": 23, "Reward": { "Type": "REP", "Amount": 600 } },
+      { "Day": 24, "Reward": { "Type": "Part", "Tier": "Elite", "Random": true } },
+      { "Day": 25, "Reward": { "Type": "Cash", "Amount": 10000 } },
+      { "Day": 26, "Reward": { "Type": "REP", "Amount": 750 } },
+      { "Day": 27, "Reward": { "Type": "Paint", "Type": "Pearl", "Random": true } },
+      { "Day": 28, "Reward": { "Type": "MysteryBox", "Tier": "Platinum" } },
+      { "Day": 29, "Reward": { "Type": "Cash", "Amount": 15000 } },
+      { "Day": 30, "Reward": { "Type": "ExclusiveReward", "ID": "MONTHLY_EXCLUSIVE" } }
+    ]
+  },
+
+  "MysteryBoxes": {
+    "Enabled": true,
+    "Types": [
+      {
+        "ID": "BOX_BRONZE",
+        "Name": "Bronze Box",
+        "Price": 2500,
+        "PurchaseLimit": 5,
+        "LimitPeriod": "Daily",
+        "Contents": {
+          "Cash": { "Chance": 0.40, "Range": [500, 2500] },
+          "REP": { "Chance": 0.30, "Range": [50, 150] },
+          "Part_Stock": { "Chance": 0.20 },
+          "Part_Sport": { "Chance": 0.08 },
+          "Vinyl_Common": { "Chance": 0.02 }
+        }
+      },
+      {
+        "ID": "BOX_SILVER",
+        "Name": "Silver Box",
+        "Price": 5000,
+        "PurchaseLimit": 3,
+        "LimitPeriod": "Daily",
+        "Contents": {
+          "Cash": { "Chance": 0.30, "Range": [2000, 7500] },
+          "REP": { "Chance": 0.25, "Range": [100, 300] },
+          "Part_Sport": { "Chance": 0.25 },
+          "Part_Race": { "Chance": 0.10 },
+          "Vinyl_Uncommon": { "Chance": 0.07 },
+          "Paint_Metallic": { "Chance": 0.03 }
+        }
+      },
+      {
+        "ID": "BOX_GOLD",
+        "Name": "Gold Box",
+        "Price": 15000,
+        "PurchaseLimit": 2,
+        "LimitPeriod": "Daily",
+        "Contents": {
+          "Cash": { "Chance": 0.25, "Range": [5000, 20000] },
+          "REP": { "Chance": 0.20, "Range": [250, 750] },
+          "Part_Race": { "Chance": 0.30 },
+          "Part_Elite": { "Chance": 0.10 },
+          "Vinyl_Rare": { "Chance": 0.08 },
+          "Paint_Pearl": { "Chance": 0.05 },
+          "Wheel_Rare": { "Chance": 0.02 }
+        }
+      },
+      {
+        "ID": "BOX_PLATINUM",
+        "Name": "Platinum Box",
+        "Price": 50000,
+        "PurchaseLimit": 1,
+        "LimitPeriod": "Daily",
+        "Contents": {
+          "Cash": { "Chance": 0.20, "Range": [15000, 50000] },
+          "REP": { "Chance": 0.15, "Range": [500, 1500] },
+          "Part_Elite": { "Chance": 0.35 },
+          "Vinyl_Epic": { "Chance": 0.12 },
+          "Paint_Special": { "Chance": 0.08 },
+          "Wheel_Epic": { "Chance": 0.05 },
+          "BodyKit_Rare": { "Chance": 0.03 },
+          "Vehicle_ClassD": { "Chance": 0.02 }
+        }
+      },
+      {
+        "ID": "BOX_LEGENDARY",
+        "Name": "Legendary Box",
+        "Price": 100000,
+        "PurchaseLimit": 1,
+        "LimitPeriod": "Weekly",
+        "UnlockCondition": "REP_TIER_PRO",
+        "Contents": {
+          "Cash": { "Chance": 0.15, "Range": [25000, 100000] },
+          "REP": { "Chance": 0.10, "Range": [1000, 3000] },
+          "Part_Elite": { "Chance": 0.30 },
+          "Part_Legendary": { "Chance": 0.15 },
+          "Vinyl_Legendary": { "Chance": 0.10 },
+          "Paint_Prestige": { "Chance": 0.08 },
+          "Wheel_Legendary": { "Chance": 0.05 },
+          "BodyKit_Epic": { "Chance": 0.04 },
+          "Vehicle_ClassC": { "Chance": 0.02 },
+          "Vehicle_ClassB": { "Chance": 0.01 }
+        }
+      }
+    ],
+    "DuplicateProtection": {
+      "Enabled": true,
+      "ConvertTo": "Cash",
+      "ConversionRate": 0.5
+    },
+    "PitySystem": {
+      "Enabled": true,
+      "GuaranteedRareAfter": 10,
+      "GuaranteedEpicAfter": 25,
+      "GuaranteedLegendaryAfter": 50
+    }
+  },
+
+  "WheelSpin": {
+    "Enabled": true,
+    "UnlockLevel": 15,
+    "FreeSpinsPerDay": 1,
+    "ExtraSpinPrice": 2500,
+    "MaxExtraSpins": 3,
+    "Segments": [
+      { "ID": "SPIN_CASH_SMALL", "Reward": { "Type": "Cash", "Amount": 1000 }, "Weight": 20 },
+      { "ID": "SPIN_CASH_MED", "Reward": { "Type": "Cash", "Amount": 5000 }, "Weight": 15 },
+      { "ID": "SPIN_CASH_LARGE", "Reward": { "Type": "Cash", "Amount": 15000 }, "Weight": 8 },
+      { "ID": "SPIN_CASH_HUGE", "Reward": { "Type": "Cash", "Amount": 50000 }, "Weight": 2 },
+      { "ID": "SPIN_REP_SMALL", "Reward": { "Type": "REP", "Amount": 100 }, "Weight": 18 },
+      { "ID": "SPIN_REP_MED", "Reward": { "Type": "REP", "Amount": 500 }, "Weight": 10 },
+      { "ID": "SPIN_REP_LARGE", "Reward": { "Type": "REP", "Amount": 1000 }, "Weight": 5 },
+      { "ID": "SPIN_PART_SPORT", "Reward": { "Type": "Part", "Tier": "Sport" }, "Weight": 10 },
+      { "ID": "SPIN_PART_RACE", "Reward": { "Type": "Part", "Tier": "Race" }, "Weight": 5 },
+      { "ID": "SPIN_PART_ELITE", "Reward": { "Type": "Part", "Tier": "Elite" }, "Weight": 2 },
+      { "ID": "SPIN_VINYL", "Reward": { "Type": "Vinyl", "Random": true }, "Weight": 3 },
+      { "ID": "SPIN_VEHICLE", "Reward": { "Type": "Vehicle", "Random": true, "Class": "D" }, "Weight": 1 },
+      { "ID": "SPIN_MYSTERY", "Reward": { "Type": "MysteryBox", "Tier": "Gold" }, "Weight": 1 }
+    ],
+    "SuperSpin": {
+      "Enabled": true,
+      "UnlockCondition": "LEVEL_30",
+      "Cost": 25000,
+      "BetterOdds": 2.0
+    }
+  },
+
+  "Challenges": {
+    "Daily": {
+      "Count": 3,
+      "RefreshTime": "00:00",
+      "Reroll": {
+        "Enabled": true,
+        "FreeRerolls": 1,
+        "PaidRerollCost": 500
+      },
+      "Categories": [
+        {
+          "ID": "CHALLENGE_RACE",
+          "Name": "Racing",
+          "Examples": [
+            { "Task": "Win 3 races", "Reward": { "Cash": 3000, "REP": 150 } },
+            { "Task": "Finish top 3 in 5 races", "Reward": { "Cash": 2500, "REP": 125 } },
+            { "Task": "Complete 10 laps", "Reward": { "Cash": 2000, "REP": 100 } },
+            { "Task": "Win a race without using nitrous", "Reward": { "Cash": 4000, "REP": 200 } }
+          ]
+        },
+        {
+          "ID": "CHALLENGE_DRIFT",
+          "Name": "Drifting",
+          "Examples": [
+            { "Task": "Score 25,000 drift points", "Reward": { "Cash": 3000, "REP": 150 } },
+            { "Task": "Achieve a 5x drift multiplier", "Reward": { "Cash": 2500, "REP": 125 } },
+            { "Task": "Drift for 500 meters total", "Reward": { "Cash": 2000, "REP": 100 } },
+            { "Task": "Land a 10-second drift", "Reward": { "Cash": 4000, "REP": 200 } }
+          ]
+        },
+        {
+          "ID": "CHALLENGE_SKILL",
+          "Name": "Skill",
+          "Examples": [
+            { "Task": "Perform 20 near misses", "Reward": { "Cash": 2500, "REP": 125 } },
+            { "Task": "Drive 50km total", "Reward": { "Cash": 2000, "REP": 100 } },
+            { "Task": "Reach 200 MPH", "Reward": { "Cash": 3500, "REP": 175 } },
+            { "Task": "Complete a race without crashing", "Reward": { "Cash": 4000, "REP": 200 } }
+          ]
+        }
+      ],
+      "BonusForAllComplete": {
+        "Enabled": true,
+        "Reward": { "Cash": 5000, "REP": 250, "MysteryBox": "Silver" }
+      }
+    },
+    "Weekly": {
+      "Count": 5,
+      "RefreshDay": "Monday",
+      "Categories": [
+        {
+          "ID": "WEEKLY_RACE",
+          "Examples": [
+            { "Task": "Win 15 races", "Reward": { "Cash": 15000, "REP": 750 } },
+            { "Task": "Win 5 races in each class", "Reward": { "Cash": 20000, "REP": 1000 } }
+          ]
+        },
+        {
+          "ID": "WEEKLY_DRIFT",
+          "Examples": [
+            { "Task": "Score 500,000 drift points", "Reward": { "Cash": 15000, "REP": 750 } },
+            { "Task": "Win 10 drift events", "Reward": { "Cash": 18000, "REP": 900 } }
+          ]
+        },
+        {
+          "ID": "WEEKLY_COLLECTION",
+          "Examples": [
+            { "Task": "Buy 5 new parts", "Reward": { "Cash": 10000, "REP": 500 } },
+            { "Task": "Customize 3 vehicles", "Reward": { "Cash": 12000, "REP": 600 } }
+          ]
+        }
+      ],
+      "BonusForAllComplete": {
+        "Enabled": true,
+        "Reward": { "Cash": 25000, "REP": 1250, "MysteryBox": "Gold", "Part": "Random_Race" }
+      }
+    }
+  },
+
+  "FirstTimeRewards": {
+    "Enabled": true,
+    "Rewards": [
+      { "Trigger": "FirstRaceWin", "Reward": { "Cash": 5000, "REP": 250 } },
+      { "Trigger": "FirstDriftEvent", "Reward": { "Cash": 3000, "REP": 150 } },
+      { "Trigger": "FirstPartPurchase", "Reward": { "Cash": 2000, "REP": 100 } },
+      { "Trigger": "FirstVehiclePurchase", "Reward": { "Cash": 5000, "REP": 250 } },
+      { "Trigger": "FirstOnlineRace", "Reward": { "Cash": 7500, "REP": 400 } },
+      { "Trigger": "FirstPhotoTaken", "Reward": { "Cash": 1000, "REP": 50 } },
+      { "Trigger": "JoinCrew", "Reward": { "Cash": 5000, "REP": 250 } },
+      { "Trigger": "ReachLevel10", "Reward": { "Cash": 10000, "REP": 500, "MysteryBox": "Silver" } },
+      { "Trigger": "ReachLevel25", "Reward": { "Cash": 25000, "REP": 1000, "MysteryBox": "Gold" } },
+      { "Trigger": "ReachLevel50", "Reward": { "Cash": 50000, "REP": 2500, "MysteryBox": "Platinum" } }
+    ]
+  },
+
+  "EventRewards": {
+    "RaceFinish": {
+      "Position": {
+        "1st": { "CashMultiplier": 1.0, "REPMultiplier": 1.0 },
+        "2nd": { "CashMultiplier": 0.7, "REPMultiplier": 0.7 },
+        "3rd": { "CashMultiplier": 0.5, "REPMultiplier": 0.5 },
+        "4th": { "CashMultiplier": 0.35, "REPMultiplier": 0.35 },
+        "5th": { "CashMultiplier": 0.25, "REPMultiplier": 0.25 },
+        "6th+": { "CashMultiplier": 0.15, "REPMultiplier": 0.15 }
+      },
+      "Bonuses": {
+        "CleanRace": { "CashBonus": 0.1, "REPBonus": 0.1 },
+        "PerfectStart": { "CashBonus": 0.05, "REPBonus": 0.05 },
+        "FastestLap": { "CashBonus": 0.15, "REPBonus": 0.15 },
+        "ComebackWin": { "CashBonus": 0.2, "REPBonus": 0.2 },
+        "Domination": { "CashBonus": 0.25, "REPBonus": 0.25 }
+      }
+    },
+    "DriftEvent": {
+      "ScoreThresholds": {
+        "Bronze": { "MinScore": 10000, "CashReward": 1000, "REPReward": 100 },
+        "Silver": { "MinScore": 25000, "CashReward": 2500, "REPReward": 250 },
+        "Gold": { "MinScore": 50000, "CashReward": 5000, "REPReward": 500 },
+        "Platinum": { "MinScore": 100000, "CashReward": 10000, "REPReward": 1000 }
+      }
+    }
+  },
+
+  "ReferralRewards": {
+    "Enabled": true,
+    "Referrer": {
+      "PerReferral": { "Cash": 10000, "REP": 500 },
+      "Milestone_5": { "Cash": 25000, "MysteryBox": "Gold" },
+      "Milestone_10": { "Cash": 50000, "ExclusiveVinyl": true },
+      "Milestone_25": { "Cash": 100000, "ExclusiveVehicle": true }
+    },
+    "Referred": {
+      "WelcomeBonus": { "Cash": 5000, "REP": 250 },
+      "StarterBoost": { "CashMultiplier": 1.25, "Duration": "7d" }
+    }
+  },
+
+  "SpecialEvents": {
+    "DoubleXP": {
+      "REPMultiplier": 2.0,
+      "CashMultiplier": 1.0,
+      "Duration": "48h"
+    },
+    "DoubleCash": {
+      "REPMultiplier": 1.0,
+      "CashMultiplier": 2.0,
+      "Duration": "48h"
+    },
+    "TripleRewards": {
+      "REPMultiplier": 3.0,
+      "CashMultiplier": 3.0,
+      "Duration": "24h",
+      "Rarity": "VeryRare"
+    }
+  }
+}

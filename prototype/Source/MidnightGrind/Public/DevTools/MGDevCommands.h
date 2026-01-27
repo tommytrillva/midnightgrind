@@ -175,6 +175,42 @@ public:
 	void ResetAIMoods();
 
 	// ==========================================
+	// VEHICLE DEBUG COMMANDS
+	// ==========================================
+
+	/** Print current vehicle damage state */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Vehicle")
+	void PrintDamageState();
+
+	/** Print vehicle physics state (suspension, weight transfer, grip) */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Vehicle")
+	void PrintPhysicsState();
+
+	/** Toggle tire debug visualization */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Vehicle")
+	void ShowTireDebug();
+
+	/** Full repair player vehicle */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Vehicle")
+	void RepairVehicle();
+
+	// ==========================================
+	// ECONOMY DEBUG COMMANDS
+	// ==========================================
+
+	/** Print player economy state */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Economy")
+	void PrintEconomyState();
+
+	/** Simulate a purchase (dry run) */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Economy")
+	void SimulatePurchase(int32 Amount = 10000);
+
+	/** Print recent transactions */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Dev|Economy")
+	void PrintTransactions(int32 Count = 10);
+
+	// ==========================================
 	// QUICK TEST
 	// ==========================================
 
@@ -199,6 +235,7 @@ protected:
 	bool bShowCheckpoints = false;
 	bool bShowRacingLine = false;
 	bool bShowAIDebug = false;
+	bool bShowTireDebug = false;
 
 	// ==========================================
 	// HELPERS

@@ -1,0 +1,272 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Statistics Tracking Configuration",
+
+  "TrackingSystem": {
+    "Enabled": true,
+    "AutoSave": true,
+    "SaveInterval": 60,
+    "CloudSync": true
+  },
+
+  "PlayerStats": {
+    "General": {
+      "TotalPlayTime": { "Type": "Duration", "Unit": "seconds" },
+      "TotalDistanceDriven": { "Type": "Distance", "Unit": "meters" },
+      "TotalRacesEntered": { "Type": "Counter" },
+      "TotalRacesCompleted": { "Type": "Counter" },
+      "TotalRacesWon": { "Type": "Counter" },
+      "TotalRacesLost": { "Type": "Counter" },
+      "TotalDNF": { "Type": "Counter" },
+      "WinStreak": { "Type": "Counter", "HighScore": true },
+      "BestWinStreak": { "Type": "Counter" },
+      "WinPercentage": { "Type": "Percentage", "Calculated": true }
+    },
+    "Racing": {
+      "CircuitRacesWon": { "Type": "Counter" },
+      "SprintRacesWon": { "Type": "Counter" },
+      "DragRacesWon": { "Type": "Counter" },
+      "TimeAttackRecords": { "Type": "Counter" },
+      "TotalLapsCompleted": { "Type": "Counter" },
+      "CleanLaps": { "Type": "Counter" },
+      "PerfectRaces": { "Type": "Counter" },
+      "FastestLapsEarned": { "Type": "Counter" },
+      "PhotoFinishes": { "Type": "Counter" },
+      "ComebackWins": { "Type": "Counter" },
+      "DominationWins": { "Type": "Counter" },
+      "TotalOvertakes": { "Type": "Counter" },
+      "OvertakesInFinalLap": { "Type": "Counter" }
+    },
+    "Drifting": {
+      "TotalDriftScore": { "Type": "Counter" },
+      "HighestDriftScore": { "Type": "HighScore" },
+      "TotalDriftDistance": { "Type": "Distance", "Unit": "meters" },
+      "LongestDrift": { "Type": "Distance", "Unit": "meters" },
+      "LongestDriftTime": { "Type": "Duration", "Unit": "seconds" },
+      "HighestDriftAngle": { "Type": "Angle", "Unit": "degrees" },
+      "HighestDriftMultiplier": { "Type": "Counter" },
+      "DriftEventsWon": { "Type": "Counter" },
+      "TandemDriftsCompleted": { "Type": "Counter" }
+    },
+    "Speed": {
+      "TopSpeedReached": { "Type": "Speed", "Unit": "mph", "HighScore": true },
+      "TotalTimeAtTopSpeed": { "Type": "Duration", "Unit": "seconds" },
+      "DistanceAtTopSpeed": { "Type": "Distance", "Unit": "meters" },
+      "NearMisses": { "Type": "Counter" },
+      "HighestNearMissSpeed": { "Type": "Speed", "Unit": "mph" }
+    },
+    "Nitrous": {
+      "NitrousUsed": { "Type": "Counter" },
+      "NitrousBoostedDistance": { "Type": "Distance", "Unit": "meters" },
+      "PerfectNitrousBoosts": { "Type": "Counter" }
+    },
+    "Pursuit": {
+      "PursuitsInitiated": { "Type": "Counter" },
+      "PursuitsEvaded": { "Type": "Counter" },
+      "PursuitsBusted": { "Type": "Counter" },
+      "LongestPursuit": { "Type": "Duration", "Unit": "seconds" },
+      "HighestHeatLevel": { "Type": "Counter", "Max": 5 },
+      "TotalBountyEarned": { "Type": "Currency" },
+      "HighestBounty": { "Type": "Currency", "HighScore": true },
+      "CopsEvaded": { "Type": "Counter" },
+      "RoadblocksSmashed": { "Type": "Counter" },
+      "SpikesAvoided": { "Type": "Counter" }
+    },
+    "Damage": {
+      "TotalCollisions": { "Type": "Counter" },
+      "WallHits": { "Type": "Counter" },
+      "TrafficHits": { "Type": "Counter" },
+      "RivalCollisions": { "Type": "Counter" },
+      "RepairCosts": { "Type": "Currency" }
+    }
+  },
+
+  "VehicleStats": {
+    "PerVehicle": {
+      "TotalDistance": { "Type": "Distance" },
+      "TotalRaces": { "Type": "Counter" },
+      "RacesWon": { "Type": "Counter" },
+      "BestLapTime": { "Type": "Duration", "PerTrack": true },
+      "BestDriftScore": { "Type": "HighScore" },
+      "TopSpeedReached": { "Type": "Speed" },
+      "TotalDriftScore": { "Type": "Counter" },
+      "TotalNitrousUsed": { "Type": "Counter" },
+      "ModificationValue": { "Type": "Currency" },
+      "TimeOwned": { "Type": "Duration" }
+    },
+    "Leaderboard": {
+      "MostDriven": { "Tracked": true },
+      "MostWins": { "Tracked": true },
+      "HighestValue": { "Tracked": true }
+    }
+  },
+
+  "TrackStats": {
+    "PerTrack": {
+      "TimesRaced": { "Type": "Counter" },
+      "Wins": { "Type": "Counter" },
+      "BestLapTime": { "Type": "Duration" },
+      "BestRaceTime": { "Type": "Duration" },
+      "AverageLapTime": { "Type": "Duration" },
+      "BestDriftScore": { "Type": "HighScore" },
+      "TotalDistanceOnTrack": { "Type": "Distance" }
+    }
+  },
+
+  "EconomyStats": {
+    "Currency": {
+      "TotalCashEarned": { "Type": "Currency" },
+      "TotalCashSpent": { "Type": "Currency" },
+      "CashFromRacing": { "Type": "Currency" },
+      "CashFromDrifting": { "Type": "Currency" },
+      "CashFromChallenges": { "Type": "Currency" },
+      "CashFromSelling": { "Type": "Currency" },
+      "HighestCashBalance": { "Type": "Currency", "HighScore": true }
+    },
+    "REP": {
+      "TotalREPEarned": { "Type": "Counter" },
+      "REPFromRacing": { "Type": "Counter" },
+      "REPFromDrifting": { "Type": "Counter" },
+      "REPFromChallenges": { "Type": "Counter" },
+      "REPFromOnline": { "Type": "Counter" }
+    },
+    "Purchases": {
+      "VehiclesPurchased": { "Type": "Counter" },
+      "VehiclesSold": { "Type": "Counter" },
+      "PartsPurchased": { "Type": "Counter" },
+      "PartsSold": { "Type": "Counter" },
+      "TotalSpentOnVehicles": { "Type": "Currency" },
+      "TotalSpentOnParts": { "Type": "Currency" },
+      "TotalSpentOnCustomization": { "Type": "Currency" }
+    }
+  },
+
+  "OnlineStats": {
+    "Multiplayer": {
+      "OnlineRacesEntered": { "Type": "Counter" },
+      "OnlineRacesWon": { "Type": "Counter" },
+      "OnlineWinPercentage": { "Type": "Percentage", "Calculated": true },
+      "RankedMatchesPlayed": { "Type": "Counter" },
+      "RankedMatchesWon": { "Type": "Counter" },
+      "HighestRank": { "Type": "Rank" },
+      "CurrentRank": { "Type": "Rank" },
+      "PeakMMR": { "Type": "Counter", "HighScore": true }
+    },
+    "Social": {
+      "PlayersRacedAgainst": { "Type": "Counter" },
+      "FriendsMade": { "Type": "Counter" },
+      "CrewEventsParticipated": { "Type": "Counter" },
+      "PhotosShared": { "Type": "Counter" },
+      "PhotoLikesReceived": { "Type": "Counter" },
+      "ReplaysShared": { "Type": "Counter" }
+    }
+  },
+
+  "CollectionStats": {
+    "Vehicles": {
+      "TotalVehiclesOwned": { "Type": "Counter" },
+      "UniqueVehiclesOwned": { "Type": "Counter" },
+      "VehiclesByClass": {
+        "ClassS": { "Type": "Counter" },
+        "ClassA": { "Type": "Counter" },
+        "ClassB": { "Type": "Counter" },
+        "ClassC": { "Type": "Counter" },
+        "ClassD": { "Type": "Counter" }
+      },
+      "VehiclesByCategory": {
+        "JDM": { "Type": "Counter" },
+        "Muscle": { "Type": "Counter" },
+        "Euro": { "Type": "Counter" },
+        "Economy": { "Type": "Counter" },
+        "Exotic": { "Type": "Counter" }
+      }
+    },
+    "Parts": {
+      "TotalPartsOwned": { "Type": "Counter" },
+      "UniquePartsOwned": { "Type": "Counter" },
+      "ElitePartsOwned": { "Type": "Counter" },
+      "LegendaryPartsOwned": { "Type": "Counter" }
+    },
+    "Customization": {
+      "PaintsUnlocked": { "Type": "Counter" },
+      "VinylsUnlocked": { "Type": "Counter" },
+      "WheelsUnlocked": { "Type": "Counter" },
+      "BodyKitsUnlocked": { "Type": "Counter" }
+    }
+  },
+
+  "AchievementStats": {
+    "TotalAchievements": { "Type": "Counter" },
+    "AchievementsUnlocked": { "Type": "Counter" },
+    "AchievementPercentage": { "Type": "Percentage", "Calculated": true },
+    "RareAchievements": { "Type": "Counter" },
+    "SecretAchievements": { "Type": "Counter" }
+  },
+
+  "SessionStats": {
+    "CurrentSession": {
+      "SessionDuration": { "Type": "Duration" },
+      "RacesThisSession": { "Type": "Counter" },
+      "WinsThisSession": { "Type": "Counter" },
+      "CashEarnedThisSession": { "Type": "Currency" },
+      "REPEarnedThisSession": { "Type": "Counter" }
+    },
+    "Historical": {
+      "TotalSessions": { "Type": "Counter" },
+      "AverageSessionLength": { "Type": "Duration" },
+      "LongestSession": { "Type": "Duration", "HighScore": true },
+      "DaysPlayed": { "Type": "Counter" },
+      "CurrentStreak": { "Type": "Counter" },
+      "LongestStreak": { "Type": "Counter", "HighScore": true }
+    }
+  },
+
+  "Milestones": {
+    "Distance": [
+      { "Threshold": 100, "Unit": "km", "Reward": { "Cash": 1000, "REP": 50 } },
+      { "Threshold": 500, "Unit": "km", "Reward": { "Cash": 5000, "REP": 250 } },
+      { "Threshold": 1000, "Unit": "km", "Reward": { "Cash": 10000, "REP": 500 } },
+      { "Threshold": 5000, "Unit": "km", "Reward": { "Cash": 25000, "REP": 1000 } },
+      { "Threshold": 10000, "Unit": "km", "Reward": { "Cash": 50000, "REP": 2500 } }
+    ],
+    "Wins": [
+      { "Threshold": 10, "Reward": { "Cash": 5000, "REP": 250 } },
+      { "Threshold": 50, "Reward": { "Cash": 15000, "REP": 750 } },
+      { "Threshold": 100, "Reward": { "Cash": 30000, "REP": 1500 } },
+      { "Threshold": 250, "Reward": { "Cash": 50000, "REP": 2500 } },
+      { "Threshold": 500, "Reward": { "Cash": 100000, "REP": 5000, "Title": "TITLE_RACING_LEGEND" } }
+    ],
+    "DriftScore": [
+      { "Threshold": 100000, "Reward": { "Cash": 5000, "REP": 250 } },
+      { "Threshold": 500000, "Reward": { "Cash": 15000, "REP": 750 } },
+      { "Threshold": 1000000, "Reward": { "Cash": 30000, "REP": 1500 } },
+      { "Threshold": 5000000, "Reward": { "Cash": 75000, "REP": 3750 } },
+      { "Threshold": 10000000, "Reward": { "Cash": 150000, "REP": 7500, "Title": "TITLE_DRIFT_KING" } }
+    ]
+  },
+
+  "Display": {
+    "ProfileCard": {
+      "ShowStats": ["TotalRacesWon", "WinPercentage", "HighestDriftScore", "TopSpeedReached"],
+      "ShowAchievements": 3,
+      "ShowVehicle": true,
+      "ShowRank": true
+    },
+    "EndRaceScreen": {
+      "ShowNewRecords": true,
+      "ShowMilestones": true,
+      "ShowComparisons": true
+    },
+    "LeaderboardComparison": {
+      "ShowFriends": true,
+      "ShowGlobal": true,
+      "ShowPercentile": true
+    }
+  },
+
+  "Export": {
+    "Enabled": true,
+    "Formats": ["JSON", "CSV"],
+    "IncludeAll": true
+  }
+}

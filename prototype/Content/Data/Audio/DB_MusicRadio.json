@@ -1,0 +1,296 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Music and Radio Station Configuration",
+
+  "RadioSystem": {
+    "Enabled": true,
+    "DefaultStation": "STATION_MIDNIGHT",
+    "RememberLastStation": true,
+    "CrossfadeDuration": 2.0,
+    "VolumeDefault": 70,
+    "DuckingEnabled": true,
+    "DuckingAmount": 0.3,
+    "DuckingTriggers": ["Dialogue", "Countdown", "Announcer", "EngineRedline"]
+  },
+
+  "Stations": [
+    {
+      "ID": "STATION_MIDNIGHT",
+      "Name": "Midnight FM",
+      "Frequency": "98.7",
+      "Genre": "Synthwave / Retrowave",
+      "Description": "The sound of neon nights and endless highways",
+      "Icon": "ICO_Radio_Midnight",
+      "Unlocked": true,
+      "DJ": {
+        "Name": "NEON",
+        "Voice": "VO_DJ_Neon",
+        "Intros": true,
+        "Commentary": true,
+        "CommentaryFrequency": 0.3
+      },
+      "Tracks": [
+        { "ID": "MUS_MIDNIGHT_01", "Title": "Night Drive", "Artist": "Synthwave Collective", "Duration": 245, "BPM": 118 },
+        { "ID": "MUS_MIDNIGHT_02", "Title": "Neon Pulse", "Artist": "Digital Dreams", "Duration": 198, "BPM": 125 },
+        { "ID": "MUS_MIDNIGHT_03", "Title": "Chrome Highway", "Artist": "RetroFuture", "Duration": 267, "BPM": 120 },
+        { "ID": "MUS_MIDNIGHT_04", "Title": "City Lights", "Artist": "Midnight Runner", "Duration": 212, "BPM": 115 },
+        { "ID": "MUS_MIDNIGHT_05", "Title": "Electric Sunset", "Artist": "Synthwave Collective", "Duration": 234, "BPM": 122 },
+        { "ID": "MUS_MIDNIGHT_06", "Title": "Turbo Dreams", "Artist": "NEON", "Duration": 189, "BPM": 128 },
+        { "ID": "MUS_MIDNIGHT_07", "Title": "Starlight Chase", "Artist": "Digital Dreams", "Duration": 256, "BPM": 118 },
+        { "ID": "MUS_MIDNIGHT_08", "Title": "Outrun", "Artist": "RetroFuture", "Duration": 223, "BPM": 124 }
+      ]
+    },
+    {
+      "ID": "STATION_UNDERGROUND",
+      "Name": "Underground 101",
+      "Frequency": "101.1",
+      "Genre": "Hip-Hop / Trap",
+      "Description": "Street beats from the underground scene",
+      "Icon": "ICO_Radio_Underground",
+      "Unlocked": true,
+      "DJ": {
+        "Name": "Big Mike",
+        "Voice": "VO_DJ_BigMike",
+        "Intros": true,
+        "Commentary": true,
+        "CommentaryFrequency": 0.4
+      },
+      "Tracks": [
+        { "ID": "MUS_UNDERGROUND_01", "Title": "Street Kings", "Artist": "Various", "Duration": 203, "BPM": 140 },
+        { "ID": "MUS_UNDERGROUND_02", "Title": "Midnight Grind", "Artist": "Various", "Duration": 187, "BPM": 145 },
+        { "ID": "MUS_UNDERGROUND_03", "Title": "Fast Lane", "Artist": "Various", "Duration": 215, "BPM": 138 },
+        { "ID": "MUS_UNDERGROUND_04", "Title": "No Limits", "Artist": "Various", "Duration": 198, "BPM": 142 },
+        { "ID": "MUS_UNDERGROUND_05", "Title": "Ride or Die", "Artist": "Various", "Duration": 224, "BPM": 136 },
+        { "ID": "MUS_UNDERGROUND_06", "Title": "Night Shift", "Artist": "Various", "Duration": 191, "BPM": 148 },
+        { "ID": "MUS_UNDERGROUND_07", "Title": "Block Party", "Artist": "Various", "Duration": 208, "BPM": 140 },
+        { "ID": "MUS_UNDERGROUND_08", "Title": "Paper Chase", "Artist": "Various", "Duration": 196, "BPM": 144 }
+      ]
+    },
+    {
+      "ID": "STATION_DRIFT",
+      "Name": "Drift Radio",
+      "Frequency": "105.5",
+      "Genre": "Eurobeat / J-Pop",
+      "Description": "High-energy beats for maximum drift",
+      "Icon": "ICO_Radio_Drift",
+      "UnlockCondition": "LEVEL_5",
+      "DJ": {
+        "Name": "DJ Takumi",
+        "Voice": "VO_DJ_Takumi",
+        "Intros": true,
+        "Commentary": true,
+        "CommentaryFrequency": 0.25
+      },
+      "Tracks": [
+        { "ID": "MUS_DRIFT_01", "Title": "Running in the 90s", "Artist": "Max Coveri", "Duration": 267, "BPM": 162 },
+        { "ID": "MUS_DRIFT_02", "Title": "Deja Vu", "Artist": "Dave Rodgers", "Duration": 245, "BPM": 158 },
+        { "ID": "MUS_DRIFT_03", "Title": "Gas Gas Gas", "Artist": "Manuel", "Duration": 223, "BPM": 155 },
+        { "ID": "MUS_DRIFT_04", "Title": "Night of Fire", "Artist": "Niko", "Duration": 256, "BPM": 160 },
+        { "ID": "MUS_DRIFT_05", "Title": "Speed Lover", "Artist": "Fastway", "Duration": 234, "BPM": 156 },
+        { "ID": "MUS_DRIFT_06", "Title": "Forever Young", "Artist": "Symbol", "Duration": 248, "BPM": 154 },
+        { "ID": "MUS_DRIFT_07", "Title": "Beat of the Rising Sun", "Artist": "Dave Rodgers", "Duration": 261, "BPM": 162 },
+        { "ID": "MUS_DRIFT_08", "Title": "No One Sleep in Tokyo", "Artist": "Edo Boys", "Duration": 239, "BPM": 158 }
+      ]
+    },
+    {
+      "ID": "STATION_ROCK",
+      "Name": "Thunder Radio",
+      "Frequency": "92.3",
+      "Genre": "Rock / Metal",
+      "Description": "Pure American muscle for your ears",
+      "Icon": "ICO_Radio_Thunder",
+      "UnlockCondition": "LEVEL_10",
+      "DJ": {
+        "Name": "Razor",
+        "Voice": "VO_DJ_Razor",
+        "Intros": true,
+        "Commentary": true,
+        "CommentaryFrequency": 0.2
+      },
+      "Tracks": [
+        { "ID": "MUS_ROCK_01", "Title": "Highway Warrior", "Artist": "Steel Thunder", "Duration": 234, "BPM": 130 },
+        { "ID": "MUS_ROCK_02", "Title": "Burn Rubber", "Artist": "Motor Rage", "Duration": 198, "BPM": 145 },
+        { "ID": "MUS_ROCK_03", "Title": "Redline", "Artist": "Steel Thunder", "Duration": 267, "BPM": 138 },
+        { "ID": "MUS_ROCK_04", "Title": "Full Throttle", "Artist": "Asphalt Kings", "Duration": 212, "BPM": 142 },
+        { "ID": "MUS_ROCK_05", "Title": "Nitro Fury", "Artist": "Motor Rage", "Duration": 245, "BPM": 135 },
+        { "ID": "MUS_ROCK_06", "Title": "Drift or Die", "Artist": "Asphalt Kings", "Duration": 223, "BPM": 140 },
+        { "ID": "MUS_ROCK_07", "Title": "Street Demon", "Artist": "Steel Thunder", "Duration": 256, "BPM": 132 },
+        { "ID": "MUS_ROCK_08", "Title": "Chrome and Fire", "Artist": "Motor Rage", "Duration": 189, "BPM": 148 }
+      ]
+    },
+    {
+      "ID": "STATION_ELECTRONIC",
+      "Name": "Pulse FM",
+      "Frequency": "107.9",
+      "Genre": "EDM / House / Drum & Bass",
+      "Description": "Electronic beats to fuel your speed",
+      "Icon": "ICO_Radio_Pulse",
+      "UnlockCondition": "LEVEL_15",
+      "DJ": {
+        "Name": "DJ Volt",
+        "Voice": "VO_DJ_Volt",
+        "Intros": true,
+        "Commentary": true,
+        "CommentaryFrequency": 0.2
+      },
+      "Tracks": [
+        { "ID": "MUS_ELEC_01", "Title": "Accelerate", "Artist": "Voltage", "Duration": 312, "BPM": 174 },
+        { "ID": "MUS_ELEC_02", "Title": "Overdrive", "Artist": "Bass Mechanics", "Duration": 287, "BPM": 128 },
+        { "ID": "MUS_ELEC_03", "Title": "Velocity", "Artist": "Voltage", "Duration": 256, "BPM": 175 },
+        { "ID": "MUS_ELEC_04", "Title": "Tunnel Vision", "Artist": "Neon Flux", "Duration": 298, "BPM": 126 },
+        { "ID": "MUS_ELEC_05", "Title": "Adrenaline", "Artist": "Bass Mechanics", "Duration": 276, "BPM": 172 },
+        { "ID": "MUS_ELEC_06", "Title": "Night Race", "Artist": "Neon Flux", "Duration": 265, "BPM": 130 },
+        { "ID": "MUS_ELEC_07", "Title": "Drop Zone", "Artist": "Voltage", "Duration": 289, "BPM": 176 },
+        { "ID": "MUS_ELEC_08", "Title": "Finish Line", "Artist": "Bass Mechanics", "Duration": 301, "BPM": 128 }
+      ]
+    },
+    {
+      "ID": "STATION_CLASSICS",
+      "Name": "Retro Classics",
+      "Frequency": "88.5",
+      "Genre": "80s / 90s Hits",
+      "Description": "Timeless tracks from the golden era",
+      "Icon": "ICO_Radio_Classics",
+      "UnlockCondition": "REP_TIER_STREET",
+      "DJ": {
+        "Name": "Smooth Eddie",
+        "Voice": "VO_DJ_Eddie",
+        "Intros": true,
+        "Commentary": true,
+        "CommentaryFrequency": 0.35
+      },
+      "Tracks": [
+        { "ID": "MUS_CLASSIC_01", "Title": "Drive", "Artist": "The Cars", "Duration": 234, "BPM": 118 },
+        { "ID": "MUS_CLASSIC_02", "Title": "Radar Love", "Artist": "Golden Earring", "Duration": 378, "BPM": 115 },
+        { "ID": "MUS_CLASSIC_03", "Title": "Highway Star", "Artist": "Deep Purple", "Duration": 365, "BPM": 170 },
+        { "ID": "MUS_CLASSIC_04", "Title": "Born to Be Wild", "Artist": "Steppenwolf", "Duration": 215, "BPM": 145 },
+        { "ID": "MUS_CLASSIC_05", "Title": "Kickstart My Heart", "Artist": "Motley Crue", "Duration": 283, "BPM": 190 },
+        { "ID": "MUS_CLASSIC_06", "Title": "Panama", "Artist": "Van Halen", "Duration": 212, "BPM": 145 },
+        { "ID": "MUS_CLASSIC_07", "Title": "Pour Some Sugar on Me", "Artist": "Def Leppard", "Duration": 265, "BPM": 124 },
+        { "ID": "MUS_CLASSIC_08", "Title": "The Final Countdown", "Artist": "Europe", "Duration": 305, "BPM": 118 }
+      ]
+    },
+    {
+      "ID": "STATION_LOFI",
+      "Name": "Chill Garage",
+      "Frequency": "94.1",
+      "Genre": "Lo-Fi / Chillhop",
+      "Description": "Relaxed vibes for late night cruising",
+      "Icon": "ICO_Radio_Chill",
+      "UnlockCondition": "LEVEL_20",
+      "DJ": {
+        "Name": "None",
+        "Voice": null,
+        "Intros": false,
+        "Commentary": false
+      },
+      "Tracks": [
+        { "ID": "MUS_LOFI_01", "Title": "Midnight Drive", "Artist": "Lo-Fi Collective", "Duration": 187, "BPM": 85 },
+        { "ID": "MUS_LOFI_02", "Title": "Rainy Streets", "Artist": "Chill Beats", "Duration": 203, "BPM": 78 },
+        { "ID": "MUS_LOFI_03", "Title": "Neon Glow", "Artist": "Lo-Fi Collective", "Duration": 198, "BPM": 82 },
+        { "ID": "MUS_LOFI_04", "Title": "City Lights", "Artist": "Ambient Drift", "Duration": 215, "BPM": 75 },
+        { "ID": "MUS_LOFI_05", "Title": "Empty Roads", "Artist": "Chill Beats", "Duration": 224, "BPM": 80 },
+        { "ID": "MUS_LOFI_06", "Title": "Garage Dreams", "Artist": "Lo-Fi Collective", "Duration": 191, "BPM": 88 },
+        { "ID": "MUS_LOFI_07", "Title": "Sunset Cruise", "Artist": "Ambient Drift", "Duration": 208, "BPM": 76 },
+        { "ID": "MUS_LOFI_08", "Title": "After Hours", "Artist": "Chill Beats", "Duration": 196, "BPM": 84 }
+      ]
+    },
+    {
+      "ID": "STATION_CUSTOM",
+      "Name": "My Playlist",
+      "Frequency": "---",
+      "Genre": "Custom",
+      "Description": "Your personal soundtrack",
+      "Icon": "ICO_Radio_Custom",
+      "UnlockCondition": "LEVEL_25",
+      "DJ": null,
+      "CustomPlaylist": true,
+      "MaxTracks": 50,
+      "ImportEnabled": true,
+      "SupportedFormats": ["MP3", "WAV", "OGG", "FLAC"]
+    }
+  ],
+
+  "DynamicMusic": {
+    "Enabled": true,
+    "Contexts": {
+      "Garage": {
+        "DefaultStation": "STATION_LOFI",
+        "VolumeMultiplier": 0.8,
+        "AllowChange": true
+      },
+      "FreeRoam": {
+        "DefaultStation": "STATION_MIDNIGHT",
+        "VolumeMultiplier": 1.0,
+        "AllowChange": true
+      },
+      "Race": {
+        "DefaultStation": "LastUsed",
+        "VolumeMultiplier": 1.0,
+        "AllowChange": true,
+        "IntensityScaling": {
+          "Enabled": true,
+          "FinalLapBoost": 1.1,
+          "CloseRaceBoost": 1.05
+        }
+      },
+      "Pursuit": {
+        "OverrideStation": "STATION_UNDERGROUND",
+        "VolumeMultiplier": 1.1,
+        "AllowChange": false,
+        "IntensityScaling": {
+          "Enabled": true,
+          "HeatLevelBoost": [1.0, 1.05, 1.1, 1.15, 1.2, 1.25]
+        }
+      },
+      "Drift": {
+        "DefaultStation": "STATION_DRIFT",
+        "VolumeMultiplier": 1.0,
+        "AllowChange": true
+      },
+      "PhotoMode": {
+        "VolumeMultiplier": 0.5,
+        "AllowChange": true
+      },
+      "Menu": {
+        "DefaultStation": "STATION_MIDNIGHT",
+        "VolumeMultiplier": 0.7,
+        "PlayIntro": true
+      }
+    }
+  },
+
+  "Announcer": {
+    "Enabled": true,
+    "DefaultVoice": "VO_Announcer_Default",
+    "Voices": [
+      { "ID": "VO_Announcer_Default", "Name": "Race Announcer", "Unlocked": true },
+      { "ID": "VO_Announcer_Hype", "Name": "Hype Man", "UnlockCondition": "LEVEL_15" },
+      { "ID": "VO_Announcer_Chill", "Name": "Smooth Operator", "UnlockCondition": "LEVEL_20" },
+      { "ID": "VO_Announcer_Retro", "Name": "Arcade Classic", "UnlockCondition": "REP_TIER_PRO" },
+      { "ID": "VO_Announcer_None", "Name": "Silent", "Unlocked": true }
+    ],
+    "Callouts": {
+      "RaceStart": ["3, 2, 1, GO!", "Racers ready... GO!", "Light 'em up!"],
+      "FinalLap": ["Final lap!", "Last lap, make it count!", "One more lap!"],
+      "PositionGain": ["Moving up!", "Nice pass!", "You're gaining!"],
+      "PositionLoss": ["Lost a spot!", "They got past you!", "Fight back!"],
+      "FirstPlace": ["You're in the lead!", "P1!", "Leading the pack!"],
+      "Win": ["Victory!", "You won!", "First place finish!"],
+      "NewRecord": ["New record!", "Personal best!", "That's a new lap record!"],
+      "DriftCombo": ["Massive combo!", "Keep it going!", "Huge drift!"],
+      "NearMiss": ["Close one!", "Too close!", "Watch it!"]
+    }
+  },
+
+  "Settings": {
+    "MasterVolume": { "Default": 100, "Min": 0, "Max": 100 },
+    "MusicVolume": { "Default": 70, "Min": 0, "Max": 100 },
+    "RadioVolume": { "Default": 80, "Min": 0, "Max": 100 },
+    "AnnouncerVolume": { "Default": 85, "Min": 0, "Max": 100 },
+    "DJVolume": { "Default": 75, "Min": 0, "Max": 100 },
+    "MuteInBackground": { "Default": false },
+    "ShowTrackInfo": { "Default": true, "Duration": 5 },
+    "LyricsDisplay": { "Default": false, "UnlockCondition": "LEVEL_30" }
+  }
+}

@@ -1,0 +1,332 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Notifications and Alerts Configuration",
+
+  "NotificationSystem": {
+    "Enabled": true,
+    "MaxQueueSize": 10,
+    "DefaultDuration": 4.0,
+    "StackBehavior": "Queue",
+    "Position": "TopRight",
+    "AnimationIn": "SlideLeft",
+    "AnimationOut": "FadeOut"
+  },
+
+  "Categories": {
+    "Achievement": {
+      "ID": "NOTIF_ACHIEVEMENT",
+      "Priority": 3,
+      "Duration": 5.0,
+      "Sound": "SFX_Achievement",
+      "Icon": "ICO_Achievement",
+      "Animation": "GoldShimmer",
+      "Interruptible": false,
+      "Examples": [
+        { "Title": "Achievement Unlocked", "Body": "Speed Demon - Reach 200 MPH" }
+      ]
+    },
+    "LevelUp": {
+      "ID": "NOTIF_LEVELUP",
+      "Priority": 4,
+      "Duration": 6.0,
+      "Sound": "SFX_LevelUp",
+      "Icon": "ICO_LevelUp",
+      "Animation": "LevelUpBurst",
+      "Interruptible": false,
+      "FullScreen": true,
+      "Examples": [
+        { "Title": "LEVEL UP!", "Body": "You are now Level 15" }
+      ]
+    },
+    "REPTierUp": {
+      "ID": "NOTIF_REPTIER",
+      "Priority": 5,
+      "Duration": 8.0,
+      "Sound": "SFX_REPTierUp",
+      "Icon": "ICO_REP",
+      "Animation": "EpicReveal",
+      "Interruptible": false,
+      "FullScreen": true,
+      "Cinematic": true,
+      "Examples": [
+        { "Title": "REP TIER ACHIEVED", "Body": "Welcome to the STREET tier" }
+      ]
+    },
+    "Reward": {
+      "ID": "NOTIF_REWARD",
+      "Priority": 2,
+      "Duration": 4.0,
+      "Sound": "SFX_Reward",
+      "Icon": "ICO_Reward",
+      "Animation": "Sparkle",
+      "Interruptible": true,
+      "Examples": [
+        { "Title": "Reward Received", "Body": "+$5,000 Cash" },
+        { "Title": "Part Unlocked", "Body": "Sport Exhaust acquired" }
+      ]
+    },
+    "Challenge": {
+      "ID": "NOTIF_CHALLENGE",
+      "Priority": 2,
+      "Duration": 4.0,
+      "Sound": "SFX_ChallengeComplete",
+      "Icon": "ICO_Challenge",
+      "Animation": "CheckMark",
+      "Interruptible": true,
+      "Examples": [
+        { "Title": "Challenge Complete", "Body": "Win 3 Races - Completed!" }
+      ]
+    },
+    "Social": {
+      "ID": "NOTIF_SOCIAL",
+      "Priority": 1,
+      "Duration": 3.0,
+      "Sound": "SFX_Social",
+      "Icon": "ICO_Social",
+      "Animation": "SlideIn",
+      "Interruptible": true,
+      "Examples": [
+        { "Title": "Friend Online", "Body": "SpeedDemon_X is now online" },
+        { "Title": "Crew Invite", "Body": "Midnight Runners invited you" }
+      ]
+    },
+    "Race": {
+      "ID": "NOTIF_RACE",
+      "Priority": 2,
+      "Duration": 3.0,
+      "Sound": "SFX_RaceNotif",
+      "Icon": "ICO_Race",
+      "Animation": "Flash",
+      "Interruptible": true,
+      "Examples": [
+        { "Title": "New Event Available", "Body": "Night Sprint is now open" },
+        { "Title": "Rival Challenge", "Body": "Shadow_Drift challenges you!" }
+      ]
+    },
+    "System": {
+      "ID": "NOTIF_SYSTEM",
+      "Priority": 1,
+      "Duration": 3.0,
+      "Sound": "SFX_UINotif",
+      "Icon": "ICO_System",
+      "Animation": "FadeIn",
+      "Interruptible": true,
+      "Examples": [
+        { "Title": "Auto-Saved", "Body": "Game progress saved" },
+        { "Title": "Connection Restored", "Body": "Online features available" }
+      ]
+    },
+    "Warning": {
+      "ID": "NOTIF_WARNING",
+      "Priority": 4,
+      "Duration": 5.0,
+      "Sound": "SFX_Warning",
+      "Icon": "ICO_Warning",
+      "Animation": "Shake",
+      "Color": "#FF6600",
+      "Interruptible": false,
+      "Examples": [
+        { "Title": "Low Fuel", "Body": "Nitrous nearly depleted" },
+        { "Title": "Tire Wear", "Body": "Tires heavily worn" }
+      ]
+    },
+    "Error": {
+      "ID": "NOTIF_ERROR",
+      "Priority": 5,
+      "Duration": 6.0,
+      "Sound": "SFX_Error",
+      "Icon": "ICO_Error",
+      "Animation": "Shake",
+      "Color": "#FF0000",
+      "Interruptible": false,
+      "Examples": [
+        { "Title": "Connection Lost", "Body": "Unable to connect to server" },
+        { "Title": "Purchase Failed", "Body": "Insufficient funds" }
+      ]
+    }
+  },
+
+  "InGameAlerts": {
+    "Racing": {
+      "PositionChange": {
+        "GainPosition": { "Icon": "ICO_ArrowUp", "Color": "#00FF00", "Duration": 1.5 },
+        "LosePosition": { "Icon": "ICO_ArrowDown", "Color": "#FF0000", "Duration": 1.5 }
+      },
+      "LapComplete": {
+        "Normal": { "Duration": 2.0, "ShowTime": true },
+        "BestLap": { "Duration": 3.0, "ShowTime": true, "Animation": "GoldFlash", "Sound": "SFX_BestLap" },
+        "FinalLap": { "Duration": 2.5, "Animation": "Pulse", "Sound": "SFX_FinalLap" }
+      },
+      "Checkpoint": {
+        "Duration": 1.0,
+        "ShowSplit": true,
+        "ColorPositive": "#00FF00",
+        "ColorNegative": "#FF0000"
+      },
+      "WrongWay": {
+        "Duration": 0,
+        "Persistent": true,
+        "Animation": "Flash",
+        "Sound": "SFX_WrongWay",
+        "ScreenEffect": "RedVignette"
+      }
+    },
+    "Drifting": {
+      "DriftStart": { "ShowAngle": true, "ShowSpeed": true },
+      "DriftScore": {
+        "Position": "CenterRight",
+        "ShowMultiplier": true,
+        "ShowCombo": true,
+        "Animation": "Scale",
+        "ColorByMultiplier": true
+      },
+      "DriftEnd": {
+        "Duration": 2.0,
+        "ShowTotal": true,
+        "Animation": "ScoreReveal"
+      },
+      "ComboBreak": {
+        "Duration": 1.5,
+        "Animation": "Shatter",
+        "Sound": "SFX_ComboBreak"
+      },
+      "Milestones": {
+        "10000": { "Message": "SICK!", "Animation": "Pop" },
+        "25000": { "Message": "AMAZING!", "Animation": "Pop" },
+        "50000": { "Message": "INSANE!", "Animation": "Explosion" },
+        "100000": { "Message": "LEGENDARY!", "Animation": "EpicReveal" }
+      }
+    },
+    "Pursuit": {
+      "PursuitStart": {
+        "Duration": 3.0,
+        "Message": "PURSUIT INITIATED",
+        "Sound": "SFX_PursuitStart"
+      },
+      "HeatIncrease": {
+        "Duration": 2.0,
+        "ShowHeatLevel": true,
+        "Animation": "HeatFlare"
+      },
+      "Evaded": {
+        "Duration": 4.0,
+        "Message": "PURSUIT EVADED",
+        "Sound": "SFX_Evaded",
+        "ShowBounty": true
+      },
+      "Busted": {
+        "Duration": 5.0,
+        "Message": "BUSTED",
+        "Sound": "SFX_Busted",
+        "FullScreen": true
+      },
+      "TacticWarning": {
+        "Roadblock": { "Message": "ROADBLOCK AHEAD", "Duration": 3.0, "Sound": "SFX_RoadblockWarning" },
+        "Spikes": { "Message": "SPIKE STRIP DEPLOYED", "Duration": 2.0, "Sound": "SFX_SpikeWarning" },
+        "Helicopter": { "Message": "HELICOPTER INBOUND", "Duration": 3.0, "Sound": "SFX_HeliWarning" }
+      }
+    },
+    "Skills": {
+      "NearMiss": {
+        "Duration": 1.0,
+        "Message": "NEAR MISS",
+        "ShowSpeed": true,
+        "Sound": "SFX_NearMiss"
+      },
+      "Airtime": {
+        "Duration": 1.5,
+        "Message": "BIG AIR",
+        "ShowDuration": true
+      },
+      "PerfectShift": {
+        "Duration": 0.5,
+        "Message": "PERFECT",
+        "Position": "GearIndicator"
+      },
+      "Drafting": {
+        "Duration": 0,
+        "Persistent": true,
+        "ShowSlipstream": true
+      }
+    }
+  },
+
+  "ToastNotifications": {
+    "Enabled": true,
+    "MaxVisible": 3,
+    "Position": "TopRight",
+    "Width": 350,
+    "Spacing": 10,
+    "DefaultDuration": 4.0,
+    "HoverPause": true,
+    "ClickToDismiss": true,
+    "SwipeToDismiss": true
+  },
+
+  "FullScreenAlerts": {
+    "VictoryScreen": {
+      "Duration": 5.0,
+      "Animation": "Celebration",
+      "ShowStats": true,
+      "ShowRewards": true,
+      "Fireworks": true
+    },
+    "DefeatScreen": {
+      "Duration": 4.0,
+      "Animation": "FadeIn",
+      "ShowPosition": true,
+      "ShowRetryOption": true
+    },
+    "NewRecord": {
+      "Duration": 5.0,
+      "Animation": "GoldReveal",
+      "ShowComparison": true,
+      "Sound": "SFX_NewRecord"
+    }
+  },
+
+  "PushNotifications": {
+    "Enabled": true,
+    "Categories": {
+      "DailyReward": {
+        "Enabled": true,
+        "Message": "Your daily reward is ready!",
+        "ScheduleTime": "10:00"
+      },
+      "ChallengeExpiring": {
+        "Enabled": true,
+        "Message": "Daily challenges reset in 2 hours!",
+        "HoursBefore": 2
+      },
+      "FriendOnline": {
+        "Enabled": false,
+        "Message": "{friend} is now online"
+      },
+      "EventStart": {
+        "Enabled": true,
+        "Message": "New event '{event}' is now live!"
+      },
+      "CrewActivity": {
+        "Enabled": false,
+        "Message": "Your crew needs you!"
+      }
+    },
+    "QuietHours": {
+      "Enabled": true,
+      "Start": "22:00",
+      "End": "08:00"
+    }
+  },
+
+  "Settings": {
+    "Master": { "Default": true, "Configurable": true },
+    "Sound": { "Default": true, "Configurable": true },
+    "InGameAlerts": { "Default": true, "Configurable": true },
+    "SocialNotifications": { "Default": true, "Configurable": true },
+    "AchievementNotifications": { "Default": true, "Configurable": true },
+    "SystemNotifications": { "Default": true, "Configurable": true },
+    "PushNotifications": { "Default": true, "Configurable": true },
+    "VibrationOnMobile": { "Default": true, "Configurable": true },
+    "NotificationHistory": { "Enabled": true, "MaxEntries": 100 }
+  }
+}
