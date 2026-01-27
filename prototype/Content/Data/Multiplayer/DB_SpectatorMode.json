@@ -1,0 +1,373 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Spectator Mode Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxSpectators": 20,
+    "SpectatorDelay": 5.0,
+    "AllowInRanked": true,
+    "AllowInPrivate": true,
+    "DefaultCamera": "AutoDirector"
+  },
+
+  "AccessControl": {
+    "PublicMatches": {
+      "AllowAnyone": true,
+      "RequireAccount": false
+    },
+    "PrivateMatches": {
+      "AllowAnyone": false,
+      "RequireInvite": true,
+      "HostCanKick": true
+    },
+    "RankedMatches": {
+      "AllowAnyone": true,
+      "DelayRequired": true,
+      "MinDelay": 10.0
+    },
+    "Tournaments": {
+      "AllowAnyone": true,
+      "DelayRequired": true,
+      "MinDelay": 30.0,
+      "StreamerMode": true
+    }
+  },
+
+  "CameraModes": {
+    "AutoDirector": {
+      "ID": "SPEC_AUTO",
+      "Name": "Auto Director",
+      "Description": "AI-controlled cinematic coverage",
+      "Settings": {
+        "CutFrequency": { "Min": 3.0, "Max": 10.0 },
+        "FocusOnAction": true,
+        "PrioritizeLeaders": true,
+        "ShowBattles": true,
+        "DramaticMoments": true
+      },
+      "ActionPriority": [
+        "Overtake",
+        "CloseBattle",
+        "Leader",
+        "FastestLap",
+        "Incident"
+      ]
+    },
+    "FollowCar": {
+      "ID": "SPEC_FOLLOW",
+      "Name": "Follow Car",
+      "Description": "Follow a specific driver",
+      "Cameras": [
+        "Chase",
+        "ChaseClose",
+        "ChaseFar",
+        "Hood",
+        "Bumper",
+        "Cockpit"
+      ],
+      "QuickSwitch": true,
+      "CycleKey": "Tab"
+    },
+    "TrackCamera": {
+      "ID": "SPEC_TRACK",
+      "Name": "Track Cameras",
+      "Description": "Fixed trackside cameras",
+      "AutoSwitch": true,
+      "ManualOverride": true,
+      "TransitionType": "Cut"
+    },
+    "FreeCam": {
+      "ID": "SPEC_FREE",
+      "Name": "Free Camera",
+      "Description": "Free-flying spectator camera",
+      "MoveSpeed": 50.0,
+      "FastSpeed": 200.0,
+      "SlowSpeed": 10.0,
+      "Collision": false,
+      "Boundaries": {
+        "Enabled": true,
+        "MaxDistance": 500.0
+      }
+    },
+    "Helicopter": {
+      "ID": "SPEC_HELI",
+      "Name": "Helicopter View",
+      "Description": "Overhead tracking camera",
+      "Height": { "Min": 30.0, "Max": 200.0, "Default": 80.0 },
+      "FollowLeader": true,
+      "ZoomEnabled": true
+    },
+    "Map": {
+      "ID": "SPEC_MAP",
+      "Name": "Map View",
+      "Description": "Top-down track overview",
+      "ShowAllPositions": true,
+      "ShowNames": true,
+      "ShowGaps": true,
+      "Zoom": { "Min": 0.5, "Max": 3.0 }
+    }
+  },
+
+  "HUD": {
+    "Layouts": {
+      "Broadcast": {
+        "ID": "HUD_BROADCAST",
+        "Name": "Broadcast",
+        "Description": "TV-style presentation",
+        "Elements": [
+          "Leaderboard",
+          "RaceProgress",
+          "CurrentDriver",
+          "LapCounter",
+          "Timer",
+          "EventLogo"
+        ]
+      },
+      "Minimal": {
+        "ID": "HUD_MINIMAL",
+        "Name": "Minimal",
+        "Description": "Clean viewing experience",
+        "Elements": [
+          "Leaderboard",
+          "LapCounter"
+        ]
+      },
+      "Full": {
+        "ID": "HUD_FULL",
+        "Name": "Full Stats",
+        "Description": "Complete information display",
+        "Elements": [
+          "Leaderboard",
+          "RaceProgress",
+          "CurrentDriver",
+          "DriverTelemetry",
+          "LapCounter",
+          "Timer",
+          "Gaps",
+          "SectorTimes",
+          "Minimap"
+        ]
+      },
+      "Clean": {
+        "ID": "HUD_CLEAN",
+        "Name": "Clean",
+        "Description": "No HUD overlay",
+        "Elements": []
+      }
+    },
+    "Elements": {
+      "Leaderboard": {
+        "Position": "TopLeft",
+        "ShowPositions": 12,
+        "ShowGaps": true,
+        "ShowTires": false,
+        "Expandable": true,
+        "HighlightBattles": true
+      },
+      "RaceProgress": {
+        "Position": "TopCenter",
+        "ShowLapsRemaining": true,
+        "ShowTimeRemaining": true,
+        "ShowFlags": true
+      },
+      "CurrentDriver": {
+        "Position": "BottomLeft",
+        "ShowName": true,
+        "ShowVehicle": true,
+        "ShowTeam": true,
+        "ShowStats": true
+      },
+      "DriverTelemetry": {
+        "Position": "BottomRight",
+        "ShowSpeed": true,
+        "ShowRPM": true,
+        "ShowGear": true,
+        "ShowInputs": true
+      },
+      "Gaps": {
+        "Position": "TopRight",
+        "ShowToLeader": true,
+        "ShowToAhead": true,
+        "ShowToBehind": true
+      },
+      "SectorTimes": {
+        "Position": "Bottom",
+        "ShowCurrentSector": true,
+        "ShowBestSectors": true,
+        "Compare": true
+      },
+      "Minimap": {
+        "Position": "BottomRight",
+        "ShowAllCars": true,
+        "ShowSectors": true
+      }
+    }
+  },
+
+  "Features": {
+    "SlowMotion": {
+      "Enabled": true,
+      "Speeds": [0.25, 0.5, 0.75],
+      "OnKeyMoments": true,
+      "ManualTrigger": true
+    },
+    "InstantReplay": {
+      "Enabled": true,
+      "BufferLength": 30.0,
+      "Hotkey": "R",
+      "Speeds": [0.25, 0.5, 1.0, 2.0, 4.0]
+    },
+    "MultiView": {
+      "Enabled": true,
+      "MaxViews": 4,
+      "Layouts": ["2x1", "2x2", "3+1"],
+      "AudioFollowsMain": true
+    },
+    "DriverStats": {
+      "ShowOnFocus": true,
+      "Stats": [
+        "Position",
+        "BestLap",
+        "LastLap",
+        "GapToLeader",
+        "Overtakes",
+        "TopSpeed"
+      ]
+    },
+    "BattleTracker": {
+      "Enabled": true,
+      "AutoDetect": true,
+      "GapThreshold": 1.0,
+      "HighlightOnHUD": true,
+      "NotifySpectators": true
+    },
+    "OvertakeAlert": {
+      "Enabled": true,
+      "ShowAnimation": true,
+      "PlaySound": true
+    }
+  },
+
+  "Broadcasting": {
+    "StreamerMode": {
+      "Enabled": false,
+      "HideNames": false,
+      "CustomOverlay": true,
+      "LowLatencyMode": true
+    },
+    "CommentatorTools": {
+      "Enabled": true,
+      "Telestrator": true,
+      "Spotlight": true,
+      "SplitScreen": true,
+      "StatCards": true
+    },
+    "Output": {
+      "CleanFeed": {
+        "Enabled": true,
+        "Description": "Video output without HUD"
+      },
+      "ProgramFeed": {
+        "Enabled": true,
+        "Description": "Video with broadcast HUD"
+      },
+      "DataFeed": {
+        "Enabled": true,
+        "Format": "JSON",
+        "RefreshRate": 10
+      }
+    }
+  },
+
+  "Interaction": {
+    "Chat": {
+      "Enabled": true,
+      "SpectatorOnly": false,
+      "ModeratedByHost": true
+    },
+    "Reactions": {
+      "Enabled": true,
+      "Types": ["Cheer", "Wow", "GG", "Heart"],
+      "ShowOnScreen": true,
+      "Cooldown": 5.0
+    },
+    "Predictions": {
+      "Enabled": false,
+      "AllowBetting": false
+    }
+  },
+
+  "Controls": {
+    "Keyboard": {
+      "CycleCamera": "C",
+      "NextDriver": "Tab",
+      "PrevDriver": "Shift+Tab",
+      "AutoDirector": "A",
+      "FreeCam": "F",
+      "ToggleHUD": "H",
+      "InstantReplay": "R",
+      "SlowMotion": "Space",
+      "Screenshot": "F12",
+      "ToggleNames": "N"
+    },
+    "Gamepad": {
+      "CycleCamera": "Y",
+      "NextDriver": "RB",
+      "PrevDriver": "LB",
+      "ToggleHUD": "Back",
+      "InstantReplay": "X"
+    },
+    "FreeCamControls": {
+      "Move": "WASD",
+      "Up": "Space",
+      "Down": "Ctrl",
+      "Look": "Mouse",
+      "Fast": "Shift",
+      "Slow": "Alt",
+      "FocusDriver": "LeftClick"
+    }
+  },
+
+  "Performance": {
+    "QualityPresets": {
+      "Spectator": {
+        "Description": "Balanced for spectating",
+        "VehicleDetail": "Medium",
+        "EnvironmentDetail": "Medium",
+        "Effects": "Medium"
+      },
+      "Broadcast": {
+        "Description": "High quality for streaming",
+        "VehicleDetail": "High",
+        "EnvironmentDetail": "High",
+        "Effects": "High"
+      }
+    },
+    "NetworkOptimization": {
+      "InterpolationBuffer": 100,
+      "MaxUpdateRate": 30,
+      "PredictionEnabled": true
+    }
+  },
+
+  "EventTypes": {
+    "Race": {
+      "DefaultLayout": "Broadcast",
+      "Features": ["AutoDirector", "BattleTracker", "OvertakeAlert"]
+    },
+    "Drift": {
+      "DefaultLayout": "Full",
+      "Features": ["ScoreDisplay", "AngleDisplay", "SlowMotion"],
+      "FocusOn": "CurrentDriver"
+    },
+    "Drag": {
+      "DefaultLayout": "Broadcast",
+      "Features": ["SplitScreen", "ReactionTime", "TopSpeed"]
+    },
+    "TimeAttack": {
+      "DefaultLayout": "Full",
+      "Features": ["GhostComparison", "SectorTimes", "Delta"]
+    }
+  }
+}

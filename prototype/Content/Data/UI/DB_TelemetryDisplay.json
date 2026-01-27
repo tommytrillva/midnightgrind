@@ -1,0 +1,401 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Telemetry Display Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultMode": "Basic",
+    "UpdateRate": 60,
+    "SmoothingFactor": 0.1,
+    "Position": "BottomLeft",
+    "Opacity": 0.85,
+    "Scale": 1.0
+  },
+
+  "DisplayModes": {
+    "Off": {
+      "ID": "TELE_OFF",
+      "Name": "Off",
+      "Description": "No telemetry display",
+      "Elements": []
+    },
+    "Basic": {
+      "ID": "TELE_BASIC",
+      "Name": "Basic",
+      "Description": "Essential driving information",
+      "Elements": ["Speedometer", "Tachometer", "Gear"],
+      "Layout": "Compact"
+    },
+    "Standard": {
+      "ID": "TELE_STANDARD",
+      "Name": "Standard",
+      "Description": "Common racing telemetry",
+      "Elements": ["Speedometer", "Tachometer", "Gear", "LapTime", "Position", "Minimap"],
+      "Layout": "Standard"
+    },
+    "Advanced": {
+      "ID": "TELE_ADVANCED",
+      "Name": "Advanced",
+      "Description": "Detailed performance data",
+      "Elements": [
+        "Speedometer", "Tachometer", "Gear", "LapTime", "Position",
+        "TireTelemetry", "GForce", "ThrottleBrake", "SteeringInput"
+      ],
+      "Layout": "Expanded"
+    },
+    "Full": {
+      "ID": "TELE_FULL",
+      "Name": "Full Telemetry",
+      "Description": "Complete vehicle telemetry",
+      "Elements": [
+        "Speedometer", "Tachometer", "Gear", "LapTime", "Position",
+        "TireTelemetry", "GForce", "ThrottleBrake", "SteeringInput",
+        "SuspensionTravel", "EngineTemp", "OilPressure", "TurboBoost",
+        "FuelLevel", "DamageIndicator"
+      ],
+      "Layout": "Full",
+      "UnlockCondition": "LEVEL_30"
+    },
+    "Drift": {
+      "ID": "TELE_DRIFT",
+      "Name": "Drift Mode",
+      "Description": "Drift-focused telemetry",
+      "Elements": [
+        "Speedometer", "Tachometer", "Gear",
+        "DriftAngle", "DriftScore", "ComboMeter", "GForce"
+      ],
+      "Layout": "Drift"
+    },
+    "TimeAttack": {
+      "ID": "TELE_TIMEATTACK",
+      "Name": "Time Attack",
+      "Description": "Lap time focused display",
+      "Elements": [
+        "Speedometer", "Tachometer", "Gear",
+        "LapTime", "BestLap", "SectorTimes", "Delta", "PredictedTime"
+      ],
+      "Layout": "TimeAttack"
+    }
+  },
+
+  "Elements": {
+    "Speedometer": {
+      "ID": "ELEM_SPEED",
+      "Type": "Gauge",
+      "Unit": { "Metric": "km/h", "Imperial": "mph" },
+      "MaxValue": 400,
+      "DigitalReadout": true,
+      "ColorZones": {
+        "Normal": { "Range": [0, 200], "Color": "#FFFFFF" },
+        "Fast": { "Range": [200, 300], "Color": "#FFFF00" },
+        "Extreme": { "Range": [300, 400], "Color": "#FF0000" }
+      },
+      "Styles": ["Analog", "Digital", "Bar", "Arc"]
+    },
+    "Tachometer": {
+      "ID": "ELEM_TACH",
+      "Type": "Gauge",
+      "Unit": "RPM",
+      "MaxValue": "VehicleSpecific",
+      "RedlineIndicator": true,
+      "ShiftLight": {
+        "Enabled": true,
+        "WarningPercent": 0.9,
+        "OptimalPercent": 0.95
+      },
+      "ColorZones": {
+        "Idle": { "Range": [0, 0.3], "Color": "#44FF44" },
+        "Normal": { "Range": [0.3, 0.8], "Color": "#FFFFFF" },
+        "High": { "Range": [0.8, 0.95], "Color": "#FFFF00" },
+        "Redline": { "Range": [0.95, 1.0], "Color": "#FF0000" }
+      },
+      "Styles": ["Analog", "Bar", "LED"]
+    },
+    "Gear": {
+      "ID": "ELEM_GEAR",
+      "Type": "Indicator",
+      "Values": ["R", "N", "1", "2", "3", "4", "5", "6", "7"],
+      "ShiftIndicator": true,
+      "ShiftArrows": true,
+      "Styles": ["Number", "Display", "Minimal"]
+    },
+    "LapTime": {
+      "ID": "ELEM_LAPTIME",
+      "Type": "Timer",
+      "Format": "MM:SS.mmm",
+      "ShowCurrentLap": true,
+      "ShowBestLap": true,
+      "ShowLastLap": true,
+      "DeltaColor": {
+        "Faster": "#44FF44",
+        "Slower": "#FF4444",
+        "Neutral": "#FFFFFF"
+      }
+    },
+    "Position": {
+      "ID": "ELEM_POSITION",
+      "Type": "Indicator",
+      "Format": "X/Y",
+      "ShowGapToLeader": true,
+      "ShowGapToAhead": true,
+      "ShowGapToBehind": true,
+      "ChangeAnimation": true
+    },
+    "TireTelemetry": {
+      "ID": "ELEM_TIRES",
+      "Type": "Diagram",
+      "ShowTemperature": true,
+      "ShowWear": true,
+      "ShowSlip": true,
+      "ShowPressure": true,
+      "Layout": "FourWheel",
+      "TemperatureColors": {
+        "Cold": "#4444FF",
+        "Optimal": "#44FF44",
+        "Hot": "#FFFF00",
+        "Critical": "#FF0000"
+      }
+    },
+    "GForce": {
+      "ID": "ELEM_GFORCE",
+      "Type": "Meter",
+      "ShowLateral": true,
+      "ShowLongitudinal": true,
+      "MaxG": 3.0,
+      "TrailEnabled": true,
+      "TrailLength": 30,
+      "Styles": ["Circle", "Cross", "Dot"]
+    },
+    "ThrottleBrake": {
+      "ID": "ELEM_INPUTS",
+      "Type": "Bars",
+      "ShowThrottle": true,
+      "ShowBrake": true,
+      "ShowClutch": false,
+      "Orientation": "Vertical",
+      "Colors": {
+        "Throttle": "#44FF44",
+        "Brake": "#FF4444",
+        "Clutch": "#4444FF"
+      }
+    },
+    "SteeringInput": {
+      "ID": "ELEM_STEERING",
+      "Type": "Wheel",
+      "ShowAngle": true,
+      "MaxAngle": 900,
+      "Styles": ["Wheel", "Bar", "Arc"]
+    },
+    "SuspensionTravel": {
+      "ID": "ELEM_SUSPENSION",
+      "Type": "Diagram",
+      "ShowTravel": true,
+      "ShowCompression": true,
+      "Layout": "FourWheel"
+    },
+    "EngineTemp": {
+      "ID": "ELEM_ENGINE_TEMP",
+      "Type": "Gauge",
+      "Unit": { "Metric": "°C", "Imperial": "°F" },
+      "WarningThreshold": 110,
+      "CriticalThreshold": 120,
+      "Colors": {
+        "Cold": "#4444FF",
+        "Normal": "#44FF44",
+        "Warning": "#FFFF00",
+        "Critical": "#FF0000"
+      }
+    },
+    "OilPressure": {
+      "ID": "ELEM_OIL",
+      "Type": "Gauge",
+      "Unit": "PSI",
+      "WarningThreshold": 20,
+      "CriticalThreshold": 10
+    },
+    "TurboBoost": {
+      "ID": "ELEM_BOOST",
+      "Type": "Gauge",
+      "Unit": "PSI",
+      "MaxValue": "VehicleSpecific",
+      "ShowIfApplicable": true,
+      "Colors": {
+        "Vacuum": "#4444FF",
+        "Ambient": "#FFFFFF",
+        "Boost": "#44FF44",
+        "MaxBoost": "#FF4444"
+      }
+    },
+    "FuelLevel": {
+      "ID": "ELEM_FUEL",
+      "Type": "Bar",
+      "WarningThreshold": 0.2,
+      "ShowLapsRemaining": true
+    },
+    "DamageIndicator": {
+      "ID": "ELEM_DAMAGE",
+      "Type": "Diagram",
+      "ShowVehicleOutline": true,
+      "DamageZones": ["Front", "Rear", "Left", "Right", "Engine"],
+      "Colors": {
+        "None": "#44FF44",
+        "Light": "#FFFF00",
+        "Heavy": "#FF8800",
+        "Critical": "#FF0000"
+      }
+    },
+    "DriftAngle": {
+      "ID": "ELEM_DRIFT_ANGLE",
+      "Type": "Gauge",
+      "Unit": "°",
+      "MaxValue": 90,
+      "ShowDirection": true
+    },
+    "DriftScore": {
+      "ID": "ELEM_DRIFT_SCORE",
+      "Type": "Counter",
+      "ShowCurrent": true,
+      "ShowTotal": true,
+      "ShowMultiplier": true,
+      "Animation": "Pulse"
+    },
+    "ComboMeter": {
+      "ID": "ELEM_COMBO",
+      "Type": "Bar",
+      "ShowDecay": true,
+      "PulseOnGain": true
+    },
+    "SectorTimes": {
+      "ID": "ELEM_SECTORS",
+      "Type": "List",
+      "ShowCurrent": true,
+      "ShowBest": true,
+      "ShowDelta": true,
+      "Colors": {
+        "PersonalBest": "#AA44FF",
+        "SessionBest": "#44FF44",
+        "Slower": "#FF4444"
+      }
+    },
+    "Delta": {
+      "ID": "ELEM_DELTA",
+      "Type": "Timer",
+      "CompareAgainst": ["PersonalBest", "SessionBest", "Ghost"],
+      "Format": "+/-SS.mmm",
+      "Colors": {
+        "Ahead": "#44FF44",
+        "Behind": "#FF4444"
+      }
+    },
+    "PredictedTime": {
+      "ID": "ELEM_PREDICTED",
+      "Type": "Timer",
+      "BasedOn": "CurrentPace",
+      "Format": "MM:SS.mmm"
+    },
+    "Minimap": {
+      "ID": "ELEM_MINIMAP",
+      "Type": "Map",
+      "ShowTrack": true,
+      "ShowPosition": true,
+      "ShowOpponents": true,
+      "ShowCheckpoints": true,
+      "Rotation": "PlayerOriented",
+      "Zoom": { "Default": 1.0, "Min": 0.5, "Max": 2.0 }
+    },
+    "Nitrous": {
+      "ID": "ELEM_NITROUS",
+      "Type": "Bar",
+      "ShowAmount": true,
+      "FlashWhenReady": true,
+      "Color": "#00FFFF"
+    }
+  },
+
+  "Layouts": {
+    "Compact": {
+      "Position": "BottomCenter",
+      "Arrangement": "Horizontal",
+      "ElementSpacing": 10
+    },
+    "Standard": {
+      "Position": "BottomLeft",
+      "Arrangement": "Grid",
+      "Columns": 2
+    },
+    "Expanded": {
+      "Position": "Bottom",
+      "Arrangement": "Spread",
+      "FullWidth": true
+    },
+    "Full": {
+      "Position": "Edges",
+      "Arrangement": "Corners"
+    },
+    "Drift": {
+      "Position": "Right",
+      "Arrangement": "Vertical",
+      "EmphasisOn": ["DriftScore", "DriftAngle"]
+    },
+    "TimeAttack": {
+      "Position": "Top",
+      "Arrangement": "Horizontal",
+      "EmphasisOn": ["LapTime", "Delta"]
+    }
+  },
+
+  "Customization": {
+    "AllowRepositioning": true,
+    "AllowResizing": true,
+    "AllowStyleChange": true,
+    "AllowColorChange": true,
+    "SavePresets": {
+      "MaxPresets": 5,
+      "CloudSync": true
+    }
+  },
+
+  "Accessibility": {
+    "HighContrast": {
+      "Enabled": false,
+      "UseHighContrastColors": true
+    },
+    "LargeText": {
+      "Enabled": false,
+      "ScaleMultiplier": 1.5
+    },
+    "ColorBlindModes": {
+      "Deuteranopia": true,
+      "Protanopia": true,
+      "Tritanopia": true
+    },
+    "AudioCues": {
+      "ShiftLight": true,
+      "WarningAlerts": true,
+      "PositionChanges": true
+    }
+  },
+
+  "DataExport": {
+    "Enabled": true,
+    "Formats": ["CSV", "JSON"],
+    "RecordDuring": ["Race", "TimeAttack", "FreeRoam"],
+    "SampleRate": 60,
+    "IncludeFields": [
+      "Timestamp",
+      "Speed",
+      "RPM",
+      "Gear",
+      "ThrottlePosition",
+      "BrakePosition",
+      "SteeringAngle",
+      "LateralG",
+      "LongitudinalG",
+      "TireTemps",
+      "TireSlip",
+      "SuspensionTravel",
+      "Position_XYZ",
+      "Rotation_YPR"
+    ]
+  }
+}
