@@ -3,6 +3,9 @@
 #include "EngineAudio/MGEngineAudioSubsystem.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 
 void UMGEngineAudioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -173,7 +176,16 @@ void UMGEngineAudioSubsystem::StartEngine(FName VehicleID)
 	Instance->State.State = EMGEngineState::Starting;
 	OnEngineStateChanged.Broadcast(VehicleID, EMGEngineState::Starting);
 
-	// Would play startup sound
+	// Play startup sound
+	if (Instance->Profile.StartupSound.IsValid())
+	{
+		USoundBase* StartupSound = Instance->Profile.StartupSound.LoadSynchronous();
+		if (StartupSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), StartupSound, 1.0f, 1.0f);
+		}
+	}
+
 	// After startup completes, transition to idle
 	if (UWorld* World = GetWorld())
 	{
@@ -246,7 +258,16 @@ void UMGEngineAudioSubsystem::TriggerBackfire(FName VehicleID)
 	Instance->State.bIsBackfiring = true;
 	OnBackfire.Broadcast(VehicleID);
 
-	// Would play backfire sound
+	// Play backfire sound
+	if (Instance->Profile.BackfireSound.IsValid())
+	{
+		USoundBase* BackfireSound = Instance->Profile.BackfireSound.LoadSynchronous();
+		if (BackfireSound)
+		{
+			float RandomPitch = FMath::RandRange(0.9f, 1.1f);
+			UGameplayStatics::PlaySound2D(GetWorld(), BackfireSound, 1.0f, RandomPitch);
+		}
+	}
 
 	if (UWorld* World = GetWorld())
 	{
@@ -275,7 +296,17 @@ void UMGEngineAudioSubsystem::TriggerBackfire(FName VehicleID)
 void UMGEngineAudioSubsystem::TriggerTurboBlowoff(FName VehicleID)
 {
 	OnTurboBlowoff.Broadcast(VehicleID);
-	// Would play blowoff sound
+
+	// Play blowoff sound
+	FMGVehicleAudioInstance* Instance = ActiveVehicles.Find(VehicleID);
+	if (Instance && Instance->Profile.BlowoffSound.IsValid())
+	{
+		USoundBase* BlowoffSound = Instance->Profile.BlowoffSound.LoadSynchronous();
+		if (BlowoffSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), BlowoffSound, 0.8f, 1.0f);
+		}
+	}
 }
 
 void UMGEngineAudioSubsystem::TriggerGearShift(FName VehicleID, int32 FromGear, int32 ToGear)
@@ -297,7 +328,17 @@ void UMGEngineAudioSubsystem::TriggerGearShift(FName VehicleID, int32 FromGear, 
 		);
 	}
 
-	// Would play gear change sound
+	// Play gear change sound
+	if (Instance->Profile.GearShiftSound.IsValid())
+	{
+		USoundBase* ShiftSound = Instance->Profile.GearShiftSound.LoadSynchronous();
+		if (ShiftSound)
+		{
+			// Slightly randomize pitch for variety
+			float Pitch = FMath::RandRange(0.95f, 1.05f);
+			UGameplayStatics::PlaySound2D(GetWorld(), ShiftSound, 0.7f, Pitch);
+		}
+	}
 
 	if (UWorld* World = GetWorld())
 	{

@@ -31,9 +31,10 @@ void UMGVoiceChatSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Start tick timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGVoiceChatSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             TickTimerHandle,
-            [this]() { TickVoiceChat(0.033f); },
+            [WeakThis]() { if (WeakThis.IsValid()) WeakThis->TickVoiceChat(0.033f); },
             0.033f,
             true
         );

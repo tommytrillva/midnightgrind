@@ -20,14 +20,19 @@ void UMGBattlePassSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Set up daily challenge refresh timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGBattlePassSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             DailyChallengeTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                FDateTime Now = FDateTime::Now();
-                if (Now.GetDay() != LastDailyChallengeRefresh.GetDay())
+                if (!WeakThis.IsValid())
                 {
-                    RefreshDailyChallenges();
+                    return;
+                }
+                FDateTime Now = FDateTime::Now();
+                if (Now.GetDay() != WeakThis->LastDailyChallengeRefresh.GetDay())
+                {
+                    WeakThis->RefreshDailyChallenges();
                 }
             },
             60.0f,

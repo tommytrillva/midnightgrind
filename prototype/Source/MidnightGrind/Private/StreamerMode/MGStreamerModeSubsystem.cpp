@@ -137,9 +137,10 @@ void UMGStreamerModeSubsystem::StartPoll(const FText& Question, const TArray<FTe
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGStreamerModeSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			PollTimerHandle,
-			[this]() { UpdatePoll(1.0f); },
+			[WeakThis]() { if (WeakThis.IsValid()) WeakThis->UpdatePoll(1.0f); },
 			1.0f,
 			true
 		);
@@ -199,10 +200,11 @@ void UMGStreamerModeSubsystem::AllowChaosMode(int32 DurationSeconds)
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGStreamerModeSubsystem> WeakThis(this);
 		FTimerHandle ChaosTimer;
 		World->GetTimerManager().SetTimer(
 			ChaosTimer,
-			[this]() { bChaosModeActive = false; },
+			[WeakThis]() { if (WeakThis.IsValid()) WeakThis->bChaosModeActive = false; },
 			DurationSeconds,
 			false
 		);

@@ -47,9 +47,10 @@ void UMGCinematicSubsystem::PlaySequence(FName SequenceID)
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGCinematicSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			PlaybackTimerHandle,
-			[this]() { UpdatePlayback(1.0f / 60.0f); },
+			[WeakThis]() { if (WeakThis.IsValid()) WeakThis->UpdatePlayback(1.0f / 60.0f); },
 			1.0f / 60.0f,
 			true
 		);
