@@ -1,0 +1,443 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Pre-configured Vehicle Build Templates",
+
+  "BuildCategories": {
+    "Street": {
+      "Description": "Daily drivable with modest upgrades",
+      "TargetPIRange": [100, 300],
+      "ReliabilityFocus": true,
+      "BudgetTier": "Low"
+    },
+    "Weekend": {
+      "Description": "Track-ready weekend warrior",
+      "TargetPIRange": [300, 500],
+      "PerformanceFocus": true,
+      "BudgetTier": "Medium"
+    },
+    "Track": {
+      "Description": "Purpose-built race car",
+      "TargetPIRange": [500, 700],
+      "MaxPerformance": true,
+      "BudgetTier": "High"
+    },
+    "Drift": {
+      "Description": "Optimized for sideways action",
+      "TargetPIRange": [400, 600],
+      "DriftFocus": true,
+      "BudgetTier": "Medium"
+    },
+    "Drag": {
+      "Description": "Quarter mile specialist",
+      "TargetPIRange": [500, 800],
+      "StraightLineSpeed": true,
+      "BudgetTier": "High"
+    },
+    "Touge": {
+      "Description": "Mountain pass specialist",
+      "TargetPIRange": [400, 600],
+      "BalancedHandling": true,
+      "BudgetTier": "Medium"
+    }
+  },
+
+  "UniversalBuilds": {
+    "BudgetBuild": {
+      "ID": "BUILD_BUDGET",
+      "Name": "Budget Build",
+      "Description": "Maximum performance per dollar",
+      "Category": "Street",
+      "ApplicableTo": "All",
+      "CostMultiplier": 0.3,
+      "PartSelection": {
+        "Engine": {
+          "Intake": "Sport",
+          "Exhaust": "Sport",
+          "ECU": "Sport"
+        },
+        "Suspension": {
+          "Springs": "Sport",
+          "Dampers": "Sport"
+        },
+        "Brakes": {
+          "Pads": "Sport"
+        },
+        "Tires": {
+          "Compound": "Sport"
+        }
+      },
+      "TuningPreset": "Street"
+    },
+    "BalancedBuild": {
+      "ID": "BUILD_BALANCED",
+      "Name": "Balanced Build",
+      "Description": "Well-rounded performance upgrade",
+      "Category": "Weekend",
+      "ApplicableTo": "All",
+      "CostMultiplier": 0.5,
+      "PartSelection": {
+        "Engine": {
+          "Intake": "Race",
+          "Exhaust": "Race",
+          "ECU": "Race",
+          "Internals": "Sport"
+        },
+        "Suspension": {
+          "Coilovers": "Race",
+          "SwayBars": "Race"
+        },
+        "Brakes": {
+          "BigBrakeKit": "Sport"
+        },
+        "Tires": {
+          "Compound": "Race"
+        },
+        "Aero": {
+          "FrontSplitter": "Sport",
+          "RearWing": "Sport"
+        }
+      },
+      "TuningPreset": "Track"
+    },
+    "MaxPowerBuild": {
+      "ID": "BUILD_MAX_POWER",
+      "Name": "Max Power Build",
+      "Description": "Maximum horsepower, all-out attack",
+      "Category": "Track",
+      "ApplicableTo": "All",
+      "CostMultiplier": 1.0,
+      "PartSelection": {
+        "Engine": {
+          "Turbo": "Elite",
+          "Internals": "Elite",
+          "Intake": "Elite",
+          "Exhaust": "Elite",
+          "ECU": "Elite",
+          "Fuel": "Elite"
+        },
+        "Drivetrain": {
+          "Clutch": "Race",
+          "Transmission": "Race",
+          "Differential": "Race"
+        },
+        "Suspension": {
+          "Coilovers": "Elite"
+        },
+        "Brakes": {
+          "BigBrakeKit": "Race"
+        },
+        "Tires": {
+          "Compound": "Elite"
+        },
+        "Aero": {
+          "FullKit": "Race"
+        },
+        "WeightReduction": "Full"
+      },
+      "TuningPreset": "MaxAttack"
+    }
+  },
+
+  "SpecialtyBuilds": {
+    "DriftMachine": {
+      "ID": "BUILD_DRIFT",
+      "Name": "Drift Machine",
+      "Description": "Optimized for angle and smoke",
+      "Category": "Drift",
+      "ApplicableTo": ["RWD", "AWD_Convertible"],
+      "PartSelection": {
+        "Engine": {
+          "Turbo": "Race",
+          "Internals": "Race",
+          "Exhaust": "Race",
+          "ECU": "Race"
+        },
+        "Drivetrain": {
+          "Clutch": "Race",
+          "Differential": "Drift"
+        },
+        "Suspension": {
+          "Coilovers": "Drift",
+          "AngleKit": true,
+          "SwayBars": "Drift"
+        },
+        "Brakes": {
+          "HydroEBrake": true
+        },
+        "Tires": {
+          "Compound": "Drift",
+          "Width": "Wide"
+        }
+      },
+      "TuningSettings": {
+        "Suspension": {
+          "FrontCamber": -5.0,
+          "RearCamber": -3.0,
+          "RideHeight": "Low"
+        },
+        "Differential": {
+          "LockAccel": 90,
+          "LockDecel": 60
+        }
+      }
+    },
+    "DragKing": {
+      "ID": "BUILD_DRAG",
+      "Name": "Drag King",
+      "Description": "Quarter mile dominator",
+      "Category": "Drag",
+      "ApplicableTo": "All",
+      "PartSelection": {
+        "Engine": {
+          "Turbo": "Elite",
+          "Internals": "Elite",
+          "FuelSystem": "Elite",
+          "Nitrous": "Elite"
+        },
+        "Drivetrain": {
+          "Transmission": "Drag",
+          "Differential": "Drag",
+          "Clutch": "Race"
+        },
+        "Suspension": {
+          "DragSetup": true
+        },
+        "Tires": {
+          "Rear": "DragSlicks",
+          "Front": "Skinnies"
+        },
+        "Aero": {
+          "WheelieBar": true,
+          "Parachute": true
+        },
+        "WeightReduction": "Full"
+      },
+      "TuningSettings": {
+        "Gearing": "Short",
+        "Suspension": {
+          "FrontSoft": true,
+          "RearStiff": true
+        },
+        "LaunchControl": {
+          "Enabled": true,
+          "RPM": 5000
+        }
+      }
+    },
+    "TougeSpecial": {
+      "ID": "BUILD_TOUGE",
+      "Name": "Touge Special",
+      "Description": "Mountain pass specialist",
+      "Category": "Touge",
+      "ApplicableTo": "All",
+      "PartSelection": {
+        "Engine": {
+          "Intake": "Race",
+          "Exhaust": "Race",
+          "ECU": "Race"
+        },
+        "Drivetrain": {
+          "Differential": "LSD"
+        },
+        "Suspension": {
+          "Coilovers": "Race",
+          "SwayBars": "Race"
+        },
+        "Brakes": {
+          "BigBrakeKit": "Race",
+          "BrakeCooling": true
+        },
+        "Tires": {
+          "Compound": "Race"
+        },
+        "WeightReduction": "Partial"
+      },
+      "TuningSettings": {
+        "Suspension": {
+          "FrontStiff": true,
+          "RearBalanced": true
+        },
+        "BrakeBias": "Rear",
+        "Gearing": "Close"
+      }
+    },
+    "HighwayRunner": {
+      "ID": "BUILD_HIGHWAY",
+      "Name": "Highway Runner",
+      "Description": "Top speed focused build",
+      "Category": "Track",
+      "ApplicableTo": "All",
+      "PartSelection": {
+        "Engine": {
+          "Turbo": "Elite",
+          "Internals": "Elite",
+          "ECU": "Elite"
+        },
+        "Drivetrain": {
+          "Transmission": "TopSpeed",
+          "FinalDrive": "Long"
+        },
+        "Aero": {
+          "LowDrag": true,
+          "SpeedKit": true
+        },
+        "Tires": {
+          "Compound": "TopSpeed"
+        }
+      },
+      "TuningSettings": {
+        "Gearing": "Long",
+        "Aero": {
+          "Downforce": "Minimum"
+        },
+        "TopSpeedLimiter": "Off"
+      }
+    },
+    "GripMonster": {
+      "ID": "BUILD_GRIP",
+      "Name": "Grip Monster",
+      "Description": "Maximum mechanical grip",
+      "Category": "Track",
+      "ApplicableTo": "All",
+      "PartSelection": {
+        "Engine": {
+          "Intake": "Race",
+          "Exhaust": "Race"
+        },
+        "Suspension": {
+          "Coilovers": "Elite",
+          "SwayBars": "Elite"
+        },
+        "Brakes": {
+          "BigBrakeKit": "Elite"
+        },
+        "Tires": {
+          "Compound": "SemiSlick",
+          "Width": "Maximum"
+        },
+        "Aero": {
+          "FullKit": "Race",
+          "Splitter": "Elite",
+          "Diffuser": "Elite"
+        }
+      },
+      "TuningSettings": {
+        "Suspension": {
+          "Stiff": true
+        },
+        "Aero": {
+          "Downforce": "Maximum"
+        }
+      }
+    },
+    "ShowCar": {
+      "ID": "BUILD_SHOW",
+      "Name": "Show Car",
+      "Description": "All show, modest performance",
+      "Category": "Street",
+      "ApplicableTo": "All",
+      "PartSelection": {
+        "Exterior": {
+          "BodyKit": "Wide",
+          "Hood": "Show",
+          "Mirrors": "Custom"
+        },
+        "Wheels": {
+          "Style": "Deep",
+          "Size": "Oversized"
+        },
+        "Lighting": {
+          "Underglow": true,
+          "LEDLights": true
+        },
+        "Interior": {
+          "RacingSeats": true,
+          "RollCage": "Show"
+        },
+        "Engine": {
+          "EngineFinish": "Chrome"
+        }
+      },
+      "TuningSettings": {
+        "Suspension": {
+          "Stance": "Slammed"
+        }
+      }
+    }
+  },
+
+  "ClassSpecificBuilds": {
+    "ClassD": {
+      "StarterUpgrade": {
+        "Description": "First upgrade path for beginners",
+        "Budget": 15000,
+        "Parts": ["Sport Intake", "Sport Exhaust", "Sport Suspension", "Sport Tires"]
+      }
+    },
+    "ClassC": {
+      "CompetitiveEntry": {
+        "Description": "Ready for competitive racing",
+        "Budget": 35000,
+        "Parts": ["Race Intake", "Race Exhaust", "Race ECU", "Race Coilovers", "Race Tires"]
+      }
+    },
+    "ClassB": {
+      "Trackday": {
+        "Description": "Full trackday preparation",
+        "Budget": 75000,
+        "Parts": ["Turbo Upgrade", "Race Internals", "Full Suspension", "Big Brake Kit"]
+      }
+    },
+    "ClassA": {
+      "ProLevel": {
+        "Description": "Professional-level build",
+        "Budget": 150000,
+        "Parts": ["Elite Turbo", "Elite Internals", "Elite Everything"]
+      }
+    },
+    "ClassS": {
+      "Ultimate": {
+        "Description": "No expense spared",
+        "Budget": 300000,
+        "Parts": ["Maximum Everything"]
+      }
+    }
+  },
+
+  "QuickTunePresets": {
+    "Street": {
+      "Description": "Comfortable daily driving",
+      "Suspension": { "Stiffness": 0.4, "RideHeight": "Stock" },
+      "Gearing": { "Final": "Stock" },
+      "Differential": { "Lock": 30 }
+    },
+    "Track": {
+      "Description": "Circuit racing optimized",
+      "Suspension": { "Stiffness": 0.7, "RideHeight": "Low" },
+      "Gearing": { "Final": "Short" },
+      "Differential": { "Lock": 60 },
+      "Camber": { "Front": -2.5, "Rear": -1.5 }
+    },
+    "Drift": {
+      "Description": "Maximum angle capability",
+      "Suspension": { "Stiffness": 0.6, "RideHeight": "Low" },
+      "Gearing": { "Final": "Medium" },
+      "Differential": { "Lock": 85 },
+      "Camber": { "Front": -5.0, "Rear": -3.0 }
+    },
+    "Drag": {
+      "Description": "Maximum acceleration",
+      "Suspension": { "Front": "Soft", "Rear": "Stiff" },
+      "Gearing": { "Final": "Short" },
+      "Differential": { "Lock": 100 }
+    },
+    "MaxAttack": {
+      "Description": "All-out lap time attack",
+      "Suspension": { "Stiffness": 0.9, "RideHeight": "Minimum" },
+      "Gearing": { "Final": "Optimized" },
+      "Differential": { "Lock": 70 },
+      "Camber": { "Front": -3.5, "Rear": -2.5 },
+      "Aero": { "Downforce": "Maximum" }
+    }
+  }
+}

@@ -125,6 +125,14 @@ void AMGPlayerController::BeginPlay()
 				PursuitSubsystem->OnUnitDisabled.AddDynamic(this, &AMGPlayerController::OnUnitDisabled);
 				PursuitSubsystem->OnRoadblockEvaded.AddDynamic(this, &AMGPlayerController::OnRoadblockEvaded);
 			}
+
+			// Bind to speedtrap subsystem for speed camera feedback
+			if (UMGSpeedtrapSubsystem* SpeedtrapSubsystem = GI->GetSubsystem<UMGSpeedtrapSubsystem>())
+			{
+				SpeedtrapSubsystem->OnSpeedtrapRecorded.AddDynamic(this, &AMGPlayerController::OnSpeedtrapRecorded);
+				SpeedtrapSubsystem->OnSpeedtrapNewPersonalBest.AddDynamic(this, &AMGPlayerController::OnSpeedtrapNewPersonalBest);
+				SpeedtrapSubsystem->OnSpeedtrapDiscovered.AddDynamic(this, &AMGPlayerController::OnSpeedtrapDiscovered);
+			}
 		}
 	}
 }
@@ -196,6 +204,13 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			PursuitSubsystem->OnPursuitEnded.RemoveDynamic(this, &AMGPlayerController::OnPursuitEnded);
 			PursuitSubsystem->OnUnitDisabled.RemoveDynamic(this, &AMGPlayerController::OnUnitDisabled);
 			PursuitSubsystem->OnRoadblockEvaded.RemoveDynamic(this, &AMGPlayerController::OnRoadblockEvaded);
+		}
+
+		if (UMGSpeedtrapSubsystem* SpeedtrapSubsystem = GI->GetSubsystem<UMGSpeedtrapSubsystem>())
+		{
+			SpeedtrapSubsystem->OnSpeedtrapRecorded.RemoveDynamic(this, &AMGPlayerController::OnSpeedtrapRecorded);
+			SpeedtrapSubsystem->OnSpeedtrapNewPersonalBest.RemoveDynamic(this, &AMGPlayerController::OnSpeedtrapNewPersonalBest);
+			SpeedtrapSubsystem->OnSpeedtrapDiscovered.RemoveDynamic(this, &AMGPlayerController::OnSpeedtrapDiscovered);
 		}
 	}
 

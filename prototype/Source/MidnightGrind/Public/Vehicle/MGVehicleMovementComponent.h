@@ -2280,6 +2280,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Turbo")
 	float TurboLagSimulation = 1.0f;
 
+	/** Engine braking strength multiplier (how much engine slows car when off throttle) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Drivetrain", meta = (ClampMin = "0.0", ClampMax = "2.0"))
+	float EngineBrakingMultiplier = 1.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tuning|Turbo")
 	float BoostBuildupRate = 2.0f; // How fast boost builds
 

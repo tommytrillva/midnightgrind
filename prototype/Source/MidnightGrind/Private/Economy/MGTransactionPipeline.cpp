@@ -1,6 +1,10 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "Economy/MGTransactionPipeline.h"
+#include "Economy/MGEconomySubsystem.h"
+#include "Catalog/MGVehicleCatalogSubsystem.h"
+#include "Catalog/MGPartsCatalogSubsystem.h"
+#include "Garage/MGGarageSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
 void UMGTransactionPipeline::Initialize(FSubsystemCollectionBase& Collection)
