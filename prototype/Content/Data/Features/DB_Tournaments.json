@@ -1,0 +1,315 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Tournament and Championship System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxActiveTournaments": 3,
+    "MinParticipants": 8,
+    "MaxParticipants": 256,
+    "RegistrationBuffer": 3600
+  },
+
+  "TournamentTypes": {
+    "SingleElimination": {
+      "ID": "TOURN_SINGLE_ELIM",
+      "Name": "Single Elimination",
+      "Description": "One loss and you're out",
+      "Format": {
+        "Bracket": "Single",
+        "MatchesPerRound": 1,
+        "LoserEliminated": true
+      },
+      "BestFor": ["QuickTournaments", "HighStakes"],
+      "Duration": "Short"
+    },
+    "DoubleElimination": {
+      "ID": "TOURN_DOUBLE_ELIM",
+      "Name": "Double Elimination",
+      "Description": "Two losses before elimination",
+      "Format": {
+        "Bracket": "Double",
+        "WinnersBracket": true,
+        "LosersBracket": true,
+        "GrandFinals": {
+          "BracketReset": true
+        }
+      },
+      "BestFor": ["CompetitiveFairness"],
+      "Duration": "Medium"
+    },
+    "RoundRobin": {
+      "ID": "TOURN_ROUND_ROBIN",
+      "Name": "Round Robin",
+      "Description": "Everyone races everyone",
+      "Format": {
+        "AllVsAll": true,
+        "PointsPerRace": { "Win": 3, "Second": 2, "Third": 1 },
+        "TiebreakerRules": ["HeadToHead", "PointDifferential", "FastestLap"]
+      },
+      "BestFor": ["SmallGroups", "LeaguePlay"],
+      "Duration": "Long"
+    },
+    "Swiss": {
+      "ID": "TOURN_SWISS",
+      "Name": "Swiss System",
+      "Description": "Matched by performance each round",
+      "Format": {
+        "Rounds": "Log2(Participants) + 1",
+        "MatchingMethod": "SimilarRecord",
+        "NoRematches": true
+      },
+      "BestFor": ["LargeFields", "FairMatching"],
+      "Duration": "Medium"
+    },
+    "Championship": {
+      "ID": "TOURN_CHAMPIONSHIP",
+      "Name": "Championship Series",
+      "Description": "Multi-race season championship",
+      "Format": {
+        "Races": { "Min": 5, "Max": 15 },
+        "PointsSystem": "F1Style",
+        "DropWorst": { "Enabled": true, "Count": 1 },
+        "BonusPoints": { "Pole": 1, "FastestLap": 1, "Win": 0 }
+      },
+      "BestFor": ["SeasonLongCompetition"],
+      "Duration": "Extended"
+    },
+    "TimeTrial": {
+      "ID": "TOURN_TIMETRAIL",
+      "Name": "Time Trial Tournament",
+      "Description": "Compete for best lap time",
+      "Format": {
+        "Attempts": 3,
+        "BestTimeWins": true,
+        "Asynchronous": true,
+        "SubmissionWindow": 86400
+      },
+      "BestFor": ["FlexibleScheduling"],
+      "Duration": "Variable"
+    },
+    "DriftCompetition": {
+      "ID": "TOURN_DRIFT",
+      "Name": "Drift Competition",
+      "Description": "Tandem drift elimination",
+      "Format": {
+        "Style": "Tandem",
+        "Rounds": 2,
+        "Judging": ["Angle", "Speed", "Line", "Style"],
+        "AdvantageSystem": true
+      },
+      "BestFor": ["DriftEvents"],
+      "Duration": "Medium"
+    }
+  },
+
+  "ScheduledTournaments": {
+    "Daily": {
+      "ID": "SCHEDULED_DAILY",
+      "Name": "Daily Showdown",
+      "Frequency": "Daily",
+      "Times": ["12:00 UTC", "20:00 UTC"],
+      "Format": "SingleElimination",
+      "MaxParticipants": 32,
+      "EntryFee": { "Cash": 1000 },
+      "PrizePool": {
+        "1st": { "Cash": 25000, "REP": 2500 },
+        "2nd": { "Cash": 15000, "REP": 1500 },
+        "3rd-4th": { "Cash": 7500, "REP": 750 }
+      }
+    },
+    "Weekly": {
+      "ID": "SCHEDULED_WEEKLY",
+      "Name": "Weekend Warriors",
+      "Frequency": "Weekly",
+      "Day": "Saturday",
+      "Time": "18:00 UTC",
+      "Format": "DoubleElimination",
+      "MaxParticipants": 64,
+      "EntryFee": { "Cash": 5000 },
+      "PrizePool": {
+        "1st": { "Cash": 100000, "REP": 10000, "Title": "Weekend Warrior" },
+        "2nd": { "Cash": 50000, "REP": 5000 },
+        "3rd": { "Cash": 25000, "REP": 2500 },
+        "4th": { "Cash": 15000, "REP": 1500 }
+      }
+    },
+    "Monthly": {
+      "ID": "SCHEDULED_MONTHLY",
+      "Name": "Monthly Championship",
+      "Frequency": "Monthly",
+      "Day": "Last Saturday",
+      "Time": "18:00 UTC",
+      "Format": "Championship",
+      "Races": 5,
+      "MaxParticipants": 128,
+      "EntryFee": { "Cash": 10000 },
+      "PrizePool": {
+        "1st": { "Cash": 500000, "REP": 50000, "Vehicle": "Exclusive", "Title": "Monthly Champion" },
+        "2nd": { "Cash": 250000, "REP": 25000 },
+        "3rd": { "Cash": 125000, "REP": 12500 }
+      }
+    },
+    "Seasonal": {
+      "ID": "SCHEDULED_SEASONAL",
+      "Name": "Season Finals",
+      "Frequency": "Seasonal",
+      "Qualification": "TopRanked",
+      "QualifyCount": 64,
+      "Format": "DoubleElimination",
+      "PrizePool": {
+        "1st": { "Cash": 2000000, "REP": 200000, "ExclusiveVehicle": true, "Title": "Season Champion" }
+      }
+    }
+  },
+
+  "CustomTournaments": {
+    "CreatorRequirements": {
+      "MinLevel": 20,
+      "MinREP": "TIER_KNOWN",
+      "CrewLeader": false
+    },
+    "Settings": {
+      "Name": { "MaxLength": 32, "ProfanityFilter": true },
+      "Description": { "MaxLength": 256 },
+      "Format": "AllTypes",
+      "Participants": { "Min": 4, "Max": 64 },
+      "EntryFee": { "Min": 0, "Max": 50000 },
+      "PrizeDistribution": ["Winner", "Top2", "Top4", "Custom"],
+      "PIRestriction": true,
+      "ClassRestriction": true,
+      "VehicleRestriction": true,
+      "TrackSelection": true,
+      "Weather": true,
+      "TimeOfDay": true,
+      "Private": { "InviteOnly": true, "Password": true }
+    },
+    "Hosting": {
+      "HostFee": { "Percent": 0.05 },
+      "MinPrizePool": 0,
+      "MaxPrizePool": 500000
+    }
+  },
+
+  "Registration": {
+    "Methods": {
+      "OpenRegistration": {
+        "FirstComeFirstServed": true,
+        "WaitList": true,
+        "WaitListMax": 16
+      },
+      "QualificationBased": {
+        "RequiresQualifying": true,
+        "QualifyingType": "TimeTrial",
+        "TopAdvance": true
+      },
+      "InviteOnly": {
+        "RequiresInvite": true,
+        "InviteSource": ["Host", "Crew"]
+      }
+    },
+    "EntryFees": {
+      "PaymentTime": "OnRegistration",
+      "Refunds": {
+        "BeforeStart": { "Percent": 1.0 },
+        "AfterStart": { "Percent": 0 }
+      }
+    },
+    "CheckIn": {
+      "Required": true,
+      "Window": 900,
+      "NoShowPenalty": {
+        "Disqualify": true,
+        "FeeForfeited": true
+      }
+    }
+  },
+
+  "MatchSettings": {
+    "Scheduling": {
+      "AutoSchedule": true,
+      "MatchInterval": 300,
+      "ReadyCheck": { "Time": 60, "Required": "AllParticipants" }
+    },
+    "Rules": {
+      "Collision": "Full",
+      "Assists": "StandardOnly",
+      "CatchUp": false,
+      "Weather": "Fixed",
+      "Damage": "Cosmetic"
+    },
+    "DisconnectHandling": {
+      "GracePeriod": 30,
+      "ReconnectAllowed": true,
+      "DNFThreshold": 120
+    }
+  },
+
+  "Seeding": {
+    "Methods": {
+      "Random": { "Description": "Random bracket placement" },
+      "Ranked": { "Description": "Based on player ranking" },
+      "Previous": { "Description": "Based on previous tournament" },
+      "Qualifying": { "Description": "Based on qualifying times" }
+    },
+    "ByeHandling": {
+      "HigherSeedAdvantage": true,
+      "ByePlacement": "Bottom"
+    }
+  },
+
+  "Prizes": {
+    "Distribution": {
+      "WinnerTakesAll": [1.0],
+      "Top2": [0.7, 0.3],
+      "Top3": [0.6, 0.25, 0.15],
+      "Top4": [0.5, 0.25, 0.15, 0.1],
+      "Top8": [0.4, 0.2, 0.1, 0.1, 0.05, 0.05, 0.05, 0.05]
+    },
+    "Payout": {
+      "Timing": "EndOfTournament",
+      "Method": "Automatic"
+    },
+    "SpecialRewards": {
+      "TournamentWinner": {
+        "Badge": true,
+        "Title": true,
+        "LeaderboardEntry": true
+      }
+    }
+  },
+
+  "Spectating": {
+    "Enabled": true,
+    "MaxSpectators": 100,
+    "Delay": 10,
+    "Features": ["MultiView", "AutoDirector", "Chat"]
+  },
+
+  "Leaderboards": {
+    "TournamentWins": true,
+    "TournamentParticipation": true,
+    "TournamentEarnings": true,
+    "TournamentRating": {
+      "Enabled": true,
+      "System": "TrueSkill"
+    }
+  },
+
+  "UI": {
+    "TournamentBrowser": {
+      "Filters": ["Format", "EntryFee", "StartTime", "Status"],
+      "Sorting": ["StartTime", "PrizePool", "Participants"]
+    },
+    "BracketView": {
+      "Interactive": true,
+      "LiveUpdates": true,
+      "ShowResults": true
+    },
+    "MatchLobby": {
+      "Chat": true,
+      "ReadyButton": true,
+      "VehiclePreview": true
+    }
+  }
+}
