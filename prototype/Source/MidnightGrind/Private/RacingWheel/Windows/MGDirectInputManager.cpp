@@ -1,6 +1,7 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "RacingWheel/Windows/MGDirectInputManager.h"
+#include "RacingWheel/MGRacingWheelSubsystem.h"
 
 #if PLATFORM_WINDOWS
 
@@ -39,11 +40,11 @@ bool FMGDirectInputManager::Initialize()
 
 	if (FAILED(hr))
 	{
-		UE_LOG(LogTemp, Error, TEXT("DirectInput8Create failed with error 0x%08X"), hr);
+		UE_LOG(LogRacingWheel, Error, TEXT("DirectInput8Create failed with error 0x%08X"), hr);
 		return false;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("DirectInput initialized successfully"));
+	UE_LOG(LogRacingWheel, Log, TEXT("DirectInput initialized successfully"));
 	return true;
 }
 
@@ -105,7 +106,7 @@ int32 FMGDirectInputManager::EnumerateDevices()
 
 	if (FAILED(hr))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EnumDevices failed with error 0x%08X"), hr);
+		UE_LOG(LogRacingWheel, Warning, TEXT("EnumDevices failed with error 0x%08X"), hr);
 		return 0;
 	}
 
@@ -134,7 +135,7 @@ int32 FMGDirectInputManager::EnumerateDevices()
 			DeviceInfo.ProductID = HIWORD(instance.guidProduct.Data1);
 			DeviceInfo.bSupportsFFB = (caps.dwFlags & DIDC_FORCEFEEDBACK) != 0;
 
-			UE_LOG(LogTemp, Log, TEXT("Found device: %s (VID: 0x%04X, PID: 0x%04X, FFB: %s)"),
+			UE_LOG(LogRacingWheel, Log, TEXT("Found device: %s (VID: 0x%04X, PID: 0x%04X, FFB: %s)"),
 				*DeviceInfo.DeviceName,
 				DeviceInfo.VendorID,
 				DeviceInfo.ProductID,
@@ -221,7 +222,7 @@ bool FMGDirectInputManager::AcquireDevice(int32 DeviceIndex)
 
 		if (FAILED(hr))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("SetCooperativeLevel failed: 0x%08X"), hr);
+			UE_LOG(LogRacingWheel, Warning, TEXT("SetCooperativeLevel failed: 0x%08X"), hr);
 		}
 	}
 
@@ -229,7 +230,7 @@ bool FMGDirectInputManager::AcquireDevice(int32 DeviceIndex)
 	hr = DeviceInfo.Device->SetDataFormat(&c_dfDIJoystick2);
 	if (FAILED(hr))
 	{
-		UE_LOG(LogTemp, Error, TEXT("SetDataFormat failed: 0x%08X"), hr);
+		UE_LOG(LogRacingWheel, Error, TEXT("SetDataFormat failed: 0x%08X"), hr);
 		return false;
 	}
 
@@ -258,7 +259,7 @@ bool FMGDirectInputManager::AcquireDevice(int32 DeviceIndex)
 	hr = DeviceInfo.Device->Acquire();
 	if (FAILED(hr) && hr != DIERR_OTHERAPPHASPRIO)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Device acquisition failed: 0x%08X"), hr);
+		UE_LOG(LogRacingWheel, Warning, TEXT("Device acquisition failed: 0x%08X"), hr);
 		// Still mark as acquired - we'll retry on poll
 	}
 
@@ -278,7 +279,7 @@ bool FMGDirectInputManager::AcquireDevice(int32 DeviceIndex)
 		SetAutoCenter(DeviceIndex, false);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Acquired device: %s"), *DeviceInfo.DeviceName);
+	UE_LOG(LogRacingWheel, Log, TEXT("Acquired device: %s"), *DeviceInfo.DeviceName);
 	return true;
 }
 
@@ -588,7 +589,7 @@ LPDIRECTINPUTEFFECT FMGDirectInputManager::CreateDIEffect(LPDIRECTINPUTDEVICE8W 
 
 	if (FAILED(hr))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CreateEffect failed: 0x%08X"), hr);
+		UE_LOG(LogRacingWheel, Warning, TEXT("CreateEffect failed: 0x%08X"), hr);
 		return nullptr;
 	}
 

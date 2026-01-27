@@ -13,6 +13,8 @@
 #include "RacingWheel/Windows/MGDirectInputManager.h"
 #endif
 
+DEFINE_LOG_CATEGORY(LogRacingWheel);
+
 void UMGRacingWheelSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
@@ -25,6 +27,10 @@ void UMGRacingWheelSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	// Create FFB processor
 	FFBProcessor = NewObject<UMGWheelFFBProcessor>(this);
+	if (FFBProcessor)
+	{
+		FFBProcessor->Initialize(this);
+	}
 
 	// Initialize DirectInput on Windows
 #if PLATFORM_WINDOWS
@@ -46,7 +52,7 @@ void UMGRacingWheelSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Initial scan for wheels
 	ScanForWheels();
 
-	UE_LOG(LogTemp, Log, TEXT("MGRacingWheelSubsystem initialized"));
+	UE_LOG(LogRacingWheel, Log, TEXT("MGRacingWheelSubsystem initialized"));
 }
 
 void UMGRacingWheelSubsystem::Deinitialize()
@@ -219,7 +225,7 @@ void UMGRacingWheelSubsystem::InitializeKnownWheelDatabase()
 		KnownWheelDatabase.Add(Entry);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Initialized known wheel database with %d entries"), KnownWheelDatabase.Num());
+	UE_LOG(LogRacingWheel, Log, TEXT("Initialized known wheel database with %d entries"), KnownWheelDatabase.Num());
 }
 
 FMGKnownWheelEntry UMGRacingWheelSubsystem::GetKnownWheelInfo(int32 VendorID, int32 ProductID) const
@@ -248,7 +254,7 @@ void UMGRacingWheelSubsystem::InitializeDirectInput()
 	DirectInputManager = MakeShared<FMGDirectInputManager>();
 	if (!DirectInputManager->Initialize())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to initialize DirectInput"));
+		UE_LOG(LogRacingWheel, Error, TEXT("Failed to initialize DirectInput"));
 		DirectInputManager.Reset();
 	}
 }
@@ -296,7 +302,7 @@ int32 UMGRacingWheelSubsystem::ScanForWheels()
 				ConnectionState = EMGWheelConnectionState::Connected;
 				LoadDefaultProfileForWheel();
 
-				UE_LOG(LogTemp, Log, TEXT("Connected to wheel: %s (VID: 0x%04X, PID: 0x%04X)"),
+				UE_LOG(LogRacingWheel, Log, TEXT("Connected to wheel: %s (VID: 0x%04X, PID: 0x%04X)"),
 					*ConnectedWheelCapabilities.DeviceName, VID, PID);
 
 				OnWheelConnected.Broadcast(ConnectedWheelModel, ConnectedWheelCapabilities);
@@ -801,7 +807,7 @@ bool UMGRacingWheelSubsystem::LoadProfile(const FString& ProfileName)
 	if (const FMGWheelProfile* Profile = AvailableProfiles.Find(ProfileName))
 	{
 		CurrentProfile = *Profile;
-		UE_LOG(LogTemp, Log, TEXT("Loaded wheel profile: %s"), *ProfileName);
+		UE_LOG(LogRacingWheel, Log, TEXT("Loaded wheel profile: %s"), *ProfileName);
 		return true;
 	}
 	return false;
@@ -974,14 +980,153 @@ void UMGRacingWheelSubsystem::LoadProfilesFromDisk()
 			if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 			{
 				FMGWheelProfile Profile;
-				Profile.ProfileName = JsonObject->GetStringField(TEXT("ProfileName"));
-				// ... load other fields
+				LoadProfileFromJson(JsonObject, Profile);
 				AvailableProfiles.Add(Profile.ProfileName, Profile);
 			}
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Loaded %d wheel profiles"), AvailableProfiles.Num());
+	UE_LOG(LogRacingWheel, Log, TEXT("Loaded %d wheel profiles"), AvailableProfiles.Num());
+}
+
+void UMGRacingWheelSubsystem::LoadProfileFromJson(const TSharedPtr<FJsonObject>& JsonObject, FMGWheelProfile& OutProfile)
+{
+	if (!JsonObject.IsValid())
+	{
+		return;
+	}
+
+	// Basic info
+	OutProfile.ProfileName = JsonObject->GetStringField(TEXT("ProfileName"));
+
+	// Steering settings - check for nested "Steering" object or flat structure
+	const TSharedPtr<FJsonObject>* SteeringObj = nullptr;
+	if (JsonObject->TryGetObjectField(TEXT("Steering"), SteeringObj) && SteeringObj->IsValid())
+	{
+		const TSharedPtr<FJsonObject>& Steering = *SteeringObj;
+		if (Steering->HasField(TEXT("SteeringRotation")))
+			OutProfile.SteeringRotation = Steering->GetNumberField(TEXT("SteeringRotation"));
+		if (Steering->HasField(TEXT("SteeringDeadzone")))
+			OutProfile.SteeringDeadzone = Steering->GetNumberField(TEXT("SteeringDeadzone"));
+		if (Steering->HasField(TEXT("SteeringLinearity")))
+			OutProfile.SteeringLinearity = Steering->GetNumberField(TEXT("SteeringLinearity"));
+		if (Steering->HasField(TEXT("InvertSteering")))
+			OutProfile.bInvertSteering = Steering->GetBoolField(TEXT("InvertSteering"));
+	}
+	else
+	{
+		// Flat structure fallback
+		if (JsonObject->HasField(TEXT("SteeringRotation")))
+			OutProfile.SteeringRotation = JsonObject->GetNumberField(TEXT("SteeringRotation"));
+		if (JsonObject->HasField(TEXT("SteeringDeadzone")))
+			OutProfile.SteeringDeadzone = JsonObject->GetNumberField(TEXT("SteeringDeadzone"));
+		if (JsonObject->HasField(TEXT("SteeringLinearity")))
+			OutProfile.SteeringLinearity = JsonObject->GetNumberField(TEXT("SteeringLinearity"));
+		if (JsonObject->HasField(TEXT("bInvertSteering")))
+			OutProfile.bInvertSteering = JsonObject->GetBoolField(TEXT("bInvertSteering"));
+	}
+
+	// Pedal settings - check for nested "Pedals" object or flat structure
+	const TSharedPtr<FJsonObject>* PedalsObj = nullptr;
+	if (JsonObject->TryGetObjectField(TEXT("Pedals"), PedalsObj) && PedalsObj->IsValid())
+	{
+		const TSharedPtr<FJsonObject>& Pedals = *PedalsObj;
+		if (Pedals->HasField(TEXT("ThrottleDeadzone")))
+			OutProfile.ThrottleDeadzone = Pedals->GetNumberField(TEXT("ThrottleDeadzone"));
+		if (Pedals->HasField(TEXT("BrakeDeadzone")))
+			OutProfile.BrakeDeadzone = Pedals->GetNumberField(TEXT("BrakeDeadzone"));
+		if (Pedals->HasField(TEXT("ClutchDeadzone")))
+			OutProfile.ClutchDeadzone = Pedals->GetNumberField(TEXT("ClutchDeadzone"));
+		if (Pedals->HasField(TEXT("ThrottleGamma")))
+			OutProfile.ThrottleGamma = Pedals->GetNumberField(TEXT("ThrottleGamma"));
+		if (Pedals->HasField(TEXT("BrakeGamma")))
+			OutProfile.BrakeGamma = Pedals->GetNumberField(TEXT("BrakeGamma"));
+		if (Pedals->HasField(TEXT("CombinedPedals")))
+			OutProfile.bCombinedPedals = Pedals->GetBoolField(TEXT("CombinedPedals"));
+		if (Pedals->HasField(TEXT("InvertClutch")))
+			OutProfile.bInvertClutch = Pedals->GetBoolField(TEXT("InvertClutch"));
+	}
+	else
+	{
+		// Flat structure fallback
+		if (JsonObject->HasField(TEXT("ThrottleDeadzone")))
+			OutProfile.ThrottleDeadzone = JsonObject->GetNumberField(TEXT("ThrottleDeadzone"));
+		if (JsonObject->HasField(TEXT("BrakeDeadzone")))
+			OutProfile.BrakeDeadzone = JsonObject->GetNumberField(TEXT("BrakeDeadzone"));
+		if (JsonObject->HasField(TEXT("ClutchDeadzone")))
+			OutProfile.ClutchDeadzone = JsonObject->GetNumberField(TEXT("ClutchDeadzone"));
+		if (JsonObject->HasField(TEXT("ThrottleGamma")))
+			OutProfile.ThrottleGamma = JsonObject->GetNumberField(TEXT("ThrottleGamma"));
+		if (JsonObject->HasField(TEXT("BrakeGamma")))
+			OutProfile.BrakeGamma = JsonObject->GetNumberField(TEXT("BrakeGamma"));
+		if (JsonObject->HasField(TEXT("bCombinedPedals")))
+			OutProfile.bCombinedPedals = JsonObject->GetBoolField(TEXT("bCombinedPedals"));
+		if (JsonObject->HasField(TEXT("bInvertClutch")))
+			OutProfile.bInvertClutch = JsonObject->GetBoolField(TEXT("bInvertClutch"));
+	}
+
+	// FFB settings - check for nested "ForceFeedback" object or flat structure
+	const TSharedPtr<FJsonObject>* FFBObj = nullptr;
+	if (JsonObject->TryGetObjectField(TEXT("ForceFeedback"), FFBObj) && FFBObj->IsValid())
+	{
+		const TSharedPtr<FJsonObject>& FFB = *FFBObj;
+		if (FFB->HasField(TEXT("FFBEnabled")))
+			OutProfile.bFFBEnabled = FFB->GetBoolField(TEXT("FFBEnabled"));
+		if (FFB->HasField(TEXT("FFBStrength")))
+			OutProfile.FFBStrength = FFB->GetNumberField(TEXT("FFBStrength"));
+		if (FFB->HasField(TEXT("SelfCenteringStrength")))
+			OutProfile.SelfCenteringStrength = FFB->GetNumberField(TEXT("SelfCenteringStrength"));
+		if (FFB->HasField(TEXT("RoadFeelStrength")))
+			OutProfile.RoadFeelStrength = FFB->GetNumberField(TEXT("RoadFeelStrength"));
+		if (FFB->HasField(TEXT("CollisionStrength")))
+			OutProfile.CollisionStrength = FFB->GetNumberField(TEXT("CollisionStrength"));
+		if (FFB->HasField(TEXT("CurbStrength")))
+			OutProfile.CurbStrength = FFB->GetNumberField(TEXT("CurbStrength"));
+		if (FFB->HasField(TEXT("EngineVibrationStrength")))
+			OutProfile.EngineVibrationStrength = FFB->GetNumberField(TEXT("EngineVibrationStrength"));
+		if (FFB->HasField(TEXT("UndersteerStrength")))
+			OutProfile.UndersteerStrength = FFB->GetNumberField(TEXT("UndersteerStrength"));
+		if (FFB->HasField(TEXT("OversteerStrength")))
+			OutProfile.OversteerStrength = FFB->GetNumberField(TEXT("OversteerStrength"));
+		if (FFB->HasField(TEXT("MinForceThreshold")))
+			OutProfile.MinForceThreshold = FFB->GetNumberField(TEXT("MinForceThreshold"));
+		if (FFB->HasField(TEXT("DamperStrength")))
+			OutProfile.DamperStrength = FFB->GetNumberField(TEXT("DamperStrength"));
+		if (FFB->HasField(TEXT("FrictionStrength")))
+			OutProfile.FrictionStrength = FFB->GetNumberField(TEXT("FrictionStrength"));
+		if (FFB->HasField(TEXT("ShowFFBClipping")))
+			OutProfile.bShowFFBClipping = FFB->GetBoolField(TEXT("ShowFFBClipping"));
+	}
+	else
+	{
+		// Flat structure fallback
+		if (JsonObject->HasField(TEXT("FFBStrength")))
+			OutProfile.FFBStrength = JsonObject->GetNumberField(TEXT("FFBStrength"));
+		if (JsonObject->HasField(TEXT("bFFBEnabled")))
+			OutProfile.bFFBEnabled = JsonObject->GetBoolField(TEXT("bFFBEnabled"));
+		if (JsonObject->HasField(TEXT("SelfCenteringStrength")))
+			OutProfile.SelfCenteringStrength = JsonObject->GetNumberField(TEXT("SelfCenteringStrength"));
+		if (JsonObject->HasField(TEXT("RoadFeelStrength")))
+			OutProfile.RoadFeelStrength = JsonObject->GetNumberField(TEXT("RoadFeelStrength"));
+		if (JsonObject->HasField(TEXT("CollisionStrength")))
+			OutProfile.CollisionStrength = JsonObject->GetNumberField(TEXT("CollisionStrength"));
+		if (JsonObject->HasField(TEXT("CurbStrength")))
+			OutProfile.CurbStrength = JsonObject->GetNumberField(TEXT("CurbStrength"));
+		if (JsonObject->HasField(TEXT("EngineVibrationStrength")))
+			OutProfile.EngineVibrationStrength = JsonObject->GetNumberField(TEXT("EngineVibrationStrength"));
+		if (JsonObject->HasField(TEXT("UndersteerStrength")))
+			OutProfile.UndersteerStrength = JsonObject->GetNumberField(TEXT("UndersteerStrength"));
+		if (JsonObject->HasField(TEXT("OversteerStrength")))
+			OutProfile.OversteerStrength = JsonObject->GetNumberField(TEXT("OversteerStrength"));
+		if (JsonObject->HasField(TEXT("MinForceThreshold")))
+			OutProfile.MinForceThreshold = JsonObject->GetNumberField(TEXT("MinForceThreshold"));
+		if (JsonObject->HasField(TEXT("DamperStrength")))
+			OutProfile.DamperStrength = JsonObject->GetNumberField(TEXT("DamperStrength"));
+		if (JsonObject->HasField(TEXT("FrictionStrength")))
+			OutProfile.FrictionStrength = JsonObject->GetNumberField(TEXT("FrictionStrength"));
+		if (JsonObject->HasField(TEXT("bShowFFBClipping")))
+			OutProfile.bShowFFBClipping = JsonObject->GetBoolField(TEXT("bShowFFBClipping"));
+	}
 }
 
 void UMGRacingWheelSubsystem::SaveProfilesToDisk()
@@ -994,17 +1139,39 @@ void UMGRacingWheelSubsystem::SaveProfilesToDisk()
 		const FMGWheelProfile& Profile = Pair.Value;
 
 		TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+
+		// Basic info
 		JsonObject->SetStringField(TEXT("ProfileName"), Profile.ProfileName);
+
+		// Steering settings
 		JsonObject->SetNumberField(TEXT("SteeringRotation"), Profile.SteeringRotation);
 		JsonObject->SetNumberField(TEXT("SteeringDeadzone"), Profile.SteeringDeadzone);
 		JsonObject->SetNumberField(TEXT("SteeringLinearity"), Profile.SteeringLinearity);
+		JsonObject->SetBoolField(TEXT("bInvertSteering"), Profile.bInvertSteering);
+
+		// Pedal settings
+		JsonObject->SetNumberField(TEXT("ThrottleDeadzone"), Profile.ThrottleDeadzone);
+		JsonObject->SetNumberField(TEXT("BrakeDeadzone"), Profile.BrakeDeadzone);
+		JsonObject->SetNumberField(TEXT("ClutchDeadzone"), Profile.ClutchDeadzone);
+		JsonObject->SetNumberField(TEXT("ThrottleGamma"), Profile.ThrottleGamma);
+		JsonObject->SetNumberField(TEXT("BrakeGamma"), Profile.BrakeGamma);
+		JsonObject->SetBoolField(TEXT("bCombinedPedals"), Profile.bCombinedPedals);
+		JsonObject->SetBoolField(TEXT("bInvertClutch"), Profile.bInvertClutch);
+
+		// FFB settings
 		JsonObject->SetNumberField(TEXT("FFBStrength"), Profile.FFBStrength);
+		JsonObject->SetBoolField(TEXT("bFFBEnabled"), Profile.bFFBEnabled);
 		JsonObject->SetNumberField(TEXT("SelfCenteringStrength"), Profile.SelfCenteringStrength);
 		JsonObject->SetNumberField(TEXT("RoadFeelStrength"), Profile.RoadFeelStrength);
 		JsonObject->SetNumberField(TEXT("CollisionStrength"), Profile.CollisionStrength);
 		JsonObject->SetNumberField(TEXT("CurbStrength"), Profile.CurbStrength);
-		JsonObject->SetNumberField(TEXT("ThrottleDeadzone"), Profile.ThrottleDeadzone);
-		JsonObject->SetNumberField(TEXT("BrakeDeadzone"), Profile.BrakeDeadzone);
+		JsonObject->SetNumberField(TEXT("EngineVibrationStrength"), Profile.EngineVibrationStrength);
+		JsonObject->SetNumberField(TEXT("UndersteerStrength"), Profile.UndersteerStrength);
+		JsonObject->SetNumberField(TEXT("OversteerStrength"), Profile.OversteerStrength);
+		JsonObject->SetNumberField(TEXT("MinForceThreshold"), Profile.MinForceThreshold);
+		JsonObject->SetNumberField(TEXT("DamperStrength"), Profile.DamperStrength);
+		JsonObject->SetNumberField(TEXT("FrictionStrength"), Profile.FrictionStrength);
+		JsonObject->SetBoolField(TEXT("bShowFFBClipping"), Profile.bShowFFBClipping);
 
 		FString OutputString;
 		TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);

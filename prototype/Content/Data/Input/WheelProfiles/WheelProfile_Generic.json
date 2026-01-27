@@ -1,18 +1,18 @@
 {
     "ProfileName": "Generic",
     "TargetModel": "Generic_DirectInput",
-    "Description": "Generic profile for unknown or unsupported racing wheels",
+    "Description": "Universal profile for DirectInput wheels - Conservative settings optimized for compatibility",
 
     "Steering": {
         "SteeringRotation": 900.0,
-        "SteeringDeadzone": 0.02,
+        "SteeringDeadzone": 0.01,
         "SteeringLinearity": 1.0,
         "InvertSteering": false
     },
 
     "Pedals": {
-        "ThrottleDeadzone": 0.05,
-        "BrakeDeadzone": 0.05,
+        "ThrottleDeadzone": 0.04,
+        "BrakeDeadzone": 0.04,
         "ClutchDeadzone": 0.1,
         "ThrottleGamma": 1.0,
         "BrakeGamma": 1.0,
@@ -22,19 +22,27 @@
 
     "ForceFeedback": {
         "FFBEnabled": true,
-        "FFBStrength": 0.7,
-        "SelfCenteringStrength": 0.5,
-        "RoadFeelStrength": 0.5,
-        "CollisionStrength": 0.8,
-        "CurbStrength": 0.5,
-        "EngineVibrationStrength": 0.2,
-        "UndersteerStrength": 0.4,
-        "OversteerStrength": 0.5,
-        "MinForceThreshold": 0.03,
-        "DamperStrength": 0.2,
-        "FrictionStrength": 0.15,
+        "FFBStrength": 0.70,
+        "SelfCenteringStrength": 0.50,
+        "RoadFeelStrength": 0.55,
+        "CollisionStrength": 0.80,
+        "CurbStrength": 0.55,
+        "EngineVibrationStrength": 0.15,
+        "UndersteerStrength": 0.45,
+        "OversteerStrength": 0.60,
+        "MinForceThreshold": 0.025,
+        "DamperStrength": 0.22,
+        "FrictionStrength": 0.12,
         "ShowFFBClipping": true
     },
 
-    "Notes": "This profile uses conservative settings that should work with most DirectInput wheels. Adjust steering rotation to match your wheel's physical rotation range."
+    "TuningNotes": {
+        "Overview": "Conservative settings designed to work well across different wheel manufacturers",
+        "SelfCentering": "Set to 0.50 - Middle ground that won't overwhelm weaker motors",
+        "RoadFeel": "Set to 0.55 - Moderate detail to avoid harsh feedback on budget wheels",
+        "OversteerStrength": "Set to 0.60 - Provides drift assistance without requiring precise motor control",
+        "DamperStrength": "Set to 0.22 - Higher damping helps smooth out less refined FFB systems",
+        "MinForceThreshold": "Set to 0.025 - Higher threshold to avoid buzz on wheels with less motor resolution",
+        "Recommendation": "If your wheel supports it, try loading a manufacturer-specific profile for better results"
+    }
 }

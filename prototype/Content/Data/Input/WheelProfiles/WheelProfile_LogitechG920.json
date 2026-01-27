@@ -1,7 +1,7 @@
 {
     "ProfileName": "Logitech_G920",
     "TargetModel": "Logitech_G920",
-    "Description": "Default profile for Logitech G920 Driving Force Racing Wheel",
+    "Description": "Optimized profile for Logitech G920 - Balanced for drifting and precision driving",
 
     "Steering": {
         "SteeringRotation": 900.0,
@@ -11,9 +11,9 @@
     },
 
     "Pedals": {
-        "ThrottleDeadzone": 0.03,
-        "BrakeDeadzone": 0.03,
-        "ClutchDeadzone": 0.1,
+        "ThrottleDeadzone": 0.02,
+        "BrakeDeadzone": 0.02,
+        "ClutchDeadzone": 0.08,
         "ThrottleGamma": 1.0,
         "BrakeGamma": 1.0,
         "CombinedPedals": false,
@@ -22,32 +22,40 @@
 
     "ForceFeedback": {
         "FFBEnabled": true,
-        "FFBStrength": 0.75,
-        "SelfCenteringStrength": 0.5,
-        "RoadFeelStrength": 0.6,
-        "CollisionStrength": 0.85,
-        "CurbStrength": 0.6,
-        "EngineVibrationStrength": 0.25,
-        "UndersteerStrength": 0.4,
-        "OversteerStrength": 0.6,
-        "MinForceThreshold": 0.02,
-        "DamperStrength": 0.15,
-        "FrictionStrength": 0.1,
+        "FFBStrength": 0.80,
+        "SelfCenteringStrength": 0.55,
+        "RoadFeelStrength": 0.70,
+        "CollisionStrength": 0.90,
+        "CurbStrength": 0.65,
+        "EngineVibrationStrength": 0.20,
+        "UndersteerStrength": 0.50,
+        "OversteerStrength": 0.75,
+        "MinForceThreshold": 0.015,
+        "DamperStrength": 0.18,
+        "FrictionStrength": 0.08,
         "ShowFFBClipping": true
     },
 
     "ButtonMapping": {
-        "Notes": "G920 button layout",
+        "Notes": "G920 Xbox button layout",
         "Button0": "A",
         "Button1": "B",
         "Button2": "X",
         "Button3": "Y",
-        "Button4": "LeftPaddle",
-        "Button5": "RightPaddle",
+        "Button4": "LeftPaddle_ShiftDown",
+        "Button5": "RightPaddle_ShiftUp",
         "Button6": "Menu",
         "Button7": "View",
         "Button8": "RSB",
         "Button9": "LSB",
         "Button10": "Xbox"
+    },
+
+    "TuningNotes": {
+        "SelfCentering": "Set to 0.55 - Strong enough to feel speed but light enough to drift",
+        "RoadFeel": "Set to 0.70 - Clear tire feedback without being overwhelming",
+        "OversteerStrength": "Set to 0.75 - Strong counter-steer assistance for learning drifts",
+        "UndersteerStrength": "Set to 0.50 - Wheel goes light when pushing too hard",
+        "DamperStrength": "Set to 0.18 - Smooths FFB without feeling sluggish"
     }
 }

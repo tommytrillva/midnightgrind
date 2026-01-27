@@ -10,16 +10,21 @@
 class UMGRacingWheelSubsystem;
 
 /**
- * FFB Processor
+ * Advanced FFB Processor
  *
- * Translates vehicle physics state into force feedback commands.
- * Calculates appropriate FFB effects based on:
- * - Self-centering force (speed-dependent spring)
- * - Aligning torque / road feel (tire slip angle)
- * - Understeer/oversteer feedback
- * - Collision impacts
- * - Kerb/rumble strip effects
- * - Engine vibration at redline
+ * Creates an intuitive, skill-based driving feel through physics-accurate force feedback.
+ * The goal is to make the wheel communicate the car's state so players can feel:
+ * - When they're at the grip limit
+ * - How to initiate and maintain drifts
+ * - Weight transfer through corners
+ * - The difference between understeer and oversteer
+ *
+ * Key Design Principles:
+ * 1. Self-centering reduces as grip is lost (critical for feeling the limit)
+ * 2. The wheel "goes light" during understeer (front tires sliding)
+ * 3. Counter-steer forces during oversteer help players catch slides
+ * 4. Slip angle feedback follows real pneumatic trail physics
+ * 5. Surface textures provide constant road information
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGWheelFFBProcessor : public UObject
@@ -29,120 +34,165 @@ class MIDNIGHTGRIND_API UMGWheelFFBProcessor : public UObject
 public:
 	UMGWheelFFBProcessor();
 
-	/**
-	 * Initialize the processor with a wheel subsystem reference
-	 */
 	void Initialize(UMGRacingWheelSubsystem* InWheelSubsystem);
-
-	/**
-	 * Tick the processor (called from wheel subsystem)
-	 */
 	void Tick(float DeltaTime);
-
-	/**
-	 * Process vehicle physics data and update FFB
-	 */
 	void ProcessVehicleData(const FMGFFBInputData& VehicleData, const FMGWheelProfile& Profile);
-
-	/**
-	 * Get the total output force magnitude (for clipping detection)
-	 */
 	float GetTotalOutputForce() const { return TotalOutputForce; }
-
-	/**
-	 * Get individual effect contributions for debugging
-	 */
 	void GetEffectContributions(float& OutSelfCentering, float& OutAligningTorque,
 								float& OutUndersteer, float& OutOversteer,
 								float& OutSurface, float& OutEngine) const;
-
-	/**
-	 * Reset all accumulated forces
-	 */
 	void Reset();
 
 protected:
-	/** Calculate self-centering spring force */
-	float CalculateSelfCenteringForce(float Speed, float SteeringAngle, const FMGWheelProfile& Profile);
+	// === Core Force Calculations ===
 
-	/** Calculate aligning torque from tire slip */
-	float CalculateAligningTorque(float SlipAngle, float TireLoad, const FMGWheelProfile& Profile);
+	/**
+	 * Calculate self-centering force based on speed and grip
+	 * - Increases with speed (faster = more centering force)
+	 * - Decreases as tires lose grip (critical for feeling the limit!)
+	 * - Goes to zero when airborne
+	 */
+	float CalculateSelfCenteringForce(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
 
-	/** Calculate understeer feedback */
-	float CalculateUndersteerFeedback(float FrontSlip, float RearSlip, const FMGWheelProfile& Profile);
+	/**
+	 * Calculate aligning torque (Self-Aligning Torque / SAT)
+	 * This is the force that makes real steering feel "heavy" or "light"
+	 * - Based on tire slip angle and pneumatic trail
+	 * - Peaks at optimal slip, then drops off as tires slide
+	 * - This is what tells you when you're at the grip limit
+	 */
+	float CalculateAligningTorque(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
 
-	/** Calculate oversteer feedback */
-	float CalculateOversteerFeedback(float FrontSlip, float RearSlip, float YawRate, const FMGWheelProfile& Profile);
+	/**
+	 * Calculate tire grip feedback
+	 * - Communicates front tire grip level through wheel weight
+	 * - Wheel goes progressively lighter as front grip is lost
+	 */
+	float CalculateGripFeedback(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
 
-	/** Calculate kerb/rumble strip effect */
-	void UpdateKerbEffect(bool bOnKerb, float Speed, const FMGWheelProfile& Profile);
+	/**
+	 * Calculate drift/oversteer feedback
+	 * - Provides counter-steer force to help catch slides
+	 * - Force direction opposes the slide
+	 * - Magnitude helps players learn the correct counter-steer amount
+	 */
+	float CalculateDriftFeedback(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
 
-	/** Calculate surface texture effect */
-	void UpdateSurfaceEffect(FName SurfaceType, float Speed, const FMGWheelProfile& Profile);
+	/**
+	 * Calculate weight transfer effects
+	 * - Feel the car loading outer tires in corners
+	 * - Feel braking weight shift forward
+	 * - Feel acceleration weight shift rearward
+	 */
+	float CalculateWeightTransferFeedback(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
 
-	/** Calculate engine vibration effect */
-	void UpdateEngineEffect(float RPMPercent, const FMGWheelProfile& Profile);
+	/**
+	 * Calculate G-force feedback
+	 * - Lateral Gs create resistance in turn direction
+	 * - Longitudinal Gs affect wheel weight
+	 */
+	float CalculateGForceFeedback(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
 
-	/** Apply effects to the wheel */
+	// === Effect Updates ===
+	void UpdateKerbEffect(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
+	void UpdateSurfaceEffect(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
+	void UpdateEngineEffect(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
+	void UpdateCollisionEffect(const FMGFFBInputData& Data, const FMGWheelProfile& Profile);
+
+	// === Output ===
 	void ApplyEffects(const FMGWheelProfile& Profile);
 
-	/** Smooth force transitions */
-	float SmoothForce(float CurrentForce, float TargetForce, float SmoothTime, float DeltaTime);
-
-	/** Apply force curve/gamma */
-	float ApplyForceCurve(float Force, float Gamma = 1.0f);
+	// === Utilities ===
+	float SmoothForce(float Current, float Target, float SmoothTime, float DeltaTime);
+	float ApplyDeadzone(float Value, float Deadzone);
+	float NormalizeSlipAngle(float SlipAngleDeg);
+	float CalculateTireGripFromSlip(float SlipAngle);
 
 private:
-	/** Wheel subsystem reference */
 	UPROPERTY()
 	TWeakObjectPtr<UMGRacingWheelSubsystem> WheelSubsystem;
 
-	/** Last processed vehicle data */
+	// Previous frame data for derivatives
 	FMGFFBInputData LastVehicleData;
+	float LastDeltaTime = 0.016f;
 
-	/** Current force contributions */
-	float CurrentSelfCenteringForce = 0.0f;
+	// === Current Force Components ===
+	float CurrentSelfCentering = 0.0f;
 	float CurrentAligningTorque = 0.0f;
-	float CurrentUndersteerForce = 0.0f;
-	float CurrentOversteerForce = 0.0f;
-	float CurrentSurfaceForce = 0.0f;
+	float CurrentGripFeedback = 0.0f;
+	float CurrentDriftFeedback = 0.0f;
+	float CurrentWeightTransfer = 0.0f;
+	float CurrentGForce = 0.0f;
+	float CurrentSurfaceRumble = 0.0f;
 	float CurrentEngineVibration = 0.0f;
-	float CurrentDamperForce = 0.0f;
 
-	/** Target forces for smoothing */
-	float TargetSelfCenteringForce = 0.0f;
+	// === Target Forces (for smoothing) ===
+	float TargetSelfCentering = 0.0f;
 	float TargetAligningTorque = 0.0f;
-	float TargetUndersteerForce = 0.0f;
-	float TargetOversteerForce = 0.0f;
+	float TargetGripFeedback = 0.0f;
+	float TargetDriftFeedback = 0.0f;
+	float TargetWeightTransfer = 0.0f;
+	float TargetGForce = 0.0f;
 
-	/** Total output force */
+	// === Output ===
 	float TotalOutputForce = 0.0f;
+	float TotalConstantForce = 0.0f;
+	float TotalSpringForce = 0.0f;
 
-	/** Active effect IDs */
+	// === Active Effect IDs ===
 	FGuid ConstantForceEffectID;
 	FGuid SpringEffectID;
 	FGuid DamperEffectID;
 	FGuid SurfaceEffectID;
 	FGuid EngineEffectID;
 	FGuid KerbEffectID;
+	FGuid CollisionEffectID;
 
-	/** Timing */
+	// === State Tracking ===
 	float TimeSinceLastUpdate = 0.0f;
-
-	/** State tracking */
-	bool bOnKerb = false;
-	FName CurrentSurface = NAME_None;
+	bool bWasOnKerb = false;
+	FName CurrentSurfaceType = NAME_None;
 	bool bIsAirborne = false;
+	bool bWasDrifting = false;
+	float DriftEntryTime = 0.0f;
+	float CurrentDriftDuration = 0.0f;
+	float PeakDriftAngle = 0.0f;
 
-	/** Smoothing parameters */
-	const float SelfCenteringSmoothTime = 0.05f;
-	const float AligningTorqueSmoothTime = 0.03f;
-	const float SlipFeedbackSmoothTime = 0.08f;
+	// === Smoothing Times (tuned for responsiveness vs smoothness) ===
+	// Faster = more responsive but can feel twitchy
+	// Slower = smoother but can feel laggy
+	static constexpr float SelfCenteringSmoothTime = 0.04f;    // Quick response for centering
+	static constexpr float AligningTorqueSmoothTime = 0.025f;  // Very quick - this is your grip info
+	static constexpr float GripFeedbackSmoothTime = 0.06f;     // Slightly slower for stability
+	static constexpr float DriftFeedbackSmoothTime = 0.02f;    // Instant! Critical for catching slides
+	static constexpr float WeightTransferSmoothTime = 0.08f;   // Slower - weight transfer is gradual
+	static constexpr float GForceSmoothTime = 0.05f;           // Medium speed
 
-	/** Force calculation constants */
-	const float MaxSelfCenteringSpeed = 200.0f; // km/h at which self-centering is maximum
-	const float MinSelfCenteringSpeed = 5.0f;   // Below this, no self-centering
-	const float MaxSlipAngleForFeedback = 12.0f; // Degrees
-	const float UndersteerThreshold = 0.7f;     // Slip ratio threshold
-	const float OversteerThreshold = 0.6f;      // Rear slip angle threshold
+	// === Physics Constants ===
+	// These define how the forces feel - tuned for arcade-sim balance
+
+	// Self-centering
+	static constexpr float MinSpeedForCentering = 5.0f;        // km/h - no centering when nearly stopped
+	static constexpr float MaxCenteringSpeed = 180.0f;         // km/h - centering maxes out here
+	static constexpr float BaseCenteringStrength = 0.4f;       // Base spring strength at max speed
+
+	// Aligning torque (the magic that makes steering feel alive)
+	static constexpr float OptimalSlipAngle = 8.0f;            // Degrees - peak grip slip angle
+	static constexpr float MaxSlipAngle = 25.0f;               // Degrees - beyond this, full slide
+	static constexpr float PeakAligningTorque = 0.6f;          // Force at optimal slip
+	static constexpr float SlidingAligningTorque = 0.15f;      // Force when fully sliding (goes light!)
+
+	// Drift feedback
+	static constexpr float DriftAngleThreshold = 10.0f;        // Degrees to consider "drifting"
+	static constexpr float MaxDriftAngleForFeedback = 60.0f;   // Degrees - scale force up to here
+	static constexpr float DriftCounterForceBase = 0.5f;       // Base counter-steer force
+	static constexpr float DriftCounterForceMax = 0.8f;        // Max counter-steer force
+
+	// Weight transfer
+	static constexpr float MaxLateralGForFeedback = 1.5f;      // G - scale forces up to this
+	static constexpr float MaxLongitudinalGForFeedback = 1.2f; // G
+
+	// Grip simulation
+	static constexpr float GripLossStartAngle = 6.0f;          // Degrees - grip starts to fade
+	static constexpr float GripLossFullAngle = 20.0f;          // Degrees - grip fully lost
 };

@@ -16,6 +16,7 @@ void UMGWheelFFBProcessor::Initialize(UMGRacingWheelSubsystem* InWheelSubsystem)
 void UMGWheelFFBProcessor::Tick(float DeltaTime)
 {
 	TimeSinceLastUpdate += DeltaTime;
+	LastDeltaTime = DeltaTime;
 }
 
 void UMGWheelFFBProcessor::ProcessVehicleData(const FMGFFBInputData& VehicleData, const FMGWheelProfile& Profile)
@@ -25,182 +26,301 @@ void UMGWheelFFBProcessor::ProcessVehicleData(const FMGFFBInputData& VehicleData
 		return;
 	}
 
-	float DeltaTime = TimeSinceLastUpdate;
+	float DeltaTime = FMath::Max(TimeSinceLastUpdate, 0.001f);
 	TimeSinceLastUpdate = 0.0f;
 
-	// Store current data
-	LastVehicleData = VehicleData;
+	// Track drift state
+	const bool bIsDriftingNow = FMath::Abs(VehicleData.DriftAngle) > DriftAngleThreshold;
+	if (bIsDriftingNow && !bWasDrifting)
+	{
+		// Just started drifting
+		DriftEntryTime = 0.0f;
+		PeakDriftAngle = FMath::Abs(VehicleData.DriftAngle);
+	}
+	if (bIsDriftingNow)
+	{
+		CurrentDriftDuration += DeltaTime;
+		PeakDriftAngle = FMath::Max(PeakDriftAngle, FMath::Abs(VehicleData.DriftAngle));
+	}
+	else
+	{
+		CurrentDriftDuration = 0.0f;
+		PeakDriftAngle = 0.0f;
+	}
+	bWasDrifting = bIsDriftingNow;
+
+	// Check airborne state
 	bIsAirborne = VehicleData.bIsAirborne;
 
-	// Skip FFB processing if airborne
+	// === CALCULATE TARGET FORCES ===
+	// When airborne, smoothly reduce all forces to zero
+
 	if (bIsAirborne)
 	{
-		// Reduce all forces smoothly
-		CurrentSelfCenteringForce = SmoothForce(CurrentSelfCenteringForce, 0.0f, 0.1f, DeltaTime);
-		CurrentAligningTorque = SmoothForce(CurrentAligningTorque, 0.0f, 0.1f, DeltaTime);
-		CurrentUndersteerForce = SmoothForce(CurrentUndersteerForce, 0.0f, 0.1f, DeltaTime);
-		CurrentOversteerForce = SmoothForce(CurrentOversteerForce, 0.0f, 0.1f, DeltaTime);
-		ApplyEffects(Profile);
-		return;
-	}
-
-	// Calculate self-centering force
-	TargetSelfCenteringForce = CalculateSelfCenteringForce(
-		VehicleData.SpeedKmh,
-		VehicleData.SteeringAngle,
-		Profile
-	);
-
-	// Calculate aligning torque (road feel)
-	TargetAligningTorque = CalculateAligningTorque(
-		VehicleData.FrontSlipAngle,
-		VehicleData.FrontTireLoad,
-		Profile
-	);
-
-	// Calculate understeer feedback
-	if (VehicleData.bIsUndersteering)
-	{
-		TargetUndersteerForce = CalculateUndersteerFeedback(
-			VehicleData.FrontSlipAngle,
-			VehicleData.RearSlipAngle,
-			Profile
-		);
+		TargetSelfCentering = 0.0f;
+		TargetAligningTorque = 0.0f;
+		TargetGripFeedback = 0.0f;
+		TargetDriftFeedback = 0.0f;
+		TargetWeightTransfer = 0.0f;
+		TargetGForce = 0.0f;
 	}
 	else
 	{
-		TargetUndersteerForce = 0.0f;
+		// Calculate each force component
+		TargetSelfCentering = CalculateSelfCenteringForce(VehicleData, Profile);
+		TargetAligningTorque = CalculateAligningTorque(VehicleData, Profile);
+		TargetGripFeedback = CalculateGripFeedback(VehicleData, Profile);
+		TargetDriftFeedback = CalculateDriftFeedback(VehicleData, Profile);
+		TargetWeightTransfer = CalculateWeightTransferFeedback(VehicleData, Profile);
+		TargetGForce = CalculateGForceFeedback(VehicleData, Profile);
 	}
 
-	// Calculate oversteer feedback
-	if (VehicleData.bIsOversteering)
-	{
-		TargetOversteerForce = CalculateOversteerFeedback(
-			VehicleData.FrontSlipAngle,
-			VehicleData.RearSlipAngle,
-			VehicleData.YawRate,
-			Profile
-		);
-	}
-	else
-	{
-		TargetOversteerForce = 0.0f;
-	}
+	// === SMOOTH FORCE TRANSITIONS ===
+	// Different smoothing times for different effects create a layered, natural feel
 
-	// Smooth force transitions
-	CurrentSelfCenteringForce = SmoothForce(CurrentSelfCenteringForce, TargetSelfCenteringForce, SelfCenteringSmoothTime, DeltaTime);
+	CurrentSelfCentering = SmoothForce(CurrentSelfCentering, TargetSelfCentering, SelfCenteringSmoothTime, DeltaTime);
 	CurrentAligningTorque = SmoothForce(CurrentAligningTorque, TargetAligningTorque, AligningTorqueSmoothTime, DeltaTime);
-	CurrentUndersteerForce = SmoothForce(CurrentUndersteerForce, TargetUndersteerForce, SlipFeedbackSmoothTime, DeltaTime);
-	CurrentOversteerForce = SmoothForce(CurrentOversteerForce, TargetOversteerForce, SlipFeedbackSmoothTime, DeltaTime);
+	CurrentGripFeedback = SmoothForce(CurrentGripFeedback, TargetGripFeedback, GripFeedbackSmoothTime, DeltaTime);
+	CurrentDriftFeedback = SmoothForce(CurrentDriftFeedback, TargetDriftFeedback, DriftFeedbackSmoothTime, DeltaTime);
+	CurrentWeightTransfer = SmoothForce(CurrentWeightTransfer, TargetWeightTransfer, WeightTransferSmoothTime, DeltaTime);
+	CurrentGForce = SmoothForce(CurrentGForce, TargetGForce, GForceSmoothTime, DeltaTime);
 
-	// Update periodic effects
-	UpdateKerbEffect(VehicleData.bOnRumbleStrip, VehicleData.SpeedKmh, Profile);
-	UpdateSurfaceEffect(VehicleData.SurfaceType, VehicleData.SpeedKmh, Profile);
-	UpdateEngineEffect(VehicleData.EngineRPM / VehicleData.MaxEngineRPM, Profile);
+	// === UPDATE PERIODIC EFFECTS ===
+	UpdateKerbEffect(VehicleData, Profile);
+	UpdateSurfaceEffect(VehicleData, Profile);
+	UpdateEngineEffect(VehicleData, Profile);
+	UpdateCollisionEffect(VehicleData, Profile);
 
-	// Apply all effects to the wheel
+	// === APPLY TO WHEEL ===
 	ApplyEffects(Profile);
+
+	// Store for next frame
+	LastVehicleData = VehicleData;
 }
 
-float UMGWheelFFBProcessor::CalculateSelfCenteringForce(float Speed, float SteeringAngle, const FMGWheelProfile& Profile)
+// ============================================================================
+// SELF-CENTERING FORCE
+// The spring that pulls the wheel back to center. Critical for feeling speed
+// and grip level. Reduces when grip is lost!
+// ============================================================================
+float UMGWheelFFBProcessor::CalculateSelfCenteringForce(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
 {
-	if (Speed < MinSelfCenteringSpeed)
+	// No centering at very low speeds (feels unnatural when parking)
+	if (Data.SpeedKmh < MinSpeedForCentering)
 	{
 		return 0.0f;
 	}
 
-	// Self-centering increases with speed
-	float SpeedFactor = FMath::Clamp(Speed / MaxSelfCenteringSpeed, 0.0f, 1.0f);
+	// Speed factor: centering increases with speed (0 to 1)
+	float SpeedFactor = FMath::Clamp((Data.SpeedKmh - MinSpeedForCentering) / (MaxCenteringSpeed - MinSpeedForCentering), 0.0f, 1.0f);
 
-	// Spring force proportional to steering angle
-	float SpringForce = -SteeringAngle * SpeedFactor;
+	// Apply a curve so centering builds more gradually at low speed
+	SpeedFactor = FMath::Pow(SpeedFactor, 0.7f);
 
-	// Apply profile strength
-	SpringForce *= Profile.SelfCenteringStrength;
+	// Calculate front tire grip (0 = no grip, 1 = full grip)
+	// This is THE critical feedback - when you're losing grip, centering reduces
+	float FrontGrip = CalculateTireGripFromSlip(Data.FrontSlipAngle);
 
-	// Apply a curve for more natural feel (stronger at center, softer at extremes)
-	float AbsForce = FMath::Abs(SpringForce);
-	float CurvedForce = FMath::Pow(AbsForce, 0.8f) * FMath::Sign(SpringForce);
+	// Base centering strength, modified by speed and grip
+	float CenteringStrength = BaseCenteringStrength * SpeedFactor * FrontGrip;
 
-	return FMath::Clamp(CurvedForce, -1.0f, 1.0f);
+	// Apply profile setting
+	CenteringStrength *= Profile.SelfCenteringStrength;
+
+	return FMath::Clamp(CenteringStrength, 0.0f, 1.0f);
 }
 
-float UMGWheelFFBProcessor::CalculateAligningTorque(float SlipAngle, float TireLoad, const FMGWheelProfile& Profile)
+// ============================================================================
+// ALIGNING TORQUE (Self-Aligning Torque / SAT)
+// This is what makes steering feel "alive". It's the force created by the tire's
+// contact patch wanting to align with the direction of travel.
+// - Increases with slip angle up to a point
+// - Then DECREASES as the tire starts sliding (the wheel goes "light")
+// - This is your primary grip indicator!
+// ============================================================================
+float UMGWheelFFBProcessor::CalculateAligningTorque(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
 {
-	// Aligning torque from pneumatic trail
-	// Gives the driver information about tire grip
+	// Get front slip angle (use average if we have both wheels)
+	float SlipAngle = FMath::Abs(Data.FrontSlipAngle);
+	float SlipSign = FMath::Sign(Data.FrontSlipAngle);
 
-	// Normalize slip angle
-	float NormalizedSlip = FMath::Clamp(SlipAngle / MaxSlipAngleForFeedback, -1.0f, 1.0f);
+	// Normalize slip angle to our scale
+	float NormalizedSlip = SlipAngle / MaxSlipAngle;
 
-	// Self-aligning torque curve (peaks around 6-8 degrees, then drops off)
-	// Using a simplified model: SAT = slip * (1 - slip^2)
-	float SlipSquared = NormalizedSlip * NormalizedSlip;
-	float SAT = NormalizedSlip * (1.0f - SlipSquared * 0.5f);
+	// The magic: SAT curve
+	// - Linear increase up to optimal slip angle
+	// - Peak at optimal slip
+	// - Decrease as tire slides (goes light!)
+	float SAT = 0.0f;
 
-	// Scale by tire load (more load = more feedback)
-	SAT *= FMath::Clamp(TireLoad, 0.5f, 1.5f);
+	if (SlipAngle <= OptimalSlipAngle)
+	{
+		// Building up to peak - linear increase
+		float T = SlipAngle / OptimalSlipAngle;
+		SAT = PeakAligningTorque * T;
+	}
+	else if (SlipAngle <= MaxSlipAngle)
+	{
+		// Past peak, dropping off - tire is sliding
+		// This is the "lightening" that tells you grip is being lost
+		float T = (SlipAngle - OptimalSlipAngle) / (MaxSlipAngle - OptimalSlipAngle);
+		SAT = FMath::Lerp(PeakAligningTorque, SlidingAligningTorque, T);
+	}
+	else
+	{
+		// Full slide - minimal feedback
+		SAT = SlidingAligningTorque;
+	}
+
+	// Modify by tire load (more load = more feedback)
+	SAT *= FMath::Clamp(Data.FrontTireLoad, 0.3f, 1.5f);
+
+	// Speed scaling - more feedback at higher speeds
+	float SpeedScale = FMath::Clamp(Data.SpeedKmh / 100.0f, 0.2f, 1.0f);
+	SAT *= SpeedScale;
 
 	// Apply profile strength
 	SAT *= Profile.RoadFeelStrength;
 
-	return FMath::Clamp(SAT, -1.0f, 1.0f);
+	// Apply direction (force is opposite to slip)
+	return FMath::Clamp(-SAT * SlipSign, -1.0f, 1.0f);
 }
 
-float UMGWheelFFBProcessor::CalculateUndersteerFeedback(float FrontSlip, float RearSlip, const FMGWheelProfile& Profile)
+// ============================================================================
+// GRIP FEEDBACK
+// Additional feedback that modifies how "heavy" the wheel feels based on
+// available grip. When understeering, the wheel should feel lighter.
+// ============================================================================
+float UMGWheelFFBProcessor::CalculateGripFeedback(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
 {
-	// Understeer: front tires are slipping more than rear
-	// Feedback: reduce spring force / wheel feels "light"
+	// Calculate grip loss (0 = full grip, 1 = no grip)
+	float FrontSlip = FMath::Abs(Data.FrontSlipAngle);
 
-	float SlipDifference = FMath::Abs(FrontSlip) - FMath::Abs(RearSlip);
-	if (SlipDifference <= 0.0f)
+	float GripLoss = 0.0f;
+	if (FrontSlip > GripLossStartAngle)
+	{
+		GripLoss = FMath::Clamp((FrontSlip - GripLossStartAngle) / (GripLossFullAngle - GripLossStartAngle), 0.0f, 1.0f);
+	}
+
+	// When understeering, the feedback should reduce (wheel goes light)
+	// This is returned as a negative modifier to overall force
+	float UndersteerModifier = 0.0f;
+	if (Data.bIsUndersteering)
+	{
+		UndersteerModifier = GripLoss * Profile.UndersteerStrength;
+	}
+
+	return -UndersteerModifier;
+}
+
+// ============================================================================
+// DRIFT FEEDBACK
+// Counter-steer force that helps players catch and maintain drifts.
+// When the rear is sliding, the wheel pushes in the counter-steer direction.
+// This teaches correct drift technique through feel!
+// ============================================================================
+float UMGWheelFFBProcessor::CalculateDriftFeedback(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
+{
+	if (!Data.bIsDrifting && !Data.bIsOversteering)
 	{
 		return 0.0f;
 	}
 
-	// Normalize understeer amount
-	float UndersteerAmount = FMath::Clamp(SlipDifference / MaxSlipAngleForFeedback, 0.0f, 1.0f);
+	float DriftAngle = Data.DriftAngle;
+	float AbsDriftAngle = FMath::Abs(DriftAngle);
 
-	// Apply profile strength
-	UndersteerAmount *= Profile.UndersteerStrength;
-
-	// This will reduce the overall force (implemented as negative modifier to spring)
-	return UndersteerAmount;
-}
-
-float UMGWheelFFBProcessor::CalculateOversteerFeedback(float FrontSlip, float RearSlip, float YawRate, const FMGWheelProfile& Profile)
-{
-	// Oversteer: rear tires are sliding out
-	// Feedback: counter-force in direction opposite to slide
-
-	// Calculate oversteer amount from rear slip
-	float OversteerAmount = FMath::Clamp(FMath::Abs(RearSlip) / MaxSlipAngleForFeedback, 0.0f, 1.0f);
-
-	// Add yaw rate contribution
-	float YawContribution = FMath::Clamp(FMath::Abs(YawRate) / 90.0f, 0.0f, 0.5f);
-	OversteerAmount = FMath::Clamp(OversteerAmount + YawContribution, 0.0f, 1.0f);
-
-	// Determine direction of counter-force
-	float Direction = FMath::Sign(RearSlip);
-
-	// Apply profile strength
-	float Force = OversteerAmount * Profile.OversteerStrength * Direction;
-
-	return FMath::Clamp(Force, -1.0f, 1.0f);
-}
-
-void UMGWheelFFBProcessor::UpdateKerbEffect(bool bOnKerb, float Speed, const FMGWheelProfile& Profile)
-{
-	if (bOnKerb && !bOnKerb)
+	// No feedback below threshold
+	if (AbsDriftAngle < DriftAngleThreshold)
 	{
-		// Start kerb effect
+		return 0.0f;
+	}
+
+	// Calculate counter-steer force
+	// - Starts at base force when drift begins
+	// - Increases up to max as drift angle increases
+	// - Direction is opposite to drift angle (helps player counter-steer)
+
+	float DriftMagnitude = FMath::Clamp(
+		(AbsDriftAngle - DriftAngleThreshold) / (MaxDriftAngleForFeedback - DriftAngleThreshold),
+		0.0f, 1.0f
+	);
+
+	// Apply a curve so small drifts feel controllable, big drifts feel powerful
+	DriftMagnitude = FMath::Pow(DriftMagnitude, 0.8f);
+
+	float CounterForce = FMath::Lerp(DriftCounterForceBase, DriftCounterForceMax, DriftMagnitude);
+
+	// Add bonus force for sustained drifts (rewards holding the drift)
+	if (CurrentDriftDuration > 0.5f)
+	{
+		float DurationBonus = FMath::Clamp((CurrentDriftDuration - 0.5f) / 2.0f, 0.0f, 0.15f);
+		CounterForce += DurationBonus;
+	}
+
+	// Apply profile strength
+	CounterForce *= Profile.OversteerStrength;
+
+	// Direction: positive drift angle (sliding right) needs negative force (counter-steer left)
+	float Direction = -FMath::Sign(DriftAngle);
+
+	return FMath::Clamp(CounterForce * Direction, -1.0f, 1.0f);
+}
+
+// ============================================================================
+// WEIGHT TRANSFER FEEDBACK
+// Feel the car's weight shifting as you brake, accelerate, and corner.
+// This adds depth to the driving feel.
+// ============================================================================
+float UMGWheelFFBProcessor::CalculateWeightTransferFeedback(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
+{
+	// Longitudinal weight transfer (braking/acceleration)
+	// Braking = weight forward = heavier steering
+	// Acceleration = weight rearward = lighter steering
+	float LongG = FMath::Clamp(Data.LongitudinalG, -MaxLongitudinalGForFeedback, MaxLongitudinalGForFeedback);
+	float LongTransfer = -LongG / MaxLongitudinalGForFeedback * 0.15f; // Subtle effect
+
+	// Lateral weight transfer (cornering)
+	// Weight transfers to outside tires, which changes steering feel slightly
+	float LatG = FMath::Clamp(Data.LateralG, -MaxLateralGForFeedback, MaxLateralGForFeedback);
+	float LatTransfer = LatG / MaxLateralGForFeedback * 0.1f; // Very subtle
+
+	return FMath::Clamp(LongTransfer + LatTransfer, -0.3f, 0.3f);
+}
+
+// ============================================================================
+// G-FORCE FEEDBACK
+// Direct feel of lateral and longitudinal G-forces through the wheel.
+// Creates that "seat of the pants" feeling.
+// ============================================================================
+float UMGWheelFFBProcessor::CalculateGForceFeedback(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
+{
+	// Lateral G creates a force that resists the turn
+	// This simulates the feeling of fighting the car through corners
+	float LatG = Data.LateralG;
+	float LatGForce = FMath::Clamp(LatG / MaxLateralGForFeedback, -1.0f, 1.0f) * 0.2f;
+
+	return LatGForce;
+}
+
+// ============================================================================
+// KERB EFFECT
+// Sharp, aggressive rumble when hitting kerbs/rumble strips.
+// Higher frequency than surface texture for clear distinction.
+// ============================================================================
+void UMGWheelFFBProcessor::UpdateKerbEffect(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
+{
+	bool bOnKerbNow = Data.bOnRumbleStrip;
+
+	if (bOnKerbNow && !bWasOnKerb)
+	{
+		// Start kerb effect - aggressive square wave
 		if (WheelSubsystem.IsValid())
 		{
-			float Intensity = FMath::Clamp(Speed / 200.0f, 0.3f, 1.0f);
+			float Intensity = FMath::Clamp(Data.SpeedKmh / 150.0f, 0.4f, 1.0f);
 			KerbEffectID = WheelSubsystem->TriggerKerbFFB(Intensity * Profile.CurbStrength, -1.0f);
 		}
 	}
-	else if (!bOnKerb && bOnKerb)
+	else if (!bOnKerbNow && bWasOnKerb)
 	{
 		// Stop kerb effect
 		if (WheelSubsystem.IsValid() && KerbEffectID.IsValid())
@@ -210,53 +330,165 @@ void UMGWheelFFBProcessor::UpdateKerbEffect(bool bOnKerb, float Speed, const FMG
 		}
 	}
 
-	bOnKerb = bOnKerb;
+	bWasOnKerb = bOnKerbNow;
 }
 
-void UMGWheelFFBProcessor::UpdateSurfaceEffect(FName SurfaceType, float Speed, const FMGWheelProfile& Profile)
+// ============================================================================
+// SURFACE EFFECT
+// Continuous texture feedback based on road surface.
+// Each surface should feel distinct and provide useful information.
+// ============================================================================
+void UMGWheelFFBProcessor::UpdateSurfaceEffect(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
 {
-	if (SurfaceType != CurrentSurface)
+	if (Data.SurfaceType == CurrentSurfaceType)
 	{
-		CurrentSurface = SurfaceType;
-
-		if (WheelSubsystem.IsValid())
-		{
-			// Stop previous surface effect
-			if (SurfaceEffectID.IsValid())
-			{
-				WheelSubsystem->StopFFBEffect(SurfaceEffectID);
-			}
-
-			// Start new surface effect
-			float Intensity = FMath::Clamp(Speed / 150.0f, 0.1f, 1.0f);
-			SurfaceEffectID = WheelSubsystem->TriggerSurfaceFFB(SurfaceType, Intensity);
-		}
+		return; // No change
 	}
-}
 
-void UMGWheelFFBProcessor::UpdateEngineEffect(float RPMPercent, const FMGWheelProfile& Profile)
-{
-	if (Profile.EngineVibrationStrength <= 0.0f)
+	CurrentSurfaceType = Data.SurfaceType;
+
+	if (!WheelSubsystem.IsValid())
 	{
 		return;
 	}
 
-	// Engine vibration only near redline (above 90%)
-	if (RPMPercent > 0.9f)
+	// Stop previous effect
+	if (SurfaceEffectID.IsValid())
 	{
-		CurrentEngineVibration = (RPMPercent - 0.9f) * 10.0f * Profile.EngineVibrationStrength;
+		WheelSubsystem->StopFFBEffect(SurfaceEffectID);
+		SurfaceEffectID.Invalidate();
+	}
+
+	// Start new surface effect based on type
+	float SpeedIntensity = FMath::Clamp(Data.SpeedKmh / 120.0f, 0.1f, 1.0f);
+
+	FMGFFBEffect Effect;
+	Effect.EffectType = EMGFFBEffectType::SineWave;
+	Effect.Duration = -1.0f; // Continuous
+
+	// Configure based on surface
+	if (Data.SurfaceType == FName("Gravel"))
+	{
+		// Gravel: Strong, chaotic feel
+		Effect.Magnitude = 0.35f * SpeedIntensity;
+		Effect.Frequency = 22.0f + FMath::RandRange(-3.0f, 3.0f);
+	}
+	else if (Data.SurfaceType == FName("Dirt"))
+	{
+		// Dirt: Moderate rumble, lower frequency
+		Effect.Magnitude = 0.25f * SpeedIntensity;
+		Effect.Frequency = 15.0f;
+	}
+	else if (Data.SurfaceType == FName("Grass"))
+	{
+		// Grass: Soft, low-frequency
+		Effect.Magnitude = 0.18f * SpeedIntensity;
+		Effect.Frequency = 10.0f;
+	}
+	else if (Data.SurfaceType == FName("Sand"))
+	{
+		// Sand: Heavy, sluggish feel
+		Effect.Magnitude = 0.30f * SpeedIntensity;
+		Effect.Frequency = 18.0f;
+	}
+	else if (Data.SurfaceType == FName("Wet"))
+	{
+		// Wet: Subtle texture, reduced grip feel comes from other systems
+		Effect.Magnitude = 0.08f * SpeedIntensity;
+		Effect.Frequency = 25.0f;
+	}
+	else if (Data.SurfaceType == FName("Ice"))
+	{
+		// Ice: Almost no texture (that's the scary part)
+		Effect.Magnitude = 0.03f * SpeedIntensity;
+		Effect.Frequency = 40.0f;
 	}
 	else
 	{
-		CurrentEngineVibration = 0.0f;
+		// Asphalt: Minimal texture at high speed, smooth road
+		Effect.Magnitude = 0.02f * SpeedIntensity;
+		Effect.Frequency = 35.0f;
 	}
 
-	if (WheelSubsystem.IsValid())
+	if (Effect.Magnitude > 0.01f)
 	{
-		WheelSubsystem->UpdateEngineFFB(RPMPercent);
+		SurfaceEffectID = WheelSubsystem->PlayFFBEffect(Effect);
 	}
 }
 
+// ============================================================================
+// ENGINE EFFECT
+// Vibration from the engine, especially near redline.
+// Provides auditory-haptic feedback synchronization.
+// ============================================================================
+void UMGWheelFFBProcessor::UpdateEngineEffect(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
+{
+	if (Profile.EngineVibrationStrength <= 0.01f)
+	{
+		return;
+	}
+
+	float RPMPercent = Data.EngineRPM / FMath::Max(Data.MaxEngineRPM, 1000.0f);
+
+	// Only vibrate near/at redline (above 85%)
+	if (RPMPercent < 0.85f)
+	{
+		if (EngineEffectID.IsValid() && WheelSubsystem.IsValid())
+		{
+			WheelSubsystem->StopFFBEffect(EngineEffectID);
+			EngineEffectID.Invalidate();
+		}
+		CurrentEngineVibration = 0.0f;
+		return;
+	}
+
+	// Calculate intensity based on how far into redline we are
+	float RedlineAmount = (RPMPercent - 0.85f) / 0.15f; // 0 at 85%, 1 at 100%
+	CurrentEngineVibration = RedlineAmount * Profile.EngineVibrationStrength * 0.25f;
+
+	FMGFFBEffect Effect;
+	Effect.EffectType = EMGFFBEffectType::SineWave;
+	Effect.Magnitude = CurrentEngineVibration;
+	Effect.Frequency = 35.0f + RedlineAmount * 45.0f; // 35-80 Hz
+	Effect.Duration = -1.0f;
+
+	if (WheelSubsystem.IsValid())
+	{
+		if (!EngineEffectID.IsValid())
+		{
+			EngineEffectID = WheelSubsystem->PlayFFBEffect(Effect);
+		}
+		else
+		{
+			WheelSubsystem->UpdateFFBEffect(EngineEffectID, Effect);
+		}
+	}
+}
+
+// ============================================================================
+// COLLISION EFFECT
+// Sharp impact when collision data is present.
+// ============================================================================
+void UMGWheelFFBProcessor::UpdateCollisionEffect(const FMGFFBInputData& Data, const FMGWheelProfile& Profile)
+{
+	if (Data.CollisionImpact <= 0.0f)
+	{
+		return;
+	}
+
+	if (!WheelSubsystem.IsValid())
+	{
+		return;
+	}
+
+	// Trigger collision FFB
+	WheelSubsystem->TriggerCollisionFFB(Data.CollisionImpact * Profile.CollisionStrength, Data.CollisionDirection);
+}
+
+// ============================================================================
+// APPLY EFFECTS
+// Combines all calculated forces and sends them to the wheel.
+// ============================================================================
 void UMGWheelFFBProcessor::ApplyEffects(const FMGWheelProfile& Profile)
 {
 	if (!WheelSubsystem.IsValid())
@@ -264,30 +496,51 @@ void UMGWheelFFBProcessor::ApplyEffects(const FMGWheelProfile& Profile)
 		return;
 	}
 
-	// Combine all forces
-	// Self-centering is a spring effect, others are constant force modifiers
+	// === COMBINE CONSTANT FORCES ===
+	// These are directional forces that push the wheel one way or another
 
-	// Calculate final constant force (aligning torque + oversteer)
-	float ConstantForce = CurrentAligningTorque + CurrentOversteerForce;
+	// Aligning torque - the main "road feel"
+	float ConstantForce = CurrentAligningTorque;
 
-	// Understeer reduces the overall force feel
-	float UndersteerModifier = 1.0f - (CurrentUndersteerForce * 0.5f);
+	// Add drift counter-steer force
+	ConstantForce += CurrentDriftFeedback;
 
-	// Apply understeer modifier
-	ConstantForce *= UndersteerModifier;
+	// Add G-force feedback
+	ConstantForce += CurrentGForce;
 
-	// Track total force for clipping detection
-	TotalOutputForce = FMath::Abs(ConstantForce) + FMath::Abs(CurrentSelfCenteringForce);
+	// Add weight transfer (subtle)
+	ConstantForce += CurrentWeightTransfer;
 
-	// Apply spring effect (self-centering)
-	float SpringCoefficient = FMath::Clamp(CurrentSelfCenteringForce * UndersteerModifier, 0.0f, 1.0f);
-	WheelSubsystem->SetSelfCentering(SpringCoefficient, 0.5f);
+	// Grip feedback reduces overall force magnitude (understeer = light wheel)
+	float GripModifier = 1.0f + CurrentGripFeedback; // GripFeedback is negative when losing grip
+	ConstantForce *= FMath::Max(GripModifier, 0.2f);
 
-	// Apply damper
+	// Apply minimum force threshold
+	if (FMath::Abs(ConstantForce) < Profile.MinForceThreshold)
+	{
+		ConstantForce = 0.0f;
+	}
+
+	TotalConstantForce = ConstantForce;
+
+	// === APPLY SPRING (SELF-CENTERING) ===
+	// Modified by grip - when understeering, centering reduces
+
+	float SpringStrength = CurrentSelfCentering;
+	SpringStrength *= FMath::Max(GripModifier, 0.3f);
+
+	TotalSpringForce = SpringStrength;
+
+	// === SEND TO WHEEL ===
+
+	// Spring effect (self-centering)
+	WheelSubsystem->SetSelfCentering(SpringStrength, 0.5f + SpringStrength * 0.3f);
+
+	// Damper (smooths out the FFB, reduces oscillation)
 	WheelSubsystem->SetDamperStrength(Profile.DamperStrength);
 
-	// Apply constant force for road feel
-	if (FMath::Abs(ConstantForce) > Profile.MinForceThreshold)
+	// Constant force (road feel, drift feedback, etc.)
+	if (FMath::Abs(ConstantForce) > 0.01f)
 	{
 		FMGFFBEffect Effect;
 		Effect.EffectType = EMGFFBEffectType::ConstantForce;
@@ -308,55 +561,100 @@ void UMGWheelFFBProcessor::ApplyEffects(const FMGWheelProfile& Profile)
 		WheelSubsystem->StopFFBEffect(ConstantForceEffectID);
 		ConstantForceEffectID.Invalidate();
 	}
+
+	// Calculate total output for clipping detection
+	TotalOutputForce = FMath::Abs(ConstantForce) + SpringStrength * 0.5f + CurrentEngineVibration + CurrentSurfaceRumble;
 }
 
-float UMGWheelFFBProcessor::SmoothForce(float CurrentForce, float TargetForce, float SmoothTime, float DeltaTime)
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+float UMGWheelFFBProcessor::SmoothForce(float Current, float Target, float SmoothTime, float DeltaTime)
 {
-	if (SmoothTime <= 0.0f)
+	if (SmoothTime <= 0.0f || DeltaTime <= 0.0f)
 	{
-		return TargetForce;
+		return Target;
 	}
 
-	float Alpha = FMath::Clamp(DeltaTime / SmoothTime, 0.0f, 1.0f);
-	return FMath::Lerp(CurrentForce, TargetForce, Alpha);
+	// Exponential smoothing for natural feel
+	float Alpha = 1.0f - FMath::Exp(-DeltaTime / SmoothTime);
+	return FMath::Lerp(Current, Target, Alpha);
 }
 
-float UMGWheelFFBProcessor::ApplyForceCurve(float Force, float Gamma)
+float UMGWheelFFBProcessor::ApplyDeadzone(float Value, float Deadzone)
 {
-	float AbsForce = FMath::Abs(Force);
-	float CurvedForce = FMath::Pow(AbsForce, Gamma);
-	return CurvedForce * FMath::Sign(Force);
+	if (FMath::Abs(Value) < Deadzone)
+	{
+		return 0.0f;
+	}
+
+	float Sign = FMath::Sign(Value);
+	float Magnitude = FMath::Abs(Value);
+	return Sign * (Magnitude - Deadzone) / (1.0f - Deadzone);
+}
+
+float UMGWheelFFBProcessor::NormalizeSlipAngle(float SlipAngleDeg)
+{
+	return FMath::Clamp(SlipAngleDeg / MaxSlipAngle, -1.0f, 1.0f);
+}
+
+float UMGWheelFFBProcessor::CalculateTireGripFromSlip(float SlipAngle)
+{
+	// Grip model: full grip until GripLossStartAngle, then linear drop to zero
+	float AbsSlip = FMath::Abs(SlipAngle);
+
+	if (AbsSlip <= GripLossStartAngle)
+	{
+		return 1.0f;
+	}
+	else if (AbsSlip >= GripLossFullAngle)
+	{
+		return 0.1f; // Never quite zero - always some feedback
+	}
+	else
+	{
+		float T = (AbsSlip - GripLossStartAngle) / (GripLossFullAngle - GripLossStartAngle);
+		return FMath::Lerp(1.0f, 0.1f, T);
+	}
 }
 
 void UMGWheelFFBProcessor::GetEffectContributions(float& OutSelfCentering, float& OutAligningTorque,
-												   float& OutUndersteer, float& OutOversteer,
-												   float& OutSurface, float& OutEngine) const
+                                                   float& OutUndersteer, float& OutOversteer,
+                                                   float& OutSurface, float& OutEngine) const
 {
-	OutSelfCentering = CurrentSelfCenteringForce;
+	OutSelfCentering = CurrentSelfCentering;
 	OutAligningTorque = CurrentAligningTorque;
-	OutUndersteer = CurrentUndersteerForce;
-	OutOversteer = CurrentOversteerForce;
-	OutSurface = CurrentSurfaceForce;
+	OutUndersteer = CurrentGripFeedback;
+	OutOversteer = CurrentDriftFeedback;
+	OutSurface = CurrentSurfaceRumble;
 	OutEngine = CurrentEngineVibration;
 }
 
 void UMGWheelFFBProcessor::Reset()
 {
-	CurrentSelfCenteringForce = 0.0f;
+	CurrentSelfCentering = 0.0f;
 	CurrentAligningTorque = 0.0f;
-	CurrentUndersteerForce = 0.0f;
-	CurrentOversteerForce = 0.0f;
-	CurrentSurfaceForce = 0.0f;
+	CurrentGripFeedback = 0.0f;
+	CurrentDriftFeedback = 0.0f;
+	CurrentWeightTransfer = 0.0f;
+	CurrentGForce = 0.0f;
+	CurrentSurfaceRumble = 0.0f;
 	CurrentEngineVibration = 0.0f;
-	CurrentDamperForce = 0.0f;
 
-	TargetSelfCenteringForce = 0.0f;
+	TargetSelfCentering = 0.0f;
 	TargetAligningTorque = 0.0f;
-	TargetUndersteerForce = 0.0f;
-	TargetOversteerForce = 0.0f;
+	TargetGripFeedback = 0.0f;
+	TargetDriftFeedback = 0.0f;
+	TargetWeightTransfer = 0.0f;
+	TargetGForce = 0.0f;
 
 	TotalOutputForce = 0.0f;
+	TotalConstantForce = 0.0f;
+	TotalSpringForce = 0.0f;
+
 	TimeSinceLastUpdate = 0.0f;
+	LastDeltaTime = 0.016f;
 
 	ConstantForceEffectID.Invalidate();
 	SpringEffectID.Invalidate();
@@ -364,8 +662,13 @@ void UMGWheelFFBProcessor::Reset()
 	SurfaceEffectID.Invalidate();
 	EngineEffectID.Invalidate();
 	KerbEffectID.Invalidate();
+	CollisionEffectID.Invalidate();
 
-	bOnKerb = false;
-	CurrentSurface = NAME_None;
+	bWasOnKerb = false;
+	CurrentSurfaceType = NAME_None;
 	bIsAirborne = false;
+	bWasDrifting = false;
+	DriftEntryTime = 0.0f;
+	CurrentDriftDuration = 0.0f;
+	PeakDriftAngle = 0.0f;
 }

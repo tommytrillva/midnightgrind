@@ -1,7 +1,7 @@
 {
     "ProfileName": "Logitech_G29",
     "TargetModel": "Logitech_G29",
-    "Description": "Default profile for Logitech G29 Driving Force Racing Wheel",
+    "Description": "Optimized profile for Logitech G29 - Balanced for drifting and precision driving",
 
     "Steering": {
         "SteeringRotation": 900.0,
@@ -11,9 +11,9 @@
     },
 
     "Pedals": {
-        "ThrottleDeadzone": 0.03,
-        "BrakeDeadzone": 0.03,
-        "ClutchDeadzone": 0.1,
+        "ThrottleDeadzone": 0.02,
+        "BrakeDeadzone": 0.02,
+        "ClutchDeadzone": 0.08,
         "ThrottleGamma": 1.0,
         "BrakeGamma": 1.0,
         "CombinedPedals": false,
@@ -22,17 +22,17 @@
 
     "ForceFeedback": {
         "FFBEnabled": true,
-        "FFBStrength": 0.75,
-        "SelfCenteringStrength": 0.5,
-        "RoadFeelStrength": 0.6,
-        "CollisionStrength": 0.85,
-        "CurbStrength": 0.6,
-        "EngineVibrationStrength": 0.25,
-        "UndersteerStrength": 0.4,
-        "OversteerStrength": 0.6,
-        "MinForceThreshold": 0.02,
-        "DamperStrength": 0.15,
-        "FrictionStrength": 0.1,
+        "FFBStrength": 0.78,
+        "SelfCenteringStrength": 0.52,
+        "RoadFeelStrength": 0.72,
+        "CollisionStrength": 0.88,
+        "CurbStrength": 0.62,
+        "EngineVibrationStrength": 0.18,
+        "UndersteerStrength": 0.48,
+        "OversteerStrength": 0.72,
+        "MinForceThreshold": 0.012,
+        "DamperStrength": 0.16,
+        "FrictionStrength": 0.07,
         "ShowFFBClipping": true
     },
 
@@ -42,8 +42,8 @@
         "Button1": "Square",
         "Button2": "Circle",
         "Button3": "Triangle",
-        "Button4": "LeftPaddle",
-        "Button5": "RightPaddle",
+        "Button4": "LeftPaddle_ShiftDown",
+        "Button5": "RightPaddle_ShiftUp",
         "Button6": "R2",
         "Button7": "L2",
         "Button8": "Share",
@@ -53,5 +53,14 @@
         "Button12": "PS",
         "Button13": "Plus",
         "Button14": "Minus"
+    },
+
+    "TuningNotes": {
+        "SelfCentering": "Set to 0.52 - G29 motors are slightly smoother, so a bit lighter centering feels natural",
+        "RoadFeel": "Set to 0.72 - Slightly higher than G920 to leverage G29's smoother detail response",
+        "OversteerStrength": "Set to 0.72 - Strong counter-steer assistance for learning drifts",
+        "UndersteerStrength": "Set to 0.48 - Wheel goes light when pushing too hard",
+        "DamperStrength": "Set to 0.16 - G29 benefits from slightly less damping due to smoother gears",
+        "MinForceThreshold": "Set to 0.012 - G29 can handle slightly finer forces than G920"
     }
 }

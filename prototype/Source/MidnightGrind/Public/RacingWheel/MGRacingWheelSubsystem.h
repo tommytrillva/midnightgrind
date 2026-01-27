@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Dom/JsonObject.h"
 #include "MGRacingWheelTypes.h"
 #include "MGRacingWheelSubsystem.generated.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogRacingWheel, Log, All);
 
 class UMGWheelFFBProcessor;
 class FMGDirectInputManager;
@@ -395,6 +398,9 @@ protected:
 
 	/** Save profiles to disk */
 	void SaveProfilesToDisk();
+
+	/** Load a single profile from JSON */
+	void LoadProfileFromJson(const TSharedPtr<FJsonObject>& JsonObject, FMGWheelProfile& OutProfile);
 
 	/** Get profile file path */
 	FString GetProfilePath() const;
