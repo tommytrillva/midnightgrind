@@ -27,6 +27,9 @@ struct FMGTakedownEvent;
 struct FMGPitStopResult;
 struct FMGBonusDefinition;
 struct FMGPursuitUnit;
+enum class EMGSpeedtrapRating : uint8;
+struct FMGDestructionEvent;
+struct FMGScoreEvent;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -503,4 +506,51 @@ protected:
 	/** Handle roadblock evaded from pursuit subsystem */
 	UFUNCTION()
 	void OnRoadblockEvaded(const FString& PlayerId, const FString& RoadblockId);
+
+	/** Handle speedtrap recorded from speedtrap subsystem */
+	UFUNCTION()
+	void OnSpeedtrapRecorded(const FString& SpeedtrapId, float RecordedValue, EMGSpeedtrapRating Rating);
+
+	/** Handle new personal best at speedtrap */
+	UFUNCTION()
+	void OnSpeedtrapNewPersonalBest(const FString& SpeedtrapId, float OldBest, float NewBest);
+
+	/** Handle speedtrap discovered */
+	UFUNCTION()
+	void OnSpeedtrapDiscovered(const FString& SpeedtrapId, int32 TotalDiscovered);
+
+	/** Handle destructible destroyed from destruction subsystem */
+	UFUNCTION()
+	void OnDestructibleDestroyed(const FString& PlayerId, const FMGDestructionEvent& Event);
+
+	/** Handle destruction combo updated from destruction subsystem */
+	UFUNCTION()
+	void OnDestructionComboUpdated(const FString& PlayerId, int32 ComboCount, float Multiplier);
+
+	/** Handle spectacular destruction from destruction subsystem */
+	UFUNCTION()
+	void OnSpectacularDestruction(const FString& PlayerId, int32 BonusPoints);
+
+	/** Handle slipstream entered from aerodynamics subsystem */
+	UFUNCTION()
+	void OnSlipstreamEntered(const FString& FollowerId, const FString& LeaderId, float Distance);
+
+	/** Handle slingshot ready from aerodynamics subsystem */
+	UFUNCTION()
+	void OnSlingshotReady(const FString& VehicleId, float BoostAmount, float Duration);
+
+	/** Handle slingshot used from aerodynamics subsystem */
+	UFUNCTION()
+	void OnSlingshotUsed(const FString& VehicleId, float SpeedGained);
+
+	/** Handle score event from scoring subsystem */
+	UFUNCTION()
+	void OnScoreEvent(const FString& PlayerId, const FMGScoreEvent& Event, int32 NewTotal);
+
+	/** Handle chain extended from scoring subsystem */
+	UFUNCTION()
+	void OnChainExtended(const FString& PlayerId, int32 ChainLength, float Multiplier, int32 ChainPoints);
+
+	/** Get local player ID for filtering events */
+	FString GetLocalPlayerId() const;
 };

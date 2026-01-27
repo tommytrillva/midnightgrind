@@ -43,11 +43,15 @@ void UMGAssetCacheSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Start cache maintenance timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGAssetCacheSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             CacheMaintenanceHandle,
-            [this]()
+            [WeakThis]()
             {
-                PerformCacheMaintenance();
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->PerformCacheMaintenance();
+                }
             },
             5.0f,
             true
@@ -56,9 +60,12 @@ void UMGAssetCacheSubsystem::Initialize(FSubsystemCollectionBase& Collection)
         // Start load queue processor
         World->GetTimerManager().SetTimer(
             LoadQueueHandle,
-            [this]()
+            [WeakThis]()
             {
-                ProcessLoadQueue();
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->ProcessLoadQueue();
+                }
             },
             0.1f,
             true
@@ -69,9 +76,12 @@ void UMGAssetCacheSubsystem::Initialize(FSubsystemCollectionBase& Collection)
         {
             World->GetTimerManager().SetTimer(
                 PredictionHandle,
-                [this]()
+                [WeakThis]()
                 {
-                    GeneratePredictions();
+                    if (WeakThis.IsValid())
+                    {
+                        WeakThis->GeneratePredictions();
+                    }
                 },
                 2.0f,
                 true

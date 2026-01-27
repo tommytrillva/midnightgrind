@@ -86,22 +86,27 @@ bool UMGDynoTuningSubsystem::StartDynoRun(FGuid SessionID)
 	// Simulate warm-up for 2 seconds then start actual run
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGDynoTuningSubsystem> WeakThis(this);
 		FTimerDelegate WarmupDelegate;
-		WarmupDelegate.BindLambda([this, SessionID]()
+		WarmupDelegate.BindLambda([WeakThis, SessionID]()
 		{
-			FMGDynoSession* Sess = ActiveSessions.Find(SessionID);
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			FMGDynoSession* Sess = WeakThis->ActiveSessions.Find(SessionID);
 			if (Sess && Sess->Status == EMGDynoStatus::WarmingUp)
 			{
 				Sess->Status = EMGDynoStatus::Running;
-				OnDynoStatusChanged.Broadcast(SessionID, EMGDynoStatus::Running);
+				WeakThis->OnDynoStatusChanged.Broadcast(SessionID, EMGDynoStatus::Running);
 
 				// Start the dyno tick simulation
-				if (UWorld* W = GetWorld())
+				if (UWorld* W = WeakThis->GetWorld())
 				{
 					W->GetTimerManager().SetTimer(
-						DynoTickTimerHandle,
-						FTimerDelegate::CreateUObject(this, &UMGDynoTuningSubsystem::TickDynoSession, SessionID, DynoTickInterval),
-						DynoTickInterval,
+						WeakThis->DynoTickTimerHandle,
+						FTimerDelegate::CreateUObject(WeakThis.Get(), &UMGDynoTuningSubsystem::TickDynoSession, SessionID, WeakThis->DynoTickInterval),
+						WeakThis->DynoTickInterval,
 						true
 					);
 				}
@@ -847,21 +852,26 @@ void UMGDynoTuningSubsystem::TickDynoSession(FGuid SessionID, float DeltaTime)
 		// After 1 second, complete the run
 		if (UWorld* World = GetWorld())
 		{
+			TWeakObjectPtr<UMGDynoTuningSubsystem> WeakThis(this);
 			FTimerHandle CooldownHandle;
 			FTimerDelegate CooldownDelegate;
-			CooldownDelegate.BindLambda([this, SessionID]()
+			CooldownDelegate.BindLambda([WeakThis, SessionID]()
 			{
-				FMGDynoSession* Sess = ActiveSessions.Find(SessionID);
+				if (!WeakThis.IsValid())
+				{
+					return;
+				}
+				FMGDynoSession* Sess = WeakThis->ActiveSessions.Find(SessionID);
 				if (Sess)
 				{
 					Sess->Status = EMGDynoStatus::Complete;
 
 					// Calculate and store result
-					FMGDynoRunResult Result = CalculateDynoResult(*Sess);
-					DynoHistory.Add(Result.RunID, Result);
+					FMGDynoRunResult Result = WeakThis->CalculateDynoResult(*Sess);
+					WeakThis->DynoHistory.Add(Result.RunID, Result);
 
-					OnDynoStatusChanged.Broadcast(SessionID, EMGDynoStatus::Complete);
-					OnDynoRunComplete.Broadcast(SessionID, Result);
+					WeakThis->OnDynoStatusChanged.Broadcast(SessionID, EMGDynoStatus::Complete);
+					WeakThis->OnDynoRunComplete.Broadcast(SessionID, Result);
 
 					UE_LOG(LogTemp, Log, TEXT("MGDynoTuningSubsystem: Dyno run complete - Peak HP: %.1f @ %d RPM, Peak Torque: %.1f @ %d RPM"),
 						Result.PeakHP, Result.PeakHPRPM, Result.PeakTorque, Result.PeakTorqueRPM);

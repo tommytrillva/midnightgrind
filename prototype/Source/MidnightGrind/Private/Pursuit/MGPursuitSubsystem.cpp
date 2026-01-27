@@ -54,11 +54,15 @@ void UMGPursuitSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start tick timer
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGPursuitSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			PursuitTickTimer,
-			[this]()
+			[WeakThis]()
 			{
-				TickPursuit(0.033f);
+				if (WeakThis.IsValid())
+				{
+					WeakThis->TickPursuit(0.033f);
+				}
 			},
 			0.033f,
 			true

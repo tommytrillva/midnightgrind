@@ -202,40 +202,49 @@ bool UMGDynoSubsystem::StartDynoRun(FGuid VehicleID, const FMGVehicleData& Vehic
 	// Start the simulation after a brief preparation phase
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGDynoSubsystem> WeakThis(this);
 		FTimerDelegate PrepDelegate;
-		PrepDelegate.BindLambda([this, VehicleID]()
+		PrepDelegate.BindLambda([WeakThis, VehicleID]()
 		{
-			FDynoSession* Session = ActiveSessions.Find(VehicleID);
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			FDynoSession* Session = WeakThis->ActiveSessions.Find(VehicleID);
 			if (Session && Session->State == EMGDynoRunState::Preparing)
 			{
-				SetDynoState(VehicleID, EMGDynoRunState::WarmingUp);
+				WeakThis->SetDynoState(VehicleID, EMGDynoRunState::WarmingUp);
 
 				// After warmup, start the actual run
-				if (UWorld* W = GetWorld())
+				if (UWorld* W = WeakThis->GetWorld())
 				{
 					FTimerDelegate WarmupDelegate;
-					WarmupDelegate.BindLambda([this, VehicleID]()
+					WarmupDelegate.BindLambda([WeakThis, VehicleID]()
 					{
-						FDynoSession* Sess = ActiveSessions.Find(VehicleID);
+						if (!WeakThis.IsValid())
+						{
+							return;
+						}
+						FDynoSession* Sess = WeakThis->ActiveSessions.Find(VehicleID);
 						if (Sess && Sess->State == EMGDynoRunState::WarmingUp)
 						{
-							Sess->CurrentRPM = DynoStartRPM;
-							SetDynoState(VehicleID, EMGDynoRunState::Running);
+							Sess->CurrentRPM = WeakThis->DynoStartRPM;
+							WeakThis->SetDynoState(VehicleID, EMGDynoRunState::Running);
 
 							// Start the tick timer
-							if (UWorld* World = GetWorld())
+							if (UWorld* World = WeakThis->GetWorld())
 							{
 								World->GetTimerManager().SetTimer(
-									DynoTickHandle,
-									FTimerDelegate::CreateUObject(this, &UMGDynoSubsystem::TickDynoSimulation, VehicleID),
-									DynoTickInterval,
+									WeakThis->DynoTickHandle,
+									FTimerDelegate::CreateUObject(WeakThis.Get(), &UMGDynoSubsystem::TickDynoSimulation, VehicleID),
+									WeakThis->DynoTickInterval,
 									true
 								);
 							}
 						}
 					});
 
-					W->GetTimerManager().SetTimer(DynoTickHandle, WarmupDelegate, WarmupDuration, false);
+					W->GetTimerManager().SetTimer(WeakThis->DynoTickHandle, WarmupDelegate, WeakThis->WarmupDuration, false);
 				}
 			}
 		});
@@ -553,21 +562,26 @@ void UMGDynoSubsystem::TickDynoSimulation(FGuid VehicleID)
 		// After cooldown, complete the run
 		if (UWorld* World = GetWorld())
 		{
+			TWeakObjectPtr<UMGDynoSubsystem> WeakThis(this);
 			FTimerDelegate CooldownDelegate;
-			CooldownDelegate.BindLambda([this, VehicleID]()
+			CooldownDelegate.BindLambda([WeakThis, VehicleID]()
 			{
-				FDynoSession* Sess = ActiveSessions.Find(VehicleID);
+				if (!WeakThis.IsValid())
+				{
+					return;
+				}
+				FDynoSession* Sess = WeakThis->ActiveSessions.Find(VehicleID);
 				if (Sess && Sess->State == EMGDynoRunState::CoolingDown)
 				{
 					// Calculate and store results
-					FMGDynoResult Result = CalculateResults(*Sess);
-					DynoHistory.Add(Result.ResultID, Result);
-					LatestResultByVehicle.Add(VehicleID, Result.ResultID);
+					FMGDynoResult Result = WeakThis->CalculateResults(*Sess);
+					WeakThis->DynoHistory.Add(Result.ResultID, Result);
+					WeakThis->LatestResultByVehicle.Add(VehicleID, Result.ResultID);
 
-					SetDynoState(VehicleID, EMGDynoRunState::Complete);
+					WeakThis->SetDynoState(VehicleID, EMGDynoRunState::Complete);
 
 					// Broadcast completion
-					OnDynoRunComplete.Broadcast(VehicleID, Result);
+					WeakThis->OnDynoRunComplete.Broadcast(VehicleID, Result);
 
 					UE_LOG(LogTemp, Log, TEXT("MGDynoSubsystem: Dyno complete - Peak WHP: %.1f @ %d RPM, Peak Torque: %.1f @ %d RPM"),
 						Result.PeakWheelHP, Result.PeakWheelHPRPM,

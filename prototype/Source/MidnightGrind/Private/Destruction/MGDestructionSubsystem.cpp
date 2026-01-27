@@ -773,12 +773,191 @@ void UMGDestructionSubsystem::UpdateDestruction(float DeltaTime)
 
 void UMGDestructionSubsystem::SaveDestructionData()
 {
-	// Placeholder - would serialize to save game
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Destruction");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("destruction_stats.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save player stats
+	int32 NumPlayers = PlayerStats.Num();
+	SaveArchive << NumPlayers;
+
+	for (const auto& Pair : PlayerStats)
+	{
+		FString PlayerId = Pair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGDestructionStats& Stats = Pair.Value;
+
+		// Save type counts map
+		int32 NumTypes = Stats.TypeCounts.Num();
+		SaveArchive << NumTypes;
+		for (const auto& TypePair : Stats.TypeCounts)
+		{
+			int32 TypeInt = static_cast<int32>(TypePair.Key);
+			int32 Count = TypePair.Value;
+			SaveArchive << TypeInt;
+			SaveArchive << Count;
+		}
+
+		// Save category counts map
+		int32 NumCategories = Stats.CategoryCounts.Num();
+		SaveArchive << NumCategories;
+		for (const auto& CatPair : Stats.CategoryCounts)
+		{
+			int32 CatInt = static_cast<int32>(CatPair.Key);
+			int32 Count = CatPair.Value;
+			SaveArchive << CatInt;
+			SaveArchive << Count;
+		}
+
+		// Save scalar stats
+		int32 TotalDestroyed = Stats.TotalDestroyed;
+		int32 TotalPoints = Stats.TotalPoints;
+		int32 HighestCombo = Stats.HighestCombo;
+		int32 LongestChainReaction = Stats.LongestChainReaction;
+		float TotalPropertyDamage = Stats.TotalPropertyDamage;
+		int32 SpectacularDestructions = Stats.SpectacularDestructions;
+
+		SaveArchive << TotalDestroyed;
+		SaveArchive << TotalPoints;
+		SaveArchive << HighestCombo;
+		SaveArchive << LongestChainReaction;
+		SaveArchive << TotalPropertyDamage;
+		SaveArchive << SpectacularDestructions;
+	}
+
+	// Save global property damage
+	float GlobalDamage = TotalPropertyDamage;
+	SaveArchive << GlobalDamage;
+
+	// Save zone completion status
+	int32 NumZones = Zones.Num();
+	SaveArchive << NumZones;
+
+	for (const auto& Pair : Zones)
+	{
+		FString ZoneId = Pair.Key;
+		SaveArchive << ZoneId;
+
+		const FMGDestructionZone& Zone = Pair.Value;
+		int32 DestroyedCount = Zone.DestroyedCount;
+		bool bIsCompleted = Zone.bIsCompleted;
+
+		SaveArchive << DestroyedCount;
+		SaveArchive << bIsCompleted;
+	}
+
+	// Write to file
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGDestructionSubsystem: Saved destruction data for %d players, %d zones"), NumPlayers, NumZones);
 }
 
 void UMGDestructionSubsystem::LoadDestructionData()
 {
-	// Placeholder - would deserialize from save game
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Destruction") / TEXT("destruction_stats.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("MGDestructionSubsystem: No saved destruction data found"));
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGDestructionSubsystem: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Load player stats
+	int32 NumPlayers;
+	LoadArchive << NumPlayers;
+
+	for (int32 i = 0; i < NumPlayers; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGDestructionStats Stats;
+		Stats.PlayerId = PlayerId;
+
+		// Load type counts map
+		int32 NumTypes;
+		LoadArchive << NumTypes;
+		for (int32 j = 0; j < NumTypes; ++j)
+		{
+			int32 TypeInt;
+			int32 Count;
+			LoadArchive << TypeInt;
+			LoadArchive << Count;
+			Stats.TypeCounts.Add(static_cast<EMGDestructibleType>(TypeInt), Count);
+		}
+
+		// Load category counts map
+		int32 NumCategories;
+		LoadArchive << NumCategories;
+		for (int32 j = 0; j < NumCategories; ++j)
+		{
+			int32 CatInt;
+			int32 Count;
+			LoadArchive << CatInt;
+			LoadArchive << Count;
+			Stats.CategoryCounts.Add(static_cast<EMGDestructionCategory>(CatInt), Count);
+		}
+
+		// Load scalar stats
+		LoadArchive << Stats.TotalDestroyed;
+		LoadArchive << Stats.TotalPoints;
+		LoadArchive << Stats.HighestCombo;
+		LoadArchive << Stats.LongestChainReaction;
+		LoadArchive << Stats.TotalPropertyDamage;
+		LoadArchive << Stats.SpectacularDestructions;
+
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	// Load global property damage
+	LoadArchive << TotalPropertyDamage;
+
+	// Load zone completion status
+	int32 NumZones;
+	LoadArchive << NumZones;
+
+	for (int32 i = 0; i < NumZones; ++i)
+	{
+		FString ZoneId;
+		LoadArchive << ZoneId;
+
+		int32 DestroyedCount;
+		bool bIsCompleted;
+
+		LoadArchive << DestroyedCount;
+		LoadArchive << bIsCompleted;
+
+		// Update zone if it exists
+		if (FMGDestructionZone* Zone = Zones.Find(ZoneId))
+		{
+			Zone->DestroyedCount = DestroyedCount;
+			Zone->bIsCompleted = bIsCompleted;
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGDestructionSubsystem: Loaded destruction data for %d players"), NumPlayers);
 }
 
 // ============================================================================

@@ -1171,12 +1171,204 @@ void UMGPowerupSubsystem::UpdateSpawnPoints(float DeltaTime)
 
 void UMGPowerupSubsystem::SavePowerupData()
 {
-	// Placeholder - would serialize to save game
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Powerup");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("powerup_stats.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save player stats
+	int32 NumPlayers = PlayerStats.Num();
+	SaveArchive << NumPlayers;
+
+	for (const auto& Pair : PlayerStats)
+	{
+		FString PlayerId = Pair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGPowerupStats& Stats = Pair.Value;
+
+		// Save powerups collected map
+		int32 NumCollected = Stats.PowerupsCollected.Num();
+		SaveArchive << NumCollected;
+		for (const auto& CollPair : Stats.PowerupsCollected)
+		{
+			int32 TypeInt = static_cast<int32>(CollPair.Key);
+			int32 Count = CollPair.Value;
+			SaveArchive << TypeInt;
+			SaveArchive << Count;
+		}
+
+		// Save powerups used map
+		int32 NumUsed = Stats.PowerupsUsed.Num();
+		SaveArchive << NumUsed;
+		for (const auto& UsedPair : Stats.PowerupsUsed)
+		{
+			int32 TypeInt = static_cast<int32>(UsedPair.Key);
+			int32 Count = UsedPair.Value;
+			SaveArchive << TypeInt;
+			SaveArchive << Count;
+		}
+
+		// Save hits dealt map
+		int32 NumHitsDealt = Stats.HitsDealt.Num();
+		SaveArchive << NumHitsDealt;
+		for (const auto& HitPair : Stats.HitsDealt)
+		{
+			int32 TypeInt = static_cast<int32>(HitPair.Key);
+			int32 Count = HitPair.Value;
+			SaveArchive << TypeInt;
+			SaveArchive << Count;
+		}
+
+		// Save hits received map
+		int32 NumHitsReceived = Stats.HitsReceived.Num();
+		SaveArchive << NumHitsReceived;
+		for (const auto& HitPair : Stats.HitsReceived)
+		{
+			int32 TypeInt = static_cast<int32>(HitPair.Key);
+			int32 Count = HitPair.Value;
+			SaveArchive << TypeInt;
+			SaveArchive << Count;
+		}
+
+		// Save hits blocked map
+		int32 NumHitsBlocked = Stats.HitsBlocked.Num();
+		SaveArchive << NumHitsBlocked;
+		for (const auto& HitPair : Stats.HitsBlocked)
+		{
+			int32 TypeInt = static_cast<int32>(HitPair.Key);
+			int32 Count = HitPair.Value;
+			SaveArchive << TypeInt;
+			SaveArchive << Count;
+		}
+
+		// Save scalar stats
+		int32 TotalProjectilesLaunched = Stats.TotalProjectilesLaunched;
+		int32 TotalProjectilesHit = Stats.TotalProjectilesHit;
+		float ProjectileAccuracy = Stats.ProjectileAccuracy;
+
+		SaveArchive << TotalProjectilesLaunched;
+		SaveArchive << TotalProjectilesHit;
+		SaveArchive << ProjectileAccuracy;
+	}
+
+	// Write to file
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGPowerupSubsystem: Saved powerup data for %d players"), NumPlayers);
 }
 
 void UMGPowerupSubsystem::LoadPowerupData()
 {
-	// Placeholder - would deserialize from save game
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Powerup") / TEXT("powerup_stats.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("MGPowerupSubsystem: No saved powerup data found"));
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGPowerupSubsystem: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Load player stats
+	int32 NumPlayers;
+	LoadArchive << NumPlayers;
+
+	for (int32 i = 0; i < NumPlayers; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGPowerupStats Stats;
+		Stats.PlayerId = PlayerId;
+
+		// Load powerups collected map
+		int32 NumCollected;
+		LoadArchive << NumCollected;
+		for (int32 j = 0; j < NumCollected; ++j)
+		{
+			int32 TypeInt;
+			int32 Count;
+			LoadArchive << TypeInt;
+			LoadArchive << Count;
+			Stats.PowerupsCollected.Add(static_cast<EMGPowerupType>(TypeInt), Count);
+		}
+
+		// Load powerups used map
+		int32 NumUsed;
+		LoadArchive << NumUsed;
+		for (int32 j = 0; j < NumUsed; ++j)
+		{
+			int32 TypeInt;
+			int32 Count;
+			LoadArchive << TypeInt;
+			LoadArchive << Count;
+			Stats.PowerupsUsed.Add(static_cast<EMGPowerupType>(TypeInt), Count);
+		}
+
+		// Load hits dealt map
+		int32 NumHitsDealt;
+		LoadArchive << NumHitsDealt;
+		for (int32 j = 0; j < NumHitsDealt; ++j)
+		{
+			int32 TypeInt;
+			int32 Count;
+			LoadArchive << TypeInt;
+			LoadArchive << Count;
+			Stats.HitsDealt.Add(static_cast<EMGPowerupType>(TypeInt), Count);
+		}
+
+		// Load hits received map
+		int32 NumHitsReceived;
+		LoadArchive << NumHitsReceived;
+		for (int32 j = 0; j < NumHitsReceived; ++j)
+		{
+			int32 TypeInt;
+			int32 Count;
+			LoadArchive << TypeInt;
+			LoadArchive << Count;
+			Stats.HitsReceived.Add(static_cast<EMGPowerupType>(TypeInt), Count);
+		}
+
+		// Load hits blocked map
+		int32 NumHitsBlocked;
+		LoadArchive << NumHitsBlocked;
+		for (int32 j = 0; j < NumHitsBlocked; ++j)
+		{
+			int32 TypeInt;
+			int32 Count;
+			LoadArchive << TypeInt;
+			LoadArchive << Count;
+			Stats.HitsBlocked.Add(static_cast<EMGPowerupType>(TypeInt), Count);
+		}
+
+		// Load scalar stats
+		LoadArchive << Stats.TotalProjectilesLaunched;
+		LoadArchive << Stats.TotalProjectilesHit;
+		LoadArchive << Stats.ProjectileAccuracy;
+
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGPowerupSubsystem: Loaded powerup data for %d players"), NumPlayers);
 }
 
 // ============================================================================

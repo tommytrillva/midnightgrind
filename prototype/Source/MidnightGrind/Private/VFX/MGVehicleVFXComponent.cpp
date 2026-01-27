@@ -607,7 +607,10 @@ void UMGVehicleVFXComponent::StopScrapeSparks()
 	// Notify VFX subsystem
 	if (UMGVFXSubsystem* VFXSub = GetVFXSubsystem())
 	{
-		VFXSub->TriggerVFXEvent(EMGVFXEvent::ScrapeEnd, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation(), GetOwner());
+		if (AActor* Owner = GetOwner())
+		{
+			VFXSub->TriggerVFXEvent(EMGVFXEvent::ScrapeEnd, Owner->GetActorLocation(), Owner->GetActorRotation(), Owner);
+		}
 	}
 }
 
@@ -900,7 +903,10 @@ void UMGVehicleVFXComponent::UpdateSpeedEffects(float SpeedKPH, float SpeedNorma
 	{
 		if (UMGVFXSubsystem* VFXSub = GetVFXSubsystem())
 		{
-			VFXSub->TriggerVFXEvent(EMGVFXEvent::TopSpeed, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation(), GetOwner());
+			if (AActor* Owner = GetOwner())
+			{
+				VFXSub->TriggerVFXEvent(EMGVFXEvent::TopSpeed, Owner->GetActorLocation(), Owner->GetActorRotation(), Owner);
+			}
 		}
 	}
 }

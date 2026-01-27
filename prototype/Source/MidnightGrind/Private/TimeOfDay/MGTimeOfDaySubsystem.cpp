@@ -13,9 +13,10 @@ void UMGTimeOfDaySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGTimeOfDaySubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			TimeUpdateHandle,
-			[this]() { UpdateTime(0.1f); },
+			[WeakThis]() { if (WeakThis.IsValid()) WeakThis->UpdateTime(0.1f); },
 			0.1f,
 			true
 		);

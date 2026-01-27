@@ -656,6 +656,17 @@ void UMGGarageSubsystem::ApplyCustomizationToVehicle(AMGVehiclePawn* Vehicle, co
 	}
 
 	// Apply visual parts (body kits, spoilers, etc.)
+	// First, remove any existing customization components to prevent memory leaks
+	TArray<UStaticMeshComponent*> ExistingPartComps;
+	Vehicle->GetComponents<UStaticMeshComponent>(ExistingPartComps);
+	for (UStaticMeshComponent* Comp : ExistingPartComps)
+	{
+		if (Comp && Comp->ComponentHasTag(TEXT("CustomizationPart")))
+		{
+			Comp->DestroyComponent();
+		}
+	}
+
 	for (const auto& Pair : OwnedVehicle.InstalledParts)
 	{
 		const FName& SlotName = Pair.Key;
@@ -667,6 +678,7 @@ void UMGGarageSubsystem::ApplyCustomizationToVehicle(AMGVehiclePawn* Vehicle, co
 			if (UStaticMesh* PartMesh = InstalledPart.PartData->PartMesh.LoadSynchronous())
 			{
 				UStaticMeshComponent* PartComp = NewObject<UStaticMeshComponent>(Vehicle);
+				PartComp->ComponentTags.Add(TEXT("CustomizationPart"));
 				PartComp->SetStaticMesh(PartMesh);
 				PartComp->AttachToComponent(Vehicle->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SlotName);
 				PartComp->RegisterComponent();

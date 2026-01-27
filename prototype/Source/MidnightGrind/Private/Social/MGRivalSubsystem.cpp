@@ -11,6 +11,11 @@ void UMGRivalSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UMGRivalSubsystem::Deinitialize()
 {
+	// Clear all tracking data to prevent memory leaks
+	Rivalries.Empty();
+	ActiveCallouts.Empty();
+	PlayerNotifications.Empty();
+
 	Super::Deinitialize();
 }
 

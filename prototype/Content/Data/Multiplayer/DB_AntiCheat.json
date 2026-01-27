@@ -1,0 +1,287 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Anti-Cheat and Fair Play Configuration",
+
+  "SystemSettings": {
+    "Enabled": true,
+    "ServerAuthoritative": true,
+    "ClientPrediction": true,
+    "MaxPredictionTime": 0.2,
+    "SyncRate": 60,
+    "ValidationInterval": 0.1
+  },
+
+  "PhysicsValidation": {
+    "MaxSpeed": {
+      "ClassD": 250,
+      "ClassC": 300,
+      "ClassB": 350,
+      "ClassA": 400,
+      "ClassS": 450,
+      "Tolerance": 1.1
+    },
+    "MaxAcceleration": {
+      "Normal": 15.0,
+      "WithNitrous": 25.0,
+      "Tolerance": 1.15
+    },
+    "TeleportThreshold": {
+      "Distance": 50.0,
+      "TimeWindow": 0.5,
+      "Action": "Rubber_Band"
+    },
+    "CollisionConsistency": {
+      "Enabled": true,
+      "MaxDiscrepancy": 5.0
+    },
+    "GripValidation": {
+      "MaxLateralG": 3.5,
+      "Tolerance": 1.1
+    }
+  },
+
+  "EconomyValidation": {
+    "MaxCashPerRace": 100000,
+    "MaxREPPerRace": 10000,
+    "MaxCashPerHour": 500000,
+    "MaxREPPerHour": 50000,
+    "TransactionValidation": {
+      "ServerSide": true,
+      "RequireReceipt": true
+    },
+    "SuspiciousThresholds": {
+      "CashPerMinute": 50000,
+      "REPPerMinute": 5000,
+      "WinStreak": 50
+    }
+  },
+
+  "ProgressionValidation": {
+    "MaxXPPerRace": 5000,
+    "LevelUpValidation": true,
+    "UnlockValidation": true,
+    "AchievementValidation": true,
+    "TimePlayed": {
+      "TrackPerSession": true,
+      "ValidateProgress": true
+    }
+  },
+
+  "NetworkValidation": {
+    "PacketValidation": {
+      "Enabled": true,
+      "MaxPacketSize": 65536,
+      "ReplayProtection": true
+    },
+    "LatencyThresholds": {
+      "Warning": 200,
+      "Kick": 500,
+      "GracePeriod": 5.0
+    },
+    "PacketLoss": {
+      "WarningThreshold": 0.05,
+      "KickThreshold": 0.2,
+      "SampleWindow": 10.0
+    },
+    "RateLimit": {
+      "MaxInputsPerSecond": 120,
+      "MaxRequestsPerSecond": 30
+    }
+  },
+
+  "StatisticalAnalysis": {
+    "Enabled": true,
+    "MetricsTracked": [
+      "WinRate",
+      "LapTimeConsistency",
+      "ReactionTime",
+      "CrashRate",
+      "AverageSpeed",
+      "DriftConsistency"
+    ],
+    "AnomalyDetection": {
+      "StandardDeviationThreshold": 3.0,
+      "SampleSize": 100,
+      "CompareToGlobal": true
+    },
+    "Patterns": {
+      "ImpossibleLapTimes": {
+        "CheckAgainstRecords": true,
+        "MinimumThreshold": 0.95
+      },
+      "PerfectInputs": {
+        "DetectMacros": true,
+        "InputVarianceThreshold": 0.01
+      },
+      "SuspiciousWinPatterns": {
+        "MaxWinRate": 0.95,
+        "SampleSize": 50
+      }
+    }
+  },
+
+  "MemoryProtection": {
+    "IntegrityChecks": {
+      "Enabled": true,
+      "Interval": 30.0,
+      "CriticalValues": [
+        "PlayerCash",
+        "PlayerREP",
+        "PlayerLevel",
+        "VehicleStats",
+        "UnlockedItems"
+      ]
+    },
+    "HashValidation": {
+      "Enabled": true,
+      "GameFiles": true,
+      "DataFiles": true
+    }
+  },
+
+  "ClientValidation": {
+    "VersionCheck": {
+      "Enabled": true,
+      "AllowedVersions": ["Current", "Current-1"]
+    },
+    "ModDetection": {
+      "Enabled": true,
+      "AllowCosmetic": false,
+      "Whitelist": [],
+      "Blacklist": []
+    },
+    "ProcessIntegrity": {
+      "CheckKnownCheats": true,
+      "UpdateInterval": 86400
+    }
+  },
+
+  "Penalties": {
+    "Levels": {
+      "Warning": {
+        "Duration": 0,
+        "Restrictions": [],
+        "Notification": true
+      },
+      "Minor": {
+        "Duration": 86400,
+        "Restrictions": ["Ranked_Disabled", "Leaderboards_Hidden"],
+        "CooldownMultiplier": 1.5
+      },
+      "Major": {
+        "Duration": 604800,
+        "Restrictions": ["Multiplayer_Disabled", "Progress_Frozen"],
+        "CooldownMultiplier": 2.0
+      },
+      "Severe": {
+        "Duration": 2592000,
+        "Restrictions": ["Account_Restricted"],
+        "CooldownMultiplier": 4.0
+      },
+      "Permanent": {
+        "Duration": -1,
+        "Restrictions": ["Account_Banned"],
+        "AppealAvailable": true
+      }
+    },
+    "EscalationRules": {
+      "WarningsBeforeMinor": 3,
+      "MinorBeforeMajor": 2,
+      "MajorBeforeSevere": 2,
+      "SevereBeforePermanent": 1,
+      "ResetPeriod": 7776000
+    },
+    "AutomaticActions": {
+      "SpeedHack": "Major",
+      "TeleportHack": "Major",
+      "MoneyHack": "Severe",
+      "AimAssist": "Minor",
+      "MacroUsage": "Warning",
+      "ExploitAbuse": "Minor",
+      "RepeatedOffense": "Escalate"
+    }
+  },
+
+  "Reporting": {
+    "PlayerReports": {
+      "Enabled": true,
+      "MaxReportsPerDay": 10,
+      "Categories": [
+        "Cheating",
+        "Exploiting",
+        "Griefing",
+        "Offensive_Behavior",
+        "Boosting"
+      ],
+      "RequireEvidence": false,
+      "ReviewThreshold": 5
+    },
+    "AutomatedReports": {
+      "Enabled": true,
+      "LogToServer": true,
+      "IncludeReplay": true,
+      "IncludeTelemetry": true
+    }
+  },
+
+  "FairPlay": {
+    "Matchmaking": {
+      "SkillBasedMatching": true,
+      "PIRangeMatching": true,
+      "MaxPIDifference": 100,
+      "LatencyMatching": true,
+      "MaxLatencyDifference": 100
+    },
+    "RaceIntegrity": {
+      "PreRaceValidation": true,
+      "LiveValidation": true,
+      "PostRaceValidation": true,
+      "ResultVerification": true
+    },
+    "CatchUpPrevention": {
+      "NoRubberBanding": true,
+      "ConsistentPhysics": true,
+      "NoHiddenAssists": true
+    }
+  },
+
+  "PrivacySettings": {
+    "DataCollection": {
+      "TelemetryOnly": true,
+      "AnonymizedStats": true,
+      "NoPersonalData": true
+    },
+    "Transparency": {
+      "ShowReasons": true,
+      "AppealProcess": true,
+      "DataRetention": 90
+    }
+  },
+
+  "Appeals": {
+    "Enabled": true,
+    "CooldownBetweenAppeals": 604800,
+    "MaxAppealsPerBan": 2,
+    "ReviewProcess": {
+      "ManualReview": true,
+      "ResponseTime": 72
+    }
+  },
+
+  "Competitive": {
+    "RankedSecurity": {
+      "EnhancedValidation": true,
+      "StricterThresholds": true,
+      "TournamentMode": {
+        "MaximumSecurity": true,
+        "ReplayRequired": true,
+        "ManualOversight": true
+      }
+    },
+    "LeaderboardProtection": {
+      "ValidateTopScores": true,
+      "RequireVideoProof": { "TopPercent": 1 },
+      "ManualReviewThreshold": 100
+    }
+  }
+}

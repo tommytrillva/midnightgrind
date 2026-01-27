@@ -1,0 +1,368 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Analytics and Telemetry Event Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "ConsentRequired": true,
+    "AnonymizeData": true,
+    "BatchInterval": 60,
+    "MaxQueueSize": 1000,
+    "RetryAttempts": 3,
+    "OfflineStorage": true,
+    "MaxOfflineEvents": 10000
+  },
+
+  "SessionEvents": {
+    "SessionStart": {
+      "ID": "ANALYTICS_SESSION_START",
+      "Trigger": "GameLaunch",
+      "Data": [
+        "Platform",
+        "GameVersion",
+        "Language",
+        "Region",
+        "SessionID",
+        "DeviceInfo",
+        "GraphicsSettings",
+        "IsFirstSession"
+      ]
+    },
+    "SessionEnd": {
+      "ID": "ANALYTICS_SESSION_END",
+      "Trigger": "GameExit",
+      "Data": [
+        "SessionDuration",
+        "ScreensVisited",
+        "RacesCompleted",
+        "CashEarned",
+        "REPEarned",
+        "ExitReason"
+      ]
+    },
+    "SessionHeartbeat": {
+      "ID": "ANALYTICS_HEARTBEAT",
+      "Interval": 300,
+      "Data": [
+        "CurrentScreen",
+        "CurrentActivity",
+        "PlaytimeThisSession"
+      ]
+    }
+  },
+
+  "ProgressionEvents": {
+    "LevelUp": {
+      "ID": "ANALYTICS_LEVEL_UP",
+      "Data": ["NewLevel", "PlaytimeToLevel", "TotalXPEarned"]
+    },
+    "REPTierUp": {
+      "ID": "ANALYTICS_REP_TIER",
+      "Data": ["NewTier", "TotalREP", "PlaytimeToTier"]
+    },
+    "Achievement": {
+      "ID": "ANALYTICS_ACHIEVEMENT",
+      "Data": ["AchievementID", "UnlockTime", "PlaytimeToUnlock"]
+    },
+    "CareerProgress": {
+      "ID": "ANALYTICS_CAREER",
+      "Data": ["ChapterID", "EventID", "Completion", "Attempts"]
+    },
+    "FirstTimeEvent": {
+      "ID": "ANALYTICS_FIRST_TIME",
+      "Data": ["EventType", "TimeFromStart"]
+    }
+  },
+
+  "RaceEvents": {
+    "RaceStart": {
+      "ID": "ANALYTICS_RACE_START",
+      "Data": [
+        "RaceType",
+        "TrackID",
+        "VehicleID",
+        "VehiclePI",
+        "Difficulty",
+        "OpponentCount",
+        "Weather",
+        "TimeOfDay"
+      ]
+    },
+    "RaceComplete": {
+      "ID": "ANALYTICS_RACE_COMPLETE",
+      "Data": [
+        "RaceType",
+        "TrackID",
+        "FinishPosition",
+        "RaceTime",
+        "BestLapTime",
+        "CashEarned",
+        "REPEarned",
+        "Restarts"
+      ]
+    },
+    "RaceAbandon": {
+      "ID": "ANALYTICS_RACE_ABANDON",
+      "Data": [
+        "RaceType",
+        "TrackID",
+        "AbandonReason",
+        "PositionAtAbandon",
+        "TimeInRace",
+        "LapsCompleted"
+      ]
+    },
+    "LapComplete": {
+      "ID": "ANALYTICS_LAP",
+      "Data": ["TrackID", "LapNumber", "LapTime", "Position"]
+    }
+  },
+
+  "EconomyEvents": {
+    "Transaction": {
+      "ID": "ANALYTICS_TRANSACTION",
+      "Data": [
+        "TransactionType",
+        "ItemID",
+        "Currency",
+        "Amount",
+        "BalanceAfter",
+        "Source"
+      ]
+    },
+    "Purchase": {
+      "ID": "ANALYTICS_PURCHASE",
+      "Data": [
+        "ItemType",
+        "ItemID",
+        "Price",
+        "Currency",
+        "ShopLocation"
+      ]
+    },
+    "Reward": {
+      "ID": "ANALYTICS_REWARD",
+      "Data": [
+        "RewardType",
+        "RewardValue",
+        "Source",
+        "Currency"
+      ]
+    },
+    "CurrencyEarned": {
+      "ID": "ANALYTICS_CURRENCY",
+      "Data": ["Currency", "Amount", "Source", "Activity"]
+    }
+  },
+
+  "GarageEvents": {
+    "VehiclePurchase": {
+      "ID": "ANALYTICS_VEHICLE_BUY",
+      "Data": ["VehicleID", "Price", "PlaytimeAtPurchase", "GarageSize"]
+    },
+    "VehicleSell": {
+      "ID": "ANALYTICS_VEHICLE_SELL",
+      "Data": ["VehicleID", "SalePrice", "OwnershipDuration"]
+    },
+    "PartInstall": {
+      "ID": "ANALYTICS_PART_INSTALL",
+      "Data": ["VehicleID", "PartID", "PartCategory", "PIChange", "Price"]
+    },
+    "TuningChange": {
+      "ID": "ANALYTICS_TUNING",
+      "Data": ["VehicleID", "TuningCategory", "SettingChanged"]
+    },
+    "Customization": {
+      "ID": "ANALYTICS_CUSTOMIZE",
+      "Data": ["VehicleID", "CustomType", "ItemID"]
+    }
+  },
+
+  "SocialEvents": {
+    "MultiplayerJoin": {
+      "ID": "ANALYTICS_MP_JOIN",
+      "Data": ["LobbyType", "PlayerCount", "Region", "Latency"]
+    },
+    "MultiplayerLeave": {
+      "ID": "ANALYTICS_MP_LEAVE",
+      "Data": ["LobbyType", "TimeInLobby", "LeaveReason"]
+    },
+    "CrewAction": {
+      "ID": "ANALYTICS_CREW",
+      "Data": ["ActionType", "CrewID", "Result"]
+    },
+    "FriendAction": {
+      "ID": "ANALYTICS_FRIEND",
+      "Data": ["ActionType", "Result"]
+    },
+    "ChatMessage": {
+      "ID": "ANALYTICS_CHAT",
+      "Data": ["ChatType", "MessageLength"],
+      "NoContent": true
+    }
+  },
+
+  "EngagementEvents": {
+    "FeatureUsed": {
+      "ID": "ANALYTICS_FEATURE",
+      "Data": ["FeatureID", "UsageCount", "Duration"]
+    },
+    "MenuNavigation": {
+      "ID": "ANALYTICS_MENU",
+      "Data": ["FromScreen", "ToScreen", "TimeOnScreen"]
+    },
+    "PhotoMode": {
+      "ID": "ANALYTICS_PHOTO",
+      "Data": ["PhotosTaken", "SharedCount", "FiltersUsed"]
+    },
+    "Replay": {
+      "ID": "ANALYTICS_REPLAY",
+      "Data": ["ReplaysWatched", "ReplaysSaved", "AverageWatchTime"]
+    },
+    "DailyLogin": {
+      "ID": "ANALYTICS_DAILY_LOGIN",
+      "Data": ["LoginStreak", "DaysSinceLastLogin", "RewardsClaimed"]
+    }
+  },
+
+  "PerformanceEvents": {
+    "FrameRate": {
+      "ID": "ANALYTICS_FPS",
+      "SampleInterval": 60,
+      "Data": ["AverageFPS", "MinFPS", "MaxFPS", "Percentile95"]
+    },
+    "LoadTime": {
+      "ID": "ANALYTICS_LOAD",
+      "Data": ["LoadType", "Duration", "Scene"]
+    },
+    "Crash": {
+      "ID": "ANALYTICS_CRASH",
+      "Data": ["CrashType", "StackTrace", "LastActivity", "SessionDuration"],
+      "Anonymize": ["StackTrace"]
+    },
+    "Error": {
+      "ID": "ANALYTICS_ERROR",
+      "Data": ["ErrorType", "ErrorCode", "Context"]
+    },
+    "NetworkIssue": {
+      "ID": "ANALYTICS_NETWORK",
+      "Data": ["IssueType", "Latency", "PacketLoss", "Duration"]
+    }
+  },
+
+  "TutorialEvents": {
+    "TutorialStart": {
+      "ID": "ANALYTICS_TUTORIAL_START",
+      "Data": ["TutorialID", "IsSkipped"]
+    },
+    "TutorialStep": {
+      "ID": "ANALYTICS_TUTORIAL_STEP",
+      "Data": ["TutorialID", "StepID", "TimeOnStep", "Completed"]
+    },
+    "TutorialComplete": {
+      "ID": "ANALYTICS_TUTORIAL_END",
+      "Data": ["TutorialID", "TotalTime", "StepsCompleted", "Skipped"]
+    }
+  },
+
+  "ABTestEvents": {
+    "VariantAssigned": {
+      "ID": "ANALYTICS_AB_ASSIGN",
+      "Data": ["TestID", "VariantID", "Timestamp"]
+    },
+    "VariantAction": {
+      "ID": "ANALYTICS_AB_ACTION",
+      "Data": ["TestID", "VariantID", "ActionType", "Value"]
+    }
+  },
+
+  "Funnels": {
+    "NewPlayerFunnel": {
+      "Steps": [
+        "GameLaunch",
+        "TutorialStart",
+        "TutorialComplete",
+        "FirstRace",
+        "FirstWin",
+        "FirstPurchase",
+        "FirstCustomization",
+        "FirstMultiplayer"
+      ]
+    },
+    "PurchaseFunnel": {
+      "Steps": [
+        "ShopOpened",
+        "ItemViewed",
+        "AddedToCart",
+        "CheckoutStarted",
+        "PurchaseComplete"
+      ]
+    },
+    "RaceFunnel": {
+      "Steps": [
+        "RaceSelected",
+        "VehicleSelected",
+        "RaceStarted",
+        "RaceCompleted"
+      ]
+    }
+  },
+
+  "Segments": {
+    "PlayerSegments": [
+      "NewPlayer",
+      "CasualPlayer",
+      "RegularPlayer",
+      "HardcorePlayer",
+      "Whale",
+      "Churned",
+      "Returning"
+    ],
+    "BehaviorSegments": [
+      "Racer",
+      "Drifter",
+      "Collector",
+      "Social",
+      "Competitor",
+      "Explorer"
+    ]
+  },
+
+  "Metrics": {
+    "KeyMetrics": [
+      "DAU",
+      "MAU",
+      "Retention_D1",
+      "Retention_D7",
+      "Retention_D30",
+      "SessionLength",
+      "SessionsPerDay",
+      "ARPU",
+      "ARPPU",
+      "ConversionRate"
+    ],
+    "GameplayMetrics": [
+      "RacesPerSession",
+      "WinRate",
+      "AverageLapTime",
+      "VehiclesOwned",
+      "PartsInstalled",
+      "CustomizationsApplied"
+    ]
+  },
+
+  "Privacy": {
+    "DataRetention": 365,
+    "DeleteOnRequest": true,
+    "ExportOnRequest": true,
+    "OptOutOptions": [
+      "Analytics",
+      "Personalization",
+      "Marketing"
+    ],
+    "MinimumDataMode": {
+      "Enabled": false,
+      "TrackOnly": ["Crashes", "CriticalErrors"]
+    }
+  }
+}

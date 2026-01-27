@@ -43,32 +43,37 @@ void UMGPoliceSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 	Super::OnWorldBeginPlay(InWorld);
 
 	// Start update timer at 10Hz for performance
+	TWeakObjectPtr<UMGPoliceSubsystem> WeakThis(this);
 	InWorld.GetTimerManager().SetTimer(
 		UpdateTimerHandle,
-		[this]()
+		[WeakThis]()
 		{
-			if (bPoliceEnabled)
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			if (WeakThis->bPoliceEnabled)
 			{
 				const float DeltaTime = 0.1f;
-				UpdatePursuit(DeltaTime);
-				UpdateCooldown(DeltaTime);
-				UpdatePoliceAI(DeltaTime);
-				UpdateBustedState(DeltaTime);
-				CheckCooldownZones();
-				UpdatePursuitStats(DeltaTime);
+				WeakThis->UpdatePursuit(DeltaTime);
+				WeakThis->UpdateCooldown(DeltaTime);
+				WeakThis->UpdatePoliceAI(DeltaTime);
+				WeakThis->UpdateBustedState(DeltaTime);
+				WeakThis->CheckCooldownZones();
+				WeakThis->UpdatePursuitStats(DeltaTime);
 
 				// Periodic tactic evaluation
-				TimeSinceTacticEvaluation += DeltaTime;
-				if (TimeSinceTacticEvaluation >= TacticEvaluationInterval)
+				WeakThis->TimeSinceTacticEvaluation += DeltaTime;
+				if (WeakThis->TimeSinceTacticEvaluation >= WeakThis->TacticEvaluationInterval)
 				{
-					EvaluateTactics();
-					TimeSinceTacticEvaluation = 0.0f;
+					WeakThis->EvaluateTactics();
+					WeakThis->TimeSinceTacticEvaluation = 0.0f;
 				}
 
 				// Heat decay when not in pursuit
-				if (!bInPursuit && CurrentHeatPoints > 0)
+				if (!WeakThis->bInPursuit && WeakThis->CurrentHeatPoints > 0)
 				{
-					UpdateHeatDecay(DeltaTime);
+					WeakThis->UpdateHeatDecay(DeltaTime);
 				}
 			}
 		},

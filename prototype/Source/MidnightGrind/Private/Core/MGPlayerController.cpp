@@ -17,6 +17,9 @@
 #include "Bonus/MGBonusSubsystem.h"
 #include "Pursuit/MGPursuitSubsystem.h"
 #include "Speedtrap/MGSpeedtrapSubsystem.h"
+#include "Destruction/MGDestructionSubsystem.h"
+#include "Aerodynamics/MGAerodynamicsSubsystem.h"
+#include "Scoring/MGScoringSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -133,6 +136,29 @@ void AMGPlayerController::BeginPlay()
 				SpeedtrapSubsystem->OnSpeedtrapNewPersonalBest.AddDynamic(this, &AMGPlayerController::OnSpeedtrapNewPersonalBest);
 				SpeedtrapSubsystem->OnSpeedtrapDiscovered.AddDynamic(this, &AMGPlayerController::OnSpeedtrapDiscovered);
 			}
+
+			// Bind to destruction subsystem for smash feedback
+			if (UMGDestructionSubsystem* DestructionSubsystem = GI->GetSubsystem<UMGDestructionSubsystem>())
+			{
+				DestructionSubsystem->OnDestructibleDestroyed.AddDynamic(this, &AMGPlayerController::OnDestructibleDestroyed);
+				DestructionSubsystem->OnDestructionComboUpdated.AddDynamic(this, &AMGPlayerController::OnDestructionComboUpdated);
+				DestructionSubsystem->OnSpectacularDestruction.AddDynamic(this, &AMGPlayerController::OnSpectacularDestruction);
+			}
+
+			// Bind to aerodynamics subsystem for slipstream feedback
+			if (UMGAerodynamicsSubsystem* AeroSubsystem = GI->GetSubsystem<UMGAerodynamicsSubsystem>())
+			{
+				AeroSubsystem->OnSlipstreamEntered.AddDynamic(this, &AMGPlayerController::OnSlipstreamEntered);
+				AeroSubsystem->OnSlingshotReady.AddDynamic(this, &AMGPlayerController::OnSlingshotReady);
+				AeroSubsystem->OnSlingshotUsed.AddDynamic(this, &AMGPlayerController::OnSlingshotUsed);
+			}
+
+			// Bind to scoring subsystem for score popups
+			if (UMGScoringSubsystem* ScoringSubsystem = GI->GetSubsystem<UMGScoringSubsystem>())
+			{
+				ScoringSubsystem->OnScoreEvent.AddDynamic(this, &AMGPlayerController::OnScoreEvent);
+				ScoringSubsystem->OnChainExtended.AddDynamic(this, &AMGPlayerController::OnChainExtended);
+			}
 		}
 	}
 }
@@ -211,6 +237,26 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			SpeedtrapSubsystem->OnSpeedtrapRecorded.RemoveDynamic(this, &AMGPlayerController::OnSpeedtrapRecorded);
 			SpeedtrapSubsystem->OnSpeedtrapNewPersonalBest.RemoveDynamic(this, &AMGPlayerController::OnSpeedtrapNewPersonalBest);
 			SpeedtrapSubsystem->OnSpeedtrapDiscovered.RemoveDynamic(this, &AMGPlayerController::OnSpeedtrapDiscovered);
+		}
+
+		if (UMGDestructionSubsystem* DestructionSubsystem = GI->GetSubsystem<UMGDestructionSubsystem>())
+		{
+			DestructionSubsystem->OnDestructibleDestroyed.RemoveDynamic(this, &AMGPlayerController::OnDestructibleDestroyed);
+			DestructionSubsystem->OnDestructionComboUpdated.RemoveDynamic(this, &AMGPlayerController::OnDestructionComboUpdated);
+			DestructionSubsystem->OnSpectacularDestruction.RemoveDynamic(this, &AMGPlayerController::OnSpectacularDestruction);
+		}
+
+		if (UMGAerodynamicsSubsystem* AeroSubsystem = GI->GetSubsystem<UMGAerodynamicsSubsystem>())
+		{
+			AeroSubsystem->OnSlipstreamEntered.RemoveDynamic(this, &AMGPlayerController::OnSlipstreamEntered);
+			AeroSubsystem->OnSlingshotReady.RemoveDynamic(this, &AMGPlayerController::OnSlingshotReady);
+			AeroSubsystem->OnSlingshotUsed.RemoveDynamic(this, &AMGPlayerController::OnSlingshotUsed);
+		}
+
+		if (UMGScoringSubsystem* ScoringSubsystem = GI->GetSubsystem<UMGScoringSubsystem>())
+		{
+			ScoringSubsystem->OnScoreEvent.RemoveDynamic(this, &AMGPlayerController::OnScoreEvent);
+			ScoringSubsystem->OnChainExtended.RemoveDynamic(this, &AMGPlayerController::OnChainExtended);
 		}
 	}
 
@@ -704,7 +750,13 @@ TArray<APlayerState*> AMGPlayerController::GetSpectateTargets() const
 {
 	TArray<APlayerState*> Targets;
 
-	if (AGameStateBase* GS = GetWorld()->GetGameState())
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return Targets;
+	}
+
+	if (AGameStateBase* GS = World->GetGameState())
 	{
 		for (APlayerState* PS : GS->PlayerArray)
 		{
@@ -1306,4 +1358,186 @@ void AMGPlayerController::OnSpeedtrapDiscovered(const FString& SpeedtrapId, int3
 			HUDSubsystem->ShowNotification(DiscoveredMessage, 3.0f, DiscoveredColor);
 		}
 	}
+}
+
+void AMGPlayerController::OnDestructibleDestroyed(const FString& PlayerId, const FMGDestructionEvent& Event)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			// Show points popup for destruction
+			FText DestroyedMessage = FText::FromString(FString::Printf(TEXT("SMASH! +%d"), Event.PointsEarned));
+			FLinearColor SmashColor = FLinearColor(1.0f, 0.6f, 0.0f, 1.0f); // Orange
+			HUDSubsystem->ShowNotification(DestroyedMessage, 1.5f, SmashColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnDestructionComboUpdated(const FString& PlayerId, int32 ComboCount, float Multiplier)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			// Show combo counter
+			FText ComboMessage = FText::FromString(FString::Printf(TEXT("COMBO x%d (%.1fx)"), ComboCount, Multiplier));
+			FLinearColor ComboColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.0f); // Yellow-orange
+			HUDSubsystem->ShowNotification(ComboMessage, 2.0f, ComboColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSpectacularDestruction(const FString& PlayerId, int32 BonusPoints)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText SpectacularMessage = FText::FromString(FString::Printf(TEXT("SPECTACULAR! +%d BONUS"), BonusPoints));
+			FLinearColor SpectacularColor = FLinearColor(1.0f, 0.2f, 0.8f, 1.0f); // Magenta
+			HUDSubsystem->ShowNotification(SpectacularMessage, 3.0f, SpectacularColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSlipstreamEntered(const FString& FollowerId, const FString& LeaderId, float Distance)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (FollowerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText SlipstreamMessage = FText::FromString(TEXT("SLIPSTREAM!"));
+			FLinearColor SlipstreamColor = FLinearColor(0.3f, 0.7f, 1.0f, 1.0f); // Light blue
+			HUDSubsystem->ShowNotification(SlipstreamMessage, 2.0f, SlipstreamColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSlingshotReady(const FString& VehicleId, float BoostAmount, float Duration)
+{
+	// Only show for local player's vehicle
+	if (!ControlledVehicle)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText SlingshotMessage = FText::FromString(TEXT("SLINGSHOT READY!"));
+			FLinearColor SlingshotColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f); // Cyan-green
+			HUDSubsystem->ShowNotification(SlingshotMessage, 2.0f, SlingshotColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSlingshotUsed(const FString& VehicleId, float SpeedGained)
+{
+	// Only show for local player's vehicle
+	if (!ControlledVehicle)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			int32 SpeedGainedInt = FMath::RoundToInt(SpeedGained);
+			FText SlingshotMessage = FText::FromString(FString::Printf(TEXT("SLINGSHOT! +%d KPH"), SpeedGainedInt));
+			FLinearColor SlingshotColor = FLinearColor(0.0f, 1.0f, 0.8f, 1.0f); // Cyan
+			HUDSubsystem->ShowNotification(SlingshotMessage, 2.5f, SlingshotColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnScoreEvent(const FString& PlayerId, const FMGScoreEvent& Event, int32 NewTotal)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	// Don't show small score events, they clutter the HUD
+	if (Event.FinalPoints < 100)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ScoreMessage = FText::FromString(FString::Printf(TEXT("+%d"), Event.FinalPoints));
+			FLinearColor ScoreColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
+			HUDSubsystem->ShowNotification(ScoreMessage, 1.5f, ScoreColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnChainExtended(const FString& PlayerId, int32 ChainLength, float Multiplier, int32 ChainPoints)
+{
+	// Only show for local player
+	FString LocalPlayerId = GetLocalPlayerId();
+	if (PlayerId != LocalPlayerId)
+	{
+		return;
+	}
+
+	// Only show significant chains
+	if (ChainLength < 3)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ChainMessage = FText::FromString(FString::Printf(TEXT("CHAIN x%d! (%.1fx)"), ChainLength, Multiplier));
+			FLinearColor ChainColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+			HUDSubsystem->ShowNotification(ChainMessage, 2.0f, ChainColor);
+		}
+	}
+}
+
+FString AMGPlayerController::GetLocalPlayerId() const
+{
+	if (PlayerState)
+	{
+		return PlayerState->GetPlayerName();
+	}
+	return FString();
 }

@@ -27,13 +27,14 @@ void UMGTrafficSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
 
+	TWeakObjectPtr<UMGTrafficSubsystem> WeakThis(this);
 	InWorld.GetTimerManager().SetTimer(
 		UpdateTimerHandle,
-		[this]()
+		[WeakThis]()
 		{
-			if (bTrafficEnabled)
+			if (WeakThis.IsValid() && WeakThis->bTrafficEnabled)
 			{
-				UpdateTraffic(0.1f);
+				WeakThis->UpdateTraffic(0.1f);
 			}
 		},
 		0.1f,

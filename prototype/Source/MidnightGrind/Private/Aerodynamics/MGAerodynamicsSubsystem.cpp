@@ -785,12 +785,157 @@ void UMGAerodynamicsSubsystem::UpdateAerodynamics(float DeltaTime)
 
 void UMGAerodynamicsSubsystem::SaveAeroData()
 {
-	// Placeholder - would serialize to save game
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Aerodynamics");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("aero_stats.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save player stats
+	int32 NumPlayers = PlayerStats.Num();
+	SaveArchive << NumPlayers;
+
+	for (const auto& Pair : PlayerStats)
+	{
+		FString PlayerId = Pair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGAeroPlayerStats& Stats = Pair.Value;
+		float TotalSlipstreamTime = Stats.TotalSlipstreamTime;
+		float LongestSlipstreamSession = Stats.LongestSlipstreamSession;
+		int32 SlingshotsUsed = Stats.SlingshotsUsed;
+		int32 OvertakesFromSlipstream = Stats.OvertakesFromSlipstream;
+		int32 SlipstreamPointsEarned = Stats.SlipstreamPointsEarned;
+		float TopSpeedInSlipstream = Stats.TopSpeedInSlipstream;
+		float DistanceDraftedMiles = Stats.DistanceDraftedMiles;
+		int32 PerfectSlipstreams = Stats.PerfectSlipstreams;
+
+		SaveArchive << TotalSlipstreamTime;
+		SaveArchive << LongestSlipstreamSession;
+		SaveArchive << SlingshotsUsed;
+		SaveArchive << OvertakesFromSlipstream;
+		SaveArchive << SlipstreamPointsEarned;
+		SaveArchive << TopSpeedInSlipstream;
+		SaveArchive << DistanceDraftedMiles;
+		SaveArchive << PerfectSlipstreams;
+	}
+
+	// Save custom aero profiles
+	int32 NumProfiles = AeroProfiles.Num();
+	SaveArchive << NumProfiles;
+
+	for (const auto& Pair : AeroProfiles)
+	{
+		FString ProfileId = Pair.Key;
+		SaveArchive << ProfileId;
+
+		const FMGAeroProfileDefinition& Profile = Pair.Value;
+		FString DisplayNameStr = Profile.DisplayName.ToString();
+		int32 TypeInt = static_cast<int32>(Profile.Type);
+		float DragCoeff = Profile.DragCoefficient;
+		float LiftCoeff = Profile.LiftCoefficient;
+		float DownforceCoeff = Profile.DownforceCoefficient;
+		float FrontalArea = Profile.FrontalArea;
+		float DownforceFrontBias = Profile.DownforceFrontBias;
+
+		SaveArchive << DisplayNameStr;
+		SaveArchive << TypeInt;
+		SaveArchive << DragCoeff;
+		SaveArchive << LiftCoeff;
+		SaveArchive << DownforceCoeff;
+		SaveArchive << FrontalArea;
+		SaveArchive << DownforceFrontBias;
+	}
+
+	// Write to file
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGAerodynamicsSubsystem: Saved aero data for %d players, %d profiles"), NumPlayers, NumProfiles);
 }
 
 void UMGAerodynamicsSubsystem::LoadAeroData()
 {
-	// Placeholder - would deserialize from save game
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Aerodynamics") / TEXT("aero_stats.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("MGAerodynamicsSubsystem: No saved aero data found"));
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGAerodynamicsSubsystem: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Load player stats
+	int32 NumPlayers;
+	LoadArchive << NumPlayers;
+
+	for (int32 i = 0; i < NumPlayers; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGAeroPlayerStats Stats;
+		Stats.PlayerId = PlayerId;
+
+		LoadArchive << Stats.TotalSlipstreamTime;
+		LoadArchive << Stats.LongestSlipstreamSession;
+		LoadArchive << Stats.SlingshotsUsed;
+		LoadArchive << Stats.OvertakesFromSlipstream;
+		LoadArchive << Stats.SlipstreamPointsEarned;
+		LoadArchive << Stats.TopSpeedInSlipstream;
+		LoadArchive << Stats.DistanceDraftedMiles;
+		LoadArchive << Stats.PerfectSlipstreams;
+
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	// Load custom aero profiles
+	int32 NumProfiles;
+	LoadArchive << NumProfiles;
+
+	for (int32 i = 0; i < NumProfiles; ++i)
+	{
+		FString ProfileId;
+		LoadArchive << ProfileId;
+
+		FMGAeroProfileDefinition Profile;
+		Profile.ProfileId = ProfileId;
+
+		FString DisplayNameStr;
+		int32 TypeInt;
+
+		LoadArchive << DisplayNameStr;
+		LoadArchive << TypeInt;
+		LoadArchive << Profile.DragCoefficient;
+		LoadArchive << Profile.LiftCoefficient;
+		LoadArchive << Profile.DownforceCoefficient;
+		LoadArchive << Profile.FrontalArea;
+		LoadArchive << Profile.DownforceFrontBias;
+
+		Profile.DisplayName = FText::FromString(DisplayNameStr);
+		Profile.Type = static_cast<EMGAeroProfile>(TypeInt);
+
+		AeroProfiles.Add(ProfileId, Profile);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGAerodynamicsSubsystem: Loaded aero data for %d players, %d profiles"), NumPlayers, NumProfiles);
 }
 
 // ============================================================================

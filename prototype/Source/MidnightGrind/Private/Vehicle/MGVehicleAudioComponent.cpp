@@ -356,10 +356,15 @@ void UMGVehicleAudioComponent::OnCollision(float ImpactVelocity, bool bIsScrape)
 	}
 	else
 	{
+		AActor* Owner = GetOwner();
+		if (!Owner)
+		{
+			return;
+		}
 		// One-shot impact sound
 		if (ImpactVelocity >= HeavyImpactThreshold)
 		{
-			PlayOneShotAtLocation(HeavyImpactSound, GetOwner()->GetActorLocation());
+			PlayOneShotAtLocation(HeavyImpactSound, Owner->GetActorLocation());
 		}
 		else if (ImpactVelocity >= 5.0f)
 		{
@@ -368,7 +373,7 @@ void UMGVehicleAudioComponent::OnCollision(float ImpactVelocity, bool bIsScrape)
 				FVector2D(0.3f, 1.0f),
 				ImpactVelocity
 			);
-			PlayOneShotAtLocation(LightImpactSound, GetOwner()->GetActorLocation(), VolumeScale);
+			PlayOneShotAtLocation(LightImpactSound, Owner->GetActorLocation(), VolumeScale);
 		}
 	}
 }

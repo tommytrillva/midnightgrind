@@ -19,9 +19,10 @@ void UMGSaveSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	{
 		if (UWorld* World = GetWorld())
 		{
+			TWeakObjectPtr<UMGSaveSubsystem> WeakThis(this);
 			World->GetTimerManager().SetTimer(
 				AutoSaveTimerHandle,
-				[this]() { OnAutoSaveTimerTick(); },
+				[WeakThis]() { if (WeakThis.IsValid()) WeakThis->OnAutoSaveTimerTick(); },
 				AutoSaveIntervalMinutes * 60.0f,
 				true
 			);
@@ -689,9 +690,10 @@ void UMGSaveSubsystem::SetAutoSaveEnabled(bool bEnabled)
 	{
 		if (bEnabled)
 		{
+			TWeakObjectPtr<UMGSaveSubsystem> WeakThis(this);
 			World->GetTimerManager().SetTimer(
 				AutoSaveTimerHandle,
-				[this]() { OnAutoSaveTimerTick(); },
+				[WeakThis]() { if (WeakThis.IsValid()) WeakThis->OnAutoSaveTimerTick(); },
 				AutoSaveIntervalMinutes * 60.0f,
 				true
 			);
