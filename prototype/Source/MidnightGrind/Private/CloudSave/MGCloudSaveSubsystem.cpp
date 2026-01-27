@@ -289,20 +289,56 @@ void UMGCloudSaveSubsystem::UploadToCloud(int32 SlotIndex)
 	// Serialize all data
 	TArray<uint8> AllData = SerializeSaveData(SlotIndex, EMGSaveDataType::All);
 
-	// Mock upload - would use platform cloud API
+	// Save to local "cloud" directory (simulates cloud storage)
+	// In production, this would use platform-specific cloud APIs:
 	// Steam: ISteamRemoteStorage
 	// Xbox: XGameSaveSubmitUpdate
 	// PlayStation: SaveData API
 
+	FString CloudDir = FPaths::ProjectSavedDir() / TEXT("CloudSaves");
+	IFileManager::Get().MakeDirectory(*CloudDir, true);
+
+	FString CloudFilePath = CloudDir / FString::Printf(TEXT("Slot_%d.cloudsave"), SlotIndex);
+
+	// Create cloud save with metadata header
+	FBufferArchive CloudArchive;
+	int32 Version = 1;
+	FString DeviceIdCopy = DeviceID;
+	int64 UploadTimestamp = FDateTime::UtcNow().GetTicks();
+	int32 DataSize = AllData.Num();
+
+	CloudArchive << Version;
+	CloudArchive << DeviceIdCopy;
+	CloudArchive << UploadTimestamp;
+	CloudArchive << DataSize;
+	CloudArchive.Append(AllData);
+
+	// Calculate checksum
+	FSHAHash Hash;
+	FSHA1::HashBuffer(AllData.GetData(), AllData.Num(), Hash.Hash);
+	FString Checksum = Hash.ToString();
+	CloudArchive << Checksum;
+
 	FMGSyncProgress Progress;
 	Progress.bIsUploading = true;
-	Progress.TotalBytes = AllData.Num();
-	Progress.TransferredBytes = AllData.Num();
-	Progress.ProgressPercent = 100.0f;
+	Progress.TotalBytes = CloudArchive.Num();
+
+	// Write to file with progress simulation
+	bool bSuccess = FFileHelper::SaveArrayToFile(CloudArchive, *CloudFilePath);
+
+	Progress.TransferredBytes = bSuccess ? CloudArchive.Num() : 0;
+	Progress.ProgressPercent = bSuccess ? 100.0f : 0.0f;
 	OnCloudSyncProgress.Broadcast(Progress);
 
-	// Simulate success
-	OnCloudUploadComplete(true);
+	// Update metadata
+	if (bSuccess)
+	{
+		CloudMetadata.LastSyncTime = FDateTime::UtcNow();
+		CloudMetadata.CloudDataSize = CloudArchive.Num();
+		CloudMetadata.bHasCloudData = true;
+	}
+
+	OnCloudUploadComplete(bSuccess);
 }
 
 void UMGCloudSaveSubsystem::DownloadFromCloud(int32 SlotIndex)
@@ -317,17 +353,74 @@ void UMGCloudSaveSubsystem::DownloadFromCloud(int32 SlotIndex)
 	CloudSyncStatus = EMGCloudSyncStatus::PendingDownload;
 	OnCloudSyncStatusChanged.Broadcast(CloudSyncStatus);
 
-	// Mock download - would use platform cloud API
+	// Load from local "cloud" directory
+	FString CloudDir = FPaths::ProjectSavedDir() / TEXT("CloudSaves");
+	FString CloudFilePath = CloudDir / FString::Printf(TEXT("Slot_%d.cloudsave"), SlotIndex);
+
+	TArray<uint8> CloudFileData;
 	TArray<uint8> CloudData;
+	bool bSuccess = false;
 
 	FMGSyncProgress Progress;
 	Progress.bIsUploading = false;
-	Progress.TotalBytes = CloudData.Num();
-	Progress.TransferredBytes = CloudData.Num();
-	Progress.ProgressPercent = 100.0f;
-	OnCloudSyncProgress.Broadcast(Progress);
 
-	OnCloudDownloadComplete(true, CloudData);
+	if (FFileHelper::LoadFileToArray(CloudFileData, *CloudFilePath))
+	{
+		Progress.TotalBytes = CloudFileData.Num();
+
+		// Parse cloud save format
+		FMemoryReader CloudArchive(CloudFileData, true);
+
+		int32 Version;
+		FString SaveDeviceId;
+		int64 UploadTimestamp;
+		int32 DataSize;
+
+		CloudArchive << Version;
+		CloudArchive << SaveDeviceId;
+		CloudArchive << UploadTimestamp;
+		CloudArchive << DataSize;
+
+		if (Version == 1 && DataSize > 0 && DataSize <= CloudFileData.Num())
+		{
+			// Extract save data
+			CloudData.SetNum(DataSize);
+			CloudArchive.Serialize(CloudData.GetData(), DataSize);
+
+			// Read and verify checksum
+			FString StoredChecksum;
+			CloudArchive << StoredChecksum;
+
+			FSHAHash Hash;
+			FSHA1::HashBuffer(CloudData.GetData(), CloudData.Num(), Hash.Hash);
+			FString CalculatedChecksum = Hash.ToString();
+
+			if (StoredChecksum == CalculatedChecksum)
+			{
+				bSuccess = true;
+				CloudMetadata.LastSyncTime = FDateTime(UploadTimestamp);
+				CloudMetadata.CloudDataSize = DataSize;
+				CloudMetadata.bHasCloudData = true;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("CloudSave: Checksum mismatch for slot %d"), SlotIndex);
+			}
+		}
+
+		Progress.TransferredBytes = bSuccess ? CloudFileData.Num() : 0;
+		Progress.ProgressPercent = bSuccess ? 100.0f : 0.0f;
+	}
+	else
+	{
+		Progress.TotalBytes = 0;
+		Progress.TransferredBytes = 0;
+		Progress.ProgressPercent = 0.0f;
+		UE_LOG(LogTemp, Log, TEXT("CloudSave: No cloud data found for slot %d"), SlotIndex);
+	}
+
+	OnCloudSyncProgress.Broadcast(Progress);
+	OnCloudDownloadComplete(bSuccess, CloudData);
 }
 
 FMGCloudSaveMetadata UMGCloudSaveSubsystem::GetCloudSaveMetadata() const

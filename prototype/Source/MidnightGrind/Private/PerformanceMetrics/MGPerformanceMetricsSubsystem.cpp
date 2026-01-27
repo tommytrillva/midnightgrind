@@ -6,7 +6,11 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "HAL/PlatformMemory.h"
+#include "HAL/PlatformTime.h"
 #include "GenericPlatform/GenericPlatformMisc.h"
+#include "RHI.h"
+#include "RenderCore.h"
+#include "Stats/Stats.h"
 
 void UMGPerformanceMetricsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -82,17 +86,26 @@ void UMGPerformanceMetricsSubsystem::SampleMetrics()
     CurrentFrameMetrics.FrameTimeMs = DeltaTime * 1000.0f;
     CurrentFrameMetrics.FPS = DeltaTime > 0.0f ? 1.0f / DeltaTime : 60.0f;
 
-    // Simulate GPU/CPU times (would use RHI stats in real implementation)
-    CurrentFrameMetrics.GPUTimeMs = CurrentFrameMetrics.FrameTimeMs * 0.4f + FMath::RandRange(-1.0f, 1.0f);
-    CurrentFrameMetrics.CPUTimeMs = CurrentFrameMetrics.FrameTimeMs * 0.4f + FMath::RandRange(-1.0f, 1.0f);
-    CurrentFrameMetrics.GameThreadMs = CurrentFrameMetrics.CPUTimeMs * 0.6f;
-    CurrentFrameMetrics.RenderThreadMs = CurrentFrameMetrics.CPUTimeMs * 0.4f;
-    CurrentFrameMetrics.RHIThreadMs = CurrentFrameMetrics.GPUTimeMs * 0.2f;
+    // Get actual thread times from engine stats
+    extern ENGINE_API float GAverageFPS;
+    extern ENGINE_API uint32 GGameThreadTime;
+    extern ENGINE_API uint32 GRenderThreadTime;
+    extern ENGINE_API uint32 GRHIThreadTime;
 
-    // Simulate draw call and triangle counts
-    CurrentFrameMetrics.DrawCalls = 500 + FMath::RandRange(-50, 50);
-    CurrentFrameMetrics.TrianglesDrawn = 1000000 + FMath::RandRange(-100000, 100000);
-    CurrentFrameMetrics.PrimitivesDrawn = CurrentFrameMetrics.DrawCalls * 10;
+    CurrentFrameMetrics.GameThreadMs = FPlatformTime::ToMilliseconds(GGameThreadTime);
+    CurrentFrameMetrics.RenderThreadMs = FPlatformTime::ToMilliseconds(GRenderThreadTime);
+    CurrentFrameMetrics.RHIThreadMs = FPlatformTime::ToMilliseconds(GRHIThreadTime);
+
+    // CPU time is the max of game and render thread (they run in parallel)
+    CurrentFrameMetrics.CPUTimeMs = FMath::Max(CurrentFrameMetrics.GameThreadMs, CurrentFrameMetrics.RenderThreadMs);
+
+    // GPU time estimate (frame time minus CPU work, clamped)
+    CurrentFrameMetrics.GPUTimeMs = FMath::Max(0.0f, CurrentFrameMetrics.FrameTimeMs - CurrentFrameMetrics.CPUTimeMs * 0.5f);
+
+    // Get actual draw call and primitive counts from RHI
+    CurrentFrameMetrics.DrawCalls = GNumDrawCallsRHI;
+    CurrentFrameMetrics.TrianglesDrawn = GNumPrimitivesDrawnRHI;
+    CurrentFrameMetrics.PrimitivesDrawn = GNumPrimitivesDrawnRHI;
 
     // Sample memory metrics
     FPlatformMemoryStats MemStats = FPlatformMemory::GetStats();
@@ -100,10 +113,23 @@ void UMGPerformanceMetricsSubsystem::SampleMetrics()
     CurrentMemoryMetrics.UsedPhysicalMemory = MemStats.UsedPhysical;
     CurrentMemoryMetrics.AvailablePhysicalMemory = MemStats.AvailablePhysical;
 
-    // Simulated VRAM (would query GPU in real implementation)
-    CurrentMemoryMetrics.TotalVRAM = HardwareInfo.GPUMemoryMB * 1024 * 1024;
-    CurrentMemoryMetrics.UsedVRAM = static_cast<int64>(CurrentMemoryMetrics.TotalVRAM * FMath::RandRange(0.4f, 0.6f));
-    CurrentMemoryMetrics.AvailableVRAM = CurrentMemoryMetrics.TotalVRAM - CurrentMemoryMetrics.UsedVRAM;
+    // Get actual VRAM stats from RHI
+    FTextureMemoryStats TextureMemStats;
+    RHIGetTextureMemoryStats(TextureMemStats);
+
+    if (TextureMemStats.DedicatedVideoMemory > 0)
+    {
+        CurrentMemoryMetrics.TotalVRAM = TextureMemStats.DedicatedVideoMemory;
+        CurrentMemoryMetrics.UsedVRAM = TextureMemStats.DedicatedVideoMemory - TextureMemStats.StreamingPool;
+        CurrentMemoryMetrics.AvailableVRAM = TextureMemStats.StreamingPool;
+    }
+    else
+    {
+        // Fallback to hardware info estimate
+        CurrentMemoryMetrics.TotalVRAM = HardwareInfo.GPUMemoryMB * 1024 * 1024;
+        CurrentMemoryMetrics.UsedVRAM = CurrentMemoryMetrics.TotalVRAM / 2;
+        CurrentMemoryMetrics.AvailableVRAM = CurrentMemoryMetrics.TotalVRAM - CurrentMemoryMetrics.UsedVRAM;
+    }
 
     CurrentMemoryMetrics.MemoryPressure = CurrentMemoryMetrics.TotalPhysicalMemory > 0 ?
         static_cast<float>(CurrentMemoryMetrics.UsedPhysicalMemory) / static_cast<float>(CurrentMemoryMetrics.TotalPhysicalMemory) : 0.0f;
