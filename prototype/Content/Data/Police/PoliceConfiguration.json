@@ -1,0 +1,296 @@
+{
+  "Version": "1.0",
+
+  "HeatLevels": {
+    "Heat1": {
+      "Name": "Suspicious",
+      "Description": "Local patrol noticed you. Don't escalate.",
+      "TriggerThreshold": 100,
+      "DecayRate": 10,
+      "DecayRateUnit": "per_second",
+      "PursuitVehicles": {
+        "Max": 1,
+        "Types": ["Patrol"]
+      },
+      "Tactics": ["Follow", "LightPursuit"],
+      "EscapeTime": 30,
+      "Penalties": {
+        "Cash": 500,
+        "REP": 25
+      },
+      "Music": "Heat1_Chase"
+    },
+    "Heat2": {
+      "Name": "Pursuit",
+      "Description": "They're coming after you. Time to run.",
+      "TriggerThreshold": 300,
+      "DecayRate": 8,
+      "DecayRateUnit": "per_second",
+      "PursuitVehicles": {
+        "Max": 2,
+        "Types": ["Patrol", "Pursuit"]
+      },
+      "Tactics": ["Chase", "BoxIn", "PITManeuver"],
+      "EscapeTime": 45,
+      "Penalties": {
+        "Cash": 1500,
+        "REP": 75
+      },
+      "Music": "Heat2_Chase"
+    },
+    "Heat3": {
+      "Name": "Hot Pursuit",
+      "Description": "Multiple units. They mean business.",
+      "TriggerThreshold": 600,
+      "DecayRate": 6,
+      "DecayRateUnit": "per_second",
+      "PursuitVehicles": {
+        "Max": 4,
+        "Types": ["Patrol", "Pursuit", "Interceptor"]
+      },
+      "Tactics": ["Aggressive", "Roadblock", "Coordinated"],
+      "Roadblocks": true,
+      "EscapeTime": 60,
+      "Penalties": {
+        "Cash": 5000,
+        "REP": 150
+      },
+      "Music": "Heat3_Chase"
+    },
+    "Heat4": {
+      "Name": "Wanted",
+      "Description": "City-wide alert. Heavy units deployed.",
+      "TriggerThreshold": 1000,
+      "DecayRate": 4,
+      "DecayRateUnit": "per_second",
+      "PursuitVehicles": {
+        "Max": 6,
+        "Types": ["Pursuit", "Interceptor", "SUV"]
+      },
+      "Tactics": ["HeavyPursuit", "SpikeStrips", "MultipleRoadblocks"],
+      "Roadblocks": true,
+      "SpikeStrips": true,
+      "EscapeTime": 90,
+      "Penalties": {
+        "Cash": 15000,
+        "REP": 200
+      },
+      "Music": "Heat4_Chase"
+    },
+    "Heat5": {
+      "Name": "Most Wanted",
+      "Description": "Maximum response. Helicopter. Everything.",
+      "TriggerThreshold": 1500,
+      "DecayRate": 2,
+      "DecayRateUnit": "per_second",
+      "PursuitVehicles": {
+        "Max": 8,
+        "Types": ["Interceptor", "SUV", "Heavy"]
+      },
+      "AirSupport": true,
+      "Tactics": ["AllOut", "Helicopter", "RamVehicles", "EMPDisabled"],
+      "Roadblocks": true,
+      "SpikeStrips": true,
+      "HelicopterSpotlight": true,
+      "EscapeTime": 120,
+      "Penalties": {
+        "Cash": 50000,
+        "REP": 300,
+        "VehicleImpound": true
+      },
+      "Music": "Heat5_Chase"
+    }
+  },
+
+  "PursuitVehicles": {
+    "Patrol": {
+      "Name": "Patrol Car",
+      "TopSpeed": 130,
+      "Acceleration": 0.7,
+      "Handling": 0.6,
+      "Aggression": 0.4,
+      "HeatLevels": [1, 2, 3]
+    },
+    "Pursuit": {
+      "Name": "Pursuit Interceptor",
+      "TopSpeed": 155,
+      "Acceleration": 0.8,
+      "Handling": 0.7,
+      "Aggression": 0.6,
+      "HeatLevels": [2, 3, 4]
+    },
+    "Interceptor": {
+      "Name": "High-Speed Interceptor",
+      "TopSpeed": 175,
+      "Acceleration": 0.85,
+      "Handling": 0.8,
+      "Aggression": 0.75,
+      "HeatLevels": [3, 4, 5]
+    },
+    "SUV": {
+      "Name": "Pursuit SUV",
+      "TopSpeed": 140,
+      "Acceleration": 0.75,
+      "Handling": 0.5,
+      "Aggression": 0.8,
+      "Ramming": 0.9,
+      "HeatLevels": [4, 5]
+    },
+    "Heavy": {
+      "Name": "Heavy Response",
+      "TopSpeed": 120,
+      "Acceleration": 0.6,
+      "Handling": 0.4,
+      "Aggression": 0.9,
+      "Ramming": 1.0,
+      "HeatLevels": [5]
+    }
+  },
+
+  "Tactics": {
+    "Follow": {
+      "Description": "Maintain visual, don't engage aggressively",
+      "SpeedMatching": 0.9,
+      "DistanceTarget": 50
+    },
+    "LightPursuit": {
+      "Description": "Attempt to catch up, minimal aggression",
+      "SpeedMatching": 1.0,
+      "DistanceTarget": 20
+    },
+    "Chase": {
+      "Description": "Active pursuit, moderate aggression",
+      "SpeedMatching": 1.05,
+      "DistanceTarget": 10
+    },
+    "BoxIn": {
+      "Description": "Multiple units surround target",
+      "RequiredUnits": 2,
+      "Formation": "Pincer"
+    },
+    "PITManeuver": {
+      "Description": "Attempt to spin out target",
+      "SpeedThreshold": 60,
+      "SuccessChance": 0.4
+    },
+    "Roadblock": {
+      "Description": "Set up barrier across road",
+      "SetupTime": 15,
+      "VehiclesUsed": 3,
+      "GapWidth": 4
+    },
+    "SpikeStrips": {
+      "Description": "Deploy tire-puncturing strips",
+      "SetupTime": 10,
+      "EffectRadius": 8,
+      "TireDamage": 0.8
+    },
+    "Aggressive": {
+      "Description": "High-speed pursuit with contact allowed",
+      "SpeedMatching": 1.1,
+      "ContactAllowed": true
+    },
+    "HeavyPursuit": {
+      "Description": "Full pursuit with heavy vehicles",
+      "SpeedMatching": 1.05,
+      "UseHeavyVehicles": true
+    },
+    "Helicopter": {
+      "Description": "Air support tracking target",
+      "Altitude": 100,
+      "SpotlightRange": 150,
+      "NeverLoseSight": true
+    }
+  },
+
+  "EscapeMechanics": {
+    "CooldownZones": {
+      "Enabled": true,
+      "Types": ["Parking Garage", "Tunnel", "Alley"],
+      "HeatReduction": 0.3
+    },
+    "LineOfSight": {
+      "BreakTime": 3,
+      "SearchPattern": "Expanding",
+      "SearchDuration": 30
+    },
+    "HidingSpots": {
+      "Enabled": true,
+      "Types": ["Container", "Garage", "Underpass"],
+      "CooldownBonus": 0.5
+    },
+    "NightBonus": {
+      "HeadlightsOff": 0.2,
+      "DarknessBonus": 0.15
+    }
+  },
+
+  "HeatSources": {
+    "Speeding": {
+      "Threshold": 80,
+      "HeatPerSecond": 2,
+      "MaxHeatFromThis": 200
+    },
+    "RunningRedLight": {
+      "HeatPerViolation": 50
+    },
+    "NearMissPolice": {
+      "HeatPerMiss": 75
+    },
+    "HittingPolice": {
+      "HeatPerHit": 150
+    },
+    "HittingCivilian": {
+      "HeatPerHit": 100
+    },
+    "PropertyDamage": {
+      "HeatPerDamage": 25
+    },
+    "WrongWay": {
+      "HeatPerSecond": 10
+    },
+    "Racing": {
+      "DetectedRace": 100,
+      "PerLapCompleted": 50
+    },
+    "Drifting": {
+      "InFrontOfPolice": 75
+    }
+  },
+
+  "BustedPenalties": {
+    "CashPenalty": {
+      "Heat1": 500,
+      "Heat2": 1500,
+      "Heat3": 5000,
+      "Heat4": 15000,
+      "Heat5": 50000
+    },
+    "REPPenalty": {
+      "Heat1": 25,
+      "Heat2": 75,
+      "Heat3": 150,
+      "Heat4": 200,
+      "Heat5": 300
+    },
+    "VehicleImpound": {
+      "Enabled": true,
+      "HeatThreshold": 5,
+      "RecoveryCost": 25000,
+      "RecoveryTime": 24
+    }
+  },
+
+  "Rewards": {
+    "EscapeBonus": {
+      "Heat1": { "Cash": 1000, "REP": 50 },
+      "Heat2": { "Cash": 3000, "REP": 100 },
+      "Heat3": { "Cash": 8000, "REP": 200 },
+      "Heat4": { "Cash": 20000, "REP": 350 },
+      "Heat5": { "Cash": 50000, "REP": 500 }
+    },
+    "TakedownBonus": {
+      "PerCop": { "Cash": 500, "REP": 25 }
+    }
+  }
+}

@@ -1,0 +1,274 @@
+{
+  "Version": "1.0",
+
+  "EngineProfiles": {
+    "InlineFour_NA": {
+      "Name": "Inline-4 Naturally Aspirated",
+      "BasePitch": 1.0,
+      "RPMRange": { "Idle": 800, "Redline": 7000 },
+      "Samples": {
+        "Idle": "Engine_I4_NA_Idle",
+        "Low": "Engine_I4_NA_Low",
+        "Mid": "Engine_I4_NA_Mid",
+        "High": "Engine_I4_NA_High",
+        "Redline": "Engine_I4_NA_Redline"
+      },
+      "Crossfades": {
+        "IdleToLow": 1500,
+        "LowToMid": 3000,
+        "MidToHigh": 5000,
+        "HighToRedline": 6500
+      },
+      "Character": "Raspy, mechanical, rev-happy"
+    },
+    "InlineFour_VTEC": {
+      "Name": "Inline-4 VTEC",
+      "BasePitch": 1.0,
+      "RPMRange": { "Idle": 850, "Redline": 8400 },
+      "VTECEngagement": 5800,
+      "Samples": {
+        "Idle": "Engine_I4_VTEC_Idle",
+        "Low": "Engine_I4_VTEC_Low",
+        "Mid": "Engine_I4_VTEC_Mid",
+        "PreVTEC": "Engine_I4_VTEC_PreVTEC",
+        "VTEC": "Engine_I4_VTEC_VTEC",
+        "High": "Engine_I4_VTEC_High",
+        "Redline": "Engine_I4_VTEC_Redline"
+      },
+      "VTECSound": "VTEC_Engage",
+      "Character": "Screaming high-RPM, distinctive VTEC crossover"
+    },
+    "InlineFour_Turbo": {
+      "Name": "Inline-4 Turbocharged",
+      "BasePitch": 0.95,
+      "RPMRange": { "Idle": 850, "Redline": 7500 },
+      "Samples": {
+        "Idle": "Engine_I4_Turbo_Idle",
+        "Low": "Engine_I4_Turbo_Low",
+        "Mid": "Engine_I4_Turbo_Mid",
+        "High": "Engine_I4_Turbo_High",
+        "Redline": "Engine_I4_Turbo_Redline"
+      },
+      "TurboLayers": {
+        "Spool": "Turbo_Spool_Small",
+        "Flutter": "Turbo_Flutter",
+        "Blowoff": "Turbo_BOV_Standard"
+      },
+      "Character": "Deep, boosted, with turbo whine and flutter"
+    },
+    "InlineSix_Turbo": {
+      "Name": "Inline-6 Twin Turbo",
+      "BasePitch": 0.9,
+      "RPMRange": { "Idle": 800, "Redline": 8000 },
+      "Samples": {
+        "Idle": "Engine_I6_Turbo_Idle",
+        "Low": "Engine_I6_Turbo_Low",
+        "Mid": "Engine_I6_Turbo_Mid",
+        "High": "Engine_I6_Turbo_High",
+        "Redline": "Engine_I6_Turbo_Redline"
+      },
+      "TurboLayers": {
+        "Spool": "Turbo_Spool_Twin",
+        "Flutter": "Turbo_Flutter_Twin",
+        "Blowoff": "Turbo_BOV_Sequential"
+      },
+      "Character": "Smooth, refined, powerful turbo surge"
+    },
+    "V8_NA_American": {
+      "Name": "V8 Naturally Aspirated (American)",
+      "BasePitch": 0.8,
+      "RPMRange": { "Idle": 650, "Redline": 6500 },
+      "Samples": {
+        "Idle": "Engine_V8_NA_Idle",
+        "IdleLope": "Engine_V8_NA_IdleLope",
+        "Low": "Engine_V8_NA_Low",
+        "Mid": "Engine_V8_NA_Mid",
+        "High": "Engine_V8_NA_High",
+        "Redline": "Engine_V8_NA_Redline"
+      },
+      "CamLope": {
+        "Enabled": true,
+        "Intensity": 0.3
+      },
+      "Character": "Deep rumble, lopey idle, American muscle"
+    },
+    "V8_Supercharged": {
+      "Name": "V8 Supercharged",
+      "BasePitch": 0.75,
+      "RPMRange": { "Idle": 700, "Redline": 7000 },
+      "Samples": {
+        "Idle": "Engine_V8_SC_Idle",
+        "Low": "Engine_V8_SC_Low",
+        "Mid": "Engine_V8_SC_Mid",
+        "High": "Engine_V8_SC_High",
+        "Redline": "Engine_V8_SC_Redline"
+      },
+      "SuperchargerLayers": {
+        "Whine": "SC_Whine",
+        "Surge": "SC_Surge"
+      },
+      "Character": "Menacing supercharger whine over V8 rumble"
+    },
+    "Rotary_Turbo": {
+      "Name": "Rotary Twin Turbo",
+      "BasePitch": 1.1,
+      "RPMRange": { "Idle": 900, "Redline": 9000 },
+      "Samples": {
+        "Idle": "Engine_Rotary_Idle",
+        "Low": "Engine_Rotary_Low",
+        "Mid": "Engine_Rotary_Mid",
+        "High": "Engine_Rotary_High",
+        "Redline": "Engine_Rotary_Redline"
+      },
+      "TurboLayers": {
+        "Spool": "Turbo_Spool_Sequential",
+        "Flutter": "Turbo_Flutter_Sequential"
+      },
+      "Character": "Unique buzzing, smooth power delivery, exotic"
+    },
+    "Flat4_Turbo": {
+      "Name": "Flat-4 Turbocharged",
+      "BasePitch": 0.95,
+      "RPMRange": { "Idle": 800, "Redline": 7500 },
+      "Samples": {
+        "Idle": "Engine_Boxer_Idle",
+        "Low": "Engine_Boxer_Low",
+        "Mid": "Engine_Boxer_Mid",
+        "High": "Engine_Boxer_High",
+        "Redline": "Engine_Boxer_Redline"
+      },
+      "TurboLayers": {
+        "Spool": "Turbo_Spool_Medium",
+        "Flutter": "Turbo_Flutter"
+      },
+      "UnequalLengthHeaders": true,
+      "Character": "Distinctive boxer rumble, rally heritage"
+    },
+    "InlineFour_Econobox": {
+      "Name": "Economy Inline-4",
+      "BasePitch": 1.1,
+      "RPMRange": { "Idle": 750, "Redline": 6500 },
+      "Samples": {
+        "Idle": "Engine_I4_Economy_Idle",
+        "Low": "Engine_I4_Economy_Low",
+        "Mid": "Engine_I4_Economy_Mid",
+        "High": "Engine_I4_Economy_High"
+      },
+      "Character": "Thin, strained, trying its best"
+    }
+  },
+
+  "ExhaustProfiles": {
+    "Stock_Quiet": {
+      "Name": "Stock Exhaust",
+      "VolumeMultiplier": 0.6,
+      "ToneShift": 0,
+      "Resonance": "Low",
+      "Pops": false
+    },
+    "Stock_Raspy": {
+      "Name": "Worn Stock Exhaust",
+      "VolumeMultiplier": 0.75,
+      "ToneShift": 0.1,
+      "Resonance": "Medium",
+      "Pops": false,
+      "Rattle": true
+    },
+    "JDM_Hatch": {
+      "Name": "JDM Hatchback",
+      "VolumeMultiplier": 0.9,
+      "ToneShift": 0.15,
+      "Resonance": "Medium",
+      "Pops": true,
+      "PopIntensity": 0.3
+    },
+    "JDM_Drift": {
+      "Name": "JDM Drift Exhaust",
+      "VolumeMultiplier": 1.0,
+      "ToneShift": 0.2,
+      "Resonance": "High",
+      "Pops": true,
+      "PopIntensity": 0.6,
+      "SingleExit": true
+    },
+    "Muscle_Deep": {
+      "Name": "American Muscle",
+      "VolumeMultiplier": 1.1,
+      "ToneShift": -0.2,
+      "Resonance": "Very High",
+      "Pops": true,
+      "PopIntensity": 0.5,
+      "Burble": true
+    },
+    "Turbo_Wastegate": {
+      "Name": "External Wastegate",
+      "VolumeMultiplier": 1.0,
+      "ToneShift": 0.1,
+      "Resonance": "High",
+      "WastegateScream": true
+    },
+    "Race_Titanium": {
+      "Name": "Titanium Race Exhaust",
+      "VolumeMultiplier": 1.2,
+      "ToneShift": 0.25,
+      "Resonance": "Maximum",
+      "Pops": true,
+      "PopIntensity": 0.8,
+      "Crackle": true
+    }
+  },
+
+  "EnvironmentSounds": {
+    "Wind": {
+      "StartSpeed": 30,
+      "MaxSpeed": 180,
+      "VolumeRange": { "Min": 0.0, "Max": 0.8 }
+    },
+    "TireSqueal": {
+      "SlipThreshold": 0.3,
+      "VolumeRange": { "Min": 0.0, "Max": 1.0 }
+    },
+    "TireRoll": {
+      "Surfaces": {
+        "Asphalt": "Tire_Roll_Asphalt",
+        "Concrete": "Tire_Roll_Concrete",
+        "Gravel": "Tire_Roll_Gravel",
+        "Wet": "Tire_Roll_Wet"
+      }
+    },
+    "Collision": {
+      "Light": "Collision_Light",
+      "Medium": "Collision_Medium",
+      "Heavy": "Collision_Heavy",
+      "Scrape": "Collision_Scrape"
+    },
+    "Transmission": {
+      "Upshift": "Trans_Upshift",
+      "Downshift": "Trans_Downshift",
+      "DownshiftRev": "Trans_DownshiftRev"
+    }
+  },
+
+  "MusicSystem": {
+    "Categories": {
+      "Menu": ["Menu_Theme_01", "Menu_Theme_02"],
+      "Garage": ["Garage_Chill_01", "Garage_Chill_02"],
+      "FreeRoam": ["FreeRoam_01", "FreeRoam_02", "FreeRoam_03"],
+      "Race": ["Race_Intense_01", "Race_Intense_02", "Race_Intense_03"],
+      "Drift": ["Drift_Electronic_01", "Drift_Electronic_02"],
+      "Chase": {
+        "Heat1": "Chase_Light_01",
+        "Heat2": "Chase_Medium_01",
+        "Heat3": "Chase_Intense_01",
+        "Heat4": "Chase_Heavy_01",
+        "Heat5": "Chase_Maximum_01"
+      },
+      "Victory": ["Victory_01"],
+      "Defeat": ["Defeat_01"]
+    },
+    "Transitions": {
+      "CrossfadeTime": 2.0,
+      "IntensityLayers": true
+    }
+  }
+}
