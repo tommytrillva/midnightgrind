@@ -2485,6 +2485,352 @@ FMGTestResult UMGSubsystemTests::TestSave_SlotNaming()
 }
 
 // ==========================================
+// PHYSICS TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestPhysics_TireCompoundGrip()
+{
+	LogTestStart(TEXT("TestPhysics_TireCompoundGrip"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test all tire compound grip values
+	struct FCompoundTest
+	{
+		EMGTireCompound Compound;
+		const TCHAR* Name;
+		float ExpectedMin;
+		float ExpectedMax;
+	};
+
+	TArray<FCompoundTest> CompoundTests = {
+		{EMGTireCompound::Economy, TEXT("Economy"), 0.6f, 0.8f},
+		{EMGTireCompound::AllSeason, TEXT("AllSeason"), 0.7f, 0.85f},
+		{EMGTireCompound::Sport, TEXT("Sport"), 0.8f, 0.9f},
+		{EMGTireCompound::Performance, TEXT("Performance"), 0.9f, 1.0f},
+		{EMGTireCompound::SemiSlick, TEXT("SemiSlick"), 1.0f, 1.1f},
+		{EMGTireCompound::Slick, TEXT("Slick"), 1.1f, 1.2f},
+		{EMGTireCompound::DragRadial, TEXT("DragRadial"), 1.05f, 1.15f},
+		{EMGTireCompound::Drift, TEXT("Drift"), 0.75f, 0.85f}
+	};
+
+	for (const auto& Test : CompoundTests)
+	{
+		float Grip = UMGStatCalculator::GetTireCompoundGrip(Test.Compound);
+		Logs.Add(FString::Printf(TEXT("%s compound grip: %.2f"), Test.Name, Grip));
+
+		if (Grip < Test.ExpectedMin || Grip > Test.ExpectedMax)
+		{
+			Logs.Add(FString::Printf(TEXT("  -> FAIL: Expected %.2f-%.2f"), Test.ExpectedMin, Test.ExpectedMax));
+			bAllPassed = false;
+		}
+	}
+
+	// Verify grip ordering (Slick > SemiSlick > Performance > Sport > AllSeason > Economy)
+	float SlickGrip = UMGStatCalculator::GetTireCompoundGrip(EMGTireCompound::Slick);
+	float EconomyGrip = UMGStatCalculator::GetTireCompoundGrip(EMGTireCompound::Economy);
+
+	if (SlickGrip <= EconomyGrip)
+	{
+		Logs.Add(TEXT("FAIL: Slick grip should be higher than Economy"));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Physics_TireCompoundGrip")),
+			TEXT("Some tire compound grip values out of expected range"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Physics_TireCompoundGrip")),
+		FString::Printf(TEXT("All %d tire compounds have valid grip coefficients"), CompoundTests.Num())
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPhysics_WetGripModifiers()
+{
+	LogTestStart(TEXT("TestPhysics_WetGripModifiers"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test wet grip modifiers - slicks should be dangerous in wet
+	TArray<TPair<EMGTireCompound, const TCHAR*>> Compounds = {
+		{EMGTireCompound::Economy, TEXT("Economy")},
+		{EMGTireCompound::AllSeason, TEXT("AllSeason")},
+		{EMGTireCompound::Sport, TEXT("Sport")},
+		{EMGTireCompound::Performance, TEXT("Performance")},
+		{EMGTireCompound::SemiSlick, TEXT("SemiSlick")},
+		{EMGTireCompound::Slick, TEXT("Slick")},
+		{EMGTireCompound::DragRadial, TEXT("DragRadial")},
+		{EMGTireCompound::Drift, TEXT("Drift")}
+	};
+
+	for (const auto& Compound : Compounds)
+	{
+		float WetGrip = UMGStatCalculator::GetWetGripModifier(Compound.Key);
+		Logs.Add(FString::Printf(TEXT("%s wet modifier: %.2f"), Compound.Value, WetGrip));
+
+		// All wet modifiers should be between 0 and 1
+		if (WetGrip < 0.0f || WetGrip > 1.0f)
+		{
+			Logs.Add(FString::Printf(TEXT("  -> FAIL: Wet modifier out of range (0.0-1.0)")));
+			bAllPassed = false;
+		}
+	}
+
+	// Slicks should have worst wet performance
+	float SlickWet = UMGStatCalculator::GetWetGripModifier(EMGTireCompound::Slick);
+	float AllSeasonWet = UMGStatCalculator::GetWetGripModifier(EMGTireCompound::AllSeason);
+
+	if (SlickWet >= AllSeasonWet)
+	{
+		Logs.Add(TEXT("FAIL: Slicks should have worse wet grip than AllSeason"));
+		bAllPassed = false;
+	}
+
+	// Verify slick wet grip is significantly reduced
+	if (SlickWet > 0.4f)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Slick wet grip (%.2f) should be <= 0.4"), SlickWet));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Physics_WetGripModifiers")),
+			TEXT("Wet grip modifiers have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Physics_WetGripModifiers")),
+		FString::Printf(TEXT("All %d wet grip modifiers are valid"), Compounds.Num())
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPhysics_WeightTransferConstants()
+{
+	LogTestStart(TEXT("TestPhysics_WeightTransferConstants"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Verify weight transfer constants are sensible
+	using namespace MGPhysicsConstants::WeightTransfer;
+
+	Logs.Add(FString::Printf(TEXT("Longitudinal ratio: %.3f"), LONGITUDINAL_RATIO));
+	Logs.Add(FString::Printf(TEXT("Lateral ratio: %.3f"), LATERAL_RATIO));
+	Logs.Add(FString::Printf(TEXT("Load min: %.3f"), LOAD_MIN));
+	Logs.Add(FString::Printf(TEXT("Load max: %.3f"), LOAD_MAX));
+	Logs.Add(FString::Printf(TEXT("Accel to transfer: %.6f"), ACCEL_TO_TRANSFER));
+	Logs.Add(FString::Printf(TEXT("Default rate: %.1f"), DEFAULT_RATE));
+
+	// Longitudinal ratio should be reasonable (0-0.5)
+	if (LONGITUDINAL_RATIO < 0.0f || LONGITUDINAL_RATIO > 0.5f)
+	{
+		Logs.Add(TEXT("FAIL: Longitudinal ratio out of expected range (0-0.5)"));
+		bAllPassed = false;
+	}
+
+	// Lateral ratio should be reasonable (0-0.5)
+	if (LATERAL_RATIO < 0.0f || LATERAL_RATIO > 0.5f)
+	{
+		Logs.Add(TEXT("FAIL: Lateral ratio out of expected range (0-0.5)"));
+		bAllPassed = false;
+	}
+
+	// Load min should be positive and less than 1
+	if (LOAD_MIN <= 0.0f || LOAD_MIN >= 1.0f)
+	{
+		Logs.Add(TEXT("FAIL: Load min should be in range (0-1)"));
+		bAllPassed = false;
+	}
+
+	// Load max should be greater than 1
+	if (LOAD_MAX <= 1.0f || LOAD_MAX > 3.0f)
+	{
+		Logs.Add(TEXT("FAIL: Load max should be in range (1-3)"));
+		bAllPassed = false;
+	}
+
+	// Default rate should be positive
+	if (DEFAULT_RATE <= 0.0f)
+	{
+		Logs.Add(TEXT("FAIL: Default rate should be positive"));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Physics_WeightTransferConstants")),
+			TEXT("Weight transfer constants have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Physics_WeightTransferConstants")),
+		TEXT("All weight transfer constants are valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPhysics_TireTemperatureConstants()
+{
+	LogTestStart(TEXT("TestPhysics_TireTemperatureConstants"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	using namespace MGPhysicsConstants::TireTemperature;
+
+	Logs.Add(FString::Printf(TEXT("Ambient temp: %.1f C"), AMBIENT));
+	Logs.Add(FString::Printf(TEXT("Optimal temp: %.1f C"), OPTIMAL));
+	Logs.Add(FString::Printf(TEXT("Peak temp: %.1f C"), PEAK));
+	Logs.Add(FString::Printf(TEXT("Overheat temp: %.1f C"), OVERHEAT));
+	Logs.Add(FString::Printf(TEXT("Cold grip min: %.2f"), COLD_GRIP_MIN));
+	Logs.Add(FString::Printf(TEXT("Optimal grip: %.2f"), OPTIMAL_GRIP));
+	Logs.Add(FString::Printf(TEXT("Peak grip: %.2f"), PEAK_GRIP));
+	Logs.Add(FString::Printf(TEXT("Overheat loss/deg: %.4f"), OVERHEAT_GRIP_LOSS_PER_DEG));
+
+	// Verify temperature ordering: Ambient < Optimal < Peak < Overheat
+	if (!(AMBIENT < OPTIMAL && OPTIMAL < PEAK && PEAK <= OVERHEAT))
+	{
+		Logs.Add(TEXT("FAIL: Temperature ordering should be Ambient < Optimal < Peak <= Overheat"));
+		bAllPassed = false;
+	}
+
+	// Verify grip ordering: Cold < Optimal <= Peak
+	if (!(COLD_GRIP_MIN < OPTIMAL_GRIP && OPTIMAL_GRIP <= PEAK_GRIP))
+	{
+		Logs.Add(TEXT("FAIL: Grip ordering should be Cold < Optimal <= Peak"));
+		bAllPassed = false;
+	}
+
+	// Ambient should be reasonable room temperature
+	if (AMBIENT < 10.0f || AMBIENT > 40.0f)
+	{
+		Logs.Add(TEXT("FAIL: Ambient temp should be 10-40 C"));
+		bAllPassed = false;
+	}
+
+	// Optimal should be in range for racing tires
+	if (OPTIMAL < 60.0f || OPTIMAL > 120.0f)
+	{
+		Logs.Add(TEXT("FAIL: Optimal temp should be 60-120 C"));
+		bAllPassed = false;
+	}
+
+	// Cold grip should be less than full
+	if (COLD_GRIP_MIN >= 1.0f)
+	{
+		Logs.Add(TEXT("FAIL: Cold grip should be < 1.0"));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Physics_TireTemperatureConstants")),
+			TEXT("Tire temperature constants have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Physics_TireTemperatureConstants")),
+		TEXT("All tire temperature constants are valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestPhysics_HandlingModeSettings()
+{
+	LogTestStart(TEXT("TestPhysics_HandlingModeSettings"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test all three handling modes
+	TArray<EMGPhysicsHandlingMode> Modes = {
+		EMGPhysicsHandlingMode::Arcade,
+		EMGPhysicsHandlingMode::Balanced,
+		EMGPhysicsHandlingMode::Simulation
+	};
+
+	for (EMGPhysicsHandlingMode Mode : Modes)
+	{
+		FMGPhysicsHandlingSettings Settings = UMGPhysicsHandlingConfig::GetSettingsForMode(Mode);
+
+		const TCHAR* ModeName = Mode == EMGPhysicsHandlingMode::Arcade ? TEXT("Arcade") :
+								Mode == EMGPhysicsHandlingMode::Balanced ? TEXT("Balanced") : TEXT("Simulation");
+
+		Logs.Add(FString::Printf(TEXT("%s mode:"), ModeName));
+		Logs.Add(FString::Printf(TEXT("  StabilityControl: %.2f"), Settings.StabilityControl));
+		Logs.Add(FString::Printf(TEXT("  BaseTireGrip: %.2f"), Settings.BaseTireGrip));
+		Logs.Add(FString::Printf(TEXT("  TireTempInfluence: %.2f"), Settings.TireTempInfluence));
+
+		// Verify stability control is in range
+		if (Settings.StabilityControl < 0.0f || Settings.StabilityControl > 1.0f)
+		{
+			Logs.Add(FString::Printf(TEXT("  FAIL: StabilityControl out of range (0-1)")));
+			bAllPassed = false;
+		}
+
+		// Verify base tire grip is reasonable
+		if (Settings.BaseTireGrip < 0.5f || Settings.BaseTireGrip > 2.0f)
+		{
+			Logs.Add(FString::Printf(TEXT("  FAIL: BaseTireGrip out of range (0.5-2.0)")));
+			bAllPassed = false;
+		}
+
+		// Verify mode is set correctly
+		if (Settings.Mode != Mode)
+		{
+			Logs.Add(FString::Printf(TEXT("  FAIL: Mode not set correctly")));
+			bAllPassed = false;
+		}
+	}
+
+	// Arcade should have more assists than Simulation
+	FMGPhysicsHandlingSettings Arcade = UMGPhysicsHandlingConfig::GetArcadeSettings();
+	FMGPhysicsHandlingSettings Simulation = UMGPhysicsHandlingConfig::GetSimulationSettings();
+
+	if (Arcade.StabilityControl <= Simulation.StabilityControl)
+	{
+		Logs.Add(TEXT("FAIL: Arcade should have more stability control than Simulation"));
+		bAllPassed = false;
+	}
+
+	if (Arcade.BaseTireGrip <= Simulation.BaseTireGrip)
+	{
+		Logs.Add(TEXT("FAIL: Arcade should have more base grip than Simulation"));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Physics_HandlingModeSettings")),
+			TEXT("Handling mode settings have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Physics_HandlingModeSettings")),
+		FString::Printf(TEXT("All %d handling modes have valid settings"), Modes.Num())
+	);
+}
+
+// ==========================================
 // CONSOLE COMMANDS
 // ==========================================
 
@@ -2549,6 +2895,13 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestSave_DataStructures());
 	TestResults.Add(TestSave_ManagerSubsystem());
 	TestResults.Add(TestSave_SlotNaming());
+
+	// Physics tests
+	TestResults.Add(TestPhysics_TireCompoundGrip());
+	TestResults.Add(TestPhysics_WetGripModifiers());
+	TestResults.Add(TestPhysics_WeightTransferConstants());
+	TestResults.Add(TestPhysics_TireTemperatureConstants());
+	TestResults.Add(TestPhysics_HandlingModeSettings());
 
 	// Count results
 	for (const FMGTestResult& Result : TestResults)
@@ -2743,6 +3096,33 @@ void UMGSubsystemTests::RunSaveTests()
 	TestResults.Add(TestSave_DataStructures());
 	TestResults.Add(TestSave_ManagerSubsystem());
 	TestResults.Add(TestSave_SlotNaming());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
+void UMGSubsystemTests::RunPhysicsTests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING PHYSICS TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestPhysics_TireCompoundGrip());
+	TestResults.Add(TestPhysics_WetGripModifiers());
+	TestResults.Add(TestPhysics_WeightTransferConstants());
+	TestResults.Add(TestPhysics_TireTemperatureConstants());
+	TestResults.Add(TestPhysics_HandlingModeSettings());
 
 	for (const FMGTestResult& Result : TestResults)
 	{
