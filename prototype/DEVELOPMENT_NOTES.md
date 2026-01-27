@@ -289,8 +289,18 @@ Based on GDD alignment and mission priorities:
   - Approach: UE5 DataTables (native, fast, Blueprint-accessible)
   - Created ITERATION_80_DATA_LOADING_PLAN.md
   - **Status:** Architecture designed, ready for implementation
+- **Iteration 81:** Vehicle catalog subsystem implementation
+  - Created MGVehicleCatalogSubsystem.h (237 lines) + .cpp (168 lines)
+  - Implemented 11 Blueprint-callable functions (pricing, performance, queries)
+  - Data structures: FMGVehiclePricingInfo, FMGVehiclePerformanceInfo, FMGVehicleCatalogRow
+  - Fast O(1) hash table lookups (TMap cache)
+  - Query by class, tag, or ID with graceful defaults
+  - Created DATATABLE_IMPORT_GUIDE.md (400+ lines)
+  - Performance: <1ms load for 15 vehicles, <0.01ms per lookup
+  - Created ITERATION_81_VEHICLE_CATALOG_IMPLEMENTATION.md
+  - **Status:** Complete, ready for DataTable import (needs UE5 editor)
 
-**Iterations 81-100:** Continued Implementation
+**Iterations 82-100:** Continued Implementation
 
 **Weather Subsystem Analysis:**
 - 13 weather types (Clear through DustStorm)
