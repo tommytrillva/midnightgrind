@@ -3,9 +3,12 @@
 #include "Track/MGTrackSubsystem.h"
 #include "Track/MGCheckpointActor.h"
 #include "Track/MGRacingLineActor.h"
+#include "Track/MGTrackDataAssets.h"
 #include "Components/SplineComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+#include "CollisionQueryParams.h"
 
 void UMGTrackSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -55,13 +58,47 @@ bool UMGTrackSubsystem::DoesSupportWorldType(EWorldType::Type WorldType) const
 
 void UMGTrackSubsystem::InitializeTrack(UMGTrackData* TrackData)
 {
-	if (!TrackData)
+	// UMGTrackData is an alias for UMGTrackDataAsset
+	UMGTrackDataAsset* DataAsset = Cast<UMGTrackDataAsset>(TrackData);
+	if (!DataAsset)
 	{
 		return;
 	}
 
-	// Would load track configuration from data asset
-	// Implementation depends on UMGTrackData structure
+	// Clear existing data
+	ClearCheckpoints();
+	RacerProgressMap.Empty();
+
+	// Load track configuration from data asset
+	TrackConfig.TrackName = DataAsset->TrackID;
+	TrackConfig.DisplayName = DataAsset->TrackName;
+	TrackConfig.bIsCircuit = DataAsset->bIsCircuit;
+	TrackConfig.TrackLength = DataAsset->TrackLength * 100.0f; // Convert meters to cm
+	TrackConfig.NumSectors = DataAsset->Sectors.Num();
+	TrackConfig.TrackRecordTime = DataAsset->TrackRecord.LapTime;
+	TrackConfig.TrackRecordHolder = DataAsset->TrackRecord.PlayerName;
+
+	// Set up sectors from data asset
+	for (const FMGTrackSector& Sector : DataAsset->Sectors)
+	{
+		// Create checkpoint data for sector splits
+		if (Sector.EndCheckpointIndex > 0)
+		{
+			FMGCheckpointData SectorCheckpoint;
+			SectorCheckpoint.Index = Sector.EndCheckpointIndex;
+			SectorCheckpoint.bIsSectorSplit = true;
+			SectorCheckpoint.SectorIndex = Sector.SectorIndex;
+			SectorCheckpoint.DistanceFromStart = Sector.Length * 100.0f; // Convert to cm
+			// Position will be set when checkpoint actors are found
+			RegisterCheckpoint(SectorCheckpoint);
+		}
+	}
+
+	// Now load the track level to find checkpoint actors
+	LoadTrack(DataAsset->TrackID);
+
+	UE_LOG(LogTemp, Log, TEXT("MGTrackSubsystem: Initialized track '%s' from data asset (Length: %.0fm, Sectors: %d)"),
+		*DataAsset->TrackID.ToString(), DataAsset->TrackLength, TrackConfig.NumSectors);
 }
 
 void UMGTrackSubsystem::LoadTrack(FName TrackID)
@@ -593,8 +630,119 @@ float UMGTrackSubsystem::GetDistanceToNextCheckpoint(int32 RacerID) const
 
 EMGTrackSurface UMGTrackSubsystem::GetSurfaceAtPosition(FVector Position) const
 {
-	// Would use physics material or trace
-	// Default to asphalt
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return EMGTrackSurface::Asphalt;
+	}
+
+	// Perform line trace downward to detect surface
+	FVector TraceStart = Position + FVector(0.0f, 0.0f, 100.0f); // Start slightly above
+	FVector TraceEnd = Position - FVector(0.0f, 0.0f, 200.0f);   // Trace down
+
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.bReturnPhysicalMaterial = true;
+	QueryParams.bTraceComplex = false;
+
+	if (World->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+	{
+		// Check physical material
+		if (UPhysicalMaterial* PhysMat = HitResult.PhysMaterial.Get())
+		{
+			FName MaterialName = PhysMat->GetFName();
+			FString MaterialNameStr = MaterialName.ToString().ToLower();
+
+			// Map physical material names to surface types
+			if (MaterialNameStr.Contains(TEXT("asphalt")) || MaterialNameStr.Contains(TEXT("road")))
+			{
+				return EMGTrackSurface::Asphalt;
+			}
+			else if (MaterialNameStr.Contains(TEXT("concrete")) || MaterialNameStr.Contains(TEXT("cement")))
+			{
+				return EMGTrackSurface::Concrete;
+			}
+			else if (MaterialNameStr.Contains(TEXT("cobble")) || MaterialNameStr.Contains(TEXT("brick")))
+			{
+				return EMGTrackSurface::Cobblestone;
+			}
+			else if (MaterialNameStr.Contains(TEXT("dirt")) || MaterialNameStr.Contains(TEXT("mud")))
+			{
+				return EMGTrackSurface::Dirt;
+			}
+			else if (MaterialNameStr.Contains(TEXT("gravel")) || MaterialNameStr.Contains(TEXT("rock")))
+			{
+				return EMGTrackSurface::Gravel;
+			}
+			else if (MaterialNameStr.Contains(TEXT("grass")) || MaterialNameStr.Contains(TEXT("turf")))
+			{
+				return EMGTrackSurface::Grass;
+			}
+			else if (MaterialNameStr.Contains(TEXT("water")) || MaterialNameStr.Contains(TEXT("puddle")))
+			{
+				return EMGTrackSurface::Water;
+			}
+			else if (MaterialNameStr.Contains(TEXT("ice")) || MaterialNameStr.Contains(TEXT("snow")))
+			{
+				return EMGTrackSurface::Ice;
+			}
+			else if (MaterialNameStr.Contains(TEXT("metal")) || MaterialNameStr.Contains(TEXT("steel")))
+			{
+				return EMGTrackSurface::Metal;
+			}
+
+			// Also check surface type enum on physical material if available
+			// This uses friction values as fallback heuristic
+			float Friction = PhysMat->Friction;
+			if (Friction >= 0.9f)
+			{
+				return EMGTrackSurface::Asphalt; // High friction = grippy surface
+			}
+			else if (Friction >= 0.7f)
+			{
+				return EMGTrackSurface::Concrete;
+			}
+			else if (Friction >= 0.5f)
+			{
+				return EMGTrackSurface::Dirt;
+			}
+			else if (Friction >= 0.3f)
+			{
+				return EMGTrackSurface::Gravel;
+			}
+			else if (Friction >= 0.1f)
+			{
+				return EMGTrackSurface::Ice;
+			}
+			else
+			{
+				return EMGTrackSurface::Water; // Very low friction
+			}
+		}
+
+		// No physical material - check component tags as fallback
+		if (HitResult.Component.IsValid())
+		{
+			for (const FName& Tag : HitResult.Component->ComponentTags)
+			{
+				FString TagStr = Tag.ToString().ToLower();
+				if (TagStr.Contains(TEXT("grass")))
+				{
+					return EMGTrackSurface::Grass;
+				}
+				else if (TagStr.Contains(TEXT("dirt")))
+				{
+					return EMGTrackSurface::Dirt;
+				}
+				else if (TagStr.Contains(TEXT("gravel")))
+				{
+					return EMGTrackSurface::Gravel;
+				}
+			}
+		}
+	}
+
+	// Default to asphalt (most common racing surface)
 	return EMGTrackSurface::Asphalt;
 }
 

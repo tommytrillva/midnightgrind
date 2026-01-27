@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGCrossProgressionSubsystem.cpp
 // Cross-Platform Progression System - Implementation
 // Midnight Grind - Y2K Arcade Street Racing

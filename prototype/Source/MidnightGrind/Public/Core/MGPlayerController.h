@@ -49,6 +49,12 @@ enum class EMGHeatLevel : uint8;
 struct FMGBountyCompletionResult;
 struct FMGRaceEvent;
 enum class EMGRaceEventType : uint8;
+enum class EMGLicenseCategory : uint8;
+enum class EMGLicenseTier : uint8;
+enum class EMGTestGrade : uint8;
+struct FMGContract;
+struct FMGContractObjective;
+struct FMGChallenge;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -696,4 +702,28 @@ protected:
 	/** Handle lead change from race director */
 	UFUNCTION()
 	void OnLeadChange(const FGuid& NewLeaderId, int32 TotalChanges);
+
+	/** Handle license upgrade from license subsystem */
+	UFUNCTION()
+	void OnLicenseUpgraded(EMGLicenseCategory Category, EMGLicenseTier NewTier);
+
+	/** Handle license test completed from license subsystem */
+	UFUNCTION()
+	void OnLicenseTestCompleted(const FString& TestId, EMGTestGrade Grade, float Time);
+
+	/** Handle contract completed from contract subsystem */
+	UFUNCTION()
+	void OnContractCompleted(const FMGContract& Contract);
+
+	/** Handle contract objective completed from contract subsystem */
+	UFUNCTION()
+	void OnContractObjectiveCompleted(FName ContractID, const FMGContractObjective& Objective);
+
+	/** Handle sponsor level up from contract subsystem */
+	UFUNCTION()
+	void OnSponsorLevelUp(FName SponsorID, int32 NewLevel);
+
+	/** Handle challenge completed from challenge subsystem */
+	UFUNCTION()
+	void OnChallengeCompleted(const FMGChallenge& Challenge);
 };

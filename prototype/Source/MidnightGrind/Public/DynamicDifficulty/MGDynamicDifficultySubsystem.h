@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGDynamicDifficultySubsystem.h
 // Dynamic Difficulty Adjustment System - Adaptive AI and challenge scaling
 // Midnight Grind - Y2K Arcade Street Racing

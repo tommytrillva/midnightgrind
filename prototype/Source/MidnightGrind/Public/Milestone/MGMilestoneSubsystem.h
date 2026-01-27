@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MidnightGrind - Arcade Street Racing Game
 // Milestone Subsystem - Achievement tracking, career progression, and unlock systems
 

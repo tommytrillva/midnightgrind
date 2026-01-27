@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGPostProcessSubsystem.cpp
 // Midnight Grind - Y2K Visual Effects and Post-Processing System
 

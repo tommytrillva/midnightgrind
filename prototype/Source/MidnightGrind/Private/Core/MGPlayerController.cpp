@@ -37,6 +37,8 @@
 #include "License/MGLicenseSubsystem.h"
 #include "Contract/MGContractSubsystem.h"
 #include "Challenges/MGChallengeSubsystem.h"
+#include "Currency/MGCurrencySubsystem.h"
+#include "DailyRewards/MGDailyRewardsSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -298,6 +300,20 @@ void AMGPlayerController::BeginPlay()
 			{
 				ChallengeSubsystem->OnChallengeCompleted.AddDynamic(this, &AMGPlayerController::OnChallengeCompleted);
 			}
+
+			// Bind to currency subsystem for reward notifications
+			if (UMGCurrencySubsystem* CurrencySubsystem = GI->GetSubsystem<UMGCurrencySubsystem>())
+			{
+				CurrencySubsystem->OnCurrencyChanged.AddDynamic(this, &AMGPlayerController::OnCurrencyChanged);
+				CurrencySubsystem->OnMultiplierActivated.AddDynamic(this, &AMGPlayerController::OnMultiplierActivated);
+			}
+
+			// Bind to daily rewards subsystem for login bonuses
+			if (UMGDailyRewardsSubsystem* DailyRewardsSubsystem = GI->GetSubsystem<UMGDailyRewardsSubsystem>())
+			{
+				DailyRewardsSubsystem->OnDailyRewardClaimed.AddDynamic(this, &AMGPlayerController::OnDailyRewardClaimed);
+				DailyRewardsSubsystem->OnMilestoneReached.AddDynamic(this, &AMGPlayerController::OnStreakMilestoneReached);
+			}
 		}
 	}
 }
@@ -483,6 +499,36 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		{
 			DirectorSubsystem->OnDramaticMoment.RemoveDynamic(this, &AMGPlayerController::OnDramaticMoment);
 			DirectorSubsystem->OnLeadChange.RemoveDynamic(this, &AMGPlayerController::OnLeadChange);
+		}
+
+		if (UMGLicenseSubsystem* LicenseSubsystem = GI->GetSubsystem<UMGLicenseSubsystem>())
+		{
+			LicenseSubsystem->OnLicenseUpgraded.RemoveDynamic(this, &AMGPlayerController::OnLicenseUpgraded);
+			LicenseSubsystem->OnTestCompleted.RemoveDynamic(this, &AMGPlayerController::OnLicenseTestCompleted);
+		}
+
+		if (UMGContractSubsystem* ContractSubsystem = GI->GetSubsystem<UMGContractSubsystem>())
+		{
+			ContractSubsystem->OnContractCompleted.RemoveDynamic(this, &AMGPlayerController::OnContractCompleted);
+			ContractSubsystem->OnObjectiveCompleted.RemoveDynamic(this, &AMGPlayerController::OnContractObjectiveCompleted);
+			ContractSubsystem->OnSponsorLevelUp.RemoveDynamic(this, &AMGPlayerController::OnSponsorLevelUp);
+		}
+
+		if (UMGChallengeSubsystem* ChallengeSubsystem = GI->GetSubsystem<UMGChallengeSubsystem>())
+		{
+			ChallengeSubsystem->OnChallengeCompleted.RemoveDynamic(this, &AMGPlayerController::OnChallengeCompleted);
+		}
+
+		if (UMGCurrencySubsystem* CurrencySubsystem = GI->GetSubsystem<UMGCurrencySubsystem>())
+		{
+			CurrencySubsystem->OnCurrencyChanged.RemoveDynamic(this, &AMGPlayerController::OnCurrencyChanged);
+			CurrencySubsystem->OnMultiplierActivated.RemoveDynamic(this, &AMGPlayerController::OnMultiplierActivated);
+		}
+
+		if (UMGDailyRewardsSubsystem* DailyRewardsSubsystem = GI->GetSubsystem<UMGDailyRewardsSubsystem>())
+		{
+			DailyRewardsSubsystem->OnDailyRewardClaimed.RemoveDynamic(this, &AMGPlayerController::OnDailyRewardClaimed);
+			DailyRewardsSubsystem->OnMilestoneReached.RemoveDynamic(this, &AMGPlayerController::OnStreakMilestoneReached);
 		}
 	}
 
@@ -2664,6 +2710,258 @@ void AMGPlayerController::OnLeadChange(const FGuid& NewLeaderId, int32 TotalChan
 			FText LeadMessage = FText::FromString(FString::Printf(TEXT("LEAD CHANGE! (%d total)"), TotalChanges));
 			FLinearColor LeadColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
 			HUDSubsystem->ShowNotification(LeadMessage, 2.5f, LeadColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnLicenseUpgraded(EMGLicenseCategory Category, EMGLicenseTier NewTier)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString TierStr;
+			FLinearColor TierColor;
+
+			switch (NewTier)
+			{
+				case EMGLicenseTier::Novice:
+					TierStr = TEXT("NOVICE");
+					TierColor = FLinearColor(0.6f, 0.6f, 0.6f, 1.0f); // Gray
+					break;
+				case EMGLicenseTier::National:
+					TierStr = TEXT("NATIONAL");
+					TierColor = FLinearColor(0.8f, 0.5f, 0.2f, 1.0f); // Bronze
+					break;
+				case EMGLicenseTier::International:
+					TierStr = TEXT("INTERNATIONAL");
+					TierColor = FLinearColor(0.75f, 0.75f, 0.75f, 1.0f); // Silver
+					break;
+				case EMGLicenseTier::Super:
+					TierStr = TEXT("SUPER");
+					TierColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+					break;
+				case EMGLicenseTier::Professional:
+					TierStr = TEXT("PROFESSIONAL");
+					TierColor = FLinearColor(0.9f, 0.95f, 1.0f, 1.0f); // Platinum
+					break;
+				case EMGLicenseTier::Elite:
+					TierStr = TEXT("ELITE");
+					TierColor = FLinearColor(0.6f, 0.85f, 1.0f, 1.0f); // Diamond
+					break;
+				default:
+					TierStr = TEXT("UPGRADED");
+					TierColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f);
+					break;
+			}
+
+			FText LicenseMessage = FText::FromString(FString::Printf(TEXT("LICENSE UPGRADED: %s"), *TierStr));
+			HUDSubsystem->ShowNotification(LicenseMessage, 5.0f, TierColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnLicenseTestCompleted(const FString& TestId, EMGTestGrade Grade, float Time)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString GradeStr;
+			FLinearColor GradeColor;
+
+			switch (Grade)
+			{
+				case EMGTestGrade::Gold:
+					GradeStr = TEXT("GOLD MEDAL!");
+					GradeColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f);
+					break;
+				case EMGTestGrade::Silver:
+					GradeStr = TEXT("SILVER MEDAL");
+					GradeColor = FLinearColor(0.75f, 0.75f, 0.75f, 1.0f);
+					break;
+				case EMGTestGrade::Bronze:
+					GradeStr = TEXT("BRONZE MEDAL");
+					GradeColor = FLinearColor(0.8f, 0.5f, 0.2f, 1.0f);
+					break;
+				case EMGTestGrade::Pass:
+					GradeStr = TEXT("PASSED");
+					GradeColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f);
+					break;
+				case EMGTestGrade::Fail:
+					GradeStr = TEXT("FAILED");
+					GradeColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f);
+					break;
+				default:
+					return;
+			}
+
+			FText TestMessage = FText::FromString(FString::Printf(TEXT("TEST COMPLETE: %s"), *GradeStr));
+			HUDSubsystem->ShowNotification(TestMessage, 4.0f, GradeColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnContractCompleted(const FMGContract& Contract)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ContractMessage = FText::FromString(FString::Printf(TEXT("CONTRACT COMPLETE: %s"), *Contract.DisplayName.ToString()));
+			FLinearColor ContractColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+			HUDSubsystem->ShowNotification(ContractMessage, 5.0f, ContractColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnContractObjectiveCompleted(FName ContractID, const FMGContractObjective& Objective)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ObjectiveMessage = FText::FromString(FString::Printf(TEXT("OBJECTIVE: %s"), *Objective.Description.ToString()));
+			FLinearColor ObjectiveColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f); // Cyan-green
+			HUDSubsystem->ShowNotification(ObjectiveMessage, 3.0f, ObjectiveColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSponsorLevelUp(FName SponsorID, int32 NewLevel)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText SponsorMessage = FText::FromString(FString::Printf(TEXT("SPONSOR LEVEL UP! Level %d"), NewLevel));
+			FLinearColor SponsorColor = FLinearColor(0.5f, 0.8f, 1.0f, 1.0f); // Light blue
+			HUDSubsystem->ShowNotification(SponsorMessage, 4.0f, SponsorColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnChallengeCompleted(const FMGChallenge& Challenge)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ChallengeMessage = FText::FromString(FString::Printf(TEXT("CHALLENGE COMPLETE: %s"), *Challenge.DisplayName.ToString()));
+			FLinearColor ChallengeColor = FLinearColor(0.0f, 1.0f, 0.8f, 1.0f); // Cyan
+			HUDSubsystem->ShowNotification(ChallengeMessage, 4.0f, ChallengeColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnCurrencyChanged(EMGCurrencyType Type, int64 NewBalance, int64 Delta)
+{
+	// Only show significant gains (not tiny increments)
+	if (Delta <= 0 || Delta < 100)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString CurrencyStr;
+			FLinearColor CurrencyColor;
+
+			switch (Type)
+			{
+				case EMGCurrencyType::Cash:
+					CurrencyStr = FString::Printf(TEXT("+$%lld"), Delta);
+					CurrencyColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green
+					break;
+
+				case EMGCurrencyType::Premium:
+					CurrencyStr = FString::Printf(TEXT("+%lld GOLD"), Delta);
+					CurrencyColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+					break;
+
+				case EMGCurrencyType::RepPoints:
+					CurrencyStr = FString::Printf(TEXT("+%lld REP"), Delta);
+					CurrencyColor = FLinearColor(0.5f, 0.8f, 1.0f, 1.0f); // Light blue
+					break;
+
+				case EMGCurrencyType::XP:
+					CurrencyStr = FString::Printf(TEXT("+%lld XP"), Delta);
+					CurrencyColor = FLinearColor(0.8f, 0.6f, 1.0f, 1.0f); // Purple
+					break;
+
+				default:
+					return;
+			}
+
+			FText CurrencyMessage = FText::FromString(CurrencyStr);
+			HUDSubsystem->ShowNotification(CurrencyMessage, 2.0f, CurrencyColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnMultiplierActivated(const FMGEarningMultiplier& Multiplier)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText MultiplierMessage = FText::FromString(FString::Printf(TEXT("%.1fx MULTIPLIER ACTIVE!"), Multiplier.Multiplier));
+			FLinearColor MultiplierColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+			HUDSubsystem->ShowNotification(MultiplierMessage, 3.0f, MultiplierColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnDailyRewardClaimed(const FMGRewardClaimResult& Result)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText RewardMessage = FText::FromString(FString::Printf(TEXT("DAILY REWARD! Day %d"), Result.Day));
+			FLinearColor RewardColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+			HUDSubsystem->ShowNotification(RewardMessage, 4.0f, RewardColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnStreakMilestoneReached(EMGStreakMilestone Milestone, const TArray<FMGDailyReward>& Rewards)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString MilestoneStr;
+			FLinearColor MilestoneColor;
+
+			switch (Milestone)
+			{
+				case EMGStreakMilestone::ThreeDay:
+					MilestoneStr = TEXT("3-DAY STREAK MILESTONE!");
+					MilestoneColor = FLinearColor(0.8f, 0.5f, 0.2f, 1.0f); // Bronze
+					break;
+				case EMGStreakMilestone::SevenDay:
+					MilestoneStr = TEXT("7-DAY STREAK MILESTONE!");
+					MilestoneColor = FLinearColor(0.75f, 0.75f, 0.75f, 1.0f); // Silver
+					break;
+				case EMGStreakMilestone::FourteenDay:
+					MilestoneStr = TEXT("14-DAY STREAK MILESTONE!");
+					MilestoneColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+					break;
+				case EMGStreakMilestone::ThirtyDay:
+					MilestoneStr = TEXT("30-DAY STREAK MILESTONE!");
+					MilestoneColor = FLinearColor(0.9f, 0.95f, 1.0f, 1.0f); // Platinum
+					break;
+				default:
+					MilestoneStr = TEXT("STREAK MILESTONE!");
+					MilestoneColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f);
+					break;
+			}
+
+			FText MilestoneMessage = FText::FromString(MilestoneStr);
+			HUDSubsystem->ShowNotification(MilestoneMessage, 5.0f, MilestoneColor);
 		}
 	}
 }

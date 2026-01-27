@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGPostProcessSubsystem.h
 // Midnight Grind - Y2K Visual Effects and Post-Processing System
 // Provides retro PS1/PS2 visual effects with modern post-processing capabilities

@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGInputBufferSubsystem.h
 // Midnight Grind - Input Buffering and Precision Input System
 // Provides frame-perfect input buffering for precise trick/drift/boost inputs

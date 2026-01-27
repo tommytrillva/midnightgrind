@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGStreamIntegrationSubsystem.h
 // Stream Integration System - Twitch/YouTube integration, viewer interactions
 // Midnight Grind - Y2K Arcade Street Racing

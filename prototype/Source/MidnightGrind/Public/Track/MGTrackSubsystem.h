@@ -8,8 +8,11 @@
 
 class AMGCheckpointActor;
 class AMGRacingLineActor;
-class UMGTrackData;
+class UMGTrackDataAsset;
 class USplineComponent;
+
+// Type alias for backwards compatibility
+using UMGTrackData = UMGTrackDataAsset;
 
 /**
  * Track surface type

@@ -1,0 +1,176 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Collectibles and Discovery System",
+
+  "CollectibleSystem": {
+    "Enabled": true,
+    "ShowOnMap": "WhenNear",
+    "ProximityRadius": 75,
+    "CollectionRadius": 5,
+    "AutoCollect": true,
+    "PlaySound": true,
+    "ShowNotification": true
+  },
+
+  "CollectibleTypes": {
+    "LicensePlates": {
+      "ID": "COL_PLATES",
+      "Name": "License Plates",
+      "Description": "Vintage and rare license plates hidden throughout the city",
+      "TotalCount": 50,
+      "Icon": "ICO_Collectible_Plate",
+      "Color": "#FFD700",
+      "Sound": "SFX_Collect_Plate",
+      "Items": [
+        { "ID": "PLATE_01", "Name": "1969 California Black", "Location": { "X": 1200, "Y": -500, "Z": 10 }, "Hint": "Near Midnight Performance" },
+        { "ID": "PLATE_02", "Name": "Tokyo Drift Special", "Location": { "X": -1000, "Y": -2100, "Z": 8 }, "Hint": "Neon District alley" },
+        { "ID": "PLATE_03", "Name": "Vintage Route 66", "Location": { "X": 5200, "Y": 100, "Z": 25 }, "Hint": "Highway rest stop" },
+        { "ID": "PLATE_04", "Name": "Racing Number 88", "Location": { "X": 6200, "Y": -1750, "Z": 22 }, "Hint": "Abandoned airfield" },
+        { "ID": "PLATE_05", "Name": "Monaco Classic", "Location": { "X": -800, "Y": 4400, "Z": 90 }, "Hint": "Hillside mansion" }
+      ],
+      "Rewards": {
+        "10": { "Cash": 5000, "REP": 250 },
+        "25": { "Cash": 15000, "REP": 750, "Unlock": "PLATE_STYLE_VINTAGE" },
+        "50": { "Cash": 50000, "REP": 2500, "Vehicle": "VEH_COLLECTOR_SPECIAL", "Achievement": "ACH_PLATE_COLLECTOR" }
+      }
+    },
+    "Graffiti": {
+      "ID": "COL_GRAFFITI",
+      "Name": "Street Art",
+      "Description": "Hidden graffiti tags from legendary street artists",
+      "TotalCount": 30,
+      "Icon": "ICO_Collectible_Graffiti",
+      "Color": "#FF69B4",
+      "Sound": "SFX_Collect_Graffiti",
+      "RequiresPhotoMode": true,
+      "Items": [
+        { "ID": "GRAF_01", "Name": "Midnight Tag", "Location": { "X": 500, "Y": 200, "Z": 12 }, "Hint": "Garage exterior wall" },
+        { "ID": "GRAF_02", "Name": "Speed Demon", "Location": { "X": -2500, "Y": 1300, "Z": 8 }, "Hint": "Harbor warehouse" },
+        { "ID": "GRAF_03", "Name": "Drift King Crown", "Location": { "X": 1300, "Y": -3350, "Z": 48 }, "Hint": "Parking garage spiral" },
+        { "ID": "GRAF_04", "Name": "Underground Legend", "Location": { "X": -500, "Y": -2750, "Z": -25 }, "Hint": "The Underground" },
+        { "ID": "GRAF_05", "Name": "Cherry Blossom", "Location": { "X": 3150, "Y": 4480, "Z": 118 }, "Hint": "Temple walls" }
+      ],
+      "Rewards": {
+        "10": { "Cash": 3000, "REP": 150 },
+        "20": { "Cash": 10000, "REP": 500, "Unlock": "VINYL_GRAFFITI_PACK" },
+        "30": { "Cash": 30000, "REP": 1500, "Title": "TITLE_ART_HUNTER", "Achievement": "ACH_GRAFFITI_HUNTER" }
+      }
+    },
+    "HistoricalMarkers": {
+      "ID": "COL_MARKERS",
+      "Name": "Historical Markers",
+      "Description": "Markers commemorating racing history",
+      "TotalCount": 20,
+      "Icon": "ICO_Collectible_Marker",
+      "Color": "#4169E1",
+      "Sound": "SFX_Collect_Marker",
+      "ShowsLore": true,
+      "Items": [
+        { "ID": "MARKER_01", "Name": "First Street Race 1965", "Location": { "X": 800, "Y": -200, "Z": 10 }, "Lore": "Where it all began..." },
+        { "ID": "MARKER_02", "Name": "The Great Chase 1978", "Location": { "X": -3500, "Y": 50, "Z": 55 }, "Lore": "A legendary bridge pursuit..." },
+        { "ID": "MARKER_03", "Name": "Touge Legend 1990", "Location": { "X": 3800, "Y": 3400, "Z": 380 }, "Lore": "Where the mountain king earned his title..." },
+        { "ID": "MARKER_04", "Name": "Underground Origins", "Location": { "X": -400, "Y": -2600, "Z": -20 }, "Lore": "The birthplace of the scene..." },
+        { "ID": "MARKER_05", "Name": "Championship Finish Line", "Location": { "X": 5600, "Y": -2100, "Z": 18 }, "Lore": "Where legends are made..." }
+      ],
+      "Rewards": {
+        "10": { "Cash": 7500, "REP": 400 },
+        "20": { "Cash": 25000, "REP": 1000, "Unlock": "LORE_COMPLETE", "Achievement": "ACH_HISTORIAN" }
+      }
+    },
+    "SpyShots": {
+      "ID": "COL_SPYSHOTS",
+      "Name": "Spy Shots",
+      "Description": "Photograph rare and unique vehicles in the wild",
+      "TotalCount": 15,
+      "Icon": "ICO_Collectible_Camera",
+      "Color": "#00CED1",
+      "Sound": "SFX_Camera_Shutter",
+      "RequiresPhotoMode": true,
+      "SpawnConditions": "Random",
+      "Items": [
+        { "ID": "SPY_01", "Name": "Mystery Prototype", "SpawnTime": "Night", "SpawnChance": 0.1, "Hint": "Rarely spotted in Industrial zone" },
+        { "ID": "SPY_02", "Name": "Celebrity Supercar", "SpawnTime": "Evening", "SpawnChance": 0.15, "Hint": "Sometimes seen in Downtown" },
+        { "ID": "SPY_03", "Name": "Vintage Rally Car", "SpawnTime": "Day", "SpawnChance": 0.08, "Hint": "Mountain roads occasionally" },
+        { "ID": "SPY_04", "Name": "Police Pursuit Spec", "SpawnTime": "Night", "SpawnChance": 0.2, "Hint": "During pursuits" },
+        { "ID": "SPY_05", "Name": "Ghost Car", "SpawnTime": "Midnight", "SpawnChance": 0.02, "Hint": "They say it appears at 3 AM..." }
+      ],
+      "Rewards": {
+        "5": { "Cash": 10000, "REP": 500 },
+        "10": { "Cash": 30000, "REP": 1500 },
+        "15": { "Cash": 75000, "REP": 3500, "Unlock": "VEH_SPY_SPECIAL", "Achievement": "ACH_PAPARAZZI" }
+      }
+    },
+    "MusicTapes": {
+      "ID": "COL_TAPES",
+      "Name": "Mixtapes",
+      "Description": "Rare mixtapes that unlock exclusive radio tracks",
+      "TotalCount": 25,
+      "Icon": "ICO_Collectible_Tape",
+      "Color": "#FF6347",
+      "Sound": "SFX_Collect_Tape",
+      "Items": [
+        { "ID": "TAPE_01", "Name": "Midnight Memories Vol.1", "Location": { "X": 250, "Y": -150, "Z": 12 }, "UnlockTrack": "MUS_SECRET_01" },
+        { "ID": "TAPE_02", "Name": "Underground Beats", "Location": { "X": -600, "Y": -2900, "Z": -28 }, "UnlockTrack": "MUS_SECRET_02" },
+        { "ID": "TAPE_03", "Name": "Tokyo Nights", "Location": { "X": -2900, "Y": -1400, "Z": 10 }, "UnlockTrack": "MUS_SECRET_03" },
+        { "ID": "TAPE_04", "Name": "Highway Hypnosis", "Location": { "X": 4800, "Y": 200, "Z": 28 }, "UnlockTrack": "MUS_SECRET_04" },
+        { "ID": "TAPE_05", "Name": "Drift Paradise", "Location": { "X": 1600, "Y": -2900, "Z": 12 }, "UnlockTrack": "MUS_SECRET_05" }
+      ],
+      "Rewards": {
+        "10": { "Cash": 5000, "REP": 300 },
+        "25": { "Cash": 25000, "REP": 1250, "Unlock": "STATION_SECRET", "Achievement": "ACH_MIXTAPE_MASTER" }
+      }
+    }
+  },
+
+  "WorldExploration": {
+    "DiscoveryBonus": {
+      "NewArea": { "REP": 50 },
+      "HiddenArea": { "REP": 150, "Cash": 500 },
+      "SecretArea": { "REP": 500, "Cash": 2500 }
+    },
+    "ExplorationMilestones": {
+      "25Percent": { "Cash": 10000, "REP": 500 },
+      "50Percent": { "Cash": 30000, "REP": 1500, "Title": "TITLE_EXPLORER" },
+      "75Percent": { "Cash": 75000, "REP": 3500 },
+      "100Percent": { "Cash": 200000, "REP": 10000, "Vehicle": "VEH_EXPLORER_SPECIAL", "Achievement": "ACH_FULL_EXPLORER" }
+    }
+  },
+
+  "CollectionRewards": {
+    "TotalCollectibles": 140,
+    "AllCollected": {
+      "Cash": 500000,
+      "REP": 25000,
+      "Title": "TITLE_MASTER_COLLECTOR",
+      "Vehicle": "VEH_ULTIMATE_COLLECTOR",
+      "Achievement": "ACH_ULTIMATE_COLLECTOR"
+    }
+  },
+
+  "MapFeatures": {
+    "CollectibleFilter": {
+      "Enabled": true,
+      "ShowCollected": true,
+      "ShowUncollected": true,
+      "FilterByType": true
+    },
+    "HintPurchase": {
+      "Enabled": true,
+      "CostPerHint": 1000,
+      "RevealRadius": 100
+    },
+    "ProximityPulse": {
+      "Enabled": true,
+      "PulseWhenNear": true,
+      "PulseRadius": 50,
+      "Sound": "SFX_Collectible_Nearby"
+    }
+  },
+
+  "Statistics": {
+    "TrackPerType": true,
+    "TrackByRegion": true,
+    "ShowCompletionPercent": true,
+    "LeaderboardEnabled": true
+  }
+}

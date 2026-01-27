@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGPerformanceMetricsSubsystem.h
 // Performance Metrics System - Runtime monitoring, optimization hints, profiling
 // Midnight Grind - Y2K Arcade Street Racing

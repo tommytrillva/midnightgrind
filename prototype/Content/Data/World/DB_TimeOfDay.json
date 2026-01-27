@@ -1,0 +1,332 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Time of Day and Day/Night Cycle Configuration",
+
+  "TimeSystem": {
+    "Enabled": true,
+    "RealTimeScale": 60,
+    "DayLengthMinutes": 24,
+    "StartTime": "22:00",
+    "PauseInMenus": true,
+    "PauseInGarage": true,
+    "SyncWithRealTime": false
+  },
+
+  "TimeOfDayPeriods": {
+    "Dawn": {
+      "ID": "TOD_DAWN",
+      "StartHour": 5,
+      "EndHour": 7,
+      "SunAngle": { "Start": -10, "End": 15 },
+      "LightColor": "#FFB366",
+      "AmbientColor": "#4D6699",
+      "FogDensity": 0.015,
+      "SkyboxAsset": "SKY_Dawn",
+      "Atmosphere": {
+        "SunIntensity": 3.0,
+        "AmbientIntensity": 0.4,
+        "SkyLightIntensity": 0.8
+      },
+      "Traffic": { "Density": 0.3 },
+      "NPCs": { "Density": 0.2 },
+      "StreetLights": "FadingOff",
+      "NeonSigns": "Off"
+    },
+    "Morning": {
+      "ID": "TOD_MORNING",
+      "StartHour": 7,
+      "EndHour": 11,
+      "SunAngle": { "Start": 15, "End": 50 },
+      "LightColor": "#FFF5E6",
+      "AmbientColor": "#99B3CC",
+      "FogDensity": 0.005,
+      "SkyboxAsset": "SKY_Morning",
+      "Atmosphere": {
+        "SunIntensity": 8.0,
+        "AmbientIntensity": 0.6,
+        "SkyLightIntensity": 1.0
+      },
+      "Traffic": { "Density": 0.8 },
+      "NPCs": { "Density": 0.6 },
+      "StreetLights": "Off",
+      "NeonSigns": "Off"
+    },
+    "Midday": {
+      "ID": "TOD_MIDDAY",
+      "StartHour": 11,
+      "EndHour": 15,
+      "SunAngle": { "Start": 50, "End": 70 },
+      "LightColor": "#FFFFFF",
+      "AmbientColor": "#B3C7E6",
+      "FogDensity": 0.002,
+      "SkyboxAsset": "SKY_Midday",
+      "Atmosphere": {
+        "SunIntensity": 10.0,
+        "AmbientIntensity": 0.7,
+        "SkyLightIntensity": 1.2
+      },
+      "Traffic": { "Density": 0.6 },
+      "NPCs": { "Density": 0.7 },
+      "StreetLights": "Off",
+      "NeonSigns": "Off",
+      "ShadowSharpness": "Hard"
+    },
+    "Afternoon": {
+      "ID": "TOD_AFTERNOON",
+      "StartHour": 15,
+      "EndHour": 18,
+      "SunAngle": { "Start": 70, "End": 30 },
+      "LightColor": "#FFF0D9",
+      "AmbientColor": "#A6B8CC",
+      "FogDensity": 0.004,
+      "SkyboxAsset": "SKY_Afternoon",
+      "Atmosphere": {
+        "SunIntensity": 7.0,
+        "AmbientIntensity": 0.6,
+        "SkyLightIntensity": 0.9
+      },
+      "Traffic": { "Density": 0.9 },
+      "NPCs": { "Density": 0.8 },
+      "StreetLights": "Off",
+      "NeonSigns": "Off"
+    },
+    "GoldenHour": {
+      "ID": "TOD_GOLDEN",
+      "StartHour": 18,
+      "EndHour": 19,
+      "SunAngle": { "Start": 30, "End": 10 },
+      "LightColor": "#FFCC66",
+      "AmbientColor": "#8099B3",
+      "FogDensity": 0.008,
+      "SkyboxAsset": "SKY_GoldenHour",
+      "Atmosphere": {
+        "SunIntensity": 4.0,
+        "AmbientIntensity": 0.5,
+        "SkyLightIntensity": 0.7
+      },
+      "Traffic": { "Density": 0.7 },
+      "NPCs": { "Density": 0.6 },
+      "StreetLights": "Off",
+      "NeonSigns": "FadingOn",
+      "PhotoBonus": 1.5
+    },
+    "Sunset": {
+      "ID": "TOD_SUNSET",
+      "StartHour": 19,
+      "EndHour": 20,
+      "SunAngle": { "Start": 10, "End": -5 },
+      "LightColor": "#FF8040",
+      "AmbientColor": "#664D80",
+      "FogDensity": 0.012,
+      "SkyboxAsset": "SKY_Sunset",
+      "Atmosphere": {
+        "SunIntensity": 2.5,
+        "AmbientIntensity": 0.4,
+        "SkyLightIntensity": 0.6
+      },
+      "Traffic": { "Density": 0.5 },
+      "NPCs": { "Density": 0.4 },
+      "StreetLights": "FadingOn",
+      "NeonSigns": "On",
+      "PhotoBonus": 2.0
+    },
+    "Dusk": {
+      "ID": "TOD_DUSK",
+      "StartHour": 20,
+      "EndHour": 21,
+      "SunAngle": { "Start": -5, "End": -18 },
+      "LightColor": "#804060",
+      "AmbientColor": "#334066",
+      "FogDensity": 0.010,
+      "SkyboxAsset": "SKY_Dusk",
+      "Atmosphere": {
+        "SunIntensity": 0.5,
+        "AmbientIntensity": 0.3,
+        "SkyLightIntensity": 0.4
+      },
+      "Traffic": { "Density": 0.4 },
+      "NPCs": { "Density": 0.3 },
+      "StreetLights": "On",
+      "NeonSigns": "On"
+    },
+    "Night": {
+      "ID": "TOD_NIGHT",
+      "StartHour": 21,
+      "EndHour": 1,
+      "SunAngle": { "Start": -18, "End": -45 },
+      "LightColor": "#1A1A33",
+      "AmbientColor": "#0D1A26",
+      "FogDensity": 0.008,
+      "SkyboxAsset": "SKY_Night",
+      "Atmosphere": {
+        "MoonIntensity": 0.3,
+        "AmbientIntensity": 0.15,
+        "SkyLightIntensity": 0.2
+      },
+      "Traffic": { "Density": 0.3 },
+      "NPCs": { "Density": 0.2 },
+      "StreetLights": "On",
+      "NeonSigns": "On",
+      "Stars": true,
+      "CityLights": true
+    },
+    "Midnight": {
+      "ID": "TOD_MIDNIGHT",
+      "StartHour": 1,
+      "EndHour": 4,
+      "SunAngle": { "Start": -45, "End": -45 },
+      "LightColor": "#0D0D1A",
+      "AmbientColor": "#0A1320",
+      "FogDensity": 0.006,
+      "SkyboxAsset": "SKY_Midnight",
+      "Atmosphere": {
+        "MoonIntensity": 0.2,
+        "AmbientIntensity": 0.1,
+        "SkyLightIntensity": 0.15
+      },
+      "Traffic": { "Density": 0.15 },
+      "NPCs": { "Density": 0.05 },
+      "StreetLights": "On",
+      "NeonSigns": "Partial",
+      "Stars": true,
+      "CityLights": true,
+      "SpecialEvents": true
+    },
+    "LateNight": {
+      "ID": "TOD_LATE_NIGHT",
+      "StartHour": 4,
+      "EndHour": 5,
+      "SunAngle": { "Start": -45, "End": -10 },
+      "LightColor": "#1A2033",
+      "AmbientColor": "#1A2640",
+      "FogDensity": 0.012,
+      "SkyboxAsset": "SKY_LateNight",
+      "Atmosphere": {
+        "MoonIntensity": 0.15,
+        "AmbientIntensity": 0.12,
+        "SkyLightIntensity": 0.18
+      },
+      "Traffic": { "Density": 0.1 },
+      "NPCs": { "Density": 0.02 },
+      "StreetLights": "On",
+      "NeonSigns": "Off"
+    }
+  },
+
+  "LightingTransitions": {
+    "BlendDuration": 300,
+    "BlendCurve": "SmoothStep",
+    "ColorGradingLUT": {
+      "Dawn": "LUT_Dawn",
+      "Morning": "LUT_Day",
+      "Midday": "LUT_Day",
+      "Afternoon": "LUT_Day",
+      "GoldenHour": "LUT_GoldenHour",
+      "Sunset": "LUT_Sunset",
+      "Dusk": "LUT_Dusk",
+      "Night": "LUT_Night",
+      "Midnight": "LUT_Midnight",
+      "LateNight": "LUT_LateNight"
+    }
+  },
+
+  "Moon": {
+    "Enabled": true,
+    "Phases": {
+      "NewMoon": { "Brightness": 0.05, "Size": 1.0, "Asset": "TEX_Moon_New" },
+      "WaxingCrescent": { "Brightness": 0.15, "Size": 1.0, "Asset": "TEX_Moon_Crescent" },
+      "FirstQuarter": { "Brightness": 0.25, "Size": 1.0, "Asset": "TEX_Moon_Quarter" },
+      "WaxingGibbous": { "Brightness": 0.35, "Size": 1.0, "Asset": "TEX_Moon_Gibbous" },
+      "FullMoon": { "Brightness": 0.5, "Size": 1.0, "Asset": "TEX_Moon_Full" },
+      "WaningGibbous": { "Brightness": 0.35, "Size": 1.0, "Asset": "TEX_Moon_Gibbous" },
+      "LastQuarter": { "Brightness": 0.25, "Size": 1.0, "Asset": "TEX_Moon_Quarter" },
+      "WaningCrescent": { "Brightness": 0.15, "Size": 1.0, "Asset": "TEX_Moon_Crescent" }
+    },
+    "CycleDays": 8
+  },
+
+  "StreetLights": {
+    "OnThreshold": 19,
+    "OffThreshold": 6,
+    "FadeTime": 15,
+    "Types": {
+      "Standard": { "Color": "#FFDD99", "Intensity": 5.0, "Radius": 15 },
+      "Highway": { "Color": "#FFE6B3", "Intensity": 8.0, "Radius": 25 },
+      "Neon": { "Color": "Dynamic", "Intensity": 4.0, "Radius": 10 },
+      "Industrial": { "Color": "#FFB366", "Intensity": 6.0, "Radius": 20 }
+    },
+    "Flickering": {
+      "Enabled": true,
+      "Chance": 0.02,
+      "Duration": { "Min": 0.1, "Max": 2.0 }
+    }
+  },
+
+  "NeonSigns": {
+    "OnThreshold": 18,
+    "OffThreshold": 4,
+    "PartialOnThreshold": 23,
+    "Colors": ["#FF0066", "#00FFFF", "#FF6600", "#00FF66", "#FF00FF", "#FFFF00"],
+    "AnimatedSigns": true,
+    "SignDensity": {
+      "NeonDistrict": 1.0,
+      "Downtown": 0.6,
+      "Industrial": 0.2,
+      "Residential": 0.1
+    }
+  },
+
+  "Skybox": {
+    "DynamicClouds": true,
+    "CloudSpeed": 0.01,
+    "StarRotation": true,
+    "MilkyWay": { "Visible": "Night", "Intensity": 0.3 },
+    "Planets": {
+      "Enabled": true,
+      "Venus": { "Visible": ["Dawn", "Dusk"], "Brightness": 0.8 }
+    }
+  },
+
+  "Shadows": {
+    "ContactShadows": true,
+    "CascadeShadows": 4,
+    "DynamicShadows": {
+      "Day": { "Resolution": 2048, "Distance": 150 },
+      "Night": { "Resolution": 1024, "Distance": 100 }
+    }
+  },
+
+  "PostProcess": {
+    "AutoExposure": {
+      "Enabled": true,
+      "MinBrightness": 0.03,
+      "MaxBrightness": 8.0,
+      "SpeedUp": 3.0,
+      "SpeedDown": 1.0
+    },
+    "EyeAdaptation": {
+      "TunnelEntry": { "Duration": 0.5, "Intensity": 2.0 },
+      "TunnelExit": { "Duration": 1.0, "Intensity": 0.5 }
+    },
+    "Bloom": {
+      "Day": 0.3,
+      "Night": 0.8,
+      "NeonDistrict": 1.2
+    }
+  },
+
+  "TimeControls": {
+    "PhotoMode": {
+      "TimeAdjustable": true,
+      "Step": 30
+    },
+    "Races": {
+      "LockedTime": true,
+      "UseEventTime": true
+    },
+    "FreeroamSettings": {
+      "PlayerCanSetTime": false,
+      "CheatToUnlock": true
+    }
+  }
+}

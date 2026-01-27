@@ -1,0 +1,242 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Traffic and NPC Vehicle System Configuration",
+
+  "TrafficSystem": {
+    "Enabled": true,
+    "MaxVehicles": 100,
+    "SpawnDistance": 300,
+    "DespawnDistance": 400,
+    "LODSystem": true,
+    "SimulationDistance": 200
+  },
+
+  "TrafficDensity": {
+    "Global": {
+      "Min": 0.0,
+      "Max": 1.0,
+      "Default": 0.6
+    },
+    "TimeOfDay": {
+      "Dawn": 0.3,
+      "Morning": 0.8,
+      "Midday": 0.6,
+      "Afternoon": 0.9,
+      "GoldenHour": 0.7,
+      "Sunset": 0.5,
+      "Dusk": 0.4,
+      "Night": 0.3,
+      "Midnight": 0.15,
+      "LateNight": 0.1
+    },
+    "Weather": {
+      "Clear": 1.0,
+      "Cloudy": 0.95,
+      "Rain": 0.7,
+      "HeavyRain": 0.5,
+      "Storm": 0.3,
+      "Fog": 0.6,
+      "Snow": 0.4
+    },
+    "ByRegion": {
+      "Downtown": 1.0,
+      "Highway": 0.8,
+      "Industrial": 0.5,
+      "Residential": 0.6,
+      "Harbor": 0.4,
+      "Mountain": 0.2,
+      "Rural": 0.15
+    }
+  },
+
+  "VehicleClasses": {
+    "Sedan": {
+      "ID": "TRAFFIC_SEDAN",
+      "SpawnWeight": 0.35,
+      "SpeedRange": { "Min": 0.8, "Max": 1.0 },
+      "Variants": ["Compact", "Mid", "Full"],
+      "Colors": ["Common"]
+    },
+    "SUV": {
+      "ID": "TRAFFIC_SUV",
+      "SpawnWeight": 0.15,
+      "SpeedRange": { "Min": 0.75, "Max": 0.95 },
+      "Variants": ["Compact", "Full"],
+      "Colors": ["Common"]
+    },
+    "Truck": {
+      "ID": "TRAFFIC_TRUCK",
+      "SpawnWeight": 0.1,
+      "SpeedRange": { "Min": 0.6, "Max": 0.85 },
+      "Variants": ["Pickup", "Delivery"],
+      "Colors": ["Work"]
+    },
+    "Van": {
+      "ID": "TRAFFIC_VAN",
+      "SpawnWeight": 0.08,
+      "SpeedRange": { "Min": 0.65, "Max": 0.85 },
+      "Variants": ["Cargo", "Passenger"],
+      "Colors": ["Work", "Common"]
+    },
+    "SportsCar": {
+      "ID": "TRAFFIC_SPORTS",
+      "SpawnWeight": 0.05,
+      "SpeedRange": { "Min": 0.9, "Max": 1.1 },
+      "Variants": ["Coupe", "Convertible"],
+      "Colors": ["Vibrant"],
+      "RegionBonus": { "Downtown": 1.5, "Hills": 2.0 }
+    },
+    "Luxury": {
+      "ID": "TRAFFIC_LUXURY",
+      "SpawnWeight": 0.05,
+      "SpeedRange": { "Min": 0.85, "Max": 1.0 },
+      "Variants": ["Sedan", "SUV"],
+      "Colors": ["Premium"],
+      "RegionBonus": { "Downtown": 1.5, "Hills": 2.5 }
+    },
+    "Bus": {
+      "ID": "TRAFFIC_BUS",
+      "SpawnWeight": 0.05,
+      "SpeedRange": { "Min": 0.5, "Max": 0.7 },
+      "Variants": ["City", "Coach"],
+      "Colors": ["Transit"],
+      "RegionRestriction": ["Downtown", "Highway"],
+      "StopsAtBusStops": true
+    },
+    "SemiTruck": {
+      "ID": "TRAFFIC_SEMI",
+      "SpawnWeight": 0.07,
+      "SpeedRange": { "Min": 0.55, "Max": 0.75 },
+      "Variants": ["Flatbed", "Container", "Tanker"],
+      "Colors": ["Commercial"],
+      "RegionRestriction": ["Highway", "Industrial", "Harbor"]
+    },
+    "Motorcycle": {
+      "ID": "TRAFFIC_MOTO",
+      "SpawnWeight": 0.05,
+      "SpeedRange": { "Min": 0.9, "Max": 1.2 },
+      "Variants": ["Sport", "Cruiser"],
+      "Colors": ["Varied"],
+      "LanesplitEnabled": true
+    },
+    "Taxi": {
+      "ID": "TRAFFIC_TAXI",
+      "SpawnWeight": 0.04,
+      "SpeedRange": { "Min": 0.8, "Max": 1.0 },
+      "Variants": ["Standard"],
+      "Colors": ["Yellow"],
+      "RegionBonus": { "Downtown": 3.0 },
+      "StopsRandomly": true
+    },
+    "Emergency": {
+      "ID": "TRAFFIC_EMERGENCY",
+      "SpawnWeight": 0.01,
+      "SpeedRange": { "Min": 1.0, "Max": 1.3 },
+      "Variants": ["Ambulance", "Firetruck"],
+      "SirenEnabled": true,
+      "RightOfWay": true
+    }
+  },
+
+  "TrafficBehavior": {
+    "BaseSpeed": {
+      "SpeedLimitMultiplier": 1.0,
+      "Variance": 0.15
+    },
+    "LaneChanging": {
+      "Enabled": true,
+      "Frequency": 0.02,
+      "SignalDuration": 2.0
+    },
+    "Intersections": {
+      "TrafficLights": true,
+      "StopSigns": true,
+      "YieldBehavior": true,
+      "RunRedLightChance": 0.01
+    },
+    "ReactionToPlayer": {
+      "HonkWhenCutOff": true,
+      "EvadeOncoming": true,
+      "PullOverForSirens": true,
+      "AggressiveDriverChance": 0.05
+    },
+    "Parking": {
+      "ParkedVehicles": true,
+      "ParkedDensity": 0.4,
+      "DoubleParkChance": 0.02
+    }
+  },
+
+  "SpecialTraffic": {
+    "RacerNPCs": {
+      "Enabled": true,
+      "SpawnChance": 0.02,
+      "Behavior": "Speeding",
+      "WillRacePlayer": true,
+      "Vehicles": ["TRAFFIC_SPORTS", "TRAFFIC_TUNER"]
+    },
+    "CarMeetTraffic": {
+      "Enabled": true,
+      "NearMeetLocations": true,
+      "IncreasedSportsCarDensity": 2.0
+    },
+    "Convoys": {
+      "Enabled": true,
+      "Types": ["Military", "Truck", "Luxury"],
+      "SpawnChance": 0.01,
+      "Size": { "Min": 3, "Max": 6 }
+    }
+  },
+
+  "Collision": {
+    "PlayerCollision": {
+      "Enabled": true,
+      "DamageToPlayer": true,
+      "DamageToTraffic": true,
+      "PhysicsResponse": "Realistic"
+    },
+    "TrafficCollision": {
+      "Enabled": true,
+      "TrafficOnTraffic": false,
+      "AvoidanceEnabled": true
+    },
+    "Aftermath": {
+      "VehiclesStayOnRoad": true,
+      "DespawnDamagedTime": 30,
+      "CreateHazard": true
+    }
+  },
+
+  "Performance": {
+    "LODDistances": {
+      "High": 50,
+      "Medium": 100,
+      "Low": 200,
+      "Impostor": 300
+    },
+    "PhysicsSimulation": {
+      "FullPhysics": 50,
+      "SimplifiedPhysics": 150,
+      "KinematicOnly": 300
+    },
+    "Culling": {
+      "FrustumCulling": true,
+      "OcclusionCulling": true,
+      "DistanceCulling": true
+    },
+    "Streaming": {
+      "VehiclePoolSize": 150,
+      "PreloadAhead": 200,
+      "AggressiveUnload": true
+    }
+  },
+
+  "DebugOptions": {
+    "ShowSpawnPoints": false,
+    "ShowPaths": false,
+    "ShowDensityMap": false,
+    "ForceMaxTraffic": false,
+    "ForceNoTraffic": false,
+    "SpawnSpecificVehicle": null
+  }
+}

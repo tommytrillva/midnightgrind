@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGProceduralContentSubsystem.h
 // Procedural Content Generation System - Generates dynamic tracks, environments, and challenges
 // Midnight Grind - Y2K Arcade Street Racing

@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGInputBufferSubsystem.cpp
 // Midnight Grind - Input Buffering and Precision Input System
 

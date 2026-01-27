@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGDynamicDifficultySubsystem.cpp
 // Dynamic Difficulty Adjustment System - Implementation
 // Midnight Grind - Y2K Arcade Street Racing

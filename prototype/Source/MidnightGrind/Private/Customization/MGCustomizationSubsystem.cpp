@@ -4,6 +4,11 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/Texture2D.h"
 #include "Components/MeshComponent.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "Misc/Paths.h"
 
 void UMGCustomizationSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -509,12 +514,196 @@ void UMGCustomizationSubsystem::DeletePreset(FName VehicleID, const FString& Pre
 
 void UMGCustomizationSubsystem::LoadCustomizationData()
 {
-	// Would load from save file
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Customization");
+	FString FilePath = SaveDir / TEXT("CustomizationData.sav");
+
+	TArray<uint8> FileData;
+	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+	{
+		return;
+	}
+
+	FMemoryReader Archive(FileData, true);
+
+	int32 Version = 0;
+	Archive << Version;
+
+	if (Version >= 1)
+	{
+		// Load owned items
+		int32 OwnedCount;
+		Archive << OwnedCount;
+		OwnedItems.Empty();
+		for (int32 i = 0; i < OwnedCount; i++)
+		{
+			FName ItemID;
+			Archive << ItemID;
+			OwnedItems.Add(ItemID);
+		}
+
+		// Load vehicle customizations
+		int32 CustomizationCount;
+		Archive << CustomizationCount;
+		for (int32 i = 0; i < CustomizationCount; i++)
+		{
+			FName VehicleID;
+			Archive << VehicleID;
+
+			FMGVehicleCustomization Customization;
+			Customization.VehicleID = VehicleID;
+
+			// Load paint config
+			Archive << Customization.Paint.PrimaryColor.R;
+			Archive << Customization.Paint.PrimaryColor.G;
+			Archive << Customization.Paint.PrimaryColor.B;
+			Archive << Customization.Paint.PrimaryColor.A;
+			Archive << Customization.Paint.SecondaryColor.R;
+			Archive << Customization.Paint.SecondaryColor.G;
+			Archive << Customization.Paint.SecondaryColor.B;
+			Archive << Customization.Paint.SecondaryColor.A;
+			Archive << Customization.Paint.FinishType;
+			Archive << Customization.Paint.Metallic;
+			Archive << Customization.Paint.Roughness;
+
+			// Load wrap status
+			Archive << Customization.bUsingWrap;
+			Archive << Customization.Wrap.WrapID;
+
+			// Load wheel config
+			Archive << Customization.Wheels.WheelID;
+			Archive << Customization.Wheels.WheelColor.R;
+			Archive << Customization.Wheels.WheelColor.G;
+			Archive << Customization.Wheels.WheelColor.B;
+			Archive << Customization.Wheels.WheelColor.A;
+			Archive << Customization.Wheels.TireID;
+
+			// Load lighting config
+			Archive << Customization.Lighting.HeadlightColor.R;
+			Archive << Customization.Lighting.HeadlightColor.G;
+			Archive << Customization.Lighting.HeadlightColor.B;
+			Archive << Customization.Lighting.HeadlightColor.A;
+			Archive << Customization.Lighting.UnderlowColor.R;
+			Archive << Customization.Lighting.UnderlowColor.G;
+			Archive << Customization.Lighting.UnderlowColor.B;
+			Archive << Customization.Lighting.UnderlowColor.A;
+			Archive << Customization.Lighting.bHasUnderlow;
+
+			// Load license plate
+			Archive << Customization.LicensePlateText;
+
+			VehicleCustomizations.Add(VehicleID, Customization);
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Customization data loaded - Owned: %d items, Vehicles: %d"),
+			OwnedItems.Num(), VehicleCustomizations.Num());
+	}
 }
 
 void UMGCustomizationSubsystem::SaveCustomizationData()
 {
-	// Would save to persistent storage
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Customization");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("CustomizationData.sav");
+
+	FBufferArchive Archive;
+
+	int32 Version = 1;
+	Archive << Version;
+
+	// Save owned items
+	int32 OwnedCount = OwnedItems.Num();
+	Archive << OwnedCount;
+	for (const FName& ItemID : OwnedItems)
+	{
+		FName ID = ItemID;
+		Archive << ID;
+	}
+
+	// Save vehicle customizations
+	int32 CustomizationCount = VehicleCustomizations.Num();
+	Archive << CustomizationCount;
+	for (const auto& Pair : VehicleCustomizations)
+	{
+		FName VehicleID = Pair.Key;
+		const FMGVehicleCustomization& Customization = Pair.Value;
+
+		Archive << VehicleID;
+
+		// Save paint config
+		float PrimaryR = Customization.Paint.PrimaryColor.R;
+		float PrimaryG = Customization.Paint.PrimaryColor.G;
+		float PrimaryB = Customization.Paint.PrimaryColor.B;
+		float PrimaryA = Customization.Paint.PrimaryColor.A;
+		float SecondaryR = Customization.Paint.SecondaryColor.R;
+		float SecondaryG = Customization.Paint.SecondaryColor.G;
+		float SecondaryB = Customization.Paint.SecondaryColor.B;
+		float SecondaryA = Customization.Paint.SecondaryColor.A;
+		int32 FinishType = static_cast<int32>(Customization.Paint.FinishType);
+		float Metallic = Customization.Paint.Metallic;
+		float Roughness = Customization.Paint.Roughness;
+
+		Archive << PrimaryR;
+		Archive << PrimaryG;
+		Archive << PrimaryB;
+		Archive << PrimaryA;
+		Archive << SecondaryR;
+		Archive << SecondaryG;
+		Archive << SecondaryB;
+		Archive << SecondaryA;
+		Archive << FinishType;
+		Archive << Metallic;
+		Archive << Roughness;
+
+		// Save wrap status
+		bool bUsingWrap = Customization.bUsingWrap;
+		FName WrapID = Customization.Wrap.WrapID;
+		Archive << bUsingWrap;
+		Archive << WrapID;
+
+		// Save wheel config
+		FName WheelID = Customization.Wheels.WheelID;
+		float WheelColorR = Customization.Wheels.WheelColor.R;
+		float WheelColorG = Customization.Wheels.WheelColor.G;
+		float WheelColorB = Customization.Wheels.WheelColor.B;
+		float WheelColorA = Customization.Wheels.WheelColor.A;
+		FName TireID = Customization.Wheels.TireID;
+		Archive << WheelID;
+		Archive << WheelColorR;
+		Archive << WheelColorG;
+		Archive << WheelColorB;
+		Archive << WheelColorA;
+		Archive << TireID;
+
+		// Save lighting config
+		float HeadlightR = Customization.Lighting.HeadlightColor.R;
+		float HeadlightG = Customization.Lighting.HeadlightColor.G;
+		float HeadlightB = Customization.Lighting.HeadlightColor.B;
+		float HeadlightA = Customization.Lighting.HeadlightColor.A;
+		float UnderlowR = Customization.Lighting.UnderlowColor.R;
+		float UnderlowG = Customization.Lighting.UnderlowColor.G;
+		float UnderlowB = Customization.Lighting.UnderlowColor.B;
+		float UnderlowA = Customization.Lighting.UnderlowColor.A;
+		bool bHasUnderlow = Customization.Lighting.bHasUnderlow;
+		Archive << HeadlightR;
+		Archive << HeadlightG;
+		Archive << HeadlightB;
+		Archive << HeadlightA;
+		Archive << UnderlowR;
+		Archive << UnderlowG;
+		Archive << UnderlowB;
+		Archive << UnderlowA;
+		Archive << bHasUnderlow;
+
+		// Save license plate
+		FString LicensePlate = Customization.LicensePlateText;
+		Archive << LicensePlate;
+	}
+
+	if (FFileHelper::SaveArrayToFile(Archive, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Customization data saved - Owned: %d items, Vehicles: %d"),
+			OwnedItems.Num(), VehicleCustomizations.Num());
+	}
 }
 
 void UMGCustomizationSubsystem::InitializePresetColors()

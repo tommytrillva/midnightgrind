@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGAssetCacheSubsystem.cpp
 // Midnight Grind - Asset Caching and Preloading System
 

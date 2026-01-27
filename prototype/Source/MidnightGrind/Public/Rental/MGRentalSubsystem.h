@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MidnightGrind - Arcade Street Racing Game
 // Rental Subsystem - Vehicle rentals, trial periods, and temporary unlocks
 

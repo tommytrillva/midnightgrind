@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MidnightGrind - Arcade Street Racing Game
 // Party Invite Subsystem - Party invitations, session joining, social matchmaking
 

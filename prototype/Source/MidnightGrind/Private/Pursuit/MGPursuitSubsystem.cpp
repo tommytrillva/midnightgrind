@@ -747,7 +747,23 @@ void UMGPursuitSubsystem::UpdateUnitAI(const FString& PlayerId, float DeltaTime)
 		return;
 	}
 
-	// AI would be handled by game code - this is placeholder
+	// Get player location from cached pursuit update (would come from player actor in real implementation)
+	// For now, estimate based on closest unit's target tracking
+	FVector EstimatedPlayerLocation = FVector::ZeroVector;
+	FVector EstimatedPlayerVelocity = FVector::ZeroVector;
+	bool bHasPlayerLocation = false;
+
+	for (const FMGPursuitUnit& Unit : Status->ActiveUnits)
+	{
+		if (!Unit.bIsDisabled && Unit.bHasVisual)
+		{
+			// Use unit's knowledge of player location
+			EstimatedPlayerLocation = Unit.Location + (Unit.Rotation.Vector() * Unit.DistanceToTarget);
+			bHasPlayerLocation = true;
+			break;
+		}
+	}
+
 	for (FMGPursuitUnit& Unit : Status->ActiveUnits)
 	{
 		if (Unit.bIsDisabled)
@@ -755,8 +771,242 @@ void UMGPursuitSubsystem::UpdateUnitAI(const FString& PlayerId, float DeltaTime)
 			continue;
 		}
 
+		// Calculate direction to target
+		FVector ToTarget = bHasPlayerLocation ?
+			(EstimatedPlayerLocation - Unit.Location).GetSafeNormal() : FVector::ZeroVector;
+
+		// Base movement speed based on role
+		float BaseSpeed = 2500.0f; // cm/s (about 90 km/h)
+		float TargetSpeed = BaseSpeed;
+
 		// Update unit behavior based on tactic
-		// This would interface with actual AI systems
+		switch (Unit.CurrentTactic)
+		{
+		case EMGPursuitTactic::Follow:
+			{
+				// Standard pursuit - maintain chase distance
+				float DesiredDistance = 3000.0f; // 30m behind target
+				if (Unit.DistanceToTarget > DesiredDistance)
+				{
+					TargetSpeed = BaseSpeed * 1.2f; // Speed up to catch up
+				}
+				else if (Unit.DistanceToTarget < DesiredDistance * 0.5f)
+				{
+					TargetSpeed = BaseSpeed * 0.8f; // Slow down if too close
+				}
+
+				// Move toward target
+				if (bHasPlayerLocation && Unit.bHasVisual)
+				{
+					Unit.Velocity = ToTarget * TargetSpeed;
+					Unit.Rotation = ToTarget.Rotation();
+				}
+				else
+				{
+					// Search behavior - move toward last known location
+					Unit.Velocity = Unit.Velocity * 0.95f; // Gradual slowdown during search
+				}
+			}
+			break;
+
+		case EMGPursuitTactic::Ram:
+			{
+				// Aggressive pursuit - close distance for ramming
+				TargetSpeed = BaseSpeed * 1.4f; // Faster approach
+				float RamDistance = 1500.0f; // Attempt ram when within 15m
+
+				if (Unit.bHasVisual && bHasPlayerLocation)
+				{
+					if (Unit.DistanceToTarget <= RamDistance)
+					{
+						// Ram approach - aim slightly ahead of target
+						FVector PredictedLocation = EstimatedPlayerLocation + (EstimatedPlayerVelocity * 0.5f);
+						FVector RamDirection = (PredictedLocation - Unit.Location).GetSafeNormal();
+						Unit.Velocity = RamDirection * TargetSpeed * 1.5f;
+					}
+					else
+					{
+						Unit.Velocity = ToTarget * TargetSpeed;
+					}
+					Unit.Rotation = Unit.Velocity.GetSafeNormal().Rotation();
+				}
+			}
+			break;
+
+		case EMGPursuitTactic::PitManeuver:
+			{
+				// Position alongside target for PIT maneuver
+				float PITDistance = 500.0f; // Need to be very close
+				float ApproachAngle = 30.0f; // Degrees offset from directly behind
+
+				if (Unit.bHasVisual && bHasPlayerLocation)
+				{
+					if (Unit.DistanceToTarget <= PITDistance)
+					{
+						// Execute PIT - aim for rear quarter panel
+						FVector OffsetDirection = FRotator(0.0f, ApproachAngle, 0.0f).RotateVector(ToTarget);
+						Unit.Velocity = OffsetDirection * BaseSpeed * 1.2f;
+					}
+					else
+					{
+						// Approach from side
+						FVector SideApproach = FRotator(0.0f, 45.0f, 0.0f).RotateVector(ToTarget);
+						Unit.Velocity = SideApproach * TargetSpeed * 1.3f;
+					}
+					Unit.Rotation = Unit.Velocity.GetSafeNormal().Rotation();
+				}
+			}
+			break;
+
+		case EMGPursuitTactic::BoxIn:
+			{
+				// Coordinate with other units to surround target
+				int32 UnitIndex = 0;
+				int32 TotalBoxUnits = 0;
+
+				// Count box-in units and find this unit's index
+				for (int32 i = 0; i < Status->ActiveUnits.Num(); ++i)
+				{
+					if (!Status->ActiveUnits[i].bIsDisabled &&
+					    Status->ActiveUnits[i].CurrentTactic == EMGPursuitTactic::BoxIn)
+					{
+						if (Status->ActiveUnits[i].UnitId == Unit.UnitId)
+						{
+							UnitIndex = TotalBoxUnits;
+						}
+						TotalBoxUnits++;
+					}
+				}
+
+				// Position around target based on unit index
+				if (bHasPlayerLocation && TotalBoxUnits > 0)
+				{
+					float AngleOffset = (360.0f / TotalBoxUnits) * UnitIndex;
+					FVector BoxPosition = EstimatedPlayerLocation +
+						FRotator(0.0f, AngleOffset, 0.0f).RotateVector(FVector::ForwardVector) * 1000.0f;
+
+					FVector ToBoxPosition = (BoxPosition - Unit.Location).GetSafeNormal();
+					Unit.Velocity = ToBoxPosition * BaseSpeed;
+					Unit.Rotation = (-ToTarget).Rotation(); // Face inward toward target
+				}
+			}
+			break;
+
+		case EMGPursuitTactic::Roadblock:
+			{
+				// Hold position at roadblock - minimal movement
+				Unit.Velocity = FVector::ZeroVector;
+				// Face oncoming traffic direction
+				if (bHasPlayerLocation)
+				{
+					Unit.Rotation = ToTarget.Rotation();
+				}
+			}
+			break;
+
+		case EMGPursuitTactic::SpikeStrip:
+			{
+				// Deploy ahead of target path
+				if (bHasPlayerLocation)
+				{
+					// Position ahead of predicted path
+					FVector DeployPosition = EstimatedPlayerLocation +
+						(EstimatedPlayerVelocity.GetSafeNormal() * 5000.0f); // 50m ahead
+					FVector ToDeployPos = (DeployPosition - Unit.Location).GetSafeNormal();
+					Unit.Velocity = ToDeployPos * BaseSpeed * 1.5f;
+					Unit.Rotation = (-EstimatedPlayerVelocity).GetSafeNormal().Rotation();
+				}
+			}
+			break;
+
+		case EMGPursuitTactic::Helicopter:
+			{
+				// Maintain altitude and follow from above
+				float HelicopterAltitude = 10000.0f; // 100m above
+				float FollowDistance = 5000.0f; // 50m behind at altitude
+
+				if (bHasPlayerLocation)
+				{
+					FVector TargetPosition = EstimatedPlayerLocation;
+					TargetPosition.Z += HelicopterAltitude;
+					TargetPosition -= EstimatedPlayerVelocity.GetSafeNormal() * FollowDistance;
+
+					FVector ToTargetPos = (TargetPosition - Unit.Location).GetSafeNormal();
+					Unit.Velocity = ToTargetPos * BaseSpeed * 2.0f; // Helicopters are faster
+					Unit.Rotation = FRotator(0.0f, ToTarget.Rotation().Yaw, 0.0f); // Level flight
+				}
+
+				// Helicopter always has visual if target is outdoors
+				Unit.bHasVisual = true;
+			}
+			break;
+
+		case EMGPursuitTactic::EMPDisable:
+			{
+				// Get close for EMP deployment
+				float EMPRange = 2000.0f;
+				if (Unit.bHasVisual && bHasPlayerLocation)
+				{
+					if (Unit.DistanceToTarget > EMPRange)
+					{
+						// Close distance
+						Unit.Velocity = ToTarget * BaseSpeed * 1.3f;
+					}
+					else
+					{
+						// In range - maintain position for deployment
+						Unit.Velocity = ToTarget * BaseSpeed * 0.5f;
+					}
+					Unit.Rotation = ToTarget.Rotation();
+				}
+			}
+			break;
+
+		case EMGPursuitTactic::TireShot:
+			{
+				// Maintain distance for accurate tire shots
+				float OptimalDistance = 4000.0f; // 40m for accuracy
+				float DistanceTolerance = 1000.0f;
+
+				if (Unit.bHasVisual && bHasPlayerLocation)
+				{
+					if (Unit.DistanceToTarget > OptimalDistance + DistanceTolerance)
+					{
+						Unit.Velocity = ToTarget * BaseSpeed * 1.2f;
+					}
+					else if (Unit.DistanceToTarget < OptimalDistance - DistanceTolerance)
+					{
+						Unit.Velocity = -ToTarget * BaseSpeed * 0.5f; // Back off
+					}
+					else
+					{
+						// Optimal range - match target speed
+						Unit.Velocity = EstimatedPlayerVelocity.GetSafeNormal() * BaseSpeed;
+					}
+					Unit.Rotation = ToTarget.Rotation();
+				}
+			}
+			break;
+
+		default:
+			// Default follow behavior
+			if (bHasPlayerLocation && Unit.bHasVisual)
+			{
+				Unit.Velocity = ToTarget * BaseSpeed;
+				Unit.Rotation = ToTarget.Rotation();
+			}
+			break;
+		}
+
+		// Apply velocity to update location
+		Unit.Location += Unit.Velocity * DeltaTime;
+
+		// Update distance to target
+		if (bHasPlayerLocation)
+		{
+			Unit.DistanceToTarget = FVector::Dist(Unit.Location, EstimatedPlayerLocation);
+			Unit.bHasVisual = Unit.DistanceToTarget < PursuitConfig.VisualRange;
+		}
 	}
 }
 

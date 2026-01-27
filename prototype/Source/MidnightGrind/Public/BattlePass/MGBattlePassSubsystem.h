@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MidnightGrind - Arcade Street Racing Game
 // Battle Pass Subsystem - Seasonal progression with free and premium reward tracks
 

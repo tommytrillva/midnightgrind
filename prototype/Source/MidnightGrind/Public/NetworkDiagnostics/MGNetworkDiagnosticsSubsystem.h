@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGNetworkDiagnosticsSubsystem.h
 // Midnight Grind - Network Diagnostics and Connection Quality System
 // Provides real-time network monitoring, latency tracking, and connection health analysis

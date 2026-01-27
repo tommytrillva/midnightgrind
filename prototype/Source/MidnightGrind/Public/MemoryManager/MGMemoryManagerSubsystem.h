@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGMemoryManagerSubsystem.h
 // Memory Management System - Budgets, streaming, loading optimization
 // Midnight Grind - Y2K Arcade Street Racing

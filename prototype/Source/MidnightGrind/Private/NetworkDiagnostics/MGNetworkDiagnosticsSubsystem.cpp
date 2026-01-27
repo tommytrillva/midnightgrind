@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGNetworkDiagnosticsSubsystem.cpp
 // Midnight Grind - Network Diagnostics and Connection Quality System
 

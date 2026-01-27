@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MidnightGrind - Arcade Street Racing Game
 // Social Hub Subsystem - Social lobby spaces, meetups, and player interactions
 

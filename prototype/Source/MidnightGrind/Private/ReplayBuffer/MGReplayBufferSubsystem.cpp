@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGReplayBufferSubsystem.cpp
 // Midnight Grind - Replay Buffer and Race Recording System
 

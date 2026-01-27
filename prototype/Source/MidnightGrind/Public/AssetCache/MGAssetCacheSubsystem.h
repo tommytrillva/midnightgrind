@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGAssetCacheSubsystem.h
 // Midnight Grind - Asset Caching and Preloading System
 // Manages intelligent asset preloading, caching strategies, and memory-efficient loading

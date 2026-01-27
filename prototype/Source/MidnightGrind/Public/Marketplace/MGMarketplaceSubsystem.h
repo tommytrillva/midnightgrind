@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MidnightGrind - Arcade Street Racing Game
 // Marketplace Subsystem - Player-to-player trading, auctions, and marketplace
 

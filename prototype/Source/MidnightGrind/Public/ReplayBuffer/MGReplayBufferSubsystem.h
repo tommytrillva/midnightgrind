@@ -1,3 +1,5 @@
+// Copyright Midnight Grind. All Rights Reserved.
+
 // MGReplayBufferSubsystem.h
 // Midnight Grind - Replay Buffer and Race Recording System
 // Provides real-time replay recording, instant replay, and cinematic playback
