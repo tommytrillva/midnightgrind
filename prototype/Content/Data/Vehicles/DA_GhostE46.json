@@ -1,0 +1,265 @@
+{
+  "VehicleID": "GHOST_E46",
+  "DisplayName": "Ghost E46",
+  "Manufacturer": "Ghost Motors",
+  "Year": 2003,
+  "Country": "Germany",
+  "Class": "B",
+  "Category": "Euro",
+  "Description": "The Ghost E46 is the thinking person's sports car. That naturally aspirated inline-six revs to 8000 RPM with mechanical precision, rewarding every input with telepathic feedback. The 50/50 weight distribution and communicative chassis make it the gold standard for driver engagement. It's not the fastest, but drive one on a twisty road and you'll understand why enthusiasts worship at its altar.",
+
+  "BaseStats": {
+    "Power": 333,
+    "PowerUnit": "HP",
+    "Torque": 262,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3415,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 50,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 3200,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "Inline",
+    "Redline": 8000,
+    "IdleRPM": 700,
+    "TopSpeed": 155,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 4.8,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 680,
+    "Class": "B",
+    "MaxPotential": 920
+  },
+
+  "Engine": {
+    "Code": "S54B32",
+    "Type": "Inline-6 NA",
+    "Block": {
+      "Material": "Aluminum",
+      "MaxPowerPotential": 450
+    },
+    "Head": {
+      "Type": "DOHC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24,
+      "IndividualThrottleBodies": true
+    },
+    "NaturallyAspirated": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 45, "Torque": 140 },
+      { "RPM": 2000, "HP": 95, "Torque": 180 },
+      { "RPM": 3000, "HP": 150, "Torque": 220 },
+      { "RPM": 4000, "HP": 210, "Torque": 250 },
+      { "RPM": 5000, "HP": 265, "Torque": 260 },
+      { "RPM": 5500, "HP": 295, "Torque": 262 },
+      { "RPM": 6000, "HP": 318, "Torque": 258 },
+      { "RPM": 6500, "HP": 330, "Torque": 252 },
+      { "RPM": 7000, "HP": 333, "Torque": 245 },
+      { "RPM": 7500, "HP": 330, "Torque": 235 },
+      { "RPM": 8000, "HP": 320, "Torque": 220 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [4.23, 2.53, 1.67, 1.23, 1.00, 0.83],
+    "FinalDrive": 3.62,
+    "ReverseRatio": 3.93
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 360,
+    "RearSpringRate": 340,
+    "FrontDamping": 0.62,
+    "RearDamping": 0.60,
+    "FrontAntiRollBar": 24,
+    "RearAntiRollBar": 18,
+    "RideHeight": 4.9,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 325,
+    "RearDiameter": 328,
+    "DiameterUnit": "mm",
+    "BrakeBias": 56,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 225,
+    "FrontAspectRatio": 45,
+    "FrontDiameter": 18,
+    "RearWidth": 255,
+    "RearAspectRatio": 40,
+    "RearDiameter": 18,
+    "Compound": "Sport",
+    "GripMultiplier": 1.0
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.32,
+    "FrontalArea": 2.0,
+    "DownforceMultiplier": 0.95,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4490,
+    "Width": 1780,
+    "Height": 1370,
+    "Wheelbase": 2730,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#4A4A4A",
+      "Secondary": "#1C1C1C",
+      "Accent": "#FF6B00"
+    },
+    "AvailableColors": [
+      { "Name": "Steel Grey", "Hex": "#4A4A4A" },
+      { "Name": "Carbon Black", "Hex": "#0A0A0A" },
+      { "Name": "Alpine White", "Hex": "#FFFFFF" },
+      { "Name": "Imola Red", "Hex": "#8B0000" },
+      { "Name": "Laguna Seca Blue", "Hex": "#00CED1" },
+      { "Name": "Phoenix Yellow", "Hex": "#FFD700" },
+      { "Name": "Titanium Silver", "Hex": "#C0C0C0" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineSix_NA_Euro",
+    "ExhaustProfile": "Euro_High_Rev",
+    "ITBSound": true,
+    "BackfireOnShift": true,
+    "HighRevScream": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 14.5,
+    "TurnRadius": 5.2,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.25,
+    "OversteerTendency": 0.55,
+    "DriftCapability": 0.75,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "PerfectBalance": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 80,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 7,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 52000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "B",
+    "MaintenanceCostMultiplier": 1.4,
+    "PartsPriceMultiplier": 1.3,
+    "StreetValue": 65000,
+    "LegendaryValue": 150000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "REGULAR",
+    "RequiredLevel": 16,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "AFE", "CSL", "Full ITB"],
+      "Exhaust": ["Stock", "Supersprint", "Akrapovic", "Full Race"],
+      "Cams": ["Stock", "Schrick", "Cat Cams"],
+      "Displacement": ["Stock", "3.4L Stroker"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow"],
+      "Internals": ["Stock", "Pistons", "Full Build"]
+    },
+    "ForcedInduction": {
+      "Supercharger": ["None", "ESS VT1", "ESS VT2"],
+      "Turbo": ["None", "Single T04E", "Twin T3"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Twin Plate"],
+      "Transmission": ["Stock", "SMG Delete", "Sequential"],
+      "FinalDrive": ["Stock", "3.91", "4.10"],
+      "LSD": ["Stock", "1.5Way", "2Way", "Diff Delete"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Race"],
+      "Dampers": ["Stock", "Bilstein", "Ohlins"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"],
+      "ControlArms": ["Stock", "Adjustable"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece", "CSL"],
+      "Calipers": ["Stock", "Brembo", "StopTech"]
+    },
+    "Wheels": {
+      "Size": [18, 19],
+      "Width": [8.0, 8.5, 9.0, 9.5, 10.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Drift"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "CSL", "GTR", "Wide"],
+      "RearBumper": ["Stock", "CSL", "Wide"],
+      "Spoiler": ["Stock", "CSL", "GT Wing", "DTM"],
+      "Hood": ["Stock", "GTR", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "GTR", "Pandem"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "Clear", "CSL"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 600,
+    "MaxTorque": 420,
+    "MinWeight": 3100,
+    "MaxTopSpeed": 195,
+    "MaxPI": 920
+  },
+
+  "Tags": ["Euro", "RWD", "NA", "Inline-6", "BMW", "E46", "M3", "Touge", "Balanced", "Driver's Car"],
+
+  "Lore": {
+    "Backstory": "The Ghost E46 is often called the last true driver's M car. Before turbocharging, before excessive weight, before screens everywhere - it was just a perfectly balanced chassis with an engine that begged to be revved. The S54 inline-six with individual throttle bodies is a mechanical masterpiece, pulling to 8000 RPM with a sound that makes grown enthusiasts weep. The 50/50 weight distribution means it does exactly what you ask, when you ask it. It's not the fastest car, but it might be the most rewarding to drive at the limit.",
+    "FamousOwners": ["Track Day Regular", "Touge Legend", "The Purist"],
+    "RivalVehicles": ["S2000", "RX-7", "350Z"]
+  },
+
+  "SpecialFeatures": {
+    "IndividualThrottleBodies": true,
+    "PerfectBalance": true,
+    "GermanEngineering": true
+  }
+}

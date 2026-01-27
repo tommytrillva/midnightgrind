@@ -1,0 +1,276 @@
+{
+  "VehicleID": "DEMON_CHALLENGER",
+  "DisplayName": "Demon Challenger",
+  "Manufacturer": "Demon Motors",
+  "Year": 2018,
+  "Country": "USA",
+  "Class": "S",
+  "Category": "Muscle",
+  "Description": "The Demon Challenger is the most insane factory muscle car ever built. 840 horsepower from a supercharged HEMI, purpose-built for the drag strip. It came with skinny front tires from the factory because the only direction that matters is forward. This isn't a car for corners - it's a sledgehammer in a world of scalpels. When that supercharger screams and the front wheels lift, you know you're in something special.",
+
+  "BaseStats": {
+    "Power": 840,
+    "PowerUnit": "HP",
+    "Torque": 770,
+    "TorqueUnit": "lb-ft",
+    "Weight": 4280,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 56,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "Supercharged",
+    "Displacement": 6200,
+    "DisplacementUnit": "cc",
+    "Cylinders": 8,
+    "Configuration": "V",
+    "Redline": 6500,
+    "IdleRPM": 700,
+    "TopSpeed": 203,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 2.3,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 850,
+    "Class": "S",
+    "MaxPotential": 999
+  },
+
+  "Engine": {
+    "Code": "Supercharged HEMI",
+    "Type": "V8 Supercharged",
+    "Block": {
+      "Material": "Cast Iron",
+      "BoostLimit": 22,
+      "MaxPowerPotential": 1100
+    },
+    "Head": {
+      "Type": "OHV",
+      "ValvesPerCylinder": 2,
+      "TotalValves": 16
+    },
+    "Supercharger": {
+      "Type": "Twin-Screw IHI",
+      "Displacement": 2.7,
+      "MaxBoost": 14.5
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 150, "Torque": 450 },
+      { "RPM": 1500, "HP": 250, "Torque": 580 },
+      { "RPM": 2000, "HP": 380, "Torque": 680 },
+      { "RPM": 2500, "HP": 480, "Torque": 750 },
+      { "RPM": 3000, "HP": 580, "Torque": 770 },
+      { "RPM": 3500, "HP": 680, "Torque": 765 },
+      { "RPM": 4000, "HP": 760, "Torque": 750 },
+      { "RPM": 4500, "HP": 820, "Torque": 730 },
+      { "RPM": 5000, "HP": 840, "Torque": 700 },
+      { "RPM": 5500, "HP": 830, "Torque": 660 },
+      { "RPM": 6000, "HP": 810, "Torque": 620 },
+      { "RPM": 6500, "HP": 780, "Torque": 575 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Automatic",
+    "Gears": 8,
+    "GearRatios": [4.71, 3.14, 2.10, 1.67, 1.29, 1.00, 0.84, 0.67],
+    "FinalDrive": 3.09,
+    "ReverseRatio": 3.30,
+    "TorqueConverter": true,
+    "TransBrake": true
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 280,
+    "RearSpringRate": 350,
+    "FrontDamping": 0.50,
+    "RearDamping": 0.55,
+    "FrontAntiRollBar": 20,
+    "RearAntiRollBar": 24,
+    "RideHeight": 5.2,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 410,
+    "RearDiameter": 380,
+    "DiameterUnit": "mm",
+    "BrakeBias": 60,
+    "ABSEquipped": true,
+    "Brembo": true
+  },
+
+  "Tires": {
+    "FrontWidth": 245,
+    "FrontAspectRatio": 45,
+    "FrontDiameter": 18,
+    "RearWidth": 315,
+    "RearAspectRatio": 40,
+    "RearDiameter": 18,
+    "Compound": "Street",
+    "GripMultiplier": 0.85,
+    "DragRadialsEquipped": false
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.38,
+    "FrontalArea": 2.45,
+    "DownforceMultiplier": 0.8,
+    "HasActiveSpoiler": false,
+    "AirGrabberHood": true
+  },
+
+  "Dimensions": {
+    "Length": 5020,
+    "Width": 1923,
+    "Height": 1450,
+    "Wheelbase": 2946,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#CC0000",
+      "Secondary": "#0A0A0A",
+      "Accent": "#000000"
+    },
+    "AvailableColors": [
+      { "Name": "TorRed", "Hex": "#CC0000" },
+      { "Name": "Pitch Black", "Hex": "#0A0A0A" },
+      { "Name": "White Knuckle", "Hex": "#FFFFFF" },
+      { "Name": "F8 Green", "Hex": "#3A5F0B" },
+      { "Name": "B5 Blue", "Hex": "#6495ED" },
+      { "Name": "Plum Crazy", "Hex": "#7B3F00" },
+      { "Name": "Go Mango", "Hex": "#FF6B00" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V8_Supercharged_HEMI",
+    "ExhaustProfile": "American_Brutal",
+    "SuperchargerWhine": true,
+    "BlowoffValve": false,
+    "BackfireOnShift": true,
+    "Burble": true,
+    "WhineIntensity": 1.3
+  },
+
+  "Handling": {
+    "SteeringRatio": 17.0,
+    "TurnRadius": 6.2,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.5,
+    "OversteerTendency": 0.4,
+    "DriftCapability": 0.6,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "LineLocker": true,
+    "TransBrake": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 200,
+    "PowerBoostUnit": "HP",
+    "Duration": 3.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 4,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 125000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "S",
+    "MaintenanceCostMultiplier": 1.3,
+    "PartsPriceMultiplier": 1.2,
+    "StreetValue": 160000,
+    "LegendaryValue": 350000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "FEARED",
+    "RequiredLevel": 35,
+    "SpecialConditions": ["Win 5 drag races"]
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "SRT", "Legmaker", "Full Race"],
+      "Exhaust": ["Stock", "Borla", "Kooks", "Long Tube Headers"],
+      "Supercharger": ["Stock", "2.7L Ported", "3.0L Upgrade", "Whipple"],
+      "Intercooler": ["Stock", "Large", "Chiller"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow", "E85", "Methanol Injection"],
+      "Internals": ["Stock", "Rods", "Pistons", "426 Stroker"]
+    },
+    "Drivetrain": {
+      "TorqueConverter": ["Stock", "High Stall", "Pro Stall"],
+      "Transmission": ["Stock", "Built", "Race Prepped"],
+      "FinalDrive": ["Stock", "3.25", "3.73", "4.10"],
+      "LSD": ["Stock", "1.5Way", "2Way", "Spool"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Drag", "Coilover"],
+      "Dampers": ["Stock", "Adjustable", "Drag"],
+      "Swaybars": ["Stock", "Sport", "Deleted"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock", "6-Piston", "8-Piston"]
+    },
+    "Wheels": {
+      "Size": [17, 18],
+      "Width": [9.0, 9.5, 10.0, 10.5, 11.0, 12.0]
+    },
+    "Tires": {
+      "Compound": ["Street", "Drag Radial", "Slick", "Skinnies"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Demon", "Wide"],
+      "RearBumper": ["Stock", "Wide"],
+      "Spoiler": ["Stock", "High", "Deleted"],
+      "Hood": ["Stock", "Air Grabber", "Cowl"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Widebody"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "Darkened"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 1100,
+    "MaxTorque": 1000,
+    "MinWeight": 4000,
+    "MaxTopSpeed": 220,
+    "MaxPI": 999
+  },
+
+  "Tags": ["American", "RWD", "Supercharged", "V8", "Muscle", "Drag", "Challenger", "HEMI", "Wheelie"],
+
+  "Lore": {
+    "Backstory": "The Demon Challenger is what happens when a factory says 'screw it, let's build a drag car.' The skinny front tires, the trans brake, the air suspension that squats the rear for launches - it's all there from the factory. The 840 horsepower rating is a lie - they sandbag it because the truth would void insurance policies. This car lifts its front wheels in first gear. It runs 9-second quarter miles on street tires. It's an absurd, beautiful, utterly impractical monument to American horsepower excess.",
+    "FamousOwners": ["Drag Strip Legend", "Quarter Mile King", "Wheelie Bar Hater"],
+    "RivalVehicles": ["Phantom Camaro", "Mustang GT500", "Corvette ZR1"]
+  },
+
+  "SpecialFeatures": {
+    "TransBrake": true,
+    "LineLocker": true,
+    "LaunchControl": true,
+    "DragMode": true,
+    "AirGrabberHood": true,
+    "WheelieCapable": true
+  }
+}

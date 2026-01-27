@@ -1,0 +1,260 @@
+{
+  "VehicleID": "KUMO_350Z",
+  "DisplayName": "Kumo 350Z",
+  "Manufacturer": "Kumo Motors",
+  "Year": 2006,
+  "Country": "Japan",
+  "Class": "B",
+  "Category": "JDM",
+  "Description": "The Kumo 350Z is the spiritual successor to the Z-car legend. That VQ35 V6 delivers smooth, rev-happy power while the rear-wheel-drive chassis begs to be thrown sideways. It's affordable, reliable, and with the right mods becomes a drift or grip monster. The Z has always been about accessible performance, and this one continues that proud tradition.",
+
+  "BaseStats": {
+    "Power": 306,
+    "PowerUnit": "HP",
+    "Torque": 268,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3370,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 53,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 3500,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "V",
+    "Redline": 7000,
+    "IdleRPM": 750,
+    "TopSpeed": 155,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 5.1,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 640,
+    "Class": "B",
+    "MaxPotential": 900
+  },
+
+  "Engine": {
+    "Code": "VQ35DE",
+    "Type": "V6 NA",
+    "Block": {
+      "Material": "Aluminum",
+      "MaxPowerPotential": 700
+    },
+    "Head": {
+      "Type": "DOHC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24
+    },
+    "NaturallyAspirated": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 50, "Torque": 150 },
+      { "RPM": 2000, "HP": 105, "Torque": 200 },
+      { "RPM": 3000, "HP": 165, "Torque": 245 },
+      { "RPM": 4000, "HP": 220, "Torque": 265 },
+      { "RPM": 4500, "HP": 250, "Torque": 268 },
+      { "RPM": 5000, "HP": 275, "Torque": 265 },
+      { "RPM": 5500, "HP": 295, "Torque": 258 },
+      { "RPM": 6000, "HP": 306, "Torque": 248 },
+      { "RPM": 6500, "HP": 302, "Torque": 235 },
+      { "RPM": 7000, "HP": 290, "Torque": 218 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [3.79, 2.32, 1.62, 1.27, 1.00, 0.79],
+    "FinalDrive": 3.54,
+    "ReverseRatio": 3.29
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 340,
+    "RearSpringRate": 320,
+    "FrontDamping": 0.58,
+    "RearDamping": 0.55,
+    "FrontAntiRollBar": 22,
+    "RearAntiRollBar": 16,
+    "RideHeight": 5.0,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 324,
+    "RearDiameter": 322,
+    "DiameterUnit": "mm",
+    "BrakeBias": 58,
+    "ABSEquipped": true,
+    "Brembo": true
+  },
+
+  "Tires": {
+    "FrontWidth": 225,
+    "FrontAspectRatio": 45,
+    "FrontDiameter": 18,
+    "RearWidth": 245,
+    "RearAspectRatio": 45,
+    "RearDiameter": 18,
+    "Compound": "Sport",
+    "GripMultiplier": 0.98
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.30,
+    "FrontalArea": 2.0,
+    "DownforceMultiplier": 0.9,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4315,
+    "Width": 1815,
+    "Height": 1315,
+    "Wheelbase": 2650,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#FF6B00",
+      "Secondary": "#000000",
+      "Accent": "#1C1C1C"
+    },
+    "AvailableColors": [
+      { "Name": "Le Mans Sunset", "Hex": "#FF6B00" },
+      { "Name": "Super Black", "Hex": "#0A0A0A" },
+      { "Name": "Pikes Peak White", "Hex": "#FFFFFF" },
+      { "Name": "Daytona Blue", "Hex": "#003366" },
+      { "Name": "Monterey Blue", "Hex": "#00CED1" },
+      { "Name": "Silverstone", "Hex": "#C0C0C0" },
+      { "Name": "Redline", "Hex": "#CC0000" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V6_NA_VQ",
+    "ExhaustProfile": "JDM_Raspy",
+    "BackfireOnShift": true,
+    "VQTrumpet": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.0,
+    "TurnRadius": 5.1,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.3,
+    "OversteerTendency": 0.5,
+    "DriftCapability": 0.7,
+    "StabilityControl": true,
+    "TractionControl": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 75,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 7,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 32000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "B",
+    "MaintenanceCostMultiplier": 1.0,
+    "PartsPriceMultiplier": 0.9,
+    "StreetValue": 40000,
+    "LegendaryValue": 95000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "NEWCOMER",
+    "RequiredLevel": 12,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Stillen", "HKS", "Full Race"],
+      "Exhaust": ["Stock", "Invidia", "HKS", "Ti Racing"],
+      "Cams": ["Stock", "JWT", "Tomei"],
+      "Headers": ["Stock", "Berk", "PPE"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow"]
+    },
+    "ForcedInduction": {
+      "Supercharger": ["None", "Vortech V3", "Stillen"],
+      "Turbo": ["None", "Single T3", "Single T4", "Twin T25"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Twin Plate"],
+      "Transmission": ["Stock", "CD009", "Sequential"],
+      "FinalDrive": ["Stock", "3.69", "3.90", "4.08"],
+      "LSD": ["Stock", "1.5Way", "2Way"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Race"],
+      "Dampers": ["Stock", "KW", "Ohlins"],
+      "Swaybars": ["Stock", "Hotchkis", "Stillen"],
+      "Bushings": ["Stock", "Poly", "Solid"],
+      "AngleKit": ["None", "SPL", "Full"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock", "Akebono", "StopTech"]
+    },
+    "Wheels": {
+      "Size": [18, 19],
+      "Width": [8.5, 9.0, 9.5, 10.0, 10.5]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Drift"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Nismo", "Amuse", "Wide"],
+      "RearBumper": ["Stock", "Nismo", "Wide"],
+      "Spoiler": ["Stock", "Nismo", "GT Wing", "Ducktail"],
+      "Hood": ["Stock", "Vented", "Carbon", "Seibon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Amuse", "Rocket Bunny"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "Clear", "LED"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 700,
+    "MaxTorque": 520,
+    "MinWeight": 3000,
+    "MaxTopSpeed": 195,
+    "MaxPI": 900
+  },
+
+  "Tags": ["JDM", "RWD", "NA", "V6", "Z", "350Z", "Drift", "Affordable", "VQ"],
+
+  "Lore": {
+    "Backstory": "The Kumo 350Z brought the Z-car back from the dead. After years of the Z being a bloated GT cruiser, this one returned to its roots - light, balanced, and eager to play. The VQ35 V6 has that distinctive trumpet-like exhaust note that's either loved or hated. The aftermarket support is massive, making it one of the most popular drift and grip platforms. It's the working man's sports car - attainable, tuneable, and rewarding.",
+    "FamousOwners": ["Formula D Rookie", "Street Drift Legend", "Budget Build King"],
+    "RivalVehicles": ["RX-8", "S2000", "E46 M3"]
+  },
+
+  "SpecialFeatures": {
+    "VQTrumpet": true,
+    "AftermarketSupport": "Excellent"
+  }
+}

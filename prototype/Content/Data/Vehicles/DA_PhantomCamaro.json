@@ -1,0 +1,269 @@
+{
+  "VehicleID": "PHANTOM_CAMARO",
+  "DisplayName": "Phantom Camaro",
+  "Manufacturer": "Phantom Motors",
+  "Year": 2015,
+  "Country": "USA",
+  "Class": "A",
+  "Category": "Muscle",
+  "Description": "The Phantom Camaro combines old-school American muscle with modern engineering. That supercharged 6.2L V8 puts down over 650 horsepower through the rear wheels with savage intensity. It's not subtle - the supercharger whine announces your presence before you even arrive. Whether you're hunting on the highway or dominating drag strips, the Phantom delivers raw, unfiltered American power.",
+
+  "BaseStats": {
+    "Power": 650,
+    "PowerUnit": "HP",
+    "Torque": 650,
+    "TorqueUnit": "lb-ft",
+    "Weight": 4120,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 54,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "Supercharged",
+    "Displacement": 6200,
+    "DisplacementUnit": "cc",
+    "Cylinders": 8,
+    "Configuration": "V",
+    "Redline": 6500,
+    "IdleRPM": 650,
+    "TopSpeed": 198,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 3.5,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 780,
+    "Class": "A",
+    "MaxPotential": 980
+  },
+
+  "Engine": {
+    "Code": "LT4",
+    "Type": "V8 Supercharged",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 20,
+      "MaxPowerPotential": 1000
+    },
+    "Head": {
+      "Type": "OHV",
+      "ValvesPerCylinder": 2,
+      "TotalValves": 16
+    },
+    "Supercharger": {
+      "Type": "Roots",
+      "Displacement": 1.7,
+      "MaxBoost": 9.4
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 120, "Torque": 380 },
+      { "RPM": 1500, "HP": 200, "Torque": 480 },
+      { "RPM": 2000, "HP": 280, "Torque": 560 },
+      { "RPM": 2500, "HP": 360, "Torque": 610 },
+      { "RPM": 3000, "HP": 440, "Torque": 640 },
+      { "RPM": 3500, "HP": 510, "Torque": 650 },
+      { "RPM": 4000, "HP": 570, "Torque": 648 },
+      { "RPM": 4500, "HP": 620, "Torque": 640 },
+      { "RPM": 5000, "HP": 645, "Torque": 625 },
+      { "RPM": 5500, "HP": 650, "Torque": 600 },
+      { "RPM": 6000, "HP": 640, "Torque": 570 },
+      { "RPM": 6500, "HP": 620, "Torque": 530 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [2.66, 1.78, 1.30, 1.00, 0.74, 0.50],
+    "FinalDrive": 3.73,
+    "ReverseRatio": 2.90
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 420,
+    "RearSpringRate": 380,
+    "FrontDamping": 0.68,
+    "RearDamping": 0.65,
+    "FrontAntiRollBar": 32,
+    "RearAntiRollBar": 28,
+    "RideHeight": 4.8,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 390,
+    "RearDiameter": 365,
+    "DiameterUnit": "mm",
+    "BrakeBias": 58,
+    "ABSEquipped": true,
+    "Brembo": true
+  },
+
+  "Tires": {
+    "FrontWidth": 285,
+    "FrontAspectRatio": 30,
+    "FrontDiameter": 19,
+    "RearWidth": 305,
+    "RearAspectRatio": 30,
+    "RearDiameter": 20,
+    "Compound": "Sport",
+    "GripMultiplier": 1.05
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.35,
+    "FrontalArea": 2.3,
+    "DownforceMultiplier": 1.0,
+    "HasActiveSpoiler": true,
+    "FunctionalHood": true
+  },
+
+  "Dimensions": {
+    "Length": 4785,
+    "Width": 1900,
+    "Height": 1350,
+    "Wheelbase": 2812,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#0A0A0A",
+      "Secondary": "#1C1C1C",
+      "Accent": "#FFD700"
+    },
+    "AvailableColors": [
+      { "Name": "Black Widow", "Hex": "#0A0A0A" },
+      { "Name": "Summit White", "Hex": "#FFFFFF" },
+      { "Name": "Red Hot", "Hex": "#CC0000" },
+      { "Name": "Riverside Blue", "Hex": "#003366" },
+      { "Name": "Rally Green", "Hex": "#2E5A1C" },
+      { "Name": "Shock Yellow", "Hex": "#FFD700" },
+      { "Name": "Satin Steel Grey", "Hex": "#6A6A6A" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V8_Supercharged_American",
+    "ExhaustProfile": "American_Aggressive",
+    "SuperchargerWhine": true,
+    "BlowoffValve": false,
+    "BackfireOnShift": true,
+    "Burble": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 16.0,
+    "TurnRadius": 5.9,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.35,
+    "OversteerTendency": 0.55,
+    "DriftCapability": 0.8,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "LineLocker": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 150,
+    "PowerBoostUnit": "HP",
+    "Duration": 3.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 5,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 75000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "A",
+    "MaintenanceCostMultiplier": 1.1,
+    "PartsPriceMultiplier": 1.0,
+    "StreetValue": 90000,
+    "LegendaryValue": 200000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "RESPECTED",
+    "RequiredLevel": 22,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "K&N", "Vararam", "Full Race"],
+      "Exhaust": ["Stock", "Borla", "Kooks", "Full Headers"],
+      "Supercharger": ["Stock", "2.3L Upgrade", "2.65L Upgrade", "Twin Screw"],
+      "Intercooler": ["Stock", "Large", "Dual Pass"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow", "E85", "Flex Fuel"],
+      "Internals": ["Stock", "Rods", "Pistons", "Forged Build"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Twin Disc"],
+      "Transmission": ["Stock", "T56", "TR6060", "Sequential"],
+      "FinalDrive": ["Stock", "3.91", "4.10", "4.56"],
+      "LSD": ["Stock", "1.5Way", "2Way", "Spool"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Drag"],
+      "Dampers": ["Stock", "Adjustable", "Racing"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece", "Carbon"],
+      "Calipers": ["Stock", "6-Piston", "8-Piston"]
+    },
+    "Wheels": {
+      "Size": [19, 20],
+      "Width": [9.0, 9.5, 10.0, 10.5, 11.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Drag Radial"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "ZL1", "1LE", "Wide"],
+      "RearBumper": ["Stock", "ZL1", "Wide"],
+      "Spoiler": ["Stock", "ZL1", "High Wing", "APR"],
+      "Hood": ["Stock", "Vented", "Cowl", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "ZL1", "Wide Body Kit"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "Clear", "Darkened"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 1000,
+    "MaxTorque": 950,
+    "MinWeight": 3800,
+    "MaxTopSpeed": 215,
+    "MaxPI": 980
+  },
+
+  "Tags": ["American", "RWD", "Supercharged", "V8", "Muscle", "Camaro", "Highway", "Drag"],
+
+  "Lore": {
+    "Backstory": "The Phantom Camaro represents the modern evolution of American muscle. Where the old pony cars were all about straight-line speed, this sixth-generation monster can actually handle corners. That supercharged LT4 makes a sound that's equal parts menacing and addictive - the whine building as boost climbs, then the explosive crack of exhaust on shift. On the highway, few can hang with a Phantom at full chat. It's brash, it's loud, and it makes absolutely no apologies.",
+    "FamousOwners": ["Highway Patrol Nightmare", "Drag Strip Regular", "Supercharger Aficionado"],
+    "RivalVehicles": ["Demon Challenger", "Mustang GT500", "Corvette Z06"]
+  },
+
+  "SpecialFeatures": {
+    "LineLocker": true,
+    "LaunchControl": true,
+    "PerformanceDataRecorder": true,
+    "MagneticRide": true
+  }
+}

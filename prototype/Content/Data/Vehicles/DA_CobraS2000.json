@@ -1,0 +1,275 @@
+{
+  "VehicleID": "COBRA_S2000",
+  "DisplayName": "Cobra S2000",
+  "Manufacturer": "Cobra Motors",
+  "Year": 2004,
+  "Country": "Japan",
+  "Class": "B",
+  "Category": "JDM",
+  "Description": "The Cobra S2000 is engineering perfection in roadster form. That F20C engine revs to 9000 RPM - the highest-revving production engine of its era. The precision of the chassis, the snap of that short-throw shifter, the direct steering - everything works in harmony. It's not forgiving, but master it and you'll understand why it's considered one of the greatest driver's cars ever made.",
+
+  "BaseStats": {
+    "Power": 237,
+    "PowerUnit": "HP",
+    "Torque": 153,
+    "TorqueUnit": "lb-ft",
+    "Weight": 2765,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 50,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 2000,
+    "DisplacementUnit": "cc",
+    "Cylinders": 4,
+    "Configuration": "Inline",
+    "Redline": 9000,
+    "IdleRPM": 950,
+    "TopSpeed": 150,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 5.4,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 620,
+    "Class": "B",
+    "MaxPotential": 880
+  },
+
+  "Engine": {
+    "Code": "F20C",
+    "Type": "Inline-4 NA VTEC",
+    "Block": {
+      "Material": "Aluminum",
+      "MaxPowerPotential": 500
+    },
+    "Head": {
+      "Type": "DOHC VTEC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 16
+    },
+    "VTEC": {
+      "CrossoverRPM": 6000,
+      "HighCamProfile": true
+    },
+    "NaturallyAspirated": true,
+    "SpecificOutput": 118.5,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 30, "Torque": 80 },
+      { "RPM": 2000, "HP": 60, "Torque": 105 },
+      { "RPM": 3000, "HP": 95, "Torque": 125 },
+      { "RPM": 4000, "HP": 130, "Torque": 140 },
+      { "RPM": 5000, "HP": 165, "Torque": 148 },
+      { "RPM": 6000, "HP": 195, "Torque": 153 },
+      { "RPM": 7000, "HP": 220, "Torque": 150 },
+      { "RPM": 7500, "HP": 232, "Torque": 148 },
+      { "RPM": 8000, "HP": 237, "Torque": 145 },
+      { "RPM": 8500, "HP": 235, "Torque": 140 },
+      { "RPM": 9000, "HP": 230, "Torque": 132 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [3.13, 2.05, 1.48, 1.16, 0.97, 0.81],
+    "FinalDrive": 4.10,
+    "ReverseRatio": 2.80,
+    "ShortThrow": true
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "DoubleWishbone",
+    "FrontSpringRate": 280,
+    "RearSpringRate": 310,
+    "FrontDamping": 0.55,
+    "RearDamping": 0.58,
+    "FrontAntiRollBar": 20,
+    "RearAntiRollBar": 14,
+    "RideHeight": 4.5,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 300,
+    "RearDiameter": 282,
+    "DiameterUnit": "mm",
+    "BrakeBias": 57,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 215,
+    "FrontAspectRatio": 45,
+    "FrontDiameter": 16,
+    "RearWidth": 245,
+    "RearAspectRatio": 40,
+    "RearDiameter": 17,
+    "Compound": "Sport",
+    "GripMultiplier": 0.95
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.33,
+    "FrontalArea": 1.75,
+    "DownforceMultiplier": 0.85,
+    "HasActiveSpoiler": false,
+    "Convertible": true
+  },
+
+  "Dimensions": {
+    "Length": 4135,
+    "Width": 1750,
+    "Height": 1285,
+    "Wheelbase": 2400,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Roadster",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#FFD700",
+      "Secondary": "#000000",
+      "Accent": "#1C1C1C"
+    },
+    "AvailableColors": [
+      { "Name": "Rio Yellow Pearl", "Hex": "#FFD700" },
+      { "Name": "Berlina Black", "Hex": "#0A0A0A" },
+      { "Name": "Grand Prix White", "Hex": "#FFFFFF" },
+      { "Name": "New Formula Red", "Hex": "#CC0000" },
+      { "Name": "Silverstone Metallic", "Hex": "#C0C0C0" },
+      { "Name": "Suzuka Blue", "Hex": "#4169E1" },
+      { "Name": "Apex Blue Pearl", "Hex": "#003366" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineFour_NA_HighRev",
+    "ExhaustProfile": "JDM_Scream",
+    "VTECCrossover": true,
+    "BackfireOnShift": true,
+    "HighRevScream": true,
+    "NineKRedline": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 13.0,
+    "TurnRadius": 5.0,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.2,
+    "OversteerTendency": 0.7,
+    "DriftCapability": 0.75,
+    "StabilityControl": false,
+    "TractionControl": false,
+    "PerfectBalance": true,
+    "SnapOversteer": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 60,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 8,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 38000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "B",
+    "MaintenanceCostMultiplier": 1.2,
+    "PartsPriceMultiplier": 1.1,
+    "StreetValue": 48000,
+    "LegendaryValue": 110000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "REGULAR",
+    "RequiredLevel": 14,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Injen", "HKS", "Full Race ITB"],
+      "Exhaust": ["Stock", "Mugen", "J's Racing", "Ti Racing"],
+      "Cams": ["Stock", "Toda", "Spoon"],
+      "Displacement": ["Stock", "2.2L F22C", "2.4L K24"],
+      "ECU": ["Stock", "Hondata", "AEM", "Standalone"],
+      "Internals": ["Stock", "Pistons", "Full Build"]
+    },
+    "ForcedInduction": {
+      "Supercharger": ["None", "CT Engineering", "Comptech"],
+      "Turbo": ["None", "Single T3", "Single T04E"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Twin Plate"],
+      "Transmission": ["Stock", "ShortShift", "OS Giken", "Sequential"],
+      "FinalDrive": ["Stock", "4.3", "4.44", "4.77"],
+      "LSD": ["Stock", "Spoon", "Cusco", "OS Giken"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Race"],
+      "Dampers": ["Stock", "KW", "Ohlins"],
+      "Swaybars": ["Stock", "Spoon", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"],
+      "Hardtop": ["None", "OEM", "ASM", "Carbon"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock", "Brembo", "StopTech"]
+    },
+    "Wheels": {
+      "Size": [16, 17, 18],
+      "Width": [7.0, 7.5, 8.0, 8.5, 9.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Drift"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Mugen", "J's Racing", "Spoon"],
+      "RearBumper": ["Stock", "Mugen", "J's Racing"],
+      "Spoiler": ["Stock", "Mugen", "J's Racing", "GT Wing"],
+      "Hood": ["Stock", "Vented", "Carbon", "Mugen"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "ASM", "J's Racing"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "Clear"],
+      "RollBar": ["None", "OEM", "Spoon"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 500,
+    "MaxTorque": 320,
+    "MinWeight": 2500,
+    "MaxTopSpeed": 185,
+    "MaxPI": 880
+  },
+
+  "Tags": ["JDM", "RWD", "NA", "VTEC", "S2000", "Roadster", "Touge", "High-Rev", "Driver's Car", "Balanced"],
+
+  "Lore": {
+    "Backstory": "The Cobra S2000 was Honda's 50th anniversary gift to the world. That F20C engine produces 118 horsepower per liter naturally aspirated - an engineering marvel that revs to 9000 RPM and rewards drivers who keep it in the powerband. The 50/50 weight distribution and double wishbone suspension all around create a chassis that does exactly what you ask. But be warned - it's not forgiving. Lift off mid-corner and the notorious snap oversteer will remind you that this car demands respect. Master it, and you'll have one of the purest driving experiences ever created.",
+    "FamousOwners": ["Canyon Carver", "Track Day Addict", "VTEC Priest"],
+    "RivalVehicles": ["RX-8", "Miata", "350Z"]
+  },
+
+  "SpecialFeatures": {
+    "VTECSystem": true,
+    "NineThousandRedline": true,
+    "PerfectBalance": true,
+    "SnapOversteer": true,
+    "BestManualEver": true
+  }
+}
