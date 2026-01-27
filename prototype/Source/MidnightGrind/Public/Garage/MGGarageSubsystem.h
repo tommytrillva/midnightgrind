@@ -6,6 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Vehicle/MGVehicleData.h"
 #include "Vehicle/MGStatCalculator.h"
+#include "Vehicle/MGVehicleWearSubsystem.h"
 #include "MGGarageSubsystem.generated.h"
 
 class AMGVehiclePawn;
@@ -251,6 +252,63 @@ struct FMGOwnedVehicle
 	/** Is this the currently selected vehicle? */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	bool bIsSelected = false;
+
+	// ==========================================
+	// WEAR & DAMAGE STATE (Persisted)
+	// ==========================================
+
+	/** Tire wear state for all four tires */
+	UPROPERTY(BlueprintReadWrite, SaveGame)
+	FMGTireSetWearData TireWear;
+
+	/** Engine wear and condition */
+	UPROPERTY(BlueprintReadWrite, SaveGame)
+	FMGEngineWearData EngineWear;
+
+	/** Brake condition (0-100%) */
+	UPROPERTY(BlueprintReadWrite, SaveGame)
+	float BrakeCondition = 100.0f;
+
+	/** Clutch condition (0-100%) */
+	UPROPERTY(BlueprintReadWrite, SaveGame)
+	float ClutchCondition = 100.0f;
+
+	/** Transmission condition (0-100%) */
+	UPROPERTY(BlueprintReadWrite, SaveGame)
+	float TransmissionCondition = 100.0f;
+
+	/** Suspension condition (0-100%) */
+	UPROPERTY(BlueprintReadWrite, SaveGame)
+	float SuspensionCondition = 100.0f;
+
+	/** Body damage level (0 = none, 1 = totaled) */
+	UPROPERTY(BlueprintReadWrite, SaveGame)
+	float BodyDamage = 0.0f;
+
+	/** Has unrepaired damage that affects performance */
+	bool HasDamage() const
+	{
+		return TireWear.GetWorstCondition() < 50.0f ||
+			   EngineWear.Condition < 50.0f ||
+			   BrakeCondition < 50.0f ||
+			   ClutchCondition < 50.0f ||
+			   TransmissionCondition < 50.0f ||
+			   SuspensionCondition < 50.0f ||
+			   BodyDamage > 0.25f;
+	}
+
+	/** Overall vehicle health (average of all components) */
+	float GetOverallHealth() const
+	{
+		float Health = TireWear.GetAverageCondition() +
+					   EngineWear.Condition +
+					   BrakeCondition +
+					   ClutchCondition +
+					   TransmissionCondition +
+					   SuspensionCondition +
+					   (1.0f - BodyDamage) * 100.0f;
+		return Health / 7.0f;
+	}
 
 	FMGOwnedVehicle()
 	{
