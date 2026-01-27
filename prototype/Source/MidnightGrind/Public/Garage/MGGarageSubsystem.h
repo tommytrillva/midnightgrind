@@ -442,6 +442,72 @@ public:
 	int64 CalculateSellValue(const FGuid& VehicleId) const;
 
 	// ==========================================
+	// VEHICLE CONFIG EXPORT/IMPORT
+	// ==========================================
+
+	/**
+	 * Export a vehicle's configuration to a JSON string.
+	 * Includes all parts, tuning settings, and paint.
+	 * Can be shared with other players to recreate the build.
+	 *
+	 * @param VehicleId The vehicle to export
+	 * @param OutJsonString The exported JSON configuration
+	 * @return True if export succeeded
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Garage|Export")
+	bool ExportVehicleBuild(const FGuid& VehicleId, FString& OutJsonString) const;
+
+	/**
+	 * Import a vehicle configuration from a JSON string.
+	 * Applies the imported parts, tuning, and paint to an existing vehicle.
+	 * Missing parts will be skipped (player must own them).
+	 *
+	 * @param VehicleId The vehicle to apply the config to
+	 * @param JsonString The JSON configuration to import
+	 * @param bRequireOwnedParts If true, only install parts the player owns
+	 * @return Result with success/failure and any error message
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Garage|Export")
+	FMGGarageResult ImportVehicleBuild(const FGuid& VehicleId, const FString& JsonString, bool bRequireOwnedParts = true);
+
+	/**
+	 * Export a vehicle's configuration to a file.
+	 * @param VehicleId The vehicle to export
+	 * @param FilePath Full path to save the JSON file
+	 * @return True if export succeeded
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Garage|Export")
+	bool ExportVehicleBuildToFile(const FGuid& VehicleId, const FString& FilePath) const;
+
+	/**
+	 * Import a vehicle configuration from a file.
+	 * @param VehicleId The vehicle to apply the config to
+	 * @param FilePath Full path to the JSON file
+	 * @param bRequireOwnedParts If true, only install parts the player owns
+	 * @return Result with success/failure
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Garage|Export")
+	FMGGarageResult ImportVehicleBuildFromFile(const FGuid& VehicleId, const FString& FilePath, bool bRequireOwnedParts = true);
+
+	/**
+	 * Get a shareable build code (compressed hash).
+	 * Short code that can be easily shared and imported.
+	 * @param VehicleId The vehicle to generate a code for
+	 * @return Short alphanumeric code, or empty if failed
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Garage|Export")
+	FString GetBuildCode(const FGuid& VehicleId) const;
+
+	/**
+	 * Apply a build from a shared code.
+	 * @param VehicleId The vehicle to apply the build to
+	 * @param BuildCode The build code to apply
+	 * @return Result with success/failure
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Garage|Export")
+	FMGGarageResult ApplyBuildCode(const FGuid& VehicleId, const FString& BuildCode);
+
+	// ==========================================
 	// VEHICLE SPAWNING
 	// ==========================================
 

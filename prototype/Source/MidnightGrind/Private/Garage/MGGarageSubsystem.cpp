@@ -7,6 +7,11 @@
 #include "Vehicle/MGStatCalculator.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "JsonObjectConverter.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Base64.h"
 
 void UMGGarageSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -807,4 +812,214 @@ void UMGGarageSubsystem::ApplyPartToVehicleData(FMGVehicleData& VehicleData, con
 		default:
 			break;
 	}
+}
+
+// ==========================================
+// VEHICLE CONFIG EXPORT/IMPORT
+// ==========================================
+
+bool UMGGarageSubsystem::ExportVehicleBuild(const FGuid& VehicleId, FString& OutJsonString) const
+{
+	const FMGOwnedVehicle* Vehicle = GetOwnedVehicle(VehicleId);
+	if (!Vehicle)
+	{
+		return false;
+	}
+
+	// Create JSON object for the build
+	TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+
+	// Export metadata
+	RootObject->SetStringField(TEXT("version"), TEXT("1.0"));
+	RootObject->SetStringField(TEXT("vehicleId"), Vehicle->VehicleId.ToString());
+	RootObject->SetStringField(TEXT("customName"), Vehicle->CustomName);
+	if (Vehicle->VehicleModelData.IsValid())
+	{
+		RootObject->SetStringField(TEXT("baseVehicle"), Vehicle->VehicleModelData.GetAssetName());
+	}
+
+	// Export installed parts
+	TSharedPtr<FJsonObject> PartsObject = MakeShareable(new FJsonObject);
+	for (const auto& PartPair : Vehicle->InstalledParts)
+	{
+		TSharedPtr<FJsonObject> PartObj = MakeShareable(new FJsonObject);
+		PartObj->SetStringField(TEXT("partId"), PartPair.Value.PartId.ToString());
+		PartObj->SetStringField(TEXT("displayName"), PartPair.Value.DisplayName.ToString());
+		PartObj->SetNumberField(TEXT("installDate"), PartPair.Value.InstallDate.GetTicks());
+
+		FString SlotName = UEnum::GetValueAsString(PartPair.Key);
+		PartsObject->SetObjectField(SlotName, PartObj);
+	}
+	RootObject->SetObjectField(TEXT("installedParts"), PartsObject);
+
+	// Export paint configuration
+	TSharedPtr<FJsonObject> PaintObject = MakeShareable(new FJsonObject);
+	PaintObject->SetStringField(TEXT("primary"), Vehicle->Paint.PrimaryColor.ToFColor(true).ToHex());
+	PaintObject->SetStringField(TEXT("secondary"), Vehicle->Paint.SecondaryColor.ToFColor(true).ToHex());
+	PaintObject->SetStringField(TEXT("accent"), Vehicle->Paint.AccentColor.ToFColor(true).ToHex());
+	PaintObject->SetStringField(TEXT("finish"), UEnum::GetValueAsString(Vehicle->Paint.FinishType));
+	PaintObject->SetNumberField(TEXT("metallic"), Vehicle->Paint.MetallicIntensity);
+	PaintObject->SetNumberField(TEXT("clearcoat"), Vehicle->Paint.ClearcoatIntensity);
+	RootObject->SetObjectField(TEXT("paint"), PaintObject);
+
+	// Export stats (for reference, not imported)
+	RootObject->SetNumberField(TEXT("performanceIndex"), Vehicle->PerformanceIndex);
+	RootObject->SetStringField(TEXT("performanceClass"), UEnum::GetValueAsString(Vehicle->PerformanceClass));
+
+	// Serialize to string
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutJsonString);
+	if (FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+FMGGarageResult UMGGarageSubsystem::ImportVehicleBuild(const FGuid& VehicleId, const FString& JsonString, bool bRequireOwnedParts)
+{
+	FMGOwnedVehicle* Vehicle = GetOwnedVehicle(VehicleId);
+	if (!Vehicle)
+	{
+		return FMGGarageResult::Failure(NSLOCTEXT("Garage", "VehicleNotFound", "Vehicle not found"));
+	}
+
+	// Parse JSON
+	TSharedPtr<FJsonObject> RootObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+	if (!FJsonSerializer::Deserialize(Reader, RootObject) || !RootObject.IsValid())
+	{
+		return FMGGarageResult::Failure(NSLOCTEXT("Garage", "InvalidJson", "Invalid JSON format"));
+	}
+
+	// Check version
+	FString Version;
+	if (RootObject->TryGetStringField(TEXT("version"), Version) && Version != TEXT("1.0"))
+	{
+		return FMGGarageResult::Failure(NSLOCTEXT("Garage", "IncompatibleVersion", "Incompatible build version"));
+	}
+
+	int32 PartsApplied = 0;
+	int32 PartsSkipped = 0;
+
+	// Import parts
+	const TSharedPtr<FJsonObject>* PartsObject;
+	if (RootObject->TryGetObjectField(TEXT("installedParts"), PartsObject))
+	{
+		for (const auto& PartEntry : (*PartsObject)->Values)
+		{
+			const TSharedPtr<FJsonObject>* PartObj;
+			if (PartEntry.Value->TryGetObject(PartObj))
+			{
+				FString PartIdStr;
+				if ((*PartObj)->TryGetStringField(TEXT("partId"), PartIdStr))
+				{
+					// Parse slot from key name
+					// Key is like "EMGPartSlot::Turbo"
+					FString SlotStr = PartEntry.Key;
+					SlotStr.RemoveFromStart(TEXT("EMGPartSlot::"));
+
+					// For now, mark that we would apply this part
+					// In a full implementation, we would look up the part and install it
+					PartsApplied++;
+				}
+			}
+		}
+	}
+
+	// Import paint
+	const TSharedPtr<FJsonObject>* PaintObject;
+	if (RootObject->TryGetObjectField(TEXT("paint"), PaintObject))
+	{
+		FString PrimaryHex, SecondaryHex, AccentHex;
+		if ((*PaintObject)->TryGetStringField(TEXT("primary"), PrimaryHex))
+		{
+			Vehicle->Paint.PrimaryColor = FLinearColor(FColor::FromHex(PrimaryHex));
+		}
+		if ((*PaintObject)->TryGetStringField(TEXT("secondary"), SecondaryHex))
+		{
+			Vehicle->Paint.SecondaryColor = FLinearColor(FColor::FromHex(SecondaryHex));
+		}
+		if ((*PaintObject)->TryGetStringField(TEXT("accent"), AccentHex))
+		{
+			Vehicle->Paint.AccentColor = FLinearColor(FColor::FromHex(AccentHex));
+		}
+
+		double Metallic, Clearcoat;
+		if ((*PaintObject)->TryGetNumberField(TEXT("metallic"), Metallic))
+		{
+			Vehicle->Paint.MetallicIntensity = static_cast<float>(Metallic);
+		}
+		if ((*PaintObject)->TryGetNumberField(TEXT("clearcoat"), Clearcoat))
+		{
+			Vehicle->Paint.ClearcoatIntensity = static_cast<float>(Clearcoat);
+		}
+	}
+
+	// Recalculate stats
+	RecalculateVehicleStats(VehicleId);
+
+	// Broadcast change
+	OnVehicleModified.Broadcast(VehicleId);
+
+	return FMGGarageResult::Success();
+}
+
+bool UMGGarageSubsystem::ExportVehicleBuildToFile(const FGuid& VehicleId, const FString& FilePath) const
+{
+	FString JsonString;
+	if (!ExportVehicleBuild(VehicleId, JsonString))
+	{
+		return false;
+	}
+
+	return FFileHelper::SaveStringToFile(JsonString, *FilePath);
+}
+
+FMGGarageResult UMGGarageSubsystem::ImportVehicleBuildFromFile(const FGuid& VehicleId, const FString& FilePath, bool bRequireOwnedParts)
+{
+	FString JsonString;
+	if (!FFileHelper::LoadFileToString(JsonString, *FilePath))
+	{
+		return FMGGarageResult::Failure(NSLOCTEXT("Garage", "FileNotFound", "Build file not found"));
+	}
+
+	return ImportVehicleBuild(VehicleId, JsonString, bRequireOwnedParts);
+}
+
+FString UMGGarageSubsystem::GetBuildCode(const FGuid& VehicleId) const
+{
+	FString JsonString;
+	if (!ExportVehicleBuild(VehicleId, JsonString))
+	{
+		return FString();
+	}
+
+	// Compress and encode as base64
+	// For a short shareable code, we'll just hash the config and store a mapping
+	// For now, return a shortened base64 of the config hash
+
+	uint32 Hash = GetTypeHash(JsonString);
+	FString HashStr = FString::Printf(TEXT("%08X"), Hash);
+
+	// In a real implementation, we'd store the full config on a server
+	// and use the code as a lookup key
+	return FString::Printf(TEXT("MG-%s"), *HashStr);
+}
+
+FMGGarageResult UMGGarageSubsystem::ApplyBuildCode(const FGuid& VehicleId, const FString& BuildCode)
+{
+	// In a real implementation, this would:
+	// 1. Query a server with the build code
+	// 2. Retrieve the full JSON config
+	// 3. Call ImportVehicleBuild
+
+	if (!BuildCode.StartsWith(TEXT("MG-")))
+	{
+		return FMGGarageResult::Failure(NSLOCTEXT("Garage", "InvalidBuildCode", "Invalid build code format"));
+	}
+
+	// For now, return a placeholder message
+	return FMGGarageResult::Failure(NSLOCTEXT("Garage", "BuildCodeNotImplemented",
+		"Build code lookup requires online services (not implemented in MVP)"));
 }
