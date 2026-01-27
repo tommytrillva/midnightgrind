@@ -7,6 +7,8 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void UMGSpectatorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -773,14 +775,37 @@ void UMGSpectatorSubsystem::UpdateTargetInfo()
 			continue;
 		}
 
-		// Get vehicle speed if available
-		// Target.CurrentSpeed = ...
+		// Get vehicle speed from movement component velocity
+		if (APawn* TargetPawn = Cast<APawn>(Target.Target))
+		{
+			if (UPawnMovementComponent* Movement = TargetPawn->GetMovementComponent())
+			{
+				FVector Velocity = Movement->Velocity;
+				// Convert cm/s to km/h (or mph based on settings)
+				Target.CurrentSpeed = Velocity.Size() * 0.036f; // cm/s to km/h
+			}
+		}
+		else
+		{
+			// Fallback for non-pawn actors - use actor velocity if available
+			FVector Velocity = Target.Target->GetVelocity();
+			Target.CurrentSpeed = Velocity.Size() * 0.036f;
+		}
 
-		// Get race position if available
-		// Target.RacePosition = ...
+		// Race position and lap would come from race manager subsystem
+		// For now, maintain existing values or use placeholder based on target index
+		if (Target.RacePosition <= 0)
+		{
+			int32 Index = AvailableTargets.IndexOfByKey(Target);
+			Target.RacePosition = Index + 1;
+		}
 
-		// Get lap info if available
-		// Target.CurrentLap = ...
+		// Lap info would come from checkpoint/lap tracking system
+		// Maintain existing value if set
+		if (Target.CurrentLap <= 0)
+		{
+			Target.CurrentLap = 1;
+		}
 	}
 
 	// Update current target reference
