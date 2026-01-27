@@ -1,0 +1,426 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Driving Assists Configuration",
+
+  "GlobalSettings": {
+    "AssistsAllowed": true,
+    "PresetSystem": true,
+    "DefaultPreset": "Normal",
+    "AffectsRewards": true,
+    "ShowIndicators": true
+  },
+
+  "AssistPresets": {
+    "Full": {
+      "ID": "PRESET_FULL",
+      "Name": "Full Assists",
+      "Description": "All assists enabled for new players",
+      "RewardMultiplier": 0.7,
+      "Settings": {
+        "TransmissionType": "Automatic",
+        "TractionControl": "Full",
+        "StabilityControl": "Full",
+        "ABS": "Full",
+        "SteeringAssist": "Strong",
+        "BrakingAssist": "Strong",
+        "RacingLine": "Full",
+        "IdealLine": true,
+        "Rewind": true
+      }
+    },
+    "Normal": {
+      "ID": "PRESET_NORMAL",
+      "Name": "Normal",
+      "Description": "Balanced assists for casual play",
+      "RewardMultiplier": 0.85,
+      "Default": true,
+      "Settings": {
+        "TransmissionType": "Automatic",
+        "TractionControl": "Medium",
+        "StabilityControl": "Medium",
+        "ABS": "Full",
+        "SteeringAssist": "Light",
+        "BrakingAssist": "Light",
+        "RacingLine": "BrakingOnly",
+        "IdealLine": false,
+        "Rewind": true
+      }
+    },
+    "Challenging": {
+      "ID": "PRESET_CHALLENGING",
+      "Name": "Challenging",
+      "Description": "Minimal assists for experienced players",
+      "RewardMultiplier": 1.0,
+      "Settings": {
+        "TransmissionType": "ManualWithClutch",
+        "TractionControl": "Off",
+        "StabilityControl": "Off",
+        "ABS": "Off",
+        "SteeringAssist": "Off",
+        "BrakingAssist": "Off",
+        "RacingLine": "Off",
+        "IdealLine": false,
+        "Rewind": false
+      }
+    },
+    "Simulation": {
+      "ID": "PRESET_SIM",
+      "Name": "Simulation",
+      "Description": "No assists, realistic driving",
+      "RewardMultiplier": 1.15,
+      "UnlockCondition": "LEVEL_20",
+      "Settings": {
+        "TransmissionType": "ManualWithClutch",
+        "TractionControl": "Off",
+        "StabilityControl": "Off",
+        "ABS": "Off",
+        "SteeringAssist": "Off",
+        "BrakingAssist": "Off",
+        "RacingLine": "Off",
+        "IdealLine": false,
+        "Rewind": false,
+        "DamageModel": "Simulation",
+        "FuelConsumption": true,
+        "TireWear": true
+      }
+    },
+    "Custom": {
+      "ID": "PRESET_CUSTOM",
+      "Name": "Custom",
+      "Description": "Customize each assist individually",
+      "RewardMultiplier": "Calculated",
+      "Settings": "UserDefined"
+    }
+  },
+
+  "Assists": {
+    "TransmissionType": {
+      "ID": "ASSIST_TRANSMISSION",
+      "Name": "Transmission",
+      "Description": "How gear changes are handled",
+      "Options": {
+        "Automatic": {
+          "Description": "Automatic gear changes",
+          "RewardModifier": 0.95
+        },
+        "Manual": {
+          "Description": "Manual gear changes",
+          "RewardModifier": 1.0
+        },
+        "ManualWithClutch": {
+          "Description": "Manual with clutch required",
+          "RewardModifier": 1.05,
+          "UnlockCondition": "LEVEL_15"
+        }
+      },
+      "Default": "Automatic"
+    },
+    "TractionControl": {
+      "ID": "ASSIST_TCS",
+      "Name": "Traction Control",
+      "Description": "Limits wheelspin during acceleration",
+      "Options": {
+        "Full": {
+          "Description": "Maximum traction assistance",
+          "Strength": 1.0,
+          "RewardModifier": 0.9
+        },
+        "Medium": {
+          "Description": "Moderate traction assistance",
+          "Strength": 0.5,
+          "RewardModifier": 0.95
+        },
+        "Light": {
+          "Description": "Minimal traction assistance",
+          "Strength": 0.25,
+          "RewardModifier": 0.98
+        },
+        "Off": {
+          "Description": "No traction control",
+          "Strength": 0.0,
+          "RewardModifier": 1.0
+        }
+      },
+      "Default": "Medium",
+      "Indicator": {
+        "Enabled": true,
+        "Position": "Dashboard",
+        "Icon": "ICO_TCS"
+      }
+    },
+    "StabilityControl": {
+      "ID": "ASSIST_ESC",
+      "Name": "Stability Control",
+      "Description": "Prevents oversteer and understeer",
+      "Options": {
+        "Full": {
+          "Description": "Maximum stability assistance",
+          "Strength": 1.0,
+          "RewardModifier": 0.9
+        },
+        "Medium": {
+          "Description": "Moderate stability assistance",
+          "Strength": 0.5,
+          "RewardModifier": 0.95
+        },
+        "Light": {
+          "Description": "Minimal stability assistance",
+          "Strength": 0.25,
+          "RewardModifier": 0.98
+        },
+        "Off": {
+          "Description": "No stability control",
+          "Strength": 0.0,
+          "RewardModifier": 1.0
+        }
+      },
+      "Default": "Medium",
+      "Indicator": {
+        "Enabled": true,
+        "Position": "Dashboard",
+        "Icon": "ICO_ESC"
+      }
+    },
+    "ABS": {
+      "ID": "ASSIST_ABS",
+      "Name": "Anti-Lock Brakes",
+      "Description": "Prevents wheels from locking under braking",
+      "Options": {
+        "Full": {
+          "Description": "Full ABS assistance",
+          "RewardModifier": 0.98
+        },
+        "Off": {
+          "Description": "No ABS - allows wheel lockup",
+          "RewardModifier": 1.0
+        }
+      },
+      "Default": "Full",
+      "Indicator": {
+        "Enabled": true,
+        "Position": "Dashboard",
+        "Icon": "ICO_ABS",
+        "ShowOnActivation": true
+      }
+    },
+    "SteeringAssist": {
+      "ID": "ASSIST_STEERING",
+      "Name": "Steering Assist",
+      "Description": "Helps maintain racing line through corners",
+      "Options": {
+        "Strong": {
+          "Description": "Heavy steering assistance",
+          "Strength": 0.8,
+          "RewardModifier": 0.85
+        },
+        "Light": {
+          "Description": "Light steering assistance",
+          "Strength": 0.4,
+          "RewardModifier": 0.95
+        },
+        "Off": {
+          "Description": "No steering assistance",
+          "Strength": 0.0,
+          "RewardModifier": 1.0
+        }
+      },
+      "Default": "Light"
+    },
+    "BrakingAssist": {
+      "ID": "ASSIST_BRAKING",
+      "Name": "Braking Assist",
+      "Description": "Automatically applies brakes before corners",
+      "Options": {
+        "Strong": {
+          "Description": "Heavy braking assistance",
+          "Strength": 0.8,
+          "RewardModifier": 0.85
+        },
+        "Light": {
+          "Description": "Light braking assistance",
+          "Strength": 0.4,
+          "RewardModifier": 0.95
+        },
+        "Off": {
+          "Description": "No braking assistance",
+          "Strength": 0.0,
+          "RewardModifier": 1.0
+        }
+      },
+      "Default": "Light"
+    },
+    "RacingLine": {
+      "ID": "ASSIST_LINE",
+      "Name": "Racing Line",
+      "Description": "Shows the optimal racing line",
+      "Options": {
+        "Full": {
+          "Description": "Full racing line visible",
+          "ShowLine": true,
+          "ShowBraking": true,
+          "RewardModifier": 0.95
+        },
+        "BrakingOnly": {
+          "Description": "Only shows braking zones",
+          "ShowLine": false,
+          "ShowBraking": true,
+          "RewardModifier": 0.98
+        },
+        "Off": {
+          "Description": "No racing line",
+          "ShowLine": false,
+          "ShowBraking": false,
+          "RewardModifier": 1.0
+        }
+      },
+      "Default": "BrakingOnly",
+      "Colors": {
+        "Throttle": "#44FF44",
+        "Brake": "#FF4444",
+        "Coast": "#FFFF44"
+      }
+    },
+    "IdealLine": {
+      "ID": "ASSIST_IDEAL",
+      "Name": "Ideal Line Guidance",
+      "Description": "Subtle steering towards ideal line",
+      "Options": {
+        "Enabled": {
+          "Description": "Active guidance",
+          "Strength": 0.3,
+          "RewardModifier": 0.9
+        },
+        "Disabled": {
+          "Description": "No guidance",
+          "Strength": 0.0,
+          "RewardModifier": 1.0
+        }
+      },
+      "Default": "Disabled"
+    },
+    "Rewind": {
+      "ID": "ASSIST_REWIND",
+      "Name": "Rewind",
+      "Description": "Allows rewinding after mistakes",
+      "Options": {
+        "Unlimited": {
+          "Description": "Unlimited rewinds",
+          "Uses": -1,
+          "RewardModifier": 0.8
+        },
+        "Limited": {
+          "Description": "Limited rewinds per race",
+          "Uses": 5,
+          "RewardModifier": 0.9
+        },
+        "Off": {
+          "Description": "No rewinds available",
+          "Uses": 0,
+          "RewardModifier": 1.0
+        }
+      },
+      "Default": "Limited",
+      "RewindDuration": 10.0
+    }
+  },
+
+  "AdvancedOptions": {
+    "DamageModel": {
+      "ID": "ADV_DAMAGE",
+      "Options": ["Off", "Cosmetic", "Limited", "Simulation"],
+      "Default": "Cosmetic",
+      "RewardModifiers": {
+        "Off": 0.95,
+        "Cosmetic": 1.0,
+        "Limited": 1.02,
+        "Simulation": 1.05
+      }
+    },
+    "FuelConsumption": {
+      "ID": "ADV_FUEL",
+      "Options": ["Off", "On"],
+      "Default": "Off",
+      "RewardModifiers": { "Off": 1.0, "On": 1.03 }
+    },
+    "TireWear": {
+      "ID": "ADV_TIRES",
+      "Options": ["Off", "On"],
+      "Default": "Off",
+      "RewardModifiers": { "Off": 1.0, "On": 1.03 }
+    },
+    "MechanicalFailures": {
+      "ID": "ADV_MECHANICAL",
+      "Options": ["Off", "On"],
+      "Default": "Off",
+      "RewardModifiers": { "Off": 1.0, "On": 1.05 },
+      "UnlockCondition": "LEVEL_30"
+    }
+  },
+
+  "DriftAssists": {
+    "CounterSteerAssist": {
+      "ID": "DRIFT_COUNTERSTEER",
+      "Description": "Helps maintain drift angle",
+      "Options": ["Off", "Light", "Medium", "Strong"],
+      "Default": "Light"
+    },
+    "DriftStabilization": {
+      "ID": "DRIFT_STABLE",
+      "Description": "Prevents spin-outs during drifts",
+      "Options": ["Off", "On"],
+      "Default": "On"
+    },
+    "AngleAssist": {
+      "ID": "DRIFT_ANGLE",
+      "Description": "Helps maintain optimal drift angle",
+      "Options": ["Off", "Light", "Medium"],
+      "Default": "Off"
+    }
+  },
+
+  "RewardCalculation": {
+    "BaseMultiplier": 1.0,
+    "AssistPenalties": {
+      "Method": "Multiplicative",
+      "MinMultiplier": 0.5,
+      "MaxMultiplier": 1.2
+    },
+    "DisplayToPlayer": true,
+    "ShowBreakdown": true
+  },
+
+  "UISettings": {
+    "ShowAssistIndicators": true,
+    "IndicatorPosition": "BottomRight",
+    "IndicatorSize": "Small",
+    "FlashOnActivation": true,
+    "SoundOnActivation": false
+  },
+
+  "CompetitiveRestrictions": {
+    "Ranked": {
+      "AllowedAssists": {
+        "TransmissionType": ["Automatic", "Manual", "ManualWithClutch"],
+        "TractionControl": ["Off", "Light"],
+        "StabilityControl": ["Off", "Light"],
+        "ABS": ["Full", "Off"],
+        "SteeringAssist": ["Off"],
+        "BrakingAssist": ["Off"],
+        "RacingLine": ["Off"],
+        "Rewind": ["Off"]
+      }
+    },
+    "Esports": {
+      "AllowedAssists": {
+        "TransmissionType": ["Manual", "ManualWithClutch"],
+        "TractionControl": ["Off"],
+        "StabilityControl": ["Off"],
+        "ABS": ["Off"],
+        "SteeringAssist": ["Off"],
+        "BrakingAssist": ["Off"],
+        "RacingLine": ["Off"],
+        "Rewind": ["Off"]
+      }
+    }
+  }
+}
