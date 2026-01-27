@@ -85,11 +85,15 @@ void UMGPowerupSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start tick timer
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGPowerupSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			PowerupTickTimer,
-			[this]()
+			[WeakThis]()
 			{
-				TickPowerups(0.033f);
+				if (WeakThis.IsValid())
+				{
+					WeakThis->TickPowerups(0.033f);
+				}
 			},
 			0.033f,
 			true

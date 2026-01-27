@@ -18,11 +18,15 @@ void UMGCompanionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGCompanionSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             TickTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                TickCompanions(1.0f);
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->TickCompanions(1.0f);
+                }
             },
             1.0f,
             true

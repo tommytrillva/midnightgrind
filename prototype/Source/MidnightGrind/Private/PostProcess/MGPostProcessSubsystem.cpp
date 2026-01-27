@@ -21,11 +21,15 @@ void UMGPostProcessSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Start effect update timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGPostProcessSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             EffectUpdateHandle,
-            [this]()
+            [WeakThis]()
             {
-                UpdateEffects(1.0f / 60.0f);
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->UpdateEffects(1.0f / 60.0f);
+                }
             },
             1.0f / 60.0f,
             true

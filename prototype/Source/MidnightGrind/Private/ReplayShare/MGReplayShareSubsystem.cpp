@@ -17,12 +17,16 @@ void UMGReplayShareSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Start processing timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGReplayShareSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             ProcessTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                ProcessExportQueue();
-                ProcessShareQueue();
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->ProcessExportQueue();
+                    WeakThis->ProcessShareQueue();
+                }
             },
             0.5f,
             true

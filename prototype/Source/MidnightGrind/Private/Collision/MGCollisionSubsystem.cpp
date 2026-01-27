@@ -91,11 +91,15 @@ void UMGCollisionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start tick timer
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGCollisionSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			CollisionTickTimer,
-			[this]()
+			[WeakThis]()
 			{
-				TickCollision(0.033f);
+				if (WeakThis.IsValid())
+				{
+					WeakThis->TickCollision(0.033f);
+				}
 			},
 			0.033f,
 			true

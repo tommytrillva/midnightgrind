@@ -23,11 +23,15 @@ void UMGCraftingSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGCraftingSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             TickTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                TickCrafting(1.0f);
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->TickCrafting(1.0f);
+                }
             },
             1.0f,
             true

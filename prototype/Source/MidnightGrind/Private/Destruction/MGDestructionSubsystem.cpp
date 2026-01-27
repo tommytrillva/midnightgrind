@@ -77,11 +77,15 @@ void UMGDestructionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start tick timer
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGDestructionSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			DestructionTickTimer,
-			[this]()
+			[WeakThis]()
 			{
-				TickDestruction(0.033f);
+				if (WeakThis.IsValid())
+				{
+					WeakThis->TickDestruction(0.033f);
+				}
 			},
 			0.033f,
 			true

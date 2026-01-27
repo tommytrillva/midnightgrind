@@ -28,11 +28,15 @@ void UMGSocialHubSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Check for upcoming events periodically
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGSocialHubSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             EventCheckTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                CheckUpcomingEvents();
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->CheckUpcomingEvents();
+                }
             },
             60.0f,
             true
