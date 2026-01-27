@@ -1,0 +1,166 @@
+{
+  "VehicleID": "FLASH_AMG",
+  "PartsVersion": "1.0",
+  "TotalParts": 70,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "AMG_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AMG_INT_02", "Name": "Weistec Intake", "Tier": 1, "PowerGain": 15, "Price": 1500 },
+      { "ID": "AMG_INT_03", "Name": "Full Race Intake", "Tier": 2, "PowerGain": 28, "Price": 3200 }
+    ],
+    "Exhaust": [
+      { "ID": "AMG_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AMG_EXH_02", "Name": "Weistec Cat-Back", "Tier": 1, "PowerGain": 22, "Price": 4500 },
+      { "ID": "AMG_EXH_03", "Name": "IPE Titanium", "Tier": 2, "PowerGain": 35, "Price": 8500 },
+      { "ID": "AMG_EXH_04", "Name": "Race Downpipes + Exhaust", "Tier": 3, "PowerGain": 55, "Price": 12000 }
+    ],
+    "Turbo": [
+      { "ID": "AMG_TRB_01", "Name": "Stock Twin Turbos", "Tier": 0, "PowerGain": 0, "BoostPSI": 22, "Price": 0 },
+      { "ID": "AMG_TRB_02", "Name": "Weistec Stage 1", "Tier": 1, "PowerGain": 60, "BoostPSI": 25, "Price": 5500 },
+      { "ID": "AMG_TRB_03", "Name": "Weistec Stage 2", "Tier": 2, "PowerGain": 120, "BoostPSI": 28, "Price": 12000 }
+    ],
+    "Intercooler": [
+      { "ID": "AMG_IC_01", "Name": "Stock Intercooler", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AMG_IC_02", "Name": "Upgraded HX", "Tier": 1, "PowerGain": 12, "Price": 2500 },
+      { "ID": "AMG_IC_03", "Name": "Race Intercooler", "Tier": 2, "PowerGain": 25, "Price": 5500 }
+    ],
+    "ECU": [
+      { "ID": "AMG_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AMG_ECU_02", "Name": "Weistec Stage 1", "Tier": 1, "PowerGain": 45, "Price": 1500 },
+      { "ID": "AMG_ECU_03", "Name": "RENNtech Tune", "Tier": 2, "PowerGain": 75, "Price": 2500 },
+      { "ID": "AMG_ECU_04", "Name": "Standalone", "Tier": 3, "PowerGain": 110, "Price": 8500 }
+    ],
+    "Internals": [
+      { "ID": "AMG_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "AMG_INTS_02", "Name": "Forged Rods", "Tier": 1, "PowerGain": 0, "Price": 6500 },
+      { "ID": "AMG_INTS_03", "Name": "Full Forged Build", "Tier": 2, "PowerGain": 15, "Price": 22000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "AMG_CLT_01", "Name": "Stock DCT", "Tier": 0, "Price": 0 },
+      { "ID": "AMG_CLT_02", "Name": "Racing Clutch Pack", "Tier": 1, "Price": 8500 }
+    ],
+    "Transmission": [
+      { "ID": "AMG_TRN_01", "Name": "Stock 7DCT", "Tier": 0, "Price": 0 },
+      { "ID": "AMG_TRN_02", "Name": "Built Trans", "Tier": 1, "Price": 15000 }
+    ],
+    "FinalDrive": [
+      { "ID": "AMG_FD_01", "Name": "Stock 3.55", "Tier": 0, "Price": 0 },
+      { "ID": "AMG_FD_02", "Name": "3.73 Final Drive", "Tier": 1, "Price": 1800 },
+      { "ID": "AMG_FD_03", "Name": "3.91 Final Drive", "Tier": 2, "Price": 2200 }
+    ],
+    "LSD": [
+      { "ID": "AMG_LSD_01", "Name": "Stock eLSD", "Tier": 0, "Price": 0 },
+      { "ID": "AMG_LSD_02", "Name": "Performance LSD", "Tier": 1, "Price": 4500 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "AMG_SPR_01", "Name": "Stock Race Springs", "Tier": 0, "Price": 0 },
+      { "ID": "AMG_SPR_02", "Name": "KW Clubsport", "Tier": 1, "Price": 5500 },
+      { "ID": "AMG_SPR_03", "Name": "Ohlins TTX", "Tier": 2, "Price": 8500 },
+      { "ID": "AMG_SPR_04", "Name": "MCS 3-Way", "Tier": 3, "Price": 15000 }
+    ],
+    "Dampers": [
+      { "ID": "AMG_DMP_01", "Name": "Stock Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "AMG_DMP_02", "Name": "KW Competition", "Tier": 1, "Price": 5500 },
+      { "ID": "AMG_DMP_03", "Name": "JRZ RS Pro", "Tier": 2, "Price": 9500 }
+    ],
+    "Swaybars": [
+      { "ID": "AMG_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "AMG_SWB_02", "Name": "Racing Swaybars", "Tier": 1, "Price": 1800 }
+    ],
+    "Bushings": [
+      { "ID": "AMG_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "AMG_BSH_02", "Name": "Solid Bushings", "Tier": 1, "Price": 1500 },
+      { "ID": "AMG_BSH_03", "Name": "Spherical Bearings", "Tier": 2, "Price": 4500 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "AMG_BPD_01", "Name": "Stock Ceramic Pads", "Tier": 0, "Price": 0 },
+      { "ID": "AMG_BPD_02", "Name": "Track Pads", "Tier": 1, "Price": 1200 },
+      { "ID": "AMG_BPD_03", "Name": "Racing Pads", "Tier": 2, "Price": 2200 }
+    ],
+    "Rotors": [
+      { "ID": "AMG_BRT_01", "Name": "Stock Carbon Ceramic", "Tier": 0, "Price": 0 }
+    ],
+    "Calipers": [
+      { "ID": "AMG_CAL_01", "Name": "Stock AMG Calipers", "Tier": 0, "Price": 0 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "AMG_WHL_01", "Name": "Stock 19/20-inch", "Size": "19x10/20x12", "Weight": 28, "Price": 0 },
+      { "ID": "AMG_WHL_02", "Name": "HRE P101", "Size": "19x10.5/20x12.5", "Weight": 20, "Price": 10500 },
+      { "ID": "AMG_WHL_03", "Name": "Forgeline GA3", "Size": "19x11/20x13", "Weight": 18, "Price": 12000 },
+      { "ID": "AMG_WHL_04", "Name": "BBS Magnesium", "Size": "19x11/20x13", "Weight": 16, "Price": 15000 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "AMG_TIR_01", "Name": "Stock Sport", "Grip": 1.22, "Price": 0 },
+      { "ID": "AMG_TIR_02", "Name": "Michelin Cup 2", "Grip": 1.32, "Price": 2800 },
+      { "ID": "AMG_TIR_03", "Name": "Slick", "Grip": 1.42, "Price": 4500 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "AMG_FB_01", "Name": "Stock Black Series", "Downforce": 100, "Price": 0 },
+      { "ID": "AMG_FB_02", "Name": "GT3 Front", "Downforce": 150, "Price": 18000 }
+    ],
+    "Spoiler": [
+      { "ID": "AMG_SPL_01", "Name": "Stock Massive Wing", "Downforce": 200, "Price": 0 },
+      { "ID": "AMG_SPL_02", "Name": "Adjustable Wing", "Downforce": 250, "Price": 8500 },
+      { "ID": "AMG_SPL_03", "Name": "GT3 Wing", "Downforce": 320, "Price": 18000 }
+    ],
+    "Hood": [
+      { "ID": "AMG_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "AMG_HOD_02", "Name": "Vented Carbon", "WeightReduction": 12, "Price": 5500 }
+    ]
+  },
+
+  "Body": {
+    "WeightReduction": [
+      { "ID": "AMG_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "AMG_WR_02", "Name": "Interior Delete", "WeightSaved": 80, "Price": 4500 },
+      { "ID": "AMG_WR_03", "Name": "Race Spec", "WeightSaved": 261, "Price": 38000 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "AMG_PKG_01",
+      "Name": "Weistec Stage 1",
+      "Description": "Simple bolt-on power",
+      "Parts": ["AMG_INT_02", "AMG_EXH_02", "AMG_ECU_02", "AMG_TRB_02"],
+      "TotalPower": 850,
+      "TotalPrice": 13000
+    },
+    {
+      "ID": "AMG_PKG_02",
+      "Name": "Weistec Stage 2",
+      "Description": "Maximum turbo power",
+      "Parts": ["AMG_TRB_03", "AMG_INT_03", "AMG_EXH_04", "AMG_ECU_04", "AMG_IC_03", "AMG_INTS_02"],
+      "TotalPower": 950,
+      "TotalPrice": 47700
+    },
+    {
+      "ID": "AMG_PKG_03",
+      "Name": "GT3 Track Spec",
+      "Description": "Ultimate track setup",
+      "Parts": ["AMG_ECU_03", "AMG_SPR_04", "AMG_FB_02", "AMG_SPL_03", "AMG_WR_03", "AMG_TIR_03"],
+      "TotalPower": 800,
+      "TotalPrice": 97500
+    }
+  ]
+}

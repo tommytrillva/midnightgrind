@@ -1,0 +1,185 @@
+{
+  "VehicleID": "NOVA_GT500",
+  "PartsVersion": "1.0",
+  "TotalParts": 82,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "GT500_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT500_INT_02", "Name": "JLT Cold Air", "Tier": 1, "PowerGain": 15, "Price": 550 },
+      { "ID": "GT500_INT_03", "Name": "VMP Performance", "Tier": 2, "PowerGain": 28, "Price": 1200 },
+      { "ID": "GT500_INT_04", "Name": "Full Race Intake", "Tier": 3, "PowerGain": 40, "Price": 2500 }
+    ],
+    "Exhaust": [
+      { "ID": "GT500_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT500_EXH_02", "Name": "Borla ATAK", "Tier": 1, "PowerGain": 18, "Price": 1800 },
+      { "ID": "GT500_EXH_03", "Name": "Corsa Xtreme", "Tier": 2, "PowerGain": 28, "Price": 2500 },
+      { "ID": "GT500_EXH_04", "Name": "Long Tube Headers", "Tier": 3, "PowerGain": 50, "Price": 4500 }
+    ],
+    "Supercharger": [
+      { "ID": "GT500_SC_01", "Name": "Stock 2.65L Eaton", "Tier": 0, "PowerGain": 0, "BoostPSI": 12, "Price": 0 },
+      { "ID": "GT500_SC_02", "Name": "VMP 3.0L TVS", "Tier": 1, "PowerGain": 100, "BoostPSI": 15, "Price": 8500 },
+      { "ID": "GT500_SC_03", "Name": "Whipple 3.8L", "Tier": 2, "PowerGain": 200, "BoostPSI": 18, "Price": 12000 },
+      { "ID": "GT500_SC_04", "Name": "Kenne Bell 4.2L", "Tier": 3, "PowerGain": 320, "BoostPSI": 22, "Price": 18000 }
+    ],
+    "Intercooler": [
+      { "ID": "GT500_IC_01", "Name": "Stock Intercooler", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT500_IC_02", "Name": "Double HX Upgrade", "Tier": 1, "PowerGain": 18, "Price": 2200 },
+      { "ID": "GT500_IC_03", "Name": "VMP Gen5", "Tier": 2, "PowerGain": 35, "Price": 4500 }
+    ],
+    "ECU": [
+      { "ID": "GT500_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT500_ECU_02", "Name": "Lund Tune", "Tier": 1, "PowerGain": 40, "Price": 850 },
+      { "ID": "GT500_ECU_03", "Name": "Palm Beach Dyno", "Tier": 2, "PowerGain": 70, "Price": 1200 },
+      { "ID": "GT500_ECU_04", "Name": "Standalone", "Tier": 3, "PowerGain": 100, "Price": 5500 }
+    ],
+    "Internals": [
+      { "ID": "GT500_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT500_INTS_02", "Name": "Forged Rods", "Tier": 1, "PowerGain": 0, "BoostCap": 950, "Price": 4500 },
+      { "ID": "GT500_INTS_03", "Name": "Forged Full Build", "Tier": 2, "PowerGain": 15, "BoostCap": 1200, "Price": 15000 },
+      { "ID": "GT500_INTS_04", "Name": "5.8L Stroker", "Tier": 3, "PowerGain": 80, "BoostCap": 1500, "Price": 25000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "GT500_CLT_01", "Name": "Stock DCT", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_CLT_02", "Name": "Racing Clutch Pack", "Tier": 1, "Price": 5500 }
+    ],
+    "Transmission": [
+      { "ID": "GT500_TRN_01", "Name": "Stock Tremec 7DCL", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_TRN_02", "Name": "Built Trans", "Tier": 1, "Price": 8500 }
+    ],
+    "FinalDrive": [
+      { "ID": "GT500_FD_01", "Name": "Stock 3.73", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_FD_02", "Name": "3.91 Final Drive", "Tier": 1, "Price": 850 },
+      { "ID": "GT500_FD_03", "Name": "4.09 Final Drive", "Tier": 2, "Price": 1100 }
+    ],
+    "LSD": [
+      { "ID": "GT500_LSD_01", "Name": "Stock Torsen", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_LSD_02", "Name": "Wavetrac", "Tier": 1, "Price": 2500 },
+      { "ID": "GT500_LSD_03", "Name": "OS Giken", "Tier": 2, "Price": 4500 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "GT500_SPR_01", "Name": "Stock MagRide", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_SPR_02", "Name": "Ford Performance", "Tier": 1, "Price": 1500 },
+      { "ID": "GT500_SPR_03", "Name": "KW V3", "Tier": 2, "Price": 3500 },
+      { "ID": "GT500_SPR_04", "Name": "Ohlins Road & Track", "Tier": 3, "Price": 5500 }
+    ],
+    "Dampers": [
+      { "ID": "GT500_DMP_01", "Name": "Stock MagRide", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_DMP_02", "Name": "Bilstein B8", "Tier": 1, "Price": 1500 },
+      { "ID": "GT500_DMP_03", "Name": "MCS 2-Way", "Tier": 2, "Price": 5500 }
+    ],
+    "Swaybars": [
+      { "ID": "GT500_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_SWB_02", "Name": "Ford Performance", "Tier": 1, "Price": 650 },
+      { "ID": "GT500_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 1200 }
+    ],
+    "Bushings": [
+      { "ID": "GT500_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_BSH_02", "Name": "BMR Poly", "Tier": 1, "Price": 550 },
+      { "ID": "GT500_BSH_03", "Name": "Solid Mounts", "Tier": 2, "Price": 1200 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "GT500_BPD_01", "Name": "Stock Brembo Pads", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_BPD_02", "Name": "Hawk HP Plus", "Tier": 1, "Price": 450 },
+      { "ID": "GT500_BPD_03", "Name": "Pagid Racing", "Tier": 2, "Price": 850 }
+    ],
+    "Rotors": [
+      { "ID": "GT500_BRT_01", "Name": "Stock Rotors", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_BRT_02", "Name": "2-Piece Floating", "Tier": 1, "Price": 2200 },
+      { "ID": "GT500_BRT_03", "Name": "Carbon Ceramic", "Tier": 2, "Price": 12000 }
+    ],
+    "Calipers": [
+      { "ID": "GT500_CAL_01", "Name": "Stock Brembo 6P", "Tier": 0, "Price": 0 },
+      { "ID": "GT500_CAL_02", "Name": "StopTech ST-65", "Tier": 1, "Price": 5500 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "GT500_WHL_01", "Name": "Stock Carbon 20-inch", "Size": "20x11/20x11.5", "Weight": 26, "Price": 0 },
+      { "ID": "GT500_WHL_02", "Name": "Weld S77", "Size": "20x11/20x12", "Weight": 22, "Price": 3500 },
+      { "ID": "GT500_WHL_03", "Name": "Forgeline GA1R", "Size": "20x11.5/20x12.5", "Weight": 18, "Price": 6500 },
+      { "ID": "GT500_WHL_04", "Name": "HRE S101", "Size": "20x12/20x13", "Weight": 16, "Price": 9500 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "GT500_TIR_01", "Name": "Stock Cup 2", "Grip": 1.12, "Price": 0 },
+      { "ID": "GT500_TIR_02", "Name": "Michelin Cup 2 R", "Grip": 1.22, "Price": 2200 },
+      { "ID": "GT500_TIR_03", "Name": "Slick", "Grip": 1.32, "Price": 3500 },
+      { "ID": "GT500_TIR_04", "Name": "Drag Radial", "Grip": 0.9, "DragGrip": 1.55, "Price": 1500 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "GT500_FB_01", "Name": "Stock Carbon Track", "Downforce": 40, "Price": 0 },
+      { "ID": "GT500_FB_02", "Name": "GT500KR Front", "Downforce": 60, "Price": 4500 },
+      { "ID": "GT500_FB_03", "Name": "Wide Front", "Downforce": 80, "Price": 8500 }
+    ],
+    "Spoiler": [
+      { "ID": "GT500_SPL_01", "Name": "Stock Carbon Wing", "Downforce": 45, "Price": 0 },
+      { "ID": "GT500_SPL_02", "Name": "Carbon Track Pack", "Downforce": 70, "Price": 3500 },
+      { "ID": "GT500_SPL_03", "Name": "GT Wing", "Downforce": 120, "Price": 5500 }
+    ],
+    "Hood": [
+      { "ID": "GT500_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "GT500_HOD_02", "Name": "Carbon Fiber", "WeightReduction": 18, "Price": 3500 },
+      { "ID": "GT500_HOD_03", "Name": "Vented Carbon", "WeightReduction": 25, "Price": 5500 }
+    ]
+  },
+
+  "Body": {
+    "WeightReduction": [
+      { "ID": "GT500_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "GT500_WR_02", "Name": "Carbon Panels", "WeightSaved": 100, "Price": 6500 },
+      { "ID": "GT500_WR_03", "Name": "Race Spec", "WeightSaved": 371, "Price": 25000 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "GT500_PKG_01",
+      "Name": "Bolt-On Build",
+      "Description": "Simple power upgrades",
+      "Parts": ["GT500_INT_03", "GT500_EXH_03", "GT500_ECU_02", "GT500_IC_02"],
+      "TotalPower": 870,
+      "TotalPrice": 6750
+    },
+    {
+      "ID": "GT500_PKG_02",
+      "Name": "1000HP Street",
+      "Description": "Four-digit horsepower daily",
+      "Parts": ["GT500_SC_02", "GT500_EXH_04", "GT500_IC_03", "GT500_ECU_03", "GT500_INTS_02"],
+      "TotalPower": 1020,
+      "TotalPrice": 21550
+    },
+    {
+      "ID": "GT500_PKG_03",
+      "Name": "1200HP Monster",
+      "Description": "Maximum power build",
+      "Parts": ["GT500_SC_04", "GT500_EXH_04", "GT500_INT_04", "GT500_IC_03", "GT500_ECU_04", "GT500_INTS_04", "GT500_TRN_02"],
+      "TotalPower": 1200,
+      "TotalPrice": 83500
+    },
+    {
+      "ID": "GT500_PKG_04",
+      "Name": "Drag Build",
+      "Description": "Quarter-mile destroyer",
+      "Parts": ["GT500_SC_03", "GT500_ECU_03", "GT500_FD_03", "GT500_LSD_03", "GT500_TIR_04"],
+      "TotalPower": 1000,
+      "TotalPrice": 19300
+    }
+  ]
+}

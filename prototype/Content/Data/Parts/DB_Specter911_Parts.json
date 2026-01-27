@@ -1,0 +1,169 @@
+{
+  "VehicleID": "SPECTER_911",
+  "PartsVersion": "1.0",
+  "TotalParts": 72,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "GT3_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT3_INT_02", "Name": "Fabspeed Intake", "Tier": 1, "PowerGain": 12, "Price": 1200 },
+      { "ID": "GT3_INT_03", "Name": "Full Race Intake", "Tier": 2, "PowerGain": 22, "Price": 2500 }
+    ],
+    "Exhaust": [
+      { "ID": "GT3_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT3_EXH_02", "Name": "Akrapovic Slip-On", "Tier": 1, "PowerGain": 18, "Price": 5500 },
+      { "ID": "GT3_EXH_03", "Name": "Fabspeed SuperSport", "Tier": 2, "PowerGain": 28, "Price": 4500 },
+      { "ID": "GT3_EXH_04", "Name": "Race Headers + Exhaust", "Tier": 3, "PowerGain": 45, "Price": 12000 }
+    ],
+    "Cams": [
+      { "ID": "GT3_CAM_01", "Name": "Stock Cams", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT3_CAM_02", "Name": "Sport Cams", "Tier": 1, "PowerGain": 18, "Price": 4500 },
+      { "ID": "GT3_CAM_03", "Name": "Race Cams", "Tier": 2, "PowerGain": 32, "Price": 8500 }
+    ],
+    "ECU": [
+      { "ID": "GT3_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT3_ECU_02", "Name": "GIAC Tune", "Tier": 1, "PowerGain": 15, "Price": 1200 },
+      { "ID": "GT3_ECU_03", "Name": "Cobb AP", "Tier": 2, "PowerGain": 25, "Price": 1800 },
+      { "ID": "GT3_ECU_04", "Name": "Race ECU", "Tier": 3, "PowerGain": 40, "Price": 8500 }
+    ],
+    "Internals": [
+      { "ID": "GT3_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "GT3_INTS_02", "Name": "Balanced Assembly", "Tier": 1, "PowerGain": 8, "Price": 8500 },
+      { "ID": "GT3_INTS_03", "Name": "Full Build", "Tier": 2, "PowerGain": 25, "Price": 28000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "GT3_CLT_01", "Name": "Stock Clutch", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_CLT_02", "Name": "Sport Clutch", "Tier": 1, "Price": 2500 },
+      { "ID": "GT3_CLT_03", "Name": "Racing Clutch", "Tier": 2, "Price": 5500 }
+    ],
+    "Transmission": [
+      { "ID": "GT3_TRN_01", "Name": "Stock 6MT", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_TRN_02", "Name": "PDK Swap", "Tier": 1, "Price": 18000 },
+      { "ID": "GT3_TRN_03", "Name": "Sequential", "Tier": 2, "Price": 35000 }
+    ],
+    "FinalDrive": [
+      { "ID": "GT3_FD_01", "Name": "Stock 3.74", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_FD_02", "Name": "3.89 Final Drive", "Tier": 1, "Price": 1800 },
+      { "ID": "GT3_FD_03", "Name": "4.00 Final Drive", "Tier": 2, "Price": 2200 }
+    ],
+    "LSD": [
+      { "ID": "GT3_LSD_01", "Name": "Stock eLSD", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_LSD_02", "Name": "Guard LSD", "Tier": 1, "Price": 3500 },
+      { "ID": "GT3_LSD_03", "Name": "Wavetrac", "Tier": 2, "Price": 3200 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "GT3_SPR_01", "Name": "Stock Springs", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_SPR_02", "Name": "Manthey Racing", "Tier": 1, "Price": 4500 },
+      { "ID": "GT3_SPR_03", "Name": "Ohlins TTX", "Tier": 2, "Price": 8500 },
+      { "ID": "GT3_SPR_04", "Name": "MCS 3-Way", "Tier": 3, "Price": 15000 }
+    ],
+    "Dampers": [
+      { "ID": "GT3_DMP_01", "Name": "Stock Dampers", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_DMP_02", "Name": "Bilstein Clubsport", "Tier": 1, "Price": 4500 },
+      { "ID": "GT3_DMP_03", "Name": "JRZ RS Pro", "Tier": 2, "Price": 8500 }
+    ],
+    "Swaybars": [
+      { "ID": "GT3_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_SWB_02", "Name": "Manthey Racing", "Tier": 1, "Price": 1500 },
+      { "ID": "GT3_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 2500 }
+    ],
+    "Bushings": [
+      { "ID": "GT3_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_BSH_02", "Name": "Solid Bushings", "Tier": 1, "Price": 1200 },
+      { "ID": "GT3_BSH_03", "Name": "Spherical Bearings", "Tier": 2, "Price": 4500 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "GT3_BPD_01", "Name": "Stock PCCB Pads", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_BPD_02", "Name": "Pagid RSL1", "Tier": 1, "Price": 850 },
+      { "ID": "GT3_BPD_03", "Name": "Racing Pads", "Tier": 2, "Price": 1500 }
+    ],
+    "Rotors": [
+      { "ID": "GT3_BRT_01", "Name": "Stock PCCB", "Tier": 0, "Price": 0 }
+    ],
+    "Calipers": [
+      { "ID": "GT3_CAL_01", "Name": "Stock Calipers", "Tier": 0, "Price": 0 },
+      { "ID": "GT3_CAL_02", "Name": "Manthey Racing", "Tier": 1, "Price": 6500 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "GT3_WHL_01", "Name": "Stock 20/21-inch", "Size": "20x9/21x12", "Weight": 24, "Price": 0 },
+      { "ID": "GT3_WHL_02", "Name": "BBS Magnesium", "Size": "20x9/21x12.5", "Weight": 18, "Price": 8500 },
+      { "ID": "GT3_WHL_03", "Name": "Forgeline GE1R", "Size": "20x9.5/21x13", "Weight": 17, "Price": 10500 },
+      { "ID": "GT3_WHL_04", "Name": "HRE P101", "Size": "20x10/21x13", "Weight": 16, "Price": 14000 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "GT3_TIR_01", "Name": "Stock Sport", "Grip": 1.20, "Price": 0 },
+      { "ID": "GT3_TIR_02", "Name": "Michelin Cup 2", "Grip": 1.28, "Price": 2500 },
+      { "ID": "GT3_TIR_03", "Name": "Cup 2 R", "Grip": 1.35, "Price": 3500 },
+      { "ID": "GT3_TIR_04", "Name": "Slick", "Grip": 1.42, "Price": 5500 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "GT3_FB_01", "Name": "Stock", "Downforce": 40, "Price": 0 },
+      { "ID": "GT3_FB_02", "Name": "Manthey Splitter", "Downforce": 70, "Price": 5500 },
+      { "ID": "GT3_FB_03", "Name": "Cup Front", "Downforce": 95, "Price": 12000 }
+    ],
+    "Spoiler": [
+      { "ID": "GT3_SPL_01", "Name": "Stock Swan Neck", "Downforce": 65, "Price": 0 },
+      { "ID": "GT3_SPL_02", "Name": "Manthey Wing", "Downforce": 100, "Price": 8500 },
+      { "ID": "GT3_SPL_03", "Name": "Adjustable", "Downforce": 130, "Price": 6500 }
+    ],
+    "Hood": [
+      { "ID": "GT3_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "GT3_HOD_02", "Name": "Vented", "WeightReduction": 8, "Price": 2500 },
+      { "ID": "GT3_HOD_03", "Name": "Carbon Fiber", "WeightReduction": 18, "Price": 5500 }
+    ]
+  },
+
+  "Body": {
+    "WeightReduction": [
+      { "ID": "GT3_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "GT3_WR_02", "Name": "Interior Delete", "WeightSaved": 60, "Price": 3500 },
+      { "ID": "GT3_WR_03", "Name": "Race Spec", "WeightSaved": 226, "Price": 35000 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "GT3_PKG_01",
+      "Name": "Street Enhancement",
+      "Description": "Refined street performer",
+      "Parts": ["GT3_INT_02", "GT3_EXH_03", "GT3_ECU_03", "GT3_SPR_02"],
+      "TotalPower": 580,
+      "TotalPrice": 12500
+    },
+    {
+      "ID": "GT3_PKG_02",
+      "Name": "Manthey Racing",
+      "Description": "Factory race shop setup",
+      "Parts": ["GT3_EXH_04", "GT3_ECU_04", "GT3_SPR_03", "GT3_FB_02", "GT3_SPL_02", "GT3_TIR_03"],
+      "TotalPower": 590,
+      "TotalPrice": 43500
+    },
+    {
+      "ID": "GT3_PKG_03",
+      "Name": "Full Race Spec",
+      "Description": "Ultimate track weapon",
+      "Parts": ["GT3_EXH_04", "GT3_CAM_03", "GT3_INTS_03", "GT3_SPR_04", "GT3_WR_03", "GT3_TIR_04"],
+      "TotalPower": 600,
+      "TotalPrice": 104000
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "VehicleID": "SHADOW_LFA",
+  "PartsVersion": "1.0",
+  "TotalParts": 58,
+  "LastUpdated": "2026-01-26",
+
+  "Engine": {
+    "Intake": [
+      { "ID": "LFA_INT_01", "Name": "Stock Intake", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "LFA_INT_02", "Name": "Performance Filter", "Tier": 1, "PowerGain": 8, "Price": 450 },
+      { "ID": "LFA_INT_03", "Name": "Full Race Intake", "Tier": 2, "PowerGain": 15, "Price": 1800 }
+    ],
+    "Exhaust": [
+      { "ID": "LFA_EXH_01", "Name": "Stock Exhaust", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "LFA_EXH_02", "Name": "Titanium Sport", "Tier": 1, "PowerGain": 18, "Price": 8500 },
+      { "ID": "LFA_EXH_03", "Name": "Race Exhaust", "Tier": 2, "PowerGain": 30, "Price": 15000 }
+    ],
+    "ECU": [
+      { "ID": "LFA_ECU_01", "Name": "Stock ECU", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "LFA_ECU_02", "Name": "Stage 1 Tune", "Tier": 1, "PowerGain": 12, "Price": 2500 },
+      { "ID": "LFA_ECU_03", "Name": "Stage 2 Tune", "Tier": 2, "PowerGain": 25, "Price": 5500 }
+    ],
+    "Internals": [
+      { "ID": "LFA_INTS_01", "Name": "Stock Internals", "Tier": 0, "PowerGain": 0, "Price": 0 },
+      { "ID": "LFA_INTS_02", "Name": "Balanced Assembly", "Tier": 1, "PowerGain": 8, "Price": 12000 },
+      { "ID": "LFA_INTS_03", "Name": "Full Build", "Tier": 2, "PowerGain": 25, "Price": 45000 }
+    ]
+  },
+
+  "Drivetrain": {
+    "Clutch": [
+      { "ID": "LFA_CLT_01", "Name": "Stock Clutch", "Tier": 0, "Price": 0 },
+      { "ID": "LFA_CLT_02", "Name": "Sport Clutch", "Tier": 1, "Price": 4500 },
+      { "ID": "LFA_CLT_03", "Name": "Racing Clutch", "Tier": 2, "Price": 8500 }
+    ],
+    "Transmission": [
+      { "ID": "LFA_TRN_01", "Name": "Stock ASG", "Tier": 0, "Price": 0 },
+      { "ID": "LFA_TRN_02", "Name": "Built Trans", "Tier": 1, "Price": 15000 }
+    ],
+    "FinalDrive": [
+      { "ID": "LFA_FD_01", "Name": "Stock 3.42", "Tier": 0, "Price": 0 },
+      { "ID": "LFA_FD_02", "Name": "3.55 Final Drive", "Tier": 1, "Price": 2200 },
+      { "ID": "LFA_FD_03", "Name": "3.73 Final Drive", "Tier": 2, "Price": 2800 }
+    ],
+    "LSD": [
+      { "ID": "LFA_LSD_01", "Name": "Stock Torsen", "Tier": 0, "Price": 0 },
+      { "ID": "LFA_LSD_02", "Name": "Cusco 2Way", "Tier": 1, "Price": 4500 }
+    ]
+  },
+
+  "Suspension": {
+    "Springs": [
+      { "ID": "LFA_SPR_01", "Name": "Stock Electronic", "Tier": 0, "Price": 0 },
+      { "ID": "LFA_SPR_02", "Name": "Track Springs", "Tier": 1, "Price": 3500 },
+      { "ID": "LFA_SPR_03", "Name": "Ohlins TTX", "Tier": 2, "Price": 12000 },
+      { "ID": "LFA_SPR_04", "Name": "MCS Race", "Tier": 3, "Price": 18000 }
+    ],
+    "Dampers": [
+      { "ID": "LFA_DMP_01", "Name": "Stock Electronic", "Tier": 0, "Price": 0 },
+      { "ID": "LFA_DMP_02", "Name": "Ohlins DFV", "Tier": 1, "Price": 8500 },
+      { "ID": "LFA_DMP_03", "Name": "JRZ RS Pro", "Tier": 2, "Price": 12000 }
+    ],
+    "Swaybars": [
+      { "ID": "LFA_SWB_01", "Name": "Stock Swaybars", "Tier": 0, "Price": 0 },
+      { "ID": "LFA_SWB_02", "Name": "Sport Swaybars", "Tier": 1, "Price": 1200 },
+      { "ID": "LFA_SWB_03", "Name": "Racing Set", "Tier": 2, "Price": 2500 }
+    ],
+    "Bushings": [
+      { "ID": "LFA_BSH_01", "Name": "Stock Rubber", "Tier": 0, "Price": 0 },
+      { "ID": "LFA_BSH_02", "Name": "Solid Bushings", "Tier": 1, "Price": 1800 },
+      { "ID": "LFA_BSH_03", "Name": "Spherical Bearings", "Tier": 2, "Price": 5500 }
+    ]
+  },
+
+  "Brakes": {
+    "Pads": [
+      { "ID": "LFA_BPD_01", "Name": "Stock Ceramic Pads", "Tier": 0, "Price": 0 },
+      { "ID": "LFA_BPD_02", "Name": "Track Pads", "Tier": 1, "Price": 1200 },
+      { "ID": "LFA_BPD_03", "Name": "Racing Pads", "Tier": 2, "Price": 2500 }
+    ],
+    "Rotors": [
+      { "ID": "LFA_BRT_01", "Name": "Stock Carbon Ceramic", "Tier": 0, "Price": 0 }
+    ],
+    "Calipers": [
+      { "ID": "LFA_CAL_01", "Name": "Stock Brembo", "Tier": 0, "Price": 0 }
+    ]
+  },
+
+  "Wheels": {
+    "Options": [
+      { "ID": "LFA_WHL_01", "Name": "Stock Forged 20-inch", "Size": "20x9.5/20x11.5", "Weight": 22, "Price": 0 },
+      { "ID": "LFA_WHL_02", "Name": "BBS FI-R", "Size": "20x9.5/20x12", "Weight": 18, "Price": 8500 },
+      { "ID": "LFA_WHL_03", "Name": "HRE P101", "Size": "20x10/20x12", "Weight": 16, "Price": 12000 }
+    ]
+  },
+
+  "Tires": {
+    "Compounds": [
+      { "ID": "LFA_TIR_01", "Name": "Stock Sport", "Grip": 1.18, "Price": 0 },
+      { "ID": "LFA_TIR_02", "Name": "Michelin Cup 2", "Grip": 1.28, "Price": 2500 },
+      { "ID": "LFA_TIR_03", "Name": "Slick", "Grip": 1.38, "Price": 4500 }
+    ]
+  },
+
+  "Aero": {
+    "FrontBumper": [
+      { "ID": "LFA_FB_01", "Name": "Stock", "Downforce": 30, "Price": 0 },
+      { "ID": "LFA_FB_02", "Name": "Nurburgring Package", "Downforce": 55, "Price": 25000 }
+    ],
+    "Spoiler": [
+      { "ID": "LFA_SPL_01", "Name": "Stock Active", "Downforce": 35, "Price": 0 },
+      { "ID": "LFA_SPL_02", "Name": "Fixed High", "Downforce": 55, "Price": 8500 },
+      { "ID": "LFA_SPL_03", "Name": "Nurburgring Wing", "Downforce": 95, "Price": 25000 }
+    ],
+    "Hood": [
+      { "ID": "LFA_HOD_01", "Name": "Stock", "WeightReduction": 0, "Price": 0 },
+      { "ID": "LFA_HOD_02", "Name": "Vented Carbon", "WeightReduction": 12, "Price": 8500 }
+    ]
+  },
+
+  "Body": {
+    "WeightReduction": [
+      { "ID": "LFA_WR_01", "Name": "Stock", "WeightSaved": 0, "Price": 0 },
+      { "ID": "LFA_WR_02", "Name": "Interior Strip", "WeightSaved": 80, "Price": 5500 },
+      { "ID": "LFA_WR_03", "Name": "Race Spec", "WeightSaved": 263, "Price": 45000 }
+    ]
+  },
+
+  "PreBuiltPackages": [
+    {
+      "ID": "LFA_PKG_01",
+      "Name": "Street Enhancement",
+      "Description": "Refined street performer",
+      "Parts": ["LFA_INT_02", "LFA_EXH_02", "LFA_ECU_02", "LFA_SPR_02"],
+      "TotalPower": 590,
+      "TotalPrice": 14950
+    },
+    {
+      "ID": "LFA_PKG_02",
+      "Name": "Nurburgring Package",
+      "Description": "Factory track spec",
+      "Parts": ["LFA_EXH_03", "LFA_ECU_03", "LFA_FB_02", "LFA_SPL_03", "LFA_SPR_03"],
+      "TotalPower": 620,
+      "TotalPrice": 82500
+    },
+    {
+      "ID": "LFA_PKG_03",
+      "Name": "Full Race Spec",
+      "Description": "Ultimate track weapon",
+      "Parts": ["LFA_INT_03", "LFA_EXH_03", "LFA_INTS_03", "LFA_SPR_04", "LFA_WR_03", "LFA_TIR_03"],
+      "TotalPower": 620,
+      "TotalPrice": 128300
+    }
+  ]
+}
