@@ -1,0 +1,180 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Season Pass and Battle Pass Configuration",
+
+  "SeasonSystem": {
+    "Enabled": true,
+    "CurrentSeason": 1,
+    "SeasonDuration": 90,
+    "MaxTier": 100,
+    "FreeTrack": true,
+    "PremiumTrack": true,
+    "CatchUpXP": true
+  },
+
+  "SeasonInfo": {
+    "Season1": {
+      "ID": "SEASON_01",
+      "Name": "Rise of the Underground",
+      "Theme": "StreetRacing",
+      "StartDate": "2026-01-01",
+      "EndDate": "2026-03-31",
+      "Description": "Prove yourself in the underground racing scene",
+      "KeyArt": "IMG_Season_01_Key",
+      "TrailerVideo": "VID_Season_01_Trailer"
+    }
+  },
+
+  "XPSystem": {
+    "XPPerTier": 10000,
+    "Sources": {
+      "RaceWin": 500,
+      "RaceParticipation": 150,
+      "DailyChallenge": 1000,
+      "WeeklyChallenge": 3500,
+      "SeasonChallenge": 5000,
+      "PhotoMode": 50,
+      "Drifting": 100,
+      "SpeedTrapRecord": 200,
+      "FirstWinOfDay": 750
+    },
+    "Multipliers": {
+      "PremiumBonus": 1.1,
+      "DoubleXPEvent": 2.0,
+      "CrewBonus": 1.05
+    }
+  },
+
+  "FreeRewards": {
+    "Tiers": [
+      { "Tier": 1, "Reward": { "Type": "Cash", "Amount": 5000 } },
+      { "Tier": 5, "Reward": { "Type": "Part", "ID": "PART_INTAKE_SPORT" } },
+      { "Tier": 10, "Reward": { "Type": "Vinyl", "ID": "VINYL_SEASON1_01" } },
+      { "Tier": 15, "Reward": { "Type": "Cash", "Amount": 10000 } },
+      { "Tier": 20, "Reward": { "Type": "Horn", "ID": "HORN_STREET_01" } },
+      { "Tier": 25, "Reward": { "Type": "Part", "ID": "PART_EXHAUST_SPORT" } },
+      { "Tier": 30, "Reward": { "Type": "Cash", "Amount": 15000 } },
+      { "Tier": 35, "Reward": { "Type": "Plate", "ID": "PLATE_SEASON1_01" } },
+      { "Tier": 40, "Reward": { "Type": "Part", "ID": "PART_SUSPENSION_SPORT" } },
+      { "Tier": 45, "Reward": { "Type": "Cash", "Amount": 20000 } },
+      { "Tier": 50, "Reward": { "Type": "Vehicle", "ID": "VEH_SEASON1_FREE", "Name": "Kaze Civic (Season 1 Edition)" } },
+      { "Tier": 55, "Reward": { "Type": "Cash", "Amount": 25000 } },
+      { "Tier": 60, "Reward": { "Type": "Vinyl", "ID": "VINYL_SEASON1_02" } },
+      { "Tier": 65, "Reward": { "Type": "Part", "ID": "PART_TURBO_SPORT" } },
+      { "Tier": 70, "Reward": { "Type": "Cash", "Amount": 30000 } },
+      { "Tier": 75, "Reward": { "Type": "Emote", "ID": "EMOTE_SEASON1_01" } },
+      { "Tier": 80, "Reward": { "Type": "Part", "ID": "PART_ECU_SPORT" } },
+      { "Tier": 85, "Reward": { "Type": "Cash", "Amount": 40000 } },
+      { "Tier": 90, "Reward": { "Type": "Vinyl", "ID": "VINYL_SEASON1_03" } },
+      { "Tier": 95, "Reward": { "Type": "Cash", "Amount": 50000 } },
+      { "Tier": 100, "Reward": { "Type": "Title", "ID": "TITLE_SEASON1_FREE", "Name": "Underground Racer" } }
+    ]
+  },
+
+  "PremiumRewards": {
+    "Tiers": [
+      { "Tier": 1, "Reward": { "Type": "Cash", "Amount": 10000 } },
+      { "Tier": 5, "Reward": { "Type": "Vinyl", "ID": "VINYL_SEASON1_PREMIUM_01" } },
+      { "Tier": 10, "Reward": { "Type": "BodyKit", "ID": "BODYKIT_PREMIUM_01" } },
+      { "Tier": 15, "Reward": { "Type": "Cash", "Amount": 15000 } },
+      { "Tier": 20, "Reward": { "Type": "Wheels", "ID": "WHEELS_SEASON1_01" } },
+      { "Tier": 25, "Reward": { "Type": "Part", "ID": "PART_PREMIUM_TURBO" } },
+      { "Tier": 30, "Reward": { "Type": "Vehicle", "ID": "VEH_SEASON1_PREM_30", "Name": "Tenshi 240 (Midnight Edition)" } },
+      { "Tier": 35, "Reward": { "Type": "Cash", "Amount": 25000 } },
+      { "Tier": 40, "Reward": { "Type": "Vinyl", "ID": "VINYL_SEASON1_PREMIUM_02" } },
+      { "Tier": 45, "Reward": { "Type": "Interior", "ID": "INTERIOR_PREMIUM_01" } },
+      { "Tier": 50, "Reward": { "Type": "Vehicle", "ID": "VEH_SEASON1_PREM_50", "Name": "Sakura GTR (Championship Edition)" } },
+      { "Tier": 55, "Reward": { "Type": "Cash", "Amount": 35000 } },
+      { "Tier": 60, "Reward": { "Type": "Wheels", "ID": "WHEELS_SEASON1_02" } },
+      { "Tier": 65, "Reward": { "Type": "BodyKit", "ID": "BODYKIT_PREMIUM_02" } },
+      { "Tier": 70, "Reward": { "Type": "Part", "ID": "PART_LEGENDARY_ENGINE" } },
+      { "Tier": 75, "Reward": { "Type": "Cash", "Amount": 50000 } },
+      { "Tier": 80, "Reward": { "Type": "Vinyl", "ID": "VINYL_SEASON1_PREMIUM_03" } },
+      { "Tier": 85, "Reward": { "Type": "Emote", "ID": "EMOTE_PREMIUM_01" } },
+      { "Tier": 90, "Reward": { "Type": "Vehicle", "ID": "VEH_SEASON1_PREM_90", "Name": "Stallion GT (Supercharged)" } },
+      { "Tier": 95, "Reward": { "Type": "Cash", "Amount": 75000 } },
+      { "Tier": 100, "Reward": { "Type": "Vehicle", "ID": "VEH_SEASON1_FINAL", "Name": "Midnight Special (One of a Kind)", "Rarity": "Legendary", "Title": "TITLE_SEASON1_CHAMPION" } }
+    ]
+  },
+
+  "Challenges": {
+    "Daily": {
+      "RefreshTime": "00:00",
+      "Slots": 3,
+      "Examples": [
+        { "ID": "DAILY_WIN_RACE", "Name": "Race Winner", "Objective": "Win 1 race", "XP": 500 },
+        { "ID": "DAILY_DRIFT_SCORE", "Name": "Drift King", "Objective": "Score 50,000 drift points", "XP": 500 },
+        { "ID": "DAILY_COMPLETE_RACES", "Name": "Persistent Racer", "Objective": "Complete 3 races", "XP": 500 },
+        { "ID": "DAILY_SPEED_TRAP", "Name": "Speed Demon", "Objective": "Hit 150+ MPH in any speed trap", "XP": 500 },
+        { "ID": "DAILY_PHOTO", "Name": "Photographer", "Objective": "Take 3 photos in photo mode", "XP": 500 }
+      ]
+    },
+    "Weekly": {
+      "RefreshDay": "Monday",
+      "Slots": 5,
+      "Examples": [
+        { "ID": "WEEKLY_WIN_RACES", "Name": "Champion", "Objective": "Win 10 races", "XP": 3500 },
+        { "ID": "WEEKLY_DRIFT_TOTAL", "Name": "Drift Master", "Objective": "Accumulate 500,000 drift points", "XP": 3500 },
+        { "ID": "WEEKLY_DISTANCE", "Name": "Road Warrior", "Objective": "Drive 100 miles", "XP": 3500 },
+        { "ID": "WEEKLY_PURSUIT_ESCAPE", "Name": "Outlaw", "Objective": "Escape 5 police pursuits", "XP": 3500 },
+        { "ID": "WEEKLY_CAR_MEET", "Name": "Social Butterfly", "Objective": "Attend 3 car meets", "XP": 3500 }
+      ]
+    },
+    "Season": {
+      "TotalChallenges": 20,
+      "Examples": [
+        { "ID": "SEASON_WIN_100", "Name": "Centurion", "Objective": "Win 100 races this season", "XP": 10000 },
+        { "ID": "SEASON_DRIFT_MILLION", "Name": "Drift Legend", "Objective": "Score 1,000,000 total drift points", "XP": 10000 },
+        { "ID": "SEASON_ALL_TRACKS", "Name": "Track Master", "Objective": "Win on every track", "XP": 15000 },
+        { "ID": "SEASON_MAX_HEAT", "Name": "Most Wanted", "Objective": "Reach maximum heat level 10 times", "XP": 10000 },
+        { "ID": "SEASON_PERFECT_STARTS", "Name": "Launch Control", "Objective": "Get 50 perfect starts", "XP": 7500 }
+      ]
+    }
+  },
+
+  "PremiumPass": {
+    "Price": { "Currency": "Premium", "Amount": 950 },
+    "Benefits": {
+      "XPBoost": 1.1,
+      "ExclusiveRewards": true,
+      "EarlyAccessContent": true,
+      "SeasonBadge": true
+    },
+    "BundleOptions": {
+      "Standard": { "Price": 950, "BonusTiers": 0 },
+      "Plus10": { "Price": 1450, "BonusTiers": 10 },
+      "Plus25": { "Price": 2200, "BonusTiers": 25 }
+    }
+  },
+
+  "TierSkip": {
+    "Enabled": true,
+    "PricePerTier": { "Currency": "Premium", "Amount": 150 },
+    "BulkDiscount": {
+      "5Tiers": 0.9,
+      "10Tiers": 0.85,
+      "25Tiers": 0.75
+    }
+  },
+
+  "PostSeason": {
+    "RewardsClaimed": "AutoClaim",
+    "MissedRewards": "AvailableInStore",
+    "SeasonVault": {
+      "Enabled": true,
+      "UnlockAfterSeasons": 2
+    }
+  },
+
+  "PrestigeRewards": {
+    "Enabled": true,
+    "UnlockAfterTier100": true,
+    "PrestigeTiers": 50,
+    "XPPerPrestigeTier": 15000,
+    "Rewards": {
+      "Prestige10": { "Type": "Cash", "Amount": 100000 },
+      "Prestige25": { "Type": "Title", "ID": "TITLE_PRESTIGE_25" },
+      "Prestige50": { "Type": "Vehicle", "ID": "VEH_PRESTIGE_FINAL" }
+    }
+  }
+}

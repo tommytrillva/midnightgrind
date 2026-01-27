@@ -1,0 +1,358 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Physics Profile Presets",
+
+  "PhysicsSystem": {
+    "Framework": "ChaosVehicle",
+    "SimulationRate": 120,
+    "SubSteps": 4,
+    "TireModel": "Combined_Slip",
+    "AerodynamicsEnabled": true
+  },
+
+  "DrivetrainProfiles": {
+    "FWD": {
+      "ID": "DRIVE_FWD",
+      "Name": "Front Wheel Drive",
+      "PowerDistribution": { "Front": 1.0, "Rear": 0.0 },
+      "Characteristics": {
+        "Understeer": "Moderate",
+        "TractionExit": "Good",
+        "DriftDifficulty": "Hard",
+        "StabilityHighSpeed": "Moderate"
+      },
+      "TuningRange": {
+        "LSD_Front": { "Min": 0.1, "Max": 0.9, "Default": 0.3 }
+      }
+    },
+    "RWD": {
+      "ID": "DRIVE_RWD",
+      "Name": "Rear Wheel Drive",
+      "PowerDistribution": { "Front": 0.0, "Rear": 1.0 },
+      "Characteristics": {
+        "Understeer": "Low",
+        "TractionExit": "Challenging",
+        "DriftDifficulty": "Easy",
+        "StabilityHighSpeed": "Good"
+      },
+      "TuningRange": {
+        "LSD_Rear": { "Min": 0.1, "Max": 0.9, "Default": 0.4 }
+      }
+    },
+    "AWD": {
+      "ID": "DRIVE_AWD",
+      "Name": "All Wheel Drive",
+      "PowerDistribution": { "Front": 0.4, "Rear": 0.6, "Adjustable": true },
+      "Characteristics": {
+        "Understeer": "Low",
+        "TractionExit": "Excellent",
+        "DriftDifficulty": "Moderate",
+        "StabilityHighSpeed": "Excellent"
+      },
+      "TuningRange": {
+        "CenterDiff": { "Min": 0.2, "Max": 0.8, "Default": 0.5 },
+        "LSD_Front": { "Min": 0.1, "Max": 0.7, "Default": 0.3 },
+        "LSD_Rear": { "Min": 0.1, "Max": 0.9, "Default": 0.5 }
+      }
+    },
+    "FourWD": {
+      "ID": "DRIVE_4WD",
+      "Name": "Four Wheel Drive",
+      "PowerDistribution": { "Front": 0.5, "Rear": 0.5, "Locked": true },
+      "Characteristics": {
+        "Understeer": "Moderate",
+        "TractionExit": "Excellent",
+        "DriftDifficulty": "Moderate",
+        "StabilityHighSpeed": "Good"
+      },
+      "OffRoadBonus": 1.5
+    }
+  },
+
+  "TireProfiles": {
+    "Street": {
+      "ID": "TIRE_STREET",
+      "Name": "Street Tires",
+      "FrictionCoef": { "Dry": 0.85, "Wet": 0.5, "Dirt": 0.4 },
+      "WearRate": 1.0,
+      "HeatupTime": 30,
+      "OptimalTemp": { "Min": 60, "Max": 100 },
+      "Characteristics": {
+        "Grip": "Moderate",
+        "Durability": "High",
+        "AllWeather": "Good"
+      }
+    },
+    "Sport": {
+      "ID": "TIRE_SPORT",
+      "Name": "Sport Tires",
+      "FrictionCoef": { "Dry": 0.95, "Wet": 0.55, "Dirt": 0.35 },
+      "WearRate": 1.25,
+      "HeatupTime": 20,
+      "OptimalTemp": { "Min": 70, "Max": 110 },
+      "Characteristics": {
+        "Grip": "Good",
+        "Durability": "Moderate",
+        "AllWeather": "Moderate"
+      }
+    },
+    "Race": {
+      "ID": "TIRE_RACE",
+      "Name": "Racing Slicks",
+      "FrictionCoef": { "Dry": 1.1, "Wet": 0.35, "Dirt": 0.2 },
+      "WearRate": 1.75,
+      "HeatupTime": 10,
+      "OptimalTemp": { "Min": 80, "Max": 120 },
+      "Characteristics": {
+        "Grip": "Excellent",
+        "Durability": "Low",
+        "AllWeather": "Poor"
+      }
+    },
+    "Drift": {
+      "ID": "TIRE_DRIFT",
+      "Name": "Drift Tires",
+      "FrictionCoef": { "Dry": 0.75, "Wet": 0.45, "Dirt": 0.5 },
+      "WearRate": 0.75,
+      "HeatupTime": 15,
+      "OptimalTemp": { "Min": 50, "Max": 90 },
+      "Characteristics": {
+        "Grip": "Low",
+        "Durability": "Very High",
+        "SlideControl": "Excellent"
+      }
+    },
+    "AllTerrain": {
+      "ID": "TIRE_ALLTERRAIN",
+      "Name": "All Terrain",
+      "FrictionCoef": { "Dry": 0.8, "Wet": 0.6, "Dirt": 0.85 },
+      "WearRate": 0.9,
+      "HeatupTime": 25,
+      "OptimalTemp": { "Min": 40, "Max": 90 },
+      "Characteristics": {
+        "Grip": "Moderate",
+        "Durability": "Very High",
+        "OffRoad": "Excellent"
+      }
+    }
+  },
+
+  "SuspensionProfiles": {
+    "Stock": {
+      "ID": "SUSP_STOCK",
+      "Name": "Stock Suspension",
+      "RideHeight": 0.0,
+      "SpringRate": { "Front": 1.0, "Rear": 1.0 },
+      "DamperRate": { "Front": 1.0, "Rear": 1.0 },
+      "AntiRollBar": { "Front": 1.0, "Rear": 1.0 },
+      "Camber": { "Front": 0.0, "Rear": 0.0 },
+      "Toe": { "Front": 0.0, "Rear": 0.0 },
+      "Characteristics": {
+        "Comfort": "High",
+        "Handling": "Moderate",
+        "BodyRoll": "High"
+      }
+    },
+    "Sport": {
+      "ID": "SUSP_SPORT",
+      "Name": "Sport Suspension",
+      "RideHeight": -15,
+      "SpringRate": { "Front": 1.3, "Rear": 1.3 },
+      "DamperRate": { "Front": 1.25, "Rear": 1.25 },
+      "AntiRollBar": { "Front": 1.2, "Rear": 1.2 },
+      "Camber": { "Front": -1.0, "Rear": -0.5 },
+      "Toe": { "Front": -0.1, "Rear": 0.1 },
+      "Characteristics": {
+        "Comfort": "Moderate",
+        "Handling": "Good",
+        "BodyRoll": "Moderate"
+      }
+    },
+    "Race": {
+      "ID": "SUSP_RACE",
+      "Name": "Race Suspension",
+      "RideHeight": -30,
+      "SpringRate": { "Front": 1.8, "Rear": 1.7 },
+      "DamperRate": { "Front": 1.6, "Rear": 1.5 },
+      "AntiRollBar": { "Front": 1.5, "Rear": 1.4 },
+      "Camber": { "Front": -2.5, "Rear": -1.5 },
+      "Toe": { "Front": -0.2, "Rear": 0.15 },
+      "Characteristics": {
+        "Comfort": "Low",
+        "Handling": "Excellent",
+        "BodyRoll": "Low"
+      }
+    },
+    "Drift": {
+      "ID": "SUSP_DRIFT",
+      "Name": "Drift Suspension",
+      "RideHeight": -20,
+      "SpringRate": { "Front": 1.2, "Rear": 1.5 },
+      "DamperRate": { "Front": 1.1, "Rear": 1.4 },
+      "AntiRollBar": { "Front": 1.0, "Rear": 1.6 },
+      "Camber": { "Front": -3.0, "Rear": -2.0 },
+      "Toe": { "Front": 0.0, "Rear": 0.3 },
+      "Characteristics": {
+        "Comfort": "Low",
+        "Handling": "Specialized",
+        "OversteerBias": "High"
+      }
+    },
+    "Rally": {
+      "ID": "SUSP_RALLY",
+      "Name": "Rally Suspension",
+      "RideHeight": 30,
+      "SpringRate": { "Front": 0.9, "Rear": 0.95 },
+      "DamperRate": { "Front": 1.4, "Rear": 1.3 },
+      "AntiRollBar": { "Front": 0.8, "Rear": 0.85 },
+      "Camber": { "Front": -0.5, "Rear": -0.3 },
+      "Toe": { "Front": 0.0, "Rear": 0.0 },
+      "Characteristics": {
+        "Comfort": "Moderate",
+        "Handling": "Good",
+        "OffRoadAbility": "Excellent"
+      }
+    }
+  },
+
+  "EngineCharacterProfiles": {
+    "Linear": {
+      "ID": "ENGINE_LINEAR",
+      "Name": "Linear Powerband",
+      "TorqueCurve": "Flat",
+      "PowerDelivery": "Smooth",
+      "RevLimit": { "Modifier": 1.0 },
+      "ThrottleResponse": "Direct",
+      "Characteristics": {
+        "Predictability": "Excellent",
+        "PeakPower": "Moderate",
+        "Drivability": "Easy"
+      }
+    },
+    "Peaky": {
+      "ID": "ENGINE_PEAKY",
+      "Name": "Peaky Powerband",
+      "TorqueCurve": "TopEnd",
+      "PowerDelivery": "Aggressive",
+      "RevLimit": { "Modifier": 1.1 },
+      "ThrottleResponse": "Sharp",
+      "Characteristics": {
+        "Predictability": "Low",
+        "PeakPower": "High",
+        "Drivability": "Challenging"
+      }
+    },
+    "Torquey": {
+      "ID": "ENGINE_TORQUEY",
+      "Name": "Torquey Powerband",
+      "TorqueCurve": "LowEnd",
+      "PowerDelivery": "Strong",
+      "RevLimit": { "Modifier": 0.9 },
+      "ThrottleResponse": "Immediate",
+      "Characteristics": {
+        "Predictability": "Good",
+        "PeakPower": "Moderate",
+        "Acceleration": "Excellent"
+      }
+    },
+    "Turbo": {
+      "ID": "ENGINE_TURBO",
+      "Name": "Turbocharged",
+      "TorqueCurve": "MidRange_Spike",
+      "PowerDelivery": "Delayed",
+      "TurboLag": { "Min": 0.2, "Max": 0.8, "Default": 0.4 },
+      "BoostThreshold": 3500,
+      "Characteristics": {
+        "Predictability": "Moderate",
+        "PeakPower": "Very High",
+        "LagManagement": "Required"
+      }
+    },
+    "Supercharged": {
+      "ID": "ENGINE_SUPERCHARGED",
+      "Name": "Supercharged",
+      "TorqueCurve": "Wide_Flat",
+      "PowerDelivery": "Linear_Boosted",
+      "NoLag": true,
+      "ParasiticLoss": 0.05,
+      "Characteristics": {
+        "Predictability": "Excellent",
+        "PeakPower": "High",
+        "Response": "Immediate"
+      }
+    }
+  },
+
+  "HandlingProfiles": {
+    "Grip": {
+      "ID": "HANDLE_GRIP",
+      "Name": "Grip Focused",
+      "SteeringRatio": 0.9,
+      "AckermannAngle": 15,
+      "Understeer": -0.2,
+      "Stability": 1.2,
+      "BestFor": ["Circuit", "Sprint", "TimeAttack"]
+    },
+    "Drift": {
+      "ID": "HANDLE_DRIFT",
+      "Name": "Drift Focused",
+      "SteeringRatio": 1.2,
+      "AckermannAngle": 8,
+      "Understeer": 0.3,
+      "Stability": 0.8,
+      "BestFor": ["Drift", "Touge", "Tandem"]
+    },
+    "Balanced": {
+      "ID": "HANDLE_BALANCED",
+      "Name": "Balanced",
+      "SteeringRatio": 1.0,
+      "AckermannAngle": 12,
+      "Understeer": 0.0,
+      "Stability": 1.0,
+      "BestFor": ["AllRound", "Freeroam", "Mixed"]
+    },
+    "Street": {
+      "ID": "HANDLE_STREET",
+      "Name": "Street Focused",
+      "SteeringRatio": 1.0,
+      "AckermannAngle": 13,
+      "Understeer": 0.1,
+      "Stability": 1.1,
+      "BestFor": ["Street", "Traffic", "Pursuit"]
+    }
+  },
+
+  "AeroProfiles": {
+    "Stock": {
+      "ID": "AERO_STOCK",
+      "DragCoefficient": 0.35,
+      "DownforceCoefficient": 0.1,
+      "FrontDownforceRatio": 0.5
+    },
+    "Sport": {
+      "ID": "AERO_SPORT",
+      "DragCoefficient": 0.32,
+      "DownforceCoefficient": 0.25,
+      "FrontDownforceRatio": 0.45
+    },
+    "Race": {
+      "ID": "AERO_RACE",
+      "DragCoefficient": 0.28,
+      "DownforceCoefficient": 0.5,
+      "FrontDownforceRatio": 0.4,
+      "ActiveAero": true
+    },
+    "TopSpeed": {
+      "ID": "AERO_TOPSPEED",
+      "DragCoefficient": 0.25,
+      "DownforceCoefficient": 0.15,
+      "FrontDownforceRatio": 0.5
+    },
+    "DriftAero": {
+      "ID": "AERO_DRIFT",
+      "DragCoefficient": 0.38,
+      "DownforceCoefficient": 0.2,
+      "FrontDownforceRatio": 0.6
+    }
+  }
+}
