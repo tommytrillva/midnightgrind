@@ -1,0 +1,186 @@
+{
+  "TrackID": "NEO_CITY_CIRCUIT",
+  "DisplayName": "Neo City Circuit",
+  "Description": "High-speed circuit through neon-lit downtown streets at night",
+  "Type": "Circuit",
+  "SubType": "Street",
+  "Version": "1.0",
+
+  "Specifications": {
+    "TotalLength": 5.8,
+    "LengthUnit": "km",
+    "Direction": "Clockwise",
+    "Lanes": 2,
+    "StartingGridPositions": 16,
+    "StartType": "StandingStart",
+    "ElevationChange": 45,
+    "ElevationUnit": "meters"
+  },
+
+  "Corners": {
+    "Total": 14,
+    "FastCorners": 5,
+    "MediumCorners": 6,
+    "SlowCorners": 3,
+    "Hairpins": 0,
+    "Details": [
+      { "Number": 1, "Name": "Tower Entry", "Type": "Fast", "Apex": "Late", "DifficultyRating": 3, "DriftZone": false },
+      { "Number": 2, "Name": "Financial S1", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 4, "DriftZone": true },
+      { "Number": 3, "Name": "Financial S2", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 4, "DriftZone": true },
+      { "Number": 4, "Name": "Tunnel Dive", "Type": "Fast", "Apex": "Early", "DifficultyRating": 5, "DriftZone": false },
+      { "Number": 5, "Name": "Subway Exit", "Type": "Slow", "Apex": "Late", "DifficultyRating": 6, "DriftZone": true },
+      { "Number": 6, "Name": "Plaza Sweep", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 4, "DriftZone": true },
+      { "Number": 7, "Name": "Market Turn", "Type": "Medium", "Apex": "Late", "DifficultyRating": 5, "DriftZone": true },
+      { "Number": 8, "Name": "Bridge Entry", "Type": "Fast", "Apex": "Early", "DifficultyRating": 3, "DriftZone": false },
+      { "Number": 9, "Name": "Bridge Kink", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 2, "DriftZone": false },
+      { "Number": 10, "Name": "Riverside Chicane 1", "Type": "Slow", "Apex": "Early", "DifficultyRating": 6, "DriftZone": false },
+      { "Number": 11, "Name": "Riverside Chicane 2", "Type": "Slow", "Apex": "Late", "DifficultyRating": 6, "DriftZone": false },
+      { "Number": 12, "Name": "Club District", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 4, "DriftZone": true },
+      { "Number": 13, "Name": "Hotel Kink", "Type": "Medium", "Apex": "Early", "DifficultyRating": 3, "DriftZone": false },
+      { "Number": 14, "Name": "Final Sweep", "Type": "Medium", "Apex": "Late", "DifficultyRating": 5, "DriftZone": true }
+    ]
+  },
+
+  "Straights": [
+    { "Name": "Start/Finish", "Length": 450, "MaxSpeedPotential": 280, "DRS": false },
+    { "Name": "Tower Straight", "Length": 380, "MaxSpeedPotential": 260, "DRS": false },
+    { "Name": "Tunnel Run", "Length": 520, "MaxSpeedPotential": 290, "DRS": false },
+    { "Name": "Bridge Straight", "Length": 680, "MaxSpeedPotential": 310, "DRS": false },
+    { "Name": "Riverside", "Length": 340, "MaxSpeedPotential": 240, "DRS": false }
+  ],
+
+  "Surfaces": {
+    "Primary": "Asphalt",
+    "Grip": 1.0,
+    "Sections": [
+      { "Zone": "Main Circuit", "Surface": "Asphalt", "Grip": 1.0 },
+      { "Zone": "Tunnel", "Surface": "Asphalt", "Grip": 0.95, "Notes": "Slightly dusty" },
+      { "Zone": "Bridge", "Surface": "Asphalt", "Grip": 1.0, "Notes": "Metal expansion joints" },
+      { "Zone": "Riverside", "Surface": "Asphalt", "Grip": 0.92, "Notes": "Damp patches possible" }
+    ]
+  },
+
+  "DriftZones": [
+    {
+      "ID": "DZ_FINANCIAL_S",
+      "Name": "Financial S-Curves",
+      "StartCorner": 2,
+      "EndCorner": 3,
+      "Length": 280,
+      "Multiplier": 1.4,
+      "OptimalAngle": 35,
+      "BasePoints": 500
+    },
+    {
+      "ID": "DZ_SUBWAY_EXIT",
+      "Name": "Subway Slide",
+      "StartCorner": 5,
+      "EndCorner": 5,
+      "Length": 120,
+      "Multiplier": 1.6,
+      "OptimalAngle": 45,
+      "BasePoints": 400
+    },
+    {
+      "ID": "DZ_PLAZA",
+      "Name": "Plaza Power Slide",
+      "StartCorner": 6,
+      "EndCorner": 7,
+      "Length": 320,
+      "Multiplier": 1.5,
+      "OptimalAngle": 40,
+      "BasePoints": 600
+    },
+    {
+      "ID": "DZ_CLUB_FINAL",
+      "Name": "Club District Combo",
+      "StartCorner": 12,
+      "EndCorner": 14,
+      "Length": 450,
+      "Multiplier": 1.8,
+      "OptimalAngle": 38,
+      "BasePoints": 800
+    }
+  ],
+
+  "SpeedTraps": [
+    { "ID": "ST_TUNNEL", "Name": "Tunnel Trap", "Location": "Mid-Tunnel", "MinSpeed": 250, "BonusThreshold": 280 },
+    { "ID": "ST_BRIDGE", "Name": "Bridge Trap", "Location": "Bridge Mid", "MinSpeed": 280, "BonusThreshold": 300 }
+  ],
+
+  "Checkpoints": [
+    { "ID": "CP_01", "Position": 0.0, "Name": "Start/Finish" },
+    { "ID": "CP_02", "Position": 0.15, "Name": "Financial District" },
+    { "ID": "CP_03", "Position": 0.30, "Name": "Tunnel Entry" },
+    { "ID": "CP_04", "Position": 0.45, "Name": "Subway Plaza" },
+    { "ID": "CP_05", "Position": 0.60, "Name": "Bridge Start" },
+    { "ID": "CP_06", "Position": 0.75, "Name": "Riverside" },
+    { "ID": "CP_07", "Position": 0.90, "Name": "Club District" }
+  ],
+
+  "AIData": {
+    "RacingLineFile": "RL_NeoCityCircuit_Optimal.json",
+    "BrakingMarkers": [
+      { "Corner": 2, "Distance": 85, "Severity": "Medium" },
+      { "Corner": 4, "Distance": 60, "Severity": "Light" },
+      { "Corner": 5, "Distance": 120, "Severity": "Hard" },
+      { "Corner": 7, "Distance": 90, "Severity": "Medium" },
+      { "Corner": 10, "Distance": 110, "Severity": "Hard" },
+      { "Corner": 14, "Distance": 75, "Severity": "Medium" }
+    ],
+    "OvertakingZones": [
+      { "Zone": "Start/Finish Straight", "Difficulty": "Easy", "RiskLevel": 2 },
+      { "Zone": "Tunnel Run", "Difficulty": "Medium", "RiskLevel": 4 },
+      { "Zone": "Bridge Straight", "Difficulty": "Easy", "RiskLevel": 2 },
+      { "Zone": "Financial S Exit", "Difficulty": "Hard", "RiskLevel": 6 }
+    ]
+  },
+
+  "Environment": {
+    "TimeOfDay": "Night",
+    "DefaultWeather": "Clear",
+    "AvailableWeather": ["Clear", "LightRain", "HeavyRain", "Fog"],
+    "Lighting": {
+      "Ambient": "NeonCityscape",
+      "StreetLights": true,
+      "BuildingLights": true,
+      "DynamicHeadlights": true
+    },
+    "Atmosphere": {
+      "Description": "Cyberpunk-inspired downtown with towering skyscrapers and neon signs",
+      "AmbientSounds": ["CityAmbience", "TrafficHum", "NeonBuzz", "DistantMusic"]
+    }
+  },
+
+  "Hazards": [
+    { "Type": "TrafficLights", "Location": "Start/Finish", "Active": false, "Notes": "Disabled for race" },
+    { "Type": "Pedestrians", "Location": "Plaza", "Active": false, "Notes": "Area cleared" },
+    { "Type": "WetPatches", "Location": "Riverside", "Active": true, "Condition": "After Rain" },
+    { "Type": "ExpansionJoints", "Location": "Bridge", "Active": true, "Effect": "Minor grip loss" }
+  ],
+
+  "Economy": {
+    "UnlockRequirement": { "REPTier": "Respected", "REPAmount": 1500 },
+    "RaceRewards": {
+      "BaseWin": 8500,
+      "BaseLose": 2800,
+      "LapBonus": 500,
+      "FastestLapBonus": 1500
+    }
+  },
+
+  "Records": {
+    "LapTimeTarget": { "Gold": 145.0, "Silver": 152.0, "Bronze": 162.0 },
+    "DriftScoreTarget": { "Gold": 85000, "Silver": 60000, "Bronze": 40000 },
+    "SpeedTrapTarget": { "Gold": 305, "Silver": 285, "Bronze": 265 }
+  },
+
+  "Metadata": {
+    "CreatedDate": "2026-01-26",
+    "Author": "Midnight Grind Content Team",
+    "Inspiration": "Tokyo/Hong Kong night street racing",
+    "DifficultyRating": 7,
+    "PopularityRating": 9,
+    "Tags": ["Circuit", "Night", "City", "Neon", "Street", "Technical"]
+  }
+}

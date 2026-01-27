@@ -1,0 +1,298 @@
+{
+  "TrackID": "ABANDONED_AIRFIELD",
+  "DisplayName": "Abandoned Airfield",
+  "Description": "Decommissioned military airbase converted into an underground racing venue with multiple configurations",
+  "Type": "Multi",
+  "SubType": "Airfield",
+  "Version": "1.0",
+
+  "Specifications": {
+    "TotalArea": 2.8,
+    "AreaUnit": "km2",
+    "MainRunwayLength": 3200,
+    "SecondaryRunwayLength": 1800,
+    "TaxiwayNetwork": true,
+    "StartingGridPositions": 32
+  },
+
+  "Configurations": [
+    {
+      "ID": "CONFIG_DRAG_MAIN",
+      "Name": "Main Runway Drag",
+      "Type": "DragStrip",
+      "Length": 1609,
+      "LengthUnit": "meters",
+      "Description": "Full mile drag strip on main runway",
+      "Lanes": 4,
+      "PrepArea": true,
+      "Burnout": true,
+      "TimingSystem": "Professional"
+    },
+    {
+      "ID": "CONFIG_DRAG_HALF",
+      "Name": "Half Mile",
+      "Type": "DragStrip",
+      "Length": 805,
+      "LengthUnit": "meters",
+      "Description": "Half mile sprint for street cars",
+      "Lanes": 4,
+      "PrepArea": true,
+      "Burnout": true
+    },
+    {
+      "ID": "CONFIG_DRAG_QUARTER",
+      "Name": "Quarter Mile",
+      "Type": "DragStrip",
+      "Length": 402,
+      "LengthUnit": "meters",
+      "Description": "Classic quarter mile strip",
+      "Lanes": 4,
+      "PrepArea": true,
+      "Burnout": true
+    },
+    {
+      "ID": "CONFIG_CIRCUIT_FULL",
+      "Name": "Airfield Circuit",
+      "Type": "Circuit",
+      "Length": 4.8,
+      "LengthUnit": "km",
+      "Description": "Full circuit using runways and taxiways",
+      "Laps": 5,
+      "Corners": 12
+    },
+    {
+      "ID": "CONFIG_TOP_SPEED",
+      "Name": "Top Speed Run",
+      "Type": "TopSpeed",
+      "Length": 3200,
+      "LengthUnit": "meters",
+      "Description": "Full runway top speed testing",
+      "Lanes": 1,
+      "SpeedTrap": true
+    },
+    {
+      "ID": "CONFIG_AUTOCROSS",
+      "Name": "Hangar Autocross",
+      "Type": "Autocross",
+      "Length": 1.2,
+      "LengthUnit": "km",
+      "Description": "Technical autocross course around hangars",
+      "Cones": 120
+    }
+  ],
+
+  "MainCircuit": {
+    "Corners": {
+      "Total": 12,
+      "FastCorners": 6,
+      "MediumCorners": 4,
+      "SlowCorners": 2,
+      "Hairpins": 0,
+      "Details": [
+        { "Number": 1, "Name": "Runway Exit", "Type": "Fast", "Apex": "Late", "DifficultyRating": 3, "DriftZone": false },
+        { "Number": 2, "Name": "Taxiway Alpha", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 4, "DriftZone": true },
+        { "Number": 3, "Name": "Hangar Turn", "Type": "Slow", "Apex": "Early", "DifficultyRating": 5, "DriftZone": true },
+        { "Number": 4, "Name": "Service Road", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 3, "DriftZone": false },
+        { "Number": 5, "Name": "Perimeter 1", "Type": "Fast", "Apex": "Early", "DifficultyRating": 4, "DriftZone": true },
+        { "Number": 6, "Name": "Perimeter 2", "Type": "Fast", "Apex": "Late", "DifficultyRating": 4, "DriftZone": true },
+        { "Number": 7, "Name": "Cross Runway", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 5, "DriftZone": false },
+        { "Number": 8, "Name": "Control Tower", "Type": "Slow", "Apex": "Late", "DifficultyRating": 6, "DriftZone": true },
+        { "Number": 9, "Name": "Secondary Entry", "Type": "Medium", "Apex": "Early", "DifficultyRating": 4, "DriftZone": false },
+        { "Number": 10, "Name": "Secondary Exit", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 3, "DriftZone": false },
+        { "Number": 11, "Name": "Final Approach", "Type": "Fast", "Apex": "Early", "DifficultyRating": 3, "DriftZone": false },
+        { "Number": 12, "Name": "Main Straight Entry", "Type": "Medium", "Apex": "Late", "DifficultyRating": 4, "DriftZone": true }
+      ]
+    },
+    "Straights": [
+      { "Name": "Main Runway", "Length": 1800, "MaxSpeedPotential": 350 },
+      { "Name": "Secondary Runway", "Length": 950, "MaxSpeedPotential": 310 },
+      { "Name": "Taxiway Bravo", "Length": 420, "MaxSpeedPotential": 220 },
+      { "Name": "Perimeter Road", "Length": 650, "MaxSpeedPotential": 260 }
+    ]
+  },
+
+  "DragStrip": {
+    "Lanes": [
+      { "ID": "LANE_1", "Name": "Lane 1", "Surface": "Prepped Concrete", "Grip": 1.15 },
+      { "ID": "LANE_2", "Name": "Lane 2", "Surface": "Prepped Concrete", "Grip": 1.15 },
+      { "ID": "LANE_3", "Name": "Lane 3", "Surface": "Prepped Concrete", "Grip": 1.15 },
+      { "ID": "LANE_4", "Name": "Lane 4", "Surface": "Prepped Concrete", "Grip": 1.15 }
+    ],
+    "StagingArea": {
+      "BurnoutBox": true,
+      "WaterBox": true,
+      "ChristmasTree": "Professional",
+      "StagingBeams": true
+    },
+    "TimingIntervals": [
+      { "Distance": 18, "Name": "60ft", "Unit": "meters" },
+      { "Distance": 100, "Name": "330ft", "Unit": "meters" },
+      { "Distance": 201, "Name": "660ft (1/8)", "Unit": "meters" },
+      { "Distance": 305, "Name": "1000ft", "Unit": "meters" },
+      { "Distance": 402, "Name": "1320ft (1/4)", "Unit": "meters" },
+      { "Distance": 805, "Name": "1/2 Mile", "Unit": "meters" },
+      { "Distance": 1609, "Name": "Full Mile", "Unit": "meters" }
+    ],
+    "ShutdownArea": {
+      "Length": 800,
+      "Surface": "Concrete",
+      "CatchNet": true,
+      "TurnoutLanes": 4
+    }
+  },
+
+  "Surfaces": {
+    "Primary": "Concrete",
+    "Grip": 1.0,
+    "Sections": [
+      { "Zone": "Main Runway", "Surface": "Military Grade Concrete", "Grip": 1.05, "Notes": "Excellent condition" },
+      { "Zone": "Drag Prep", "Surface": "Prepped/VHT", "Grip": 1.20, "Notes": "Race prepped surface" },
+      { "Zone": "Secondary Runway", "Surface": "Concrete", "Grip": 1.0, "Notes": "Standard" },
+      { "Zone": "Taxiways", "Surface": "Asphalt", "Grip": 0.95, "Notes": "Older surface" },
+      { "Zone": "Perimeter", "Surface": "Weathered Asphalt", "Grip": 0.90, "Notes": "Some cracking" },
+      { "Zone": "Hangars Area", "Surface": "Mixed", "Grip": 0.92, "Notes": "Concrete/asphalt mix" }
+    ]
+  },
+
+  "DriftZones": [
+    {
+      "ID": "DZ_TAXIWAY",
+      "Name": "Taxiway Drift",
+      "StartCorner": 2,
+      "EndCorner": 3,
+      "Length": 280,
+      "Multiplier": 1.4,
+      "OptimalAngle": 40,
+      "BasePoints": 500
+    },
+    {
+      "ID": "DZ_PERIMETER",
+      "Name": "Perimeter Sweep",
+      "StartCorner": 5,
+      "EndCorner": 6,
+      "Length": 420,
+      "Multiplier": 1.6,
+      "OptimalAngle": 35,
+      "BasePoints": 700
+    },
+    {
+      "ID": "DZ_TOWER",
+      "Name": "Control Tower Slide",
+      "StartCorner": 8,
+      "EndCorner": 8,
+      "Length": 150,
+      "Multiplier": 1.8,
+      "OptimalAngle": 50,
+      "BasePoints": 600
+    },
+    {
+      "ID": "DZ_FINAL",
+      "Name": "Final Approach Drift",
+      "StartCorner": 12,
+      "EndCorner": 12,
+      "Length": 180,
+      "Multiplier": 1.5,
+      "OptimalAngle": 38,
+      "BasePoints": 450
+    }
+  ],
+
+  "SpeedTraps": [
+    { "ID": "ST_MAIN_RUNWAY", "Name": "Main Runway Trap", "Location": "2000m mark", "MinSpeed": 300, "BonusThreshold": 340 },
+    { "ID": "ST_SECONDARY", "Name": "Secondary Trap", "Location": "End of secondary", "MinSpeed": 260, "BonusThreshold": 290 },
+    { "ID": "ST_TOP_SPEED", "Name": "Top Speed Zone", "Location": "3000m mark", "MinSpeed": 320, "BonusThreshold": 360 }
+  ],
+
+  "Checkpoints": [
+    { "ID": "CP_01", "Position": 0.0, "Name": "Main Start/Finish" },
+    { "ID": "CP_02", "Position": 0.15, "Name": "Taxiway Entry" },
+    { "ID": "CP_03", "Position": 0.30, "Name": "Hangar Row" },
+    { "ID": "CP_04", "Position": 0.45, "Name": "Perimeter Start" },
+    { "ID": "CP_05", "Position": 0.60, "Name": "Cross Runway" },
+    { "ID": "CP_06", "Position": 0.75, "Name": "Control Tower" },
+    { "ID": "CP_07", "Position": 0.90, "Name": "Final Approach" }
+  ],
+
+  "AIData": {
+    "CircuitLineFile": "RL_Airfield_Circuit.json",
+    "DragLineFile": "DL_Airfield_Drag.json",
+    "BrakingMarkers": [
+      { "Corner": 1, "Distance": 180, "Severity": "Hard" },
+      { "Corner": 3, "Distance": 95, "Severity": "Medium" },
+      { "Corner": 7, "Distance": 110, "Severity": "Medium" },
+      { "Corner": 8, "Distance": 130, "Severity": "Hard" }
+    ],
+    "OvertakingZones": [
+      { "Zone": "Main Runway", "Difficulty": "Easy", "RiskLevel": 1 },
+      { "Zone": "Secondary Runway", "Difficulty": "Easy", "RiskLevel": 2 },
+      { "Zone": "Perimeter", "Difficulty": "Medium", "RiskLevel": 3 }
+    ],
+    "DragAI": {
+      "LaunchTiming": { "Perfect": 0.02, "Good": 0.08, "Average": 0.15 },
+      "ShiftPoints": "Optimal",
+      "ErrorRate": 0.05
+    }
+  },
+
+  "Environment": {
+    "TimeOfDay": "Night",
+    "DefaultWeather": "Clear",
+    "AvailableWeather": ["Clear", "Overcast", "LightRain", "Fog", "Dusty"],
+    "Lighting": {
+      "Ambient": "MilitaryFloodlights",
+      "RunwayLights": true,
+      "DragTreeLights": true,
+      "HangarInterior": true
+    },
+    "Atmosphere": {
+      "Description": "Abandoned Cold War era airbase, now an illegal racing venue",
+      "AmbientSounds": ["Wind", "DistantJets", "Generators", "CrowdMurmur"],
+      "Features": ["Rusted Hangars", "Control Tower", "Radar Dishes", "Aircraft Wrecks"]
+    }
+  },
+
+  "Hazards": [
+    { "Type": "RunwayDebris", "Location": "Edges", "Active": true, "Effect": "Puncture risk" },
+    { "Type": "CrackedPavement", "Location": "Perimeter", "Active": true, "Effect": "Reduced grip" },
+    { "Type": "Crosswind", "Location": "Main Runway", "Active": true, "Effect": "High-speed instability", "Condition": "Weather" },
+    { "Type": "SurfaceTransition", "Location": "Taxiway Entries", "Active": true, "Effect": "Grip change" }
+  ],
+
+  "Economy": {
+    "UnlockRequirement": { "REPTier": "Known", "REPAmount": 500 },
+    "CircuitRewards": {
+      "BaseWin": 7500,
+      "BaseLose": 2500,
+      "LapBonus": 400,
+      "FastestLapBonus": 1200
+    },
+    "DragRewards": {
+      "QuarterMileWin": 4500,
+      "HalfMileWin": 6500,
+      "MileWin": 12000,
+      "RecordBonus": 5000
+    },
+    "TopSpeedRewards": {
+      "BaseReward": 3000,
+      "SpeedBonus": 50,
+      "SpeedUnit": "per km/h over 300"
+    }
+  },
+
+  "Records": {
+    "CircuitLapTarget": { "Gold": 168.0, "Silver": 178.0, "Bronze": 192.0 },
+    "QuarterMileTarget": { "Gold": 9.5, "Silver": 10.5, "Bronze": 12.0 },
+    "HalfMileTarget": { "Gold": 16.0, "Silver": 18.0, "Bronze": 21.0 },
+    "MileTarget": { "Gold": 28.0, "Silver": 32.0, "Bronze": 38.0 },
+    "TopSpeedTarget": { "Gold": 380, "Silver": 350, "Bronze": 320 }
+  },
+
+  "Metadata": {
+    "CreatedDate": "2026-01-26",
+    "Author": "Midnight Grind Content Team",
+    "Inspiration": "Texas Mile, abandoned military bases, illegal runway meets",
+    "DifficultyRating": 5,
+    "PopularityRating": 9,
+    "Tags": ["Drag", "TopSpeed", "Circuit", "Night", "Airfield", "Multi-Config"]
+  }
+}

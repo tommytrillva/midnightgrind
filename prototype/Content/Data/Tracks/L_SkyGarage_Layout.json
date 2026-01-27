@@ -1,0 +1,265 @@
+{
+  "TrackID": "SKY_GARAGE",
+  "DisplayName": "Sky Garage",
+  "Description": "Multi-level parking structure converted into an underground drift arena",
+  "Type": "DriftArena",
+  "SubType": "Parking",
+  "Version": "1.0",
+
+  "Specifications": {
+    "TotalLength": 2.4,
+    "LengthUnit": "km",
+    "Direction": "Bidirectional",
+    "Lanes": 2,
+    "StartingGridPositions": 4,
+    "StartType": "TandemStart",
+    "Levels": 5,
+    "LevelHeight": 3.2,
+    "TotalElevationChange": 16,
+    "ElevationUnit": "meters"
+  },
+
+  "Layout": {
+    "Type": "Spiral",
+    "Floors": [
+      { "Level": "B2", "Name": "Pit Level", "Type": "Staging", "Features": ["StartLine", "JudgeBox", "Spectator"] },
+      { "Level": "B1", "Name": "Lower Arena", "Type": "Competition", "Features": ["MainDriftSection", "InitiationZone"] },
+      { "Level": "G", "Name": "Ground Floor", "Type": "Competition", "Features": ["TightTechnical", "OClip"] },
+      { "Level": "1", "Name": "Ramp Section", "Type": "Transition", "Features": ["SpiralRamp", "HighSpeed"] },
+      { "Level": "R", "Name": "Rooftop", "Type": "Competition", "Features": ["OpenArea", "FinalZone", "CityView"] }
+    ]
+  },
+
+  "Corners": {
+    "Total": 18,
+    "FastCorners": 4,
+    "MediumCorners": 8,
+    "SlowCorners": 4,
+    "Hairpins": 2,
+    "Details": [
+      { "Number": 1, "Name": "Pit Exit", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 4, "DriftZone": true, "Level": "B2" },
+      { "Number": 2, "Name": "Initiation", "Type": "Fast", "Apex": "Early", "DifficultyRating": 5, "DriftZone": true, "Level": "B1" },
+      { "Number": 3, "Name": "Wall Ride 1", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 7, "DriftZone": true, "Level": "B1" },
+      { "Number": 4, "Name": "Wall Ride 2", "Type": "Medium", "Apex": "Late", "DifficultyRating": 7, "DriftZone": true, "Level": "B1" },
+      { "Number": 5, "Name": "Ramp Entry", "Type": "Slow", "Apex": "Early", "DifficultyRating": 6, "DriftZone": true, "Level": "B1" },
+      { "Number": 6, "Name": "Spiral 1", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 5, "DriftZone": false, "Level": "B1-G" },
+      { "Number": 7, "Name": "Spiral 2", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 5, "DriftZone": false, "Level": "G" },
+      { "Number": 8, "Name": "O-Clip Entry", "Type": "Fast", "Apex": "Late", "DifficultyRating": 8, "DriftZone": true, "Level": "G" },
+      { "Number": 9, "Name": "O-Clip", "Type": "Slow", "Apex": "Standard", "DifficultyRating": 9, "DriftZone": true, "Level": "G", "Clipping": true },
+      { "Number": 10, "Name": "O-Clip Exit", "Type": "Medium", "Apex": "Early", "DifficultyRating": 7, "DriftZone": true, "Level": "G" },
+      { "Number": 11, "Name": "Column Slalom 1", "Type": "Slow", "Apex": "Standard", "DifficultyRating": 8, "DriftZone": true, "Level": "G" },
+      { "Number": 12, "Name": "Column Slalom 2", "Type": "Slow", "Apex": "Standard", "DifficultyRating": 8, "DriftZone": true, "Level": "G" },
+      { "Number": 13, "Name": "Upper Ramp", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 4, "DriftZone": false, "Level": "G-1" },
+      { "Number": 14, "Name": "Transition Hairpin", "Type": "Hairpin", "Apex": "Late", "DifficultyRating": 9, "DriftZone": true, "Level": "1" },
+      { "Number": 15, "Name": "Rooftop Entry", "Type": "Fast", "Apex": "Early", "DifficultyRating": 5, "DriftZone": true, "Level": "1-R" },
+      { "Number": 16, "Name": "Sky Sweep", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 6, "DriftZone": true, "Level": "R" },
+      { "Number": 17, "Name": "City View", "Type": "Medium", "Apex": "Late", "DifficultyRating": 7, "DriftZone": true, "Level": "R" },
+      { "Number": 18, "Name": "Final Hairpin", "Type": "Hairpin", "Apex": "Late", "DifficultyRating": 10, "DriftZone": true, "Level": "R" }
+    ]
+  },
+
+  "Straights": [
+    { "Name": "Pit Lane", "Length": 80, "MaxSpeedPotential": 100 },
+    { "Name": "Arena Straight", "Length": 120, "MaxSpeedPotential": 140 },
+    { "Name": "Ground Stretch", "Length": 95, "MaxSpeedPotential": 120 },
+    { "Name": "Spiral Ramp", "Length": 180, "MaxSpeedPotential": 110 },
+    { "Name": "Rooftop Run", "Length": 150, "MaxSpeedPotential": 160 }
+  ],
+
+  "Surfaces": {
+    "Primary": "Concrete",
+    "Grip": 0.90,
+    "Sections": [
+      { "Zone": "B2 Pit", "Surface": "Polished Concrete", "Grip": 0.85, "Notes": "Very slippery" },
+      { "Zone": "B1 Arena", "Surface": "Painted Concrete", "Grip": 0.88, "Notes": "Competition surface" },
+      { "Zone": "Ground Floor", "Surface": "Textured Concrete", "Grip": 0.92, "Notes": "More grip" },
+      { "Zone": "Ramps", "Surface": "Concrete", "Grip": 0.90, "Notes": "Sloped" },
+      { "Zone": "Rooftop", "Surface": "Asphalt", "Grip": 0.95, "Notes": "Best grip" }
+    ]
+  },
+
+  "DriftZones": [
+    {
+      "ID": "DZ_INITIATION",
+      "Name": "Initiation Zone",
+      "StartCorner": 2,
+      "EndCorner": 4,
+      "Length": 180,
+      "Multiplier": 1.5,
+      "OptimalAngle": 45,
+      "BasePoints": 600,
+      "JudgingCriteria": ["Entry Speed", "Angle", "Line"]
+    },
+    {
+      "ID": "DZ_O_CLIP",
+      "Name": "O-Clip Section",
+      "StartCorner": 8,
+      "EndCorner": 10,
+      "Length": 120,
+      "Multiplier": 2.5,
+      "OptimalAngle": 50,
+      "BasePoints": 1000,
+      "JudgingCriteria": ["Clipping Distance", "Angle Hold", "Transition"],
+      "Notes": "Signature section - must clip inner post"
+    },
+    {
+      "ID": "DZ_COLUMN_SLALOM",
+      "Name": "Column Slalom",
+      "StartCorner": 11,
+      "EndCorner": 12,
+      "Length": 85,
+      "Multiplier": 2.2,
+      "OptimalAngle": 40,
+      "BasePoints": 850,
+      "JudgingCriteria": ["Proximity", "Transitions", "Consistency"],
+      "Notes": "Weave between support columns"
+    },
+    {
+      "ID": "DZ_TRANSITION",
+      "Name": "Transition Hairpin",
+      "StartCorner": 14,
+      "EndCorner": 14,
+      "Length": 60,
+      "Multiplier": 2.0,
+      "OptimalAngle": 70,
+      "BasePoints": 700,
+      "JudgingCriteria": ["Entry Speed", "Manji", "Exit Speed"]
+    },
+    {
+      "ID": "DZ_SKY_FINALE",
+      "Name": "Sky Finale",
+      "StartCorner": 16,
+      "EndCorner": 18,
+      "Length": 200,
+      "Multiplier": 2.8,
+      "OptimalAngle": 48,
+      "BasePoints": 1200,
+      "JudgingCriteria": ["Commitment", "City View", "Final Impact"],
+      "Notes": "End on the rooftop with city backdrop"
+    }
+  ],
+
+  "ClippingPoints": [
+    { "ID": "CLIP_01", "Name": "Entry Cone", "Location": "Corner 2", "PointValue": 200, "Type": "Cone" },
+    { "ID": "CLIP_02", "Name": "Wall Touch 1", "Location": "Corner 3", "PointValue": 500, "Type": "Wall" },
+    { "ID": "CLIP_03", "Name": "Wall Touch 2", "Location": "Corner 4", "PointValue": 500, "Type": "Wall" },
+    { "ID": "CLIP_04", "Name": "O-Clip Post", "Location": "Corner 9", "PointValue": 1500, "Type": "Post", "Critical": true },
+    { "ID": "CLIP_05", "Name": "Column 1", "Location": "Corner 11", "PointValue": 800, "Type": "Column" },
+    { "ID": "CLIP_06", "Name": "Column 2", "Location": "Corner 12", "PointValue": 800, "Type": "Column" },
+    { "ID": "CLIP_07", "Name": "Final Wall", "Location": "Corner 18", "PointValue": 1000, "Type": "Wall" }
+  ],
+
+  "TandemZones": [
+    {
+      "ID": "TANDEM_ARENA",
+      "Name": "Arena Battle",
+      "StartCorner": 2,
+      "EndCorner": 5,
+      "ProximityBonus": 1.5,
+      "Notes": "Lead/Chase battle zone"
+    },
+    {
+      "ID": "TANDEM_GROUND",
+      "Name": "Ground Floor Battle",
+      "StartCorner": 8,
+      "EndCorner": 12,
+      "ProximityBonus": 2.0,
+      "Notes": "Technical tandem section"
+    },
+    {
+      "ID": "TANDEM_ROOFTOP",
+      "Name": "Rooftop Finale",
+      "StartCorner": 15,
+      "EndCorner": 18,
+      "ProximityBonus": 2.5,
+      "Notes": "Final showdown zone"
+    }
+  ],
+
+  "Checkpoints": [
+    { "ID": "CP_01", "Position": 0.0, "Name": "Pit Start" },
+    { "ID": "CP_02", "Position": 0.20, "Name": "Arena Entry" },
+    { "ID": "CP_03", "Position": 0.40, "Name": "Ground Floor" },
+    { "ID": "CP_04", "Position": 0.60, "Name": "O-Clip Zone" },
+    { "ID": "CP_05", "Position": 0.80, "Name": "Upper Ramp" },
+    { "ID": "CP_06", "Position": 1.0, "Name": "Rooftop Finish" }
+  ],
+
+  "AIData": {
+    "DriftLineFile": "DL_SkyGarage_Competition.json",
+    "TandemLineFile": "TL_SkyGarage_Chase.json",
+    "DriftParameters": {
+      "PreferredAngle": 45,
+      "TransitionSpeed": "Fast",
+      "WallProximity": "Close",
+      "ClippingAggression": 0.8
+    }
+  },
+
+  "Environment": {
+    "TimeOfDay": "Night",
+    "DefaultWeather": "Indoor",
+    "AvailableWeather": ["Indoor"],
+    "Lighting": {
+      "Ambient": "FluroLighting",
+      "SpotLights": true,
+      "NeonAccents": true,
+      "StrobeLights": true,
+      "RooftopCityView": true
+    },
+    "Atmosphere": {
+      "Description": "Converted parking structure with professional drift competition setup",
+      "AmbientSounds": ["CrowdCheers", "TireScrub", "Echoes", "Music"],
+      "SpectatorCount": 500
+    }
+  },
+
+  "Hazards": [
+    { "Type": "SupportColumn", "Location": "All Levels", "Active": true, "Effect": "Collision damage" },
+    { "Type": "WallContact", "Location": "All Levels", "Active": true, "Effect": "Light damage, drift points" },
+    { "Type": "LowCeiling", "Location": "B1, B2", "Active": true, "Effect": "Camera adjustment" },
+    { "Type": "RampTransition", "Location": "Level Changes", "Active": true, "Effect": "Suspension load" },
+    { "Type": "RooftopEdge", "Location": "Level R", "Active": true, "Effect": "Spectacle zone" }
+  ],
+
+  "JudgingSystem": {
+    "Criteria": [
+      { "Name": "Line", "Weight": 0.30, "Description": "Proximity to ideal drift line" },
+      { "Name": "Angle", "Weight": 0.25, "Description": "Drift angle maintenance" },
+      { "Name": "Style", "Weight": 0.20, "Description": "Smoke, flair, commitment" },
+      { "Name": "Speed", "Weight": 0.15, "Description": "Entry and zone speed" },
+      { "Name": "Clipping", "Weight": 0.10, "Description": "Hitting designated clip points" }
+    ],
+    "TandemCriteria": [
+      { "Name": "Proximity", "Weight": 0.35, "Description": "Door-to-door distance" },
+      { "Name": "Sync", "Weight": 0.25, "Description": "Matching lead driver" },
+      { "Name": "Pressure", "Weight": 0.20, "Description": "Applying chase pressure" },
+      { "Name": "Initiative", "Weight": 0.20, "Description": "Attack attempts and execution" }
+    ]
+  },
+
+  "Economy": {
+    "UnlockRequirement": { "REPTier": "Respected", "REPAmount": 1000, "DriftRank": "C" },
+    "CompetitionRewards": {
+      "BaseWin": 6500,
+      "TandemWin": 9500,
+      "PerfectRun": 15000,
+      "ClipBonus": 500
+    }
+  },
+
+  "Records": {
+    "DriftScoreTarget": { "Gold": 75000, "Silver": 55000, "Bronze": 35000 },
+    "TandemScoreTarget": { "Gold": 95000, "Silver": 70000, "Bronze": 45000 },
+    "ClipComboTarget": { "Gold": 7, "Silver": 5, "Bronze": 3 }
+  },
+
+  "Metadata": {
+    "CreatedDate": "2026-01-26",
+    "Author": "Midnight Grind Content Team",
+    "Inspiration": "Japanese parking garage drift events, D1GP",
+    "DifficultyRating": 8,
+    "PopularityRating": 9,
+    "Tags": ["Drift", "Parking", "Night", "Competition", "Tandem", "Indoor"]
+  }
+}

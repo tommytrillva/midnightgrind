@@ -1,0 +1,219 @@
+{
+  "TrackID": "RED_ROCK_CANYON",
+  "DisplayName": "Red Rock Canyon",
+  "Description": "Challenging desert canyon road with dramatic elevation changes and blind crests",
+  "Type": "PointToPoint",
+  "SubType": "Canyon",
+  "Version": "1.0",
+
+  "Specifications": {
+    "TotalLength": 8.2,
+    "LengthUnit": "km",
+    "Direction": "Downhill",
+    "Lanes": 2,
+    "StartingGridPositions": 8,
+    "StartType": "RollingStart",
+    "ElevationChange": 620,
+    "ElevationUnit": "meters",
+    "AverageGradient": -7.5
+  },
+
+  "Corners": {
+    "Total": 24,
+    "FastCorners": 8,
+    "MediumCorners": 10,
+    "SlowCorners": 4,
+    "Hairpins": 2,
+    "Details": [
+      { "Number": 1, "Name": "Summit Start", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 3, "DriftZone": false },
+      { "Number": 2, "Name": "Eagle's Nest", "Type": "Fast", "Apex": "Late", "DifficultyRating": 4, "DriftZone": true, "BlindCrest": true },
+      { "Number": 3, "Name": "Cliff Edge 1", "Type": "Medium", "Apex": "Early", "DifficultyRating": 6, "DriftZone": true, "Guardrail": false },
+      { "Number": 4, "Name": "Cliff Edge 2", "Type": "Medium", "Apex": "Late", "DifficultyRating": 6, "DriftZone": true, "Guardrail": false },
+      { "Number": 5, "Name": "Red Wall Hairpin", "Type": "Hairpin", "Apex": "Late", "DifficultyRating": 8, "DriftZone": true },
+      { "Number": 6, "Name": "Switchback 1", "Type": "Slow", "Apex": "Standard", "DifficultyRating": 7, "DriftZone": true },
+      { "Number": 7, "Name": "Switchback 2", "Type": "Slow", "Apex": "Standard", "DifficultyRating": 7, "DriftZone": true },
+      { "Number": 8, "Name": "Arch View", "Type": "Fast", "Apex": "Early", "DifficultyRating": 4, "DriftZone": false },
+      { "Number": 9, "Name": "Canyon Dive", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 5, "DriftZone": true, "BlindCrest": true },
+      { "Number": 10, "Name": "Rattlesnake", "Type": "Medium", "Apex": "Late", "DifficultyRating": 5, "DriftZone": true },
+      { "Number": 11, "Name": "Dust Bowl", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 4, "DriftZone": true },
+      { "Number": 12, "Name": "Mesa Turn", "Type": "Medium", "Apex": "Early", "DifficultyRating": 5, "DriftZone": false },
+      { "Number": 13, "Name": "Wash Crossing", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 3, "DriftZone": false },
+      { "Number": 14, "Name": "Boulder Field", "Type": "Medium", "Apex": "Late", "DifficultyRating": 6, "DriftZone": true },
+      { "Number": 15, "Name": "Devil's Backbone 1", "Type": "Medium", "Apex": "Early", "DifficultyRating": 7, "DriftZone": true, "Guardrail": false },
+      { "Number": 16, "Name": "Devil's Backbone 2", "Type": "Medium", "Apex": "Late", "DifficultyRating": 7, "DriftZone": true, "Guardrail": false },
+      { "Number": 17, "Name": "Devil's Backbone 3", "Type": "Medium", "Apex": "Standard", "DifficultyRating": 7, "DriftZone": true, "Guardrail": false },
+      { "Number": 18, "Name": "Valley Hairpin", "Type": "Hairpin", "Apex": "Late", "DifficultyRating": 8, "DriftZone": true },
+      { "Number": 19, "Name": "Coyote Run", "Type": "Fast", "Apex": "Early", "DifficultyRating": 4, "DriftZone": false },
+      { "Number": 20, "Name": "Scorpion S1", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 5, "DriftZone": true },
+      { "Number": 21, "Name": "Scorpion S2", "Type": "Fast", "Apex": "Standard", "DifficultyRating": 5, "DriftZone": true },
+      { "Number": 22, "Name": "Mirage", "Type": "Slow", "Apex": "Late", "DifficultyRating": 6, "DriftZone": true },
+      { "Number": 23, "Name": "Oasis Kink", "Type": "Fast", "Apex": "Early", "DifficultyRating": 3, "DriftZone": false },
+      { "Number": 24, "Name": "Finish Sweep", "Type": "Slow", "Apex": "Standard", "DifficultyRating": 4, "DriftZone": false }
+    ]
+  },
+
+  "Straights": [
+    { "Name": "Summit Straight", "Length": 280, "MaxSpeedPotential": 220, "Gradient": -4 },
+    { "Name": "Cliff Run", "Length": 320, "MaxSpeedPotential": 240, "Gradient": -8 },
+    { "Name": "Canyon Floor", "Length": 450, "MaxSpeedPotential": 260, "Gradient": -6 },
+    { "Name": "Mesa Straight", "Length": 380, "MaxSpeedPotential": 250, "Gradient": -5 },
+    { "Name": "Valley Run", "Length": 520, "MaxSpeedPotential": 280, "Gradient": -3 },
+    { "Name": "Final Approach", "Length": 340, "MaxSpeedPotential": 240, "Gradient": -2 }
+  ],
+
+  "Surfaces": {
+    "Primary": "Asphalt",
+    "Grip": 0.95,
+    "Sections": [
+      { "Zone": "Summit", "Surface": "Asphalt", "Grip": 0.98, "Notes": "Good condition" },
+      { "Zone": "Cliffs", "Surface": "Asphalt", "Grip": 0.92, "Notes": "Gravel patches at edges" },
+      { "Zone": "Canyon", "Surface": "Asphalt", "Grip": 0.95, "Notes": "Standard" },
+      { "Zone": "Wash", "Surface": "Asphalt", "Grip": 0.85, "Notes": "Sand accumulation" },
+      { "Zone": "Valley", "Surface": "Asphalt", "Grip": 0.96, "Notes": "Recently paved" }
+    ]
+  },
+
+  "DriftZones": [
+    {
+      "ID": "DZ_CLIFF_EDGE",
+      "Name": "Cliff Edge Series",
+      "StartCorner": 3,
+      "EndCorner": 4,
+      "Length": 280,
+      "Multiplier": 2.0,
+      "OptimalAngle": 42,
+      "BasePoints": 800,
+      "Notes": "High risk - no guardrails"
+    },
+    {
+      "ID": "DZ_RED_WALL",
+      "Name": "Red Wall Slide",
+      "StartCorner": 5,
+      "EndCorner": 7,
+      "Length": 380,
+      "Multiplier": 1.8,
+      "OptimalAngle": 55,
+      "BasePoints": 1000
+    },
+    {
+      "ID": "DZ_CANYON_DIVE",
+      "Name": "Canyon Dive Drift",
+      "StartCorner": 9,
+      "EndCorner": 11,
+      "Length": 420,
+      "Multiplier": 1.6,
+      "OptimalAngle": 38,
+      "BasePoints": 750
+    },
+    {
+      "ID": "DZ_DEVILS_BACKBONE",
+      "Name": "Devil's Backbone",
+      "StartCorner": 15,
+      "EndCorner": 17,
+      "Length": 350,
+      "Multiplier": 2.2,
+      "OptimalAngle": 45,
+      "BasePoints": 1200,
+      "Notes": "Most dangerous section - no guardrails"
+    },
+    {
+      "ID": "DZ_SCORPION",
+      "Name": "Scorpion Sting",
+      "StartCorner": 20,
+      "EndCorner": 22,
+      "Length": 380,
+      "Multiplier": 1.5,
+      "OptimalAngle": 40,
+      "BasePoints": 650
+    }
+  ],
+
+  "SpeedTraps": [
+    { "ID": "ST_CLIFF", "Name": "Cliff Trap", "Location": "After Corner 4", "MinSpeed": 180, "BonusThreshold": 210 },
+    { "ID": "ST_CANYON", "Name": "Canyon Trap", "Location": "Canyon Floor", "MinSpeed": 230, "BonusThreshold": 260 },
+    { "ID": "ST_VALLEY", "Name": "Valley Trap", "Location": "Valley Run", "MinSpeed": 250, "BonusThreshold": 275 }
+  ],
+
+  "Checkpoints": [
+    { "ID": "CP_01", "Position": 0.0, "Name": "Summit Start" },
+    { "ID": "CP_02", "Position": 0.12, "Name": "Cliff Edge" },
+    { "ID": "CP_03", "Position": 0.25, "Name": "Red Wall" },
+    { "ID": "CP_04", "Position": 0.38, "Name": "Canyon Entry" },
+    { "ID": "CP_05", "Position": 0.50, "Name": "Mesa View" },
+    { "ID": "CP_06", "Position": 0.62, "Name": "Devil's Backbone" },
+    { "ID": "CP_07", "Position": 0.75, "Name": "Valley Floor" },
+    { "ID": "CP_08", "Position": 0.88, "Name": "Oasis" },
+    { "ID": "CP_09", "Position": 1.0, "Name": "Finish" }
+  ],
+
+  "AIData": {
+    "RacingLineFile": "RL_RedRockCanyon_Optimal.json",
+    "BrakingMarkers": [
+      { "Corner": 3, "Distance": 95, "Severity": "Medium" },
+      { "Corner": 5, "Distance": 140, "Severity": "Hard" },
+      { "Corner": 6, "Distance": 110, "Severity": "Hard" },
+      { "Corner": 14, "Distance": 85, "Severity": "Medium" },
+      { "Corner": 15, "Distance": 90, "Severity": "Medium" },
+      { "Corner": 18, "Distance": 150, "Severity": "Hard" },
+      { "Corner": 22, "Distance": 100, "Severity": "Medium" }
+    ],
+    "OvertakingZones": [
+      { "Zone": "Canyon Floor", "Difficulty": "Medium", "RiskLevel": 4 },
+      { "Zone": "Valley Run", "Difficulty": "Easy", "RiskLevel": 2 },
+      { "Zone": "Scorpion Exit", "Difficulty": "Hard", "RiskLevel": 6 }
+    ],
+    "DangerZones": [
+      { "Zone": "Cliff Edge", "RiskLevel": 9, "Notes": "No guardrails, fatal drop" },
+      { "Zone": "Devil's Backbone", "RiskLevel": 10, "Notes": "Most dangerous section" }
+    ]
+  },
+
+  "Environment": {
+    "TimeOfDay": "Sunset",
+    "DefaultWeather": "Clear",
+    "AvailableWeather": ["Clear", "Dusty", "Sandstorm"],
+    "Lighting": {
+      "Ambient": "DesertSunset",
+      "GoldenHour": true,
+      "DramaticShadows": true
+    },
+    "Atmosphere": {
+      "Description": "Dramatic red rock formations with steep cliffs and ancient canyons",
+      "AmbientSounds": ["Wind", "DistantThunder", "CanyonEcho", "Wildlife"]
+    }
+  },
+
+  "Hazards": [
+    { "Type": "NoGuardrail", "Location": "Cliff Edge", "Active": true, "Effect": "Fatal crash risk" },
+    { "Type": "NoGuardrail", "Location": "Devil's Backbone", "Active": true, "Effect": "Fatal crash risk" },
+    { "Type": "SandPatches", "Location": "Wash Crossing", "Active": true, "Effect": "Reduced grip" },
+    { "Type": "BlindCrest", "Location": "Eagle's Nest", "Active": true, "Effect": "Limited visibility" },
+    { "Type": "BlindCrest", "Location": "Canyon Dive", "Active": true, "Effect": "Limited visibility" },
+    { "Type": "LooseGravel", "Location": "Corner exits", "Active": true, "Effect": "Off-track penalty" }
+  ],
+
+  "Economy": {
+    "UnlockRequirement": { "REPTier": "Feared", "REPAmount": 3000 },
+    "RaceRewards": {
+      "BaseWin": 12000,
+      "BaseLose": 3500,
+      "SectorBonus": 800,
+      "SurvivalBonus": 3000
+    }
+  },
+
+  "Records": {
+    "RunTimeTarget": { "Gold": 285.0, "Silver": 305.0, "Bronze": 330.0 },
+    "DriftScoreTarget": { "Gold": 120000, "Silver": 85000, "Bronze": 55000 },
+    "SpeedTrapTarget": { "Gold": 280, "Silver": 260, "Bronze": 240 }
+  },
+
+  "Metadata": {
+    "CreatedDate": "2026-01-26",
+    "Author": "Midnight Grind Content Team",
+    "Inspiration": "Utah/Arizona canyon roads, Pikes Peak",
+    "DifficultyRating": 9,
+    "PopularityRating": 8,
+    "Tags": ["Canyon", "Desert", "Downhill", "Dangerous", "Touge", "Scenic"]
+  }
+}
