@@ -10,6 +10,7 @@
 #include "Social/MGLeaderboardSubsystem.h"
 #include "Economy/MGEconomySubsystem.h"
 #include "Rivals/MGRivalsSubsystem.h"
+#include "DynamicDifficulty/MGDynamicDifficultySubsystem.h"
 
 void UMGRaceFlowManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -229,7 +230,16 @@ FMGRaceRewardBreakdown UMGRaceFlowManager::CalculateRewards(const FMGRaceResults
 	int32 PlayerPosition = 1;
 	float PlayerDriftScore = 0.0f;
 	bool bHadBestLap = false;
-	bool bCleanRace = true; // Assume clean unless collision data says otherwise
+
+	// Check collision count from DynamicDifficultySubsystem for clean race detection
+	bool bCleanRace = false;
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UMGDynamicDifficultySubsystem* DifficultySubsystem = GI->GetSubsystem<UMGDynamicDifficultySubsystem>())
+		{
+			bCleanRace = (DifficultySubsystem->GetRaceCollisionCount() == 0);
+		}
+	}
 
 	for (const FMGRacerData& Racer : Results.RacerResults)
 	{
@@ -405,7 +415,7 @@ void UMGRaceFlowManager::ApplyRewards(const FMGRaceRewardBreakdown& Rewards)
 			}
 		}
 
-		// Clean race if no major collisions (placeholder - would track from race)
+		// Clean race determined by CalculateRewards() based on collision count
 		bool bCleanRace = Rewards.CleanRaceBonus > 0;
 
 		CareerSubsystem->OnRaceCompleted(PlayerPosition, TotalRacers, bCleanRace, DefeatedRivals);
@@ -433,7 +443,17 @@ void UMGRaceFlowManager::ApplyRewards(const FMGRaceRewardBreakdown& Rewards)
 		}
 
 		// Determine race type from config
-		FName RaceTypeID = FName(TEXT("Circuit")); // Would come from CurrentConfig.RaceType
+		FName RaceTypeID;
+		switch (CurrentConfig.RaceType)
+		{
+		case EMGRaceType::Circuit:   RaceTypeID = FName(TEXT("Circuit")); break;
+		case EMGRaceType::Sprint:    RaceTypeID = FName(TEXT("Sprint")); break;
+		case EMGRaceType::Drift:     RaceTypeID = FName(TEXT("Drift")); break;
+		case EMGRaceType::TimeTrial: RaceTypeID = FName(TEXT("TimeTrial")); break;
+		case EMGRaceType::Drag:      RaceTypeID = FName(TEXT("Drag")); break;
+		case EMGRaceType::PinkSlip:  RaceTypeID = FName(TEXT("PinkSlip")); break;
+		default:                     RaceTypeID = FName(TEXT("Circuit")); break;
+		}
 
 		ProgressionSubsystem->RecordRaceResult(PlayerPosition, TotalRacers, EMGCrew::None, RaceTypeID);
 	}
@@ -695,8 +715,18 @@ void UMGRaceFlowManager::BuildPostRaceSummary(const FMGRaceResults& Results)
 		{
 			if (!Racer.bIsAI && Racer.BestLapTime > 0.0f)
 			{
-				// Would check against stored personal best
-				PostRaceSummary.bNewPersonalBest = false; // Placeholder
+				// Get track records to compare against personal best
+				const FName TrackID = Results.Config.TrackName;
+				const FMGTrackRecord TrackRecord = LeaderboardSubsystem->GetTrackRecords(TrackID);
+
+				// Convert lap time to milliseconds for comparison (scores stored as ms)
+				const int64 PlayerLapTimeMs = static_cast<int64>(Racer.BestLapTime * 1000.0f);
+				const int64 PersonalBestMs = TrackRecord.PersonalBest.Score;
+
+				// New personal best if no previous record (Score == 0) or faster time
+				PostRaceSummary.bNewPersonalBest = (PersonalBestMs == 0 || PlayerLapTimeMs < PersonalBestMs);
+
+				// Track record if player got the best lap of this race
 				PostRaceSummary.bTrackRecord = (Racer.BestLapTime == Results.BestLapTime);
 				break;
 			}

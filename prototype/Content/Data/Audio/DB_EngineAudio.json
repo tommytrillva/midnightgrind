@@ -1,0 +1,468 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Engine Audio Profiles and Sound Design",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "Quality": ["Low", "Medium", "High", "Ultra"],
+    "DefaultQuality": "High",
+    "DopplerEffect": true,
+    "DistanceAttenuation": true,
+    "ReverbEnabled": true
+  },
+
+  "EngineTypes": {
+    "I4_Turbo": {
+      "ID": "ENGINE_I4_TURBO",
+      "Name": "Inline-4 Turbo",
+      "Description": "High-revving turbocharged four-cylinder",
+      "Characteristics": {
+        "BaseRPM": 900,
+        "RedlineRPM": 8500,
+        "PeakTorqueRPM": 5500,
+        "SoundCharacter": "Raspy"
+      },
+      "AudioLayers": {
+        "Idle": {
+          "Sample": "i4_turbo_idle",
+          "Volume": 0.6,
+          "Pitch": { "Min": 0.95, "Max": 1.05 }
+        },
+        "Onload": {
+          "Sample": "i4_turbo_onload",
+          "RPMCurve": true,
+          "VolumeByLoad": true
+        },
+        "Offload": {
+          "Sample": "i4_turbo_offload",
+          "Crackle": true,
+          "PopIntensity": 0.6
+        },
+        "Exhaust": {
+          "Sample": "i4_turbo_exhaust",
+          "ResonanceFreq": 400,
+          "Harmonics": [1, 2, 4]
+        },
+        "Turbo": {
+          "Sample": "turbo_spool",
+          "SpoolTime": 0.8,
+          "BlowoffValve": {
+            "Sample": "bov_flutter",
+            "Trigger": "ThrottleLift"
+          }
+        }
+      },
+      "Vehicles": ["Civic Type R", "WRX STI", "Golf R", "Focus RS"]
+    },
+    "I6_Turbo": {
+      "ID": "ENGINE_I6_TURBO",
+      "Name": "Inline-6 Turbo",
+      "Description": "Smooth and powerful inline-six",
+      "Characteristics": {
+        "BaseRPM": 800,
+        "RedlineRPM": 7500,
+        "PeakTorqueRPM": 5000,
+        "SoundCharacter": "Smooth"
+      },
+      "AudioLayers": {
+        "Idle": {
+          "Sample": "i6_turbo_idle",
+          "Volume": 0.65,
+          "Smoothness": 0.9
+        },
+        "Onload": {
+          "Sample": "i6_turbo_onload",
+          "RPMCurve": true,
+          "LinearProgression": true
+        },
+        "Offload": {
+          "Sample": "i6_turbo_offload",
+          "Crackle": true,
+          "PopIntensity": 0.4
+        },
+        "Exhaust": {
+          "Sample": "i6_turbo_exhaust",
+          "ResonanceFreq": 350,
+          "Harmonics": [1, 2, 3, 6]
+        },
+        "Turbo": {
+          "Sample": "twin_turbo_spool",
+          "SpoolTime": 0.6,
+          "SequentialSetup": false
+        }
+      },
+      "Vehicles": ["Supra", "M3", "M4", "Z4"]
+    },
+    "Flat4_Turbo": {
+      "ID": "ENGINE_FLAT4_TURBO",
+      "Name": "Flat-4 Boxer Turbo",
+      "Description": "Distinctive boxer rumble with turbo",
+      "Characteristics": {
+        "BaseRPM": 850,
+        "RedlineRPM": 8000,
+        "PeakTorqueRPM": 5500,
+        "SoundCharacter": "Rumble"
+      },
+      "AudioLayers": {
+        "Idle": {
+          "Sample": "flat4_idle",
+          "Volume": 0.7,
+          "UnequalPulsing": true
+        },
+        "Onload": {
+          "Sample": "flat4_onload",
+          "BoxerBurble": true,
+          "RPMCurve": true
+        },
+        "Offload": {
+          "Sample": "flat4_offload",
+          "Crackle": true,
+          "PopIntensity": 0.7
+        },
+        "Exhaust": {
+          "Sample": "flat4_exhaust",
+          "UnequalLength": true,
+          "SignatureRumble": true
+        },
+        "Turbo": {
+          "Sample": "turbo_spool_boxer",
+          "SpoolTime": 0.9,
+          "WastegateChatter": true
+        }
+      },
+      "Vehicles": ["WRX", "BRZ Turbo", "STI", "Impreza"]
+    },
+    "V6_Twin_Turbo": {
+      "ID": "ENGINE_V6_TT",
+      "Name": "V6 Twin Turbo",
+      "Description": "Powerful and refined twin-turbo V6",
+      "Characteristics": {
+        "BaseRPM": 750,
+        "RedlineRPM": 7500,
+        "PeakTorqueRPM": 4500,
+        "SoundCharacter": "Refined"
+      },
+      "AudioLayers": {
+        "Idle": {
+          "Sample": "v6_tt_idle",
+          "Volume": 0.6,
+          "VConfiguration": true
+        },
+        "Onload": {
+          "Sample": "v6_tt_onload",
+          "RPMCurve": true,
+          "PowerfulMidrange": true
+        },
+        "Offload": {
+          "Sample": "v6_tt_offload",
+          "Crackle": true,
+          "PopIntensity": 0.5
+        },
+        "Exhaust": {
+          "Sample": "v6_tt_exhaust",
+          "ResonanceFreq": 380,
+          "Harmonics": [1, 2, 3]
+        },
+        "Turbo": {
+          "Sample": "twin_turbo_v6",
+          "SpoolTime": 0.5,
+          "ParallelSetup": true
+        }
+      },
+      "Vehicles": ["GT-R", "NSX", "370Z", "Q60"]
+    },
+    "V8_NA": {
+      "ID": "ENGINE_V8_NA",
+      "Name": "V8 Naturally Aspirated",
+      "Description": "Classic American muscle V8",
+      "Characteristics": {
+        "BaseRPM": 650,
+        "RedlineRPM": 7000,
+        "PeakTorqueRPM": 4000,
+        "SoundCharacter": "Growl"
+      },
+      "AudioLayers": {
+        "Idle": {
+          "Sample": "v8_na_idle",
+          "Volume": 0.75,
+          "LopeyIdle": true
+        },
+        "Onload": {
+          "Sample": "v8_na_onload",
+          "RPMCurve": true,
+          "DeepGrowl": true
+        },
+        "Offload": {
+          "Sample": "v8_na_offload",
+          "Crackle": true,
+          "PopIntensity": 0.8
+        },
+        "Exhaust": {
+          "Sample": "v8_na_exhaust",
+          "CrossPlane": true,
+          "ResonanceFreq": 250,
+          "Harmonics": [1, 2, 4, 8]
+        },
+        "Intake": {
+          "Sample": "v8_intake_roar",
+          "HighRPMEmphasis": true
+        }
+      },
+      "Vehicles": ["Mustang GT", "Camaro SS", "Challenger", "Corvette"]
+    },
+    "V8_Supercharged": {
+      "ID": "ENGINE_V8_SC",
+      "Name": "V8 Supercharged",
+      "Description": "Supercharged V8 with signature whine",
+      "Characteristics": {
+        "BaseRPM": 650,
+        "RedlineRPM": 6500,
+        "PeakTorqueRPM": 3500,
+        "SoundCharacter": "Whine"
+      },
+      "AudioLayers": {
+        "Idle": {
+          "Sample": "v8_sc_idle",
+          "Volume": 0.7,
+          "SuperchargerWhine": 0.2
+        },
+        "Onload": {
+          "Sample": "v8_sc_onload",
+          "RPMCurve": true,
+          "SuperchargerWhine": true
+        },
+        "Offload": {
+          "Sample": "v8_sc_offload",
+          "Crackle": true,
+          "SuperchargerSurge": true
+        },
+        "Exhaust": {
+          "Sample": "v8_sc_exhaust",
+          "ResonanceFreq": 280,
+          "PowerfulTone": true
+        },
+        "Supercharger": {
+          "Sample": "supercharger_whine",
+          "RPMLinked": true,
+          "LoadSensitive": true
+        }
+      },
+      "Vehicles": ["Hellcat", "GT500", "ZL1", "Corvette Z06"]
+    },
+    "Rotary_Turbo": {
+      "ID": "ENGINE_ROTARY",
+      "Name": "Rotary Twin Turbo",
+      "Description": "Unique rotary engine sound",
+      "Characteristics": {
+        "BaseRPM": 950,
+        "RedlineRPM": 9000,
+        "PeakTorqueRPM": 5000,
+        "SoundCharacter": "Unique"
+      },
+      "AudioLayers": {
+        "Idle": {
+          "Sample": "rotary_idle",
+          "Volume": 0.6,
+          "RotaryPulse": true
+        },
+        "Onload": {
+          "Sample": "rotary_onload",
+          "RPMCurve": true,
+          "HighRevScream": true
+        },
+        "Offload": {
+          "Sample": "rotary_offload",
+          "Crackle": true,
+          "PopIntensity": 0.9,
+          "SignaturePops": true
+        },
+        "Exhaust": {
+          "Sample": "rotary_exhaust",
+          "UniqueFrequency": true,
+          "BrapBrap": true
+        },
+        "Turbo": {
+          "Sample": "sequential_turbo",
+          "SequentialKick": true,
+          "SpoolCharacter": "Quick"
+        }
+      },
+      "Vehicles": ["RX-7", "RX-8", "Mazda Cosmo"]
+    },
+    "Electric": {
+      "ID": "ENGINE_ELECTRIC",
+      "Name": "Electric Motor",
+      "Description": "High-performance electric powertrain",
+      "Characteristics": {
+        "BaseRPM": 0,
+        "MaxRPM": 20000,
+        "InstantTorque": true,
+        "SoundCharacter": "Futuristic"
+      },
+      "AudioLayers": {
+        "Idle": {
+          "Sample": "ev_idle_hum",
+          "Volume": 0.2,
+          "SubtleWhine": true
+        },
+        "Acceleration": {
+          "Sample": "ev_accel",
+          "SpeedLinked": true,
+          "MotorWhine": true
+        },
+        "Regen": {
+          "Sample": "ev_regen",
+          "BrakingIntensity": true
+        },
+        "HighSpeed": {
+          "Sample": "ev_highspeed",
+          "AeroNoise": true
+        }
+      },
+      "Vehicles": ["Tesla", "Rimac", "Porsche Taycan"]
+    }
+  },
+
+  "ExhaustSystems": {
+    "Stock": {
+      "ID": "EXHAUST_STOCK",
+      "Name": "Stock",
+      "VolumeMultiplier": 0.6,
+      "ToneModifier": "Muffled",
+      "CrackleIntensity": 0.2
+    },
+    "Sport": {
+      "ID": "EXHAUST_SPORT",
+      "Name": "Sport Exhaust",
+      "VolumeMultiplier": 0.8,
+      "ToneModifier": "Open",
+      "CrackleIntensity": 0.5,
+      "UnlockLevel": 10
+    },
+    "Performance": {
+      "ID": "EXHAUST_PERFORMANCE",
+      "Name": "Performance Exhaust",
+      "VolumeMultiplier": 0.9,
+      "ToneModifier": "Aggressive",
+      "CrackleIntensity": 0.7,
+      "UnlockLevel": 20
+    },
+    "Race": {
+      "ID": "EXHAUST_RACE",
+      "Name": "Race Exhaust",
+      "VolumeMultiplier": 1.0,
+      "ToneModifier": "Raw",
+      "CrackleIntensity": 0.9,
+      "UnlockLevel": 30
+    },
+    "Titanium": {
+      "ID": "EXHAUST_TITANIUM",
+      "Name": "Titanium Race",
+      "VolumeMultiplier": 1.0,
+      "ToneModifier": "HighPitch",
+      "CrackleIntensity": 0.85,
+      "UnlockLevel": 35
+    },
+    "Straight_Pipe": {
+      "ID": "EXHAUST_STRAIGHT",
+      "Name": "Straight Pipe",
+      "VolumeMultiplier": 1.1,
+      "ToneModifier": "Unmuffled",
+      "CrackleIntensity": 1.0,
+      "UnlockLevel": 40
+    }
+  },
+
+  "EnvironmentEffects": {
+    "Tunnel": {
+      "ReverbTime": 2.5,
+      "WetMix": 0.8,
+      "EchoDelay": 0.15,
+      "VolumeBoost": 1.3
+    },
+    "Underpass": {
+      "ReverbTime": 1.5,
+      "WetMix": 0.6,
+      "EchoDelay": 0.08,
+      "VolumeBoost": 1.15
+    },
+    "OpenRoad": {
+      "ReverbTime": 0.2,
+      "WetMix": 0.1,
+      "NaturalDecay": true
+    },
+    "City": {
+      "ReverbTime": 0.8,
+      "WetMix": 0.3,
+      "Reflections": true
+    },
+    "Garage": {
+      "ReverbTime": 1.2,
+      "WetMix": 0.5,
+      "Enclosed": true
+    },
+    "Parking_Structure": {
+      "ReverbTime": 2.0,
+      "WetMix": 0.7,
+      "MultiFloorEcho": true
+    }
+  },
+
+  "TransmissionSounds": {
+    "Manual": {
+      "ShiftUp": { "Sample": "manual_shift_up", "Volume": 0.5 },
+      "ShiftDown": { "Sample": "manual_shift_down", "Volume": 0.5 },
+      "MissedShift": { "Sample": "grind", "Volume": 0.7 },
+      "Clutch": { "Sample": "clutch_engage", "Volume": 0.3 }
+    },
+    "Sequential": {
+      "ShiftUp": { "Sample": "sequential_up", "Volume": 0.6, "Quick": true },
+      "ShiftDown": { "Sample": "sequential_down", "Volume": 0.6, "Blip": true }
+    },
+    "DCT": {
+      "ShiftUp": { "Sample": "dct_shift", "Volume": 0.4, "Seamless": true },
+      "ShiftDown": { "Sample": "dct_downshift", "Volume": 0.5, "Blip": true }
+    }
+  },
+
+  "TurboSounds": {
+    "Spool": {
+      "Types": ["Quick", "Progressive", "Laggy"],
+      "SpoolUpTime": { "Min": 0.3, "Max": 1.5 }
+    },
+    "BlowOff": {
+      "Types": ["VTA", "Recirculating", "Flutter", "Screamer"],
+      "Samples": {
+        "VTA": "bov_vta",
+        "Recirculating": "bov_recirc",
+        "Flutter": "bov_flutter",
+        "Screamer": "bov_screamer"
+      }
+    },
+    "Wastegate": {
+      "Sample": "wastegate_chatter",
+      "BoostThreshold": true
+    },
+    "AntiLag": {
+      "Sample": "antilag_pops",
+      "Intensity": ["Mild", "Moderate", "Aggressive"],
+      "Flames": true
+    }
+  },
+
+  "InteriorAudio": {
+    "CockpitMuffling": {
+      "Enabled": true,
+      "ReductionDB": -6,
+      "FrequencyFilter": "LowPass"
+    },
+    "WindowsOpen": {
+      "MufflingReduction": 0.5,
+      "WindNoise": true
+    },
+    "HelmetEffect": {
+      "Enabled": true,
+      "MufflingDB": -3
+    }
+  }
+}

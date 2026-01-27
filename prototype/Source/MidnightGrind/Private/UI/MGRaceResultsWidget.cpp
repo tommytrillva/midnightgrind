@@ -655,7 +655,10 @@ void UMGRaceResultsWidget::RevealNextRow()
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().ClearTimer(RowRevealTimerHandle);
+		if (UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(RowRevealTimerHandle);
+		}
 	}
 }
 

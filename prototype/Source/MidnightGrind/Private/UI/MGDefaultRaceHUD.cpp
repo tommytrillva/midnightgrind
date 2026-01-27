@@ -506,8 +506,11 @@ void UMGDefaultRaceHUD::PlayFinalLapEffect_Implementation()
 		StatusMessageText->SetColorAndOpacity(WarningColor);
 		StatusMessageText->SetVisibility(ESlateVisibility::HitTestInvisible);
 
-		GetWorld()->GetTimerManager().ClearTimer(StatusMessageTimerHandle);
-		GetWorld()->GetTimerManager().SetTimer(StatusMessageTimerHandle, this, &UMGDefaultRaceHUD::ClearStatusMessage, 3.0f, false);
+		if (UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(StatusMessageTimerHandle);
+			World->GetTimerManager().SetTimer(StatusMessageTimerHandle, this, &UMGDefaultRaceHUD::ClearStatusMessage, 3.0f, false);
+		}
 	}
 }
 

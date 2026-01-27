@@ -771,6 +771,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "DynamicDifficulty|RealTime")
     void ResetRaceTimeAdjustments();
 
+    /** Get the number of collisions recorded during the current race */
+    UFUNCTION(BlueprintPure, Category = "DynamicDifficulty|RealTime")
+    int32 GetRaceCollisionCount() const { return RaceCollisionCount; }
+
     // ========================================================================
     // Statistics
     // ========================================================================

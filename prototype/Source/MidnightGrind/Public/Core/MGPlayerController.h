@@ -34,6 +34,9 @@ struct FMGAchievementDefinition;
 enum class EMGStreakType : uint8;
 enum class EMGStreakTier : uint8;
 enum class EMGPrestigeRank : uint8;
+enum class EMGDamageState : uint8;
+struct FMGCheckpointPassage;
+struct FMGLapData;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -577,4 +580,16 @@ protected:
 	/** Handle prestige level up from prestige subsystem */
 	UFUNCTION()
 	void OnPrestigeLevelUp(const FString& PlayerId, int32 OldLevel, int32 NewLevel);
+
+	/** Handle damage state changed from collision subsystem */
+	UFUNCTION()
+	void OnDamageStateChanged(const FString& VehicleId, EMGDamageState OldState, EMGDamageState NewState);
+
+	/** Handle checkpoint passed from checkpoint subsystem */
+	UFUNCTION()
+	void OnCheckpointPassed(const FMGCheckpointPassage& Passage, int32 CheckpointsRemaining, float DeltaTime);
+
+	/** Handle lap completed from checkpoint subsystem */
+	UFUNCTION()
+	void OnLapCompleted(const FMGLapData& LapData, int32 LapsRemaining, bool bIsBestLap);
 };

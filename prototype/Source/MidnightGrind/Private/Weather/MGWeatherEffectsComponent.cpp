@@ -588,12 +588,16 @@ void UMGWeatherEffectsComponent::PlayThunderSound(float Delay)
 
 	if (ThunderSound && GetWorld())
 	{
+		TWeakObjectPtr<UMGWeatherEffectsComponent> WeakThis(this);
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(
 			TimerHandle,
-			[this, ThunderSound]()
+			[WeakThis, ThunderSound]()
 			{
-				UGameplayStatics::PlaySound2D(GetWorld(), ThunderSound);
+				if (WeakThis.IsValid() && WeakThis->GetWorld())
+				{
+					UGameplayStatics::PlaySound2D(WeakThis->GetWorld(), ThunderSound);
+				}
 			},
 			Delay,
 			false

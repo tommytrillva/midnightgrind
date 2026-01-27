@@ -54,7 +54,10 @@ void UMGOnlineProfileSubsystem::Deinitialize()
 		// In production, might want to force sync here
 	}
 
-	GetWorld()->GetTimerManager().ClearTimer(RetryTimerHandle);
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(RetryTimerHandle);
+	}
 
 	Super::Deinitialize();
 }
@@ -609,9 +612,12 @@ void UMGOnlineProfileSubsystem::RetryRequest(const FGuid& RequestId)
 	UE_LOG(LogTemp, Warning, TEXT("MGOnlineProfile: Retrying request %s in %.1f seconds (attempt %d/%d)"),
 		*RequestId.ToString(), Delay, Request.RetryCount, MaxRetryAttempts);
 
-	GetWorld()->GetTimerManager().SetTimer(RetryTimerHandle,
-		FTimerDelegate::CreateUObject(this, &UMGOnlineProfileSubsystem::ProcessPendingRequests),
-		Delay, false);
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().SetTimer(RetryTimerHandle,
+			FTimerDelegate::CreateUObject(this, &UMGOnlineProfileSubsystem::ProcessPendingRequests),
+			Delay, false);
+	}
 }
 
 // ==========================================

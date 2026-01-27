@@ -1,0 +1,397 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - AI Driver Personalities and Behavior",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxAIDrivers": 15,
+    "DifficultyScaling": true,
+    "RubberBanding": {
+      "Enabled": true,
+      "Intensity": ["Off", "Low", "Medium", "High"],
+      "Default": "Low"
+    },
+    "AdaptiveDifficulty": {
+      "Enabled": true,
+      "AdjustmentRate": 0.05,
+      "MinLevel": 0.5,
+      "MaxLevel": 1.5
+    }
+  },
+
+  "DifficultyLevels": {
+    "Rookie": {
+      "ID": "DIFF_ROOKIE",
+      "SpeedMultiplier": 0.75,
+      "ReactionTime": 0.5,
+      "AggressionLevel": 0.2,
+      "MistakeFrequency": 0.3,
+      "RecoveryTime": 2.0,
+      "OptimalLineDeviation": 0.4,
+      "Description": "For new players learning the game"
+    },
+    "Amateur": {
+      "ID": "DIFF_AMATEUR",
+      "SpeedMultiplier": 0.85,
+      "ReactionTime": 0.35,
+      "AggressionLevel": 0.35,
+      "MistakeFrequency": 0.2,
+      "RecoveryTime": 1.5,
+      "OptimalLineDeviation": 0.25,
+      "Description": "Moderate challenge for casual players"
+    },
+    "Professional": {
+      "ID": "DIFF_PRO",
+      "SpeedMultiplier": 0.95,
+      "ReactionTime": 0.25,
+      "AggressionLevel": 0.5,
+      "MistakeFrequency": 0.1,
+      "RecoveryTime": 1.0,
+      "OptimalLineDeviation": 0.15,
+      "Description": "Challenging opponents that race to win"
+    },
+    "Expert": {
+      "ID": "DIFF_EXPERT",
+      "SpeedMultiplier": 1.0,
+      "ReactionTime": 0.15,
+      "AggressionLevel": 0.7,
+      "MistakeFrequency": 0.05,
+      "RecoveryTime": 0.75,
+      "OptimalLineDeviation": 0.08,
+      "Description": "Near-perfect racing with minimal mistakes"
+    },
+    "Legend": {
+      "ID": "DIFF_LEGEND",
+      "SpeedMultiplier": 1.05,
+      "ReactionTime": 0.1,
+      "AggressionLevel": 0.85,
+      "MistakeFrequency": 0.02,
+      "RecoveryTime": 0.5,
+      "OptimalLineDeviation": 0.03,
+      "Description": "The ultimate challenge - nearly flawless AI"
+    }
+  },
+
+  "PersonalityTypes": {
+    "Aggressive": {
+      "ID": "PERSONALITY_AGGRESSIVE",
+      "Name": "Aggressive",
+      "Traits": {
+        "BlockingTendency": 0.8,
+        "OvertakingAggression": 0.9,
+        "RiskTaking": 0.85,
+        "DefensiveDriving": 0.4,
+        "RespectForSpace": 0.3,
+        "BrakingZone": "Late",
+        "CornerEntry": "Aggressive"
+      },
+      "Behavior": {
+        "WillDiveBomb": true,
+        "WillPushOff": true,
+        "WillBlockMultipleTimes": true,
+        "RetaliatesAfterContact": true
+      }
+    },
+    "Defensive": {
+      "ID": "PERSONALITY_DEFENSIVE",
+      "Name": "Defensive",
+      "Traits": {
+        "BlockingTendency": 0.7,
+        "OvertakingAggression": 0.4,
+        "RiskTaking": 0.3,
+        "DefensiveDriving": 0.9,
+        "RespectForSpace": 0.6,
+        "BrakingZone": "Early",
+        "CornerEntry": "Cautious"
+      },
+      "Behavior": {
+        "WillDiveBomb": false,
+        "WillPushOff": false,
+        "WillBlockMultipleTimes": true,
+        "ProtectsPosition": true
+      }
+    },
+    "Calculated": {
+      "ID": "PERSONALITY_CALCULATED",
+      "Name": "Calculated",
+      "Traits": {
+        "BlockingTendency": 0.5,
+        "OvertakingAggression": 0.6,
+        "RiskTaking": 0.5,
+        "DefensiveDriving": 0.7,
+        "RespectForSpace": 0.8,
+        "BrakingZone": "Optimal",
+        "CornerEntry": "Precise"
+      },
+      "Behavior": {
+        "WaitsForOpportunity": true,
+        "ExploitsWeaknesses": true,
+        "ConsistentPace": true,
+        "RarelyMakesMistakes": true
+      }
+    },
+    "Reckless": {
+      "ID": "PERSONALITY_RECKLESS",
+      "Name": "Reckless",
+      "Traits": {
+        "BlockingTendency": 0.6,
+        "OvertakingAggression": 1.0,
+        "RiskTaking": 1.0,
+        "DefensiveDriving": 0.2,
+        "RespectForSpace": 0.1,
+        "BrakingZone": "VeryLate",
+        "CornerEntry": "SendIt"
+      },
+      "Behavior": {
+        "WillDiveBomb": true,
+        "WillPushOff": true,
+        "WillCrashFrequently": true,
+        "HighRewardHighRisk": true
+      }
+    },
+    "Clean": {
+      "ID": "PERSONALITY_CLEAN",
+      "Name": "Clean Racer",
+      "Traits": {
+        "BlockingTendency": 0.3,
+        "OvertakingAggression": 0.5,
+        "RiskTaking": 0.4,
+        "DefensiveDriving": 0.6,
+        "RespectForSpace": 0.95,
+        "BrakingZone": "Normal",
+        "CornerEntry": "Safe"
+      },
+      "Behavior": {
+        "LeavesRoom": true,
+        "CleanOvertakes": true,
+        "NoIntentionalContact": true,
+        "FairPlay": true
+      }
+    },
+    "Strategic": {
+      "ID": "PERSONALITY_STRATEGIC",
+      "Name": "Strategic",
+      "Traits": {
+        "BlockingTendency": 0.6,
+        "OvertakingAggression": 0.55,
+        "RiskTaking": 0.45,
+        "DefensiveDriving": 0.75,
+        "RespectForSpace": 0.7,
+        "BrakingZone": "Variable",
+        "CornerEntry": "Adaptive"
+      },
+      "Behavior": {
+        "ManagesRacePace": true,
+        "ConservesTires": true,
+        "StrategicOvertakes": true,
+        "EndRacePush": true
+      }
+    }
+  },
+
+  "DrivingStyles": {
+    "Grip": {
+      "ID": "STYLE_GRIP",
+      "Description": "Maximum grip, minimal sliding",
+      "DriftAngle": { "Max": 5 },
+      "CornerSpeed": "High",
+      "TireWear": "Low",
+      "Consistency": "High"
+    },
+    "Drift": {
+      "ID": "STYLE_DRIFT",
+      "Description": "Controlled drifting through corners",
+      "DriftAngle": { "Min": 15, "Max": 45 },
+      "CornerSpeed": "Medium",
+      "TireWear": "High",
+      "Consistency": "Medium"
+    },
+    "Balanced": {
+      "ID": "STYLE_BALANCED",
+      "Description": "Mix of grip and controlled oversteer",
+      "DriftAngle": { "Max": 15 },
+      "CornerSpeed": "Medium-High",
+      "TireWear": "Medium",
+      "Consistency": "High"
+    },
+    "Aggressive": {
+      "ID": "STYLE_AGGRESSIVE",
+      "Description": "Late braking, hard on the car",
+      "DriftAngle": { "Max": 20 },
+      "CornerSpeed": "Very High",
+      "TireWear": "Very High",
+      "Consistency": "Low"
+    }
+  },
+
+  "RivalDrivers": {
+    "Enabled": true,
+    "MaxRivals": 5,
+    "RivalGeneration": {
+      "BasedOnPerformance": true,
+      "SimilarSkillLevel": true,
+      "VehicleClassMatch": true
+    },
+    "RivalBehavior": {
+      "TargetsPlayer": true,
+      "AggressionIncrease": 0.2,
+      "BlockingIncrease": 0.3,
+      "AppearanceBoost": 1.5
+    },
+    "RivalryDevelopment": {
+      "LossCreatesRivalry": true,
+      "WinEndsRivalry": 3,
+      "IntensifiesOverTime": true
+    }
+  },
+
+  "NamedDrivers": {
+    "StoryCharacters": [
+      {
+        "ID": "AI_TAKESHI",
+        "Name": "Takeshi Yamamoto",
+        "Nickname": "The Phantom",
+        "Personality": "Calculated",
+        "Style": "Drift",
+        "Difficulty": "Expert",
+        "Signature": { "Vehicle": "RX-7", "Color": "Midnight Blue" },
+        "StoryRole": "Rival",
+        "Catchphrase": "The mountain belongs to me."
+      },
+      {
+        "ID": "AI_MARIA",
+        "Name": "Maria Santos",
+        "Nickname": "Lightning",
+        "Personality": "Aggressive",
+        "Style": "Grip",
+        "Difficulty": "Expert",
+        "Signature": { "Vehicle": "NSX", "Color": "Racing Red" },
+        "StoryRole": "Champion",
+        "Catchphrase": "Try to keep up."
+      },
+      {
+        "ID": "AI_VIKTOR",
+        "Name": "Viktor Kozlov",
+        "Nickname": "The Wall",
+        "Personality": "Defensive",
+        "Style": "Balanced",
+        "Difficulty": "Professional",
+        "Signature": { "Vehicle": "Skyline R34", "Color": "Silver" },
+        "StoryRole": "Boss",
+        "Catchphrase": "You're not getting past me."
+      },
+      {
+        "ID": "AI_CHEN",
+        "Name": "Chen Wei",
+        "Nickname": "The Professor",
+        "Personality": "Strategic",
+        "Style": "Grip",
+        "Difficulty": "Legend",
+        "Signature": { "Vehicle": "Evo X", "Color": "White" },
+        "StoryRole": "FinalBoss",
+        "Catchphrase": "I've calculated every move."
+      },
+      {
+        "ID": "AI_JADE",
+        "Name": "Jade Thompson",
+        "Nickname": "Wildfire",
+        "Personality": "Reckless",
+        "Style": "Drift",
+        "Difficulty": "Professional",
+        "Signature": { "Vehicle": "350Z", "Color": "Orange" },
+        "StoryRole": "Ally",
+        "Catchphrase": "Full send, no regrets!"
+      }
+    ],
+    "GeneratedDrivers": {
+      "NamePool": {
+        "FirstNames": ["Alex", "Jordan", "Sam", "Casey", "Riley", "Morgan", "Taylor", "Quinn", "Avery", "Dakota"],
+        "LastNames": ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Martinez", "Wilson"]
+      },
+      "RandomPersonality": true,
+      "RandomStyle": true,
+      "MatchPlayerLevel": true
+    }
+  },
+
+  "RaceBehavior": {
+    "Start": {
+      "ReactionTime": { "Min": 0.1, "Max": 0.5 },
+      "Wheelspin": { "Chance": "SkillBased" },
+      "AggressionFirstCorner": "Elevated"
+    },
+    "MidRace": {
+      "Overtaking": {
+        "PreferredSide": "Inside",
+        "UsesSlipstream": true,
+        "DiveBombChance": "PersonalityBased",
+        "CleanlinessFactor": "PersonalityBased"
+      },
+      "Defending": {
+        "SingleMoveRule": "PersonalityBased",
+        "LateBlockingChance": "PersonalityBased",
+        "CrowdingChance": "PersonalityBased"
+      },
+      "PitStrategy": {
+        "Enabled": false,
+        "OptimalTiming": true
+      }
+    },
+    "EndRace": {
+      "FinalLapPush": true,
+      "DesperationMoves": "PersonalityBased",
+      "DefenseIntensity": "Increased"
+    },
+    "Mistakes": {
+      "SpinChance": "DifficultyBased",
+      "OvershootChance": "DifficultyBased",
+      "RecoveryBehavior": "Realistic",
+      "LearnsFromMistakes": true
+    }
+  },
+
+  "TrackKnowledge": {
+    "OptimalLine": {
+      "Accuracy": "DifficultyBased",
+      "Adaptation": true,
+      "WeatherAdjustment": true
+    },
+    "Shortcuts": {
+      "Knowledge": "DifficultyBased",
+      "UsageChance": 0.3
+    },
+    "DangerZones": {
+      "Awareness": "DifficultyBased",
+      "SpeedReduction": true
+    }
+  },
+
+  "VehicleHandling": {
+    "TractionControl": {
+      "Simulated": true,
+      "Effectiveness": "DifficultyBased"
+    },
+    "PowerDelivery": {
+      "SmoothApplication": "DifficultyBased",
+      "ExitSpeed": "SkillBased"
+    },
+    "BrakingPoints": {
+      "Consistency": "DifficultyBased",
+      "TrailBraking": "StyleBased"
+    }
+  },
+
+  "PerformanceBalancing": {
+    "CatchUp": {
+      "Enabled": true,
+      "MaxBoost": 0.1,
+      "MaxHandicap": 0.05,
+      "ActivationThreshold": 3.0
+    },
+    "Spread": {
+      "MinGap": 0.5,
+      "MaxGap": 10.0,
+      "Natural": true
+    }
+  }
+}

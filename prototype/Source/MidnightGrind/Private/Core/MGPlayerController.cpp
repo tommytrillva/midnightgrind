@@ -56,12 +56,14 @@ void AMGPlayerController::BeginPlay()
 			}
 		}
 
-		// Bind to checkpoint subsystem's wrong-way detection
+		// Bind to checkpoint subsystem's events
 		if (UWorld* World = GetWorld())
 		{
 			if (UMGCheckpointSubsystem* CheckpointSubsystem = World->GetSubsystem<UMGCheckpointSubsystem>())
 			{
 				CheckpointSubsystem->OnWrongWay.AddDynamic(this, &AMGPlayerController::OnWrongWayDetected);
+				CheckpointSubsystem->OnCheckpointPassed.AddDynamic(this, &AMGPlayerController::OnCheckpointPassed);
+				CheckpointSubsystem->OnLapCompleted.AddDynamic(this, &AMGPlayerController::OnLapCompleted);
 			}
 
 			// Bind to near miss subsystem for HUD popups
@@ -100,12 +102,13 @@ void AMGPlayerController::BeginPlay()
 				TireSubsystem->OnTireConditionChanged.AddDynamic(this, &AMGPlayerController::OnTireConditionChanged);
 			}
 
-			// Bind to collision subsystem for takedown notifications
+			// Bind to collision subsystem for takedown notifications and damage state
 			if (UMGCollisionSubsystem* CollisionSubsystem = GI->GetSubsystem<UMGCollisionSubsystem>())
 			{
 				CollisionSubsystem->OnTakedownDealt.AddDynamic(this, &AMGPlayerController::OnTakedownDealt);
 				CollisionSubsystem->OnTakedownChain.AddDynamic(this, &AMGPlayerController::OnTakedownChain);
 				CollisionSubsystem->OnRevengeComplete.AddDynamic(this, &AMGPlayerController::OnRevengeComplete);
+				CollisionSubsystem->OnDamageStateChanged.AddDynamic(this, &AMGPlayerController::OnDamageStateChanged);
 			}
 
 			// Bind to pit stop subsystem for pit notifications
@@ -194,6 +197,8 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		if (UMGCheckpointSubsystem* CheckpointSubsystem = World->GetSubsystem<UMGCheckpointSubsystem>())
 		{
 			CheckpointSubsystem->OnWrongWay.RemoveDynamic(this, &AMGPlayerController::OnWrongWayDetected);
+			CheckpointSubsystem->OnCheckpointPassed.RemoveDynamic(this, &AMGPlayerController::OnCheckpointPassed);
+			CheckpointSubsystem->OnLapCompleted.RemoveDynamic(this, &AMGPlayerController::OnLapCompleted);
 		}
 
 		if (UMGNearMissSubsystem* NearMissSubsystem = World->GetSubsystem<UMGNearMissSubsystem>())
@@ -232,6 +237,7 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			CollisionSubsystem->OnTakedownDealt.RemoveDynamic(this, &AMGPlayerController::OnTakedownDealt);
 			CollisionSubsystem->OnTakedownChain.RemoveDynamic(this, &AMGPlayerController::OnTakedownChain);
 			CollisionSubsystem->OnRevengeComplete.RemoveDynamic(this, &AMGPlayerController::OnRevengeComplete);
+			CollisionSubsystem->OnDamageStateChanged.RemoveDynamic(this, &AMGPlayerController::OnDamageStateChanged);
 		}
 
 		if (UMGPitStopSubsystem* PitStopSubsystem = GI->GetSubsystem<UMGPitStopSubsystem>())
@@ -1718,6 +1724,148 @@ void AMGPlayerController::OnPrestigeLevelUp(const FString& PlayerId, int32 OldLe
 			FText LevelUpMessage = FText::FromString(FString::Printf(TEXT("LEVEL UP! %d"), NewLevel));
 			FLinearColor LevelUpColor = FLinearColor(0.5f, 0.8f, 1.0f, 1.0f); // Light blue
 			HUDSubsystem->ShowNotification(LevelUpMessage, 3.0f, LevelUpColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnDamageStateChanged(const FString& VehicleId, EMGDamageState OldState, EMGDamageState NewState)
+{
+	// Only show for the player's vehicle
+	if (!ControlledVehicle || VehicleId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	// Only show warnings for significant damage transitions
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText DamageMessage;
+			FLinearColor DamageColor;
+			float Duration = 3.0f;
+
+			switch (NewState)
+			{
+				case EMGDamageState::Damaged:
+					DamageMessage = FText::FromString(TEXT("VEHICLE DAMAGED"));
+					DamageColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.0f); // Yellow
+					Duration = 2.0f;
+					break;
+
+				case EMGDamageState::HeavyDamage:
+					DamageMessage = FText::FromString(TEXT("HEAVY DAMAGE!"));
+					DamageColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+					Duration = 2.5f;
+					break;
+
+				case EMGDamageState::Critical:
+					DamageMessage = FText::FromString(TEXT("CRITICAL DAMAGE! FIND A PIT STOP!"));
+					DamageColor = FLinearColor(1.0f, 0.2f, 0.0f, 1.0f); // Red-orange
+					Duration = 4.0f;
+					break;
+
+				case EMGDamageState::Wrecked:
+					DamageMessage = FText::FromString(TEXT("WRECKED!"));
+					DamageColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+					Duration = 5.0f;
+					break;
+
+				default:
+					// Don't show notifications for minor states (Pristine, Scratched, Dented)
+					return;
+			}
+
+			HUDSubsystem->ShowNotification(DamageMessage, Duration, DamageColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnCheckpointPassed(const FMGCheckpointPassage& Passage, int32 CheckpointsRemaining, float DeltaTime)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			// Show split time delta
+			FText SplitMessage;
+			FLinearColor SplitColor;
+
+			if (DeltaTime < 0.0f)
+			{
+				// Ahead of target
+				SplitMessage = FText::FromString(FString::Printf(TEXT("SPLIT: -%.2fs"), FMath::Abs(DeltaTime)));
+				SplitColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green
+			}
+			else if (DeltaTime > 0.0f)
+			{
+				// Behind target
+				SplitMessage = FText::FromString(FString::Printf(TEXT("SPLIT: +%.2fs"), DeltaTime));
+				SplitColor = FLinearColor(1.0f, 0.3f, 0.0f, 1.0f); // Red-orange
+			}
+			else
+			{
+				// Exactly on pace
+				SplitMessage = FText::FromString(TEXT("SPLIT: 0.00s"));
+				SplitColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f); // White
+			}
+
+			HUDSubsystem->ShowNotification(SplitMessage, 2.0f, SplitColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnLapCompleted(const FMGLapData& LapData, int32 LapsRemaining, bool bIsBestLap)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			// Format lap time as MM:SS.mmm
+			int32 Minutes = FMath::FloorToInt(LapData.LapTime / 60.0f);
+			float Seconds = FMath::Fmod(LapData.LapTime, 60.0f);
+
+			FText LapMessage;
+			FLinearColor LapColor;
+
+			if (bIsBestLap)
+			{
+				LapMessage = FText::FromString(FString::Printf(TEXT("BEST LAP! %d:%05.2f"), Minutes, Seconds));
+				LapColor = FLinearColor(1.0f, 0.0f, 1.0f, 1.0f); // Magenta
+			}
+			else
+			{
+				LapMessage = FText::FromString(FString::Printf(TEXT("LAP %d: %d:%05.2f"), LapData.LapNumber, Minutes, Seconds));
+
+				// Color based on delta from best
+				if (LapData.DeltaFromBest < 0.5f)
+				{
+					LapColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f); // Cyan-green (very close)
+				}
+				else if (LapData.DeltaFromBest < 2.0f)
+				{
+					LapColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f); // Yellow (decent)
+				}
+				else
+				{
+					LapColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange (behind)
+				}
+			}
+
+			HUDSubsystem->ShowNotification(LapMessage, 4.0f, LapColor);
+
+			// If there are laps remaining, show them
+			if (LapsRemaining > 0)
+			{
+				FText RemainingMessage = FText::FromString(FString::Printf(TEXT("%d LAPS TO GO"), LapsRemaining));
+				HUDSubsystem->ShowNotification(RemainingMessage, 3.0f, FLinearColor::White);
+			}
+			else
+			{
+				// Race finished
+				FText FinishMessage = FText::FromString(TEXT("RACE COMPLETE!"));
+				HUDSubsystem->ShowNotification(FinishMessage, 5.0f, FLinearColor(1.0f, 0.84f, 0.0f, 1.0f)); // Gold
+			}
 		}
 	}
 }
