@@ -761,9 +761,14 @@ bool UMGBonusSubsystem::IsInBonusRound(const FString& PlayerId) const
 
 void UMGBonusSubsystem::ProcessComboBonus(const FString& PlayerId, int32 ComboCount, float ComboMultiplier)
 {
-	int32 ComboLevel = ComboCount / static_cast<int32>(BonusConfig.ComboThresholdForBonus);
+	int32 Threshold = static_cast<int32>(BonusConfig.ComboThresholdForBonus);
+	if (Threshold <= 0)
+	{
+		return;
+	}
+	int32 ComboLevel = ComboCount / Threshold;
 
-	if (ComboLevel > 0 && ComboCount % static_cast<int32>(BonusConfig.ComboThresholdForBonus) == 0)
+	if (ComboLevel > 0 && ComboCount % Threshold == 0)
 	{
 		int32 BonusPoints = FMath::RoundToInt(ComboLevel * BonusConfig.ComboBonusPointsPerLevel * ComboMultiplier);
 

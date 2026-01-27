@@ -40,47 +40,75 @@
 
 class UMGVehicleModelData;
 
+// =============================================================================
+// ENUMERATIONS - Crew & Reputation Types
+// =============================================================================
+
 /**
- * Crew/faction types in the game world
+ * @brief Racing crews/factions in the Midnight Grind world
+ *
+ * Each crew represents a distinct racing culture with unique aesthetics,
+ * preferred vehicle types, and race styles. Players build reputation with
+ * crews by participating in their events and can eventually unlock
+ * crew-exclusive content.
+ *
+ * @note Players can have standing with multiple crews simultaneously.
+ *       The "primary crew" is determined by highest reputation.
  */
 UENUM(BlueprintType)
 enum class EMGCrew : uint8
 {
-	None			UMETA(DisplayName = "Unaffiliated"),
-	Midnight		UMETA(DisplayName = "Midnight Runners"),	// Street racing purists
-	Velocity		UMETA(DisplayName = "Team Velocity"),		// Import tuners
-	Chrome			UMETA(DisplayName = "Chrome Kings"),		// Muscle car enthusiasts
-	Shadow			UMETA(DisplayName = "Shadow Syndicate"),	// Underground elite
-	Apex			UMETA(DisplayName = "Apex Racing"),			// Professional racers
+	None			UMETA(DisplayName = "Unaffiliated"),        ///< No crew affiliation
+	Midnight		UMETA(DisplayName = "Midnight Runners"),	///< Street racing purists - focus on raw skill
+	Velocity		UMETA(DisplayName = "Team Velocity"),		///< Import tuners - JDM and precision driving
+	Chrome			UMETA(DisplayName = "Chrome Kings"),		///< Muscle car enthusiasts - American power
+	Shadow			UMETA(DisplayName = "Shadow Syndicate"),	///< Underground elite - high-stakes racing
+	Apex			UMETA(DisplayName = "Apex Racing"),			///< Professional racers - track-focused excellence
 };
 
 /**
- * Reputation tier with a crew
+ * @brief Reputation tier thresholds for crew standing
+ *
+ * Tiers gate access to crew-specific content and events. Higher tiers
+ * unlock exclusive vehicles, parts, and race types. Tier progression
+ * is non-linear to reward dedicated play.
+ *
+ * | Tier      | REP Range   | Typical Unlock                    |
+ * |-----------|-------------|-----------------------------------|
+ * | Unknown   | 0-99        | Basic crew access                 |
+ * | Rookie    | 100-499     | Entry-level crew races            |
+ * | Known     | 500-1499    | Crew-specific parts               |
+ * | Respected | 1500-3999   | Crew vehicles, advanced races     |
+ * | Feared    | 4000-7999   | Elite content, pink slip eligible |
+ * | Legend    | 8000+       | All crew content unlocked         |
  */
 UENUM(BlueprintType)
 enum class EMGReputationTier : uint8
 {
-	Unknown		UMETA(DisplayName = "Unknown"),		// 0-99
-	Rookie		UMETA(DisplayName = "Rookie"),		// 100-499
-	Known		UMETA(DisplayName = "Known"),		// 500-1499
-	Respected	UMETA(DisplayName = "Respected"),	// 1500-3999
-	Feared		UMETA(DisplayName = "Feared"),		// 4000-7999
-	Legend		UMETA(DisplayName = "Legend")		// 8000+
+	Unknown		UMETA(DisplayName = "Unknown"),		///< 0-99 REP - newcomer status
+	Rookie		UMETA(DisplayName = "Rookie"),		///< 100-499 REP - recognized racer
+	Known		UMETA(DisplayName = "Known"),		///< 500-1499 REP - established presence
+	Respected	UMETA(DisplayName = "Respected"),	///< 1500-3999 REP - crew inner circle
+	Feared		UMETA(DisplayName = "Feared"),		///< 4000-7999 REP - elite status
+	Legend		UMETA(DisplayName = "Legend")		///< 8000+ REP - crew legend
 };
 
 /**
- * Unlock types
+ * @brief Categories of unlockable content
+ *
+ * Used to classify unlocks for filtering in UI and determining
+ * which subsystem handles the unlock (Garage, Inventory, etc.).
  */
 UENUM(BlueprintType)
 enum class EMGUnlockType : uint8
 {
-	Vehicle,
-	Part,
-	Track,
-	RaceType,
-	Crew,
-	Cosmetic,
-	Feature
+	Vehicle,	///< New vehicle available for purchase/acquisition
+	Part,		///< Performance or cosmetic part unlocked
+	Track,		///< New track/route accessible
+	RaceType,	///< New race mode (drift, drag, etc.) unlocked
+	Crew,		///< Access to a new crew's content
+	Cosmetic,	///< Visual customization option (paint, vinyl, etc.)
+	Feature		///< Game feature unlock (tuning shop, pink slips, etc.)
 };
 
 /**

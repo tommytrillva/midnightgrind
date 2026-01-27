@@ -371,7 +371,11 @@ struct FMGPlaylistEntry
 };
 
 /**
- * Featured playlist
+ * @brief A curated collection of races with bonus rewards for event participation.
+ *
+ * Featured playlists incentivize players to try specific content by offering XP
+ * and cash multipliers. They are displayed prominently in the event UI and rotate
+ * based on the current active events.
  */
 USTRUCT(BlueprintType)
 struct FMGFeaturedPlaylist
@@ -411,8 +415,19 @@ struct FMGFeaturedPlaylist
 	bool bIsFeatured = false;
 };
 
+// ============================================================================
+// DATA STRUCTURES - Event Container
+// ============================================================================
+
 /**
- * Live event data
+ * @brief Complete data structure for a live event with all associated content.
+ *
+ * FMGLiveEvent is the top-level container for event data. It holds metadata
+ * (name, times, type), visual assets (banner, theme color), and all gameplay
+ * content (challenges, community goals, playlists, rewards).
+ *
+ * Events are loaded from the server and stored in the AllEvents array. The
+ * subsystem automatically updates Status based on current time.
  */
 USTRUCT(BlueprintType)
 struct FMGLiveEvent
@@ -485,7 +500,10 @@ struct FMGLiveEvent
 };
 
 /**
- * Daily challenge set
+ * @brief Container for a day's worth of challenges with bonus reward for completion.
+ *
+ * Daily challenges reset at midnight UTC. Completing all challenges in a day
+ * awards a bonus reward and contributes to the player's daily streak.
  */
 USTRUCT(BlueprintType)
 struct FMGDailyChallenges
@@ -513,15 +531,29 @@ struct FMGDailyChallenges
 	bool bBonusClaimed = false;
 };
 
-/**
- * Delegates
- */
+// ============================================================================
+// DELEGATE DECLARATIONS
+// ============================================================================
+
+/// Broadcast when a new event becomes active (Start time reached)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEventStarted, const FMGLiveEvent&, Event);
+
+/// Broadcast when an event ends (End time reached or all content completed)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEventEnded, const FMGLiveEvent&, Event);
+
+/// Broadcast when challenge progress updates; use for UI progress bars
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnChallengeProgress, FName, ChallengeID, const FMGEventChallenge&, Challenge);
+
+/// Broadcast when all objectives in a challenge are completed; show claim prompt
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChallengeCompleted, const FMGEventChallenge&, Challenge);
+
+/// Broadcast when community goal progress updates from server
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCommunityGoalProgress, FName, GoalID, const FMGCommunityGoal&, Goal);
+
+/// Broadcast when community goal reaches a new tier; unlock tier rewards
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCommunityGoalTierReached, FName, GoalID, int32, Tier);
+
+/// Broadcast at midnight UTC when daily challenges refresh
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDailyChallengesRefreshed);
 
 /**

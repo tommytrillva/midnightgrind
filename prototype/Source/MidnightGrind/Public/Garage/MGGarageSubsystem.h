@@ -280,59 +280,89 @@ struct FMGPaintConfiguration
 	FLinearColor FlakeColor = FLinearColor::White;
 };
 
+// ============================================================================
+// PART DATA STRUCTURES
+// ============================================================================
+
 /**
- * Part data struct for garage operations (simplified from UMGPartData)
+ * @struct FMGPartData
+ * @brief Lightweight part data for garage operations
+ *
+ * This is a simplified representation of part data used for runtime operations.
+ * For full part definitions, see the Parts Catalog subsystem and UMGPartData asset.
+ *
+ * ## Part Identification
+ * Parts are identified by a unique FName PartID (e.g., "TURBO_T3_SMALL").
+ * The same part may be compatible with multiple vehicles.
  */
 USTRUCT(BlueprintType)
 struct FMGPartData
 {
 	GENERATED_BODY()
 
+	/// Unique identifier for this part (e.g., "INTAKE_COLD_AIR_V1")
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	FName PartID;
 
+	/// Human-readable name shown in UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	FText DisplayName;
 
+	/// Brand/manufacturer name (e.g., "HKS", "Garrett", "Brembo")
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	FText Manufacturer;
 
+	/// Which slot this part installs into
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	EMGPartSlot Slot = EMGPartSlot::None;
 
+	/// Quality tier affecting price and performance gains
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	EMGPartTier Tier = EMGPartTier::Stock;
 
+	/// Purchase price in credits
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	int64 Price = 0;
 
+	/// Performance modifiers applied when installed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	FMGPartModifiers Modifiers;
 
+	/// List of vehicles this part can be installed on (empty = universal)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	TArray<UMGVehicleModelData*> CompatibleVehicles;
 
+	/// Optional 3D mesh for visual representation in garage
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	TSoftObjectPtr<UStaticMesh> VisualMesh;
 };
 
 /**
- * An installed part with metadata
+ * @struct FMGInstalledPart
+ * @brief Represents a part that has been installed on a vehicle
+ *
+ * Wraps FMGPartData with installation-specific metadata like install date,
+ * current condition, and mileage tracking. Used for wear simulation and
+ * maintenance tracking.
  */
 USTRUCT(BlueprintType)
 struct FMGInstalledPart
 {
 	GENERATED_BODY()
 
+	/// The part data describing what is installed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	FMGPartData PartData;
 
+	/// When the part was installed (for warranty/history tracking)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	FDateTime InstallDate;
 
+	/// Current part condition (0-100%, affects performance when damaged)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	float Condition = 100.0f;
 
+	/// Odometer reading when part was installed (for wear calculations)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Part")
 	int32 MileageAtInstall = 0;
 
@@ -342,8 +372,29 @@ struct FMGInstalledPart
 	}
 };
 
+// ============================================================================
+// OWNED VEHICLE DATA
+// ============================================================================
+
 /**
- * Represents a vehicle owned by the player in their garage
+ * @struct FMGOwnedVehicle
+ * @brief Complete data for a vehicle owned by the player
+ *
+ * This is the primary data structure for player vehicles. It contains:
+ * - Identity: Unique ID and reference to base vehicle model
+ * - Customization: Installed parts and paint configuration
+ * - Performance: Calculated PI and class
+ * - Statistics: Odometer, race history, investment tracking
+ * - Wear State: Condition of all components (tires, engine, brakes, etc.)
+ *
+ * ## Persistence
+ * All properties marked with SaveGame will be saved/loaded automatically.
+ * Transient properties like cached stats are recalculated on load.
+ *
+ * ## Vehicle Health System
+ * Each component has a condition percentage (0-100). When condition drops
+ * below 50%, performance begins to degrade. Components can be repaired
+ * or replaced at shops.
  */
 USTRUCT(BlueprintType)
 struct FMGOwnedVehicle

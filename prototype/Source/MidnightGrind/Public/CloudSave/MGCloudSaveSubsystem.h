@@ -111,83 +111,120 @@ enum class EMGConflictResolution : uint8
 	AskUser				UMETA(DisplayName = "Ask User")          ///< Prompt player to choose
 };
 
+// ============================================================================
+// DATA STRUCTURES - SAVE SLOT INFORMATION
+// ============================================================================
+
 /**
- * Save Slot Info
+ * @struct FMGSaveSlotInfo
+ * @brief Metadata about a save slot, displayed in the save/load UI.
+ *
+ * Contains summary information about a save without loading the full save data.
+ * Used to populate save slot selection screens with preview information.
  */
 USTRUCT(BlueprintType)
 struct FMGSaveSlotInfo
 {
 	GENERATED_BODY()
 
+	/// Index of this save slot (0, 1, 2, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	int32 SlotIndex = 0;
 
+	/// Display name for this slot (e.g., "Save Slot 1" or custom name)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	FString SlotName;
 
+	/// Player's display name at time of save
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	FString PlayerName;
 
+	/// Player's level at time of save
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	int32 PlayerLevel = 1;
 
+	/// Total play time in seconds for this save file
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
-	int32 TotalPlayTime = 0; // In seconds
+	int32 TotalPlayTime = 0;
 
+	/// Game completion percentage (0.0 to 100.0)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	float CompletionPercent = 0.0f;
 
+	/// Timestamp of last local save
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	FDateTime LastSaveTime;
 
+	/// Timestamp of last successful cloud sync
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	FDateTime LastCloudSyncTime;
 
+	/// True if this slot has no save data
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	bool bIsEmpty = true;
 
+	/// True if save data failed validation (may need repair)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	bool bIsCorrupted = false;
 
+	/// Data format version (for migration purposes)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	int32 SaveVersion = 1;
 
+	/// Unique identifier of the device that created this save
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	FString DeviceID;
 
+	/// Platform name (e.g., "Windows", "PlayStation", "Xbox")
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveSlot")
 	FString Platform;
 };
 
+// ============================================================================
+// DATA STRUCTURES - CLOUD METADATA
+// ============================================================================
+
 /**
- * Cloud Save Metadata
+ * @struct FMGCloudSaveMetadata
+ * @brief Information about a save stored in the cloud.
+ *
+ * Contains metadata retrieved from the cloud server without downloading
+ * the full save data. Used for conflict detection and UI display.
  */
 USTRUCT(BlueprintType)
 struct FMGCloudSaveMetadata
 {
 	GENERATED_BODY()
 
+	/// Unique identifier for this cloud save record
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CloudSave")
 	FString CloudSaveID;
 
+	/// Player account ID that owns this save
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CloudSave")
 	FString PlayerID;
 
+	/// Server timestamp of when this save was uploaded
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CloudSave")
 	FDateTime CloudTimestamp;
 
+	/// Version counter incremented on each cloud upload
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CloudSave")
 	int32 CloudVersion = 0;
 
+	/// Size of the save data in bytes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CloudSave")
 	int64 DataSize = 0;
 
+	/// Hash for data integrity verification
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CloudSave")
 	FString Checksum;
 
+	/// Device ID that last uploaded this save
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CloudSave")
 	FString OriginDevice;
 
+	/// Platform that last uploaded this save
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CloudSave")
 	FString OriginPlatform;
 };

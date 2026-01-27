@@ -469,7 +469,54 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 50);
+	// UI Data Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_UIData_HUDDataDefaults"));
+		Test.TestName = FText::FromString(TEXT("UI Data - HUD Data Defaults"));
+		Test.Description = FText::FromString(TEXT("Verify HUD data structure default values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("UIData")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_UIData_RaceStatusDefaults"));
+		Test.TestName = FText::FromString(TEXT("UI Data - Race Status Defaults"));
+		Test.Description = FText::FromString(TEXT("Verify race status structure default values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("UIData")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_UIData_TelemetryDefaults"));
+		Test.TestName = FText::FromString(TEXT("UI Data - Telemetry Defaults"));
+		Test.Description = FText::FromString(TEXT("Verify vehicle telemetry structure default values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("UIData")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_UIData_HUDModes"));
+		Test.TestName = FText::FromString(TEXT("UI Data - HUD Modes"));
+		Test.Description = FText::FromString(TEXT("Verify HUD mode enumeration values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("UIData")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_UIData_DataProvider"));
+		Test.TestName = FText::FromString(TEXT("UI Data - Data Provider"));
+		Test.Description = FText::FromString(TEXT("Verify HUD data provider subsystem"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("UIData")));
+		TestFramework->RegisterTest(Test);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 55);
 }
 
 // ==========================================

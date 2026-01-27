@@ -342,6 +342,22 @@ void AMGPlayerController::BeginPlay()
 				ShortcutSubsystem->OnShortcutMastered.AddDynamic(this, &AMGPlayerController::OnShortcutMastered);
 				ShortcutSubsystem->OnSecretShortcutFound.AddDynamic(this, &AMGPlayerController::OnSecretShortcutFound);
 			}
+
+			// Bind to career subsystem for story progression
+			if (UMGCareerSubsystem* CareerSubsystem = GI->GetSubsystem<UMGCareerSubsystem>())
+			{
+				CareerSubsystem->OnChapterAdvanced.AddDynamic(this, &AMGPlayerController::OnCareerChapterAdvanced);
+				CareerSubsystem->OnMilestoneReached.AddDynamic(this, &AMGPlayerController::OnCareerMilestoneReached);
+				CareerSubsystem->OnObjectiveCompleted.AddDynamic(this, &AMGPlayerController::OnCareerObjectiveCompleted);
+			}
+
+			// Bind to rivals subsystem for rivalry events
+			if (UMGRivalsSubsystem* RivalsSubsystem = GI->GetSubsystem<UMGRivalsSubsystem>())
+			{
+				RivalsSubsystem->OnNewRivalDiscovered.AddDynamic(this, &AMGPlayerController::OnNewRivalDiscovered);
+				RivalsSubsystem->OnRivalDefeated.AddDynamic(this, &AMGPlayerController::OnRivalDefeated);
+				RivalsSubsystem->OnNemesisDesignated.AddDynamic(this, &AMGPlayerController::OnNemesisDesignated);
+			}
 		}
 	}
 }
@@ -577,6 +593,20 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			ShortcutSubsystem->OnShortcutCompleted.RemoveDynamic(this, &AMGPlayerController::OnShortcutCompleted);
 			ShortcutSubsystem->OnShortcutMastered.RemoveDynamic(this, &AMGPlayerController::OnShortcutMastered);
 			ShortcutSubsystem->OnSecretShortcutFound.RemoveDynamic(this, &AMGPlayerController::OnSecretShortcutFound);
+		}
+
+		if (UMGCareerSubsystem* CareerSubsystem = GI->GetSubsystem<UMGCareerSubsystem>())
+		{
+			CareerSubsystem->OnChapterAdvanced.RemoveDynamic(this, &AMGPlayerController::OnCareerChapterAdvanced);
+			CareerSubsystem->OnMilestoneReached.RemoveDynamic(this, &AMGPlayerController::OnCareerMilestoneReached);
+			CareerSubsystem->OnObjectiveCompleted.RemoveDynamic(this, &AMGPlayerController::OnCareerObjectiveCompleted);
+		}
+
+		if (UMGRivalsSubsystem* RivalsSubsystem = GI->GetSubsystem<UMGRivalsSubsystem>())
+		{
+			RivalsSubsystem->OnNewRivalDiscovered.RemoveDynamic(this, &AMGPlayerController::OnNewRivalDiscovered);
+			RivalsSubsystem->OnRivalDefeated.RemoveDynamic(this, &AMGPlayerController::OnRivalDefeated);
+			RivalsSubsystem->OnNemesisDesignated.RemoveDynamic(this, &AMGPlayerController::OnNemesisDesignated);
 		}
 	}
 

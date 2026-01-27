@@ -1,0 +1,304 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - VIP Membership and Premium Subscription System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "SubscriptionBased": true,
+    "NoPayToWin": true,
+    "ConvenienceOnly": true,
+    "GracePeriod": 7
+  },
+
+  "MembershipTiers": {
+    "Free": {
+      "ID": "VIP_FREE",
+      "Name": "Street Racer",
+      "Price": 0,
+      "Features": {
+        "FullGameAccess": true,
+        "AllContent": true,
+        "StandardRewards": true,
+        "BaseGarageSlots": 10
+      }
+    },
+    "VIPSilver": {
+      "ID": "VIP_SILVER",
+      "Name": "VIP Silver",
+      "Price": { "Monthly": 4.99, "Yearly": 49.99 },
+      "Features": {
+        "REPBonus": 1.15,
+        "CashBonus": 1.1,
+        "ExtraGarageSlots": 10,
+        "PrivateLobbies": true,
+        "ExclusiveLiveries": 5,
+        "PriorityMatchmaking": true,
+        "NoAds": true
+      },
+      "MonthlyRewards": {
+        "Chrome": 200,
+        "CosmeticCrate": 1,
+        "Cash": 50000
+      }
+    },
+    "VIPGold": {
+      "ID": "VIP_GOLD",
+      "Name": "VIP Gold",
+      "Price": { "Monthly": 9.99, "Yearly": 99.99 },
+      "Features": {
+        "REPBonus": 1.25,
+        "CashBonus": 1.2,
+        "ExtraGarageSlots": 25,
+        "PrivateLobbies": true,
+        "ExclusiveLiveries": 15,
+        "PriorityMatchmaking": true,
+        "NoAds": true,
+        "ExclusiveVehicleAccess": true,
+        "DoubleDaily": true,
+        "CrewSlotBonus": 10,
+        "CustomPlateStyles": true
+      },
+      "MonthlyRewards": {
+        "Chrome": 500,
+        "PremiumCrate": 1,
+        "CosmeticCrate": 2,
+        "Cash": 150000,
+        "RandomPart": 1
+      }
+    },
+    "VIPPlatinum": {
+      "ID": "VIP_PLATINUM",
+      "Name": "VIP Platinum",
+      "Price": { "Monthly": 14.99, "Yearly": 149.99 },
+      "Features": {
+        "REPBonus": 1.35,
+        "CashBonus": 1.3,
+        "ExtraGarageSlots": 50,
+        "PrivateLobbies": true,
+        "ExclusiveLiveries": 30,
+        "PriorityMatchmaking": true,
+        "NoAds": true,
+        "ExclusiveVehicleAccess": true,
+        "DoubleDaily": true,
+        "CrewSlotBonus": 25,
+        "CustomPlateStyles": true,
+        "EarlyAccess": true,
+        "BetaFeatures": true,
+        "PrioritySupport": true,
+        "ExclusiveEvents": true,
+        "CustomHornSlots": 10,
+        "UnlimitedPhotoStorage": true
+      },
+      "MonthlyRewards": {
+        "Chrome": 1000,
+        "LegendaryCrate": 1,
+        "PremiumCrate": 2,
+        "Cash": 300000,
+        "RandomPart": 3,
+        "ExclusiveItem": 1
+      }
+    }
+  },
+
+  "ExclusiveContent": {
+    "Vehicles": {
+      "VIPSilver": {
+        "Count": 2,
+        "Type": "Recolors",
+        "Tradeable": false
+      },
+      "VIPGold": {
+        "Count": 5,
+        "Type": "UniqueVariants",
+        "Tradeable": false
+      },
+      "VIPPlatinum": {
+        "Count": 10,
+        "Type": "ExclusiveModels",
+        "Tradeable": false
+      }
+    },
+    "Cosmetics": {
+      "Liveries": { "PerTier": [5, 15, 30] },
+      "Wheels": { "PerTier": [2, 5, 10] },
+      "Effects": { "PerTier": [1, 3, 5] },
+      "Plates": { "PerTier": [3, 8, 15] }
+    },
+    "ProfileItems": {
+      "Badges": { "Unique": true, "ShowsTier": true },
+      "Banners": { "AnimatedAvailable": true },
+      "Titles": { "ExclusivePerTier": true },
+      "Avatars": { "Premium": true }
+    }
+  },
+
+  "Perks": {
+    "Progression": {
+      "REPMultiplier": { "Silver": 1.15, "Gold": 1.25, "Platinum": 1.35 },
+      "CashMultiplier": { "Silver": 1.1, "Gold": 1.2, "Platinum": 1.3 },
+      "XPMultiplier": { "Silver": 1.1, "Gold": 1.15, "Platinum": 1.2 }
+    },
+    "Garage": {
+      "ExtraSlots": { "Silver": 10, "Gold": 25, "Platinum": 50 },
+      "FreePaintJobs": { "Silver": 0, "Gold": 5, "Platinum": "Unlimited" },
+      "FreeRepairs": { "Silver": 0, "Gold": 3, "Platinum": 10 }
+    },
+    "Social": {
+      "PrivateLobbies": { "Silver": 8, "Gold": 16, "Platinum": 32 },
+      "CrewSlots": { "Silver": 0, "Gold": 10, "Platinum": 25 },
+      "FriendSlots": { "Silver": 100, "Gold": 250, "Platinum": 500 }
+    },
+    "Marketplace": {
+      "ExtraListings": { "Silver": 5, "Gold": 15, "Platinum": 25 },
+      "ReducedFees": { "Silver": 0, "Gold": 0.02, "Platinum": 0.03 },
+      "FeaturedListings": { "Silver": 0, "Gold": 1, "Platinum": 3 }
+    },
+    "Quality": {
+      "PriorityMatchmaking": { "Silver": true, "Gold": true, "Platinum": true },
+      "PrioritySupport": { "Silver": false, "Gold": false, "Platinum": true },
+      "BetaAccess": { "Silver": false, "Gold": false, "Platinum": true },
+      "EarlyAccess": { "Silver": false, "Gold": false, "Platinum": true }
+    }
+  },
+
+  "DailyBonuses": {
+    "VIPSilver": {
+      "BonusCash": 5000,
+      "BonusREP": 500,
+      "SpinWheel": { "Attempts": 2 }
+    },
+    "VIPGold": {
+      "BonusCash": 15000,
+      "BonusREP": 1500,
+      "SpinWheel": { "Attempts": 3 },
+      "DoubleDailyRewards": true
+    },
+    "VIPPlatinum": {
+      "BonusCash": 30000,
+      "BonusREP": 3000,
+      "SpinWheel": { "Attempts": 5 },
+      "DoubleDailyRewards": true,
+      "MysteryBonus": true
+    }
+  },
+
+  "ExclusiveEvents": {
+    "VIPRaces": {
+      "Frequency": "Weekly",
+      "MinTier": "Silver",
+      "Rewards": { "Multiplier": 2.0 }
+    },
+    "GoldOnlyTournaments": {
+      "Frequency": "Monthly",
+      "MinTier": "Gold",
+      "ExclusivePrizes": true
+    },
+    "PlatinumShowcase": {
+      "Frequency": "Monthly",
+      "MinTier": "Platinum",
+      "DevInteraction": true,
+      "UniqueRewards": true
+    }
+  },
+
+  "SubscriptionManagement": {
+    "Billing": {
+      "AutoRenew": { "Default": true, "Cancellable": true },
+      "Proration": true,
+      "UpgradeAnytime": true,
+      "DowngradeAtPeriodEnd": true
+    },
+    "GracePeriod": {
+      "Days": 7,
+      "ReducedFeatures": true,
+      "FullAccessToOwned": true
+    },
+    "Cancellation": {
+      "KeepEarnedItems": true,
+      "KeepProgress": true,
+      "LosePerks": true,
+      "RefundPolicy": "Prorated"
+    },
+    "Resubscribe": {
+      "WelcomeBackBonus": true,
+      "StreakRecovery": { "Within30Days": true }
+    }
+  },
+
+  "LoyaltyProgram": {
+    "Enabled": true,
+    "Milestones": {
+      "3Months": {
+        "Reward": { "Chrome": 500, "Badge": "Loyal" }
+      },
+      "6Months": {
+        "Reward": { "Chrome": 1000, "ExclusiveItem": true, "Badge": "Dedicated" }
+      },
+      "12Months": {
+        "Reward": { "Chrome": 2500, "ExclusiveVehicle": true, "Title": "Founding Member" }
+      },
+      "24Months": {
+        "Reward": { "Chrome": 5000, "LegendaryVehicle": true, "Badge": "Legend" }
+      }
+    },
+    "CumulativeBonus": {
+      "PerMonth": { "REPBonus": 0.01 },
+      "MaxBonus": 0.25
+    }
+  },
+
+  "TrialPeriod": {
+    "Enabled": true,
+    "Duration": 7,
+    "Tier": "VIPGold",
+    "OnePerAccount": true,
+    "RequiresPaymentMethod": false
+  },
+
+  "Gifting": {
+    "Enabled": true,
+    "Duration": [1, 3, 6, 12],
+    "Discount": { "6Months": 0.1, "12Months": 0.2 },
+    "GiftMessage": true
+  },
+
+  "FamilyPlan": {
+    "Enabled": true,
+    "MaxMembers": 5,
+    "Discount": 0.4,
+    "SharedFeatures": ["ExclusiveContent", "Perks"],
+    "IndividualFeatures": ["Progress", "Rewards"]
+  },
+
+  "Transparency": {
+    "ClearPricing": true,
+    "NoHiddenFees": true,
+    "FeatureComparison": true,
+    "ValueCalculator": true,
+    "CancellationProcess": "Simple"
+  },
+
+  "UI": {
+    "VIPHub": {
+      "CurrentStatus": true,
+      "BenefitsOverview": true,
+      "ExclusiveStore": true,
+      "RewardsCalendar": true
+    },
+    "UpgradePrompts": {
+      "NonIntrusive": true,
+      "ContextRelevant": true,
+      "DismissablePermanently": true
+    },
+    "SubscriptionManager": {
+      "BillingHistory": true,
+      "PlanComparison": true,
+      "ManageRenewal": true
+    },
+    "VIPIndicator": {
+      "ProfileBadge": true,
+      "InGameIcon": true,
+      "Subtle": true
+    }
+  }
+}

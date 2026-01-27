@@ -210,67 +210,93 @@ struct FMGPlayerReport
 };
 
 /**
- * Validation Thresholds
+ * @brief Configuration thresholds for validation checks
+ *
+ * These values define the boundaries of acceptable gameplay. Values exceeding
+ * these thresholds trigger violation detection. Thresholds should be tuned
+ * based on the fastest vehicles and most extreme legitimate gameplay scenarios.
+ *
+ * @note These are default values; actual limits may vary per vehicle and track
  */
 USTRUCT(BlueprintType)
 struct FMGValidationThresholds
 {
 	GENERATED_BODY()
 
+	/// Maximum allowed vehicle speed in km/h (fastest vehicle at max upgrades)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thresholds")
-	float MaxSpeed = 500.0f; // km/h
+	float MaxSpeed = 500.0f;
 
+	/// Maximum allowed acceleration in m/s^2 (prevents instant speed gains)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thresholds")
-	float MaxAcceleration = 50.0f; // m/s^2
+	float MaxAcceleration = 50.0f;
 
+	/// Maximum distance a player can move in one frame in meters (teleport detection)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thresholds")
-	float MaxTeleportDistance = 100.0f; // meters per frame
+	float MaxTeleportDistance = 100.0f;
 
+	/// Shortest possible lap time in seconds (per-track overrides recommended)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thresholds")
-	float MinLapTime = 20.0f; // seconds
+	float MinLapTime = 20.0f;
 
+	/// Maximum drift angle in degrees before physics violation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thresholds")
-	float MaxDriftAngle = 90.0f; // degrees
+	float MaxDriftAngle = 90.0f;
 
+	/// Maximum in-game currency earnable from a single race
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thresholds")
 	int32 MaxCurrencyPerRace = 100000;
 
+	/// Maximum XP earnable from a single race
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thresholds")
 	int32 MaxXPPerRace = 50000;
 
+	/// Maximum ping variance in ms before flagging connection manipulation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thresholds")
-	float MaxPingVariance = 500.0f; // ms
+	float MaxPingVariance = 500.0f;
 
+	/// Maximum client-server time difference in seconds before flagging
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Thresholds")
-	float TimeDesyncThreshold = 2.0f; // seconds
+	float TimeDesyncThreshold = 2.0f;
 };
 
 /**
- * Integrity Check Result
+ * @brief Results from a system integrity check
+ *
+ * Contains the outcome of various integrity checks including file verification,
+ * memory scanning, and environment detection. Used to identify tampered game
+ * installations or suspicious runtime environments.
  */
 USTRUCT(BlueprintType)
 struct FMGIntegrityCheckResult
 {
 	GENERATED_BODY()
 
+	/// True if all integrity checks passed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integrity")
 	bool bPassed = true;
 
+	/// List of specific checks that failed (for logging/debugging)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integrity")
 	TArray<FString> FailedChecks;
 
+	/// File paths that have been modified from expected checksums
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integrity")
 	TArray<FString> ModifiedFiles;
 
+	/// True if a debugger is attached to the game process
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integrity")
 	bool bDebuggerDetected = false;
 
+	/// True if game is running inside a virtual machine
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integrity")
 	bool bVirtualMachineDetected = false;
 
+	/// True if critical memory regions have been altered
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integrity")
 	bool bMemoryModified = false;
 
+	/// When this integrity check was performed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Integrity")
 	FDateTime CheckTime;
 };

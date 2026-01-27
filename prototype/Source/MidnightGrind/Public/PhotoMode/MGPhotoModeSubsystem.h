@@ -290,23 +290,47 @@ struct FMGPhotoInfo
 	bool bIsShared = false;
 };
 
-/**
- * Delegates
- */
+// ============================================================================
+// DELEGATES - Event Notifications
+// ============================================================================
+
+/** @brief Broadcast when photo mode is entered. Use to pause gameplay, hide HUD, etc. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPhotoModeEntered);
+
+/** @brief Broadcast when photo mode is exited. Use to resume gameplay, restore HUD, etc. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPhotoModeExited);
+
+/** @brief Broadcast when a photo is successfully captured. Provides photo metadata. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPhotoCaptured, const FMGPhotoInfo&, PhotoInfo);
+
+/** @brief Broadcast when camera mode changes. Use to update UI hints for controls. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCameraModeChanged, EMGPhotoCamera, NewMode);
 
+// ============================================================================
+// PHOTO MODE SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Photo Mode Subsystem
- * Manages photo capture and editing
+ * @class UMGPhotoModeSubsystem
+ * @brief World subsystem that manages the in-game photo mode feature.
  *
- * Features:
- * - Free camera controls
- * - Filters and effects
- * - Depth of field
- * - Photo export and gallery
+ * This subsystem provides complete photo mode functionality including:
+ * - **Camera Control**: Multiple modes (free, orbit, track, locked) with smooth movement
+ * - **Visual Adjustments**: Filters, exposure, color grading, and effects
+ * - **Depth of Field**: Adjustable focal distance and aperture for bokeh effects
+ * - **Overlays**: Logos, frames, timestamps, and contextual information
+ * - **Capture**: Standard and high-resolution photo capture with automatic saving
+ * - **Gallery**: Browse, delete, and share saved photos
+ *
+ * The subsystem automatically handles scene pausing, HUD hiding, and camera
+ * transitions when entering/exiting photo mode.
+ *
+ * @note This is a UWorldSubsystem, meaning one instance exists per game world.
+ *       Access via GetWorld()->GetSubsystem<UMGPhotoModeSubsystem>().
+ *
+ * @see EMGPhotoCamera for camera mode options
+ * @see EMGPhotoFilter for available filter presets
+ * @see FMGPhotoInfo for saved photo metadata
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGPhotoModeSubsystem : public UWorldSubsystem
@@ -314,26 +338,47 @@ class MIDNIGHTGRIND_API UMGPhotoModeSubsystem : public UWorldSubsystem
 	GENERATED_BODY()
 
 public:
+	/// @name Lifecycle
+	/// @{
+
+	/** Initialize the subsystem, set up render targets and materials. */
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	/** Clean up resources when subsystem is destroyed. */
 	virtual void Deinitialize() override;
+
+	/** Per-frame update for camera movement and effect updates. */
 	virtual void Tick(float DeltaTime) override;
+
+	/** Always create this subsystem for worlds that support it. */
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override { return true; }
 
-	// ==========================================
-	// EVENTS
-	// ==========================================
+	/// @}
 
+	// ==========================================
+	/// @name Events
+	/// @brief Delegates for photo mode state changes and captures.
+	/// Bind to these events to react to photo mode activities.
+	// ==========================================
+	/// @{
+
+	/** Broadcast when entering photo mode. Pause gameplay systems here. */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPhotoModeEntered OnPhotoModeEntered;
 
+	/** Broadcast when exiting photo mode. Resume gameplay systems here. */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPhotoModeExited OnPhotoModeExited;
 
+	/** Broadcast when a photo is captured. Provides saved photo info. */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPhotoCaptured OnPhotoCaptured;
 
+	/** Broadcast when camera mode changes (Free, Orbit, etc.). */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCameraModeChanged OnCameraModeChanged;
+
+	/// @}
 
 	// ==========================================
 	// PHOTO MODE CONTROL
