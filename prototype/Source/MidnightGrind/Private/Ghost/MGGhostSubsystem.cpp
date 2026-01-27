@@ -8,6 +8,20 @@
 #include "HAL/PlatformFileManager.h"
 #include "Serialization/BufferArchive.h"
 #include "Serialization/MemoryReader.h"
+#include "HttpModule.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
+#include "JsonObjectConverter.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
+
+// Backend API configuration
+namespace MGGhostAPI
+{
+	const FString BaseURL = TEXT("https://api.midnightgrind.com/v1/ghosts");
+	const FString APIKey = TEXT(""); // Set via config
+}
 
 void UMGGhostSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -652,22 +666,136 @@ void UMGGhostSubsystem::ShowAllGhosts()
 
 void UMGGhostSubsystem::DownloadGhost(FGuid GhostID)
 {
-	// Placeholder for online implementation
-	// Would make HTTP request to server
-	OnGhostDownloaded.Broadcast(GhostID, true);
+	// Create HTTP request to download ghost data
+	FHttpModule& HttpModule = FHttpModule::Get();
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = HttpModule.CreateRequest();
+
+	FString URL = FString::Printf(TEXT("%s/%s"), *MGGhostAPI::BaseURL, *GhostID.ToString());
+	Request->SetURL(URL);
+	Request->SetVerb(TEXT("GET"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	// Handle response
+	Request->OnProcessRequestComplete().BindWeakLambda(this,
+		[this, GhostID](FHttpRequestPtr Req, FHttpResponsePtr Resp, bool bSuccess)
+		{
+			bool bDownloadSuccess = false;
+
+			if (bSuccess && Resp.IsValid() && Resp->GetResponseCode() == 200)
+			{
+				// Parse JSON response into ghost data
+				FString ResponseBody = Resp->GetContentAsString();
+				TSharedPtr<FJsonObject> JsonObject;
+				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseBody);
+
+				if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+				{
+					FMGGhostData DownloadedGhost;
+					if (FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &DownloadedGhost))
+					{
+						// Cache the downloaded ghost
+						DownloadedGhosts.Add(GhostID, DownloadedGhost);
+						bDownloadSuccess = true;
+					}
+				}
+			}
+
+			OnGhostDownloaded.Broadcast(GhostID, bDownloadSuccess);
+		});
+
+	Request->ProcessRequest();
 }
 
 void UMGGhostSubsystem::UploadGhost(const FMGGhostData& GhostData)
 {
-	// Placeholder for online implementation
-	// Would make HTTP POST to server
-	OnGhostUploaded.Broadcast(GhostData.GhostID, true);
+	// Serialize ghost data to JSON
+	FString JsonString;
+	TSharedPtr<FJsonObject> JsonObject = FJsonObjectConverter::UStructToJsonObject(GhostData);
+	if (!JsonObject.IsValid())
+	{
+		OnGhostUploaded.Broadcast(GhostData.GhostID, false);
+		return;
+	}
+
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+	// Create HTTP request to upload ghost
+	FHttpModule& HttpModule = FHttpModule::Get();
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = HttpModule.CreateRequest();
+
+	Request->SetURL(MGGhostAPI::BaseURL);
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetContentAsString(JsonString);
+
+	// Handle response
+	FGuid GhostID = GhostData.GhostID;
+	Request->OnProcessRequestComplete().BindWeakLambda(this,
+		[this, GhostID](FHttpRequestPtr Req, FHttpResponsePtr Resp, bool bSuccess)
+		{
+			bool bUploadSuccess = bSuccess && Resp.IsValid() &&
+				(Resp->GetResponseCode() == 200 || Resp->GetResponseCode() == 201);
+
+			OnGhostUploaded.Broadcast(GhostID, bUploadSuccess);
+		});
+
+	Request->ProcessRequest();
 }
 
 void UMGGhostSubsystem::FetchLeaderboard(FName TrackID, int32 StartRank, int32 Count)
 {
-	// Placeholder for online implementation
-	// Would fetch from server and populate Leaderboards map
+	// Create HTTP request to fetch leaderboard
+	FHttpModule& HttpModule = FHttpModule::Get();
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = HttpModule.CreateRequest();
+
+	FString URL = FString::Printf(TEXT("%s/leaderboard/%s?start=%d&count=%d"),
+		*MGGhostAPI::BaseURL, *TrackID.ToString(), StartRank, Count);
+	Request->SetURL(URL);
+	Request->SetVerb(TEXT("GET"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	// Handle response
+	Request->OnProcessRequestComplete().BindWeakLambda(this,
+		[this, TrackID](FHttpRequestPtr Req, FHttpResponsePtr Resp, bool bSuccess)
+		{
+			if (bSuccess && Resp.IsValid() && Resp->GetResponseCode() == 200)
+			{
+				FString ResponseBody = Resp->GetContentAsString();
+				TArray<TSharedPtr<FJsonValue>> JsonArray;
+				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseBody);
+
+				if (FJsonSerializer::Deserialize(Reader, JsonArray))
+				{
+					TArray<FMGGhostLeaderboardEntry> Entries;
+					for (const TSharedPtr<FJsonValue>& JsonValue : JsonArray)
+					{
+						if (JsonValue->Type == EJson::Object)
+						{
+							FMGGhostLeaderboardEntry Entry;
+							if (FJsonObjectConverter::JsonObjectToUStruct(
+								JsonValue->AsObject().ToSharedRef(), &Entry))
+							{
+								Entries.Add(Entry);
+							}
+						}
+					}
+
+					// Cache leaderboard
+					Leaderboards.Add(TrackID, Entries);
+
+					// If this is the top entry, cache as world record
+					if (Entries.Num() > 0)
+					{
+						DownloadGhost(Entries[0].GhostID);
+					}
+				}
+			}
+
+			OnLeaderboardFetched.Broadcast(TrackID);
+		});
+
+	Request->ProcessRequest();
 }
 
 TArray<FMGGhostLeaderboardEntry> UMGGhostSubsystem::GetLeaderboard(FName TrackID) const
@@ -741,8 +869,44 @@ void UMGGhostSubsystem::RaceWorldRecord(FName TrackID)
 
 void UMGGhostSubsystem::RaceRival(FName TrackID, FName RivalID)
 {
-	// Would fetch rival's ghost from server
-	// For now, placeholder
+	// Fetch rival's ghost from server
+	FHttpModule& HttpModule = FHttpModule::Get();
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = HttpModule.CreateRequest();
+
+	FString URL = FString::Printf(TEXT("%s/rival/%s/%s"),
+		*MGGhostAPI::BaseURL, *TrackID.ToString(), *RivalID.ToString());
+	Request->SetURL(URL);
+	Request->SetVerb(TEXT("GET"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	// Handle response
+	Request->OnProcessRequestComplete().BindWeakLambda(this,
+		[this, TrackID, RivalID](FHttpRequestPtr Req, FHttpResponsePtr Resp, bool bSuccess)
+		{
+			if (bSuccess && Resp.IsValid() && Resp->GetResponseCode() == 200)
+			{
+				FString ResponseBody = Resp->GetContentAsString();
+				TSharedPtr<FJsonObject> JsonObject;
+				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseBody);
+
+				if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+				{
+					FMGGhostData RivalGhost;
+					if (FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &RivalGhost))
+					{
+						// Start playback with rival ghost
+						RivalGhost.GhostType = EMGGhostType::Rival;
+						StartPlayback(RivalGhost);
+						OnRivalGhostLoaded.Broadcast(TrackID, RivalID, true);
+						return;
+					}
+				}
+			}
+
+			OnRivalGhostLoaded.Broadcast(TrackID, RivalID, false);
+		});
+
+	Request->ProcessRequest();
 }
 
 void UMGGhostSubsystem::ClearActiveGhosts()

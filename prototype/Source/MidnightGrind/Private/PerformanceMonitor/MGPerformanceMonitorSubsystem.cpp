@@ -7,6 +7,11 @@
 #include "HAL/PlatformTime.h"
 #include "RenderCore.h"
 #include "RHI.h"
+#include "Engine/NetDriver.h"
+#include "Engine/NetConnection.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMGPerformanceMonitorSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -447,10 +452,128 @@ void UMGPerformanceMonitorSubsystem::UpdateCPUStats()
 
 void UMGPerformanceMonitorSubsystem::UpdateNetworkStats()
 {
-	// Network stats would be populated from the networking subsystem
-	// Placeholder implementation
-	CurrentSnapshot.NetworkStats.PingMs = 0.0f;
-	CurrentSnapshot.NetworkStats.PacketLossPercent = 0.0f;
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	// Get ping from player state
+	APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+	if (PC && PC->PlayerState)
+	{
+		// ExactPing is more accurate than compressed Ping
+		CurrentSnapshot.NetworkStats.PingMs = PC->PlayerState->GetPingInMilliseconds();
+	}
+
+	// Get detailed network stats from net driver
+	UNetDriver* NetDriver = World->GetNetDriver();
+	if (!NetDriver)
+	{
+		// No net driver means single player - reset network stats
+		CurrentSnapshot.NetworkStats.PingMs = 0.0f;
+		CurrentSnapshot.NetworkStats.PacketLossPercent = 0.0f;
+		CurrentSnapshot.NetworkStats.IncomingBandwidthKBps = 0.0f;
+		CurrentSnapshot.NetworkStats.OutgoingBandwidthKBps = 0.0f;
+		CurrentSnapshot.NetworkStats.PacketsReceived = 0;
+		CurrentSnapshot.NetworkStats.PacketsSent = 0;
+		CurrentSnapshot.NetworkStats.PacketsLost = 0;
+		CurrentSnapshot.NetworkStats.Jitter = 0.0f;
+		return;
+	}
+
+	// Aggregate stats from all connections
+	int32 TotalPacketsReceived = 0;
+	int32 TotalPacketsSent = 0;
+	int32 TotalPacketsLost = 0;
+	float TotalIncomingBytes = 0.0f;
+	float TotalOutgoingBytes = 0.0f;
+	float WorstPing = 0.0f;
+	float TotalJitter = 0.0f;
+	int32 ConnectionCount = 0;
+
+	// Check server connection (for clients)
+	if (NetDriver->ServerConnection)
+	{
+		UNetConnection* Conn = NetDriver->ServerConnection;
+
+		TotalPacketsReceived += Conn->InPacketsPerSecond;
+		TotalPacketsSent += Conn->OutPacketsPerSecond;
+		TotalPacketsLost += Conn->InPacketsLost;
+		TotalIncomingBytes += Conn->InBytesPerSecond;
+		TotalOutgoingBytes += Conn->OutBytesPerSecond;
+
+		// Average RTT is more accurate than single sample
+		float ConnPing = Conn->AvgLag * 1000.0f; // Convert to milliseconds
+		if (ConnPing > WorstPing)
+		{
+			WorstPing = ConnPing;
+		}
+
+		// Calculate jitter from packet timing variance
+		// Jitter = difference between expected and actual packet arrival times
+		TotalJitter += FMath::Abs(Conn->AvgLag - Conn->GetAverageRTT()) * 1000.0f;
+		ConnectionCount++;
+	}
+
+	// Check client connections (for server/listen server)
+	for (UNetConnection* Conn : NetDriver->ClientConnections)
+	{
+		if (Conn && Conn->GetConnectionState() == USOCK_Open)
+		{
+			TotalPacketsReceived += Conn->InPacketsPerSecond;
+			TotalPacketsSent += Conn->OutPacketsPerSecond;
+			TotalPacketsLost += Conn->InPacketsLost;
+			TotalIncomingBytes += Conn->InBytesPerSecond;
+			TotalOutgoingBytes += Conn->OutBytesPerSecond;
+
+			float ConnPing = Conn->AvgLag * 1000.0f;
+			if (ConnPing > WorstPing)
+			{
+				WorstPing = ConnPing;
+			}
+
+			TotalJitter += FMath::Abs(Conn->AvgLag - Conn->GetAverageRTT()) * 1000.0f;
+			ConnectionCount++;
+		}
+	}
+
+	// Update network stats
+	CurrentSnapshot.NetworkStats.PacketsReceived = TotalPacketsReceived;
+	CurrentSnapshot.NetworkStats.PacketsSent = TotalPacketsSent;
+	CurrentSnapshot.NetworkStats.PacketsLost = TotalPacketsLost;
+
+	// Calculate packet loss percentage
+	int32 TotalPackets = TotalPacketsReceived + TotalPacketsLost;
+	if (TotalPackets > 0)
+	{
+		CurrentSnapshot.NetworkStats.PacketLossPercent =
+			(static_cast<float>(TotalPacketsLost) / static_cast<float>(TotalPackets)) * 100.0f;
+	}
+	else
+	{
+		CurrentSnapshot.NetworkStats.PacketLossPercent = 0.0f;
+	}
+
+	// Convert bytes to KBps
+	CurrentSnapshot.NetworkStats.IncomingBandwidthKBps = TotalIncomingBytes / 1024.0f;
+	CurrentSnapshot.NetworkStats.OutgoingBandwidthKBps = TotalOutgoingBytes / 1024.0f;
+
+	// Use worst ping as the reported ping (conservative)
+	if (WorstPing > 0.0f)
+	{
+		CurrentSnapshot.NetworkStats.PingMs = WorstPing;
+	}
+
+	// Average jitter across connections
+	if (ConnectionCount > 0)
+	{
+		CurrentSnapshot.NetworkStats.Jitter = TotalJitter / ConnectionCount;
+	}
+	else
+	{
+		CurrentSnapshot.NetworkStats.Jitter = 0.0f;
+	}
 }
 
 void UMGPerformanceMonitorSubsystem::EvaluatePerformanceLevel()

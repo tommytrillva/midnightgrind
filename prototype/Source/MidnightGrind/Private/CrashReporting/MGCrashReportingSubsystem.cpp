@@ -3,6 +3,8 @@
 #include "CrashReporting/MGCrashReportingSubsystem.h"
 #include "Misc/App.h"
 #include "GenericPlatform/GenericPlatformCrashContext.h"
+#include "HAL/PlatformStackWalk.h"
+#include "GenericPlatform/GenericPlatformMisc.h"
 
 void UMGCrashReportingSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -145,11 +147,67 @@ void UMGCrashReportingSubsystem::UploadReport(const FMGCrashReport& Report)
 
 FString UMGCrashReportingSubsystem::GenerateStackTrace()
 {
-	// Would capture actual stack trace
-	TArray<FProgramCounterSymbolInfo> StackFrames;
-	// FPlatformStackWalk::CaptureStackBackTrace would be used
+	// Capture call stack
+	const int32 MaxStackDepth = 64;
+	uint64 StackTrace[MaxStackDepth];
+	FMemory::Memzero(StackTrace, sizeof(StackTrace));
 
-	return TEXT("Stack trace capture placeholder");
+	// Skip first few frames (this function, ReportCrash, etc.)
+	const int32 IgnoreCount = 3;
+	const int32 CapturedDepth = FPlatformStackWalk::CaptureStackBackTrace(StackTrace, MaxStackDepth);
+
+	if (CapturedDepth == 0)
+	{
+		return TEXT("Stack trace unavailable");
+	}
+
+	FString StackTraceString;
+
+	// Convert program counters to human-readable symbols
+	for (int32 i = IgnoreCount; i < CapturedDepth; ++i)
+	{
+		if (StackTrace[i] == 0)
+		{
+			break;
+		}
+
+		FProgramCounterSymbolInfo SymbolInfo;
+		FPlatformStackWalk::ProgramCounterToSymbolInfo(StackTrace[i], SymbolInfo);
+
+		// Format: [index] ModuleName!FunctionName (filename:line)
+		FString FrameString;
+
+		// Frame number
+		FrameString = FString::Printf(TEXT("[%d] "), i - IgnoreCount);
+
+		// Module name
+		if (SymbolInfo.ModuleName[0] != '\0')
+		{
+			FrameString += FString(SymbolInfo.ModuleName);
+			FrameString += TEXT("!");
+		}
+
+		// Function name
+		if (SymbolInfo.FunctionName[0] != '\0')
+		{
+			FrameString += FString(SymbolInfo.FunctionName);
+		}
+		else
+		{
+			FrameString += FString::Printf(TEXT("0x%016llX"), StackTrace[i]);
+		}
+
+		// Source location (if available)
+		if (SymbolInfo.Filename[0] != '\0')
+		{
+			FrameString += FString::Printf(TEXT(" (%s:%d)"), SymbolInfo.Filename, SymbolInfo.LineNumber);
+		}
+
+		StackTraceString += FrameString;
+		StackTraceString += TEXT("\n");
+	}
+
+	return StackTraceString;
 }
 
 void UMGCrashReportingSubsystem::OnEngineCrash()

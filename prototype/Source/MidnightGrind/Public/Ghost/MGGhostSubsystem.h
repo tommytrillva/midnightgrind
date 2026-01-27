@@ -326,6 +326,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGhostComparison, const FMGGhostC
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNewPersonalBest, FName, TrackID, float, NewTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGhostDownloaded, FGuid, GhostID, bool, bSuccess);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGhostUploaded, FGuid, GhostID, bool, bSuccess);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnLeaderboardFetched, FName, TrackID, const TArray<FMGGhostLeaderboardEntry>&, Entries, bool, bSuccess);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnRivalGhostLoaded, FName, TrackID, FName, RivalID, bool, bSuccess);
 
 UCLASS()
 class MIDNIGHTGRIND_API UMGGhostSubsystem : public UGameInstanceSubsystem
@@ -513,6 +515,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Ghost|Events")
 	FOnGhostUploaded OnGhostUploaded;
+
+	UPROPERTY(BlueprintAssignable, Category = "Ghost|Events")
+	FOnLeaderboardFetched OnLeaderboardFetched;
+
+	UPROPERTY(BlueprintAssignable, Category = "Ghost|Events")
+	FOnRivalGhostLoaded OnRivalGhostLoaded;
 
 protected:
 	void OnGhostTick();

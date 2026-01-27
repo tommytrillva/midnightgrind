@@ -6,6 +6,9 @@
 #include "TimerManager.h"
 #include "Misc/Guid.h"
 #include "Misc/DateTime.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "UnrealClient.h"
 
 void UMGReplayBufferSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -872,8 +875,27 @@ void UMGReplayBufferSubsystem::CancelExport()
 
 void UMGReplayBufferSubsystem::CaptureScreenshot(const FString& FilePath)
 {
-    // Screenshot capture would be implemented with platform-specific code
-    // This is a placeholder
+    if (!GEngine || !GEngine->GameViewport)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("MGReplayBuffer: Cannot capture screenshot - no game viewport"));
+        return;
+    }
+
+    FString FullPath = FilePath;
+    if (FullPath.IsEmpty())
+    {
+        // Generate default path with timestamp
+        FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Screenshots") / TEXT("Replay");
+        IFileManager::Get().MakeDirectory(*SaveDir, true);
+
+        FString Timestamp = FDateTime::Now().ToString(TEXT("%Y%m%d_%H%M%S"));
+        FullPath = SaveDir / FString::Printf(TEXT("Replay_%s.png"), *Timestamp);
+    }
+
+    // Request screenshot from viewport
+    FScreenshotRequest::RequestScreenshot(FullPath, false, false);
+
+    UE_LOG(LogTemp, Log, TEXT("MGReplayBuffer: Screenshot requested: %s"), *FullPath);
 }
 
 FMGReplayFrame UMGReplayBufferSubsystem::GetFrame(int32 FrameNumber) const
@@ -1049,15 +1071,195 @@ void UMGReplayBufferSubsystem::TrimBuffer()
 
 void UMGReplayBufferSubsystem::AnalyzeForEvents()
 {
-    // Auto-detect events by analyzing vehicle states
-    // This would involve analyzing snapshots for:
-    // - Speed changes (overtakes)
-    // - Collisions
-    // - Airtime
-    // - Drift angle changes
-    // etc.
+    if (CurrentRecording.Frames.Num() < 2)
+    {
+        return;
+    }
 
-    // Placeholder implementation - real implementation would analyze frame data
+    // Track vehicle states for event detection
+    TMap<int32, float> PreviousSpeed;
+    TMap<int32, bool> WasDrifting;
+    TMap<int32, bool> WasAirborne;
+    TMap<int32, int32> PreviousPosition; // For overtake detection
+    TMap<int32, FVector> PreviousLocation;
+
+    // Thresholds for event detection
+    const float BigAirMinTime = 0.5f; // Minimum airtime for big air event
+    const float DriftMinAngle = 15.0f; // Minimum angle to start drift
+    const float OvertakeMinSpeedDiff = 5.0f; // MPH difference for overtake
+    const float NearMissDistance = 200.0f; // cm for near miss detection
+
+    TMap<int32, float> AirborneStartTime;
+    TMap<int32, float> DriftStartTime;
+
+    for (int32 FrameIdx = 1; FrameIdx < CurrentRecording.Frames.Num(); ++FrameIdx)
+    {
+        const FMGReplayFrame& PrevFrame = CurrentRecording.Frames[FrameIdx - 1];
+        const FMGReplayFrame& CurrentFrame = CurrentRecording.Frames[FrameIdx];
+
+        // Sort vehicles by distance traveled to get positions
+        TArray<TPair<int32, float>> VehicleDistances;
+        for (const auto& Pair : CurrentFrame.VehicleSnapshots)
+        {
+            // Use distance from origin as proxy for race progress
+            float Distance = Pair.Value.Transform.GetLocation().Size();
+            VehicleDistances.Add(TPair<int32, float>(Pair.Key, Distance));
+        }
+        VehicleDistances.Sort([](const TPair<int32, float>& A, const TPair<int32, float>& B)
+        {
+            return A.Value > B.Value; // Higher distance = further ahead
+        });
+
+        // Assign positions
+        TMap<int32, int32> CurrentPositions;
+        for (int32 i = 0; i < VehicleDistances.Num(); ++i)
+        {
+            CurrentPositions.Add(VehicleDistances[i].Key, i + 1);
+        }
+
+        // Analyze each vehicle
+        for (const auto& Pair : CurrentFrame.VehicleSnapshots)
+        {
+            int32 VehicleId = Pair.Key;
+            const FMGVehicleSnapshot& Snapshot = Pair.Value;
+            const FMGVehicleSnapshot* PrevSnapshot = PrevFrame.VehicleSnapshots.Find(VehicleId);
+
+            if (!PrevSnapshot)
+            {
+                continue;
+            }
+
+            // Detect drift start/end
+            bool bCurrentlyDrifting = Snapshot.bDrifting || FMath::Abs(Snapshot.DriftAngle) >= DriftMinAngle;
+            bool* bWasPrevDrifting = WasDrifting.Find(VehicleId);
+
+            if (bCurrentlyDrifting && (!bWasPrevDrifting || !(*bWasPrevDrifting)))
+            {
+                // Drift started
+                FMGReplayEvent Event;
+                Event.EventId = FGuid::NewGuid();
+                Event.EventType = EMGReplayEventType::DriftStart;
+                Event.Timestamp = CurrentFrame.Timestamp;
+                Event.FrameNumber = CurrentFrame.FrameNumber;
+                Event.VehicleId = VehicleId;
+                Event.WorldLocation = Snapshot.Transform.GetLocation();
+                CurrentRecording.Events.Add(Event);
+
+                DriftStartTime.Add(VehicleId, CurrentFrame.Timestamp);
+            }
+            else if (!bCurrentlyDrifting && bWasPrevDrifting && *bWasPrevDrifting)
+            {
+                // Drift ended
+                FMGReplayEvent Event;
+                Event.EventId = FGuid::NewGuid();
+                Event.EventType = EMGReplayEventType::DriftEnd;
+                Event.Timestamp = CurrentFrame.Timestamp;
+                Event.FrameNumber = CurrentFrame.FrameNumber;
+                Event.VehicleId = VehicleId;
+                Event.WorldLocation = Snapshot.Transform.GetLocation();
+                CurrentRecording.Events.Add(Event);
+            }
+            WasDrifting.Add(VehicleId, bCurrentlyDrifting);
+
+            // Detect big air
+            bool bCurrentlyAirborne = Snapshot.bAirborne;
+            bool* bWasPrevAirborne = WasAirborne.Find(VehicleId);
+
+            if (bCurrentlyAirborne && (!bWasPrevAirborne || !(*bWasPrevAirborne)))
+            {
+                // Started airborne
+                AirborneStartTime.Add(VehicleId, CurrentFrame.Timestamp);
+            }
+            else if (!bCurrentlyAirborne && bWasPrevAirborne && *bWasPrevAirborne)
+            {
+                // Landed - check if it was big air
+                float* StartTime = AirborneStartTime.Find(VehicleId);
+                if (StartTime && (CurrentFrame.Timestamp - *StartTime) >= BigAirMinTime)
+                {
+                    FMGReplayEvent Event;
+                    Event.EventId = FGuid::NewGuid();
+                    Event.EventType = EMGReplayEventType::BigAir;
+                    Event.Timestamp = *StartTime;
+                    Event.FrameNumber = CurrentFrame.FrameNumber;
+                    Event.VehicleId = VehicleId;
+                    Event.WorldLocation = Snapshot.Transform.GetLocation();
+                    CurrentRecording.Events.Add(Event);
+                }
+            }
+            WasAirborne.Add(VehicleId, bCurrentlyAirborne);
+
+            // Detect overtakes
+            int32* PrevPos = PreviousPosition.Find(VehicleId);
+            int32* CurrPos = CurrentPositions.Find(VehicleId);
+            if (PrevPos && CurrPos && *CurrPos < *PrevPos)
+            {
+                // Position improved (lower number = better position)
+                FMGReplayEvent Event;
+                Event.EventId = FGuid::NewGuid();
+                Event.EventType = EMGReplayEventType::Overtake;
+                Event.Timestamp = CurrentFrame.Timestamp;
+                Event.FrameNumber = CurrentFrame.FrameNumber;
+                Event.VehicleId = VehicleId;
+                Event.WorldLocation = Snapshot.Transform.GetLocation();
+                CurrentRecording.Events.Add(Event);
+            }
+
+            // Detect nitro activation
+            if (Snapshot.bNitroActive && !PrevSnapshot->bNitroActive)
+            {
+                FMGReplayEvent Event;
+                Event.EventId = FGuid::NewGuid();
+                Event.EventType = EMGReplayEventType::NitroActivated;
+                Event.Timestamp = CurrentFrame.Timestamp;
+                Event.FrameNumber = CurrentFrame.FrameNumber;
+                Event.VehicleId = VehicleId;
+                Event.WorldLocation = Snapshot.Transform.GetLocation();
+                CurrentRecording.Events.Add(Event);
+            }
+
+            // Update previous position tracking
+            if (CurrPos)
+            {
+                PreviousPosition.Add(VehicleId, *CurrPos);
+            }
+            PreviousLocation.Add(VehicleId, Snapshot.Transform.GetLocation());
+        }
+
+        // Detect near misses between vehicles
+        TArray<int32> VehicleIds;
+        CurrentFrame.VehicleSnapshots.GetKeys(VehicleIds);
+        for (int32 i = 0; i < VehicleIds.Num(); ++i)
+        {
+            for (int32 j = i + 1; j < VehicleIds.Num(); ++j)
+            {
+                const FMGVehicleSnapshot* SnapA = CurrentFrame.VehicleSnapshots.Find(VehicleIds[i]);
+                const FMGVehicleSnapshot* SnapB = CurrentFrame.VehicleSnapshots.Find(VehicleIds[j]);
+
+                if (SnapA && SnapB)
+                {
+                    float Distance = FVector::Dist(
+                        SnapA->Transform.GetLocation(),
+                        SnapB->Transform.GetLocation()
+                    );
+
+                    // Check if close and both moving fast
+                    if (Distance < NearMissDistance &&
+                        SnapA->Speed > 50.0f && SnapB->Speed > 50.0f)
+                    {
+                        // Check they didn't collide (velocities still largely intact)
+                        FMGReplayEvent Event;
+                        Event.EventId = FGuid::NewGuid();
+                        Event.EventType = EMGReplayEventType::NearMiss;
+                        Event.Timestamp = CurrentFrame.Timestamp;
+                        Event.FrameNumber = CurrentFrame.FrameNumber;
+                        Event.VehicleId = VehicleIds[i]; // Primary vehicle
+                        Event.WorldLocation = SnapA->Transform.GetLocation();
+                        CurrentRecording.Events.Add(Event);
+                    }
+                }
+            }
+        }
+    }
 }
 
 FMGVehicleSnapshot UMGReplayBufferSubsystem::LerpSnapshot(const FMGVehicleSnapshot& A, const FMGVehicleSnapshot& B, float Alpha) const
