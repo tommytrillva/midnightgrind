@@ -1,0 +1,389 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Camera System Configuration",
+
+  "DefaultCamera": "Chase",
+  "CameraSwitchCooldown": 0.5,
+  "SmoothTransition": true,
+  "TransitionDuration": 0.3,
+
+  "CameraViews": {
+    "Chase": {
+      "ID": "CAM_CHASE",
+      "Name": "Chase Camera",
+      "Description": "Dynamic third-person following camera",
+      "Unlocked": true,
+      "Settings": {
+        "Distance": {
+          "Default": 6.0,
+          "Min": 4.0,
+          "Max": 12.0,
+          "SpeedScaling": {
+            "Enabled": true,
+            "MinSpeed": 0,
+            "MaxSpeed": 200,
+            "DistanceAdd": 3.0
+          }
+        },
+        "Height": {
+          "Default": 1.8,
+          "Min": 0.5,
+          "Max": 4.0
+        },
+        "FOV": {
+          "Default": 75,
+          "Min": 60,
+          "Max": 100,
+          "SpeedScaling": {
+            "Enabled": true,
+            "MaxFOVBoost": 15
+          }
+        },
+        "LookAhead": {
+          "Enabled": true,
+          "Distance": 0.3,
+          "SteeringInfluence": 0.5
+        },
+        "Smoothing": {
+          "Position": 0.1,
+          "Rotation": 0.15,
+          "FOV": 0.2
+        },
+        "Offset": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "Shake": {
+          "Collision": true,
+          "Terrain": true,
+          "Speed": false
+        }
+      }
+    },
+    "ChaseClose": {
+      "ID": "CAM_CHASE_CLOSE",
+      "Name": "Close Chase",
+      "Description": "Closer third-person view",
+      "Unlocked": true,
+      "Settings": {
+        "Distance": {
+          "Default": 4.0,
+          "SpeedScaling": { "Enabled": true, "DistanceAdd": 2.0 }
+        },
+        "Height": { "Default": 1.5 },
+        "FOV": { "Default": 80 },
+        "LookAhead": { "Enabled": true, "Distance": 0.4 },
+        "Smoothing": { "Position": 0.08, "Rotation": 0.12 }
+      }
+    },
+    "ChaseFar": {
+      "ID": "CAM_CHASE_FAR",
+      "Name": "Far Chase",
+      "Description": "Wide third-person view",
+      "Unlocked": true,
+      "Settings": {
+        "Distance": {
+          "Default": 10.0,
+          "SpeedScaling": { "Enabled": true, "DistanceAdd": 4.0 }
+        },
+        "Height": { "Default": 2.5 },
+        "FOV": { "Default": 70 },
+        "LookAhead": { "Enabled": true, "Distance": 0.2 },
+        "Smoothing": { "Position": 0.15, "Rotation": 0.2 }
+      }
+    },
+    "Hood": {
+      "ID": "CAM_HOOD",
+      "Name": "Hood Camera",
+      "Description": "On the hood looking forward",
+      "Unlocked": true,
+      "Settings": {
+        "Height": { "Default": 0.9 },
+        "ForwardOffset": { "Default": 0.3 },
+        "FOV": { "Default": 85 },
+        "Tilt": { "Default": -2.0 },
+        "Shake": {
+          "Enabled": true,
+          "Intensity": 0.02,
+          "SpeedScaling": true
+        }
+      }
+    },
+    "Bumper": {
+      "ID": "CAM_BUMPER",
+      "Name": "Bumper Camera",
+      "Description": "Front bumper view",
+      "Unlocked": true,
+      "Settings": {
+        "Height": { "Default": 0.4 },
+        "FOV": { "Default": 95 },
+        "SpeedFOVBoost": { "Enabled": true, "Max": 20 },
+        "Shake": {
+          "Enabled": true,
+          "Intensity": 0.03
+        }
+      }
+    },
+    "Cockpit": {
+      "ID": "CAM_COCKPIT",
+      "Name": "Cockpit Camera",
+      "Description": "Driver's seat view with interior",
+      "UnlockCondition": "LEVEL_5",
+      "Settings": {
+        "Position": {
+          "HeadPosition": true,
+          "SeatAdjustment": true
+        },
+        "FOV": { "Default": 75, "Min": 60, "Max": 90 },
+        "HeadBob": {
+          "Enabled": true,
+          "Intensity": 0.3,
+          "AccelerationInfluence": 0.5,
+          "BrakingInfluence": 0.4,
+          "TurningInfluence": 0.3
+        },
+        "LookToApex": {
+          "Enabled": true,
+          "Intensity": 0.3,
+          "MaxAngle": 15
+        },
+        "SteeringWheelVisible": true,
+        "MirrorReflections": true,
+        "GaugesVisible": true
+      }
+    },
+    "Dashboard": {
+      "ID": "CAM_DASHBOARD",
+      "Name": "Dashboard Camera",
+      "Description": "Low dashboard view",
+      "UnlockCondition": "LEVEL_10",
+      "Settings": {
+        "Height": { "Default": 0.7 },
+        "FOV": { "Default": 80 },
+        "ShowDashboard": true,
+        "ShowSteeringWheel": false
+      }
+    },
+    "RoofTop": {
+      "ID": "CAM_ROOF",
+      "Name": "Roof Camera",
+      "Description": "Top-down roof view",
+      "UnlockCondition": "LEVEL_15",
+      "Settings": {
+        "Height": { "Default": 1.2 },
+        "Tilt": { "Default": -10 },
+        "FOV": { "Default": 85 }
+      }
+    },
+    "Wheel": {
+      "ID": "CAM_WHEEL",
+      "Name": "Wheel Camera",
+      "Description": "Close-up wheel view",
+      "UnlockCondition": "LEVEL_20",
+      "Settings": {
+        "WheelIndex": 0,
+        "Distance": 0.6,
+        "FollowWheel": true,
+        "ShowSuspension": true
+      }
+    }
+  },
+
+  "RaceModeOverrides": {
+    "Circuit": {
+      "DefaultCamera": "Chase",
+      "SpeedFOVBoost": true,
+      "CatchupCameraSmoothing": 0.2
+    },
+    "Sprint": {
+      "DefaultCamera": "Chase",
+      "SpeedFOVBoost": true,
+      "HighSpeedShake": true
+    },
+    "Drag": {
+      "DefaultCamera": "ChaseClose",
+      "LaunchCamera": {
+        "Enabled": true,
+        "Duration": 2.0,
+        "Type": "Cinematic"
+      },
+      "FinishCamera": {
+        "Enabled": true,
+        "Duration": 3.0,
+        "Type": "SlowMotion"
+      }
+    },
+    "Drift": {
+      "DefaultCamera": "Chase",
+      "DriftCameraSettings": {
+        "ExtraDistance": 2.0,
+        "HeightBoost": 0.5,
+        "FollowAngle": true,
+        "AngleSmoothing": 0.3
+      },
+      "ScorePopups": true
+    },
+    "Touge": {
+      "DefaultCamera": "Chase",
+      "MountainSettings": {
+        "CliffAwareness": true,
+        "HeightCompensation": true,
+        "GuardrailAvoidance": true
+      }
+    },
+    "Highway": {
+      "DefaultCamera": "ChaseFar",
+      "HighSpeedSettings": {
+        "ExtendedDistance": true,
+        "ReducedLag": true,
+        "SpeedBlur": true
+      }
+    },
+    "FreeRoam": {
+      "DefaultCamera": "Chase",
+      "PhotoModeQuickAccess": true,
+      "CinematicMode": {
+        "Enabled": true,
+        "Hotkey": true
+      }
+    }
+  },
+
+  "CinematicCamera": {
+    "Enabled": true,
+    "AutoCut": {
+      "Enabled": true,
+      "MinDuration": 2.0,
+      "MaxDuration": 8.0
+    },
+    "Angles": [
+      { "ID": "CIN_FRONT_LOW", "Name": "Front Low", "Position": "FrontLow", "Weight": 1.0 },
+      { "ID": "CIN_REAR_HIGH", "Name": "Rear High", "Position": "RearHigh", "Weight": 1.0 },
+      { "ID": "CIN_SIDE_TRACK", "Name": "Side Tracking", "Position": "SideTrack", "Weight": 0.8 },
+      { "ID": "CIN_WHEEL_CLOSE", "Name": "Wheel Close-up", "Position": "WheelClose", "Weight": 0.5 },
+      { "ID": "CIN_HELICOPTER", "Name": "Helicopter", "Position": "Helicopter", "Weight": 0.6 },
+      { "ID": "CIN_TRACKSIDE", "Name": "Trackside", "Position": "Trackside", "Weight": 0.7 }
+    ],
+    "EventPriority": {
+      "Overtake": ["CIN_SIDE_TRACK", "CIN_FRONT_LOW"],
+      "Drift": ["CIN_REAR_HIGH", "CIN_SIDE_TRACK"],
+      "Jump": ["CIN_SIDE_TRACK", "CIN_HELICOPTER"],
+      "Crash": ["CIN_FRONT_LOW", "CIN_SIDE_TRACK"]
+    }
+  },
+
+  "ReplayCamera": {
+    "InheritFromCameraViews": true,
+    "AdditionalCameras": [
+      {
+        "ID": "REPLAY_ORBIT",
+        "Name": "Orbit",
+        "Type": "Orbit",
+        "AutoOrbit": true,
+        "OrbitSpeed": 10.0
+      },
+      {
+        "ID": "REPLAY_FREE",
+        "Name": "Free Camera",
+        "Type": "Free",
+        "MoveSpeed": 50.0,
+        "FastSpeed": 200.0
+      },
+      {
+        "ID": "REPLAY_TRACKSIDE",
+        "Name": "Trackside",
+        "Type": "Static",
+        "AutoSwitch": true
+      },
+      {
+        "ID": "REPLAY_HELICOPTER",
+        "Name": "Helicopter",
+        "Type": "Following",
+        "Height": 50.0,
+        "Distance": 30.0
+      }
+    ]
+  },
+
+  "PhotoModeCamera": {
+    "InheritFromReplayCamera": true,
+    "FreeCamera": {
+      "Enabled": true,
+      "MaxDistance": 50.0,
+      "MinDistance": 1.0
+    },
+    "OrbitCamera": {
+      "Enabled": true,
+      "SmoothOrbit": true
+    },
+    "DepthOfField": {
+      "Enabled": true,
+      "FocusModes": ["Auto", "Manual", "TapToFocus"]
+    }
+  },
+
+  "SpecialCameras": {
+    "StartGrid": {
+      "Type": "Flyover",
+      "Duration": 5.0,
+      "ShowAllVehicles": true
+    },
+    "Finish": {
+      "Type": "SlowMotion",
+      "Duration": 3.0,
+      "SlowMotionFactor": 0.25,
+      "FocusOnWinner": true
+    },
+    "Crash": {
+      "Type": "ActionCam",
+      "Duration": 2.0,
+      "SlowMotion": true,
+      "MultiAngle": true
+    },
+    "PinkSlipResult": {
+      "Type": "Dramatic",
+      "Duration": 5.0,
+      "FocusOnVehicle": true,
+      "SlowPan": true
+    },
+    "Busted": {
+      "Type": "PoliceView",
+      "Duration": 3.0,
+      "ShowPolice": true
+    },
+    "Escaped": {
+      "Type": "Victory",
+      "Duration": 2.0,
+      "SpeedEffect": true
+    }
+  },
+
+  "Accessibility": {
+    "ReducedMotion": {
+      "DisableShake": true,
+      "DisableSpeedEffects": true,
+      "SteadierCamera": true
+    },
+    "MotionSickness": {
+      "ReducedFOVChange": true,
+      "DisableHeadBob": true,
+      "StaticHorizon": true
+    }
+  },
+
+  "PerformanceSettings": {
+    "CameraLOD": {
+      "Enabled": true,
+      "DistanceBased": true
+    },
+    "ReflectionQuality": {
+      "Mirrors": "Medium",
+      "Puddles": "High"
+    },
+    "ShadowQuality": {
+      "CockpitView": "High",
+      "ExteriorView": "Medium"
+    }
+  }
+}

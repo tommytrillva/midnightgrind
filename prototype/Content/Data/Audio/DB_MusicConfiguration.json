@@ -1,0 +1,300 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Music and Soundtrack Configuration",
+
+  "MusicSystem": {
+    "MasterVolume": 0.8,
+    "FadeTime": 2.0,
+    "CrossfadeEnabled": true,
+    "CrossfadeDuration": 1.5,
+    "DynamicMixing": true,
+    "EngineAudioDucking": 0.3
+  },
+
+  "Playlists": {
+    "MainMenu": {
+      "ID": "PLAYLIST_MENU",
+      "Name": "Main Menu",
+      "Shuffle": true,
+      "Loop": true,
+      "Tracks": [
+        { "ID": "MUS_MENU_01", "Name": "Midnight Dreams", "Duration": 240, "Artist": "Synthwave Driver" },
+        { "ID": "MUS_MENU_02", "Name": "Neon Horizons", "Duration": 195, "Artist": "Night Runner" },
+        { "ID": "MUS_MENU_03", "Name": "The Grind", "Duration": 210, "Artist": "Street Legend" }
+      ],
+      "Mood": "Atmospheric",
+      "Energy": "Low"
+    },
+    "Garage": {
+      "ID": "PLAYLIST_GARAGE",
+      "Name": "Garage",
+      "Shuffle": true,
+      "Loop": true,
+      "Tracks": [
+        { "ID": "MUS_GARAGE_01", "Name": "Wrench Work", "Duration": 180, "Artist": "Lo-Fi Mechanics" },
+        { "ID": "MUS_GARAGE_02", "Name": "Build Season", "Duration": 200, "Artist": "Chill Garage" },
+        { "ID": "MUS_GARAGE_03", "Name": "Parts Run", "Duration": 165, "Artist": "Underground Beats" },
+        { "ID": "MUS_GARAGE_04", "Name": "Engine Bay", "Duration": 190, "Artist": "Tuner Vibes" }
+      ],
+      "Mood": "Chill",
+      "Energy": "Low"
+    },
+    "Racing": {
+      "ID": "PLAYLIST_RACING",
+      "Name": "Racing",
+      "Shuffle": true,
+      "Loop": true,
+      "Tracks": [
+        { "ID": "MUS_RACE_01", "Name": "Full Throttle", "Duration": 210, "Artist": "Speed Demon" },
+        { "ID": "MUS_RACE_02", "Name": "Redline", "Duration": 195, "Artist": "Rev Limiter" },
+        { "ID": "MUS_RACE_03", "Name": "Checkered Flag", "Duration": 225, "Artist": "Victory Lane" },
+        { "ID": "MUS_RACE_04", "Name": "Nitrous Rush", "Duration": 180, "Artist": "Boost Kings" },
+        { "ID": "MUS_RACE_05", "Name": "Photo Finish", "Duration": 200, "Artist": "Close Call" },
+        { "ID": "MUS_RACE_06", "Name": "Apex Hunter", "Duration": 215, "Artist": "Track Master" }
+      ],
+      "Mood": "Intense",
+      "Energy": "High"
+    },
+    "Drift": {
+      "ID": "PLAYLIST_DRIFT",
+      "Name": "Drift",
+      "Shuffle": true,
+      "Loop": true,
+      "Tracks": [
+        { "ID": "MUS_DRIFT_01", "Name": "Sideways", "Duration": 200, "Artist": "Angle King" },
+        { "ID": "MUS_DRIFT_02", "Name": "Tire Smoke", "Duration": 185, "Artist": "Drift Queen" },
+        { "ID": "MUS_DRIFT_03", "Name": "Tandem Flow", "Duration": 210, "Artist": "Sync Masters" },
+        { "ID": "MUS_DRIFT_04", "Name": "Manji", "Duration": 175, "Artist": "JDM Beats" }
+      ],
+      "Mood": "Stylish",
+      "Energy": "Medium-High"
+    },
+    "Touge": {
+      "ID": "PLAYLIST_TOUGE",
+      "Name": "Mountain Pass",
+      "Shuffle": true,
+      "Loop": true,
+      "Tracks": [
+        { "ID": "MUS_TOUGE_01", "Name": "Mountain Spirit", "Duration": 240, "Artist": "Pass Runner" },
+        { "ID": "MUS_TOUGE_02", "Name": "Downhill Legend", "Duration": 220, "Artist": "Canyon Ghost" },
+        { "ID": "MUS_TOUGE_03", "Name": "Hairpin", "Duration": 195, "Artist": "Turn Master" },
+        { "ID": "MUS_TOUGE_04", "Name": "Gutter Run", "Duration": 205, "Artist": "Edge Rider" }
+      ],
+      "Mood": "Focused",
+      "Energy": "Medium"
+    },
+    "Highway": {
+      "ID": "PLAYLIST_HIGHWAY",
+      "Name": "Highway",
+      "Shuffle": true,
+      "Loop": true,
+      "Tracks": [
+        { "ID": "MUS_HWY_01", "Name": "Wangan Nights", "Duration": 250, "Artist": "Speed Hunter" },
+        { "ID": "MUS_HWY_02", "Name": "Top Speed", "Duration": 230, "Artist": "Highway Devil" },
+        { "ID": "MUS_HWY_03", "Name": "Midnight Runner", "Duration": 215, "Artist": "Night Shift" },
+        { "ID": "MUS_HWY_04", "Name": "300 Club", "Duration": 240, "Artist": "Elite Speed" }
+      ],
+      "Mood": "Epic",
+      "Energy": "High"
+    },
+    "Pursuit": {
+      "ID": "PLAYLIST_PURSUIT",
+      "Name": "Police Pursuit",
+      "Shuffle": false,
+      "Loop": true,
+      "DynamicIntensity": true,
+      "Tracks": [
+        { "ID": "MUS_PURSUIT_01", "Name": "On The Run", "Duration": 180, "Artist": "Escape Artist", "HeatLevel": 1 },
+        { "ID": "MUS_PURSUIT_02", "Name": "Code Red", "Duration": 195, "Artist": "Wanted", "HeatLevel": 2 },
+        { "ID": "MUS_PURSUIT_03", "Name": "Most Wanted", "Duration": 210, "Artist": "Fugitive", "HeatLevel": 3 },
+        { "ID": "MUS_PURSUIT_04", "Name": "No Escape", "Duration": 225, "Artist": "Last Stand", "HeatLevel": 4 },
+        { "ID": "MUS_PURSUIT_05", "Name": "Endgame", "Duration": 240, "Artist": "Final Chase", "HeatLevel": 5 }
+      ],
+      "Mood": "Tense",
+      "Energy": "Escalating"
+    },
+    "PinkSlip": {
+      "ID": "PLAYLIST_PINKSLIP",
+      "Name": "Pink Slip",
+      "Shuffle": false,
+      "Loop": false,
+      "Tracks": [
+        { "ID": "MUS_PINK_01", "Name": "All Or Nothing", "Duration": 200, "Artist": "High Stakes" },
+        { "ID": "MUS_PINK_02", "Name": "Title Deed", "Duration": 215, "Artist": "Risk Taker" }
+      ],
+      "Mood": "Dramatic",
+      "Energy": "Intense"
+    },
+    "Victory": {
+      "ID": "PLAYLIST_VICTORY",
+      "Name": "Victory",
+      "Shuffle": true,
+      "Loop": false,
+      "Tracks": [
+        { "ID": "MUS_WIN_01", "Name": "Winner's Circle", "Duration": 60, "Artist": "Champion" },
+        { "ID": "MUS_WIN_02", "Name": "Glory", "Duration": 45, "Artist": "Victory Lap" }
+      ],
+      "Mood": "Triumphant",
+      "Energy": "High"
+    },
+    "Defeat": {
+      "ID": "PLAYLIST_DEFEAT",
+      "Name": "Defeat",
+      "Shuffle": true,
+      "Loop": false,
+      "Tracks": [
+        { "ID": "MUS_LOSE_01", "Name": "Next Time", "Duration": 30, "Artist": "Comeback" },
+        { "ID": "MUS_LOSE_02", "Name": "Learn From This", "Duration": 25, "Artist": "Retry" }
+      ],
+      "Mood": "Somber",
+      "Energy": "Low"
+    },
+    "MeetSpot": {
+      "ID": "PLAYLIST_MEET",
+      "Name": "Meet Spot",
+      "Shuffle": true,
+      "Loop": true,
+      "Tracks": [
+        { "ID": "MUS_MEET_01", "Name": "Car Show", "Duration": 220, "Artist": "Scene Setter" },
+        { "ID": "MUS_MEET_02", "Name": "Showcase", "Duration": 195, "Artist": "Display Mode" },
+        { "ID": "MUS_MEET_03", "Name": "Crew Vibes", "Duration": 210, "Artist": "Squad Goals" },
+        { "ID": "MUS_MEET_04", "Name": "Parking Lot", "Duration": 185, "Artist": "Late Night Meet" }
+      ],
+      "Mood": "Social",
+      "Energy": "Medium"
+    },
+    "FreeRoam": {
+      "ID": "PLAYLIST_FREEROAM",
+      "Name": "Free Roam",
+      "Shuffle": true,
+      "Loop": true,
+      "DynamicSelection": true,
+      "TimeOfDayAware": true,
+      "Tracks": [
+        { "ID": "MUS_FR_DAY_01", "Name": "City Cruise", "Duration": 240, "TimeOfDay": "Day" },
+        { "ID": "MUS_FR_DAY_02", "Name": "Sunday Drive", "Duration": 220, "TimeOfDay": "Day" },
+        { "ID": "MUS_FR_SUNSET_01", "Name": "Golden Hour", "Duration": 230, "TimeOfDay": "Sunset" },
+        { "ID": "MUS_FR_NIGHT_01", "Name": "Midnight City", "Duration": 250, "TimeOfDay": "Night" },
+        { "ID": "MUS_FR_NIGHT_02", "Name": "Neon Streets", "Duration": 235, "TimeOfDay": "Night" },
+        { "ID": "MUS_FR_NIGHT_03", "Name": "After Hours", "Duration": 245, "TimeOfDay": "Night" }
+      ],
+      "Mood": "Varied",
+      "Energy": "Low-Medium"
+    }
+  },
+
+  "DynamicMusic": {
+    "Enabled": true,
+    "IntensityLayers": {
+      "Low": { "Instruments": ["Ambient", "Pads"], "Volume": 0.6 },
+      "Medium": { "Instruments": ["Drums", "Bass", "Synth"], "Volume": 0.8 },
+      "High": { "Instruments": ["All", "Leads", "Stabs"], "Volume": 1.0 }
+    },
+    "Triggers": {
+      "Racing": {
+        "Position": { "1st": "High", "2nd-3rd": "Medium", "4th+": "Low" },
+        "GapToLeader": { "Close": "High", "Medium": "Medium", "Far": "Low" },
+        "FinalLap": "High",
+        "Overtake": { "Sting": true, "Duration": 3.0 }
+      },
+      "Pursuit": {
+        "HeatLevel": { "1-2": "Low", "3": "Medium", "4-5": "High" },
+        "NearMiss": { "Sting": true },
+        "Escaped": { "Transition": "Victory" },
+        "Busted": { "Transition": "Defeat" }
+      },
+      "Drift": {
+        "Score": { "0-10000": "Low", "10000-50000": "Medium", "50000+": "High" },
+        "Combo": { "Active": "High", "Broken": "Low" },
+        "Grade": { "SSS": { "Sting": true } }
+      }
+    }
+  },
+
+  "Stingers": {
+    "RaceStart": { "ID": "STING_START", "Duration": 2.0 },
+    "RaceFinish": { "ID": "STING_FINISH", "Duration": 3.0 },
+    "Overtake": { "ID": "STING_OVERTAKE", "Duration": 1.5 },
+    "FinalLap": { "ID": "STING_FINAL_LAP", "Duration": 2.5 },
+    "Win": { "ID": "STING_WIN", "Duration": 5.0 },
+    "Lose": { "ID": "STING_LOSE", "Duration": 3.0 },
+    "PinkSlipWin": { "ID": "STING_PINK_WIN", "Duration": 6.0 },
+    "PinkSlipLose": { "ID": "STING_PINK_LOSE", "Duration": 4.0 },
+    "Achievement": { "ID": "STING_ACHIEVEMENT", "Duration": 2.0 },
+    "LevelUp": { "ID": "STING_LEVEL", "Duration": 3.0 },
+    "REPTierUp": { "ID": "STING_REP", "Duration": 4.0 }
+  },
+
+  "Radio": {
+    "Enabled": true,
+    "Stations": [
+      {
+        "ID": "RADIO_SYNTHWAVE",
+        "Name": "Midnight FM",
+        "Genre": "Synthwave",
+        "Icon": "ICO_Radio_Synth",
+        "Playlists": ["PLAYLIST_RACING", "PLAYLIST_HIGHWAY", "PLAYLIST_FREEROAM"]
+      },
+      {
+        "ID": "RADIO_HIPHOP",
+        "Name": "Street Beat",
+        "Genre": "Hip-Hop",
+        "Icon": "ICO_Radio_HipHop",
+        "UnlockCondition": "LEVEL_10"
+      },
+      {
+        "ID": "RADIO_ELECTRONIC",
+        "Name": "Boost FM",
+        "Genre": "Electronic",
+        "Icon": "ICO_Radio_EDM",
+        "Playlists": ["PLAYLIST_RACING", "PLAYLIST_DRIFT"]
+      },
+      {
+        "ID": "RADIO_ROCK",
+        "Name": "Redline Rock",
+        "Genre": "Rock",
+        "Icon": "ICO_Radio_Rock",
+        "UnlockCondition": "LEVEL_15"
+      },
+      {
+        "ID": "RADIO_LOFI",
+        "Name": "Chill Garage",
+        "Genre": "Lo-Fi",
+        "Icon": "ICO_Radio_LoFi",
+        "Playlists": ["PLAYLIST_GARAGE", "PLAYLIST_MEET"]
+      },
+      {
+        "ID": "RADIO_JPOP",
+        "Name": "Tokyo Drift FM",
+        "Genre": "J-Pop/Eurobeat",
+        "Icon": "ICO_Radio_JPop",
+        "UnlockCondition": "REP_TIER_STREET"
+      }
+    ],
+    "CustomPlaylist": {
+      "Enabled": true,
+      "MaxTracks": 50,
+      "ImportEnabled": false
+    }
+  },
+
+  "Accessibility": {
+    "Subtitles": {
+      "Enabled": true,
+      "LyricDisplay": false
+    },
+    "VisualizerMode": {
+      "Enabled": true,
+      "Description": "Visual representation of music for hearing impaired"
+    }
+  },
+
+  "Settings": {
+    "MasterVolume": { "Default": 80, "Min": 0, "Max": 100 },
+    "MusicVolume": { "Default": 70, "Min": 0, "Max": 100 },
+    "RadioEnabled": { "Default": true },
+    "DynamicMusicEnabled": { "Default": true },
+    "CrossfadeEnabled": { "Default": true },
+    "ShuffleByDefault": { "Default": true }
+  }
+}

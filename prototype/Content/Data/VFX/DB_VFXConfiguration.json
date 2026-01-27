@@ -1,0 +1,385 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Visual Effects Configuration",
+
+  "TireEffects": {
+    "TireSmoke": {
+      "Enabled": true,
+      "SpawnThreshold": {
+        "SlipRatio": 0.15,
+        "SlipAngle": 5.0
+      },
+      "Intensity": {
+        "Base": 0.3,
+        "MaxMultiplier": 3.0,
+        "SlipScaling": 2.0,
+        "SpeedScaling": 1.5
+      },
+      "Colors": {
+        "Default": "#CCCCCC",
+        "Burnout": "#666666",
+        "Drift": "#AAAAAA",
+        "Custom": {
+          "Enabled": true,
+          "UnlockCondition": "REP_TIER_STREET",
+          "Options": [
+            { "ID": "SMOKE_WHITE", "Color": "#FFFFFF", "Unlocked": true },
+            { "ID": "SMOKE_GRAY", "Color": "#888888", "Unlocked": true },
+            { "ID": "SMOKE_RED", "Color": "#FF4444", "UnlockCondition": "LEVEL_15" },
+            { "ID": "SMOKE_BLUE", "Color": "#4444FF", "UnlockCondition": "LEVEL_15" },
+            { "ID": "SMOKE_GREEN", "Color": "#44FF44", "UnlockCondition": "LEVEL_20" },
+            { "ID": "SMOKE_PURPLE", "Color": "#AA44FF", "UnlockCondition": "LEVEL_25" },
+            { "ID": "SMOKE_PINK", "Color": "#FF44AA", "UnlockCondition": "LEVEL_25" },
+            { "ID": "SMOKE_ORANGE", "Color": "#FF8844", "UnlockCondition": "LEVEL_30" },
+            { "ID": "SMOKE_RAINBOW", "Color": "Rainbow", "UnlockCondition": "REP_TIER_LEGEND" }
+          ]
+        }
+      },
+      "ParticleSettings": {
+        "EmissionRate": 500,
+        "Lifetime": 3.0,
+        "Size": { "Min": 0.5, "Max": 2.0 },
+        "Velocity": { "Min": 1.0, "Max": 5.0 },
+        "Turbulence": 0.5,
+        "WindAffected": true
+      }
+    },
+    "TireMarks": {
+      "Enabled": true,
+      "SpawnThreshold": {
+        "SlipRatio": 0.1,
+        "SlipAngle": 3.0
+      },
+      "Surfaces": {
+        "Asphalt": { "Enabled": true, "Color": "#1A1A1A", "Width": 0.25 },
+        "Concrete": { "Enabled": true, "Color": "#2A2A2A", "Width": 0.25 },
+        "Dirt": { "Enabled": false },
+        "Grass": { "Enabled": false }
+      },
+      "Lifetime": 60.0,
+      "FadeTime": 10.0,
+      "MaxMarks": 500
+    },
+    "RubberDebris": {
+      "Enabled": true,
+      "SpawnThreshold": 0.5,
+      "ParticleCount": 10,
+      "Lifetime": 2.0
+    }
+  },
+
+  "ExhaustEffects": {
+    "Flames": {
+      "Enabled": true,
+      "Conditions": {
+        "AntiLagActive": true,
+        "OnShift": true,
+        "OnThrottleLift": true,
+        "OnBackfire": true
+      },
+      "Intensity": {
+        "Base": 0.5,
+        "RPMScaling": true,
+        "ThrottleScaling": true,
+        "TuningModifier": true
+      },
+      "Colors": {
+        "Default": { "Core": "#FFAA00", "Outer": "#FF4400" },
+        "AntiLag": { "Core": "#FFFFFF", "Outer": "#00AAFF" },
+        "Nitrous": { "Core": "#FFFFFF", "Outer": "#0066FF" }
+      },
+      "Upgrades": {
+        "Stock": { "FlameLength": 0.2, "Frequency": 0.1 },
+        "Sport": { "FlameLength": 0.4, "Frequency": 0.3 },
+        "Race": { "FlameLength": 0.6, "Frequency": 0.5 },
+        "Elite": { "FlameLength": 0.8, "Frequency": 0.7 }
+      }
+    },
+    "Smoke": {
+      "Enabled": true,
+      "ColdStart": {
+        "Enabled": true,
+        "Duration": 30.0,
+        "Intensity": 0.5
+      },
+      "Overheating": {
+        "Enabled": true,
+        "Threshold": 110,
+        "Intensity": 0.8
+      }
+    },
+    "Pops": {
+      "Enabled": true,
+      "VisualIntensity": 0.3,
+      "LightFlash": true,
+      "LightColor": "#FF6600",
+      "LightDuration": 0.05
+    }
+  },
+
+  "NitrousEffects": {
+    "Purge": {
+      "Enabled": true,
+      "ParticleCount": 100,
+      "Color": "#FFFFFF",
+      "Lifetime": 1.5,
+      "Sound": "SFX_NOS_Purge"
+    },
+    "Active": {
+      "Enabled": true,
+      "FlameColor": { "Core": "#FFFFFF", "Outer": "#0088FF" },
+      "FlameIntensity": 2.0,
+      "ExhaustGlow": true,
+      "SpeedLines": true
+    },
+    "Bottle": {
+      "FrostEffect": true,
+      "FrostIntensity": 0.5
+    }
+  },
+
+  "EnvironmentEffects": {
+    "Rain": {
+      "Drops": {
+        "Enabled": true,
+        "Density": { "Light": 500, "Medium": 1500, "Heavy": 3000 },
+        "Size": { "Min": 0.01, "Max": 0.03 },
+        "Speed": { "Min": 10, "Max": 20 }
+      },
+      "Splashes": {
+        "Enabled": true,
+        "OnVehicle": true,
+        "OnGround": true,
+        "SprayFromWheels": true
+      },
+      "Puddles": {
+        "Enabled": true,
+        "Reflections": true,
+        "Spray": true
+      },
+      "Windshield": {
+        "Droplets": true,
+        "Wipers": true,
+        "Streaking": true
+      }
+    },
+    "Fog": {
+      "Enabled": true,
+      "Volumetric": true,
+      "HeadlightBeams": true,
+      "DensityLevels": { "Light": 0.01, "Medium": 0.03, "Heavy": 0.06 }
+    },
+    "Dust": {
+      "Enabled": true,
+      "OnDirtSurface": true,
+      "FromOtherVehicles": true,
+      "Lifetime": 5.0
+    },
+    "Leaves": {
+      "Enabled": true,
+      "SpawnOnDrive": true,
+      "WindBlown": true,
+      "Seasonal": true
+    }
+  },
+
+  "CollisionEffects": {
+    "Sparks": {
+      "Enabled": true,
+      "MinSpeed": 20,
+      "Intensity": {
+        "Base": 50,
+        "SpeedScaling": 2.0
+      },
+      "Color": "#FFAA44",
+      "Lifetime": 0.5,
+      "BounceCount": 2
+    },
+    "Debris": {
+      "Enabled": true,
+      "Types": ["Metal", "Glass", "Plastic", "Carbon"],
+      "SpawnCount": { "Light": 5, "Medium": 15, "Heavy": 30 },
+      "Lifetime": 3.0,
+      "PhysicsEnabled": true
+    },
+    "Glass": {
+      "Enabled": true,
+      "Shatter": true,
+      "ShardCount": 50,
+      "Reflective": true
+    },
+    "DustCloud": {
+      "Enabled": true,
+      "OnImpact": true,
+      "Size": { "Min": 1.0, "Max": 5.0 },
+      "Lifetime": 2.0
+    }
+  },
+
+  "LightingEffects": {
+    "Headlights": {
+      "Volumetric": true,
+      "VolumetricIntensity": 0.3,
+      "FlareEnabled": true,
+      "FlareIntensity": 0.5,
+      "RoadReflection": true
+    },
+    "Taillights": {
+      "Bloom": true,
+      "BloomIntensity": 0.4,
+      "BrakeIntensity": 2.0,
+      "TrailEffect": {
+        "Enabled": true,
+        "SpeedThreshold": 100,
+        "Length": 0.5
+      }
+    },
+    "NeonUnderglow": {
+      "Enabled": true,
+      "UnlockCondition": "REP_TIER_STREET",
+      "Colors": [
+        { "ID": "NEON_BLUE", "Color": "#0066FF" },
+        { "ID": "NEON_RED", "Color": "#FF0044" },
+        { "ID": "NEON_GREEN", "Color": "#00FF44" },
+        { "ID": "NEON_PURPLE", "Color": "#8800FF" },
+        { "ID": "NEON_PINK", "Color": "#FF0088" },
+        { "ID": "NEON_WHITE", "Color": "#FFFFFF" },
+        { "ID": "NEON_ORANGE", "Color": "#FF6600" },
+        { "ID": "NEON_CYAN", "Color": "#00FFFF" }
+      ],
+      "Modes": ["Solid", "Pulse", "Breathe", "Strobe", "Rainbow"],
+      "Intensity": { "Min": 0.3, "Max": 1.0 },
+      "GroundReflection": true
+    },
+    "PoliceFlashers": {
+      "Enabled": true,
+      "Pattern": "Alternating",
+      "Colors": ["Red", "Blue"],
+      "Frequency": 4.0,
+      "EnvironmentLighting": true
+    }
+  },
+
+  "SpeedEffects": {
+    "SpeedLines": {
+      "Enabled": true,
+      "SpeedThreshold": 150,
+      "Intensity": {
+        "Base": 0.3,
+        "MaxSpeed": 250,
+        "MaxIntensity": 1.0
+      },
+      "Color": "#FFFFFF",
+      "Length": 0.5
+    },
+    "TunnelVision": {
+      "Enabled": true,
+      "SpeedThreshold": 180,
+      "VignetteIntensity": 0.3,
+      "ChromaticAberration": 0.2
+    },
+    "MotionBlur": {
+      "Enabled": true,
+      "SpeedThreshold": 100,
+      "MaxIntensity": 0.5,
+      "Samples": 8
+    },
+    "CameraShake": {
+      "Enabled": true,
+      "SpeedThreshold": 200,
+      "Intensity": 0.1,
+      "Frequency": 20
+    }
+  },
+
+  "PostProcessEffects": {
+    "Bloom": {
+      "Enabled": true,
+      "Intensity": 1.0,
+      "Threshold": 0.8,
+      "NightBoost": 1.5
+    },
+    "LensFlare": {
+      "Enabled": true,
+      "SunFlare": true,
+      "HeadlightFlare": true,
+      "NeonFlare": true,
+      "Intensity": 0.5
+    },
+    "ChromaticAberration": {
+      "Enabled": true,
+      "BaseIntensity": 0.0,
+      "SpeedIntensity": 0.3,
+      "DamageIntensity": 0.5
+    },
+    "Vignette": {
+      "Enabled": true,
+      "Intensity": 0.2,
+      "SpeedBoost": true,
+      "DamageBoost": true
+    },
+    "FilmGrain": {
+      "Enabled": true,
+      "Intensity": 0.1,
+      "Size": 1.0,
+      "NightBoost": true
+    },
+    "RetroEffects": {
+      "PS1Mode": {
+        "Enabled": false,
+        "UnlockCondition": "HIDDEN_ACHIEVEMENT",
+        "VertexWobble": true,
+        "TextureWarping": true,
+        "Dithering": true,
+        "ColorDepth": 15
+      },
+      "CRTEffect": {
+        "Enabled": false,
+        "Scanlines": true,
+        "Curvature": true,
+        "ChromaticAberration": true
+      }
+    }
+  },
+
+  "QualitySettings": {
+    "Presets": {
+      "Low": {
+        "TireSmoke": 0.3,
+        "TireMarks": 100,
+        "Particles": 0.3,
+        "Debris": false,
+        "VolumetricFog": false,
+        "Bloom": 0.5,
+        "MotionBlur": false
+      },
+      "Medium": {
+        "TireSmoke": 0.6,
+        "TireMarks": 300,
+        "Particles": 0.6,
+        "Debris": true,
+        "VolumetricFog": false,
+        "Bloom": 0.8,
+        "MotionBlur": true
+      },
+      "High": {
+        "TireSmoke": 0.9,
+        "TireMarks": 500,
+        "Particles": 0.9,
+        "Debris": true,
+        "VolumetricFog": true,
+        "Bloom": 1.0,
+        "MotionBlur": true
+      },
+      "Ultra": {
+        "TireSmoke": 1.0,
+        "TireMarks": 1000,
+        "Particles": 1.0,
+        "Debris": true,
+        "VolumetricFog": true,
+        "Bloom": 1.2,
+        "MotionBlur": true
+      }
+    }
+  }
+}

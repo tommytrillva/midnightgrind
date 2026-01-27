@@ -1,0 +1,428 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Notification and Toast System Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxSimultaneous": 3,
+    "DefaultDuration": 4.0,
+    "QueueOverflow": "Replace",
+    "Position": "TopRight",
+    "AnimationIn": "SlideIn",
+    "AnimationOut": "FadeOut",
+    "SoundEnabled": true
+  },
+
+  "Positions": {
+    "TopLeft": { "X": 20, "Y": 20, "Anchor": "TopLeft" },
+    "TopCenter": { "X": 0.5, "Y": 20, "Anchor": "TopCenter" },
+    "TopRight": { "X": -20, "Y": 20, "Anchor": "TopRight" },
+    "BottomLeft": { "X": 20, "Y": -20, "Anchor": "BottomLeft" },
+    "BottomCenter": { "X": 0.5, "Y": -20, "Anchor": "BottomCenter" },
+    "BottomRight": { "X": -20, "Y": -20, "Anchor": "BottomRight" },
+    "Center": { "X": 0.5, "Y": 0.5, "Anchor": "Center" }
+  },
+
+  "NotificationTypes": {
+    "Achievement": {
+      "ID": "NOTIF_ACHIEVEMENT",
+      "Icon": "ICO_Achievement",
+      "Color": "#FFD700",
+      "Duration": 5.0,
+      "Sound": "SFX_Achievement",
+      "Priority": 10,
+      "Position": "TopCenter",
+      "Animation": {
+        "In": "PopScale",
+        "Out": "FadeOut",
+        "Particle": "Confetti"
+      },
+      "Template": {
+        "Title": "ACHIEVEMENT UNLOCKED",
+        "Subtitle": "{name}",
+        "Body": "{description}",
+        "ShowReward": true
+      }
+    },
+    "LevelUp": {
+      "ID": "NOTIF_LEVELUP",
+      "Icon": "ICO_LevelUp",
+      "Color": "#00FF88",
+      "Duration": 5.0,
+      "Sound": "SFX_LevelUp",
+      "Priority": 9,
+      "Position": "TopCenter",
+      "Animation": {
+        "In": "ScaleBounce",
+        "Out": "SlideUp"
+      },
+      "Template": {
+        "Title": "LEVEL UP!",
+        "Subtitle": "Level {level}",
+        "ShowReward": true
+      }
+    },
+    "REPTierUp": {
+      "ID": "NOTIF_REP_TIER",
+      "Icon": "ICO_REP",
+      "Color": "#FF4488",
+      "Duration": 6.0,
+      "Sound": "SFX_REPTier",
+      "Priority": 10,
+      "Position": "Center",
+      "Fullscreen": true,
+      "Animation": {
+        "In": "Dramatic",
+        "Out": "FadeOut"
+      },
+      "Template": {
+        "Title": "REP TIER ACHIEVED",
+        "Subtitle": "{tier}",
+        "ShowUnlocks": true
+      }
+    },
+    "CashEarned": {
+      "ID": "NOTIF_CASH",
+      "Icon": "ICO_Cash",
+      "Color": "#44FF44",
+      "Duration": 2.5,
+      "Sound": "SFX_Cash",
+      "Priority": 3,
+      "Position": "TopRight",
+      "Template": {
+        "Title": "+${amount}",
+        "ShowSource": true
+      }
+    },
+    "REPEarned": {
+      "ID": "NOTIF_REP",
+      "Icon": "ICO_REP",
+      "Color": "#FF44AA",
+      "Duration": 2.5,
+      "Sound": "SFX_REP",
+      "Priority": 3,
+      "Position": "TopRight",
+      "Template": {
+        "Title": "+{amount} REP"
+      }
+    },
+    "PartUnlocked": {
+      "ID": "NOTIF_PART",
+      "Icon": "ICO_Part",
+      "Color": "#4488FF",
+      "Duration": 4.0,
+      "Sound": "SFX_Unlock",
+      "Priority": 5,
+      "Template": {
+        "Title": "PART UNLOCKED",
+        "Subtitle": "{partName}",
+        "ShowThumbnail": true
+      }
+    },
+    "VehicleUnlocked": {
+      "ID": "NOTIF_VEHICLE",
+      "Icon": "ICO_Vehicle",
+      "Color": "#FFD700",
+      "Duration": 6.0,
+      "Sound": "SFX_VehicleUnlock",
+      "Priority": 8,
+      "Position": "Center",
+      "Template": {
+        "Title": "VEHICLE UNLOCKED",
+        "Subtitle": "{vehicleName}",
+        "ShowThumbnail": true,
+        "ShowStats": true
+      }
+    },
+    "DailyLogin": {
+      "ID": "NOTIF_DAILY",
+      "Icon": "ICO_Calendar",
+      "Color": "#88CCFF",
+      "Duration": 4.0,
+      "Sound": "SFX_Reward",
+      "Priority": 6,
+      "Template": {
+        "Title": "DAILY LOGIN BONUS",
+        "Subtitle": "Day {streak}",
+        "ShowReward": true
+      }
+    },
+    "ChallengeComplete": {
+      "ID": "NOTIF_CHALLENGE",
+      "Icon": "ICO_Challenge",
+      "Color": "#FF8844",
+      "Duration": 4.0,
+      "Sound": "SFX_Challenge",
+      "Priority": 5,
+      "Template": {
+        "Title": "CHALLENGE COMPLETE",
+        "Subtitle": "{challengeName}",
+        "ShowReward": true
+      }
+    },
+    "NewRival": {
+      "ID": "NOTIF_RIVAL",
+      "Icon": "ICO_Rival",
+      "Color": "#FF4444",
+      "Duration": 4.0,
+      "Sound": "SFX_Rival",
+      "Priority": 4,
+      "Template": {
+        "Title": "NEW RIVALRY",
+        "Subtitle": "{driverName}",
+        "Body": "Beat them to increase your reputation"
+      }
+    },
+    "CrewInvite": {
+      "ID": "NOTIF_CREW_INVITE",
+      "Icon": "ICO_Crew",
+      "Color": "#8844FF",
+      "Duration": 10.0,
+      "Sound": "SFX_Invite",
+      "Priority": 7,
+      "Interactive": true,
+      "Template": {
+        "Title": "CREW INVITATION",
+        "Subtitle": "{crewName}",
+        "Buttons": ["Accept", "Decline"]
+      }
+    },
+    "FriendOnline": {
+      "ID": "NOTIF_FRIEND",
+      "Icon": "ICO_Friend",
+      "Color": "#44CCFF",
+      "Duration": 3.0,
+      "Sound": "SFX_Online",
+      "Priority": 2,
+      "Template": {
+        "Title": "{friendName}",
+        "Subtitle": "is now online"
+      }
+    },
+    "RaceInvite": {
+      "ID": "NOTIF_RACE_INVITE",
+      "Icon": "ICO_Race",
+      "Color": "#FF6644",
+      "Duration": 15.0,
+      "Sound": "SFX_RaceInvite",
+      "Priority": 8,
+      "Interactive": true,
+      "Template": {
+        "Title": "RACE INVITATION",
+        "Subtitle": "From {playerName}",
+        "Body": "{raceType} at {trackName}",
+        "Buttons": ["Join", "Decline"]
+      }
+    },
+    "PinkSlipChallenge": {
+      "ID": "NOTIF_PINKSLIP",
+      "Icon": "ICO_PinkSlip",
+      "Color": "#FF0044",
+      "Duration": 20.0,
+      "Sound": "SFX_PinkSlip",
+      "Priority": 9,
+      "Interactive": true,
+      "Template": {
+        "Title": "PINK SLIP CHALLENGE",
+        "Subtitle": "From {playerName}",
+        "Body": "Their {theirVehicle} vs Your {yourVehicle}",
+        "Buttons": ["Accept", "Decline"],
+        "Warning": true
+      }
+    },
+    "SeasonPassReward": {
+      "ID": "NOTIF_SEASON",
+      "Icon": "ICO_Season",
+      "Color": "#FFD700",
+      "Duration": 5.0,
+      "Sound": "SFX_SeasonReward",
+      "Priority": 6,
+      "Template": {
+        "Title": "SEASON PASS REWARD",
+        "Subtitle": "Tier {tier}",
+        "ShowReward": true
+      }
+    },
+    "LeaderboardRank": {
+      "ID": "NOTIF_LEADERBOARD",
+      "Icon": "ICO_Leaderboard",
+      "Color": "#FFCC00",
+      "Duration": 4.0,
+      "Sound": "SFX_Rank",
+      "Priority": 4,
+      "Template": {
+        "Title": "NEW PERSONAL BEST",
+        "Subtitle": "Rank #{rank}",
+        "Body": "{category}"
+      }
+    },
+    "PhotoFeatured": {
+      "ID": "NOTIF_PHOTO",
+      "Icon": "ICO_Photo",
+      "Color": "#FF88CC",
+      "Duration": 5.0,
+      "Sound": "SFX_Featured",
+      "Priority": 5,
+      "Template": {
+        "Title": "PHOTO FEATURED!",
+        "Subtitle": "Your photo was featured in the community gallery",
+        "ShowReward": true
+      }
+    },
+    "SystemMessage": {
+      "ID": "NOTIF_SYSTEM",
+      "Icon": "ICO_System",
+      "Color": "#888888",
+      "Duration": 5.0,
+      "Sound": "SFX_Notification",
+      "Priority": 1,
+      "Template": {
+        "Title": "{title}",
+        "Body": "{message}"
+      }
+    },
+    "Error": {
+      "ID": "NOTIF_ERROR",
+      "Icon": "ICO_Error",
+      "Color": "#FF4444",
+      "Duration": 6.0,
+      "Sound": "SFX_Error",
+      "Priority": 10,
+      "Template": {
+        "Title": "ERROR",
+        "Body": "{message}",
+        "Dismissible": true
+      }
+    },
+    "Warning": {
+      "ID": "NOTIF_WARNING",
+      "Icon": "ICO_Warning",
+      "Color": "#FFAA00",
+      "Duration": 5.0,
+      "Sound": "SFX_Warning",
+      "Priority": 8,
+      "Template": {
+        "Title": "WARNING",
+        "Body": "{message}"
+      }
+    }
+  },
+
+  "InGameNotifications": {
+    "DriftScore": {
+      "Position": "CenterRight",
+      "ShowMultiplier": true,
+      "ComboCounter": true,
+      "GradeDisplay": true,
+      "Colors": {
+        "D": "#AAAAAA",
+        "C": "#88FF88",
+        "B": "#44AAFF",
+        "A": "#FF88FF",
+        "S": "#FFD700",
+        "SS": "#FF4488",
+        "SSS": "#FF0000"
+      }
+    },
+    "LapTime": {
+      "Position": "TopCenter",
+      "Duration": 3.0,
+      "ShowDelta": true,
+      "Colors": {
+        "Faster": "#44FF44",
+        "Slower": "#FF4444",
+        "Neutral": "#FFFFFF"
+      }
+    },
+    "Checkpoint": {
+      "Position": "TopCenter",
+      "Duration": 2.0,
+      "ShowTimeRemaining": true
+    },
+    "Position": {
+      "Position": "TopLeft",
+      "ShowChange": true,
+      "ChangeAnimation": true
+    },
+    "NearMiss": {
+      "Position": "Center",
+      "Duration": 1.0,
+      "ShowBonus": true
+    },
+    "Overtake": {
+      "Position": "Center",
+      "Duration": 1.5,
+      "ShowDriverName": true
+    },
+    "SpeedTrap": {
+      "Position": "TopCenter",
+      "Duration": 2.0,
+      "ShowSpeed": true,
+      "ShowRecord": true
+    },
+    "PoliceSighting": {
+      "Position": "TopCenter",
+      "Duration": 2.0,
+      "FlashWarning": true
+    },
+    "HeatLevel": {
+      "Position": "TopRight",
+      "Persistent": true,
+      "ShowChange": true
+    }
+  },
+
+  "Animations": {
+    "SlideIn": { "Duration": 0.3, "Easing": "EaseOut" },
+    "SlideOut": { "Duration": 0.2, "Easing": "EaseIn" },
+    "FadeIn": { "Duration": 0.2, "Easing": "Linear" },
+    "FadeOut": { "Duration": 0.3, "Easing": "Linear" },
+    "PopScale": { "Duration": 0.4, "Easing": "EaseOutBack", "Scale": 1.2 },
+    "ScaleBounce": { "Duration": 0.5, "Easing": "Bounce" },
+    "SlideUp": { "Duration": 0.3, "Easing": "EaseIn", "Distance": 100 },
+    "Dramatic": { "Duration": 1.0, "Easing": "EaseInOut", "Flash": true }
+  },
+
+  "Sounds": {
+    "SFX_Achievement": { "Volume": 0.8, "Priority": "High" },
+    "SFX_LevelUp": { "Volume": 0.9, "Priority": "High" },
+    "SFX_REPTier": { "Volume": 1.0, "Priority": "Critical" },
+    "SFX_Cash": { "Volume": 0.5, "Priority": "Low" },
+    "SFX_REP": { "Volume": 0.5, "Priority": "Low" },
+    "SFX_Unlock": { "Volume": 0.7, "Priority": "Medium" },
+    "SFX_Reward": { "Volume": 0.6, "Priority": "Medium" },
+    "SFX_Notification": { "Volume": 0.4, "Priority": "Low" },
+    "SFX_Error": { "Volume": 0.7, "Priority": "High" },
+    "SFX_Warning": { "Volume": 0.6, "Priority": "Medium" }
+  },
+
+  "Accessibility": {
+    "ScreenReader": {
+      "Enabled": true,
+      "ReadTitle": true,
+      "ReadBody": true
+    },
+    "ExtendedDuration": {
+      "Enabled": false,
+      "Multiplier": 2.0
+    },
+    "ReducedAnimations": {
+      "Enabled": false,
+      "SimpleFade": true
+    },
+    "HighContrast": {
+      "Enabled": false,
+      "BackgroundOpacity": 1.0
+    }
+  },
+
+  "Settings": {
+    "NotificationsEnabled": { "Default": true },
+    "SoundEnabled": { "Default": true },
+    "ShowDuringRace": { "Default": true },
+    "ShowFriendNotifications": { "Default": true },
+    "ShowAchievements": { "Default": true },
+    "ShowRewards": { "Default": true },
+    "ShowSystemMessages": { "Default": true }
+  }
+}
