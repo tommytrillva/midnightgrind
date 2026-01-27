@@ -1,0 +1,269 @@
+{
+  "VehicleID": "TITAN_CTS",
+  "DisplayName": "Titan CTS-V",
+  "Manufacturer": "Titan Motors",
+  "Year": 2016,
+  "Country": "USA",
+  "Class": "A",
+  "Category": "Muscle",
+  "Description": "The Titan CTS-V is American muscle refined into a surgical instrument. That supercharged 6.2L V8 makes 640 horsepower and sends it through the rear wheels with magnetic ride control keeping everything in check. It'll embarrass German sedans on track, then cruise home in leather-lined comfort. This is what happens when American engineers decide to beat Europe at their own game.",
+
+  "BaseStats": {
+    "Power": 640,
+    "PowerUnit": "HP",
+    "Torque": 630,
+    "TorqueUnit": "lb-ft",
+    "Weight": 4145,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 52,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "Supercharged",
+    "Displacement": 6200,
+    "DisplacementUnit": "cc",
+    "Cylinders": 8,
+    "Configuration": "V",
+    "Redline": 6400,
+    "IdleRPM": 650,
+    "TopSpeed": 200,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 3.7,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 800,
+    "Class": "A",
+    "MaxPotential": 970
+  },
+
+  "Engine": {
+    "Code": "LT4",
+    "Type": "V8 Supercharged",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 18,
+      "MaxPowerPotential": 900
+    },
+    "Head": {
+      "Type": "OHV",
+      "ValvesPerCylinder": 2,
+      "TotalValves": 16
+    },
+    "Supercharger": {
+      "Type": "Roots",
+      "Displacement": 1.7,
+      "MaxBoost": 9.4
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 120, "Torque": 380 },
+      { "RPM": 1500, "HP": 200, "Torque": 480 },
+      { "RPM": 2000, "HP": 300, "Torque": 560 },
+      { "RPM": 2500, "HP": 400, "Torque": 610 },
+      { "RPM": 3000, "HP": 480, "Torque": 625 },
+      { "RPM": 3500, "HP": 550, "Torque": 630 },
+      { "RPM": 4000, "HP": 600, "Torque": 620 },
+      { "RPM": 4500, "HP": 630, "Torque": 605 },
+      { "RPM": 5000, "HP": 640, "Torque": 585 },
+      { "RPM": 5500, "HP": 635, "Torque": 560 },
+      { "RPM": 6000, "HP": 620, "Torque": 530 },
+      { "RPM": 6400, "HP": 600, "Torque": 495 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Automatic",
+    "Gears": 8,
+    "GearRatios": [4.56, 2.97, 2.08, 1.69, 1.27, 1.00, 0.85, 0.66],
+    "FinalDrive": 2.85,
+    "ReverseRatio": 2.94,
+    "PaddleShift": true
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 420,
+    "RearSpringRate": 400,
+    "FrontDamping": 0.70,
+    "RearDamping": 0.68,
+    "FrontAntiRollBar": 30,
+    "RearAntiRollBar": 26,
+    "RideHeight": 4.5,
+    "RideHeightUnit": "inches",
+    "MagneticRide": true
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 390,
+    "RearDiameter": 365,
+    "DiameterUnit": "mm",
+    "BrakeBias": 58,
+    "ABSEquipped": true,
+    "Brembo": true
+  },
+
+  "Tires": {
+    "FrontWidth": 265,
+    "FrontAspectRatio": 35,
+    "FrontDiameter": 19,
+    "RearWidth": 295,
+    "RearAspectRatio": 35,
+    "RearDiameter": 19,
+    "Compound": "Sport",
+    "GripMultiplier": 1.05
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.36,
+    "FrontalArea": 2.25,
+    "DownforceMultiplier": 1.0,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4965,
+    "Width": 1850,
+    "Height": 1455,
+    "Wheelbase": 2850,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Sedan",
+    "Doors": 4,
+    "DefaultColor": {
+      "Primary": "#0A0A0A",
+      "Secondary": "#000000",
+      "Accent": "#C0C0C0"
+    },
+    "AvailableColors": [
+      { "Name": "Black Raven", "Hex": "#0A0A0A" },
+      { "Name": "Crystal White", "Hex": "#FFFFFF" },
+      { "Name": "Red Obsession", "Hex": "#8B0000" },
+      { "Name": "Phantom Grey", "Hex": "#4A4A4A" },
+      { "Name": "Velocity Blue", "Hex": "#003366" },
+      { "Name": "Radiant Silver", "Hex": "#C0C0C0" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V8_Supercharged_LS",
+    "ExhaustProfile": "American_Executive",
+    "SuperchargerWhine": true,
+    "BackfireOnShift": true,
+    "Burble": true,
+    "ActiveExhaust": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.5,
+    "TurnRadius": 5.8,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.3,
+    "OversteerTendency": 0.5,
+    "DriftCapability": 0.7,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "MagneticRide": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 130,
+    "PowerBoostUnit": "HP",
+    "Duration": 3.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 5,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 85000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "A",
+    "MaintenanceCostMultiplier": 1.2,
+    "PartsPriceMultiplier": 1.1,
+    "StreetValue": 100000,
+    "LegendaryValue": 210000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "RESPECTED",
+    "RequiredLevel": 28,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "K&N", "Vararam", "Full Race"],
+      "Exhaust": ["Stock", "Corsa", "Kooks", "Full Race"],
+      "Supercharger": ["Stock", "2.0L", "2.3L", "Whipple"],
+      "Intercooler": ["Stock", "Large HX", "Dual Pass"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow", "E85", "Flex"],
+      "Internals": ["Stock", "Rods", "Forged"]
+    },
+    "Drivetrain": {
+      "TorqueConverter": ["Stock", "High Stall"],
+      "Transmission": ["Stock", "Built 8L90"],
+      "FinalDrive": ["Stock", "3.08", "3.42"],
+      "LSD": ["Stock eLSD", "Mechanical"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Track", "Race"],
+      "Dampers": ["Stock MagRide", "KW", "Ohlins"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "Carbon"],
+      "Calipers": ["Stock Brembo", "8-Piston"]
+    },
+    "Wheels": {
+      "Size": [19, 20],
+      "Width": [9.5, 10.0, 10.5, 11.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Drag"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "V Sport", "Racing"],
+      "RearBumper": ["Stock", "V Sport"],
+      "Spoiler": ["Stock", "V Sport", "GT Wing"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Wide"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "Clear", "Darkened"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 900,
+    "MaxTorque": 850,
+    "MinWeight": 3900,
+    "MaxTopSpeed": 220,
+    "MaxPI": 970
+  },
+
+  "Tags": ["American", "RWD", "Supercharged", "V8", "CTS-V", "Sedan", "Luxury", "Track"],
+
+  "Lore": {
+    "Backstory": "The Titan CTS-V is America's answer to the M5 and E63. But where those German sedans are refined and restrained, the V is unapologetically brutal. 640 horsepower from a supercharged small-block, sent exclusively to the rear wheels, wrapped in a luxury sedan body. It'll eat M5s for breakfast on the Nurburgring, then cruise home in Recaro seats with the Bose system playing. This is what peak American performance looks like when it wears a suit.",
+    "FamousOwners": ["Executive Street Racer", "Autobahn Tourist", "The Refined Hooligan"],
+    "RivalVehicles": ["M5", "E63 AMG", "Charger Hellcat"]
+  },
+
+  "SpecialFeatures": {
+    "MagneticRide": true,
+    "FourDoorFun": true,
+    "LuxuryInterior": true,
+    "SuperchargedLT4": true
+  }
+}

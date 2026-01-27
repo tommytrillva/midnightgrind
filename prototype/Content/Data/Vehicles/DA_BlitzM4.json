@@ -1,0 +1,269 @@
+{
+  "VehicleID": "BLITZ_M4",
+  "DisplayName": "Blitz M4",
+  "Manufacturer": "Blitz Motors",
+  "Year": 2018,
+  "Country": "Germany",
+  "Class": "A",
+  "Category": "Euro",
+  "Description": "The Blitz M4 is German engineering unleashed. That twin-turbo inline-six screams to 7600 RPM while producing 425 horsepower. The carbon fiber roof lowers the center of gravity. The adaptive suspension switches from daily comfort to track attack in milliseconds. It's a precision instrument that happens to be shaped like a coupe - equally at home on the Autobahn or the Nurburgring.",
+
+  "BaseStats": {
+    "Power": 425,
+    "PowerUnit": "HP",
+    "Torque": 406,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3530,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 51,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "TwinTurbo",
+    "Displacement": 3000,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "Inline",
+    "Redline": 7600,
+    "IdleRPM": 750,
+    "TopSpeed": 180,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 3.8,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 780,
+    "Class": "A",
+    "MaxPotential": 960
+  },
+
+  "Engine": {
+    "Code": "S55B30",
+    "Type": "Inline-6 Twin Turbo",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 28,
+      "MaxPowerPotential": 750
+    },
+    "Head": {
+      "Type": "DOHC 24V",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24
+    },
+    "Turbo": {
+      "Type": "Twin Scroll Twin",
+      "SpoolRPM": 2500,
+      "MaxBoost": 17
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 80, "Torque": 220 },
+      { "RPM": 2000, "HP": 180, "Torque": 350 },
+      { "RPM": 2500, "HP": 260, "Torque": 400 },
+      { "RPM": 3000, "HP": 320, "Torque": 406 },
+      { "RPM": 3500, "HP": 365, "Torque": 402 },
+      { "RPM": 4000, "HP": 395, "Torque": 395 },
+      { "RPM": 4500, "HP": 415, "Torque": 385 },
+      { "RPM": 5000, "HP": 425, "Torque": 372 },
+      { "RPM": 6000, "HP": 420, "Torque": 345 },
+      { "RPM": 7000, "HP": 405, "Torque": 310 },
+      { "RPM": 7600, "HP": 385, "Torque": 280 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "DCT",
+    "Gears": 7,
+    "GearRatios": [4.78, 3.14, 2.11, 1.58, 1.22, 1.00, 0.85],
+    "FinalDrive": 2.81,
+    "ReverseRatio": 3.68,
+    "LaunchControl": true
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 400,
+    "RearSpringRate": 380,
+    "FrontDamping": 0.68,
+    "RearDamping": 0.65,
+    "FrontAntiRollBar": 28,
+    "RearAntiRollBar": 22,
+    "RideHeight": 4.6,
+    "RideHeightUnit": "inches",
+    "AdaptiveDampers": true
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 380,
+    "RearDiameter": 370,
+    "DiameterUnit": "mm",
+    "BrakeBias": 56,
+    "ABSEquipped": true,
+    "CompoundBrakes": true
+  },
+
+  "Tires": {
+    "FrontWidth": 255,
+    "FrontAspectRatio": 35,
+    "FrontDiameter": 19,
+    "RearWidth": 275,
+    "RearAspectRatio": 35,
+    "RearDiameter": 19,
+    "Compound": "Sport",
+    "GripMultiplier": 1.08
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.33,
+    "FrontalArea": 2.1,
+    "DownforceMultiplier": 1.1,
+    "HasActiveSpoiler": true
+  },
+
+  "Dimensions": {
+    "Length": 4670,
+    "Width": 1870,
+    "Height": 1385,
+    "Wheelbase": 2810,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#003366",
+      "Secondary": "#000000",
+      "Accent": "#C0C0C0"
+    },
+    "AvailableColors": [
+      { "Name": "San Marino Blue", "Hex": "#003366" },
+      { "Name": "Black Sapphire", "Hex": "#0A0A0A" },
+      { "Name": "Alpine White", "Hex": "#FFFFFF" },
+      { "Name": "Austin Yellow", "Hex": "#FFD700" },
+      { "Name": "Sakhir Orange", "Hex": "#FF6B00" },
+      { "Name": "Mineral Grey", "Hex": "#4A4A4A" },
+      { "Name": "Silverstone", "Hex": "#C0C0C0" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineSix_TwinTurbo",
+    "ExhaustProfile": "Euro_M",
+    "TurboWhine": true,
+    "BlowoffValve": true,
+    "BackfireOnShift": true,
+    "ActiveExhaust": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 14.0,
+    "TurnRadius": 5.6,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.25,
+    "OversteerTendency": 0.55,
+    "DriftCapability": 0.75,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "LaunchControl": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 100,
+    "PowerBoostUnit": "HP",
+    "Duration": 3.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 6,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 78000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "A",
+    "MaintenanceCostMultiplier": 1.4,
+    "PartsPriceMultiplier": 1.3,
+    "StreetValue": 95000,
+    "LegendaryValue": 200000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "RESPECTED",
+    "RequiredLevel": 25,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Eventuri", "Dinan", "Full Race"],
+      "Exhaust": ["Stock", "Akrapovic", "AWE", "Full Race"],
+      "Turbo": ["Stock", "Pure Stage 2", "Vargas"],
+      "Intercooler": ["Stock", "FMIC", "CSF"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Bootmod3"],
+      "FuelSystem": ["Stock", "PI", "E85", "Meth"],
+      "Internals": ["Stock", "Rods", "Full Build"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock DCT", "Racing Clutch Pack"],
+      "Transmission": ["Stock", "Upgraded DCT", "Manual Swap"],
+      "FinalDrive": ["Stock", "3.08", "3.23"],
+      "LSD": ["Stock eLSD", "Drexler", "Wavetrac"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Track", "Race"],
+      "Dampers": ["Stock Adaptive", "KW", "Ohlins"],
+      "Swaybars": ["Stock", "Dinan", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "Carbon"],
+      "Calipers": ["Stock", "M Carbon", "StopTech"]
+    },
+    "Wheels": {
+      "Size": [19, 20],
+      "Width": [9.0, 9.5, 10.0, 10.5, 11.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Cup 2", "Slick", "Drift"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "M4 GTS", "DTM", "Wide"],
+      "RearBumper": ["Stock", "GTS"],
+      "Spoiler": ["Stock", "GTS", "GT Wing", "APR"],
+      "Hood": ["Stock", "GTS", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "GTS", "Liberty Walk"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "GTS Organic LED"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 750,
+    "MaxTorque": 650,
+    "MinWeight": 3300,
+    "MaxTopSpeed": 210,
+    "MaxPI": 960
+  },
+
+  "Tags": ["Euro", "RWD", "TwinTurbo", "M4", "BMW", "Track", "Autobahn"],
+
+  "Lore": {
+    "Backstory": "The Blitz M4 is what happens when German engineers are told to build the ultimate driver's coupe. The S55 engine is a masterpiece of turbocharging - twin turbos that spool fast enough to feel naturally aspirated, yet produce boost for days. The carbon fiber roof and trunk reduce weight where it matters most. The adaptive suspension can be docile for daily driving or brutal for track work. It's an Autobahn stormer, a track day champion, and a drift machine all in one package.",
+    "FamousOwners": ["Nurburgring Record Chaser", "Time Attack Elite", "The Perfectionist"],
+    "RivalVehicles": ["C63 AMG", "RS5", "Alfa Giulia QV"]
+  },
+
+  "SpecialFeatures": {
+    "CarbonRoof": true,
+    "AdaptiveDampers": true,
+    "LaunchControl": true,
+    "ActiveDifferential": true
+  }
+}

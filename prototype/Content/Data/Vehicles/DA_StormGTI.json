@@ -1,0 +1,263 @@
+{
+  "VehicleID": "STORM_GTI",
+  "DisplayName": "Storm GTI",
+  "Manufacturer": "Storm Motors",
+  "Year": 2018,
+  "Country": "Germany",
+  "Class": "D",
+  "Category": "Euro",
+  "Description": "The Storm GTI is the ultimate hot hatch - the car that proves front-wheel drive can be fast and fun. That turbocharged 2.0 makes over 200 horsepower and sends it through a clever limited-slip differential that eliminates torque steer. It's practical, it's fast, and on a twisty road it'll embarrass cars costing twice as much. The daily driver that secretly wants to race.",
+
+  "BaseStats": {
+    "Power": 228,
+    "PowerUnit": "HP",
+    "Torque": 258,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3086,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 60,
+    "Drivetrain": "FWD",
+    "EnginePosition": "Front",
+    "Aspiration": "Turbocharged",
+    "Displacement": 2000,
+    "DisplacementUnit": "cc",
+    "Cylinders": 4,
+    "Configuration": "Inline",
+    "Redline": 6800,
+    "IdleRPM": 850,
+    "TopSpeed": 155,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 5.8,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 560,
+    "Class": "D",
+    "MaxPotential": 780
+  },
+
+  "Engine": {
+    "Code": "EA888",
+    "Type": "Inline-4 Turbo",
+    "Block": {
+      "Material": "Cast Iron",
+      "BoostLimit": 32,
+      "MaxPowerPotential": 500
+    },
+    "Head": {
+      "Type": "DOHC 16V",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 16
+    },
+    "Turbo": {
+      "Type": "Single IHI",
+      "SpoolRPM": 2500,
+      "MaxBoost": 15
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 45, "Torque": 120 },
+      { "RPM": 1500, "HP": 85, "Torque": 200 },
+      { "RPM": 2000, "HP": 135, "Torque": 245 },
+      { "RPM": 2500, "HP": 175, "Torque": 258 },
+      { "RPM": 3000, "HP": 200, "Torque": 255 },
+      { "RPM": 3500, "HP": 215, "Torque": 248 },
+      { "RPM": 4000, "HP": 225, "Torque": 238 },
+      { "RPM": 5000, "HP": 228, "Torque": 220 },
+      { "RPM": 6000, "HP": 222, "Torque": 195 },
+      { "RPM": 6800, "HP": 210, "Torque": 175 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [3.77, 2.09, 1.47, 1.10, 0.93, 0.78],
+    "FinalDrive": 3.65,
+    "ReverseRatio": 3.99
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 320,
+    "RearSpringRate": 280,
+    "FrontDamping": 0.58,
+    "RearDamping": 0.55,
+    "FrontAntiRollBar": 24,
+    "RearAntiRollBar": 18,
+    "RideHeight": 5.0,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 340,
+    "RearDiameter": 310,
+    "DiameterUnit": "mm",
+    "BrakeBias": 62,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 225,
+    "FrontAspectRatio": 40,
+    "FrontDiameter": 18,
+    "RearWidth": 225,
+    "RearAspectRatio": 40,
+    "RearDiameter": 18,
+    "Compound": "Sport",
+    "GripMultiplier": 1.0
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.32,
+    "FrontalArea": 2.0,
+    "DownforceMultiplier": 0.9,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4270,
+    "Width": 1800,
+    "Height": 1470,
+    "Wheelbase": 2630,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Hatchback",
+    "Doors": 5,
+    "DefaultColor": {
+      "Primary": "#CC0000",
+      "Secondary": "#000000",
+      "Accent": "#FFFFFF"
+    },
+    "AvailableColors": [
+      { "Name": "Tornado Red", "Hex": "#CC0000" },
+      { "Name": "Deep Black Pearl", "Hex": "#0A0A0A" },
+      { "Name": "Pure White", "Hex": "#FFFFFF" },
+      { "Name": "Dark Iron Blue", "Hex": "#003366" },
+      { "Name": "Carbon Steel Grey", "Hex": "#4A4A4A" },
+      { "Name": "Cornflower Blue", "Hex": "#6495ED" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineFour_Turbo_Euro",
+    "ExhaustProfile": "Euro_Sport",
+    "TurboWhine": true,
+    "BlowoffValve": true,
+    "BackfireOnShift": true,
+    "DSGFarts": false
+  },
+
+  "Handling": {
+    "SteeringRatio": 14.0,
+    "TurnRadius": 5.3,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.4,
+    "OversteerTendency": 0.25,
+    "DriftCapability": 0.35,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "FrontLSD": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 55,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 8,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 32000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "D",
+    "MaintenanceCostMultiplier": 1.1,
+    "PartsPriceMultiplier": 1.0,
+    "StreetValue": 38000,
+    "LegendaryValue": 80000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "REGULAR",
+    "RequiredLevel": 8,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "APR", "Unitronic", "Full Race"],
+      "Exhaust": ["Stock", "AWE", "Borla", "Milltek"],
+      "Turbo": ["Stock", "IS38 Swap", "Hybrid", "Big Turbo"],
+      "Intercooler": ["Stock", "FMIC", "Wagner"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Stage3"],
+      "FuelSystem": ["Stock", "HighFlow", "Port Injection"],
+      "Internals": ["Stock", "Rods", "Full Build"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Single Mass"],
+      "Transmission": ["Stock", "Short Throw", "Dog Box"],
+      "FinalDrive": ["Stock", "3.94", "4.20"],
+      "LSD": ["Stock VAQ", "Wavetrac", "Quaife"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover"],
+      "Dampers": ["Stock", "KW", "Ohlins"],
+      "Swaybars": ["Stock", "Neuspeed", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock", "6-Piston"]
+    },
+    "Wheels": {
+      "Size": [18, 19],
+      "Width": [7.5, 8.0, 8.5, 9.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "GTI Clubsport", "TCR", "Wide"],
+      "RearBumper": ["Stock", "Clubsport"],
+      "Spoiler": ["Stock", "Clubsport", "GT Wing"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "TCR Wide"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "LED", "Smoked"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 500,
+    "MaxTorque": 450,
+    "MinWeight": 2800,
+    "MaxTopSpeed": 175,
+    "MaxPI": 780
+  },
+
+  "Tags": ["Euro", "FWD", "Turbo", "GTI", "Hot Hatch", "Daily", "Practical"],
+
+  "Lore": {
+    "Backstory": "The Storm GTI represents decades of hot hatch evolution. What started as a simple idea - take an economy car, add power, make it fun - has become a science. The EA888 engine responds to tunes with alarming enthusiasm. The front LSD eliminates the torque steer that plagues lesser FWD cars. On a track, it'll surprise you. On a commute, it's comfortable. It's the car for people who want one vehicle that does everything well.",
+    "FamousOwners": ["The Practical Enthusiast", "Track Day Commuter", "APR Stage 2 Gang"],
+    "RivalVehicles": ["Focus ST", "Civic Type R", "Veloster N"]
+  },
+
+  "SpecialFeatures": {
+    "FrontLSD": true,
+    "DailyPractical": true,
+    "TunerFriendly": true
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "VehicleID": "SHOGUN_NSX",
+  "DisplayName": "Shogun NSX",
+  "Manufacturer": "Shogun Motors",
+  "Year": 1995,
+  "Country": "Japan",
+  "Class": "A",
+  "Category": "JDM",
+  "Description": "The Shogun NSX was built to embarrass Ferraris at half the price. That hand-built VTEC V6 sits behind you, screaming to 8000 RPM while the aluminum chassis dances through corners with supernatural precision. Ayrton Senna helped develop the handling. It doesn't need turbos or massive displacement - just perfect engineering and a driver who can keep up with it.",
+
+  "BaseStats": {
+    "Power": 290,
+    "PowerUnit": "HP",
+    "Torque": 224,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3020,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 42,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Mid",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 3000,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "V",
+    "Redline": 8000,
+    "IdleRPM": 850,
+    "TopSpeed": 168,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 4.5,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 720,
+    "Class": "A",
+    "MaxPotential": 920
+  },
+
+  "Engine": {
+    "Code": "C30A",
+    "Type": "V6 NA VTEC",
+    "Block": {
+      "Material": "Aluminum",
+      "MaxPowerPotential": 550
+    },
+    "Head": {
+      "Type": "DOHC VTEC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24
+    },
+    "VTEC": {
+      "CrossoverRPM": 5800,
+      "HighCamProfile": true
+    },
+    "NaturallyAspirated": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 45, "Torque": 120 },
+      { "RPM": 2000, "HP": 95, "Torque": 165 },
+      { "RPM": 3000, "HP": 145, "Torque": 195 },
+      { "RPM": 4000, "HP": 195, "Torque": 215 },
+      { "RPM": 5000, "HP": 235, "Torque": 222 },
+      { "RPM": 5800, "HP": 265, "Torque": 224 },
+      { "RPM": 6500, "HP": 282, "Torque": 220 },
+      { "RPM": 7000, "HP": 288, "Torque": 215 },
+      { "RPM": 7500, "HP": 290, "Torque": 208 },
+      { "RPM": 8000, "HP": 285, "Torque": 195 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 5,
+    "GearRatios": [3.07, 1.73, 1.23, 0.97, 0.77],
+    "FinalDrive": 4.06,
+    "ReverseRatio": 2.85
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "DoubleWishbone",
+    "FrontSpringRate": 320,
+    "RearSpringRate": 350,
+    "FrontDamping": 0.60,
+    "RearDamping": 0.62,
+    "FrontAntiRollBar": 22,
+    "RearAntiRollBar": 20,
+    "RideHeight": 4.3,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 298,
+    "RearDiameter": 286,
+    "DiameterUnit": "mm",
+    "BrakeBias": 55,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 215,
+    "FrontAspectRatio": 45,
+    "FrontDiameter": 16,
+    "RearWidth": 245,
+    "RearAspectRatio": 40,
+    "RearDiameter": 17,
+    "Compound": "Sport",
+    "GripMultiplier": 1.02
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.32,
+    "FrontalArea": 1.85,
+    "DownforceMultiplier": 0.95,
+    "HasActiveSpoiler": false,
+    "MidEngine": true
+  },
+
+  "Dimensions": {
+    "Length": 4430,
+    "Width": 1810,
+    "Height": 1170,
+    "Wheelbase": 2530,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#CC0000",
+      "Secondary": "#000000",
+      "Accent": "#1C1C1C"
+    },
+    "AvailableColors": [
+      { "Name": "Formula Red", "Hex": "#CC0000" },
+      { "Name": "Berlina Black", "Hex": "#0A0A0A" },
+      { "Name": "Grand Prix White", "Hex": "#FFFFFF" },
+      { "Name": "Spa Yellow", "Hex": "#FFD700" },
+      { "Name": "Long Beach Blue", "Hex": "#003366" },
+      { "Name": "Sebring Silver", "Hex": "#C0C0C0" },
+      { "Name": "Kaiser Silver", "Hex": "#808080" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "V6_NA_VTEC",
+    "ExhaustProfile": "JDM_Exotic",
+    "VTECCrossover": true,
+    "BackfireOnShift": true,
+    "HighRevScream": true,
+    "MidEngineSoundscape": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 13.5,
+    "TurnRadius": 5.0,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.15,
+    "OversteerTendency": 0.5,
+    "DriftCapability": 0.7,
+    "StabilityControl": false,
+    "TractionControl": true,
+    "MidEngineBalance": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 70,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 7,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 95000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "A",
+    "MaintenanceCostMultiplier": 1.5,
+    "PartsPriceMultiplier": 1.4,
+    "StreetValue": 120000,
+    "LegendaryValue": 280000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "FEARED",
+    "RequiredLevel": 30,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Comptech", "CT Engineering", "Full Race ITB"],
+      "Exhaust": ["Stock", "Taitec", "Comptech", "Full Ti"],
+      "Cams": ["Stock", "Toda", "JUN"],
+      "Displacement": ["Stock", "3.2L C32B"],
+      "ECU": ["Stock", "Hondata", "AEM", "Standalone"],
+      "Internals": ["Stock", "Pistons", "Full Build"]
+    },
+    "ForcedInduction": {
+      "Supercharger": ["None", "CT Engineering", "Comptech"],
+      "Turbo": ["None", "Single T3", "Single T04E"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Twin Plate"],
+      "Transmission": ["Stock", "6-Speed Swap", "Sequential"],
+      "FinalDrive": ["Stock", "4.23", "4.44"],
+      "LSD": ["Stock", "1.5Way", "2Way"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Race"],
+      "Dampers": ["Stock", "Ohlins", "MCS"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock", "Brembo", "StopTech"]
+    },
+    "Wheels": {
+      "Size": [16, 17, 18],
+      "Width": [7.0, 7.5, 8.0, 8.5, 9.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "NSX-R", "Downforce", "Wide"],
+      "RearBumper": ["Stock", "NSX-R", "Wide"],
+      "Spoiler": ["Stock", "NSX-R", "GT Wing"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "NSX-R Wide", "Full Wide"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "02 Spec"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 550,
+    "MaxTorque": 380,
+    "MinWeight": 2800,
+    "MaxTopSpeed": 195,
+    "MaxPI": 920
+  },
+
+  "Tags": ["JDM", "RWD", "NA", "VTEC", "NSX", "Mid-Engine", "Supercar", "Exotic", "Track"],
+
+  "Lore": {
+    "Backstory": "The Shogun NSX was Honda's audacious declaration that they could build a supercar. Not just any supercar - one reliable enough for daily driving, yet capable enough to humble Ferraris on track. Ayrton Senna personally developed the chassis, demanding changes until it met his standards. That hand-built V6 doesn't have the displacement of its rivals, but it has something better: VTEC magic and the highest specific output of its era. The aluminum body was revolutionary. The mid-engine balance is supernatural. This is the car that proved Japan could play with the best.",
+    "FamousOwners": ["Racing Legend", "Tech Mogul", "The Purist's Choice"],
+    "RivalVehicles": ["Ferrari 348", "Porsche 911", "Corvette ZR1"]
+  },
+
+  "SpecialFeatures": {
+    "VTECSystem": true,
+    "MidEngine": true,
+    "AluminumChassis": true,
+    "SennaDeveloped": true,
+    "HandBuiltEngine": true
+  }
+}

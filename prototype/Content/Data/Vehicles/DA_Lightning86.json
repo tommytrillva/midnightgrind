@@ -1,0 +1,265 @@
+{
+  "VehicleID": "LIGHTNING_86",
+  "DisplayName": "Lightning 86",
+  "Manufacturer": "Lightning Motors",
+  "Year": 1986,
+  "Country": "Japan",
+  "Class": "D",
+  "Category": "JDM",
+  "Description": "The Lightning 86 is the car that launched a million drift careers. Light, rear-wheel drive, and with that legendary 4A-GE engine that revs to the moon. It doesn't have power, but it has something better - balance and feel. Master the weight transfer and lift-off oversteer, and you'll understand why this humble hatchback became the symbol of grassroots motorsport.",
+
+  "BaseStats": {
+    "Power": 128,
+    "PowerUnit": "HP",
+    "Torque": 110,
+    "TorqueUnit": "lb-ft",
+    "Weight": 2150,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 53,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "NaturallyAspirated",
+    "Displacement": 1600,
+    "DisplacementUnit": "cc",
+    "Cylinders": 4,
+    "Configuration": "Inline",
+    "Redline": 7800,
+    "IdleRPM": 900,
+    "TopSpeed": 121,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 8.0,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 420,
+    "Class": "D",
+    "MaxPotential": 750
+  },
+
+  "Engine": {
+    "Code": "4A-GE",
+    "Type": "Inline-4 NA",
+    "Block": {
+      "Material": "Aluminum",
+      "MaxPowerPotential": 350
+    },
+    "Head": {
+      "Type": "DOHC 16V",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 16
+    },
+    "NaturallyAspirated": true,
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 20, "Torque": 55 },
+      { "RPM": 2000, "HP": 42, "Torque": 78 },
+      { "RPM": 3000, "HP": 65, "Torque": 95 },
+      { "RPM": 4000, "HP": 88, "Torque": 105 },
+      { "RPM": 5000, "HP": 108, "Torque": 110 },
+      { "RPM": 6000, "HP": 120, "Torque": 108 },
+      { "RPM": 6500, "HP": 126, "Torque": 105 },
+      { "RPM": 7000, "HP": 128, "Torque": 100 },
+      { "RPM": 7500, "HP": 125, "Torque": 92 },
+      { "RPM": 7800, "HP": 120, "Torque": 85 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 5,
+    "GearRatios": [3.59, 2.02, 1.32, 1.03, 0.85],
+    "FinalDrive": 4.30,
+    "ReverseRatio": 3.48
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "FourLink",
+    "FrontSpringRate": 220,
+    "RearSpringRate": 200,
+    "FrontDamping": 0.45,
+    "RearDamping": 0.42,
+    "FrontAntiRollBar": 18,
+    "RearAntiRollBar": 12,
+    "RideHeight": 5.5,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Drum",
+    "FrontDiameter": 257,
+    "RearDiameter": 200,
+    "DiameterUnit": "mm",
+    "BrakeBias": 65,
+    "ABSEquipped": false
+  },
+
+  "Tires": {
+    "FrontWidth": 185,
+    "FrontAspectRatio": 60,
+    "FrontDiameter": 14,
+    "RearWidth": 185,
+    "RearAspectRatio": 60,
+    "RearDiameter": 14,
+    "Compound": "Street",
+    "GripMultiplier": 0.88
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.36,
+    "FrontalArea": 1.75,
+    "DownforceMultiplier": 0.7,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4215,
+    "Width": 1625,
+    "Height": 1335,
+    "Wheelbase": 2400,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Hatchback",
+    "Doors": 3,
+    "DefaultColor": {
+      "Primary": "#FFFFFF",
+      "Secondary": "#000000",
+      "Accent": "#1C1C1C"
+    },
+    "AvailableColors": [
+      { "Name": "High Tech Two Tone", "Hex": "#FFFFFF" },
+      { "Name": "Super White", "Hex": "#FFFFFF" },
+      { "Name": "Black", "Hex": "#0A0A0A" },
+      { "Name": "Super Red", "Hex": "#CC0000" },
+      { "Name": "Silver Metallic", "Hex": "#C0C0C0" },
+      { "Name": "Blue Metallic", "Hex": "#003366" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineFour_NA_HighRev",
+    "ExhaustProfile": "JDM_Vintage",
+    "BackfireOnShift": true,
+    "HighRevBuzz": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 18.0,
+    "TurnRadius": 4.8,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.2,
+    "OversteerTendency": 0.7,
+    "DriftCapability": 0.9,
+    "StabilityControl": false,
+    "TractionControl": false,
+    "LiftOffOversteer": true,
+    "LightWeight": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 40,
+    "PowerBoostUnit": "HP",
+    "Duration": 5.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 10,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 12000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "D",
+    "MaintenanceCostMultiplier": 0.7,
+    "PartsPriceMultiplier": 0.8,
+    "StreetValue": 18000,
+    "LegendaryValue": 85000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "NEWCOMER",
+    "RequiredLevel": 5,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "TRD", "HKS", "ITB"],
+      "Exhaust": ["Stock", "Fujitsubo", "HKS", "Full Race"],
+      "Cams": ["Stock", "TRD", "Toda"],
+      "HeadSwap": ["Stock 16V", "20V Blacktop", "20V Silvertop"],
+      "ECU": ["Stock", "HKS", "Standalone"],
+      "Internals": ["Stock", "Pistons", "Full Build"]
+    },
+    "ForcedInduction": {
+      "Supercharger": ["None", "TRD SC"],
+      "Turbo": ["None", "T25", "T28", "GT2871"]
+    },
+    "EngineSwap": {
+      "Options": ["Stock 4A-GE", "3S-GE", "1JZ-GTE", "2JZ-GE"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing"],
+      "Transmission": ["Stock", "Close Ratio", "6-Speed Swap"],
+      "FinalDrive": ["Stock", "4.56", "4.78"],
+      "LSD": ["Stock Open", "1.5Way", "2Way", "Welded"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover"],
+      "Dampers": ["Stock", "Adjustable", "Racing"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "AngleKit": ["None", "Basic", "Pro"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track"],
+      "Rotors": ["Stock", "Slotted"],
+      "RearDisc": ["Drum", "Disc Conversion"],
+      "Calipers": ["Stock", "4-Piston"]
+    },
+    "Wheels": {
+      "Size": [14, 15, 16],
+      "Width": [6.0, 6.5, 7.0, 7.5, 8.0]
+    },
+    "Tires": {
+      "Compound": ["Street", "Sport", "Semi-Slick", "Drift"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "TRD", "Origin", "Wide"],
+      "RearBumper": ["Stock", "TRD", "Wide"],
+      "Spoiler": ["Stock", "TRD", "Duck", "GT Wing"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Origin", "Levin/Trueno Front"],
+      "Mirrors": ["Stock", "Fender"],
+      "Lights": ["Stock", "Popup Delete"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 350,
+    "MaxTorque": 280,
+    "MinWeight": 1900,
+    "MaxTopSpeed": 160,
+    "MaxPI": 750
+  },
+
+  "Tags": ["JDM", "RWD", "NA", "AE86", "Drift", "Touge", "Lightweight", "Classic", "Grassroots"],
+
+  "Lore": {
+    "Backstory": "The Lightning 86 wasn't supposed to become a legend. It was just an affordable sports coupe with rear-wheel drive and a rev-happy engine. But something magical happened - it became the car that taught a generation how to drift. The light weight means you can feel everything through the steering wheel. The lift-off oversteer is predictable and exploitable. The engine loves to rev. Put it all together on a mountain pass at 2 AM, and you understand why this car inspired an entire anime about tofu delivery.",
+    "FamousOwners": ["The Tofu Delivery Driver", "Drift Grassroots Legend", "Every Beginner Ever"],
+    "RivalVehicles": ["S13", "Miata", "Corolla GTS"]
+  },
+
+  "SpecialFeatures": {
+    "PopupHeadlights": true,
+    "LiftOffOversteer": true,
+    "FeatherweightChassis": true,
+    "LegendaryStatus": true
+  }
+}

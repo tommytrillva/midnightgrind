@@ -1,0 +1,270 @@
+{
+  "VehicleID": "DRIFT_KING_SILVIA",
+  "DisplayName": "Drift King Silvia",
+  "Manufacturer": "Drift King Motors",
+  "Year": 2002,
+  "Country": "Japan",
+  "Class": "C",
+  "Category": "JDM",
+  "Description": "The Drift King Silvia is the final evolution of the S-chassis - the car that defined modern drifting. That SR20DET engine is a tuner's dream, responding to every bolt-on with more power and more boost. The chassis geometry is perfect for angle, the aftermarket support is endless, and the styling is timeless. This is the weapon of choice for those who want to paint lines with tire smoke.",
+
+  "BaseStats": {
+    "Power": 250,
+    "PowerUnit": "HP",
+    "Torque": 220,
+    "TorqueUnit": "lb-ft",
+    "Weight": 2750,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 55,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "Turbocharged",
+    "Displacement": 2000,
+    "DisplacementUnit": "cc",
+    "Cylinders": 4,
+    "Configuration": "Inline",
+    "Redline": 7500,
+    "IdleRPM": 850,
+    "TopSpeed": 155,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 5.5,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 590,
+    "Class": "C",
+    "MaxPotential": 880
+  },
+
+  "Engine": {
+    "Code": "SR20DET",
+    "Type": "Inline-4 Turbo",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 30,
+      "MaxPowerPotential": 650
+    },
+    "Head": {
+      "Type": "DOHC 16V",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 16
+    },
+    "Turbo": {
+      "Type": "Single T28",
+      "SpoolRPM": 3000,
+      "MaxBoost": 12
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 40, "Torque": 100 },
+      { "RPM": 2000, "HP": 85, "Torque": 150 },
+      { "RPM": 2500, "HP": 120, "Torque": 185 },
+      { "RPM": 3000, "HP": 160, "Torque": 215 },
+      { "RPM": 3500, "HP": 195, "Torque": 220 },
+      { "RPM": 4000, "HP": 220, "Torque": 218 },
+      { "RPM": 4500, "HP": 240, "Torque": 212 },
+      { "RPM": 5000, "HP": 250, "Torque": 205 },
+      { "RPM": 5500, "HP": 248, "Torque": 195 },
+      { "RPM": 6000, "HP": 242, "Torque": 182 },
+      { "RPM": 7000, "HP": 225, "Torque": 160 },
+      { "RPM": 7500, "HP": 210, "Torque": 145 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [3.32, 1.90, 1.31, 1.00, 0.75, 0.63],
+    "FinalDrive": 4.08,
+    "ReverseRatio": 2.93
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 300,
+    "RearSpringRate": 280,
+    "FrontDamping": 0.55,
+    "RearDamping": 0.52,
+    "FrontAntiRollBar": 22,
+    "RearAntiRollBar": 14,
+    "RideHeight": 5.0,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 296,
+    "RearDiameter": 292,
+    "DiameterUnit": "mm",
+    "BrakeBias": 58,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 225,
+    "FrontAspectRatio": 45,
+    "FrontDiameter": 17,
+    "RearWidth": 235,
+    "RearAspectRatio": 45,
+    "RearDiameter": 17,
+    "Compound": "Sport",
+    "GripMultiplier": 0.95
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.32,
+    "FrontalArea": 1.9,
+    "DownforceMultiplier": 0.88,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4445,
+    "Width": 1695,
+    "Height": 1285,
+    "Wheelbase": 2525,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#C0C0C0",
+      "Secondary": "#000000",
+      "Accent": "#FFD700"
+    },
+    "AvailableColors": [
+      { "Name": "Spark Silver", "Hex": "#C0C0C0" },
+      { "Name": "Super Black", "Hex": "#0A0A0A" },
+      { "Name": "White Pearl", "Hex": "#FFFFFF" },
+      { "Name": "Lightning Yellow", "Hex": "#FFD700" },
+      { "Name": "Super Clear Red", "Hex": "#CC0000" },
+      { "Name": "Brilliant Blue", "Hex": "#003366" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineFour_Turbo_SR",
+    "ExhaustProfile": "JDM_Drift",
+    "TurboWhine": true,
+    "BlowoffValve": true,
+    "BackfireOnShift": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.5,
+    "TurnRadius": 5.1,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.2,
+    "OversteerTendency": 0.7,
+    "DriftCapability": 0.95,
+    "StabilityControl": false,
+    "TractionControl": false,
+    "PerfectDriftChassis": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 65,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 8,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 28000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "C",
+    "MaintenanceCostMultiplier": 1.0,
+    "PartsPriceMultiplier": 0.9,
+    "StreetValue": 38000,
+    "LegendaryValue": 100000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "REGULAR",
+    "RequiredLevel": 10,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "Apexi", "HKS", "Full Race"],
+      "Exhaust": ["Stock", "HKS", "Tomei", "Ti Racing"],
+      "Turbo": ["Stock T28", "GT2871", "GT3076", "GTX3582"],
+      "Intercooler": ["Stock", "FMIC", "V-Mount"],
+      "ECU": ["Stock", "Apexi", "HKS", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow", "E85"],
+      "Internals": ["Stock", "Rods", "Full Build"]
+    },
+    "EngineSwap": {
+      "Options": ["Stock SR20DET", "RB25DET", "2JZ-GTE", "LS3"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Twin Plate"],
+      "Transmission": ["Stock", "Close Ratio", "Sequential"],
+      "FinalDrive": ["Stock", "4.3", "4.63"],
+      "LSD": ["Stock", "1.5Way", "2Way"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover"],
+      "Dampers": ["Stock", "Adjustable", "Racing"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "AngleKit": ["None", "Basic +15°", "Pro +30°", "Max +50°"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock", "4-Piston", "6-Piston"],
+      "HydroEBrake": ["None", "Installed"]
+    },
+    "Wheels": {
+      "Size": [17, 18],
+      "Width": [8.0, 8.5, 9.0, 9.5, 10.0, 10.5]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Drift"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Nismo", "Origin", "Wide"],
+      "RearBumper": ["Stock", "Nismo", "Origin", "Wide"],
+      "Spoiler": ["Stock", "Nismo", "Duck", "GT Wing"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Origin", "Rocket Bunny", "Pandem"],
+      "Mirrors": ["Stock", "Ganadors", "Carbon"],
+      "Lights": ["Stock", "Clear", "Kouki"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 650,
+    "MaxTorque": 500,
+    "MinWeight": 2500,
+    "MaxTopSpeed": 185,
+    "MaxPI": 880
+  },
+
+  "Tags": ["JDM", "RWD", "Turbo", "S15", "Silvia", "Drift", "SR20", "Formula D"],
+
+  "Lore": {
+    "Backstory": "The Drift King Silvia is the final word in S-chassis evolution. Where the S13 started the drift revolution and the S14 refined it, the S15 perfected it. That SR20DET responds to modifications like nothing else - bolt-ons, bigger turbo, and a tune will have you pushing 400hp before lunch. The suspension geometry was designed for angle. The styling aged like fine wine. In Formula D paddocks and mountain passes worldwide, the S15 remains the gold standard for what a drift car should be.",
+    "FamousOwners": ["Formula D Champion", "D1GP Legend", "Drift YouTube Star"],
+    "RivalVehicles": ["RX-7", "350Z", "E46 M3"]
+  },
+
+  "SpecialFeatures": {
+    "SR20DET": true,
+    "PerfectDriftChassis": true,
+    "MassiveAftermarket": true,
+    "AngleKitReady": true
+  }
+}
