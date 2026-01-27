@@ -312,9 +312,13 @@ void UMGGameInstance::AttemptReconnect()
 	// Exponential backoff
 	float Delay = FMath::Pow(2.0f, static_cast<float>(ReconnectAttempt));
 
-	GetTimerManager().SetTimer(ReconnectTimerHandle, [this]()
+	TWeakObjectPtr<UMGGameInstance> WeakThis(this);
+	GetTimerManager().SetTimer(ReconnectTimerHandle, [WeakThis]()
 	{
-		GoOnline();
+		if (WeakThis.IsValid())
+		{
+			WeakThis->GoOnline();
+		}
 	}, Delay, false);
 }
 

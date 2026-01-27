@@ -858,14 +858,23 @@ void UMGMemoryManagerSubsystem::ProcessLoadQueue()
         if (UWorld* World = GetWorld())
         {
             float LoadTime = FMath::RandRange(0.1f, 0.5f);
-            World->GetTimerManager().SetTimerForNextTick([this, Request, LoadTime]()
+            TWeakObjectPtr<UMGMemoryManagerSubsystem> WeakThis(this);
+            FGuid RequestId = Request.RequestId;
+            World->GetTimerManager().SetTimerForNextTick([WeakThis, RequestId, LoadTime]()
             {
-                if (UWorld* InnerWorld = GetWorld())
+                if (!WeakThis.IsValid())
+                {
+                    return;
+                }
+                if (UWorld* InnerWorld = WeakThis->GetWorld())
                 {
                     FTimerHandle TempHandle;
-                    InnerWorld->GetTimerManager().SetTimer(TempHandle, [this, Request]()
+                    InnerWorld->GetTimerManager().SetTimer(TempHandle, [WeakThis, RequestId]()
                     {
-                        CompleteAssetLoad(Request.RequestId);
+                        if (WeakThis.IsValid())
+                        {
+                            WeakThis->CompleteAssetLoad(RequestId);
+                        }
                     }, LoadTime, false);
                 }
             });

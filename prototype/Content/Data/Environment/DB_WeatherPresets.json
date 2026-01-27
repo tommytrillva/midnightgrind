@@ -1,0 +1,410 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Weather and Time of Day Presets",
+
+  "TimeOfDay": {
+    "Cycle": {
+      "Enabled": true,
+      "RealTimeMinutes": 60,
+      "GameHours": 24
+    },
+    "Periods": [
+      {
+        "ID": "TOD_DAWN",
+        "Name": "Dawn",
+        "StartHour": 5,
+        "EndHour": 7,
+        "SunAngle": { "Start": -10, "End": 15 },
+        "SkyColor": { "Horizon": "#FF8844", "Zenith": "#4466AA" },
+        "FogDensity": 0.02,
+        "TrafficDensity": 0.3,
+        "Mood": "Peaceful"
+      },
+      {
+        "ID": "TOD_MORNING",
+        "Name": "Morning",
+        "StartHour": 7,
+        "EndHour": 11,
+        "SunAngle": { "Start": 15, "End": 45 },
+        "SkyColor": { "Horizon": "#88CCFF", "Zenith": "#4488FF" },
+        "FogDensity": 0.005,
+        "TrafficDensity": 0.7,
+        "Mood": "Active"
+      },
+      {
+        "ID": "TOD_NOON",
+        "Name": "Noon",
+        "StartHour": 11,
+        "EndHour": 14,
+        "SunAngle": { "Start": 45, "End": 60 },
+        "SkyColor": { "Horizon": "#AADDFF", "Zenith": "#3377FF" },
+        "FogDensity": 0.002,
+        "TrafficDensity": 0.8,
+        "Mood": "Bright"
+      },
+      {
+        "ID": "TOD_AFTERNOON",
+        "Name": "Afternoon",
+        "StartHour": 14,
+        "EndHour": 17,
+        "SunAngle": { "Start": 60, "End": 30 },
+        "SkyColor": { "Horizon": "#FFDD88", "Zenith": "#5588CC" },
+        "FogDensity": 0.005,
+        "TrafficDensity": 0.9,
+        "Mood": "Warm"
+      },
+      {
+        "ID": "TOD_SUNSET",
+        "Name": "Sunset",
+        "StartHour": 17,
+        "EndHour": 19,
+        "SunAngle": { "Start": 30, "End": 5 },
+        "SkyColor": { "Horizon": "#FF6622", "Zenith": "#8844AA" },
+        "FogDensity": 0.01,
+        "TrafficDensity": 0.7,
+        "Mood": "Golden"
+      },
+      {
+        "ID": "TOD_DUSK",
+        "Name": "Dusk",
+        "StartHour": 19,
+        "EndHour": 21,
+        "SunAngle": { "Start": 5, "End": -15 },
+        "SkyColor": { "Horizon": "#443366", "Zenith": "#221133" },
+        "FogDensity": 0.015,
+        "TrafficDensity": 0.5,
+        "Mood": "Mysterious",
+        "LightsOn": true
+      },
+      {
+        "ID": "TOD_NIGHT",
+        "Name": "Night",
+        "StartHour": 21,
+        "EndHour": 1,
+        "SunAngle": { "Start": -15, "End": -45 },
+        "SkyColor": { "Horizon": "#111122", "Zenith": "#000011" },
+        "FogDensity": 0.02,
+        "TrafficDensity": 0.3,
+        "Mood": "Midnight",
+        "LightsOn": true,
+        "NeonIntensity": 1.5
+      },
+      {
+        "ID": "TOD_LATE_NIGHT",
+        "Name": "Late Night",
+        "StartHour": 1,
+        "EndHour": 5,
+        "SunAngle": { "Start": -45, "End": -10 },
+        "SkyColor": { "Horizon": "#0A0A15", "Zenith": "#000008" },
+        "FogDensity": 0.025,
+        "TrafficDensity": 0.1,
+        "Mood": "Desolate",
+        "LightsOn": true,
+        "NeonIntensity": 2.0,
+        "StreetRacingPeak": true
+      }
+    ]
+  },
+
+  "WeatherTypes": {
+    "Clear": {
+      "ID": "WX_CLEAR",
+      "Name": "Clear",
+      "Description": "Clear skies with good visibility",
+      "Probability": 0.35,
+      "Visibility": 1.0,
+      "GripModifier": 1.0,
+      "Effects": {
+        "Clouds": 0.1,
+        "Wind": 0.2,
+        "Precipitation": 0.0
+      },
+      "Lighting": {
+        "SunIntensity": 1.0,
+        "AmbientIntensity": 1.0
+      }
+    },
+    "PartlyCloudy": {
+      "ID": "WX_PARTLY_CLOUDY",
+      "Name": "Partly Cloudy",
+      "Description": "Scattered clouds, variable lighting",
+      "Probability": 0.25,
+      "Visibility": 0.95,
+      "GripModifier": 1.0,
+      "Effects": {
+        "Clouds": 0.4,
+        "Wind": 0.3,
+        "Precipitation": 0.0
+      },
+      "Lighting": {
+        "SunIntensity": 0.85,
+        "AmbientIntensity": 0.9,
+        "CloudShadows": true
+      }
+    },
+    "Overcast": {
+      "ID": "WX_OVERCAST",
+      "Name": "Overcast",
+      "Description": "Complete cloud cover, diffuse lighting",
+      "Probability": 0.15,
+      "Visibility": 0.85,
+      "GripModifier": 1.0,
+      "Effects": {
+        "Clouds": 1.0,
+        "Wind": 0.4,
+        "Precipitation": 0.0
+      },
+      "Lighting": {
+        "SunIntensity": 0.3,
+        "AmbientIntensity": 0.7,
+        "SoftShadows": true
+      }
+    },
+    "LightRain": {
+      "ID": "WX_LIGHT_RAIN",
+      "Name": "Light Rain",
+      "Description": "Light drizzle, reduced grip",
+      "Probability": 0.10,
+      "Visibility": 0.75,
+      "GripModifier": 0.85,
+      "Effects": {
+        "Clouds": 0.9,
+        "Wind": 0.4,
+        "Precipitation": 0.3,
+        "RainDrops": true,
+        "WetRoads": true
+      },
+      "Lighting": {
+        "SunIntensity": 0.2,
+        "AmbientIntensity": 0.6
+      },
+      "Audio": {
+        "RainAmbient": 0.4,
+        "WiperEnabled": true
+      }
+    },
+    "HeavyRain": {
+      "ID": "WX_HEAVY_RAIN",
+      "Name": "Heavy Rain",
+      "Description": "Heavy downpour, significantly reduced grip",
+      "Probability": 0.05,
+      "Visibility": 0.5,
+      "GripModifier": 0.7,
+      "Effects": {
+        "Clouds": 1.0,
+        "Wind": 0.6,
+        "Precipitation": 0.8,
+        "RainDrops": true,
+        "WetRoads": true,
+        "StandingWater": true,
+        "Spray": true
+      },
+      "Lighting": {
+        "SunIntensity": 0.1,
+        "AmbientIntensity": 0.4
+      },
+      "Audio": {
+        "RainAmbient": 0.8,
+        "WiperEnabled": true,
+        "WiperSpeed": "Fast"
+      }
+    },
+    "Thunderstorm": {
+      "ID": "WX_THUNDERSTORM",
+      "Name": "Thunderstorm",
+      "Description": "Severe storm with lightning",
+      "Probability": 0.03,
+      "Visibility": 0.4,
+      "GripModifier": 0.6,
+      "Effects": {
+        "Clouds": 1.0,
+        "Wind": 0.8,
+        "Precipitation": 1.0,
+        "RainDrops": true,
+        "WetRoads": true,
+        "StandingWater": true,
+        "Spray": true,
+        "Lightning": true
+      },
+      "Lighting": {
+        "SunIntensity": 0.05,
+        "AmbientIntensity": 0.3,
+        "LightningFlashes": true
+      },
+      "Audio": {
+        "RainAmbient": 1.0,
+        "Thunder": true,
+        "WiperEnabled": true,
+        "WiperSpeed": "Max"
+      },
+      "REPBonus": 1.5
+    },
+    "Fog": {
+      "ID": "WX_FOG",
+      "Name": "Fog",
+      "Description": "Dense fog, very low visibility",
+      "Probability": 0.04,
+      "Visibility": 0.3,
+      "GripModifier": 0.95,
+      "Effects": {
+        "Clouds": 0.0,
+        "Wind": 0.1,
+        "Precipitation": 0.0,
+        "VolumetricFog": true,
+        "FogDensity": 0.1
+      },
+      "Lighting": {
+        "SunIntensity": 0.2,
+        "AmbientIntensity": 0.5,
+        "HeadlightBeams": true
+      },
+      "REPBonus": 1.3
+    },
+    "Snow": {
+      "ID": "WX_SNOW",
+      "Name": "Snow",
+      "Description": "Snowfall, icy conditions",
+      "Probability": 0.02,
+      "Visibility": 0.6,
+      "GripModifier": 0.5,
+      "SeasonalOnly": true,
+      "Effects": {
+        "Clouds": 0.8,
+        "Wind": 0.5,
+        "Precipitation": 0.6,
+        "SnowParticles": true,
+        "SnowAccumulation": true,
+        "IcyRoads": true
+      },
+      "Lighting": {
+        "SunIntensity": 0.4,
+        "AmbientIntensity": 0.8,
+        "SnowReflection": true
+      },
+      "REPBonus": 2.0
+    },
+    "DustStorm": {
+      "ID": "WX_DUST",
+      "Name": "Dust Storm",
+      "Description": "Desert dust storm",
+      "Probability": 0.01,
+      "Visibility": 0.35,
+      "GripModifier": 0.8,
+      "LocationSpecific": ["Canyon", "Desert"],
+      "Effects": {
+        "Clouds": 0.0,
+        "Wind": 0.9,
+        "Precipitation": 0.0,
+        "DustParticles": true,
+        "SandOnRoad": true
+      },
+      "Lighting": {
+        "SunIntensity": 0.5,
+        "AmbientIntensity": 0.6,
+        "OrangeHaze": true
+      },
+      "REPBonus": 1.4
+    }
+  },
+
+  "WeatherTransitions": {
+    "TransitionDuration": {
+      "Fast": 60,
+      "Normal": 180,
+      "Slow": 300
+    },
+    "ValidTransitions": {
+      "Clear": ["PartlyCloudy", "Fog"],
+      "PartlyCloudy": ["Clear", "Overcast", "LightRain"],
+      "Overcast": ["PartlyCloudy", "LightRain", "HeavyRain"],
+      "LightRain": ["Overcast", "HeavyRain", "Thunderstorm"],
+      "HeavyRain": ["LightRain", "Thunderstorm"],
+      "Thunderstorm": ["HeavyRain"],
+      "Fog": ["Clear", "PartlyCloudy"],
+      "Snow": ["Overcast", "Clear"],
+      "DustStorm": ["Clear"]
+    }
+  },
+
+  "Presets": {
+    "PerfectDay": {
+      "TimeOfDay": "TOD_AFTERNOON",
+      "Weather": "WX_CLEAR",
+      "Description": "Ideal racing conditions"
+    },
+    "GoldenHour": {
+      "TimeOfDay": "TOD_SUNSET",
+      "Weather": "WX_PARTLY_CLOUDY",
+      "Description": "Beautiful sunset lighting"
+    },
+    "MidnightRun": {
+      "TimeOfDay": "TOD_NIGHT",
+      "Weather": "WX_CLEAR",
+      "Description": "Classic night racing"
+    },
+    "WetNight": {
+      "TimeOfDay": "TOD_NIGHT",
+      "Weather": "WX_LIGHT_RAIN",
+      "Description": "Challenging wet night conditions"
+    },
+    "StormChaser": {
+      "TimeOfDay": "TOD_DUSK",
+      "Weather": "WX_THUNDERSTORM",
+      "Description": "Extreme storm conditions"
+    },
+    "SilentMorning": {
+      "TimeOfDay": "TOD_DAWN",
+      "Weather": "WX_FOG",
+      "Description": "Foggy early morning"
+    },
+    "WinterWonderland": {
+      "TimeOfDay": "TOD_AFTERNOON",
+      "Weather": "WX_SNOW",
+      "Description": "Snowy conditions"
+    },
+    "DesertStorm": {
+      "TimeOfDay": "TOD_NOON",
+      "Weather": "WX_DUST",
+      "Description": "Desert dust storm"
+    }
+  },
+
+  "TrackSpecificWeather": {
+    "HARUNA_PASS": {
+      "DefaultWeather": "Clear",
+      "FogChance": 0.15,
+      "MorningFogEnabled": true,
+      "SeasonalSnow": true
+    },
+    "WANGAN_HIGHWAY": {
+      "DefaultWeather": "Clear",
+      "NightOnly": false,
+      "CoastalWind": true
+    },
+    "RED_ROCK_CANYON": {
+      "DefaultWeather": "Clear",
+      "DustStormChance": 0.1,
+      "NoRain": true,
+      "HotTemperature": true
+    },
+    "NEO_CITY_CIRCUIT": {
+      "DefaultWeather": "Clear",
+      "NeonEnhancedNight": true,
+      "UrbanHeat": true
+    }
+  },
+
+  "RaceSettings": {
+    "DynamicWeather": {
+      "Enabled": true,
+      "ChangeChance": 0.1,
+      "MinRaceLaps": 5
+    },
+    "WeatherRewards": {
+      "Rain": { "CashBonus": 1.25, "REPBonus": 1.25 },
+      "Fog": { "CashBonus": 1.3, "REPBonus": 1.3 },
+      "Thunderstorm": { "CashBonus": 1.5, "REPBonus": 1.5 },
+      "Snow": { "CashBonus": 2.0, "REPBonus": 2.0 }
+    }
+  }
+}

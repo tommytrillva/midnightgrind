@@ -446,6 +446,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRevengeComplete, const FString&,
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnVehicleRepaired, const FString&, VehicleId, float, RepairAmount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInvincibilityStart, const FString&, VehicleId, float, Duration);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInvincibilityEnd, const FString&, VehicleId);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCollisionEffectsTriggered, const FMGCollisionEvent&, Collision, const FMGCrashEffect&, Effect);
 
 /**
  * Collision Subsystem
@@ -493,6 +494,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Collision|Events")
 	FOnInvincibilityEnd OnInvincibilityEnd;
+
+	UPROPERTY(BlueprintAssignable, Category = "Collision|Events")
+	FOnCollisionEffectsTriggered OnCollisionEffectsTriggered;
 
 	// Vehicle Registration
 	UFUNCTION(BlueprintCallable, Category = "Collision|Vehicle")

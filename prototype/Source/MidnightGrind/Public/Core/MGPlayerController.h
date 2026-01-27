@@ -20,6 +20,13 @@ enum class EMGTrickType : uint8;
 enum class EMGFuelAlert : uint8;
 enum class EMGTirePosition : uint8;
 enum class EMGTireCondition : uint8;
+enum class EMGTakedownType : uint8;
+enum class EMGPitLaneViolation : uint8;
+enum class EMGPursuitIntensity : uint8;
+struct FMGTakedownEvent;
+struct FMGPitStopResult;
+struct FMGBonusDefinition;
+struct FMGPursuitUnit;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -448,4 +455,52 @@ protected:
 	/** Handle tire condition change from tire subsystem */
 	UFUNCTION()
 	void OnTireConditionChanged(FName VehicleID, EMGTirePosition Position, EMGTireCondition NewCondition);
+
+	/** Handle takedown dealt from collision subsystem */
+	UFUNCTION()
+	void OnTakedownDealt(const FString& AttackerId, const FMGTakedownEvent& Takedown);
+
+	/** Handle takedown chain from collision subsystem */
+	UFUNCTION()
+	void OnTakedownChain(const FString& PlayerId, int32 ChainCount, float ChainMultiplier);
+
+	/** Handle revenge completed from collision subsystem */
+	UFUNCTION()
+	void OnRevengeComplete(const FString& AttackerId, const FString& OriginalAttackerId);
+
+	/** Handle pit stop completed from pit stop subsystem */
+	UFUNCTION()
+	void OnPitStopCompleted(FName VehicleID, const FMGPitStopResult& Result);
+
+	/** Handle pit lane violation from pit stop subsystem */
+	UFUNCTION()
+	void OnPitLaneViolation(FName VehicleID, EMGPitLaneViolation Violation);
+
+	/** Handle bonus collected from bonus subsystem */
+	UFUNCTION()
+	void OnBonusCollected(const FString& PlayerId, const FMGBonusDefinition& Bonus, int32 PointsAwarded);
+
+	/** Handle combo bonus from bonus subsystem */
+	UFUNCTION()
+	void OnComboBonusTriggered(const FString& PlayerId, int32 ComboLevel, int32 BonusPoints);
+
+	/** Handle secret found from bonus subsystem */
+	UFUNCTION()
+	void OnSecretBonusFound(const FString& PlayerId, const FString& SecretId);
+
+	/** Handle pursuit started from pursuit subsystem */
+	UFUNCTION()
+	void OnPursuitStarted(const FString& PlayerId, EMGPursuitIntensity Intensity);
+
+	/** Handle pursuit ended from pursuit subsystem */
+	UFUNCTION()
+	void OnPursuitEnded(const FString& PlayerId, bool bEscaped, int32 FinalBounty);
+
+	/** Handle unit disabled from pursuit subsystem */
+	UFUNCTION()
+	void OnUnitDisabled(const FString& PlayerId, const FMGPursuitUnit& Unit);
+
+	/** Handle roadblock evaded from pursuit subsystem */
+	UFUNCTION()
+	void OnRoadblockEvaded(const FString& PlayerId, const FString& RoadblockId);
 };

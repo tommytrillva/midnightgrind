@@ -6,6 +6,7 @@
 #include "ChaosWheeledVehicleMovementComponent.h"
 #include "MGVehicleData.h"
 #include "MGTirePressureTypes.h"
+#include "MGPhysicsConstants.h"
 #include "RacingWheel/MGRacingWheelTypes.h"
 #include "MGVehicleMovementComponent.generated.h"
 
@@ -1418,6 +1419,45 @@ public:
 	const FMGVehicleData& GetVehicleConfiguration() const { return CurrentConfiguration; }
 
 	// ==========================================
+	// PHYSICS HANDLING MODE
+	// ==========================================
+
+	/**
+	 * @brief Apply physics handling mode preset
+	 *
+	 * Configures assists, physics simulation depth, and steering response
+	 * based on the selected handling mode (Arcade/Balanced/Simulation).
+	 *
+	 * @param Mode The handling mode to apply
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Handling")
+	void ApplyPhysicsHandlingMode(EMGPhysicsHandlingMode Mode);
+
+	/**
+	 * @brief Apply custom handling settings
+	 *
+	 * For fine-grained control over handling parameters.
+	 *
+	 * @param Settings Custom handling configuration
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Handling")
+	void ApplyPhysicsHandlingSettings(const FMGPhysicsHandlingSettings& Settings);
+
+	/**
+	 * @brief Get current physics handling mode
+	 * @return Current handling mode
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Handling")
+	EMGPhysicsHandlingMode GetPhysicsHandlingMode() const { return CurrentHandlingMode; }
+
+	/**
+	 * @brief Get current handling settings
+	 * @return Current handling configuration
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Handling")
+	const FMGPhysicsHandlingSettings& GetPhysicsHandlingSettings() const { return CurrentHandlingSettings; }
+
+	// ==========================================
 	// INPUT
 	// ==========================================
 
@@ -2715,6 +2755,14 @@ protected:
 
 	UPROPERTY()
 	FMGVehicleData CurrentConfiguration;
+
+	/** Current physics handling mode */
+	UPROPERTY()
+	EMGPhysicsHandlingMode CurrentHandlingMode = EMGPhysicsHandlingMode::Balanced;
+
+	/** Current physics handling settings */
+	UPROPERTY()
+	FMGPhysicsHandlingSettings CurrentHandlingSettings;
 
 	UPROPERTY()
 	FMGEngineState EngineState;

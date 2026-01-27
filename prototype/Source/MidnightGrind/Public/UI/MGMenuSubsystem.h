@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Vehicle/MGPhysicsConstants.h"
 #include "MGMenuSubsystem.generated.h"
 
 class UUserWidget;
@@ -162,6 +163,17 @@ struct FMGGameSettings
 	// ==========================================
 	// GAMEPLAY
 	// ==========================================
+
+	/**
+	 * @brief Physics handling mode preset
+	 *
+	 * Controls overall physics feel:
+	 * - Arcade: Forgiving, assisted, great for casual play
+	 * - Balanced: Default, realistic but accessible
+	 * - Simulation: Challenging, minimal assists, for enthusiasts
+	 */
+	UPROPERTY(BlueprintReadWrite, Category = "Gameplay")
+	EMGPhysicsHandlingMode PhysicsHandlingMode = EMGPhysicsHandlingMode::Balanced;
 
 	/** Camera style (0=Chase, 1=Hood, 2=Bumper, 3=Cockpit) */
 	UPROPERTY(BlueprintReadWrite, Category = "Gameplay")

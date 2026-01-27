@@ -7,6 +7,14 @@
 #include "HAL/PlatformFileManager.h"
 #include "Serialization/BufferArchive.h"
 #include "Serialization/MemoryReader.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
+#include "Sound/SoundBase.h"
+#include "Haptics/MGHapticsSubsystem.h"
+#include "ScreenEffect/MGScreenEffectSubsystem.h"
 
 void UMGCollisionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -795,8 +803,96 @@ void UMGCollisionSubsystem::TriggerCrashEffects(const FMGCollisionEvent& Collisi
 {
 	FMGCrashEffect Effect = GetCrashEffect(Collision.Severity);
 
-	// Effects would be triggered through game systems
-	// This is a placeholder for the implementation
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	// 1. Spawn particle effect at impact location
+	if (Effect.ParticleEffect.IsValid())
+	{
+		if (UNiagaraSystem* NiagaraSystem = Cast<UNiagaraSystem>(Effect.ParticleEffect.LoadSynchronous()))
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+				World,
+				NiagaraSystem,
+				Collision.ImpactLocation,
+				Collision.ImpactNormal.Rotation(),
+				FVector(1.0f),
+				true,
+				true
+			);
+		}
+	}
+
+	// 2. Play sound effect at impact location
+	if (Effect.SoundEffect.IsValid())
+	{
+		if (USoundBase* Sound = Cast<USoundBase>(Effect.SoundEffect.LoadSynchronous()))
+		{
+			// Scale volume based on impact force
+			float VolumeMultiplier = FMath::Clamp(Collision.ImpactForce / 10000.0f, 0.5f, 1.5f);
+			UGameplayStatics::PlaySoundAtLocation(
+				World,
+				Sound,
+				Collision.ImpactLocation,
+				VolumeMultiplier
+			);
+		}
+	}
+
+	// 3. Trigger camera shake for local player
+	if (Effect.CameraShakeIntensity > 0.0f)
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0))
+		{
+			// Use screen effect subsystem for camera shake
+			if (UGameInstance* GI = GetGameInstance())
+			{
+				if (UMGScreenEffectSubsystem* ScreenEffects = GI->GetSubsystem<UMGScreenEffectSubsystem>())
+				{
+					ScreenEffects->TriggerImpactShake(Effect.CameraShakeIntensity, Collision.ImpactNormal);
+				}
+			}
+		}
+	}
+
+	// 4. Trigger slow motion for dramatic crashes
+	if (Effect.SlowMotionDuration > 0.0f && Collision.Severity >= EMGCollisionSeverity::Major)
+	{
+		UGameplayStatics::SetGlobalTimeDilation(World, Effect.SlowMotionScale);
+
+		// Set timer to restore normal time
+		FTimerHandle TimeDilationHandle;
+		World->GetTimerManager().SetTimer(
+			TimeDilationHandle,
+			[World, SlowMoDuration = Effect.SlowMotionDuration]()
+			{
+				if (World)
+				{
+					UGameplayStatics::SetGlobalTimeDilation(World, 1.0f);
+				}
+			},
+			Effect.SlowMotionDuration * Effect.SlowMotionScale, // Adjusted for time dilation
+			false
+		);
+	}
+
+	// 5. Trigger controller rumble/haptics
+	if (Effect.bTriggerRumble)
+	{
+		if (UGameInstance* GI = GetGameInstance())
+		{
+			if (UMGHapticsSubsystem* Haptics = GI->GetSubsystem<UMGHapticsSubsystem>())
+			{
+				Haptics->PlayCollisionFeedback(Collision.ImpactForce, Collision.ImpactNormal);
+			}
+		}
+	}
+
+	// Broadcast collision event for other systems to react
+	OnCollisionEffectsTriggered.Broadcast(Collision, Effect);
 }
 
 // ============================================================================

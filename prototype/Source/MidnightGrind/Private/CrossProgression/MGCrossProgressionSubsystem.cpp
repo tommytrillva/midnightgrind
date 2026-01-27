@@ -462,22 +462,33 @@ void UMGCrossProgressionSubsystem::PerformSync(ETransferDirection Direction, EPr
         float SyncDuration = 1.0f + FMath::RandRange(0.0f, 1.0f); // 1-2 seconds
 
         // Progress updates
-        World->GetTimerManager().SetTimer(BackupTimer, [this]()
+        TWeakObjectPtr<UMGCrossProgressionSubsystem> WeakThis(this);
+        World->GetTimerManager().SetTimer(BackupTimer, [WeakThis]()
         {
-            CurrentOperation.Progress += 0.25f;
-            OnSyncProgress.Broadcast(CurrentOperation, CurrentOperation.Progress);
+            if (WeakThis.IsValid())
+            {
+                WeakThis->CurrentOperation.Progress += 0.25f;
+                WeakThis->OnSyncProgress.Broadcast(WeakThis->CurrentOperation, WeakThis->CurrentOperation.Progress);
+            }
         }, SyncDuration * 0.25f, true, 0.0f);
 
         // Completion
-        World->GetTimerManager().SetTimerForNextTick([this, SyncDuration]()
+        World->GetTimerManager().SetTimerForNextTick([WeakThis, SyncDuration]()
         {
-            if (UWorld* InnerWorld = GetWorld())
+            if (!WeakThis.IsValid())
             {
-                InnerWorld->GetTimerManager().SetTimer(AutoSyncTimer, [this]()
+                return;
+            }
+            if (UWorld* InnerWorld = WeakThis->GetWorld())
+            {
+                InnerWorld->GetTimerManager().SetTimer(WeakThis->AutoSyncTimer, [WeakThis]()
                 {
-                    // Simulate success (90% chance) or failure (10% chance)
-                    bool bSuccess = FMath::RandRange(0.0f, 1.0f) < 0.9f;
-                    HandleSyncResult(bSuccess, bSuccess ? TEXT("") : TEXT("Network timeout"));
+                    if (WeakThis.IsValid())
+                    {
+                        // Simulate success (90% chance) or failure (10% chance)
+                        bool bSuccess = FMath::RandRange(0.0f, 1.0f) < 0.9f;
+                        WeakThis->HandleSyncResult(bSuccess, bSuccess ? TEXT("") : TEXT("Network timeout"));
+                    }
                 }, SyncDuration, false);
             }
         });

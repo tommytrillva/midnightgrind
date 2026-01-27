@@ -12,6 +12,11 @@
 #include "Airtime/MGAirtimeSubsystem.h"
 #include "Fuel/MGFuelSubsystem.h"
 #include "Tire/MGTireSubsystem.h"
+#include "Collision/MGCollisionSubsystem.h"
+#include "PitStop/MGPitStopSubsystem.h"
+#include "Bonus/MGBonusSubsystem.h"
+#include "Pursuit/MGPursuitSubsystem.h"
+#include "Speedtrap/MGSpeedtrapSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -88,6 +93,38 @@ void AMGPlayerController::BeginPlay()
 				TireSubsystem->OnTirePunctured.AddDynamic(this, &AMGPlayerController::OnTirePunctured);
 				TireSubsystem->OnTireConditionChanged.AddDynamic(this, &AMGPlayerController::OnTireConditionChanged);
 			}
+
+			// Bind to collision subsystem for takedown notifications
+			if (UMGCollisionSubsystem* CollisionSubsystem = GI->GetSubsystem<UMGCollisionSubsystem>())
+			{
+				CollisionSubsystem->OnTakedownDealt.AddDynamic(this, &AMGPlayerController::OnTakedownDealt);
+				CollisionSubsystem->OnTakedownChain.AddDynamic(this, &AMGPlayerController::OnTakedownChain);
+				CollisionSubsystem->OnRevengeComplete.AddDynamic(this, &AMGPlayerController::OnRevengeComplete);
+			}
+
+			// Bind to pit stop subsystem for pit notifications
+			if (UMGPitStopSubsystem* PitStopSubsystem = GI->GetSubsystem<UMGPitStopSubsystem>())
+			{
+				PitStopSubsystem->OnPitStopCompleted.AddDynamic(this, &AMGPlayerController::OnPitStopCompleted);
+				PitStopSubsystem->OnPitLaneViolation.AddDynamic(this, &AMGPlayerController::OnPitLaneViolation);
+			}
+
+			// Bind to bonus subsystem for pickup notifications
+			if (UMGBonusSubsystem* BonusSubsystem = GI->GetSubsystem<UMGBonusSubsystem>())
+			{
+				BonusSubsystem->OnBonusCollected.AddDynamic(this, &AMGPlayerController::OnBonusCollected);
+				BonusSubsystem->OnComboBonusTriggered.AddDynamic(this, &AMGPlayerController::OnComboBonusTriggered);
+				BonusSubsystem->OnSecretBonusFound.AddDynamic(this, &AMGPlayerController::OnSecretBonusFound);
+			}
+
+			// Bind to pursuit subsystem for chase notifications
+			if (UMGPursuitSubsystem* PursuitSubsystem = GI->GetSubsystem<UMGPursuitSubsystem>())
+			{
+				PursuitSubsystem->OnPursuitStarted.AddDynamic(this, &AMGPlayerController::OnPursuitStarted);
+				PursuitSubsystem->OnPursuitEnded.AddDynamic(this, &AMGPlayerController::OnPursuitEnded);
+				PursuitSubsystem->OnUnitDisabled.AddDynamic(this, &AMGPlayerController::OnUnitDisabled);
+				PursuitSubsystem->OnRoadblockEvaded.AddDynamic(this, &AMGPlayerController::OnRoadblockEvaded);
+			}
 		}
 	}
 }
@@ -131,6 +168,34 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		{
 			TireSubsystem->OnTirePunctured.RemoveDynamic(this, &AMGPlayerController::OnTirePunctured);
 			TireSubsystem->OnTireConditionChanged.RemoveDynamic(this, &AMGPlayerController::OnTireConditionChanged);
+		}
+
+		if (UMGCollisionSubsystem* CollisionSubsystem = GI->GetSubsystem<UMGCollisionSubsystem>())
+		{
+			CollisionSubsystem->OnTakedownDealt.RemoveDynamic(this, &AMGPlayerController::OnTakedownDealt);
+			CollisionSubsystem->OnTakedownChain.RemoveDynamic(this, &AMGPlayerController::OnTakedownChain);
+			CollisionSubsystem->OnRevengeComplete.RemoveDynamic(this, &AMGPlayerController::OnRevengeComplete);
+		}
+
+		if (UMGPitStopSubsystem* PitStopSubsystem = GI->GetSubsystem<UMGPitStopSubsystem>())
+		{
+			PitStopSubsystem->OnPitStopCompleted.RemoveDynamic(this, &AMGPlayerController::OnPitStopCompleted);
+			PitStopSubsystem->OnPitLaneViolation.RemoveDynamic(this, &AMGPlayerController::OnPitLaneViolation);
+		}
+
+		if (UMGBonusSubsystem* BonusSubsystem = GI->GetSubsystem<UMGBonusSubsystem>())
+		{
+			BonusSubsystem->OnBonusCollected.RemoveDynamic(this, &AMGPlayerController::OnBonusCollected);
+			BonusSubsystem->OnComboBonusTriggered.RemoveDynamic(this, &AMGPlayerController::OnComboBonusTriggered);
+			BonusSubsystem->OnSecretBonusFound.RemoveDynamic(this, &AMGPlayerController::OnSecretBonusFound);
+		}
+
+		if (UMGPursuitSubsystem* PursuitSubsystem = GI->GetSubsystem<UMGPursuitSubsystem>())
+		{
+			PursuitSubsystem->OnPursuitStarted.RemoveDynamic(this, &AMGPlayerController::OnPursuitStarted);
+			PursuitSubsystem->OnPursuitEnded.RemoveDynamic(this, &AMGPlayerController::OnPursuitEnded);
+			PursuitSubsystem->OnUnitDisabled.RemoveDynamic(this, &AMGPlayerController::OnUnitDisabled);
+			PursuitSubsystem->OnRoadblockEvaded.RemoveDynamic(this, &AMGPlayerController::OnRoadblockEvaded);
 		}
 	}
 
@@ -843,6 +908,307 @@ void AMGPlayerController::OnTireConditionChanged(FName VehicleID, EMGTirePositio
 			FText AlertMessage = FText::FromString(TEXT("TIRE WEAR CRITICAL!"));
 			FLinearColor AlertColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
 			HUDSubsystem->ShowNotification(AlertMessage, 3.0f, AlertColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnTakedownDealt(const FString& AttackerId, const FMGTakedownEvent& Takedown)
+{
+	// Only show for the player's own takedowns
+	if (!ControlledVehicle || AttackerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText TakedownMessage;
+			FLinearColor TakedownColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+
+			switch (Takedown.Type)
+			{
+				case EMGTakedownType::Shunt:
+					TakedownMessage = FText::FromString(TEXT("SHUNT TAKEDOWN!"));
+					break;
+				case EMGTakedownType::Slam:
+					TakedownMessage = FText::FromString(TEXT("SLAM TAKEDOWN!"));
+					break;
+				case EMGTakedownType::PIT:
+					TakedownMessage = FText::FromString(TEXT("PIT MANEUVER!"));
+					break;
+				case EMGTakedownType::Vertical:
+					TakedownMessage = FText::FromString(TEXT("VERTICAL TAKEDOWN!"));
+					TakedownColor = FLinearColor(1.0f, 0.2f, 0.8f, 1.0f); // Purple
+					break;
+				case EMGTakedownType::Traffic:
+					TakedownMessage = FText::FromString(TEXT("TRAFFIC TAKEDOWN!"));
+					break;
+				case EMGTakedownType::Aftertouch:
+					TakedownMessage = FText::FromString(TEXT("AFTERTOUCH TAKEDOWN!"));
+					TakedownColor = FLinearColor(0.2f, 1.0f, 0.8f, 1.0f); // Cyan
+					break;
+				default:
+					TakedownMessage = FText::FromString(TEXT("TAKEDOWN!"));
+					break;
+			}
+
+			HUDSubsystem->ShowNotification(TakedownMessage, 3.0f, TakedownColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnTakedownChain(const FString& PlayerId, int32 ChainCount, float ChainMultiplier)
+{
+	// Only show for the player
+	if (!ControlledVehicle || PlayerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (ChainCount < 2)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ChainMessage = FText::FromString(FString::Printf(TEXT("TAKEDOWN x%d! (%.1fx)"), ChainCount, ChainMultiplier));
+			FLinearColor ChainColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.0f); // Gold
+			HUDSubsystem->ShowNotification(ChainMessage, 2.5f, ChainColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnRevengeComplete(const FString& AttackerId, const FString& OriginalAttackerId)
+{
+	// Only show for the player
+	if (!ControlledVehicle || AttackerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText RevengeMessage = FText::FromString(TEXT("REVENGE!"));
+			FLinearColor RevengeColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+			HUDSubsystem->ShowNotification(RevengeMessage, 3.0f, RevengeColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPitStopCompleted(FName VehicleID, const FMGPitStopResult& Result)
+{
+	// Only show for the player's vehicle
+	if (!ControlledVehicle || VehicleID != FName(*ControlledVehicle->GetName()))
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			// Format pit stop time
+			float TotalTime = Result.TotalTime;
+			FString TimeStr = FString::Printf(TEXT("PIT STOP: %.2fs"), TotalTime);
+
+			FText PitMessage = FText::FromString(TimeStr);
+			FLinearColor PitColor = FLinearColor(0.2f, 0.8f, 1.0f, 1.0f); // Light blue
+			HUDSubsystem->ShowNotification(PitMessage, 4.0f, PitColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPitLaneViolation(FName VehicleID, EMGPitLaneViolation Violation)
+{
+	// Only show for the player's vehicle
+	if (!ControlledVehicle || VehicleID != FName(*ControlledVehicle->GetName()))
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ViolationMessage;
+			switch (Violation)
+			{
+				case EMGPitLaneViolation::Speeding:
+					ViolationMessage = FText::FromString(TEXT("PIT LANE SPEEDING PENALTY!"));
+					break;
+				case EMGPitLaneViolation::UnsafeRelease:
+					ViolationMessage = FText::FromString(TEXT("UNSAFE RELEASE PENALTY!"));
+					break;
+				case EMGPitLaneViolation::CrossingLine:
+					ViolationMessage = FText::FromString(TEXT("PIT LINE CROSSING PENALTY!"));
+					break;
+				case EMGPitLaneViolation::WrongBox:
+					ViolationMessage = FText::FromString(TEXT("WRONG PIT BOX!"));
+					break;
+				default:
+					ViolationMessage = FText::FromString(TEXT("PIT LANE VIOLATION!"));
+					break;
+			}
+
+			FLinearColor ViolationColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+			HUDSubsystem->ShowNotification(ViolationMessage, 4.0f, ViolationColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnBonusCollected(const FString& PlayerId, const FMGBonusDefinition& Bonus, int32 PointsAwarded)
+{
+	// Only show for the player
+	if (!ControlledVehicle || PlayerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (PointsAwarded <= 0)
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText BonusMessage = FText::FromString(FString::Printf(TEXT("+%d %s"), PointsAwarded, *Bonus.DisplayName.ToString()));
+			FLinearColor BonusColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f); // Green-cyan
+			HUDSubsystem->ShowNotification(BonusMessage, 2.0f, BonusColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnComboBonusTriggered(const FString& PlayerId, int32 ComboLevel, int32 BonusPoints)
+{
+	// Only show for the player
+	if (!ControlledVehicle || PlayerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ComboMessage = FText::FromString(FString::Printf(TEXT("COMBO x%d! +%d"), ComboLevel, BonusPoints));
+			FLinearColor ComboColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.0f); // Gold
+			HUDSubsystem->ShowNotification(ComboMessage, 2.5f, ComboColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSecretBonusFound(const FString& PlayerId, const FString& SecretId)
+{
+	// Only show for the player
+	if (!ControlledVehicle || PlayerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText SecretMessage = FText::FromString(TEXT("SECRET FOUND!"));
+			FLinearColor SecretColor = FLinearColor(1.0f, 0.0f, 1.0f, 1.0f); // Magenta
+			HUDSubsystem->ShowNotification(SecretMessage, 3.0f, SecretColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPursuitStarted(const FString& PlayerId, EMGPursuitIntensity Intensity)
+{
+	// Only show for the player
+	if (!ControlledVehicle || PlayerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText PursuitMessage = FText::FromString(TEXT("PURSUIT INITIATED!"));
+			FLinearColor PursuitColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+			HUDSubsystem->ShowNotification(PursuitMessage, 3.0f, PursuitColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnPursuitEnded(const FString& PlayerId, bool bEscaped, int32 FinalBounty)
+{
+	// Only show for the player
+	if (!ControlledVehicle || PlayerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText EndMessage;
+			FLinearColor EndColor;
+
+			if (bEscaped)
+			{
+				EndMessage = FText::FromString(FString::Printf(TEXT("ESCAPED! +$%d"), FinalBounty));
+				EndColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green
+			}
+			else
+			{
+				EndMessage = FText::FromString(TEXT("BUSTED!"));
+				EndColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+			}
+
+			HUDSubsystem->ShowNotification(EndMessage, 4.0f, EndColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnUnitDisabled(const FString& PlayerId, const FMGPursuitUnit& Unit)
+{
+	// Only show for the player
+	if (!ControlledVehicle || PlayerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText DisabledMessage = FText::FromString(TEXT("UNIT DISABLED!"));
+			FLinearColor DisabledColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+			HUDSubsystem->ShowNotification(DisabledMessage, 2.0f, DisabledColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnRoadblockEvaded(const FString& PlayerId, const FString& RoadblockId)
+{
+	// Only show for the player
+	if (!ControlledVehicle || PlayerId != ControlledVehicle->GetName())
+	{
+		return;
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText EvadedMessage = FText::FromString(TEXT("ROADBLOCK EVADED!"));
+			FLinearColor EvadedColor = FLinearColor(0.0f, 1.0f, 0.8f, 1.0f); // Cyan
+			HUDSubsystem->ShowNotification(EvadedMessage, 2.5f, EvadedColor);
 		}
 	}
 }

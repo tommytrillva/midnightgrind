@@ -32,7 +32,8 @@ void UMGStreamIntegrationSubsystem::Initialize(FSubsystemCollectionBase& Collect
     if (UWorld* World = GetWorld())
     {
         World->GetTimerManager().SetTimer(InteractionProcessTimer, this, &UMGStreamIntegrationSubsystem::ProcessInteractionQueue, 0.1f, true);
-        World->GetTimerManager().SetTimer(CooldownUpdateTimer, [this]() { UpdateCooldowns(1.0f); }, 1.0f, true);
+        TWeakObjectPtr<UMGStreamIntegrationSubsystem> WeakThis(this);
+        World->GetTimerManager().SetTimer(CooldownUpdateTimer, [WeakThis]() { if (WeakThis.IsValid()) WeakThis->UpdateCooldowns(1.0f); }, 1.0f, true);
     }
 
     UE_LOG(LogTemp, Log, TEXT("MGStreamIntegrationSubsystem initialized"));
@@ -255,10 +256,15 @@ void UMGStreamIntegrationSubsystem::ConnectToStream(EStreamPlatform Platform, co
     // Simulate connection
     if (UWorld* World = GetWorld())
     {
-        World->GetTimerManager().SetTimerForNextTick([this, Platform]()
+        TWeakObjectPtr<UMGStreamIntegrationSubsystem> WeakThis(this);
+        World->GetTimerManager().SetTimerForNextTick([WeakThis, Platform]()
         {
+            if (!WeakThis.IsValid())
+            {
+                return;
+            }
             // Simulate successful connection
-            ConnectionStatus[Platform] = EStreamStatus::Connected;
+            WeakThis->ConnectionStatus[Platform] = EStreamStatus::Connected;
 
             FStreamInfo Info;
             Info.Platform = Platform;
@@ -267,9 +273,9 @@ void UMGStreamIntegrationSubsystem::ConnectToStream(EStreamPlatform Platform, co
             Info.bIsLive = true;
             Info.StreamStartTime = FDateTime::Now();
             Info.ViewerCount = FMath::RandRange(50, 500);
-            StreamInfos.Add(Platform, Info);
+            WeakThis->StreamInfos.Add(Platform, Info);
 
-            OnStreamConnected.Broadcast(Platform);
+            WeakThis->OnStreamConnected.Broadcast(Platform);
             UE_LOG(LogTemp, Log, TEXT("Connected to stream platform: %d"), static_cast<int32>(Platform));
         });
     }
@@ -688,9 +694,14 @@ void UMGStreamIntegrationSubsystem::CreatePoll(const FString& Title, const TArra
     // Set timer to end poll
     if (UWorld* World = GetWorld())
     {
-        World->GetTimerManager().SetTimer(ViewerCountUpdateTimer, [this]()
+        TWeakObjectPtr<UMGStreamIntegrationSubsystem> WeakThis(this);
+        FGuid PollId = ActivePoll.PollId;
+        World->GetTimerManager().SetTimer(ViewerCountUpdateTimer, [WeakThis, PollId]()
         {
-            EndPoll(ActivePoll.PollId);
+            if (WeakThis.IsValid())
+            {
+                WeakThis->EndPoll(PollId);
+            }
         }, Duration, false);
     }
 }

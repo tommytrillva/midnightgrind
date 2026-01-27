@@ -472,6 +472,58 @@ void UMGVehicleMovementComponent::ApplyVehicleConfiguration(const FMGVehicleData
 }
 
 // ==========================================
+// PHYSICS HANDLING MODE
+// ==========================================
+
+void UMGVehicleMovementComponent::ApplyPhysicsHandlingMode(EMGPhysicsHandlingMode Mode)
+{
+	FMGPhysicsHandlingSettings Settings = UMGPhysicsHandlingConfig::GetSettingsForMode(Mode);
+	ApplyPhysicsHandlingSettings(Settings);
+}
+
+void UMGVehicleMovementComponent::ApplyPhysicsHandlingSettings(const FMGPhysicsHandlingSettings& Settings)
+{
+	CurrentHandlingMode = Settings.Mode;
+	CurrentHandlingSettings = Settings;
+
+	// Apply stability assist parameters
+	StabilityControl = Settings.StabilityControl;
+	AntiFlipTorque = Settings.AntiFlipTorque;
+	SpeedSensitiveSteeringFactor = Settings.SpeedSensitiveSteeringFactor;
+
+	// Apply physics simulation parameters
+	WeightTransferRate = Settings.WeightTransferRate;
+	BaseTireGrip = Settings.BaseTireGrip;
+	TireTempGripInfluence = Settings.TireTempInfluence;
+	TurboLagSimulation = Settings.TurboLagSimulation;
+	EngineBrakingMultiplier = Settings.EngineBrakingMultiplier;
+
+	// Apply steering response parameters
+	ArcadeSteeringSpeed = Settings.ArcadeSteeringSpeed;
+	ArcadeSteeringReturnSpeed = Settings.ArcadeSteeringReturnSpeed;
+
+	// Update tire grip on all wheels to reflect new base grip
+	for (int32 i = 0; i < Wheels.Num(); ++i)
+	{
+		if (UChaosVehicleWheel* Wheel = Cast<UChaosVehicleWheel>(Wheels[i]))
+		{
+			// Preserve existing tire compound multiplier but apply new base grip
+			const bool bIsFrontWheel = (i < 2);
+			const float CompoundGrip = bIsFrontWheel
+				? GetTireCompoundGrip(CurrentConfiguration.WheelsTires.FrontTireCompound)
+				: GetTireCompoundGrip(CurrentConfiguration.WheelsTires.RearTireCompound);
+
+			Wheel->FrictionForceMultiplier = BaseTireGrip * CompoundGrip;
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Applied physics handling mode: %s (StabilityControl: %.2f, BaseGrip: %.2f, WeightTransferRate: %.1f)"),
+		Settings.Mode == EMGPhysicsHandlingMode::Arcade ? TEXT("Arcade") :
+		Settings.Mode == EMGPhysicsHandlingMode::Simulation ? TEXT("Simulation") : TEXT("Balanced"),
+		StabilityControl, BaseTireGrip, WeightTransferRate);
+}
+
+// ==========================================
 // SIMULATION UPDATES
 // ==========================================
 

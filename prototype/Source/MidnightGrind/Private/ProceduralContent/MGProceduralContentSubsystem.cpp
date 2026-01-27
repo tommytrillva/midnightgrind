@@ -382,9 +382,13 @@ void UMGProceduralContentSubsystem::GenerateTrackAsync(const FGenerationSettings
 
     if (UWorld* World = GetWorld())
     {
-        World->GetTimerManager().SetTimerForNextTick([this, Settings]()
+        TWeakObjectPtr<UMGProceduralContentSubsystem> WeakThis(this);
+        World->GetTimerManager().SetTimerForNextTick([WeakThis, Settings]()
         {
-            GenerateTrack(Settings);
+            if (WeakThis.IsValid())
+            {
+                WeakThis->GenerateTrack(Settings);
+            }
         });
     }
 }
