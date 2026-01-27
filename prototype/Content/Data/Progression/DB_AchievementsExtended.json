@@ -1,0 +1,582 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Extended Achievements and Challenges",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "TrackProgress": true,
+    "ShowNotifications": true,
+    "TotalAchievements": 250,
+    "SecretAchievements": 25
+  },
+
+  "AchievementCategories": {
+    "Racing": {
+      "ID": "ACH_RACING",
+      "Icon": "trophy_racing",
+      "Achievements": {
+        "FirstBlood": {
+          "ID": "ACH_FIRST_WIN",
+          "Name": "First Blood",
+          "Description": "Win your first race",
+          "Requirement": { "Wins": 1 },
+          "Reward": { "REP": 500, "Cash": 5000 },
+          "Rarity": "Common"
+        },
+        "TenTimer": {
+          "ID": "ACH_TEN_WINS",
+          "Name": "Ten Timer",
+          "Description": "Win 10 races",
+          "Requirement": { "Wins": 10 },
+          "Reward": { "REP": 2500, "Cash": 25000 },
+          "Rarity": "Common"
+        },
+        "HundredClub": {
+          "ID": "ACH_HUNDRED_WINS",
+          "Name": "Hundred Club",
+          "Description": "Win 100 races",
+          "Requirement": { "Wins": 100 },
+          "Reward": { "REP": 10000, "Cash": 100000, "Title": "Centurion" },
+          "Rarity": "Rare"
+        },
+        "ThousandVictories": {
+          "ID": "ACH_THOUSAND_WINS",
+          "Name": "Thousand Victories",
+          "Description": "Win 1000 races",
+          "Requirement": { "Wins": 1000 },
+          "Reward": { "REP": 50000, "Cash": 500000, "Title": "Racing Immortal" },
+          "Rarity": "Legendary"
+        },
+        "PerfectRace": {
+          "ID": "ACH_PERFECT_RACE",
+          "Name": "Perfect Race",
+          "Description": "Win a race without any collisions",
+          "Requirement": { "CleanWin": 1 },
+          "Reward": { "REP": 1500 },
+          "Rarity": "Uncommon"
+        },
+        "Flawless": {
+          "ID": "ACH_FLAWLESS",
+          "Name": "Flawless",
+          "Description": "Complete 50 clean races",
+          "Requirement": { "CleanRaces": 50 },
+          "Reward": { "REP": 15000, "Title": "Clean Driver" },
+          "Rarity": "Rare"
+        },
+        "FromBehind": {
+          "ID": "ACH_COMEBACK",
+          "Name": "From Behind",
+          "Description": "Win after being in last place on the final lap",
+          "Requirement": { "ComebackWin": 1 },
+          "Reward": { "REP": 3000 },
+          "Rarity": "Rare"
+        },
+        "PhotoFinish": {
+          "ID": "ACH_PHOTO_FINISH",
+          "Name": "Photo Finish",
+          "Description": "Win by less than 0.1 seconds",
+          "Requirement": { "CloseWin": 0.1 },
+          "Reward": { "REP": 2000 },
+          "Rarity": "Uncommon"
+        },
+        "Dominant": {
+          "ID": "ACH_DOMINANT",
+          "Name": "Dominant",
+          "Description": "Win a race by more than 10 seconds",
+          "Requirement": { "WinMargin": 10 },
+          "Reward": { "REP": 2500 },
+          "Rarity": "Uncommon"
+        },
+        "Untouchable": {
+          "ID": "ACH_UNTOUCHABLE",
+          "Name": "Untouchable",
+          "Description": "Win 5 races in a row without any collisions",
+          "Requirement": { "CleanWinStreak": 5 },
+          "Reward": { "REP": 10000, "Title": "Untouchable" },
+          "Rarity": "Epic"
+        }
+      }
+    },
+    "WinStreaks": {
+      "ID": "ACH_STREAKS",
+      "Icon": "trophy_streak",
+      "Achievements": {
+        "OnFire": {
+          "ID": "ACH_STREAK_3",
+          "Name": "On Fire",
+          "Description": "Win 3 races in a row",
+          "Requirement": { "WinStreak": 3 },
+          "Reward": { "REP": 1500 },
+          "Rarity": "Common"
+        },
+        "Unstoppable": {
+          "ID": "ACH_STREAK_5",
+          "Name": "Unstoppable",
+          "Description": "Win 5 races in a row",
+          "Requirement": { "WinStreak": 5 },
+          "Reward": { "REP": 5000 },
+          "Rarity": "Uncommon"
+        },
+        "Legendary": {
+          "ID": "ACH_STREAK_10",
+          "Name": "Legendary Run",
+          "Description": "Win 10 races in a row",
+          "Requirement": { "WinStreak": 10 },
+          "Reward": { "REP": 15000, "Title": "Legend" },
+          "Rarity": "Rare"
+        },
+        "Godlike": {
+          "ID": "ACH_STREAK_20",
+          "Name": "Godlike",
+          "Description": "Win 20 races in a row",
+          "Requirement": { "WinStreak": 20 },
+          "Reward": { "REP": 50000, "Title": "Godlike", "Vehicle": "Exclusive" },
+          "Rarity": "Legendary"
+        }
+      }
+    },
+    "Drifting": {
+      "ID": "ACH_DRIFTING",
+      "Icon": "trophy_drift",
+      "Achievements": {
+        "FirstSlide": {
+          "ID": "ACH_FIRST_DRIFT",
+          "Name": "First Slide",
+          "Description": "Complete your first drift",
+          "Requirement": { "Drifts": 1 },
+          "Reward": { "REP": 250 },
+          "Rarity": "Common"
+        },
+        "DriftApprentice": {
+          "ID": "ACH_DRIFT_10K",
+          "Name": "Drift Apprentice",
+          "Description": "Earn 10,000 drift points",
+          "Requirement": { "DriftPoints": 10000 },
+          "Reward": { "REP": 1000 },
+          "Rarity": "Common"
+        },
+        "DriftMaster": {
+          "ID": "ACH_DRIFT_100K",
+          "Name": "Drift Master",
+          "Description": "Earn 100,000 drift points",
+          "Requirement": { "DriftPoints": 100000 },
+          "Reward": { "REP": 5000 },
+          "Rarity": "Uncommon"
+        },
+        "DriftKing": {
+          "ID": "ACH_DRIFT_1M",
+          "Name": "Drift King",
+          "Description": "Earn 1,000,000 drift points",
+          "Requirement": { "DriftPoints": 1000000 },
+          "Reward": { "REP": 25000, "Title": "Drift King" },
+          "Rarity": "Rare"
+        },
+        "DriftGod": {
+          "ID": "ACH_DRIFT_10M",
+          "Name": "Drift God",
+          "Description": "Earn 10,000,000 drift points",
+          "Requirement": { "DriftPoints": 10000000 },
+          "Reward": { "REP": 100000, "Title": "Drift God", "Vehicle": "DriftSpecial" },
+          "Rarity": "Legendary"
+        },
+        "LongSlide": {
+          "ID": "ACH_LONG_DRIFT",
+          "Name": "Long Slide",
+          "Description": "Maintain a single drift for 5 seconds",
+          "Requirement": { "DriftDuration": 5 },
+          "Reward": { "REP": 1500 },
+          "Rarity": "Uncommon"
+        },
+        "EndlessDrift": {
+          "ID": "ACH_ENDLESS_DRIFT",
+          "Name": "Endless Drift",
+          "Description": "Maintain a single drift for 30 seconds",
+          "Requirement": { "DriftDuration": 30 },
+          "Reward": { "REP": 10000 },
+          "Rarity": "Epic"
+        },
+        "SidewaysSpeed": {
+          "ID": "ACH_FAST_DRIFT",
+          "Name": "Sideways Speed",
+          "Description": "Drift at over 200 km/h",
+          "Requirement": { "DriftSpeed": 200 },
+          "Reward": { "REP": 3000 },
+          "Rarity": "Rare"
+        },
+        "TandemKing": {
+          "ID": "ACH_TANDEM",
+          "Name": "Tandem King",
+          "Description": "Win 25 tandem drift battles",
+          "Requirement": { "TandemWins": 25 },
+          "Reward": { "REP": 10000, "Title": "Tandem King" },
+          "Rarity": "Rare"
+        }
+      }
+    },
+    "Speed": {
+      "ID": "ACH_SPEED",
+      "Icon": "trophy_speed",
+      "Achievements": {
+        "SpeedDemon": {
+          "ID": "ACH_SPEED_200",
+          "Name": "Speed Demon",
+          "Description": "Reach 200 km/h",
+          "Requirement": { "TopSpeed": 200 },
+          "Reward": { "REP": 500 },
+          "Rarity": "Common"
+        },
+        "RocketMan": {
+          "ID": "ACH_SPEED_300",
+          "Name": "Rocket Man",
+          "Description": "Reach 300 km/h",
+          "Requirement": { "TopSpeed": 300 },
+          "Reward": { "REP": 2000 },
+          "Rarity": "Uncommon"
+        },
+        "Supersonic": {
+          "ID": "ACH_SPEED_350",
+          "Name": "Supersonic",
+          "Description": "Reach 350 km/h",
+          "Requirement": { "TopSpeed": 350 },
+          "Reward": { "REP": 5000 },
+          "Rarity": "Rare"
+        },
+        "Hyperspeed": {
+          "ID": "ACH_SPEED_400",
+          "Name": "Hyperspeed",
+          "Description": "Reach 400 km/h",
+          "Requirement": { "TopSpeed": 400 },
+          "Reward": { "REP": 15000, "Title": "Speed Demon" },
+          "Rarity": "Epic"
+        },
+        "SpeedTrapHunter": {
+          "ID": "ACH_SPEED_TRAPS",
+          "Name": "Speed Trap Hunter",
+          "Description": "Set records at 50 speed traps",
+          "Requirement": { "SpeedTrapRecords": 50 },
+          "Reward": { "REP": 10000 },
+          "Rarity": "Rare"
+        }
+      }
+    },
+    "Exploration": {
+      "ID": "ACH_EXPLORE",
+      "Icon": "trophy_explore",
+      "Achievements": {
+        "Tourist": {
+          "ID": "ACH_VISIT_TRACKS",
+          "Name": "Tourist",
+          "Description": "Race on 10 different tracks",
+          "Requirement": { "TracksVisited": 10 },
+          "Reward": { "REP": 2000 },
+          "Rarity": "Common"
+        },
+        "WorldTraveler": {
+          "ID": "ACH_ALL_TRACKS",
+          "Name": "World Traveler",
+          "Description": "Race on every track",
+          "Requirement": { "AllTracks": true },
+          "Reward": { "REP": 15000, "Title": "World Traveler" },
+          "Rarity": "Rare"
+        },
+        "NightOwl": {
+          "ID": "ACH_NIGHT_RACES",
+          "Name": "Night Owl",
+          "Description": "Complete 50 night races",
+          "Requirement": { "NightRaces": 50 },
+          "Reward": { "REP": 5000 },
+          "Rarity": "Uncommon"
+        },
+        "StormChaser": {
+          "ID": "ACH_WEATHER_RACES",
+          "Name": "Storm Chaser",
+          "Description": "Complete races in all weather conditions",
+          "Requirement": { "AllWeather": true },
+          "Reward": { "REP": 7500 },
+          "Rarity": "Uncommon"
+        },
+        "SecretFinder": {
+          "ID": "ACH_SECRETS",
+          "Name": "Secret Finder",
+          "Description": "Discover all hidden shortcuts",
+          "Requirement": { "Shortcuts": "All" },
+          "Reward": { "REP": 10000 },
+          "Rarity": "Rare"
+        }
+      }
+    },
+    "Vehicles": {
+      "ID": "ACH_VEHICLES",
+      "Icon": "trophy_vehicle",
+      "Achievements": {
+        "FirstRide": {
+          "ID": "ACH_FIRST_CAR",
+          "Name": "First Ride",
+          "Description": "Purchase your first car",
+          "Requirement": { "Cars": 1 },
+          "Reward": { "REP": 500 },
+          "Rarity": "Common"
+        },
+        "Collector": {
+          "ID": "ACH_TEN_CARS",
+          "Name": "Collector",
+          "Description": "Own 10 vehicles",
+          "Requirement": { "Cars": 10 },
+          "Reward": { "REP": 5000 },
+          "Rarity": "Uncommon"
+        },
+        "GarageFull": {
+          "ID": "ACH_FIFTY_CARS",
+          "Name": "Garage Full",
+          "Description": "Own 50 vehicles",
+          "Requirement": { "Cars": 50 },
+          "Reward": { "REP": 25000, "Title": "Car Collector" },
+          "Rarity": "Rare"
+        },
+        "CompleteCollection": {
+          "ID": "ACH_ALL_CARS",
+          "Name": "Complete Collection",
+          "Description": "Own every vehicle",
+          "Requirement": { "AllCars": true },
+          "Reward": { "REP": 100000, "Title": "Ultimate Collector", "Garage": "Ultimate" },
+          "Rarity": "Legendary"
+        },
+        "MaxPower": {
+          "ID": "ACH_MAX_TUNE",
+          "Name": "Max Power",
+          "Description": "Fully upgrade a vehicle to maximum performance",
+          "Requirement": { "MaxUpgrade": 1 },
+          "Reward": { "REP": 5000 },
+          "Rarity": "Uncommon"
+        },
+        "MasterMechanic": {
+          "ID": "ACH_ALL_MAX",
+          "Name": "Master Mechanic",
+          "Description": "Fully upgrade 10 vehicles",
+          "Requirement": { "MaxUpgrade": 10 },
+          "Reward": { "REP": 25000, "Title": "Master Mechanic" },
+          "Rarity": "Rare"
+        },
+        "ClassMaster": {
+          "ID": "ACH_WIN_ALL_CLASS",
+          "Name": "Class Master",
+          "Description": "Win a race in every vehicle class",
+          "Requirement": { "WinInAllClasses": true },
+          "Reward": { "REP": 10000 },
+          "Rarity": "Uncommon"
+        }
+      }
+    },
+    "Social": {
+      "ID": "ACH_SOCIAL",
+      "Icon": "trophy_social",
+      "Achievements": {
+        "Friendly": {
+          "ID": "ACH_FIRST_FRIEND",
+          "Name": "Friendly",
+          "Description": "Add your first friend",
+          "Requirement": { "Friends": 1 },
+          "Reward": { "REP": 250 },
+          "Rarity": "Common"
+        },
+        "Popular": {
+          "ID": "ACH_MANY_FRIENDS",
+          "Name": "Popular",
+          "Description": "Have 50 friends",
+          "Requirement": { "Friends": 50 },
+          "Reward": { "REP": 5000 },
+          "Rarity": "Uncommon"
+        },
+        "CrewMember": {
+          "ID": "ACH_JOIN_CREW",
+          "Name": "Crew Member",
+          "Description": "Join a crew",
+          "Requirement": { "JoinCrew": true },
+          "Reward": { "REP": 1000 },
+          "Rarity": "Common"
+        },
+        "CrewLeader": {
+          "ID": "ACH_CREATE_CREW",
+          "Name": "Crew Leader",
+          "Description": "Create and lead a crew",
+          "Requirement": { "CreateCrew": true },
+          "Reward": { "REP": 5000 },
+          "Rarity": "Uncommon"
+        },
+        "CrewChampion": {
+          "ID": "ACH_CREW_WIN",
+          "Name": "Crew Champion",
+          "Description": "Win a crew championship",
+          "Requirement": { "CrewChampionship": true },
+          "Reward": { "REP": 25000, "Title": "Crew Champion" },
+          "Rarity": "Rare"
+        },
+        "Mentor": {
+          "ID": "ACH_HELP_NEWBIE",
+          "Name": "Mentor",
+          "Description": "Complete 10 races with new players",
+          "Requirement": { "NewbieRaces": 10 },
+          "Reward": { "REP": 3000 },
+          "Rarity": "Uncommon"
+        }
+      }
+    },
+    "Economy": {
+      "ID": "ACH_ECONOMY",
+      "Icon": "trophy_money",
+      "Achievements": {
+        "FirstPayday": {
+          "ID": "ACH_EARN_10K",
+          "Name": "First Payday",
+          "Description": "Earn 10,000 cash",
+          "Requirement": { "TotalEarned": 10000 },
+          "Reward": { "REP": 500 },
+          "Rarity": "Common"
+        },
+        "RollingInIt": {
+          "ID": "ACH_EARN_1M",
+          "Name": "Rolling In It",
+          "Description": "Earn 1,000,000 cash",
+          "Requirement": { "TotalEarned": 1000000 },
+          "Reward": { "REP": 10000 },
+          "Rarity": "Uncommon"
+        },
+        "Millionaire": {
+          "ID": "ACH_HAVE_1M",
+          "Name": "Millionaire",
+          "Description": "Have 1,000,000 cash at once",
+          "Requirement": { "CurrentCash": 1000000 },
+          "Reward": { "REP": 5000, "Title": "Millionaire" },
+          "Rarity": "Uncommon"
+        },
+        "Mogul": {
+          "ID": "ACH_EARN_10M",
+          "Name": "Mogul",
+          "Description": "Earn 10,000,000 total cash",
+          "Requirement": { "TotalEarned": 10000000 },
+          "Reward": { "REP": 50000, "Title": "Racing Mogul" },
+          "Rarity": "Rare"
+        },
+        "HighRoller": {
+          "ID": "ACH_BIG_BET",
+          "Name": "High Roller",
+          "Description": "Win a pink slip race worth over 500,000",
+          "Requirement": { "PinkSlipValue": 500000 },
+          "Reward": { "REP": 15000 },
+          "Rarity": "Rare"
+        }
+      }
+    },
+    "Special": {
+      "ID": "ACH_SPECIAL",
+      "Icon": "trophy_special",
+      "Achievements": {
+        "MidnightGrinder": {
+          "ID": "ACH_MIDNIGHT",
+          "Name": "Midnight Grinder",
+          "Description": "Race at exactly midnight in your timezone",
+          "Requirement": { "MidnightRace": true },
+          "Reward": { "REP": 2500, "Title": "Midnight Grinder" },
+          "Rarity": "Uncommon"
+        },
+        "MarathonRunner": {
+          "ID": "ACH_MARATHON",
+          "Name": "Marathon Runner",
+          "Description": "Complete a 50-lap race",
+          "Requirement": { "LongRace": 50 },
+          "Reward": { "REP": 5000 },
+          "Rarity": "Uncommon"
+        },
+        "Dedication": {
+          "ID": "ACH_DAILY_STREAK",
+          "Name": "Dedication",
+          "Description": "Log in for 30 days in a row",
+          "Requirement": { "LoginStreak": 30 },
+          "Reward": { "REP": 10000 },
+          "Rarity": "Rare"
+        },
+        "Veteran": {
+          "ID": "ACH_YEAR_PLAYER",
+          "Name": "Veteran",
+          "Description": "Play for one year",
+          "Requirement": { "PlayTime": 365 },
+          "Reward": { "REP": 50000, "Title": "Veteran", "Badge": "VeteranBadge" },
+          "Rarity": "Epic"
+        }
+      }
+    },
+    "Secret": {
+      "ID": "ACH_SECRET",
+      "Icon": "trophy_secret",
+      "Hidden": true,
+      "Achievements": {
+        "EasterEgg1": {
+          "ID": "ACH_SECRET_1",
+          "Name": "???",
+          "Description": "Hidden achievement",
+          "Revealed": "Find the hidden Initial D reference",
+          "Reward": { "REP": 5000 },
+          "Rarity": "Rare"
+        },
+        "EasterEgg2": {
+          "ID": "ACH_SECRET_2",
+          "Name": "???",
+          "Description": "Hidden achievement",
+          "Revealed": "Drive backwards for an entire lap",
+          "Reward": { "REP": 3000 },
+          "Rarity": "Uncommon"
+        },
+        "EasterEgg3": {
+          "ID": "ACH_SECRET_3",
+          "Name": "???",
+          "Description": "Hidden achievement",
+          "Revealed": "Discover the developer garage",
+          "Reward": { "REP": 10000, "Vehicle": "DevCar" },
+          "Rarity": "Legendary"
+        }
+      }
+    }
+  },
+
+  "Challenges": {
+    "Daily": {
+      "Count": 3,
+      "ResetTime": "00:00 UTC",
+      "Categories": ["Racing", "Drifting", "Exploration"],
+      "Rewards": {
+        "PerChallenge": { "REP": 250, "Cash": 2500 },
+        "AllComplete": { "REP": 500, "Cash": 5000 }
+      }
+    },
+    "Weekly": {
+      "Count": 5,
+      "ResetTime": "Monday 00:00 UTC",
+      "Categories": ["Performance", "Social", "Variety"],
+      "Rewards": {
+        "PerChallenge": { "REP": 1000, "Cash": 10000 },
+        "AllComplete": { "REP": 5000, "Cash": 50000, "Item": "WeeklyCrate" }
+      }
+    },
+    "Seasonal": {
+      "Duration": 90,
+      "TierRewards": true,
+      "Categories": ["Mastery", "Collection", "Competition"]
+    }
+  },
+
+  "UI": {
+    "AchievementTracker": {
+      "PinAchievements": { "Max": 5 },
+      "ShowProgress": true,
+      "ShowRarity": true,
+      "FilterByCategory": true,
+      "FilterByStatus": ["Locked", "InProgress", "Completed"]
+    },
+    "Notifications": {
+      "PopupDuration": 5,
+      "ShowProgress": true,
+      "PlaySound": true,
+      "Screenshot": { "Enabled": true, "AutoSave": true }
+    }
+  }
+}

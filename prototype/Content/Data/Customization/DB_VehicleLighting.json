@@ -1,0 +1,328 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Lighting and Light Customization",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DynamicLighting": true,
+    "TimeOfDayAffects": true,
+    "WeatherAffects": true,
+    "MaxCustomLights": 20
+  },
+
+  "Headlights": {
+    "Types": {
+      "Halogen": {
+        "ID": "HEADLIGHT_HALOGEN",
+        "Name": "Halogen",
+        "Brightness": 0.7,
+        "Range": 80,
+        "ColorTemp": 3200,
+        "Color": "Warm White",
+        "UnlockMethod": "Default"
+      },
+      "HID": {
+        "ID": "HEADLIGHT_HID",
+        "Name": "HID Xenon",
+        "Brightness": 0.9,
+        "Range": 120,
+        "ColorTemp": 5000,
+        "Color": "Cool White",
+        "UnlockMethod": "LEVEL_10"
+      },
+      "LED": {
+        "ID": "HEADLIGHT_LED",
+        "Name": "LED",
+        "Brightness": 0.95,
+        "Range": 150,
+        "ColorTemp": 6000,
+        "Color": "Bright White",
+        "UnlockMethod": "LEVEL_20"
+      },
+      "Laser": {
+        "ID": "HEADLIGHT_LASER",
+        "Name": "Laser",
+        "Brightness": 1.0,
+        "Range": 200,
+        "ColorTemp": 5500,
+        "Color": "Pure White",
+        "UnlockMethod": "LEVEL_35"
+      },
+      "Sequential": {
+        "ID": "HEADLIGHT_SEQUENTIAL",
+        "Name": "Sequential LED",
+        "Brightness": 0.95,
+        "Range": 150,
+        "Animation": "Sequential",
+        "UnlockMethod": "LEVEL_25"
+      }
+    },
+    "Colors": {
+      "Legal": ["White", "WarmWhite", "CoolWhite"],
+      "Unlockable": ["Ice Blue", "Crystal", "Diamond White"],
+      "Premium": ["Purple Haze", "Demon Eyes", "RGB"]
+    },
+    "Styles": {
+      "Projector": { "BeamPattern": "Focused", "Cutoff": true },
+      "Reflector": { "BeamPattern": "Wide", "Cutoff": false },
+      "DRL": { "DaytimeRunning": true, "Styles": 10 },
+      "Halo": { "RingLight": true, "Colors": "RGB", "Patterns": 5 }
+    },
+    "CustomHousing": {
+      "Tint": ["Clear", "Smoked", "Blacked", "Chrome"],
+      "Retrofit": true,
+      "DemonEyes": { "Colors": "Full", "Effects": ["Static", "Breathing", "Strobe"] }
+    }
+  },
+
+  "Taillights": {
+    "Types": {
+      "Standard": {
+        "ID": "TAILLIGHT_STANDARD",
+        "Name": "Standard",
+        "Brightness": 0.6,
+        "UnlockMethod": "Default"
+      },
+      "LED": {
+        "ID": "TAILLIGHT_LED",
+        "Name": "LED",
+        "Brightness": 0.8,
+        "FastResponse": true,
+        "UnlockMethod": "LEVEL_10"
+      },
+      "Sequential": {
+        "ID": "TAILLIGHT_SEQUENTIAL",
+        "Name": "Sequential LED",
+        "Brightness": 0.85,
+        "SequentialTurn": true,
+        "UnlockMethod": "LEVEL_20"
+      },
+      "OLED": {
+        "ID": "TAILLIGHT_OLED",
+        "Name": "OLED",
+        "Brightness": 0.9,
+        "CustomPatterns": true,
+        "UnlockMethod": "LEVEL_30"
+      }
+    },
+    "Styles": {
+      "Euro": { "RedTint": true, "ClearLens": false },
+      "Clear": { "RedTint": false, "ClearLens": true, "RedBulbs": true },
+      "Smoked": { "TintLevel": 0.5 },
+      "Blacked": { "TintLevel": 0.8 },
+      "Custom": { "ShapeChange": true, "Designs": 15 }
+    },
+    "Effects": {
+      "StartupAnimation": ["Sweep", "Fill", "Chase", "Custom"],
+      "BrakeLight": ["Standard", "Pulse", "Progressive"],
+      "TurnSignal": ["Standard", "Sequential", "Scrolling"]
+    }
+  },
+
+  "Underglow": {
+    "Enabled": true,
+    "UnlockLevel": 15,
+    "Zones": {
+      "Front": { "LEDCount": 50, "Length": "BumperWidth" },
+      "Rear": { "LEDCount": 50, "Length": "BumperWidth" },
+      "LeftSide": { "LEDCount": 100, "Length": "WheelBase" },
+      "RightSide": { "LEDCount": 100, "Length": "WheelBase" }
+    },
+    "Colors": {
+      "Solid": ["Red", "Blue", "Green", "Purple", "Pink", "Orange", "Yellow", "White", "Cyan", "Magenta"],
+      "Gradient": { "Enabled": true, "MaxColors": 4 },
+      "RGB": { "Enabled": true, "ColorWheel": true }
+    },
+    "Effects": {
+      "Static": { "ID": "UG_STATIC", "Description": "Solid color" },
+      "Breathing": { "ID": "UG_BREATHING", "Speed": [0.5, 2.0] },
+      "Chase": { "ID": "UG_CHASE", "Direction": ["Forward", "Backward", "Center"] },
+      "Rainbow": { "ID": "UG_RAINBOW", "Speed": [0.5, 3.0] },
+      "Strobe": { "ID": "UG_STROBE", "Speed": [1, 10] },
+      "Music": { "ID": "UG_MUSIC", "Reactive": true, "Sensitivity": [0.1, 1.0] },
+      "Speed": { "ID": "UG_SPEED", "SpeedReactive": true, "ColorShift": true },
+      "Drift": { "ID": "UG_DRIFT", "ActivateOnDrift": true, "Intensity": "AngleBased" }
+    },
+    "Brightness": { "Min": 0.1, "Max": 1.0, "Default": 0.7 },
+    "GroundProjection": {
+      "Enabled": true,
+      "Distance": { "Min": 0.1, "Max": 0.5, "Default": 0.3 },
+      "Quality": ["Low", "Medium", "High"]
+    }
+  },
+
+  "InteriorLighting": {
+    "Enabled": true,
+    "Zones": {
+      "Dashboard": { "Customizable": true, "Colors": "RGB" },
+      "Footwell": { "Customizable": true, "Colors": "RGB" },
+      "DoorPanels": { "Customizable": true, "Colors": "RGB" },
+      "Console": { "Customizable": true, "Colors": "RGB" },
+      "Seats": { "Customizable": true, "Colors": "Limited" },
+      "Ceiling": { "Customizable": true, "Colors": "RGB" }
+    },
+    "Gauges": {
+      "BacklightColor": ["Stock", "White", "Red", "Blue", "Green", "Custom"],
+      "NeedleColor": ["Stock", "Red", "White", "Orange"]
+    },
+    "AmbientLight": {
+      "Enabled": true,
+      "Brightness": { "Min": 0, "Max": 1, "Default": 0.5 },
+      "SpeedFade": true,
+      "MusicReactive": true
+    }
+  },
+
+  "ExteriorAccents": {
+    "SideMarkers": {
+      "Types": ["Stock", "Clear", "Smoked", "LED"],
+      "Colors": ["Amber", "Clear", "Smoked", "Custom"]
+    },
+    "ThirdBrakeLight": {
+      "Types": ["Stock", "LED", "Sequential", "Custom"],
+      "Styles": 8
+    },
+    "LicensePlateLight": {
+      "Types": ["Stock", "LED"],
+      "Colors": ["White", "Custom"]
+    },
+    "MirrorLights": {
+      "TurnSignal": ["None", "LED", "Sequential"],
+      "Puddle": { "Enabled": true, "Projection": ["Logo", "Custom"] }
+    },
+    "GrilleLights": {
+      "Types": ["None", "LED Strip", "Accent", "Sequential"],
+      "Colors": "RGB"
+    },
+    "WheelLights": {
+      "Enabled": true,
+      "Types": ["Valve Caps", "Ring", "Spoke"],
+      "Colors": "RGB",
+      "SpinEffect": true
+    }
+  },
+
+  "PopupHeadlights": {
+    "Enabled": true,
+    "AnimationSpeed": { "Min": 0.5, "Max": 2.0, "Default": 1.0 },
+    "WinkEnabled": true,
+    "SleepyMode": true,
+    "SequentialOpen": false,
+    "CustomSound": true
+  },
+
+  "NeonEngine": {
+    "Enabled": true,
+    "Components": {
+      "Intake": { "LED": true, "Colors": "RGB" },
+      "Turbo": { "LED": true, "GlowOnBoost": true },
+      "Exhaust": { "LED": true, "HeatReactive": true },
+      "ValveCover": { "LED": true, "Colors": "RGB" },
+      "Intercooler": { "LED": true, "TempReactive": true }
+    },
+    "UnderhoodLighting": {
+      "Enabled": true,
+      "LEDStrips": 4,
+      "Colors": "RGB",
+      "Effects": ["Static", "Breathing", "Chase"]
+    }
+  },
+
+  "LightBars": {
+    "Types": {
+      "RoofBar": {
+        "Sizes": ["20in", "30in", "40in", "50in"],
+        "LED": true,
+        "Brightness": "High",
+        "UnlockLevel": 25
+      },
+      "BumperBar": {
+        "Sizes": ["10in", "20in", "30in"],
+        "LED": true,
+        "FogReplacement": true,
+        "UnlockLevel": 20
+      },
+      "GrilleBar": {
+        "Hidden": true,
+        "LED": true,
+        "UnlockLevel": 15
+      }
+    },
+    "Colors": ["White", "Amber", "RGB"],
+    "Patterns": ["Spot", "Flood", "Combo"]
+  },
+
+  "SpecialEffects": {
+    "FlameKit": {
+      "ID": "EFFECT_FLAME",
+      "Name": "Flame Thrower",
+      "Description": "Exhaust flame on rev/shift",
+      "Trigger": ["Rev", "Shift", "AntiLag"],
+      "Colors": ["Natural", "Blue", "Green"],
+      "UnlockLevel": 40
+    },
+    "ExhaustGlow": {
+      "ID": "EFFECT_EXHAUST_GLOW",
+      "HeatSimulation": true,
+      "GlowIntensity": "LoadBased"
+    },
+    "BrakeLightFlash": {
+      "ID": "EFFECT_BRAKE_FLASH",
+      "EmergencyFlash": true,
+      "FlashCount": 3
+    },
+    "LogoProjection": {
+      "ID": "EFFECT_LOGO",
+      "Locations": ["Door", "Mirror"],
+      "CustomLogo": true,
+      "UnlockLevel": 30
+    }
+  },
+
+  "Presets": {
+    "Street": {
+      "ID": "LIGHTING_STREET",
+      "Description": "Street legal lighting setup",
+      "HeadlightColor": "White",
+      "Underglow": false,
+      "Legal": true
+    },
+    "Show": {
+      "ID": "LIGHTING_SHOW",
+      "Description": "Full show car lighting",
+      "AllLights": true,
+      "MaxBrightness": true,
+      "AllEffects": true
+    },
+    "Drift": {
+      "ID": "LIGHTING_DRIFT",
+      "Description": "Drift reactive lighting",
+      "Underglow": true,
+      "Effect": "DriftReactive",
+      "Colors": "Dynamic"
+    },
+    "Stealth": {
+      "ID": "LIGHTING_STEALTH",
+      "Description": "Minimal lighting",
+      "Underglow": false,
+      "InteriorDim": true,
+      "DarkMode": true
+    }
+  },
+
+  "LegalRestrictions": {
+    "RaceMode": {
+      "AllLightsAllowed": true,
+      "NoRestrictions": true
+    },
+    "FreeRoam": {
+      "UnderlowAllowed": true,
+      "ColorRestrictions": ["NoRed", "NoBlue"],
+      "FlashingRestrictions": true
+    },
+    "Competitive": {
+      "StandardLightsOnly": true,
+      "NoDistractingEffects": true
+    }
+  }
+}
