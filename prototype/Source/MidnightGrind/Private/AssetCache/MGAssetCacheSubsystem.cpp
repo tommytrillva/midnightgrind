@@ -751,11 +751,15 @@ void UMGAssetCacheSubsystem::ApplyCacheConfig(const FMGCacheConfig& Config)
 
         if (CacheConfig.bEnablePredictiveLoading)
         {
+            TWeakObjectPtr<UMGAssetCacheSubsystem> WeakThis(this);
             World->GetTimerManager().SetTimer(
                 PredictionHandle,
-                [this]()
+                [WeakThis]()
                 {
-                    GeneratePredictions();
+                    if (WeakThis.IsValid())
+                    {
+                        WeakThis->GeneratePredictions();
+                    }
                 },
                 2.0f,
                 true
@@ -806,11 +810,15 @@ void UMGAssetCacheSubsystem::EnablePredictiveLoading(bool bEnabled)
 
         if (bEnabled)
         {
+            TWeakObjectPtr<UMGAssetCacheSubsystem> WeakThis(this);
             World->GetTimerManager().SetTimer(
                 PredictionHandle,
-                [this]()
+                [WeakThis]()
                 {
-                    GeneratePredictions();
+                    if (WeakThis.IsValid())
+                    {
+                        WeakThis->GeneratePredictions();
+                    }
                 },
                 2.0f,
                 true

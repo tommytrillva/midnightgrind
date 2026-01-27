@@ -295,11 +295,15 @@ void UMGReplayBufferSubsystem::StartPlaybackFromRecording(const FMGReplayRecordi
     // Start playback timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGReplayBufferSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             PlaybackTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                UpdatePlayback(1.0f / 60.0f);
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->UpdatePlayback(1.0f / 60.0f);
+                }
             },
             1.0f / 60.0f,
             true
@@ -482,11 +486,15 @@ void UMGReplayBufferSubsystem::TriggerInstantReplay(float Duration)
     // Start playback timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGReplayBufferSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             PlaybackTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                UpdatePlayback(1.0f / 60.0f);
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->UpdatePlayback(1.0f / 60.0f);
+                }
             },
             1.0f / 60.0f,
             true
@@ -840,11 +848,15 @@ void UMGReplayBufferSubsystem::ExportReplay(const FMGReplayExportSettings& Setti
     // Start export process
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGReplayBufferSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             ExportTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                ProcessExport();
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->ProcessExport();
+                }
             },
             0.1f,
             true

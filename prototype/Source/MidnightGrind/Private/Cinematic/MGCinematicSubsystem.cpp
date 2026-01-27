@@ -614,6 +614,10 @@ FMGCinematicSequence UMGCinematicSubsystem::GenerateShowcaseSequence(AActor* Veh
 TArray<FMGCameraShot> UMGCinematicSubsystem::GenerateOrbitingShots(FVector Center, float Radius, int32 NumShots, float TotalDuration)
 {
 	TArray<FMGCameraShot> Shots;
+	if (NumShots <= 0)
+	{
+		return Shots;
+	}
 	float ShotDuration = TotalDuration / NumShots;
 
 	for (int32 i = 0; i < NumShots; i++)

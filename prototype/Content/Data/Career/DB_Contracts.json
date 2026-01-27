@@ -1,0 +1,414 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Contracts, Sponsorships, and Career Deals",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxActiveContracts": 3,
+    "MaxActiveSponsors": 5,
+    "ContractSlots": {
+      "Base": 2,
+      "PerREPTier": 1,
+      "Maximum": 5
+    }
+  },
+
+  "ContractTypes": {
+    "Performance": {
+      "ID": "CONTRACT_PERFORMANCE",
+      "Name": "Performance Contract",
+      "Description": "Complete specific race objectives",
+      "Duration": { "Min": 1, "Max": 30, "Unit": "Days" },
+      "Categories": {
+        "WinContract": {
+          "ID": "PERF_WINS",
+          "Objectives": ["WinRaces", "WinInClass", "WinOnTrack"],
+          "Difficulty": "Variable"
+        },
+        "PodiumContract": {
+          "ID": "PERF_PODIUM",
+          "Objectives": ["FinishTop3", "ConsecutivePodiums"],
+          "Difficulty": "Medium"
+        },
+        "PointsContract": {
+          "ID": "PERF_POINTS",
+          "Objectives": ["EarnPoints", "PointsPerRace"],
+          "Difficulty": "Easy"
+        },
+        "PerfectRace": {
+          "ID": "PERF_PERFECT",
+          "Objectives": ["NoCollisions", "LeadEveryLap", "CleanRace"],
+          "Difficulty": "Hard"
+        }
+      }
+    },
+    "Participation": {
+      "ID": "CONTRACT_PARTICIPATION",
+      "Name": "Participation Contract",
+      "Description": "Participate in racing events",
+      "Duration": { "Min": 3, "Max": 14, "Unit": "Days" },
+      "Categories": {
+        "RaceCount": {
+          "ID": "PART_RACES",
+          "Objectives": ["CompleteRaces", "RacesPerDay"]
+        },
+        "EventTypes": {
+          "ID": "PART_EVENTS",
+          "Objectives": ["DriftEvents", "TournamentEntry", "CrewRaces"]
+        },
+        "TimeTrials": {
+          "ID": "PART_TIMETRIALS",
+          "Objectives": ["SetTimes", "BeatTimes", "LeaderboardEntry"]
+        }
+      }
+    },
+    "Skill": {
+      "ID": "CONTRACT_SKILL",
+      "Name": "Skill Contract",
+      "Description": "Demonstrate specific driving skills",
+      "Duration": { "Min": 7, "Max": 30, "Unit": "Days" },
+      "Categories": {
+        "DriftContract": {
+          "ID": "SKILL_DRIFT",
+          "Objectives": ["TotalDriftScore", "SingleDrift", "DriftZones"]
+        },
+        "SpeedContract": {
+          "ID": "SKILL_SPEED",
+          "Objectives": ["TopSpeed", "SpeedTraps", "AverageSpeed"]
+        },
+        "TechniqueContract": {
+          "ID": "SKILL_TECHNIQUE",
+          "Objectives": ["PerfectCorners", "Overtakes", "DraftDistance"]
+        }
+      }
+    },
+    "Exclusive": {
+      "ID": "CONTRACT_EXCLUSIVE",
+      "Name": "Exclusive Deal",
+      "Description": "Use sponsor vehicles/parts exclusively",
+      "Duration": { "Min": 14, "Max": 60, "Unit": "Days" },
+      "Restrictions": {
+        "VehicleBrand": true,
+        "PartsBrand": true,
+        "LiveryRequired": true
+      },
+      "BonusMultiplier": 1.5
+    },
+    "Story": {
+      "ID": "CONTRACT_STORY",
+      "Name": "Career Story Contract",
+      "Description": "Major career milestone contracts",
+      "Unique": true,
+      "Progression": {
+        "Required": true,
+        "UnlocksNext": true
+      }
+    }
+  },
+
+  "Sponsors": {
+    "Tiers": {
+      "Tier1_Local": {
+        "ID": "SPONSOR_TIER1",
+        "Name": "Local Sponsor",
+        "UnlockREP": "TIER_NEWCOMER",
+        "BaseReward": { "Min": 1000, "Max": 5000 },
+        "Visibility": "Small",
+        "Contracts": ["Simple", "Short"]
+      },
+      "Tier2_Regional": {
+        "ID": "SPONSOR_TIER2",
+        "Name": "Regional Sponsor",
+        "UnlockREP": "TIER_KNOWN",
+        "BaseReward": { "Min": 5000, "Max": 25000 },
+        "Visibility": "Medium",
+        "Contracts": ["Standard"]
+      },
+      "Tier3_National": {
+        "ID": "SPONSOR_TIER3",
+        "Name": "National Sponsor",
+        "UnlockREP": "TIER_RESPECTED",
+        "BaseReward": { "Min": 25000, "Max": 100000 },
+        "Visibility": "Large",
+        "Contracts": ["Standard", "Exclusive"]
+      },
+      "Tier4_Global": {
+        "ID": "SPONSOR_TIER4",
+        "Name": "Global Sponsor",
+        "UnlockREP": "TIER_ELITE",
+        "BaseReward": { "Min": 100000, "Max": 500000 },
+        "Visibility": "Premium",
+        "Contracts": ["Exclusive", "Story"]
+      },
+      "Tier5_Legendary": {
+        "ID": "SPONSOR_TIER5",
+        "Name": "Legendary Partner",
+        "UnlockREP": "TIER_LEGENDARY",
+        "BaseReward": { "Min": 500000, "Max": 2000000 },
+        "Visibility": "Exclusive",
+        "Contracts": ["Ultimate"]
+      }
+    },
+    "Categories": {
+      "Automotive": {
+        "Types": ["Manufacturer", "TunerShop", "PartsSupplier"],
+        "Benefits": ["VehicleDiscounts", "FreeParts", "ExclusiveAccess"]
+      },
+      "Performance": {
+        "Types": ["TireCompany", "FuelBrand", "TuningCompany"],
+        "Benefits": ["PerformanceBonus", "FreeUpgrades", "TuningServices"]
+      },
+      "Lifestyle": {
+        "Types": ["EnergyDrink", "ClothingBrand", "TechCompany"],
+        "Benefits": ["CashBonus", "ExclusiveGear", "Cosmetics"]
+      },
+      "Media": {
+        "Types": ["StreamingPlatform", "Magazine", "TVNetwork"],
+        "Benefits": ["REPBonus", "MediaCoverage", "Followers"]
+      }
+    }
+  },
+
+  "SponsorList": {
+    "Automotive": [
+      {
+        "ID": "SPONSOR_APEX_MOTORS",
+        "Name": "Apex Motors",
+        "Tier": "Tier3_National",
+        "Logo": "apex_motors_logo",
+        "Specialty": "Japanese Performance",
+        "Benefits": {
+          "VehicleDiscount": 0.15,
+          "ExclusiveVehicles": ["APEX_CONCEPT_R"],
+          "BrandBonus": 1.1
+        }
+      },
+      {
+        "ID": "SPONSOR_VELOCITY_PARTS",
+        "Name": "Velocity Parts Co",
+        "Tier": "Tier2_Regional",
+        "Logo": "velocity_parts_logo",
+        "Specialty": "Aftermarket Parts",
+        "Benefits": {
+          "PartsDiscount": 0.2,
+          "FreeInstallation": true,
+          "ExclusiveParts": true
+        }
+      },
+      {
+        "ID": "SPONSOR_TURBO_TECH",
+        "Name": "TurboTech",
+        "Tier": "Tier3_National",
+        "Logo": "turbotech_logo",
+        "Specialty": "Forced Induction",
+        "Benefits": {
+          "TurboBoost": 0.05,
+          "FreeTurboUpgrade": true,
+          "TuningBonus": 1.15
+        }
+      }
+    ],
+    "Performance": [
+      {
+        "ID": "SPONSOR_GRIP_MASTER",
+        "Name": "GripMaster Tires",
+        "Tier": "Tier3_National",
+        "Logo": "gripmaster_logo",
+        "Specialty": "Racing Tires",
+        "Benefits": {
+          "TireGrip": 0.03,
+          "FreeTires": true,
+          "DurabilityBonus": 1.2
+        }
+      },
+      {
+        "ID": "SPONSOR_NITRO_FUEL",
+        "Name": "NitroFuel",
+        "Tier": "Tier2_Regional",
+        "Logo": "nitrofuel_logo",
+        "Specialty": "Racing Fuel",
+        "Benefits": {
+          "NitroBoost": 0.1,
+          "FuelEfficiency": 1.15
+        }
+      }
+    ],
+    "Lifestyle": [
+      {
+        "ID": "SPONSOR_MIDNIGHT_ENERGY",
+        "Name": "Midnight Energy",
+        "Tier": "Tier4_Global",
+        "Logo": "midnight_energy_logo",
+        "Specialty": "Energy Drinks",
+        "Benefits": {
+          "CashMultiplier": 1.25,
+          "ExclusiveLivery": true,
+          "REPBonus": 1.1
+        }
+      },
+      {
+        "ID": "SPONSOR_STREET_THREADS",
+        "Name": "Street Threads",
+        "Tier": "Tier1_Local",
+        "Logo": "street_threads_logo",
+        "Specialty": "Street Wear",
+        "Benefits": {
+          "FreeClothing": true,
+          "ExclusiveGear": ["StreetThreadsJacket"]
+        }
+      }
+    ],
+    "Media": [
+      {
+        "ID": "SPONSOR_RACE_TV",
+        "Name": "RaceTV Network",
+        "Tier": "Tier4_Global",
+        "Logo": "racetv_logo",
+        "Specialty": "Broadcasting",
+        "Benefits": {
+          "REPMultiplier": 1.5,
+          "FollowerBonus": 500,
+          "PriorityBroadcast": true
+        }
+      }
+    ]
+  },
+
+  "ContractRewards": {
+    "Cash": {
+      "BaseAmount": "ContractDefined",
+      "Bonuses": {
+        "EarlyCompletion": { "Multiplier": 1.25, "DaysEarly": 3 },
+        "PerfectExecution": { "Multiplier": 1.5, "NoFails": true },
+        "Streak": { "PerConsecutive": 0.1, "Max": 0.5 }
+      }
+    },
+    "REP": {
+      "BaseAmount": "10% of Cash",
+      "Bonuses": {
+        "SponsorTier": { "PerTier": 0.1 },
+        "FirstContract": { "Bonus": 500 }
+      }
+    },
+    "Items": {
+      "ExclusiveItems": true,
+      "SponsorGear": true,
+      "LimitedEdition": true
+    },
+    "Unlocks": {
+      "Vehicles": true,
+      "Parts": true,
+      "Tracks": true,
+      "Events": true
+    }
+  },
+
+  "ContractPenalties": {
+    "FailedContract": {
+      "CashPenalty": 0,
+      "REPPenalty": 0.05,
+      "CooldownPeriod": 86400,
+      "SponsorRelationship": -10
+    },
+    "AbandonedContract": {
+      "CashPenalty": 0.25,
+      "REPPenalty": 0.1,
+      "CooldownPeriod": 172800,
+      "SponsorRelationship": -25
+    },
+    "ViolatedExclusivity": {
+      "ContractTerminated": true,
+      "CashPenalty": 0.5,
+      "SponsorBan": 604800
+    }
+  },
+
+  "SponsorRelationship": {
+    "Levels": {
+      "New": { "Range": [0, 100], "Benefits": "Base" },
+      "Established": { "Range": [101, 500], "Benefits": "Improved" },
+      "Valued": { "Range": [501, 1000], "Benefits": "Enhanced" },
+      "Partner": { "Range": [1001, 2500], "Benefits": "Premium" },
+      "Ambassador": { "Range": [2501, 10000], "Benefits": "Ultimate" }
+    },
+    "PointEarning": {
+      "ContractComplete": 50,
+      "BonusObjective": 25,
+      "PerfectContract": 100,
+      "UseExclusively": 10
+    },
+    "PointLoss": {
+      "FailContract": -25,
+      "AbandonContract": -50,
+      "UseCompetitor": -10
+    },
+    "LevelBenefits": {
+      "Established": { "BonusReward": 0.1, "PriorityContracts": true },
+      "Valued": { "BonusReward": 0.2, "ExclusiveContracts": true },
+      "Partner": { "BonusReward": 0.35, "UniqueItems": true },
+      "Ambassador": { "BonusReward": 0.5, "SignatureItems": true, "BrandAmbassador": true }
+    }
+  },
+
+  "ContractBoard": {
+    "RefreshPeriod": 86400,
+    "AvailableContracts": {
+      "Base": 5,
+      "PerREPTier": 2,
+      "Maximum": 15
+    },
+    "Filters": {
+      "ByType": true,
+      "BySponsor": true,
+      "ByReward": true,
+      "ByDuration": true,
+      "ByDifficulty": true
+    },
+    "Sorting": ["Reward", "Duration", "Difficulty", "Expiration"],
+    "FeaturedContract": {
+      "Enabled": true,
+      "BonusReward": 1.25,
+      "RefreshPeriod": 604800
+    }
+  },
+
+  "SeasonalContracts": {
+    "Enabled": true,
+    "Duration": "Season",
+    "Types": {
+      "ChampionshipContract": {
+        "Description": "Compete in seasonal championship",
+        "Objectives": ["Races", "Points", "Placement"],
+        "MajorRewards": true
+      },
+      "BrandAmbassador": {
+        "Description": "Represent brand for full season",
+        "Exclusivity": true,
+        "SeasonRewards": true
+      }
+    }
+  },
+
+  "UI": {
+    "ContractHub": {
+      "ActiveContracts": true,
+      "AvailableContracts": true,
+      "SponsorList": true,
+      "ContractHistory": true
+    },
+    "ContractDetails": {
+      "ShowObjectives": true,
+      "ShowProgress": true,
+      "ShowRewards": true,
+      "ShowDeadline": true,
+      "ShowSponsorInfo": true
+    },
+    "Notifications": {
+      "NewContract": true,
+      "ObjectiveComplete": true,
+      "ContractComplete": true,
+      "ContractExpiring": true,
+      "SponsorLevelUp": true
+    }
+  }
+}

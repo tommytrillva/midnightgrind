@@ -561,18 +561,22 @@ void UMGPostProcessSubsystem::ShakeScreen(float Intensity, float Duration)
     ApplyEffectsToPostProcessVolume();
 
     // Set timer to restore effects
+    TWeakObjectPtr<UMGPostProcessSubsystem> WeakThis(this);
     World->GetTimerManager().SetTimer(
         ShakeTimerHandle,
-        [this]()
+        [WeakThis]()
         {
-            bShakeActive = false;
-            ShakeIntensity = 0.0f;
+            if (WeakThis.IsValid())
+            {
+                WeakThis->bShakeActive = false;
+                WeakThis->ShakeIntensity = 0.0f;
 
-            // Restore chromatic aberration
-            CurrentProfile.ChromaticAberration.Intensity = 0.0f;
+                // Restore chromatic aberration
+                WeakThis->CurrentProfile.ChromaticAberration.Intensity = 0.0f;
 
-            // Restore vignette to normal
-            ApplyEffectsToPostProcessVolume();
+                // Restore vignette to normal
+                WeakThis->ApplyEffectsToPostProcessVolume();
+            }
         },
         Duration,
         false

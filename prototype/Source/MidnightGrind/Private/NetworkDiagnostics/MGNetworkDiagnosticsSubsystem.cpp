@@ -177,11 +177,15 @@ void UMGNetworkDiagnosticsSubsystem::StartMonitoring()
     // Start periodic ping sampling
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGNetworkDiagnosticsSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             PingTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                SimulatePing();
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->SimulatePing();
+                }
             },
             NetworkConfig.PingSampleInterval,
             true
@@ -354,11 +358,15 @@ void UMGNetworkDiagnosticsSubsystem::StartBandwidthTest()
     // Simulate bandwidth test
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGNetworkDiagnosticsSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             BandwidthTestHandle,
-            [this]()
+            [WeakThis]()
             {
-                SimulateBandwidthTest();
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->SimulateBandwidthTest();
+                }
             },
             0.1f,
             true
@@ -368,19 +376,22 @@ void UMGNetworkDiagnosticsSubsystem::StartBandwidthTest()
         FTimerHandle CompletionHandle;
         World->GetTimerManager().SetTimer(
             CompletionHandle,
-            [this]()
+            [WeakThis]()
             {
-                bBandwidthTestRunning = false;
-                CurrentHealth.BandwidthStats.bBandwidthTestComplete = true;
-                CurrentHealth.BandwidthStats.LastTestTime = FDateTime::Now();
-
-                if (UWorld* InnerWorld = GetWorld())
+                if (WeakThis.IsValid())
                 {
-                    InnerWorld->GetTimerManager().ClearTimer(BandwidthTestHandle);
-                }
+                    WeakThis->bBandwidthTestRunning = false;
+                    WeakThis->CurrentHealth.BandwidthStats.bBandwidthTestComplete = true;
+                    WeakThis->CurrentHealth.BandwidthStats.LastTestTime = FDateTime::Now();
 
-                OnBandwidthTestComplete.Broadcast(CurrentHealth.BandwidthStats);
-                LogNetworkEvent(EMGNetworkIssue::None, TEXT("Bandwidth test completed"));
+                    if (UWorld* InnerWorld = WeakThis->GetWorld())
+                    {
+                        InnerWorld->GetTimerManager().ClearTimer(WeakThis->BandwidthTestHandle);
+                    }
+
+                    WeakThis->OnBandwidthTestComplete.Broadcast(WeakThis->CurrentHealth.BandwidthStats);
+                    WeakThis->LogNetworkEvent(EMGNetworkIssue::None, TEXT("Bandwidth test completed"));
+                }
             },
             5.0f,
             false
@@ -600,37 +611,38 @@ void UMGNetworkDiagnosticsSubsystem::RunFullDiagnostic()
     // Complete full diagnostic after all tests finish
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGNetworkDiagnosticsSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             DiagnosticHandle,
-            [this]()
+            [WeakThis]()
             {
-                if (PendingDiagnosticTests.Num() == 0 && !bDiagnosticRunning)
+                if (WeakThis.IsValid() && WeakThis->PendingDiagnosticTests.Num() == 0 && !WeakThis->bDiagnosticRunning)
                 {
                     // Compile final report
-                    LastDiagnosticReport.TestResults = DiagnosticHistory;
+                    WeakThis->LastDiagnosticReport.TestResults = WeakThis->DiagnosticHistory;
 
                     // Determine if meets minimum requirements
-                    LastDiagnosticReport.bMeetsMinimumRequirements =
-                        CurrentHealth.LatencyStats.AverageLatencyMs < 200.0f &&
-                        CurrentHealth.PacketLossStats.LossPercentage < 10.0f &&
-                        CurrentHealth.NATType != EMGNATType::Symmetric;
+                    WeakThis->LastDiagnosticReport.bMeetsMinimumRequirements =
+                        WeakThis->CurrentHealth.LatencyStats.AverageLatencyMs < 200.0f &&
+                        WeakThis->CurrentHealth.PacketLossStats.LossPercentage < 10.0f &&
+                        WeakThis->CurrentHealth.NATType != EMGNATType::Symmetric;
 
                     // Generate overall recommendations
-                    if (CurrentHealth.LatencyStats.AverageLatencyMs > NetworkConfig.QualityThresholds.FairLatency)
+                    if (WeakThis->CurrentHealth.LatencyStats.AverageLatencyMs > WeakThis->NetworkConfig.QualityThresholds.FairLatency)
                     {
-                        LastDiagnosticReport.OverallRecommendations.Add(TEXT("High latency detected. Consider selecting a closer server region."));
+                        WeakThis->LastDiagnosticReport.OverallRecommendations.Add(TEXT("High latency detected. Consider selecting a closer server region."));
                     }
-                    if (CurrentHealth.PacketLossStats.LossPercentage > NetworkConfig.QualityThresholds.FairPacketLoss)
+                    if (WeakThis->CurrentHealth.PacketLossStats.LossPercentage > WeakThis->NetworkConfig.QualityThresholds.FairPacketLoss)
                     {
-                        LastDiagnosticReport.OverallRecommendations.Add(TEXT("Packet loss detected. Check your network connection quality."));
+                        WeakThis->LastDiagnosticReport.OverallRecommendations.Add(TEXT("Packet loss detected. Check your network connection quality."));
                     }
-                    if (CurrentHealth.NATType == EMGNATType::Strict || CurrentHealth.NATType == EMGNATType::Symmetric)
+                    if (WeakThis->CurrentHealth.NATType == EMGNATType::Strict || WeakThis->CurrentHealth.NATType == EMGNATType::Symmetric)
                     {
-                        LastDiagnosticReport.OverallRecommendations.Add(TEXT("Restrictive NAT detected. You may have difficulty connecting to other players."));
+                        WeakThis->LastDiagnosticReport.OverallRecommendations.Add(TEXT("Restrictive NAT detected. You may have difficulty connecting to other players."));
                     }
 
-                    OnFullDiagnosticComplete.Broadcast(LastDiagnosticReport);
-                    LogNetworkEvent(EMGNetworkIssue::None, TEXT("Full diagnostic completed"));
+                    WeakThis->OnFullDiagnosticComplete.Broadcast(WeakThis->LastDiagnosticReport);
+                    WeakThis->LogNetworkEvent(EMGNetworkIssue::None, TEXT("Full diagnostic completed"));
                 }
             },
             15.0f,
@@ -921,12 +933,16 @@ void UMGNetworkDiagnosticsSubsystem::SetPingSampleInterval(float IntervalSeconds
         // Restart timer with new interval
         if (UWorld* World = GetWorld())
         {
+            TWeakObjectPtr<UMGNetworkDiagnosticsSubsystem> WeakThis(this);
             World->GetTimerManager().ClearTimer(PingTimerHandle);
             World->GetTimerManager().SetTimer(
                 PingTimerHandle,
-                [this]()
+                [WeakThis]()
                 {
-                    SimulatePing();
+                    if (WeakThis.IsValid())
+                    {
+                        WeakThis->SimulatePing();
+                    }
                 },
                 NetworkConfig.PingSampleInterval,
                 true
@@ -1365,24 +1381,28 @@ void UMGNetworkDiagnosticsSubsystem::AttemptReconnect()
 
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGNetworkDiagnosticsSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             ReconnectHandle,
-            [this]()
+            [WeakThis]()
             {
-                // Simulate reconnection attempt
-                bool bSuccess = FMath::RandRange(0, 100) > 30; // 70% success rate
+                if (WeakThis.IsValid())
+                {
+                    // Simulate reconnection attempt
+                    bool bSuccess = FMath::RandRange(0, 100) > 30; // 70% success rate
 
-                if (bSuccess)
-                {
-                    CurrentHealth.bIsConnected = true;
-                    CurrentHealth.LastConnectedTime = FDateTime::Now();
-                    CurrentHealth.ReconnectAttempts = 0;
-                    OnConnectionRestored.Broadcast();
-                    LogNetworkEvent(EMGNetworkIssue::None, TEXT("Connection restored"));
-                }
-                else
-                {
-                    AttemptReconnect();
+                    if (bSuccess)
+                    {
+                        WeakThis->CurrentHealth.bIsConnected = true;
+                        WeakThis->CurrentHealth.LastConnectedTime = FDateTime::Now();
+                        WeakThis->CurrentHealth.ReconnectAttempts = 0;
+                        WeakThis->OnConnectionRestored.Broadcast();
+                        WeakThis->LogNetworkEvent(EMGNetworkIssue::None, TEXT("Connection restored"));
+                    }
+                    else
+                    {
+                        WeakThis->AttemptReconnect();
+                    }
                 }
             },
             Delay,

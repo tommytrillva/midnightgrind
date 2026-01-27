@@ -1,0 +1,374 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Audio Settings and Sound Configuration",
+
+  "GlobalSettings": {
+    "MasterVolume": { "Min": 0, "Max": 100, "Default": 80 },
+    "MuteOnFocusLoss": true,
+    "DynamicRange": {
+      "Options": ["Full", "Medium", "Compressed", "Night"],
+      "Default": "Full"
+    },
+    "AudioOutput": {
+      "Options": ["Auto", "Stereo", "Surround5.1", "Surround7.1", "Headphones"],
+      "Default": "Auto"
+    },
+    "SampleRate": {
+      "Options": ["44100", "48000", "96000"],
+      "Default": "48000"
+    }
+  },
+
+  "VolumeCategories": {
+    "EngineSound": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 85,
+      "Description": "Vehicle engine and exhaust sounds"
+    },
+    "TireSound": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 75,
+      "Description": "Tire squeal, skid, and road noise"
+    },
+    "Environment": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 70,
+      "Description": "Ambient sounds, weather, city noise"
+    },
+    "Traffic": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 65,
+      "Description": "NPC vehicle sounds"
+    },
+    "Collision": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 80,
+      "Description": "Impact and crash sounds"
+    },
+    "Music": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 60,
+      "Description": "In-game music and radio"
+    },
+    "Voice": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 90,
+      "Description": "Voice chat and announcer"
+    },
+    "UI": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 70,
+      "Description": "Menu and interface sounds"
+    },
+    "Notifications": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 75,
+      "Description": "Alerts and notification sounds"
+    }
+  },
+
+  "EngineAudio": {
+    "Quality": {
+      "Options": ["Low", "Medium", "High", "Ultra"],
+      "Default": "High",
+      "Description": "Engine sound sample quality"
+    },
+    "Simulation": {
+      "Options": ["Arcade", "Realistic", "Ultra Realistic"],
+      "Default": "Realistic",
+      "RPMAccuracy": true,
+      "LoadSimulation": true
+    },
+    "Components": {
+      "Intake": { "Enabled": true, "Volume": 70 },
+      "Exhaust": { "Enabled": true, "Volume": 100 },
+      "Turbo": { "Enabled": true, "Volume": 80 },
+      "Supercharger": { "Enabled": true, "Volume": 75 },
+      "BOV": { "Enabled": true, "Volume": 85 },
+      "Backfire": { "Enabled": true, "Volume": 90 },
+      "Transmission": { "Enabled": true, "Volume": 50 }
+    },
+    "ExteriorInteriorBlend": {
+      "Enabled": true,
+      "CockpitAttenuation": 0.7,
+      "WindowsOpenEffect": true
+    },
+    "Doppler": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 1, "Default": 0.8 }
+    }
+  },
+
+  "EnvironmentAudio": {
+    "Reverb": {
+      "Enabled": true,
+      "Quality": ["Off", "Low", "Medium", "High"],
+      "Default": "High",
+      "ContextAware": true
+    },
+    "ReverbZones": {
+      "Tunnel": { "ReverbTime": 2.5, "WetMix": 0.8 },
+      "Underpass": { "ReverbTime": 1.8, "WetMix": 0.6 },
+      "Garage": { "ReverbTime": 1.2, "WetMix": 0.5 },
+      "OpenRoad": { "ReverbTime": 0.3, "WetMix": 0.1 },
+      "Urban": { "ReverbTime": 0.8, "WetMix": 0.3 },
+      "Mountain": { "ReverbTime": 1.5, "WetMix": 0.4 }
+    },
+    "WeatherSounds": {
+      "Rain": {
+        "Intensity": "Dynamic",
+        "RoofImpact": true,
+        "Windshield": true,
+        "Puddles": true
+      },
+      "Thunder": { "Enabled": true, "Distance": true },
+      "Wind": { "SpeedBased": true, "Gusts": true },
+      "Snow": { "Tire Crunch": true, "Ambient": true }
+    },
+    "AmbientSounds": {
+      "CityNoise": true,
+      "Wildlife": true,
+      "Construction": true,
+      "Sirens": true,
+      "Crowds": true
+    },
+    "TimeOfDaySounds": {
+      "Dawn": ["Birds", "LightTraffic"],
+      "Day": ["FullTraffic", "Activity"],
+      "Dusk": ["Crickets", "NightLife"],
+      "Night": ["Insects", "Clubs", "StreetRacing"]
+    }
+  },
+
+  "MusicSystem": {
+    "Radio": {
+      "Enabled": true,
+      "Stations": 8,
+      "VolumeIndependent": true,
+      "FadeOnPause": true,
+      "CrossFade": { "Enabled": true, "Duration": 2.0 }
+    },
+    "DynamicMusic": {
+      "Enabled": true,
+      "Intensity": {
+        "Racing": "High",
+        "Cruising": "Low",
+        "Menu": "Medium",
+        "Victory": "Celebration"
+      },
+      "TransitionSmoothing": true
+    },
+    "CustomMusic": {
+      "Enabled": true,
+      "ImportFolder": "UserMusic",
+      "SupportedFormats": ["MP3", "WAV", "FLAC", "OGG"],
+      "CreatePlaylists": true,
+      "MaxTracks": 500
+    },
+    "MuteOptions": {
+      "MuteDuringVoiceChat": true,
+      "MuteDuringCutscenes": false,
+      "MuteDuringRaceStart": true
+    }
+  },
+
+  "VoiceChat": {
+    "Enabled": true,
+    "InputDevice": "Default",
+    "OutputDevice": "Default",
+    "PushToTalk": {
+      "Enabled": true,
+      "Key": "V",
+      "Default": true
+    },
+    "OpenMic": {
+      "Enabled": false,
+      "Threshold": { "Min": 0, "Max": 100, "Default": 30 }
+    },
+    "NoiseReduction": {
+      "Enabled": true,
+      "Level": ["Off", "Low", "Medium", "High"],
+      "Default": "Medium"
+    },
+    "VoiceEffects": {
+      "Enabled": false,
+      "Options": ["None", "Radio", "Megaphone", "Anonymous"]
+    },
+    "SpatialVoice": {
+      "Enabled": true,
+      "Range": { "Min": 10, "Max": 100, "Default": 50 },
+      "Falloff": "Linear"
+    },
+    "MuteOptions": {
+      "MuteAll": false,
+      "MuteNonFriends": false,
+      "MuteNonCrew": false,
+      "IndividualMute": true
+    }
+  },
+
+  "Announcer": {
+    "Enabled": true,
+    "Volume": { "Min": 0, "Max": 100, "Default": 80 },
+    "VoicePack": {
+      "Options": ["Default", "Hype", "Professional", "Minimal"],
+      "Default": "Default"
+    },
+    "Callouts": {
+      "RaceStart": true,
+      "LapComplete": true,
+      "FinalLap": true,
+      "RaceEnd": true,
+      "Overtake": true,
+      "NewRecord": true,
+      "WinStreak": true,
+      "Milestone": true
+    },
+    "Frequency": {
+      "Options": ["All", "Important", "Minimal", "Off"],
+      "Default": "Important"
+    },
+    "LanguageOverride": {
+      "Enabled": false,
+      "Language": "System"
+    }
+  },
+
+  "SpatialAudio": {
+    "Enabled": true,
+    "Technology": {
+      "Options": ["Stereo", "HRTF", "DolbyAtmos", "WindowsSonic", "DTS:X"],
+      "Default": "HRTF"
+    },
+    "HeadTracking": {
+      "Enabled": false,
+      "Devices": ["Gyro", "TrackIR"]
+    },
+    "Positioning": {
+      "Accuracy": ["Low", "Medium", "High"],
+      "Default": "High"
+    },
+    "OcclusionSimulation": {
+      "Enabled": true,
+      "Quality": ["Off", "Simple", "Full"],
+      "Default": "Full"
+    }
+  },
+
+  "AccessibilityAudio": {
+    "MonoAudio": {
+      "Enabled": false,
+      "Description": "Mix all audio to mono for single-ear hearing"
+    },
+    "VisualSoundIndicators": {
+      "Enabled": false,
+      "ShowDirection": true,
+      "ShowIntensity": true
+    },
+    "SubtitlesForSounds": {
+      "Enabled": false,
+      "EnvironmentalCues": true,
+      "VehicleCues": true
+    },
+    "BalanceAdjustment": {
+      "LeftRight": { "Min": -100, "Max": 100, "Default": 0 }
+    },
+    "FlashingAudioCues": {
+      "Enabled": false,
+      "ReplacesVisualFlashing": true
+    }
+  },
+
+  "PerformanceAudio": {
+    "AudioQuality": {
+      "Options": ["Low", "Medium", "High", "Ultra"],
+      "Default": "High"
+    },
+    "MaxVoices": {
+      "Low": 32,
+      "Medium": 64,
+      "High": 128,
+      "Ultra": 256
+    },
+    "StreamingQuality": {
+      "Options": ["Low", "Medium", "High"],
+      "Default": "High"
+    },
+    "PreloadSounds": {
+      "Enabled": true,
+      "EnginePreload": true,
+      "EnvironmentPreload": true
+    }
+  },
+
+  "CockpitAudio": {
+    "DashboardSounds": {
+      "RPMWarning": { "Enabled": true, "Volume": 60 },
+      "ShiftLight": { "Enabled": true, "Volume": 50 },
+      "SpeedWarning": { "Enabled": false, "Threshold": 200 },
+      "LowFuel": { "Enabled": true, "Volume": 70 },
+      "Damage": { "Enabled": true, "Volume": 80 }
+    },
+    "ButtonClicks": {
+      "Enabled": true,
+      "Volume": { "Min": 0, "Max": 100, "Default": 40 }
+    },
+    "HelmetAudio": {
+      "Enabled": true,
+      "Muffling": { "Min": 0, "Max": 1, "Default": 0.3 },
+      "BreathingSounds": false,
+      "RadioCrackle": true
+    }
+  },
+
+  "Presets": {
+    "Default": {
+      "ID": "AUDIO_DEFAULT",
+      "Description": "Balanced audio settings"
+    },
+    "Racing": {
+      "ID": "AUDIO_RACING",
+      "Description": "Emphasizes engine and tire sounds",
+      "EngineSound": 100,
+      "TireSound": 90,
+      "Music": 40
+    },
+    "Immersive": {
+      "ID": "AUDIO_IMMERSIVE",
+      "Description": "Full environmental audio experience",
+      "Environment": 90,
+      "EngineSound": 80,
+      "Music": 50
+    },
+    "Competitive": {
+      "ID": "AUDIO_COMPETITIVE",
+      "Description": "Minimal distractions, focus on gameplay",
+      "EngineSound": 70,
+      "Music": 20,
+      "Environment": 40,
+      "Notifications": 100
+    },
+    "Music": {
+      "ID": "AUDIO_MUSIC",
+      "Description": "Music-forward experience",
+      "Music": 100,
+      "EngineSound": 50,
+      "Environment": 30
+    },
+    "LateNight": {
+      "ID": "AUDIO_LATENIGHT",
+      "Description": "Compressed dynamics for quiet listening",
+      "DynamicRange": "Night",
+      "MasterVolume": 50
+    }
+  }
+}
