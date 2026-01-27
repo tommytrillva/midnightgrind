@@ -60,6 +60,11 @@ struct FMGEarningMultiplier;
 struct FMGRewardClaimResult;
 enum class EMGStreakMilestone : uint8;
 struct FMGDailyReward;
+enum class EMGReputationCategory : uint8;
+enum class EMGReputationTier : uint8;
+struct FMGReputationUnlock;
+struct FMGGhostComparator;
+enum class EMGGhostComparison : uint8;
 
 /**
  * Vehicle input state - replicated for multiplayer

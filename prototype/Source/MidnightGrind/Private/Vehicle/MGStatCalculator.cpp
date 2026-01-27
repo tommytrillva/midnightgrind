@@ -533,7 +533,7 @@ FMGVehicleStats UMGStatCalculator::CalculateAllStats(const FMGVehicleData& Vehic
 	// Weight
 	Stats.WeightKG = CalculateWeight(Vehicle, BaseModel);
 	Stats.WeightDistributionFront = CalculateWeightDistribution(Vehicle, BaseModel);
-	Stats.PowerToWeightRatio = Stats.Horsepower / (Stats.WeightKG * 2.20462f) * 1000.0f; // HP per 1000 lbs
+	Stats.PowerToWeightRatio = (Stats.WeightKG > 0.0f) ? (Stats.Horsepower / (Stats.WeightKG * 2.20462f) * 1000.0f) : 0.0f; // HP per 1000 lbs
 
 	// Grip
 	Stats.GripFront = CalculateFrontGrip(Vehicle);
