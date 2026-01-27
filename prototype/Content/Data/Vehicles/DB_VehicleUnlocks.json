@@ -1,0 +1,316 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Unlock Requirements and Acquisition Methods",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MultipleUnlockPaths": true,
+    "ShowLockedVehicles": true,
+    "HintSystem": true
+  },
+
+  "UnlockMethods": {
+    "Purchase": {
+      "ID": "UNLOCK_PURCHASE",
+      "Description": "Buy from dealership",
+      "Currency": "Cash",
+      "Availability": "Dealership",
+      "Percentage": 60
+    },
+    "LevelUnlock": {
+      "ID": "UNLOCK_LEVEL",
+      "Description": "Reach required level",
+      "Currency": "None",
+      "AutoUnlock": true,
+      "Percentage": 15
+    },
+    "REPUnlock": {
+      "ID": "UNLOCK_REP",
+      "Description": "Reach REP tier",
+      "Currency": "None",
+      "TierBased": true,
+      "Percentage": 10
+    },
+    "Achievement": {
+      "ID": "UNLOCK_ACHIEVE",
+      "Description": "Complete specific achievements",
+      "Currency": "None",
+      "SkillBased": true,
+      "Percentage": 5
+    },
+    "Story": {
+      "ID": "UNLOCK_STORY",
+      "Description": "Progress through story",
+      "Currency": "None",
+      "ChapterBased": true,
+      "Percentage": 5
+    },
+    "Event": {
+      "ID": "UNLOCK_EVENT",
+      "Description": "Win special events",
+      "Currency": "None",
+      "LimitedTime": true,
+      "Percentage": 3
+    },
+    "Hidden": {
+      "ID": "UNLOCK_HIDDEN",
+      "Description": "Discover secret methods",
+      "Currency": "None",
+      "Secret": true,
+      "Percentage": 2
+    }
+  },
+
+  "LevelUnlocks": {
+    "Level1": {
+      "Vehicles": ["MX5_NA", "CivicEG", "240SX_S13"],
+      "Category": "Starter"
+    },
+    "Level5": {
+      "Vehicles": ["Integra_DC2", "Silvia_S14", "E36_325i"],
+      "Category": "EntryTuner"
+    },
+    "Level10": {
+      "Vehicles": ["Supra_MK4", "Skyline_R32", "RX7_FD"],
+      "Category": "JDMLegends"
+    },
+    "Level15": {
+      "Vehicles": ["M3_E46", "350Z", "EvoVIII"],
+      "Category": "SportCompact"
+    },
+    "Level20": {
+      "Vehicles": ["GT86", "WRX_STI", "FocusRS"],
+      "Category": "ModernTuner"
+    },
+    "Level25": {
+      "Vehicles": ["Mustang_GT", "Camaro_SS", "Challenger_RT"],
+      "Category": "AmericanMuscle"
+    },
+    "Level30": {
+      "Vehicles": ["911_GT3", "R8", "GTR_R35"],
+      "Category": "PerformanceElite"
+    },
+    "Level40": {
+      "Vehicles": ["Huracan", "488GTB", "720S"],
+      "Category": "Supercar"
+    },
+    "Level50": {
+      "Vehicles": ["LaFerrari", "P1", "918"],
+      "Category": "Hypercar"
+    }
+  },
+
+  "REPUnlocks": {
+    "TIER_UNKNOWN": {
+      "Vehicles": [],
+      "PartAccess": "Basic"
+    },
+    "TIER_NOTICED": {
+      "Vehicles": ["Silvia_S15", "Chaser_JZX100"],
+      "PartAccess": "Standard"
+    },
+    "TIER_KNOWN": {
+      "Vehicles": ["NSX_NA1", "300ZX_Z32"],
+      "PartAccess": "Performance"
+    },
+    "TIER_RESPECTED": {
+      "Vehicles": ["LFA", "Carrera_GT"],
+      "PartAccess": "Premium"
+    },
+    "TIER_FEARED": {
+      "Vehicles": ["Zonda", "One77"],
+      "PartAccess": "Elite"
+    },
+    "TIER_LEGENDARY": {
+      "Vehicles": ["CLK_GTR", "F1_LM"],
+      "PartAccess": "Legendary"
+    }
+  },
+
+  "AchievementUnlocks": {
+    "FirstWin": {
+      "Vehicle": "Bonus_Starter",
+      "Description": "Win your first race"
+    },
+    "DriftKing": {
+      "Vehicle": "AE86_Trueno",
+      "Requirement": "Score 1,000,000 drift points"
+    },
+    "SpeedDemon": {
+      "Vehicle": "Venom_GT",
+      "Requirement": "Reach 300 MPH"
+    },
+    "UndefeatedStreak": {
+      "Vehicle": "Centenario",
+      "Requirement": "Win 50 races without losing"
+    },
+    "CollectorComplete": {
+      "Vehicle": "DevCar_Exclusive",
+      "Requirement": "Own 100 vehicles"
+    },
+    "PinkSlipMaster": {
+      "Vehicle": "Demon",
+      "Requirement": "Win 25 pink slip races"
+    },
+    "PoliceEvader": {
+      "Vehicle": "Pursuit_Interceptor",
+      "Requirement": "Escape 100 police chases"
+    },
+    "TunerMaster": {
+      "Vehicle": "Custom_BuildSlot",
+      "Requirement": "Max out 10 different vehicles"
+    }
+  },
+
+  "StoryUnlocks": {
+    "Chapter1Complete": {
+      "Vehicle": "Story_Car_1",
+      "Description": "Complete Chapter 1: Street Beginnings"
+    },
+    "Chapter2Complete": {
+      "Vehicle": "Story_Car_2",
+      "Description": "Complete Chapter 2: Rising Heat"
+    },
+    "Chapter3Complete": {
+      "Vehicle": "Story_Car_3",
+      "Description": "Complete Chapter 3: Underground Kings"
+    },
+    "Chapter4Complete": {
+      "Vehicle": "Story_Car_4",
+      "Description": "Complete Chapter 4: The Syndicate"
+    },
+    "Chapter5Complete": {
+      "Vehicle": "Story_Legend",
+      "Description": "Complete Chapter 5: Midnight Legend"
+    },
+    "AllStoryComplete": {
+      "Vehicle": "Boss_Car",
+      "Description": "Complete all story chapters"
+    }
+  },
+
+  "EventUnlocks": {
+    "SeasonalEvents": {
+      "SummerShowdown": { "Vehicle": "Summer_Exclusive", "Recurring": "Yearly" },
+      "WinterWarrior": { "Vehicle": "Winter_Exclusive", "Recurring": "Yearly" },
+      "Halloween": { "Vehicle": "Spooky_Car", "Recurring": "Yearly" }
+    },
+    "Tournaments": {
+      "MonthlyChampion": { "Vehicle": "Champion_Car", "Recurring": "Monthly" },
+      "GrandPrix": { "Vehicle": "GP_Winner", "Recurring": "Quarterly" }
+    },
+    "LimitedTime": {
+      "LaunchEvent": { "Vehicle": "Launch_Exclusive", "OneTime": true },
+      "Anniversary": { "Vehicle": "Anniversary_Car", "Recurring": "Yearly" }
+    }
+  },
+
+  "HiddenUnlocks": {
+    "BarnFinds": {
+      "BarnFind_1": {
+        "Vehicle": "Classic_Mustang_67",
+        "Location": "AbandonedBarn",
+        "Hint": "An old farmer's treasure"
+      },
+      "BarnFind_2": {
+        "Vehicle": "E30_M3",
+        "Location": "Warehouse",
+        "Hint": "Hidden in the industrial district"
+      },
+      "BarnFind_3": {
+        "Vehicle": "CountachLP400",
+        "Location": "Mansion",
+        "Hint": "A wealthy collector's secret"
+      }
+    },
+    "SecretChallenges": {
+      "MidnightRun": {
+        "Vehicle": "Ghost_Car",
+        "Trigger": "Beat the ghost at midnight",
+        "Hint": "Legends speak of a phantom racer"
+      },
+      "PerfectRace": {
+        "Vehicle": "Perfection_Award",
+        "Trigger": "Complete a race with perfect score",
+        "Hint": "Flawless execution"
+      }
+    },
+    "EasterEggs": {
+      "DevRoom": {
+        "Vehicle": "Dev_Prototype",
+        "Trigger": "Find the hidden room",
+        "Hint": "The creators left something behind"
+      }
+    }
+  },
+
+  "Dealerships": {
+    "MainDealer": {
+      "ID": "DEALER_MAIN",
+      "Inventory": "Standard",
+      "Rotation": "None",
+      "Discount": 0
+    },
+    "ImportDealer": {
+      "ID": "DEALER_IMPORT",
+      "Inventory": "JDM",
+      "Rotation": "Weekly",
+      "Specialization": "Japanese"
+    },
+    "ExoticDealer": {
+      "ID": "DEALER_EXOTIC",
+      "Inventory": "Supercar",
+      "Rotation": "Monthly",
+      "RequiredLevel": 30
+    },
+    "ClassicDealer": {
+      "ID": "DEALER_CLASSIC",
+      "Inventory": "Vintage",
+      "Rotation": "BiWeekly",
+      "Specialization": "Classic"
+    },
+    "BlackMarket": {
+      "ID": "DEALER_BLACK",
+      "Inventory": "Rare",
+      "Rotation": "Random",
+      "RequiredREP": "TIER_FEARED",
+      "Hidden": true
+    }
+  },
+
+  "SpecialConditions": {
+    "LimitedStock": {
+      "Enabled": true,
+      "Vehicles": ["Limited_Edition_1", "Limited_Edition_2"],
+      "QuantityPerPlayer": 1
+    },
+    "ExclusiveTime": {
+      "Enabled": true,
+      "Window": "7Days",
+      "NotifyPlayers": true
+    },
+    "Prerequisites": {
+      "OwnVehicle": { "Example": "Own R32 to unlock R34" },
+      "CompleteChallenge": { "Example": "Win drift event to unlock drift car" }
+    }
+  },
+
+  "UI": {
+    "Showroom": {
+      "ShowLocked": true,
+      "UnlockRequirements": true,
+      "ProgressTracker": true,
+      "WishList": true
+    },
+    "UnlockNotification": {
+      "Celebration": true,
+      "PreviewCar": true,
+      "QuickBuy": true
+    },
+    "Filters": {
+      "ByUnlockStatus": true,
+      "ByUnlockMethod": true,
+      "ByProgress": true
+    }
+  }
+}

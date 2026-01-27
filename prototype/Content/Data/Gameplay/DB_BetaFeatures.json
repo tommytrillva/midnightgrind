@@ -1,0 +1,284 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Beta Features and Experimental Content",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "OptInRequired": true,
+    "FeedbackSystem": true,
+    "DataCollection": true,
+    "VIPExclusive": false
+  },
+
+  "BetaProgram": {
+    "Tiers": {
+      "Public": {
+        "ID": "BETA_PUBLIC",
+        "Access": "AllPlayers",
+        "Features": ["StableBeta"],
+        "Delay": "2WeeksAfterPlatinum"
+      },
+      "VIP": {
+        "ID": "BETA_VIP",
+        "Access": "VIPMembers",
+        "Features": ["StableBeta", "EarlyBeta"],
+        "Delay": "1WeekAfterPlatinum"
+      },
+      "Platinum": {
+        "ID": "BETA_PLATINUM",
+        "Access": "PlatinumVIP",
+        "Features": ["AllBeta", "ExperimentalFeatures"],
+        "Delay": "None"
+      },
+      "Insider": {
+        "ID": "BETA_INSIDER",
+        "Access": "SelectedTesters",
+        "Features": ["AllFeatures", "InternalBuilds"],
+        "Application": true
+      }
+    }
+  },
+
+  "CurrentBetaFeatures": {
+    "WeatherSystem2_0": {
+      "ID": "BETA_WEATHER2",
+      "Name": "Dynamic Weather 2.0",
+      "Description": "Enhanced weather with snow, sandstorms, aurora",
+      "Status": "EarlyBeta",
+      "Tier": "VIP",
+      "Components": {
+        "Snow": { "Status": "Testing", "Stability": 0.8 },
+        "Sandstorm": { "Status": "Testing", "Stability": 0.7 },
+        "Aurora": { "Status": "Polishing", "Stability": 0.9 }
+      }
+    },
+    "PhotoMode2_0": {
+      "ID": "BETA_PHOTO2",
+      "Name": "Advanced Photo Mode",
+      "Description": "Ray-traced reflections and advanced effects",
+      "Status": "LateBeta",
+      "Tier": "Public",
+      "Components": {
+        "RayTracing": { "Status": "Stable", "Stability": 0.95 },
+        "DepthEffects": { "Status": "Stable", "Stability": 0.9 },
+        "Filters": { "Status": "Testing", "Stability": 0.85 }
+      }
+    },
+    "AICompanion": {
+      "ID": "BETA_AIBUDDY",
+      "Name": "AI Driving Companion",
+      "Description": "AI teammate for races and free roam",
+      "Status": "EarlyBeta",
+      "Tier": "Platinum",
+      "Components": {
+        "BasicAI": { "Status": "Testing", "Stability": 0.75 },
+        "VoiceComms": { "Status": "Experimental", "Stability": 0.6 },
+        "Strategies": { "Status": "Experimental", "Stability": 0.5 }
+      }
+    },
+    "CrossPlayExpansion": {
+      "ID": "BETA_CROSSPLAY",
+      "Name": "Extended Cross-Play",
+      "Description": "Cross-platform progression and features",
+      "Status": "Testing",
+      "Tier": "VIP",
+      "Components": {
+        "SharedProgress": { "Status": "Testing", "Stability": 0.8 },
+        "CrossPlatformTrades": { "Status": "Experimental", "Stability": 0.6 }
+      }
+    },
+    "VRSupport": {
+      "ID": "BETA_VR",
+      "Name": "VR Mode",
+      "Description": "Virtual reality driving experience",
+      "Status": "Experimental",
+      "Tier": "Insider",
+      "Components": {
+        "CockpitVR": { "Status": "Testing", "Stability": 0.7 },
+        "GarageVR": { "Status": "Experimental", "Stability": 0.5 },
+        "SpectatorVR": { "Status": "Planned", "Stability": 0 }
+      }
+    }
+  },
+
+  "ExperimentalFeatures": {
+    "Description": "Highly unstable features for testing",
+    "Access": "Insider",
+    "Warning": "May cause issues, progress loss, or crashes",
+    "Features": {
+      "ProceduralTracks": {
+        "ID": "EXP_PROCTRACK",
+        "Status": "EarlyDevelopment"
+      },
+      "DynamicStory": {
+        "ID": "EXP_DYNSTORY",
+        "Status": "Concept"
+      },
+      "RealtimeDeformation": {
+        "ID": "EXP_DEFORM",
+        "Status": "Testing"
+      }
+    }
+  },
+
+  "FeedbackSystem": {
+    "InGameReporting": {
+      "BugReport": {
+        "Categories": ["Crash", "Visual", "Gameplay", "Performance", "Other"],
+        "Screenshot": true,
+        "SystemInfo": true,
+        "ReplayAttachment": true
+      },
+      "FeatureFeedback": {
+        "Rating": { "Scale": 5 },
+        "Comments": { "MaxLength": 1000 },
+        "Suggestions": true
+      },
+      "QuickFeedback": {
+        "ThumbsUp": true,
+        "ThumbsDown": true,
+        "PopupPrompt": true
+      }
+    },
+    "Surveys": {
+      "PostFeature": true,
+      "Weekly": true,
+      "Incentivized": { "Reward": { "REP": 500 } }
+    },
+    "Forums": {
+      "BetaDiscussion": true,
+      "DevResponses": true,
+      "Voting": true
+    }
+  },
+
+  "DataCollection": {
+    "Metrics": {
+      "FeatureUsage": true,
+      "Performance": true,
+      "Crashes": true,
+      "SessionLength": true,
+      "ErrorLogs": true
+    },
+    "Privacy": {
+      "Anonymized": true,
+      "OptOut": true,
+      "DataRetention": "90Days"
+    },
+    "Analytics": {
+      "ABTesting": true,
+      "Heatmaps": true,
+      "FunnelAnalysis": true
+    }
+  },
+
+  "Rewards": {
+    "BetaTester": {
+      "ParticipationRewards": {
+        "Weekly": { "REP": 500, "Chrome": 50 },
+        "FeedbackSubmitted": { "REP": 100 },
+        "BugFound": { "REP": 500, "Badge": "BugHunter" }
+      },
+      "Milestones": {
+        "FirstBeta": { "Badge": "BetaPioneer" },
+        "10Features": { "Title": "Early Adopter" },
+        "50Reports": { "Badge": "QualityChampion" }
+      }
+    },
+    "ExclusiveContent": {
+      "BetaLiveries": true,
+      "TesterBadges": true,
+      "SpecialTitles": true
+    }
+  },
+
+  "RolloutProcess": {
+    "Stages": {
+      "Internal": {
+        "Access": "DevTeam",
+        "Duration": "Variable",
+        "Focus": "CoreFunctionality"
+      },
+      "Insider": {
+        "Access": "SelectedTesters",
+        "Duration": "2-4Weeks",
+        "Focus": "Stability"
+      },
+      "Platinum": {
+        "Access": "PlatinumVIP",
+        "Duration": "1-2Weeks",
+        "Focus": "Feedback"
+      },
+      "VIP": {
+        "Access": "AllVIP",
+        "Duration": "1Week",
+        "Focus": "ScaleTesting"
+      },
+      "Public": {
+        "Access": "AllPlayers",
+        "Duration": "Ongoing",
+        "Focus": "WideFeedback"
+      },
+      "Release": {
+        "Access": "Default",
+        "Status": "Stable"
+      }
+    },
+    "Rollback": {
+      "Enabled": true,
+      "Criteria": ["CriticalBugs", "PerformanceIssues", "NegativeFeedback"],
+      "Process": "Immediate"
+    }
+  },
+
+  "ToggleSystem": {
+    "PerFeature": true,
+    "PerComponent": true,
+    "UserControl": {
+      "EnableDisable": true,
+      "DefaultState": "Enabled",
+      "RememberPreference": true
+    },
+    "AutoDisable": {
+      "OnCrash": true,
+      "OnPerformanceIssue": true,
+      "Threshold": { "Crashes": 3, "FPSDrop": 0.5 }
+    }
+  },
+
+  "Communication": {
+    "BetaNotes": {
+      "InGame": true,
+      "Website": true,
+      "Email": true
+    },
+    "KnownIssues": {
+      "Listed": true,
+      "Updated": "Realtime",
+      "Workarounds": true
+    },
+    "Roadmap": {
+      "Visible": true,
+      "VotingEnabled": true,
+      "EstimatedDates": "Approximate"
+    }
+  },
+
+  "UI": {
+    "BetaHub": {
+      "FeatureList": true,
+      "StatusIndicators": true,
+      "FeedbackButtons": true,
+      "ToggleControls": true
+    },
+    "Indicators": {
+      "BetaTag": { "Color": "#FFD700", "Label": "BETA" },
+      "ExperimentalTag": { "Color": "#FF4500", "Label": "EXPERIMENTAL" }
+    },
+    "Notifications": {
+      "NewBetaAvailable": true,
+      "FeatureUpdated": true,
+      "FeatureGraduated": true
+    }
+  }
+}

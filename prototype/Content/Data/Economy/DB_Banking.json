@@ -1,0 +1,255 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - In-Game Banking and Financial Services",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "InterestEnabled": true,
+    "LoansEnabled": true,
+    "InvestmentsEnabled": true,
+    "MaxBalance": 999999999
+  },
+
+  "AccountTypes": {
+    "Checking": {
+      "ID": "BANK_CHECKING",
+      "Name": "Street Racer Account",
+      "Description": "Standard account for daily transactions",
+      "InterestRate": 0,
+      "MinBalance": 0,
+      "MaxBalance": 999999999,
+      "TransactionFee": 0,
+      "Features": ["QuickAccess", "DirectDeposit", "BillPay"]
+    },
+    "Savings": {
+      "ID": "BANK_SAVINGS",
+      "Name": "Garage Fund",
+      "Description": "Earn interest on your savings",
+      "InterestRate": { "Daily": 0.0001, "Monthly": 0.003 },
+      "MinBalance": 10000,
+      "MaxBalance": 50000000,
+      "WithdrawalLimit": { "PerDay": 3, "Penalty": 0.01 },
+      "Features": ["Interest", "GoalTracking", "AutoTransfer"]
+    },
+    "Premium": {
+      "ID": "BANK_PREMIUM",
+      "Name": "VIP Account",
+      "Description": "Premium banking for elite racers",
+      "InterestRate": { "Daily": 0.0002, "Monthly": 0.006 },
+      "MinBalance": 100000,
+      "RequiresVIP": true,
+      "Features": ["HigherInterest", "PrioritySupport", "ExclusiveOffers"]
+    }
+  },
+
+  "InterestSystem": {
+    "Calculation": {
+      "Frequency": "Daily",
+      "Compound": true,
+      "MinBalanceRequired": true
+    },
+    "Bonuses": {
+      "LoyaltyBonus": {
+        "30Days": { "Multiplier": 1.1 },
+        "90Days": { "Multiplier": 1.2 },
+        "365Days": { "Multiplier": 1.5 }
+      },
+      "BalanceTier": {
+        "100K": { "Multiplier": 1.05 },
+        "500K": { "Multiplier": 1.1 },
+        "1M": { "Multiplier": 1.15 },
+        "10M": { "Multiplier": 1.25 }
+      }
+    },
+    "Cap": {
+      "DailyMax": 50000,
+      "MonthlyMax": 1000000
+    }
+  },
+
+  "LoanSystem": {
+    "VehicleLoan": {
+      "ID": "LOAN_VEHICLE",
+      "Name": "Vehicle Financing",
+      "Description": "Finance a vehicle purchase",
+      "Requirements": {
+        "MinLevel": 15,
+        "MinREP": "TIER_KNOWN",
+        "GoodStanding": true
+      },
+      "Terms": {
+        "LoanToValue": 0.8,
+        "InterestRate": { "Min": 0.05, "Max": 0.15 },
+        "Duration": { "Options": [7, 14, 30], "Unit": "Days" },
+        "MinAmount": 50000,
+        "MaxAmount": 5000000
+      },
+      "Collateral": "Vehicle",
+      "DefaultPenalty": "VehicleRepossession"
+    },
+    "PersonalLoan": {
+      "ID": "LOAN_PERSONAL",
+      "Name": "Quick Cash",
+      "Description": "Unsecured personal loan",
+      "Requirements": {
+        "MinLevel": 20,
+        "MinREP": "TIER_RESPECTED",
+        "CreditScore": 700
+      },
+      "Terms": {
+        "InterestRate": { "Min": 0.1, "Max": 0.25 },
+        "Duration": { "Options": [3, 7, 14], "Unit": "Days" },
+        "MinAmount": 10000,
+        "MaxAmount": 500000
+      },
+      "DefaultPenalty": "CreditScoreDrop"
+    },
+    "EmergencyLoan": {
+      "ID": "LOAN_EMERGENCY",
+      "Name": "Emergency Fund",
+      "Description": "High-interest emergency cash",
+      "Requirements": {
+        "MinLevel": 10
+      },
+      "Terms": {
+        "InterestRate": 0.3,
+        "Duration": { "Fixed": 7, "Unit": "Days" },
+        "MaxAmount": 50000
+      },
+      "NoApproval": true,
+      "DefaultPenalty": "REPPenalty"
+    }
+  },
+
+  "CreditScore": {
+    "Enabled": true,
+    "Range": { "Min": 300, "Max": 850 },
+    "StartingScore": 650,
+    "Factors": {
+      "PaymentHistory": 0.35,
+      "AccountAge": 0.15,
+      "CreditUtilization": 0.3,
+      "AccountTypes": 0.1,
+      "Inquiries": 0.1
+    },
+    "Impact": {
+      "Excellent": { "Range": [750, 850], "InterestDiscount": 0.3 },
+      "Good": { "Range": [700, 749], "InterestDiscount": 0.15 },
+      "Fair": { "Range": [650, 699], "InterestDiscount": 0 },
+      "Poor": { "Range": [550, 649], "InterestPenalty": 0.2 },
+      "Bad": { "Range": [300, 549], "LoanDenied": true }
+    }
+  },
+
+  "Investments": {
+    "CarInvestments": {
+      "ID": "INVEST_CARS",
+      "Name": "Collector Car Fund",
+      "Description": "Invest in appreciating vehicles",
+      "MinInvestment": 100000,
+      "Returns": {
+        "Average": 0.08,
+        "Risk": "Medium",
+        "Period": "Monthly"
+      },
+      "Features": ["Appreciation", "Dividends", "RareCarAccess"]
+    },
+    "RacingSponsor": {
+      "ID": "INVEST_SPONSOR",
+      "Name": "Sponsor Investment",
+      "Description": "Invest in racing teams",
+      "MinInvestment": 50000,
+      "Returns": {
+        "Variable": true,
+        "BasedOn": "TeamPerformance",
+        "Risk": "High"
+      }
+    },
+    "PartsBusiness": {
+      "ID": "INVEST_PARTS",
+      "Name": "Parts Business",
+      "Description": "Invest in aftermarket parts",
+      "MinInvestment": 25000,
+      "Returns": {
+        "Average": 0.05,
+        "Risk": "Low",
+        "Bonus": "PartDiscounts"
+      }
+    }
+  },
+
+  "Transactions": {
+    "Types": {
+      "Deposit": { "Fee": 0 },
+      "Withdrawal": { "Fee": 0, "InstantAccess": true },
+      "Transfer": { "Fee": 0, "ToOtherPlayers": true },
+      "AutoPay": { "Enabled": true, "ForLoans": true }
+    },
+    "History": {
+      "RetentionDays": 365,
+      "Exportable": true,
+      "Categories": true
+    },
+    "Limits": {
+      "DailyWithdrawal": "Unlimited",
+      "TransferLimit": 1000000
+    }
+  },
+
+  "Goals": {
+    "SavingsGoals": {
+      "Enabled": true,
+      "MaxGoals": 5,
+      "Types": {
+        "Vehicle": { "Tracking": "VehiclePrice" },
+        "Garage": { "Tracking": "GaragePrice" },
+        "Parts": { "Tracking": "PartsList" },
+        "Custom": { "Tracking": "ManualAmount" }
+      },
+      "AutoContribution": {
+        "Enabled": true,
+        "Percentage": { "Min": 1, "Max": 50 }
+      }
+    },
+    "Rewards": {
+      "GoalReached": { "REP": 500 },
+      "ConsistentSaver": { "Badge": "FinancialWizard" }
+    }
+  },
+
+  "Insurance": {
+    "DepositInsurance": {
+      "Enabled": true,
+      "Coverage": 10000000,
+      "Protection": "SystemError"
+    }
+  },
+
+  "Notifications": {
+    "InterestEarned": true,
+    "LoanDue": { "DaysBefore": [3, 1, 0] },
+    "LowBalance": { "Threshold": 10000 },
+    "GoalProgress": { "Milestones": [25, 50, 75, 100] },
+    "CreditScoreChange": true
+  },
+
+  "UI": {
+    "BankingApp": {
+      "Dashboard": {
+        "AccountSummary": true,
+        "RecentTransactions": true,
+        "Goals": true,
+        "CreditScore": true
+      },
+      "Tabs": ["Accounts", "Loans", "Investments", "Goals", "History"]
+    },
+    "QuickAccess": {
+      "BalanceWidget": true,
+      "QuickTransfer": true
+    },
+    "ATMLocations": {
+      "InWorld": true,
+      "GarageAccess": true
+    }
+  }
+}

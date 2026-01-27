@@ -1,0 +1,268 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Legacy and Prestige Achievement System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "PrestigeSystem": true,
+    "LegacyTracking": true,
+    "GenerationalRewards": true
+  },
+
+  "PrestigeSystem": {
+    "Description": "Reset progress for exclusive rewards and multipliers",
+    "Requirements": {
+      "MinLevel": 50,
+      "MinREP": "TIER_LEGENDARY",
+      "StoryComplete": true
+    },
+    "Tiers": {
+      "Prestige1": {
+        "ID": "PRESTIGE_1",
+        "Name": "Bronze Legend",
+        "Bonuses": {
+          "XPMultiplier": 1.1,
+          "CashMultiplier": 1.05,
+          "StarterCash": 100000
+        },
+        "Rewards": {
+          "Badge": "PrestigeBronze",
+          "Title": "Reborn Racer",
+          "ExclusivePaint": "LegacyBronze"
+        }
+      },
+      "Prestige2": {
+        "ID": "PRESTIGE_2",
+        "Name": "Silver Legend",
+        "Bonuses": {
+          "XPMultiplier": 1.2,
+          "CashMultiplier": 1.1,
+          "StarterCash": 250000
+        },
+        "Rewards": {
+          "Badge": "PrestigeSilver",
+          "Title": "Twice Risen",
+          "ExclusiveVehicle": "LegacySilverCar"
+        }
+      },
+      "Prestige3": {
+        "ID": "PRESTIGE_3",
+        "Name": "Gold Legend",
+        "Bonuses": {
+          "XPMultiplier": 1.35,
+          "CashMultiplier": 1.15,
+          "StarterCash": 500000
+        },
+        "Rewards": {
+          "Badge": "PrestigeGold",
+          "Title": "Thrice Forged",
+          "ExclusiveVehicle": "LegacyGoldCar",
+          "GoldenGarage": true
+        }
+      },
+      "Prestige4": {
+        "ID": "PRESTIGE_4",
+        "Name": "Platinum Legend",
+        "Bonuses": {
+          "XPMultiplier": 1.5,
+          "CashMultiplier": 1.2,
+          "StarterCash": 1000000
+        },
+        "Rewards": {
+          "Badge": "PrestigePlatinum",
+          "Title": "Eternal Racer",
+          "ExclusiveVehicle": "LegacyPlatinumCar",
+          "UnlockAllParts": true
+        }
+      },
+      "Prestige5": {
+        "ID": "PRESTIGE_5",
+        "Name": "Diamond Legend",
+        "Bonuses": {
+          "XPMultiplier": 1.75,
+          "CashMultiplier": 1.3,
+          "StarterCash": 2500000
+        },
+        "Rewards": {
+          "Badge": "PrestigeDiamond",
+          "Title": "Immortal Legend",
+          "ExclusiveVehicle": "LegacyDiamondCar",
+          "AllExclusiveContent": true,
+          "DevRoomAccess": true
+        }
+      }
+    },
+    "Retention": {
+      "Keeps": ["Achievements", "PrestigeBadges", "ExclusiveItems", "Friends", "Crew"],
+      "Resets": ["Level", "Cash", "REP", "Vehicles", "Parts", "Story"]
+    }
+  },
+
+  "LegacyAchievements": {
+    "Description": "Achievements that persist across prestiges",
+    "Categories": {
+      "LifetimeStats": {
+        "TotalMilesDriven": {
+          "Milestones": [10000, 50000, 100000, 500000, 1000000],
+          "Rewards": [
+            { "REP": 1000 },
+            { "REP": 5000, "Badge": "RoadWarrior" },
+            { "REP": 10000, "Title": "Century Driver" },
+            { "REP": 25000, "Badge": "HalfMillionaire" },
+            { "REP": 50000, "Title": "Million Mile Legend", "Vehicle": "MilestoneCar" }
+          ]
+        },
+        "TotalRacesWon": {
+          "Milestones": [100, 500, 1000, 5000, 10000],
+          "Rewards": [
+            { "REP": 1000 },
+            { "REP": 5000 },
+            { "REP": 15000, "Title": "Thousand Wins" },
+            { "REP": 50000, "Badge": "VictoryKing" },
+            { "REP": 100000, "Title": "10K Champion", "Badge": "Ultimate Victor" }
+          ]
+        },
+        "TotalCashEarned": {
+          "Milestones": [10000000, 100000000, 500000000, 1000000000],
+          "Rewards": [
+            { "REP": 5000 },
+            { "REP": 25000, "Title": "Multi-Millionaire" },
+            { "REP": 75000, "Badge": "HalfBillionaire" },
+            { "REP": 150000, "Title": "Billionaire Racer", "GoldPlating": true }
+          ]
+        },
+        "TotalDriftScore": {
+          "Milestones": [10000000, 100000000, 1000000000],
+          "Rewards": [
+            { "REP": 5000 },
+            { "REP": 25000, "Title": "Drift Legend" },
+            { "REP": 100000, "Badge": "BillionPointDrifter" }
+          ]
+        }
+      },
+      "PrestigeJourney": {
+        "FirstPrestige": {
+          "Reward": { "REP": 10000, "Badge": "PrestigeInitiate" }
+        },
+        "MaxPrestige": {
+          "Reward": { "REP": 100000, "Badge": "PrestigeMaster", "Title": "The Eternal" }
+        },
+        "SpeedPrestige": {
+          "Description": "Reach prestige in under 100 hours",
+          "Reward": { "REP": 25000, "Badge": "SpeedRunner" }
+        }
+      },
+      "CrossGeneration": {
+        "OwnershipHistory": {
+          "Description": "Own the same vehicle across 3 prestiges",
+          "Reward": { "Badge": "Loyal Owner", "BondedVehicle": true }
+        },
+        "ConsistentWinner": {
+          "Description": "Win 100 races in each prestige",
+          "Reward": { "Title": "Consistent Champion" }
+        }
+      }
+    }
+  },
+
+  "LegacyStats": {
+    "Tracking": {
+      "TotalPlayTime": true,
+      "TotalDistance": true,
+      "TotalRaces": true,
+      "TotalWins": true,
+      "TotalCashEarned": true,
+      "TotalREPEarned": true,
+      "TotalDriftScore": true,
+      "TotalCarsOwned": true,
+      "TotalPartsInstalled": true,
+      "TotalPoliceEscapes": true,
+      "TotalPinkSlipsWon": true
+    },
+    "Records": {
+      "TopSpeed": { "Tracked": true, "PerVehicle": true },
+      "FastestLap": { "Tracked": true, "PerTrack": true },
+      "LongestDrift": true,
+      "HighestBounty": true,
+      "MostExpensiveCarOwned": true
+    },
+    "Milestones": {
+      "FirstRace": { "Date": true },
+      "FirstWin": { "Date": true },
+      "FirstPrestige": { "Date": true },
+      "AccountCreation": { "Date": true }
+    }
+  },
+
+  "GenerationalRewards": {
+    "Description": "Rewards that get better each prestige",
+    "Scaling": {
+      "StarterBonus": {
+        "BaseAmount": 50000,
+        "PerPrestige": 50000
+      },
+      "XPBoost": {
+        "BaseBoost": 1.0,
+        "PerPrestige": 0.1
+      },
+      "UnlockSpeed": {
+        "BaseReduction": 0,
+        "PerPrestige": 0.05
+      }
+    },
+    "CumulativePerks": {
+      "PartDiscount": { "PerPrestige": 0.02, "Max": 0.1 },
+      "InsuranceDiscount": { "PerPrestige": 0.05, "Max": 0.25 },
+      "REPBonus": { "PerPrestige": 0.03, "Max": 0.15 }
+    }
+  },
+
+  "VeteranRewards": {
+    "AccountAge": {
+      "1Month": { "Badge": "NewRacer" },
+      "6Months": { "Badge": "EstablishedRacer", "REP": 5000 },
+      "1Year": { "Badge": "VeteranRacer", "REP": 15000, "Title": "One Year Strong" },
+      "2Years": { "Badge": "SeniorRacer", "REP": 30000, "ExclusiveCar": true },
+      "3Years": { "Badge": "LegendaryVeteran", "REP": 50000, "Title": "Three Year Legend" }
+    },
+    "ReturnPlayer": {
+      "30DaysAway": { "Bonus": 50000, "REP": 5000 },
+      "90DaysAway": { "Bonus": 150000, "REP": 15000, "CatchUpXP": true },
+      "1YearAway": { "Bonus": 500000, "REP": 50000, "FullCatchUp": true }
+    }
+  },
+
+  "HallOfFame": {
+    "Enabled": true,
+    "Categories": {
+      "TopRacers": { "Metric": "TotalWins", "Display": 100 },
+      "TopDrifters": { "Metric": "TotalDriftScore", "Display": 100 },
+      "TopCollectors": { "Metric": "TotalCarsOwned", "Display": 100 },
+      "TopPrestige": { "Metric": "PrestigeLevel", "Display": 100 },
+      "TopVeterans": { "Metric": "AccountAge", "Display": 100 }
+    },
+    "Rewards": {
+      "Top10": { "Badge": "HallOfFamer", "Title": "Top 10" },
+      "Top100": { "Badge": "EliteRacer" }
+    },
+    "Updates": "Weekly"
+  },
+
+  "UI": {
+    "LegacyHub": {
+      "Tabs": ["Stats", "Achievements", "Prestige", "Hall of Fame"],
+      "Timeline": true,
+      "CompareToOthers": true
+    },
+    "PrestigeScreen": {
+      "ConfirmationRequired": true,
+      "PreviewRewards": true,
+      "ShowRetention": true
+    },
+    "ProfileDisplay": {
+      "PrestigeBadge": true,
+      "LegacyStats": true,
+      "VeteranBadge": true
+    }
+  }
+}

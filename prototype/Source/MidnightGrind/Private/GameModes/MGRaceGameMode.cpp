@@ -736,8 +736,14 @@ void AMGRaceGameMode::NotifyPlayersRaceEnded()
 
 void AMGRaceGameMode::UpdateHUDSubsystem()
 {
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
 	// Get HUD subsystem
-	UMGRaceHUDSubsystem* HUDSubsystem = GetWorld()->GetSubsystem<UMGRaceHUDSubsystem>();
+	UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>();
 	if (!HUDSubsystem)
 	{
 		return;

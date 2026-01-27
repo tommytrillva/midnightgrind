@@ -193,7 +193,7 @@ void UMGVFXSubsystem::ReturnToPool(UNiagaraComponent* Component)
 			{
 				Component->Deactivate();
 				PooledVFX.bInUse = false;
-				PooledVFX.LastUsedTime = GetWorld()->GetTimeSeconds();
+				PooledVFX.LastUsedTime = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.0f;
 				ActiveVFXCount = FMath::Max(0, ActiveVFXCount - 1);
 				return;
 			}
@@ -452,7 +452,7 @@ UNiagaraComponent* UMGVFXSubsystem::GetPooledComponent(UNiagaraSystem* System)
 			if (!PooledVFX.bInUse && PooledVFX.Component)
 			{
 				PooledVFX.bInUse = true;
-				PooledVFX.LastUsedTime = GetWorld()->GetTimeSeconds();
+				PooledVFX.LastUsedTime = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.0f;
 				return PooledVFX.Component;
 			}
 		}
