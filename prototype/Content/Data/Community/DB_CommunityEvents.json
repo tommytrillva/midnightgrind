@@ -1,0 +1,426 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Community Events and Live Service Configuration",
+
+  "LiveService": {
+    "Enabled": true,
+    "ContentUpdateCheck": 3600,
+    "FeaturedContentRotation": 86400,
+    "MaintenanceWindow": {
+      "Day": "Tuesday",
+      "Time": "06:00",
+      "Duration": 120,
+      "Timezone": "UTC"
+    }
+  },
+
+  "FeaturedContent": {
+    "Showcase": {
+      "MaxItems": 5,
+      "Types": ["Vehicle", "Event", "Challenge", "CreatorContent"],
+      "RotationHours": 24
+    },
+    "FeaturedVehicle": {
+      "Enabled": true,
+      "Discount": 0.15,
+      "BonusREP": 1.25,
+      "Duration": 168
+    },
+    "FeaturedTrack": {
+      "Enabled": true,
+      "BonusRewards": 1.5,
+      "Duration": 168
+    }
+  },
+
+  "CommunityGoals": {
+    "Enabled": true,
+    "Types": [
+      {
+        "ID": "GOAL_DISTANCE",
+        "Name": "Community Drive",
+        "Description": "Together we drive to the moon!",
+        "Metric": "TotalDistanceKM",
+        "Tiers": [
+          { "Target": 100000, "Reward": { "AllPlayers": { "Cash": 5000 } } },
+          { "Target": 500000, "Reward": { "AllPlayers": { "Cash": 10000, "Part": "RANDOM_SPORT" } } },
+          { "Target": 1000000, "Reward": { "AllPlayers": { "Cash": 25000, "Vinyl": "VINYL_COMMUNITY_1" } } }
+        ],
+        "Duration": 168,
+        "Recurring": "Monthly"
+      },
+      {
+        "ID": "GOAL_DRIFT",
+        "Name": "Drift Marathon",
+        "Description": "Community drift score challenge",
+        "Metric": "TotalDriftScore",
+        "Tiers": [
+          { "Target": 10000000, "Reward": { "AllPlayers": { "Cash": 5000 } } },
+          { "Target": 50000000, "Reward": { "AllPlayers": { "Cash": 15000, "REP": 500 } } },
+          { "Target": 100000000, "Reward": { "AllPlayers": { "ExclusiveItem": "DRIFT_TROPHY" } } }
+        ],
+        "Duration": 168,
+        "Recurring": "Monthly"
+      },
+      {
+        "ID": "GOAL_RACES",
+        "Name": "Race Week",
+        "Description": "Complete races as a community",
+        "Metric": "TotalRacesCompleted",
+        "Tiers": [
+          { "Target": 50000, "Reward": { "AllPlayers": { "Cash": 3000 } } },
+          { "Target": 150000, "Reward": { "AllPlayers": { "Cash": 10000 } } },
+          { "Target": 300000, "Reward": { "AllPlayers": { "Vehicle": "VEHICLE_COMMUNITY_SPECIAL" } } }
+        ],
+        "Duration": 168,
+        "Recurring": "Quarterly"
+      }
+    ],
+    "ContributionTracking": {
+      "ShowIndividual": true,
+      "ShowLeaderboard": true,
+      "TopContributorRewards": {
+        "Top10": { "Cash": 50000, "Title": "TITLE_TOP_CONTRIBUTOR" },
+        "Top100": { "Cash": 25000 },
+        "Top1000": { "Cash": 10000 }
+      }
+    }
+  },
+
+  "LimitedTimeEvents": {
+    "Types": [
+      {
+        "ID": "LTE_DOUBLE_REP",
+        "Name": "Double REP Weekend",
+        "Description": "Earn double REP in all activities",
+        "Modifiers": { "REPMultiplier": 2.0 },
+        "Duration": 72,
+        "Frequency": "BiWeekly"
+      },
+      {
+        "ID": "LTE_DOUBLE_CASH",
+        "Name": "Cash Rush",
+        "Description": "Double cash rewards",
+        "Modifiers": { "CashMultiplier": 2.0 },
+        "Duration": 48,
+        "Frequency": "Monthly"
+      },
+      {
+        "ID": "LTE_RARE_PARTS",
+        "Name": "Rare Parts Sale",
+        "Description": "Elite and Legendary parts available at discount",
+        "Modifiers": { "RarePartDiscount": 0.25, "RarePartSpawnRate": 2.0 },
+        "Duration": 72,
+        "Frequency": "Monthly"
+      },
+      {
+        "ID": "LTE_PURSUIT_MADNESS",
+        "Name": "Pursuit Madness",
+        "Description": "Increased bounty rewards, aggressive police",
+        "Modifiers": { "BountyMultiplier": 3.0, "PoliceAggression": 1.5 },
+        "Duration": 48,
+        "Frequency": "Monthly"
+      },
+      {
+        "ID": "LTE_DRIFT_FESTIVAL",
+        "Name": "Drift Festival",
+        "Description": "Drift score bonuses and special drift events",
+        "Modifiers": { "DriftScoreMultiplier": 1.5, "DriftEventsBonus": 2.0 },
+        "Duration": 96,
+        "Frequency": "Quarterly"
+      }
+    ]
+  },
+
+  "SeasonalEvents": {
+    "Spring": {
+      "ID": "SEASON_SPRING",
+      "Name": "Cherry Blossom Season",
+      "Theme": "Japanese Spring",
+      "Duration": "March-May",
+      "SpecialContent": {
+        "Track": "L_SakuraCircuit_Spring",
+        "Weather": "CherryBlossomRain",
+        "Vehicle": "VEHICLE_SPRING_SPECIAL",
+        "Vinyl": "VINYL_SAKURA",
+        "Paint": "PAINT_CHERRY_BLOSSOM"
+      },
+      "Events": [
+        { "Name": "Hanami Drift", "Type": "DriftEvent", "Exclusive": true },
+        { "Name": "Spring Sprint", "Type": "SprintRace", "Exclusive": true }
+      ]
+    },
+    "Summer": {
+      "ID": "SEASON_SUMMER",
+      "Name": "Summer Nights",
+      "Theme": "Beach and Neon",
+      "Duration": "June-August",
+      "SpecialContent": {
+        "Track": "L_BeachsideBoulevard",
+        "Weather": "ClearNight_Summer",
+        "Vehicle": "VEHICLE_SUMMER_SPECIAL",
+        "Vinyl": "VINYL_SUMMER_VIBES",
+        "Paint": "PAINT_SUNSET_GRADIENT"
+      },
+      "Events": [
+        { "Name": "Midnight Beach Run", "Type": "SprintRace", "Exclusive": true },
+        { "Name": "Neon Nights", "Type": "FreeRoamMeetup", "Exclusive": true }
+      ]
+    },
+    "Fall": {
+      "ID": "SEASON_FALL",
+      "Name": "Autumn Thunder",
+      "Theme": "Mountain Touge",
+      "Duration": "September-November",
+      "SpecialContent": {
+        "Track": "L_MountainPass_Autumn",
+        "Weather": "FoggyMorning",
+        "Vehicle": "VEHICLE_FALL_SPECIAL",
+        "Vinyl": "VINYL_AUTUMN_LEAVES",
+        "Paint": "PAINT_BURNT_ORANGE"
+      },
+      "Events": [
+        { "Name": "Touge Masters", "Type": "TougeRace", "Exclusive": true },
+        { "Name": "Fog Runner", "Type": "TimeAttack", "Exclusive": true }
+      ]
+    },
+    "Winter": {
+      "ID": "SEASON_WINTER",
+      "Name": "Winter Wonderland",
+      "Theme": "Snow and Ice",
+      "Duration": "December-February",
+      "SpecialContent": {
+        "Track": "L_FrozenLake",
+        "Weather": "SnowStorm",
+        "Vehicle": "VEHICLE_WINTER_SPECIAL",
+        "Vinyl": "VINYL_SNOWFLAKE",
+        "Paint": "PAINT_ICE_BLUE"
+      },
+      "Events": [
+        { "Name": "Ice Drift Championship", "Type": "DriftEvent", "Exclusive": true },
+        { "Name": "Blizzard Sprint", "Type": "SprintRace", "Exclusive": true }
+      ]
+    },
+    "Halloween": {
+      "ID": "SEASON_HALLOWEEN",
+      "Name": "Midnight Terror",
+      "Theme": "Horror Racing",
+      "Duration": "October 15-November 5",
+      "SpecialContent": {
+        "Track": "L_HauntedHighway",
+        "Weather": "SpookyFog",
+        "Vehicle": "VEHICLE_HALLOWEEN_HEARSE",
+        "Vinyl": "VINYL_SKULL_FLAMES",
+        "Paint": "PAINT_BLOOD_RED"
+      },
+      "Events": [
+        { "Name": "Graveyard Shift", "Type": "PursuitEvent", "Exclusive": true },
+        { "Name": "Ghost Race", "Type": "TimeAttack", "GhostOnly": true }
+      ],
+      "SpecialEffects": {
+        "GhostCars": true,
+        "SpookyAmbience": true,
+        "JumpScares": false
+      }
+    },
+    "Christmas": {
+      "ID": "SEASON_CHRISTMAS",
+      "Name": "Holiday Rush",
+      "Theme": "Festive Racing",
+      "Duration": "December 15-January 5",
+      "SpecialContent": {
+        "Track": "L_WinterCity_Holiday",
+        "Weather": "LightSnow",
+        "Vehicle": "VEHICLE_SLEIGH_RACER",
+        "Vinyl": "VINYL_HOLIDAY_WRAP",
+        "Paint": "PAINT_CANDY_CANE"
+      },
+      "Events": [
+        { "Name": "Gift Delivery", "Type": "SprintRace", "Exclusive": true },
+        { "Name": "New Year Countdown", "Type": "CommunityEvent", "Exclusive": true }
+      ],
+      "BonusRewards": {
+        "DailyGifts": true,
+        "GiftCalendar": 25
+      }
+    }
+  },
+
+  "Tournaments": {
+    "Enabled": true,
+    "Types": [
+      {
+        "ID": "TOURNEY_WEEKLY",
+        "Name": "Weekly Championship",
+        "Format": "Swiss",
+        "Rounds": 5,
+        "EntryFee": 0,
+        "Prizes": {
+          "1st": { "Cash": 100000, "REP": 5000, "Trophy": "TROPHY_WEEKLY_GOLD" },
+          "2nd": { "Cash": 50000, "REP": 2500, "Trophy": "TROPHY_WEEKLY_SILVER" },
+          "3rd": { "Cash": 25000, "REP": 1000, "Trophy": "TROPHY_WEEKLY_BRONZE" },
+          "Top10": { "Cash": 10000, "REP": 500 }
+        },
+        "Schedule": "Every Saturday",
+        "Duration": 180
+      },
+      {
+        "ID": "TOURNEY_MONTHLY",
+        "Name": "Monthly Grand Prix",
+        "Format": "Bracket",
+        "Rounds": 7,
+        "EntryRequirement": "LEVEL_20",
+        "Prizes": {
+          "1st": { "Cash": 500000, "REP": 25000, "Vehicle": "VEHICLE_CHAMPION_EDITION", "Title": "TITLE_MONTHLY_CHAMPION" },
+          "2nd": { "Cash": 250000, "REP": 12500, "Part": "PART_LEGENDARY_RANDOM" },
+          "3rd": { "Cash": 100000, "REP": 5000 }
+        },
+        "Schedule": "Last Weekend of Month",
+        "Duration": 480
+      },
+      {
+        "ID": "TOURNEY_SEASONAL",
+        "Name": "Seasonal Championship",
+        "Format": "League",
+        "Duration": "12 Weeks",
+        "PointsSystem": { "Win": 25, "2nd": 18, "3rd": 15, "4th": 12, "5th": 10, "6th": 8, "7th": 6, "8th": 4 },
+        "Prizes": {
+          "1st": { "Cash": 2000000, "REP": 100000, "Vehicle": "VEHICLE_SEASONAL_EXCLUSIVE", "Title": "TITLE_SEASON_CHAMPION" },
+          "Top10": { "Cash": 500000, "REP": 25000 },
+          "Top50": { "Cash": 100000, "REP": 5000 }
+        }
+      }
+    ],
+    "CrewTournaments": {
+      "Enabled": true,
+      "MinCrewSize": 4,
+      "Types": ["CrewVsCrew", "CrewRelay", "CrewDrift"]
+    }
+  },
+
+  "CreatorContent": {
+    "Enabled": true,
+    "UnlockLevel": 25,
+    "Types": {
+      "Liveries": {
+        "Enabled": true,
+        "Sharing": true,
+        "Rating": true,
+        "Download": true,
+        "CreatorRewards": {
+          "PerDownload": 10,
+          "PerLike": 5,
+          "Featured": 5000
+        }
+      },
+      "Tunes": {
+        "Enabled": true,
+        "Sharing": true,
+        "Rating": true,
+        "Download": true,
+        "CreatorRewards": {
+          "PerDownload": 15,
+          "PerLike": 10,
+          "Featured": 7500
+        }
+      },
+      "Photos": {
+        "Enabled": true,
+        "Sharing": true,
+        "Rating": true,
+        "Contests": true,
+        "CreatorRewards": {
+          "PerLike": 2,
+          "Featured": 2500,
+          "ContestWin": 25000
+        }
+      },
+      "Replays": {
+        "Enabled": true,
+        "Sharing": true,
+        "Rating": true,
+        "CreatorRewards": {
+          "PerView": 1,
+          "Featured": 5000
+        }
+      }
+    },
+    "Curation": {
+      "StaffPicks": true,
+      "CommunityVoting": true,
+      "TrendingSection": true,
+      "ReportSystem": true
+    }
+  },
+
+  "Rivals": {
+    "Enabled": true,
+    "System": {
+      "AutoAssign": true,
+      "MaxRivals": 5,
+      "MatchCriteria": ["SimilarLevel", "SimilarVehicleClass", "SimilarPlaytime"]
+    },
+    "Challenges": {
+      "Types": ["LapTime", "DriftScore", "RaceResult"],
+      "Duration": 168,
+      "Rewards": {
+        "Win": { "Cash": 5000, "REP": 250 },
+        "Streak3": { "Cash": 15000, "REP": 750 },
+        "Streak5": { "Cash": 30000, "REP": 1500, "Title": "TITLE_RIVAL_CRUSHER" }
+      }
+    },
+    "Nemesis": {
+      "Enabled": true,
+      "AssignAfterLosses": 3,
+      "BonusForDefeat": { "Cash": 25000, "REP": 1000 }
+    }
+  },
+
+  "Spectating": {
+    "Enabled": true,
+    "Modes": {
+      "LiveRaces": {
+        "Enabled": true,
+        "MaxSpectators": 100,
+        "Cameras": ["FreeCam", "FollowCam", "Broadcast"],
+        "Chat": true
+      },
+      "Tournaments": {
+        "Enabled": true,
+        "MaxSpectators": 1000,
+        "Commentary": true,
+        "Replays": true
+      },
+      "FeaturedStreams": {
+        "Enabled": true,
+        "Integration": ["Twitch", "YouTube"],
+        "InGameBrowser": true
+      }
+    },
+    "Rewards": {
+      "WatchTime": { "Per30Min": { "REP": 25 }, "DailyMax": 100 }
+    }
+  },
+
+  "Leaderboards": {
+    "Global": {
+      "Categories": ["TotalWins", "TotalREP", "BestLapTimes", "DriftScores", "RankedMMR"],
+      "RefreshInterval": 300,
+      "ShowTop": 1000
+    },
+    "Weekly": {
+      "Categories": ["WeeklyWins", "WeeklyREP", "WeeklyDrift"],
+      "ResetDay": "Monday",
+      "Rewards": {
+        "Top10": { "Cash": 25000, "REP": 1000 },
+        "Top100": { "Cash": 10000, "REP": 500 },
+        "Top1000": { "Cash": 5000, "REP": 250 }
+      }
+    },
+    "Friends": {
+      "Enabled": true,
+      "ShowInGame": true,
+      "Notifications": true
+    }
+  }
+}

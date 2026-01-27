@@ -138,6 +138,9 @@ void UMGStreakSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		RegisterStreakType(CleanStreak);
 	}
 
+	// Load saved data
+	LoadStreakData();
+
 	// Start streak tick
 	if (UWorld* World = GetWorld())
 	{
@@ -1052,10 +1055,241 @@ FString UMGStreakSubsystem::GenerateResultId() const
 // Persistence
 void UMGStreakSubsystem::SaveStreakData()
 {
-	// Save implementation would persist streaks, daily data, and stats
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Streak");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("streak_data.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save player streaks
+	int32 NumPlayers = PlayerStreaks.Num();
+	SaveArchive << NumPlayers;
+
+	for (const auto& PlayerPair : PlayerStreaks)
+	{
+		FString PlayerId = PlayerPair.Key;
+		SaveArchive << PlayerId;
+
+		int32 NumStreaks = PlayerPair.Value.Num();
+		SaveArchive << NumStreaks;
+
+		for (const auto& StreakPair : PlayerPair.Value)
+		{
+			int32 TypeInt = static_cast<int32>(StreakPair.Key);
+			SaveArchive << TypeInt;
+
+			const FMGActiveStreak& Streak = StreakPair.Value;
+			FString StreakId = Streak.StreakId;
+			int32 StatusInt = static_cast<int32>(Streak.Status);
+			int32 TierInt = static_cast<int32>(Streak.CurrentTier);
+			int32 CurrentCount = Streak.CurrentCount;
+			int32 BestCount = Streak.BestCount;
+			int32 TotalPoints = Streak.TotalPointsEarned;
+			int64 StartTimeTicks = Streak.StartTime.GetTicks();
+			int64 LastUpdateTicks = Streak.LastUpdateTime.GetTicks();
+
+			SaveArchive << StreakId;
+			SaveArchive << StatusInt;
+			SaveArchive << TierInt;
+			SaveArchive << CurrentCount;
+			SaveArchive << BestCount;
+			SaveArchive << TotalPoints;
+			SaveArchive << StartTimeTicks;
+			SaveArchive << LastUpdateTicks;
+		}
+	}
+
+	// Save player stats
+	int32 NumStats = PlayerStats.Num();
+	SaveArchive << NumStats;
+
+	for (const auto& StatPair : PlayerStats)
+	{
+		FString PlayerId = StatPair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGStreakPlayerStats& Stats = StatPair.Value;
+		int32 TotalCombos = Stats.TotalCombosCompleted;
+		int32 HighestCombo = Stats.HighestComboCount;
+		int32 LongestStreak = Stats.LongestStreakDays;
+		int32 TotalRewards = Stats.TotalRewardsClaimed;
+
+		SaveArchive << TotalCombos;
+		SaveArchive << HighestCombo;
+		SaveArchive << LongestStreak;
+		SaveArchive << TotalRewards;
+
+		// Save best streaks map
+		int32 NumBestStreaks = Stats.BestStreaks.Num();
+		SaveArchive << NumBestStreaks;
+		for (const auto& BestPair : Stats.BestStreaks)
+		{
+			int32 TypeInt = static_cast<int32>(BestPair.Key);
+			int32 Count = BestPair.Value;
+			SaveArchive << TypeInt;
+			SaveArchive << Count;
+		}
+	}
+
+	// Save daily streak data
+	int32 NumDaily = DailyStreaks.Num();
+	SaveArchive << NumDaily;
+
+	for (const auto& DailyPair : DailyStreaks)
+	{
+		FString PlayerId = DailyPair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGDailyStreakData& Daily = DailyPair.Value;
+		int32 CurrentStreak = Daily.CurrentStreak;
+		int32 LongestStreak = Daily.LongestStreak;
+		int64 LastLoginTicks = Daily.LastLoginDate.GetTicks();
+		int32 TotalLogins = Daily.TotalLogins;
+
+		SaveArchive << CurrentStreak;
+		SaveArchive << LongestStreak;
+		SaveArchive << LastLoginTicks;
+		SaveArchive << TotalLogins;
+	}
+
+	// Write to file
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGStreakSubsystem: Saved streak data for %d players"), NumPlayers);
 }
 
 void UMGStreakSubsystem::LoadStreakData()
 {
-	// Load implementation would restore streaks, daily data, and stats
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Streak") / TEXT("streak_data.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("MGStreakSubsystem: No saved streak data found"));
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGStreakSubsystem: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Load player streaks
+	int32 NumPlayers;
+	LoadArchive << NumPlayers;
+
+	for (int32 i = 0; i < NumPlayers; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		int32 NumStreaks;
+		LoadArchive << NumStreaks;
+
+		TMap<EMGStreakType, FMGActiveStreak> Streaks;
+
+		for (int32 j = 0; j < NumStreaks; ++j)
+		{
+			int32 TypeInt;
+			LoadArchive << TypeInt;
+
+			FMGActiveStreak Streak;
+			Streak.PlayerId = PlayerId;
+			Streak.Type = static_cast<EMGStreakType>(TypeInt);
+
+			int32 StatusInt;
+			int32 TierInt;
+			int64 StartTimeTicks;
+			int64 LastUpdateTicks;
+
+			LoadArchive << Streak.StreakId;
+			LoadArchive << StatusInt;
+			LoadArchive << TierInt;
+			LoadArchive << Streak.CurrentCount;
+			LoadArchive << Streak.BestCount;
+			LoadArchive << Streak.TotalPointsEarned;
+			LoadArchive << StartTimeTicks;
+			LoadArchive << LastUpdateTicks;
+
+			Streak.Status = static_cast<EMGStreakStatus>(StatusInt);
+			Streak.CurrentTier = static_cast<EMGStreakTier>(TierInt);
+			Streak.StartTime = FDateTime(StartTimeTicks);
+			Streak.LastUpdateTime = FDateTime(LastUpdateTicks);
+
+			Streaks.Add(Streak.Type, Streak);
+		}
+
+		PlayerStreaks.Add(PlayerId, Streaks);
+	}
+
+	// Load player stats
+	int32 NumStats;
+	LoadArchive << NumStats;
+
+	for (int32 i = 0; i < NumStats; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGStreakPlayerStats Stats;
+		Stats.PlayerId = PlayerId;
+
+		LoadArchive << Stats.TotalCombosCompleted;
+		LoadArchive << Stats.HighestComboCount;
+		LoadArchive << Stats.LongestStreakDays;
+		LoadArchive << Stats.TotalRewardsClaimed;
+
+		// Load best streaks map
+		int32 NumBestStreaks;
+		LoadArchive << NumBestStreaks;
+		for (int32 j = 0; j < NumBestStreaks; ++j)
+		{
+			int32 TypeInt;
+			int32 Count;
+			LoadArchive << TypeInt;
+			LoadArchive << Count;
+			Stats.BestStreaks.Add(static_cast<EMGStreakType>(TypeInt), Count);
+		}
+
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	// Load daily streak data
+	int32 NumDaily;
+	LoadArchive << NumDaily;
+
+	for (int32 i = 0; i < NumDaily; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGDailyStreakData Daily;
+		Daily.PlayerId = PlayerId;
+
+		int64 LastLoginTicks;
+
+		LoadArchive << Daily.CurrentStreak;
+		LoadArchive << Daily.LongestStreak;
+		LoadArchive << LastLoginTicks;
+		LoadArchive << Daily.TotalLogins;
+
+		Daily.LastLoginDate = FDateTime(LastLoginTicks);
+
+		DailyStreaks.Add(PlayerId, Daily);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGStreakSubsystem: Loaded streak data for %d players"), NumPlayers);
 }

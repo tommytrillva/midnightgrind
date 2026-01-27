@@ -1,0 +1,473 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Recommended Vehicle Builds and Tuning Guides",
+
+  "BuildCategories": {
+    "Grip": {
+      "ID": "BUILD_GRIP",
+      "Name": "Grip Racing",
+      "Description": "Maximum traction for circuit racing",
+      "Icon": "ICO_Grip",
+      "PriorityStats": ["Handling", "Acceleration", "Braking"],
+      "Characteristics": {
+        "DriftTendency": "Low",
+        "Stability": "High",
+        "CornerSpeed": "High"
+      }
+    },
+    "Drift": {
+      "ID": "BUILD_DRIFT",
+      "Name": "Drift Build",
+      "Description": "Optimized for controlled oversteer",
+      "Icon": "ICO_Drift",
+      "PriorityStats": ["Handling", "Acceleration", "DriftAngle"],
+      "Characteristics": {
+        "DriftTendency": "High",
+        "Stability": "Medium",
+        "TireSmoke": "Maximum"
+      }
+    },
+    "Drag": {
+      "ID": "BUILD_DRAG",
+      "Name": "Drag Racing",
+      "Description": "Straight-line speed monster",
+      "Icon": "ICO_Drag",
+      "PriorityStats": ["TopSpeed", "Acceleration", "Launch"],
+      "Characteristics": {
+        "TopSpeedFocus": "High",
+        "WeightReduction": "High",
+        "Aerodynamics": "Low Drag"
+      }
+    },
+    "Touge": {
+      "ID": "BUILD_TOUGE",
+      "Name": "Mountain Pass",
+      "Description": "Balanced for technical mountain roads",
+      "Icon": "ICO_Touge",
+      "PriorityStats": ["Handling", "Braking", "Acceleration"],
+      "Characteristics": {
+        "DriftTendency": "Medium",
+        "Stability": "High",
+        "WeightBalance": "Critical"
+      }
+    },
+    "AllRound": {
+      "ID": "BUILD_ALLROUND",
+      "Name": "All-Rounder",
+      "Description": "Balanced for any situation",
+      "Icon": "ICO_Balance",
+      "PriorityStats": ["Balanced"],
+      "Characteristics": {
+        "Versatility": "High",
+        "NoWeakness": true
+      }
+    },
+    "TopSpeed": {
+      "ID": "BUILD_TOPSPEED",
+      "Name": "Highway King",
+      "Description": "Maximum top speed for highway runs",
+      "Icon": "ICO_Speed",
+      "PriorityStats": ["TopSpeed", "Stability"],
+      "Characteristics": {
+        "TopSpeedFocus": "Maximum",
+        "Aerodynamics": "Low Drag",
+        "GearRatios": "Tall"
+      }
+    }
+  },
+
+  "VehicleBuilds": {
+    "SAKURA_GTR": {
+      "VehicleID": "SAKURA_GTR",
+      "VehicleName": "Sakura GTR",
+      "RecommendedBuilds": [
+        {
+          "BuildType": "Grip",
+          "Name": "Circuit Demon",
+          "Description": "Optimized for circuit racing dominance",
+          "Difficulty": "Intermediate",
+          "EstimatedCost": 125000,
+          "TargetPI": 750,
+          "Parts": {
+            "Engine": ["INTAKE_RACE", "EXHAUST_RACE", "ECU_RACE", "TURBO_STAGE2"],
+            "Drivetrain": ["CLUTCH_RACE", "TRANSMISSION_RACE", "DIFF_LSD_RACE"],
+            "Suspension": ["COILOVERS_RACE", "SWAYBARS_RACE", "BUSHINGS_RACE"],
+            "Brakes": ["BRAKES_RACE", "LINES_BRAIDED"],
+            "Tires": ["TIRES_SEMI_SLICK"],
+            "Aero": ["SPLITTER_RACE", "WING_GT"]
+          },
+          "TuningRecommendations": {
+            "Suspension": {
+              "FrontSpringRate": "Stiff",
+              "RearSpringRate": "Medium-Stiff",
+              "FrontDamping": "8/10",
+              "RearDamping": "7/10",
+              "FrontAntiRoll": "Stiff",
+              "RearAntiRoll": "Medium",
+              "RideHeight": "Low"
+            },
+            "Alignment": {
+              "FrontCamber": -2.5,
+              "RearCamber": -1.8,
+              "FrontToe": 0.0,
+              "RearToe": 0.1
+            },
+            "Differential": {
+              "Acceleration": 65,
+              "Deceleration": 35
+            },
+            "GearRatios": "Stock or slightly shorter final drive"
+          },
+          "DrivingTips": [
+            "Trail brake into corners for maximum grip",
+            "Use the AWD system to power out of corners early",
+            "Avoid excessive throttle mid-corner to prevent understeer"
+          ]
+        },
+        {
+          "BuildType": "Drift",
+          "Name": "Sideways GTR",
+          "Description": "RWD conversion drift machine",
+          "Difficulty": "Advanced",
+          "EstimatedCost": 175000,
+          "TargetPI": 720,
+          "Parts": {
+            "Engine": ["INTAKE_RACE", "EXHAUST_RACE", "ECU_RACE", "TURBO_STAGE3"],
+            "Drivetrain": ["CLUTCH_RACE", "TRANSMISSION_RACE", "DIFF_LSD_DRIFT", "RWD_CONVERSION"],
+            "Suspension": ["COILOVERS_DRIFT", "ANGLE_KIT", "KNUCKLES_DRIFT"],
+            "Brakes": ["BRAKES_SPORT", "HYDRO_EBRAKE"],
+            "Tires": ["TIRES_DRIFT"],
+            "Aero": ["SPLITTER_NONE", "WING_DUCKTAIL"]
+          },
+          "TuningRecommendations": {
+            "Suspension": {
+              "FrontSpringRate": "Soft-Medium",
+              "RearSpringRate": "Soft",
+              "FrontDamping": "5/10",
+              "RearDamping": "4/10",
+              "FrontAntiRoll": "Medium",
+              "RearAntiRoll": "Soft",
+              "RideHeight": "Medium"
+            },
+            "Alignment": {
+              "FrontCamber": -5.0,
+              "RearCamber": -2.0,
+              "FrontToe": 0.0,
+              "RearToe": 0.0,
+              "SteeringAngle": "Maximum"
+            },
+            "Differential": {
+              "Acceleration": 100,
+              "Deceleration": 75
+            }
+          },
+          "DrivingTips": [
+            "Use clutch kicks to initiate drifts",
+            "Modulate throttle to control drift angle",
+            "Look where you want to go, not where you're pointing"
+          ]
+        }
+      ]
+    },
+    "TENSHI_240": {
+      "VehicleID": "TENSHI_240",
+      "VehicleName": "Tenshi 240",
+      "RecommendedBuilds": [
+        {
+          "BuildType": "Drift",
+          "Name": "Formula Drift Spec",
+          "Description": "Competition-ready drift build",
+          "Difficulty": "Intermediate",
+          "EstimatedCost": 95000,
+          "TargetPI": 650,
+          "Parts": {
+            "Engine": ["INTAKE_RACE", "EXHAUST_RACE", "ECU_RACE", "TURBO_STAGE2"],
+            "Drivetrain": ["CLUTCH_RACE", "TRANSMISSION_RACE", "DIFF_LSD_DRIFT"],
+            "Suspension": ["COILOVERS_DRIFT", "ANGLE_KIT", "KNUCKLES_DRIFT"],
+            "Brakes": ["BRAKES_SPORT", "HYDRO_EBRAKE"],
+            "Tires": ["TIRES_DRIFT"],
+            "Aero": ["SPLITTER_DRIFT", "WING_DRIFT"]
+          },
+          "TuningRecommendations": {
+            "Suspension": {
+              "FrontSpringRate": "Medium",
+              "RearSpringRate": "Soft-Medium",
+              "RideHeight": "Medium-Low"
+            },
+            "Alignment": {
+              "FrontCamber": -6.0,
+              "RearCamber": -3.0,
+              "SteeringAngle": "Maximum"
+            },
+            "Differential": {
+              "Acceleration": 100,
+              "Deceleration": 80
+            }
+          },
+          "DrivingTips": [
+            "The SR20 loves to rev - keep it high",
+            "Light weight makes transitions quick",
+            "Perfect platform for learning drift techniques"
+          ]
+        },
+        {
+          "BuildType": "Touge",
+          "Name": "Mountain Hunter",
+          "Description": "Technical downhill specialist",
+          "Difficulty": "Advanced",
+          "EstimatedCost": 85000,
+          "TargetPI": 620,
+          "Parts": {
+            "Engine": ["INTAKE_RACE", "EXHAUST_RACE", "ECU_SPORT", "TURBO_STAGE1"],
+            "Drivetrain": ["CLUTCH_SPORT", "TRANSMISSION_CLOSE_RATIO", "DIFF_LSD_SPORT"],
+            "Suspension": ["COILOVERS_SPORT", "SWAYBARS_SPORT"],
+            "Brakes": ["BRAKES_RACE", "LINES_BRAIDED"],
+            "Tires": ["TIRES_SPORT"],
+            "Aero": ["SPLITTER_SPORT", "WING_TOUGE"]
+          },
+          "DrivingTips": [
+            "Use weight transfer for controlled drifts on downhill",
+            "Short wheelbase means quick direction changes",
+            "Brake late but smooth on tight hairpins"
+          ]
+        }
+      ]
+    },
+    "STALLION_GT": {
+      "VehicleID": "STALLION_GT",
+      "VehicleName": "Stallion GT",
+      "RecommendedBuilds": [
+        {
+          "BuildType": "Drag",
+          "Name": "Quarter Mile King",
+          "Description": "Built for straight-line domination",
+          "Difficulty": "Beginner",
+          "EstimatedCost": 110000,
+          "TargetPI": 780,
+          "Parts": {
+            "Engine": ["INTAKE_RACE", "EXHAUST_RACE", "ECU_RACE", "SUPERCHARGER_STAGE2", "CAM_RACE"],
+            "Drivetrain": ["CLUTCH_RACE", "TRANSMISSION_DRAG", "DIFF_SPOOL"],
+            "Suspension": ["DRAG_SUSPENSION", "WHEELIE_BAR"],
+            "Brakes": ["BRAKES_SPORT"],
+            "Tires": ["TIRES_DRAG_REAR", "TIRES_SKINNY_FRONT"],
+            "Aero": ["COWL_HOOD", "PARACHUTE"]
+          },
+          "TuningRecommendations": {
+            "Suspension": {
+              "FrontSpringRate": "Soft",
+              "RearSpringRate": "Stiff",
+              "RideHeight": "Rear High, Front Low"
+            },
+            "GearRatios": {
+              "1st": "Very Short",
+              "2nd": "Short",
+              "3rd": "Medium",
+              "4th": "Tall",
+              "Final": "Short"
+            },
+            "LaunchControl": {
+              "RPM": 4500,
+              "TractionControl": "Off"
+            }
+          },
+          "DrivingTips": [
+            "Stage properly and watch the tree",
+            "Shift at redline for maximum acceleration",
+            "Short shift into 2nd to avoid wheelspin"
+          ]
+        },
+        {
+          "BuildType": "Grip",
+          "Name": "Track Day Terror",
+          "Description": "Muscle car turned corner carver",
+          "Difficulty": "Advanced",
+          "EstimatedCost": 140000,
+          "TargetPI": 760,
+          "Parts": {
+            "Engine": ["INTAKE_RACE", "EXHAUST_RACE", "ECU_RACE", "SUPERCHARGER_STAGE1"],
+            "Drivetrain": ["CLUTCH_RACE", "TRANSMISSION_RACE", "DIFF_LSD_RACE"],
+            "Suspension": ["COILOVERS_RACE", "SWAYBARS_RACE", "SUBFRAME_BRACE"],
+            "Brakes": ["BRAKES_RACE", "LINES_BRAIDED", "COOLING_BRAKE"],
+            "Tires": ["TIRES_SEMI_SLICK"],
+            "Aero": ["SPLITTER_RACE", "DIFFUSER_RACE", "WING_GT"]
+          },
+          "TuningRecommendations": {
+            "Suspension": {
+              "FrontSpringRate": "Stiff",
+              "RearSpringRate": "Medium-Stiff",
+              "FrontAntiRoll": "Stiff",
+              "RearAntiRoll": "Medium"
+            },
+            "Alignment": {
+              "FrontCamber": -3.0,
+              "RearCamber": -2.0
+            },
+            "Differential": {
+              "Acceleration": 55,
+              "Deceleration": 30
+            }
+          },
+          "DrivingTips": [
+            "Heavy front end requires early braking",
+            "Use the V8 torque for corner exit",
+            "Smooth inputs prevent snap oversteer"
+          ]
+        }
+      ]
+    },
+    "KAZE_CIVIC": {
+      "VehicleID": "KAZE_CIVIC",
+      "VehicleName": "Kaze Civic",
+      "RecommendedBuilds": [
+        {
+          "BuildType": "Grip",
+          "Name": "FWD Warrior",
+          "Description": "Making FWD work on track",
+          "Difficulty": "Intermediate",
+          "EstimatedCost": 65000,
+          "TargetPI": 550,
+          "Parts": {
+            "Engine": ["INTAKE_RACE", "EXHAUST_RACE", "ECU_RACE", "TURBO_STAGE1"],
+            "Drivetrain": ["CLUTCH_RACE", "TRANSMISSION_CLOSE_RATIO", "DIFF_LSD_FWD"],
+            "Suspension": ["COILOVERS_RACE", "SWAYBARS_RACE"],
+            "Brakes": ["BRAKES_RACE", "LINES_BRAIDED"],
+            "Tires": ["TIRES_SEMI_SLICK"],
+            "Aero": ["SPLITTER_SPORT", "WING_SPORT"]
+          },
+          "TuningRecommendations": {
+            "Suspension": {
+              "FrontSpringRate": "Medium",
+              "RearSpringRate": "Medium-Stiff",
+              "FrontAntiRoll": "Medium",
+              "RearAntiRoll": "Stiff",
+              "RideHeight": "Low"
+            },
+            "Alignment": {
+              "FrontCamber": -2.0,
+              "RearCamber": -1.5
+            },
+            "Differential": {
+              "Acceleration": 45,
+              "Deceleration": 25
+            }
+          },
+          "DrivingTips": [
+            "Lift-off oversteer is your friend",
+            "Trail brake to rotate the car",
+            "The light weight compensates for FWD limitations"
+          ]
+        },
+        {
+          "BuildType": "AllRound",
+          "Name": "Daily Driver Plus",
+          "Description": "Capable of everything",
+          "Difficulty": "Beginner",
+          "EstimatedCost": 35000,
+          "TargetPI": 480,
+          "Parts": {
+            "Engine": ["INTAKE_SPORT", "EXHAUST_SPORT", "ECU_SPORT"],
+            "Drivetrain": ["CLUTCH_SPORT", "DIFF_LSD_FWD"],
+            "Suspension": ["COILOVERS_SPORT", "SWAYBARS_SPORT"],
+            "Brakes": ["BRAKES_SPORT"],
+            "Tires": ["TIRES_SPORT"],
+            "Aero": ["SPLITTER_SPORT", "WING_SPORT"]
+          },
+          "DrivingTips": [
+            "Great car to learn racing fundamentals",
+            "Forgiving at the limit",
+            "VTEC engagement is your power band"
+          ]
+        }
+      ]
+    },
+    "BEATER_SEDAN": {
+      "VehicleID": "BEATER_SEDAN",
+      "VehicleName": "Beater Sedan",
+      "RecommendedBuilds": [
+        {
+          "BuildType": "AllRound",
+          "Name": "Sleeper Build",
+          "Description": "Don't judge a book by its cover",
+          "Difficulty": "Beginner",
+          "EstimatedCost": 45000,
+          "TargetPI": 500,
+          "Parts": {
+            "Engine": ["INTAKE_RACE", "EXHAUST_RACE", "ECU_RACE", "TURBO_STAGE1"],
+            "Drivetrain": ["CLUTCH_SPORT", "DIFF_LSD_SPORT"],
+            "Suspension": ["COILOVERS_SPORT", "SWAYBARS_SPORT"],
+            "Brakes": ["BRAKES_SPORT"],
+            "Tires": ["TIRES_SPORT"],
+            "Aero": []
+          },
+          "DrivingTips": [
+            "Surprise opponents with hidden performance",
+            "Understeer tendency - brake earlier",
+            "Great for learning throttle control"
+          ]
+        },
+        {
+          "BuildType": "Drift",
+          "Name": "Drift Missile",
+          "Description": "Cheap thrills, maximum angle",
+          "Difficulty": "Intermediate",
+          "EstimatedCost": 55000,
+          "TargetPI": 480,
+          "Parts": {
+            "Engine": ["INTAKE_SPORT", "EXHAUST_RACE", "ECU_SPORT", "TURBO_STAGE1"],
+            "Drivetrain": ["CLUTCH_RACE", "RWD_CONVERSION", "DIFF_LSD_DRIFT"],
+            "Suspension": ["COILOVERS_DRIFT", "ANGLE_KIT"],
+            "Brakes": ["BRAKES_SPORT", "HYDRO_EBRAKE"],
+            "Tires": ["TIRES_DRIFT"],
+            "Aero": ["SPLITTER_NONE"]
+          },
+          "DrivingTips": [
+            "Low power means commitment to entries",
+            "Perfect for learning without fear",
+            "Cable-tie the bumper back on after each session"
+          ]
+        }
+      ]
+    }
+  },
+
+  "QuickTunePresets": {
+    "Understeer": {
+      "Problem": "Car pushes wide in corners",
+      "Solutions": [
+        "Soften front anti-roll bar",
+        "Stiffen rear anti-roll bar",
+        "Add negative front camber",
+        "Lower front ride height",
+        "Reduce front tire pressure slightly"
+      ]
+    },
+    "Oversteer": {
+      "Problem": "Rear end steps out unexpectedly",
+      "Solutions": [
+        "Stiffen front anti-roll bar",
+        "Soften rear anti-roll bar",
+        "Add negative rear camber",
+        "Raise rear ride height",
+        "Increase rear tire pressure slightly"
+      ]
+    },
+    "WheelSpin": {
+      "Problem": "Excessive wheelspin on acceleration",
+      "Solutions": [
+        "Reduce differential lock on acceleration",
+        "Soften rear springs",
+        "Lower rear ride height",
+        "Use softer tire compound"
+      ]
+    },
+    "InstabilityBraking": {
+      "Problem": "Car unstable under braking",
+      "Solutions": [
+        "Stiffen front springs",
+        "Stiffen front damping rebound",
+        "Adjust brake bias toward rear",
+        "Check toe alignment"
+      ]
+    }
+  }
+}

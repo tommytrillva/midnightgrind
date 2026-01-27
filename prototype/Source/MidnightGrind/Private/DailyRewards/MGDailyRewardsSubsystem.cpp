@@ -16,9 +16,10 @@ void UMGDailyRewardsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGDailyRewardsSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			ResetCheckHandle,
-			[this]() { if (IsNewDay()) ProcessLogin(); },
+			[WeakThis]() { if (WeakThis.IsValid() && WeakThis->IsNewDay()) WeakThis->ProcessLogin(); },
 			60.0f,
 			true
 		);

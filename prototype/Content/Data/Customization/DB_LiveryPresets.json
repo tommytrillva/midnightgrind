@@ -1,0 +1,345 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Livery Presets and Racing Designs",
+
+  "PresetCategories": {
+    "Racing": {
+      "ID": "CAT_RACING",
+      "Name": "Racing Liveries",
+      "Description": "Professional motorsport-inspired designs",
+      "Presets": [
+        {
+          "ID": "LIVERY_RACE_01",
+          "Name": "Circuit Racer",
+          "Description": "Classic racing stripes",
+          "Unlocked": true,
+          "Layers": [
+            { "Type": "Stripe", "Position": "CenterHood", "Width": 0.15, "Color": "Primary" },
+            { "Type": "Stripe", "Position": "CenterRoof", "Width": 0.15, "Color": "Primary" },
+            { "Type": "Stripe", "Position": "CenterTrunk", "Width": 0.15, "Color": "Primary" },
+            { "Type": "Number", "Position": "DoorLeft", "Value": "Auto", "Font": "Racing", "Color": "Primary" },
+            { "Type": "Number", "Position": "DoorRight", "Value": "Auto", "Font": "Racing", "Color": "Primary" }
+          ],
+          "DefaultColors": { "Primary": "#FFFFFF", "Secondary": "#000000" }
+        },
+        {
+          "ID": "LIVERY_RACE_02",
+          "Name": "GT Endurance",
+          "Description": "Multi-sponsor GT style",
+          "UnlockCondition": "LEVEL_10",
+          "Layers": [
+            { "Type": "SplitColor", "Position": "Full", "SplitAngle": 15, "Color1": "Primary", "Color2": "Secondary" },
+            { "Type": "Stripe", "Position": "LowerSide", "Width": 0.08, "Color": "Accent" },
+            { "Type": "Decal", "Asset": "DECAL_SPONSOR_PACK_GT", "Position": "Multiple" },
+            { "Type": "Number", "Position": "DoorBoth", "Value": "Auto", "Font": "Bold", "Color": "White" }
+          ],
+          "DefaultColors": { "Primary": "#0066CC", "Secondary": "#FFFFFF", "Accent": "#FF6600" }
+        },
+        {
+          "ID": "LIVERY_RACE_03",
+          "Name": "Rally Cross",
+          "Description": "Aggressive rally-inspired design",
+          "UnlockCondition": "LEVEL_15",
+          "Layers": [
+            { "Type": "Camo", "Pattern": "Digital", "Scale": 0.5, "Color1": "Primary", "Color2": "Secondary" },
+            { "Type": "Graphic", "Asset": "GFX_SPLATTER", "Position": "LowerBody", "Color": "Accent" },
+            { "Type": "Stripe", "Position": "RoofRail", "Width": 0.05, "Color": "Accent" },
+            { "Type": "Number", "Position": "Hood", "Value": "Auto", "Font": "Stencil", "Color": "White", "Size": "Large" }
+          ],
+          "DefaultColors": { "Primary": "#333333", "Secondary": "#666666", "Accent": "#FF0000" }
+        },
+        {
+          "ID": "LIVERY_RACE_04",
+          "Name": "Time Attack",
+          "Description": "Minimalist track day style",
+          "UnlockCondition": "LEVEL_20",
+          "Layers": [
+            { "Type": "Solid", "Position": "Full", "Color": "Primary" },
+            { "Type": "Stripe", "Position": "FenderFlare", "Width": 0.03, "Color": "Accent" },
+            { "Type": "Text", "Content": "TIME ATTACK", "Position": "Windshield", "Font": "Bold", "Color": "Accent" },
+            { "Type": "Number", "Position": "DoorBoth", "Value": "Auto", "Font": "Digital", "Color": "Accent" }
+          ],
+          "DefaultColors": { "Primary": "#FFFFFF", "Accent": "#00FF00" }
+        }
+      ]
+    },
+    "JDM": {
+      "ID": "CAT_JDM",
+      "Name": "JDM Style",
+      "Description": "Japanese domestic market inspired",
+      "Presets": [
+        {
+          "ID": "LIVERY_JDM_01",
+          "Name": "Kanjo Racer",
+          "Description": "Osaka loop style",
+          "UnlockCondition": "LEVEL_5",
+          "Layers": [
+            { "Type": "Solid", "Position": "Full", "Color": "Primary" },
+            { "Type": "Decal", "Asset": "DECAL_KANJI_SPEED", "Position": "DoorBoth", "Color": "Secondary" },
+            { "Type": "Stripe", "Position": "BumperLip", "Width": 0.02, "Color": "Accent" },
+            { "Type": "Text", "Content": "大阪環状", "Position": "RearWindow", "Font": "Japanese", "Color": "Secondary" }
+          ],
+          "DefaultColors": { "Primary": "#FFFFFF", "Secondary": "#000000", "Accent": "#FF0000" }
+        },
+        {
+          "ID": "LIVERY_JDM_02",
+          "Name": "Touge Legend",
+          "Description": "Mountain pass racing style",
+          "UnlockCondition": "LEVEL_12",
+          "Layers": [
+            { "Type": "TwoTone", "Position": "Full", "SplitLine": "BeltLine", "Color1": "Primary", "Color2": "Secondary" },
+            { "Type": "Decal", "Asset": "DECAL_MOUNTAIN", "Position": "DoorBoth", "Color": "Accent" },
+            { "Type": "Text", "Content": "峠", "Position": "Hood", "Font": "Brush", "Color": "Accent", "Size": "Large" }
+          ],
+          "DefaultColors": { "Primary": "#1A1A1A", "Secondary": "#FFFFFF", "Accent": "#FF6600" }
+        },
+        {
+          "ID": "LIVERY_JDM_03",
+          "Name": "Bosozoku",
+          "Description": "Japanese biker gang style",
+          "UnlockCondition": "REP_TIER_STREET",
+          "Layers": [
+            { "Type": "Gradient", "Position": "Full", "Direction": "TopToBottom", "Color1": "Primary", "Color2": "Secondary" },
+            { "Type": "Decal", "Asset": "DECAL_RISING_SUN", "Position": "Hood", "Color": "Accent" },
+            { "Type": "Decal", "Asset": "DECAL_KANJI_GANG", "Position": "Trunk", "Color": "White" },
+            { "Type": "Pinstripe", "Position": "SideSkirt", "Pattern": "Flame", "Color": "Accent" }
+          ],
+          "DefaultColors": { "Primary": "#660066", "Secondary": "#000066", "Accent": "#GOLD" }
+        },
+        {
+          "ID": "LIVERY_JDM_04",
+          "Name": "Drift Missile",
+          "Description": "Beat-up drift car style",
+          "UnlockCondition": "LEVEL_18",
+          "Layers": [
+            { "Type": "Weathered", "Position": "Full", "Color": "Primary", "WearLevel": 0.6 },
+            { "Type": "Decal", "Asset": "DECAL_ZIP_TIES", "Position": "Random" },
+            { "Type": "Decal", "Asset": "DECAL_STICKER_BOMB", "Position": "Bumpers" },
+            { "Type": "Text", "Content": "MISSILE", "Position": "DoorBoth", "Font": "Spray", "Color": "Accent" }
+          ],
+          "DefaultColors": { "Primary": "#666666", "Accent": "#FF0000" }
+        }
+      ]
+    },
+    "Street": {
+      "ID": "CAT_STREET",
+      "Name": "Street Style",
+      "Description": "Urban underground racing designs",
+      "Presets": [
+        {
+          "ID": "LIVERY_STREET_01",
+          "Name": "Midnight Runner",
+          "Description": "Classic street racing look",
+          "Unlocked": true,
+          "Layers": [
+            { "Type": "Solid", "Position": "Full", "Color": "Primary" },
+            { "Type": "Stripe", "Position": "Side", "Width": 0.1, "Color": "Secondary", "Style": "Fade" },
+            { "Type": "Decal", "Asset": "DECAL_MIDNIGHT_LOGO", "Position": "Hood" }
+          ],
+          "DefaultColors": { "Primary": "#000000", "Secondary": "#00FFFF" }
+        },
+        {
+          "ID": "LIVERY_STREET_02",
+          "Name": "Neon Dreams",
+          "Description": "Cyberpunk-inspired glow",
+          "UnlockCondition": "LEVEL_8",
+          "Layers": [
+            { "Type": "Solid", "Position": "Full", "Color": "Primary" },
+            { "Type": "NeonLine", "Position": "BodyLines", "Color": "Accent", "Glow": true },
+            { "Type": "Decal", "Asset": "DECAL_CYBER_PATTERN", "Position": "Sides", "Color": "Accent", "Opacity": 0.5 }
+          ],
+          "DefaultColors": { "Primary": "#0A0A0A", "Accent": "#FF00FF" }
+        },
+        {
+          "ID": "LIVERY_STREET_03",
+          "Name": "Underground King",
+          "Description": "Bold street presence",
+          "UnlockCondition": "LEVEL_15",
+          "Layers": [
+            { "Type": "Matte", "Position": "Full", "Color": "Primary" },
+            { "Type": "Graphic", "Asset": "GFX_CROWN", "Position": "Hood", "Color": "Accent" },
+            { "Type": "Text", "Content": "KING", "Position": "RearWindow", "Font": "Gothic", "Color": "Accent" },
+            { "Type": "Stripe", "Position": "Rocker", "Width": 0.05, "Color": "Accent" }
+          ],
+          "DefaultColors": { "Primary": "#1A1A1A", "Accent": "#FFD700" }
+        },
+        {
+          "ID": "LIVERY_STREET_04",
+          "Name": "Stealth Mode",
+          "Description": "Murdered out style",
+          "UnlockCondition": "LEVEL_20",
+          "Layers": [
+            { "Type": "Matte", "Position": "Full", "Color": "#000000" },
+            { "Type": "Gloss", "Position": "Trim", "Color": "#000000" },
+            { "Type": "Tint", "Position": "Windows", "Level": 0.95 },
+            { "Type": "Decal", "Asset": "DECAL_GHOST", "Position": "Hood", "Color": "#111111", "Opacity": 0.3 }
+          ],
+          "DefaultColors": {}
+        }
+      ]
+    },
+    "Muscle": {
+      "ID": "CAT_MUSCLE",
+      "Name": "American Muscle",
+      "Description": "Classic American styling",
+      "Presets": [
+        {
+          "ID": "LIVERY_MUSCLE_01",
+          "Name": "Classic Stripes",
+          "Description": "Timeless American muscle",
+          "Unlocked": true,
+          "Layers": [
+            { "Type": "Solid", "Position": "Full", "Color": "Primary" },
+            { "Type": "RacingStripe", "Position": "Center", "Width": 0.2, "Gap": 0.02, "Color": "Secondary" }
+          ],
+          "DefaultColors": { "Primary": "#CC0000", "Secondary": "#FFFFFF" }
+        },
+        {
+          "ID": "LIVERY_MUSCLE_02",
+          "Name": "Drag Strip",
+          "Description": "Quarter mile ready",
+          "UnlockCondition": "LEVEL_10",
+          "Layers": [
+            { "Type": "Solid", "Position": "Full", "Color": "Primary" },
+            { "Type": "Flame", "Position": "FrontFenders", "Style": "Traditional", "Color": "Accent" },
+            { "Type": "Number", "Position": "DoorBoth", "Value": "Auto", "Font": "Drag", "Color": "Secondary", "Circle": true }
+          ],
+          "DefaultColors": { "Primary": "#000000", "Secondary": "#FFFFFF", "Accent": "#FF6600" }
+        },
+        {
+          "ID": "LIVERY_MUSCLE_03",
+          "Name": "Trans-Am",
+          "Description": "70s racing heritage",
+          "UnlockCondition": "LEVEL_18",
+          "Layers": [
+            { "Type": "Solid", "Position": "Full", "Color": "Primary" },
+            { "Type": "Stripe", "Position": "Beltline", "Width": 0.08, "Color": "Secondary" },
+            { "Type": "Stripe", "Position": "Beltline", "Width": 0.02, "Offset": 0.1, "Color": "Accent" },
+            { "Type": "Decal", "Asset": "DECAL_EAGLE", "Position": "Hood", "Color": "Accent" },
+            { "Type": "Number", "Position": "DoorBoth", "Value": "Auto", "Font": "Vintage", "Color": "Secondary" }
+          ],
+          "DefaultColors": { "Primary": "#000066", "Secondary": "#FFFFFF", "Accent": "#FF0000" }
+        }
+      ]
+    },
+    "Retro": {
+      "ID": "CAT_RETRO",
+      "Name": "Retro Gaming",
+      "Description": "Video game inspired designs",
+      "UnlockCondition": "REP_TIER_STREET",
+      "Presets": [
+        {
+          "ID": "LIVERY_RETRO_01",
+          "Name": "Pixel Racer",
+          "Description": "8-bit inspired design",
+          "Layers": [
+            { "Type": "Solid", "Position": "Full", "Color": "Primary" },
+            { "Type": "Pixel", "Position": "Sides", "Pattern": "Checkered", "Color": "Secondary", "Resolution": 8 },
+            { "Type": "Text", "Content": "PLAYER 1", "Position": "DoorLeft", "Font": "Pixel", "Color": "Accent" },
+            { "Type": "Decal", "Asset": "DECAL_8BIT_CAR", "Position": "Hood", "Color": "Accent" }
+          ],
+          "DefaultColors": { "Primary": "#0000AA", "Secondary": "#00AA00", "Accent": "#FFFF00" }
+        },
+        {
+          "ID": "LIVERY_RETRO_02",
+          "Name": "Arcade Classic",
+          "Description": "90s racing game nostalgia",
+          "Layers": [
+            { "Type": "Gradient", "Position": "Full", "Direction": "FrontToBack", "Color1": "Primary", "Color2": "Secondary" },
+            { "Type": "Decal", "Asset": "DECAL_ARCADE_LOGO", "Position": "DoorBoth" },
+            { "Type": "Text", "Content": "INSERT COIN", "Position": "RearBumper", "Font": "Arcade", "Color": "Accent" }
+          ],
+          "DefaultColors": { "Primary": "#FF00FF", "Secondary": "#00FFFF", "Accent": "#FFFF00" }
+        },
+        {
+          "ID": "LIVERY_RETRO_03",
+          "Name": "Synthwave",
+          "Description": "80s retrowave aesthetic",
+          "Layers": [
+            { "Type": "Gradient", "Position": "Full", "Direction": "BottomToTop", "Color1": "#FF0080", "Color2": "#8000FF" },
+            { "Type": "Grid", "Position": "Lower", "Color": "#00FFFF", "Perspective": true },
+            { "Type": "Decal", "Asset": "DECAL_PALM_SUNSET", "Position": "DoorBoth" },
+            { "Type": "NeonLine", "Position": "Trim", "Color": "#FF00FF", "Glow": true }
+          ],
+          "DefaultColors": {}
+        }
+      ]
+    },
+    "Special": {
+      "ID": "CAT_SPECIAL",
+      "Name": "Special Edition",
+      "Description": "Exclusive and limited designs",
+      "Presets": [
+        {
+          "ID": "LIVERY_SPECIAL_FOUNDER",
+          "Name": "Founder's Edition",
+          "Description": "Exclusive to early supporters",
+          "UnlockCondition": "FOUNDER_STATUS",
+          "Exclusive": true,
+          "Layers": [
+            { "Type": "Chrome", "Position": "Full", "Color": "#FFD700" },
+            { "Type": "Decal", "Asset": "DECAL_FOUNDER_BADGE", "Position": "DoorBoth" },
+            { "Type": "Text", "Content": "FOUNDER", "Position": "Trunk", "Font": "Elegant", "Color": "#000000" }
+          ]
+        },
+        {
+          "ID": "LIVERY_SPECIAL_LEGEND",
+          "Name": "Legend Status",
+          "Description": "For those who reached Legend tier",
+          "UnlockCondition": "REP_TIER_LEGEND",
+          "Exclusive": true,
+          "Layers": [
+            { "Type": "Pearlescent", "Position": "Full", "Color1": "#FFD700", "Color2": "#FF6600" },
+            { "Type": "Decal", "Asset": "DECAL_LEGEND_WINGS", "Position": "Hood", "Color": "#FFFFFF" },
+            { "Type": "Decal", "Asset": "DECAL_LEGEND_BADGE", "Position": "DoorBoth" }
+          ]
+        },
+        {
+          "ID": "LIVERY_SPECIAL_CHAMPION",
+          "Name": "Season Champion",
+          "Description": "Seasonal championship winner",
+          "UnlockCondition": "SEASON_CHAMPION",
+          "Exclusive": true,
+          "Layers": [
+            { "Type": "Chrome", "Position": "Full", "Color": "#C0C0C0" },
+            { "Type": "Decal", "Asset": "DECAL_CHAMPION_LAUREL", "Position": "Hood" },
+            { "Type": "Number", "Position": "DoorBoth", "Value": "1", "Font": "Champion", "Color": "#FFD700" }
+          ]
+        }
+      ]
+    }
+  },
+
+  "LayerTypes": {
+    "Solid": { "Description": "Single color fill" },
+    "Gradient": { "Description": "Two-color gradient", "Directions": ["TopToBottom", "BottomToTop", "LeftToRight", "FrontToBack"] },
+    "TwoTone": { "Description": "Split color at belt line" },
+    "Stripe": { "Description": "Racing stripe", "Positions": ["Center", "Side", "Beltline", "Rocker", "Hood", "RoofRail"] },
+    "RacingStripe": { "Description": "Dual stripe with gap" },
+    "Decal": { "Description": "Pre-made graphic element" },
+    "Text": { "Description": "Custom text", "MaxChars": 20 },
+    "Number": { "Description": "Racing number", "AutoAssign": true },
+    "Flame": { "Description": "Flame pattern", "Styles": ["Traditional", "Tribal", "Modern"] },
+    "Camo": { "Description": "Camouflage pattern", "Patterns": ["Digital", "Woodland", "Urban", "Arctic"] },
+    "Pixel": { "Description": "Pixelated pattern" },
+    "Chrome": { "Description": "Reflective chrome finish" },
+    "Matte": { "Description": "Matte finish" },
+    "Pearlescent": { "Description": "Color-shifting pearl" },
+    "NeonLine": { "Description": "Glowing accent line" },
+    "Grid": { "Description": "Perspective grid effect" },
+    "Weathered": { "Description": "Worn/aged effect" }
+  },
+
+  "CustomEditor": {
+    "Enabled": true,
+    "UnlockLevel": 10,
+    "MaxLayers": 100,
+    "MaxShapes": 500,
+    "Tools": ["Shapes", "Text", "Decals", "Gradients", "Masks"],
+    "Sharing": {
+      "Enabled": true,
+      "RequireApproval": true,
+      "MaxShared": 50
+    }
+  }
+}

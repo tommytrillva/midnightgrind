@@ -6,6 +6,10 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "Misc/SecureHash.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
 
 void UMGCrossProgressionSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -139,8 +143,67 @@ void UMGCrossProgressionSubsystem::LoadLocalData()
 
 void UMGCrossProgressionSubsystem::SaveLocalData()
 {
-    // Save cross progression data placeholder
-    UE_LOG(LogTemp, Log, TEXT("Saving cross progression data"));
+    FString SaveDir = FPaths::ProjectSavedDir() / TEXT("CrossProgression");
+    IFileManager::Get().MakeDirectory(*SaveDir, true);
+    FString FilePath = SaveDir / TEXT("cross_progression.dat");
+
+    FBufferArchive SaveArchive;
+
+    // Version for compatibility
+    int32 Version = 1;
+    SaveArchive << Version;
+
+    // Save unified player data
+    FString UnifiedIdStr = UnifiedPlayer.UnifiedId.ToString();
+    SaveArchive << UnifiedIdStr;
+    SaveArchive << UnifiedPlayer.Email;
+    SaveArchive << UnifiedPlayer.DisplayName;
+
+    // Save linked accounts
+    int32 NumAccounts = UnifiedPlayer.LinkedAccounts.Num();
+    SaveArchive << NumAccounts;
+    for (const auto& Account : UnifiedPlayer.LinkedAccounts)
+    {
+        int32 PlatformInt = static_cast<int32>(Account.Platform);
+        SaveArchive << PlatformInt;
+        SaveArchive << Account.PlatformUserId;
+        SaveArchive << Account.PlatformDisplayName;
+        SaveArchive << Account.bIsPrimary;
+    }
+
+    // Save linked devices
+    int32 NumDevices = LinkedDevices.Num();
+    SaveArchive << NumDevices;
+    for (const FMGLinkedDevice& Device : LinkedDevices)
+    {
+        SaveArchive << Device.DeviceId;
+        SaveArchive << Device.DeviceName;
+        int32 PlatformInt = static_cast<int32>(Device.Platform);
+        SaveArchive << PlatformInt;
+        SaveArchive << Device.GameVersion;
+        SaveArchive << Device.bTrusted;
+    }
+
+    // Save sync settings
+    SaveArchive << Settings.bEnabled;
+    SaveArchive << Settings.bAutoSync;
+    SaveArchive << Settings.AutoSyncIntervalMinutes;
+    SaveArchive << Settings.bSyncGarage;
+    SaveArchive << Settings.bSyncProgression;
+    SaveArchive << Settings.bSyncSettings;
+    SaveArchive << Settings.bSyncAchievements;
+
+    // Save last sync timestamp
+    int64 LastSyncTicks = LastSyncTime.GetTicks();
+    SaveArchive << LastSyncTicks;
+
+    // Write to file
+    if (SaveArchive.Num() > 0)
+    {
+        FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("Saved cross progression data - %d accounts, %d devices"), NumAccounts, NumDevices);
 }
 
 void UMGCrossProgressionSubsystem::StartAutoSyncTimer()

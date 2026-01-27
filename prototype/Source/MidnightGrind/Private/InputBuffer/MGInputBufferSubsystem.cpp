@@ -42,11 +42,15 @@ void UMGInputBufferSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Start maintenance timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGInputBufferSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             BufferMaintenanceHandle,
-            [this]()
+            [WeakThis]()
             {
-                CleanExpiredBuffers();
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->CleanExpiredBuffers();
+                }
             },
             0.05f,
             true
@@ -54,11 +58,11 @@ void UMGInputBufferSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
         World->GetTimerManager().SetTimer(
             ComboCheckHandle,
-            [this]()
+            [WeakThis]()
             {
-                if (BufferConfig.bEnableComboDetection)
+                if (WeakThis.IsValid() && WeakThis->BufferConfig.bEnableComboDetection)
                 {
-                    CheckForCombos();
+                    WeakThis->CheckForCombos();
                 }
             },
             0.016f,

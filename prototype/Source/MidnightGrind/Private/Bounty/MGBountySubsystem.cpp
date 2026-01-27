@@ -1153,10 +1153,216 @@ float UMGBountySubsystem::GetDifficultyMultiplier(EMGBountyDifficulty Difficulty
 // Persistence
 void UMGBountySubsystem::SaveBountyData()
 {
-	// Save implementation would persist bounty progress, stats, and cooldowns
+	FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Bounty");
+	IFileManager::Get().MakeDirectory(*SaveDir, true);
+	FString FilePath = SaveDir / TEXT("bounty_data.dat");
+
+	FBufferArchive SaveArchive;
+
+	// Version for future compatibility
+	int32 Version = 1;
+	SaveArchive << Version;
+
+	// Save player stats
+	int32 NumStats = PlayerStats.Num();
+	SaveArchive << NumStats;
+
+	for (const auto& StatPair : PlayerStats)
+	{
+		FString PlayerId = StatPair.Key;
+		SaveArchive << PlayerId;
+
+		const FMGBountyPlayerStats& Stats = StatPair.Value;
+		int32 TotalCompleted = Stats.TotalBountiesCompleted;
+		int32 TotalFailed = Stats.TotalBountiesFailed;
+		int32 TotalAbandoned = Stats.TotalBountiesAbandoned;
+		int32 PerfectCompletions = Stats.PerfectCompletions;
+		int64 TotalCurrency = Stats.TotalCurrencyEarned;
+		int64 TotalXP = Stats.TotalExperienceEarned;
+		int64 TotalRep = Stats.TotalReputationEarned;
+		int32 CurrentStreak = Stats.CurrentStreak;
+		int32 BestStreak = Stats.BestStreak;
+		float FastestTime = Stats.FastestBountyTime;
+
+		SaveArchive << TotalCompleted;
+		SaveArchive << TotalFailed;
+		SaveArchive << TotalAbandoned;
+		SaveArchive << PerfectCompletions;
+		SaveArchive << TotalCurrency;
+		SaveArchive << TotalXP;
+		SaveArchive << TotalRep;
+		SaveArchive << CurrentStreak;
+		SaveArchive << BestStreak;
+		SaveArchive << FastestTime;
+
+		// Save completions by type
+		int32 NumTypes = Stats.CompletionsByType.Num();
+		SaveArchive << NumTypes;
+		for (const auto& TypePair : Stats.CompletionsByType)
+		{
+			int32 TypeInt = static_cast<int32>(TypePair.Key);
+			int32 Count = TypePair.Value;
+			SaveArchive << TypeInt;
+			SaveArchive << Count;
+		}
+
+		// Save completions by difficulty
+		int32 NumDiffs = Stats.CompletionsByDifficulty.Num();
+		SaveArchive << NumDiffs;
+		for (const auto& DiffPair : Stats.CompletionsByDifficulty)
+		{
+			int32 DiffInt = static_cast<int32>(DiffPair.Key);
+			int32 Count = DiffPair.Value;
+			SaveArchive << DiffInt;
+			SaveArchive << Count;
+		}
+
+		// Save target capture counts
+		int32 NumTargets = Stats.TargetCaptureCount.Num();
+		SaveArchive << NumTargets;
+		for (const auto& TargetPair : Stats.TargetCaptureCount)
+		{
+			FString TargetId = TargetPair.Key;
+			int32 Count = TargetPair.Value;
+			SaveArchive << TargetId;
+			SaveArchive << Count;
+		}
+	}
+
+	// Save completed bounties per player
+	int32 NumCompletedPlayers = CompletedBounties.Num();
+	SaveArchive << NumCompletedPlayers;
+
+	for (const auto& CompletedPair : CompletedBounties)
+	{
+		FString PlayerId = CompletedPair.Key;
+		SaveArchive << PlayerId;
+
+		int32 NumCompleted = CompletedPair.Value.Num();
+		SaveArchive << NumCompleted;
+
+		for (const FString& BountyId : CompletedPair.Value)
+		{
+			FString Id = BountyId;
+			SaveArchive << Id;
+		}
+	}
+
+	// Write to file
+	if (SaveArchive.Num() > 0)
+	{
+		FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGBountySubsystem: Saved bounty data for %d players"), NumStats);
 }
 
 void UMGBountySubsystem::LoadBountyData()
 {
-	// Load implementation would restore bounty progress, stats, and cooldowns
+	FString FilePath = FPaths::ProjectSavedDir() / TEXT("Bounty") / TEXT("bounty_data.dat");
+
+	TArray<uint8> LoadData;
+	if (!FFileHelper::LoadFileToArray(LoadData, *FilePath))
+	{
+		UE_LOG(LogTemp, Log, TEXT("MGBountySubsystem: No saved bounty data found"));
+		return;
+	}
+
+	FMemoryReader LoadArchive(LoadData, true);
+
+	int32 Version;
+	LoadArchive << Version;
+
+	if (Version != 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MGBountySubsystem: Unknown save version %d"), Version);
+		return;
+	}
+
+	// Load player stats
+	int32 NumStats;
+	LoadArchive << NumStats;
+
+	for (int32 i = 0; i < NumStats; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		FMGBountyPlayerStats Stats;
+		Stats.PlayerId = PlayerId;
+
+		LoadArchive << Stats.TotalBountiesCompleted;
+		LoadArchive << Stats.TotalBountiesFailed;
+		LoadArchive << Stats.TotalBountiesAbandoned;
+		LoadArchive << Stats.PerfectCompletions;
+		LoadArchive << Stats.TotalCurrencyEarned;
+		LoadArchive << Stats.TotalExperienceEarned;
+		LoadArchive << Stats.TotalReputationEarned;
+		LoadArchive << Stats.CurrentStreak;
+		LoadArchive << Stats.BestStreak;
+		LoadArchive << Stats.FastestBountyTime;
+
+		// Load completions by type
+		int32 NumTypes;
+		LoadArchive << NumTypes;
+		for (int32 j = 0; j < NumTypes; ++j)
+		{
+			int32 TypeInt;
+			int32 Count;
+			LoadArchive << TypeInt;
+			LoadArchive << Count;
+			Stats.CompletionsByType.Add(static_cast<EMGBountyType>(TypeInt), Count);
+		}
+
+		// Load completions by difficulty
+		int32 NumDiffs;
+		LoadArchive << NumDiffs;
+		for (int32 j = 0; j < NumDiffs; ++j)
+		{
+			int32 DiffInt;
+			int32 Count;
+			LoadArchive << DiffInt;
+			LoadArchive << Count;
+			Stats.CompletionsByDifficulty.Add(static_cast<EMGBountyDifficulty>(DiffInt), Count);
+		}
+
+		// Load target capture counts
+		int32 NumTargets;
+		LoadArchive << NumTargets;
+		for (int32 j = 0; j < NumTargets; ++j)
+		{
+			FString TargetId;
+			int32 Count;
+			LoadArchive << TargetId;
+			LoadArchive << Count;
+			Stats.TargetCaptureCount.Add(TargetId, Count);
+		}
+
+		PlayerStats.Add(PlayerId, Stats);
+	}
+
+	// Load completed bounties per player
+	int32 NumCompletedPlayers;
+	LoadArchive << NumCompletedPlayers;
+
+	for (int32 i = 0; i < NumCompletedPlayers; ++i)
+	{
+		FString PlayerId;
+		LoadArchive << PlayerId;
+
+		int32 NumCompleted;
+		LoadArchive << NumCompleted;
+
+		TSet<FString> CompletedSet;
+		for (int32 j = 0; j < NumCompleted; ++j)
+		{
+			FString BountyId;
+			LoadArchive << BountyId;
+			CompletedSet.Add(BountyId);
+		}
+
+		CompletedBounties.Add(PlayerId, CompletedSet);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGBountySubsystem: Loaded bounty data for %d players"), NumStats);
 }

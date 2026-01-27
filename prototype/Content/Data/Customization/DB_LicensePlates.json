@@ -1,0 +1,413 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - License Plate Customization System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxTextLength": 8,
+    "MinTextLength": 2,
+    "AllowCustomText": true,
+    "ContentFilter": true,
+    "DefaultPlate": "PLATE_STANDARD_WHITE"
+  },
+
+  "PlateStyles": {
+    "Standard": {
+      "White": {
+        "ID": "PLATE_STANDARD_WHITE",
+        "Name": "Standard White",
+        "Background": "#FFFFFF",
+        "TextColor": "#000000",
+        "BorderColor": "#333333",
+        "Unlocked": true,
+        "Cost": 0
+      },
+      "Black": {
+        "ID": "PLATE_STANDARD_BLACK",
+        "Name": "Standard Black",
+        "Background": "#111111",
+        "TextColor": "#FFFFFF",
+        "BorderColor": "#444444",
+        "Unlocked": true,
+        "Cost": 500
+      },
+      "Yellow": {
+        "ID": "PLATE_STANDARD_YELLOW",
+        "Name": "Standard Yellow",
+        "Background": "#FFD700",
+        "TextColor": "#000000",
+        "BorderColor": "#8B7500",
+        "Unlocked": true,
+        "Cost": 500
+      },
+      "Blue": {
+        "ID": "PLATE_STANDARD_BLUE",
+        "Name": "Euro Blue",
+        "Background": "#003399",
+        "TextColor": "#FFFFFF",
+        "BorderColor": "#001166",
+        "Unlocked": true,
+        "Cost": 750
+      }
+    },
+    "Regional": {
+      "JDM": {
+        "ID": "PLATE_JDM_WHITE",
+        "Name": "JDM Style",
+        "Background": "#FFFFFF",
+        "TextColor": "#006633",
+        "BorderColor": "#006633",
+        "RegionalMarker": "JP",
+        "Cost": 1000,
+        "UnlockCondition": "REP_TIER_STREET"
+      },
+      "JDMYellow": {
+        "ID": "PLATE_JDM_YELLOW",
+        "Name": "JDM Kei",
+        "Background": "#FFD700",
+        "TextColor": "#000000",
+        "BorderColor": "#000000",
+        "RegionalMarker": "JP",
+        "Cost": 1000,
+        "Description": "Japanese Kei car style plate"
+      },
+      "Euro": {
+        "ID": "PLATE_EURO",
+        "Name": "Euro Style",
+        "Background": "#FFFFFF",
+        "TextColor": "#000000",
+        "BorderColor": "#003399",
+        "EuroStripe": true,
+        "Cost": 1000
+      },
+      "UK": {
+        "ID": "PLATE_UK",
+        "Name": "UK Style",
+        "Background": "#FFD700",
+        "TextColor": "#000000",
+        "BorderColor": "#000000",
+        "Cost": 1000
+      },
+      "California": {
+        "ID": "PLATE_CALI",
+        "Name": "California",
+        "Background": "#FFFFFF",
+        "TextColor": "#003366",
+        "BorderColor": "#CC0000",
+        "Graphic": "California_Script",
+        "Cost": 1500
+      },
+      "NewYork": {
+        "ID": "PLATE_NY",
+        "Name": "New York",
+        "Background": "#FFD700",
+        "TextColor": "#003366",
+        "BorderColor": "#003366",
+        "Graphic": "NY_Skyline",
+        "Cost": 1500
+      },
+      "Texas": {
+        "ID": "PLATE_TEXAS",
+        "Name": "Texas",
+        "Background": "#FFFFFF",
+        "TextColor": "#003366",
+        "BorderColor": "#BF0A30",
+        "Graphic": "Texas_Flag",
+        "Cost": 1500
+      }
+    },
+    "Premium": {
+      "Carbon": {
+        "ID": "PLATE_CARBON",
+        "Name": "Carbon Fiber",
+        "Background": "Material_Carbon",
+        "TextColor": "#FFFFFF",
+        "BorderColor": "#444444",
+        "Cost": 5000,
+        "UnlockCondition": "LEVEL_20"
+      },
+      "Brushed": {
+        "ID": "PLATE_BRUSHED",
+        "Name": "Brushed Metal",
+        "Background": "Material_BrushedAluminum",
+        "TextColor": "#111111",
+        "BorderColor": "#666666",
+        "Cost": 5000,
+        "UnlockCondition": "LEVEL_25"
+      },
+      "Chrome": {
+        "ID": "PLATE_CHROME",
+        "Name": "Chrome",
+        "Background": "Material_Chrome",
+        "TextColor": "#000000",
+        "BorderColor": "#AAAAAA",
+        "Cost": 7500,
+        "UnlockCondition": "LEVEL_30"
+      },
+      "Gold": {
+        "ID": "PLATE_GOLD",
+        "Name": "Gold",
+        "Background": "#FFD700",
+        "TextColor": "#000000",
+        "BorderColor": "#B8860B",
+        "Metallic": true,
+        "Cost": 10000,
+        "UnlockCondition": "REP_TIER_LEGEND"
+      }
+    },
+    "Special": {
+      "Neon": {
+        "ID": "PLATE_NEON",
+        "Name": "Neon Glow",
+        "Background": "#111111",
+        "TextColor": "#00FFFF",
+        "BorderColor": "#00FFFF",
+        "Glow": true,
+        "GlowIntensity": 1.5,
+        "Cost": 15000,
+        "UnlockCondition": "LEVEL_40"
+      },
+      "Holographic": {
+        "ID": "PLATE_HOLO",
+        "Name": "Holographic",
+        "Background": "Material_Holographic",
+        "TextColor": "#FFFFFF",
+        "BorderColor": "Rainbow",
+        "Cost": 20000,
+        "UnlockCondition": "LEVEL_50"
+      },
+      "Champion": {
+        "ID": "PLATE_CHAMPION",
+        "Name": "Champion",
+        "Background": "#8B0000",
+        "TextColor": "#FFD700",
+        "BorderColor": "#FFD700",
+        "Graphic": "Crown",
+        "Cost": 0,
+        "UnlockCondition": "ACHIEVEMENT_CHAMPION"
+      },
+      "Founder": {
+        "ID": "PLATE_FOUNDER",
+        "Name": "Founder's Edition",
+        "Background": "#1A1A2E",
+        "TextColor": "#E94560",
+        "BorderColor": "#E94560",
+        "Exclusive": true,
+        "UnlockCondition": "FOUNDERS_EDITION"
+      }
+    },
+    "Seasonal": {
+      "Halloween": {
+        "ID": "PLATE_HALLOWEEN",
+        "Name": "Spooky",
+        "Background": "#1A0A2E",
+        "TextColor": "#FF6600",
+        "BorderColor": "#FF6600",
+        "Graphic": "Pumpkin",
+        "Seasonal": "Halloween",
+        "LimitedTime": true
+      },
+      "Christmas": {
+        "ID": "PLATE_CHRISTMAS",
+        "Name": "Holiday",
+        "Background": "#006633",
+        "TextColor": "#FF0000",
+        "BorderColor": "#FFD700",
+        "Graphic": "Snowflake",
+        "Seasonal": "Christmas",
+        "LimitedTime": true
+      },
+      "Summer": {
+        "ID": "PLATE_SUMMER",
+        "Name": "Summer Vibes",
+        "Background": "#87CEEB",
+        "TextColor": "#FF6B35",
+        "BorderColor": "#FFD700",
+        "Graphic": "Sun",
+        "Seasonal": "Summer",
+        "LimitedTime": true
+      }
+    }
+  },
+
+  "TextOptions": {
+    "Fonts": {
+      "Standard": {
+        "ID": "FONT_STANDARD",
+        "Name": "Standard",
+        "Style": "Bold",
+        "Unlocked": true
+      },
+      "Classic": {
+        "ID": "FONT_CLASSIC",
+        "Name": "Classic",
+        "Style": "Serif",
+        "Cost": 500
+      },
+      "Modern": {
+        "ID": "FONT_MODERN",
+        "Name": "Modern",
+        "Style": "SansSerif",
+        "Cost": 500
+      },
+      "Racing": {
+        "ID": "FONT_RACING",
+        "Name": "Racing",
+        "Style": "Italic",
+        "Cost": 1000
+      },
+      "Digital": {
+        "ID": "FONT_DIGITAL",
+        "Name": "Digital",
+        "Style": "LCD",
+        "Cost": 1500
+      },
+      "Gothic": {
+        "ID": "FONT_GOTHIC",
+        "Name": "Gothic",
+        "Style": "Blackletter",
+        "Cost": 1500
+      },
+      "Script": {
+        "ID": "FONT_SCRIPT",
+        "Name": "Script",
+        "Style": "Cursive",
+        "Cost": 2000
+      }
+    },
+    "Effects": {
+      "Outline": {
+        "Enabled": true,
+        "Colors": ["Black", "White", "Red", "Blue", "Gold"],
+        "Cost": 250
+      },
+      "Shadow": {
+        "Enabled": true,
+        "Cost": 250
+      },
+      "3D": {
+        "Enabled": true,
+        "Cost": 500,
+        "UnlockCondition": "LEVEL_15"
+      },
+      "Glow": {
+        "Enabled": true,
+        "Colors": ["Cyan", "Pink", "Green", "Orange"],
+        "Cost": 1000,
+        "UnlockCondition": "LEVEL_25"
+      }
+    }
+  },
+
+  "PlateFrames": {
+    "None": {
+      "ID": "FRAME_NONE",
+      "Unlocked": true,
+      "Cost": 0
+    },
+    "Simple": {
+      "ID": "FRAME_SIMPLE",
+      "Name": "Simple Frame",
+      "Colors": ["Black", "Chrome", "Gold"],
+      "Cost": 500
+    },
+    "Racing": {
+      "ID": "FRAME_RACING",
+      "Name": "Racing Frame",
+      "Checkered": true,
+      "Cost": 1000
+    },
+    "LED": {
+      "ID": "FRAME_LED",
+      "Name": "LED Frame",
+      "Illuminated": true,
+      "Colors": ["White", "Blue", "Red", "RGB"],
+      "Cost": 3000,
+      "UnlockCondition": "LEVEL_20"
+    },
+    "Dealer": {
+      "ID": "FRAME_DEALER",
+      "Name": "Dealer Frame",
+      "CustomText": true,
+      "TextPosition": "Top",
+      "Cost": 750
+    },
+    "Sponsor": {
+      "ID": "FRAME_SPONSOR",
+      "Name": "Sponsor Frame",
+      "Brands": ["Performance", "Tire", "Oil", "Tuning"],
+      "Cost": 1500
+    }
+  },
+
+  "ContentFilter": {
+    "Enabled": true,
+    "BlockedWords": "ServerSide",
+    "BlockedPatterns": "ServerSide",
+    "AllowNumbers": true,
+    "AllowSymbols": false,
+    "AllowedSymbols": ["-", " "],
+    "CaseSensitive": false,
+    "ReportSystem": true
+  },
+
+  "PresetPlates": {
+    "Random": [
+      "GR1ND3R",
+      "2FAST4U",
+      "NEON",
+      "REDLINE",
+      "BOOST",
+      "VTEC",
+      "TURBO",
+      "DRIFT",
+      "TOUGE",
+      "WANGAN",
+      "APEX",
+      "REV IT",
+      "NO LIFE",
+      "SEND IT",
+      "FULL SND"
+    ]
+  },
+
+  "Placement": {
+    "Front": {
+      "Enabled": true,
+      "Optional": true,
+      "Position": "VehicleSpecific"
+    },
+    "Rear": {
+      "Enabled": true,
+      "Optional": false,
+      "Position": "VehicleSpecific"
+    },
+    "Offset": {
+      "Adjustable": true,
+      "Range": { "Vertical": [-0.05, 0.05], "Horizontal": [-0.1, 0.1] }
+    },
+    "Angle": {
+      "Adjustable": true,
+      "Range": [-15, 15]
+    }
+  },
+
+  "Unlocks": {
+    "ByLevel": [
+      { "Level": 10, "Unlocks": ["PLATE_STANDARD_BLACK", "PLATE_STANDARD_YELLOW"] },
+      { "Level": 20, "Unlocks": ["PLATE_CARBON", "FRAME_LED"] },
+      { "Level": 30, "Unlocks": ["PLATE_CHROME"] },
+      { "Level": 40, "Unlocks": ["PLATE_NEON"] },
+      { "Level": 50, "Unlocks": ["PLATE_HOLO"] }
+    ],
+    "ByAchievement": [
+      { "Achievement": "FIRST_WIN", "Unlocks": ["PLATE_JDM_WHITE"] },
+      { "Achievement": "DRIFT_MASTER", "Unlocks": ["PLATE_JDM_YELLOW"] },
+      { "Achievement": "CHAMPION", "Unlocks": ["PLATE_CHAMPION"] }
+    ],
+    "ByEvent": [
+      { "Event": "HALLOWEEN_2026", "Unlocks": ["PLATE_HALLOWEEN"] },
+      { "Event": "CHRISTMAS_2026", "Unlocks": ["PLATE_CHRISTMAS"] }
+    ]
+  }
+}

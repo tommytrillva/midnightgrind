@@ -21,11 +21,15 @@ void UMGRentalSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGRentalSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             TickTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                TickRentals(1.0f);
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->TickRentals(1.0f);
+                }
             },
             1.0f,
             true

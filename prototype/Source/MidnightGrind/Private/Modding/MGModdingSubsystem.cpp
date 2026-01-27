@@ -26,14 +26,19 @@ void UMGModdingSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Set up periodic update check
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGModdingSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             UpdateCheckTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                // Check for mod updates periodically
-                for (const FString& ModId : InstalledModIds)
+                if (!WeakThis.IsValid())
                 {
-                    if (FMGModItem* Mod = AllMods.Find(ModId))
+                    return;
+                }
+                // Check for mod updates periodically
+                for (const FString& ModId : WeakThis->InstalledModIds)
+                {
+                    if (FMGModItem* Mod = WeakThis->AllMods.Find(ModId))
                     {
                         // Simulate update check
                         if (Mod->InstalledVersion.GetVersionString() != Mod->CurrentVersion.GetVersionString())

@@ -1,0 +1,321 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Ghost Racing and Time Trial System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxGhosts": 5,
+    "DefaultOpacity": 0.6,
+    "RecordingPrecision": 60,
+    "MaxRecordingDuration": 600,
+    "CompressionEnabled": true
+  },
+
+  "GhostTypes": {
+    "Personal": {
+      "ID": "GHOST_PERSONAL",
+      "Name": "Personal Best",
+      "Description": "Your fastest lap on this track/vehicle combo",
+      "Color": "#44FF44",
+      "Priority": 1,
+      "AutoRecord": true,
+      "AutoLoad": true
+    },
+    "SessionBest": {
+      "ID": "GHOST_SESSION",
+      "Name": "Session Best",
+      "Description": "Your fastest lap this session",
+      "Color": "#88CCFF",
+      "Priority": 2,
+      "AutoRecord": true,
+      "PersistAcrossSessions": false
+    },
+    "TrackRecord": {
+      "ID": "GHOST_TRACK_RECORD",
+      "Name": "Track Record",
+      "Description": "The fastest time ever on this track",
+      "Color": "#FFD700",
+      "Priority": 3,
+      "DownloadRequired": true,
+      "ShowDriverName": true
+    },
+    "ClassRecord": {
+      "ID": "GHOST_CLASS_RECORD",
+      "Name": "Class Record",
+      "Description": "Fastest time in your vehicle's class",
+      "Color": "#FF88FF",
+      "Priority": 4,
+      "DownloadRequired": true
+    },
+    "Friend": {
+      "ID": "GHOST_FRIEND",
+      "Name": "Friend's Ghost",
+      "Description": "A friend's best time",
+      "Color": "#FF8844",
+      "Priority": 5,
+      "DownloadRequired": true,
+      "ShowDriverName": true
+    },
+    "Rival": {
+      "ID": "GHOST_RIVAL",
+      "Name": "Rival Ghost",
+      "Description": "Your rival's best time",
+      "Color": "#FF4444",
+      "Priority": 6,
+      "DownloadRequired": true,
+      "ShowDriverName": true,
+      "ChallengeBased": true
+    },
+    "Developer": {
+      "ID": "GHOST_DEV",
+      "Name": "Developer Ghost",
+      "Description": "Official developer time",
+      "Color": "#AA44FF",
+      "Priority": 7,
+      "DownloadRequired": true,
+      "Badge": "Developer"
+    },
+    "Target": {
+      "ID": "GHOST_TARGET",
+      "Name": "Target Time",
+      "Description": "Time to beat for challenges",
+      "Color": "#FFFFFF",
+      "Priority": 8,
+      "ShowTargetMarker": true
+    }
+  },
+
+  "Recording": {
+    "DataCaptured": {
+      "Position": {
+        "Enabled": true,
+        "Precision": "Float32",
+        "Rate": 60
+      },
+      "Rotation": {
+        "Enabled": true,
+        "Precision": "Float16",
+        "Rate": 60
+      },
+      "Velocity": {
+        "Enabled": true,
+        "Rate": 30
+      },
+      "WheelRotation": {
+        "Enabled": true,
+        "Rate": 30
+      },
+      "SteeringAngle": {
+        "Enabled": true,
+        "Rate": 30
+      },
+      "Suspension": {
+        "Enabled": false,
+        "Rate": 15
+      },
+      "Inputs": {
+        "Enabled": true,
+        "Rate": 60,
+        "Data": ["Throttle", "Brake", "Steering", "Gear"]
+      }
+    },
+    "Storage": {
+      "LocalGhosts": {
+        "MaxPerTrack": 10,
+        "AutoPrune": true,
+        "PruneKeep": ["Fastest", "MostRecent"]
+      },
+      "CloudGhosts": {
+        "MaxPerTrack": 3,
+        "SyncEnabled": true,
+        "RequireLogin": true
+      }
+    },
+    "Validation": {
+      "RequireCleanLap": false,
+      "RequireNoAssists": false,
+      "ValidateVehicleSetup": true,
+      "ChecksumEnabled": true
+    }
+  },
+
+  "Visualization": {
+    "VehicleDisplay": {
+      "UseActualVehicle": true,
+      "ShowLivery": true,
+      "SimplifiedModel": false,
+      "TransparencyMode": "Constant"
+    },
+    "Effects": {
+      "TireTrails": false,
+      "ExhaustEffects": false,
+      "Shadows": false,
+      "HeadlightsAtNight": true
+    },
+    "Markers": {
+      "NameTag": {
+        "Enabled": true,
+        "ShowAboveVehicle": true,
+        "ShowTime": true,
+        "Distance": 200
+      },
+      "ProgressMarker": {
+        "Enabled": true,
+        "ShowOnTrack": true,
+        "ShowDelta": true
+      }
+    },
+    "Trail": {
+      "Enabled": true,
+      "Length": 50,
+      "Style": "Line",
+      "ColorBySpeed": false
+    }
+  },
+
+  "Comparison": {
+    "Delta": {
+      "ShowRealTime": true,
+      "Position": "TopCenter",
+      "Format": "+/-SS.mmm",
+      "UpdateRate": 10,
+      "Colors": {
+        "Ahead": "#44FF44",
+        "Behind": "#FF4444",
+        "Equal": "#FFFFFF"
+      }
+    },
+    "SectorComparison": {
+      "Enabled": true,
+      "ShowPerSector": true,
+      "ShowCumulative": true
+    },
+    "PredictedLap": {
+      "Enabled": true,
+      "BasedOn": "CurrentPace"
+    },
+    "SpeedComparison": {
+      "Enabled": true,
+      "ShowAtKeyPoints": true,
+      "KeyPoints": ["Straights", "Corners", "Apexes"]
+    }
+  },
+
+  "Leaderboards": {
+    "TimeAttack": {
+      "Categories": [
+        "Overall",
+        "ByVehicle",
+        "ByClass",
+        "Weekly",
+        "Friends"
+      ],
+      "ShowTop": 100,
+      "PlayerPosition": true,
+      "DownloadGhost": {
+        "Enabled": true,
+        "FromTopN": 10
+      }
+    },
+    "Validation": {
+      "ServerValidated": true,
+      "RequireReplay": true,
+      "AntiCheat": true
+    }
+  },
+
+  "Challenges": {
+    "BeatTheGhost": {
+      "ID": "CHALLENGE_GHOST",
+      "Description": "Beat the target ghost to earn rewards",
+      "Tiers": {
+        "Bronze": {
+          "Requirement": "Within 5%",
+          "Reward": { "Cash": 5000, "REP": 500 }
+        },
+        "Silver": {
+          "Requirement": "Within 2%",
+          "Reward": { "Cash": 10000, "REP": 1000 }
+        },
+        "Gold": {
+          "Requirement": "Beat Ghost",
+          "Reward": { "Cash": 25000, "REP": 2500 }
+        },
+        "Platinum": {
+          "Requirement": "Beat by 2%",
+          "Reward": { "Cash": 50000, "REP": 5000, "Title": "Ghost Buster" }
+        }
+      }
+    },
+    "DeveloperTimes": {
+      "ID": "CHALLENGE_DEV_TIMES",
+      "Description": "Beat the developer's best times",
+      "RewardPerTrack": { "Cash": 50000, "REP": 5000 },
+      "AllTracksReward": { "Vehicle": "VEHICLE_EXCLUSIVE", "Title": "Time Attack Legend" }
+    }
+  },
+
+  "Sharing": {
+    "ShareGhost": {
+      "Enabled": true,
+      "Methods": ["DirectLink", "FriendsList", "Crew"],
+      "Privacy": ["Public", "FriendsOnly", "Private"]
+    },
+    "DownloadGhost": {
+      "Enabled": true,
+      "Sources": ["Leaderboard", "Friends", "Rivals", "SharedLink"],
+      "MaxDownloaded": 50
+    },
+    "GhostBattle": {
+      "Enabled": true,
+      "Multiplayer": true,
+      "MaxParticipants": 8,
+      "TurnBased": false
+    }
+  },
+
+  "Performance": {
+    "LOD": {
+      "FullDetail": 100,
+      "ReducedDetail": 200,
+      "Hidden": 400
+    },
+    "Culling": {
+      "BehindPlayer": true,
+      "OutOfView": true
+    },
+    "Interpolation": {
+      "Method": "CatmullRom",
+      "Samples": 3
+    }
+  },
+
+  "UI": {
+    "GhostSelection": {
+      "PreRaceMenu": true,
+      "ShowPreview": true,
+      "CompareStats": true,
+      "QuickSelect": ["PersonalBest", "TrackRecord", "Friend"]
+    },
+    "InRace": {
+      "DeltaDisplay": true,
+      "GhostIndicator": true,
+      "ToggleVisibility": "G"
+    },
+    "PostRace": {
+      "ComparisonScreen": true,
+      "SavePrompt": true,
+      "SharePrompt": true
+    }
+  },
+
+  "Settings": {
+    "GhostsEnabled": { "Default": true },
+    "GhostOpacity": { "Default": 0.6, "Min": 0.2, "Max": 1.0 },
+    "GhostCollision": { "Default": false },
+    "AutoRecordBest": { "Default": true },
+    "AutoLoadPersonalBest": { "Default": true },
+    "ShowNameTags": { "Default": true },
+    "ShowDelta": { "Default": true }
+  }
+}

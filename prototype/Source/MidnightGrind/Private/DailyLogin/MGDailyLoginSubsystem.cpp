@@ -35,9 +35,10 @@ void UMGDailyLoginSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Start tick timer
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGDailyLoginSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             TickTimerHandle,
-            [this]() { TickDailyLoginSystem(1.0f); },
+            [WeakThis]() { if (WeakThis.IsValid()) WeakThis->TickDailyLoginSystem(1.0f); },
             1.0f,
             true
         );

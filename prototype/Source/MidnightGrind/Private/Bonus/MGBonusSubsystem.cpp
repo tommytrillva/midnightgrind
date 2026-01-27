@@ -102,11 +102,15 @@ void UMGBonusSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	// Start tick timer
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGBonusSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			BonusTickTimer,
-			[this]()
+			[WeakThis]()
 			{
-				TickBonus(0.033f);
+				if (WeakThis.IsValid())
+				{
+					WeakThis->TickBonus(0.033f);
+				}
 			},
 			0.033f,
 			true

@@ -178,23 +178,28 @@ bool UMGRaceModeSubsystem::StartCountdown()
 	// Start countdown timer
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGRaceModeSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			CountdownTimerHandle,
-			[this]()
+			[WeakThis]()
 			{
-				CountdownSeconds--;
-
-				if (CountdownSeconds > 0)
+				if (!WeakThis.IsValid())
 				{
-					OnCountdownTick.Broadcast(CountdownSeconds);
+					return;
+				}
+				WeakThis->CountdownSeconds--;
+
+				if (WeakThis->CountdownSeconds > 0)
+				{
+					WeakThis->OnCountdownTick.Broadcast(WeakThis->CountdownSeconds);
 				}
 				else
 				{
-					if (UWorld* World = GetWorld())
+					if (UWorld* World = WeakThis->GetWorld())
 					{
-						World->GetTimerManager().ClearTimer(CountdownTimerHandle);
+						World->GetTimerManager().ClearTimer(WeakThis->CountdownTimerHandle);
 					}
-					StartRace();
+					WeakThis->StartRace();
 				}
 			},
 			1.0f,

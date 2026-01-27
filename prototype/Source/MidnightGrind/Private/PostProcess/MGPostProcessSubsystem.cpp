@@ -4,6 +4,9 @@
 #include "PostProcess/MGPostProcessSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
+#include "Camera/CameraShakeBase.h"
 
 void UMGPostProcessSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {

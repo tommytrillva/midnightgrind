@@ -187,13 +187,14 @@ void UMGCheckpointSubsystem::StartRace(int32 TotalLaps, float TimeLimit)
 	// Start race tick timer
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGCheckpointSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			RaceTickTimer,
-			[this]()
+			[WeakThis]()
 			{
-				if (!bRacePaused)
+				if (WeakThis.IsValid() && !WeakThis->bRacePaused)
 				{
-					TickRace(0.016f); // ~60fps tick
+					WeakThis->TickRace(0.016f); // ~60fps tick
 				}
 			},
 			0.016f,

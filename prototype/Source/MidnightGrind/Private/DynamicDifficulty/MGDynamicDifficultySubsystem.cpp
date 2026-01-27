@@ -5,6 +5,10 @@
 #include "DynamicDifficulty/MGDynamicDifficultySubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
 
 void UMGDynamicDifficultySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -286,8 +290,61 @@ void UMGDynamicDifficultySubsystem::LoadPlayerData()
 
 void UMGDynamicDifficultySubsystem::SavePlayerData()
 {
-    // Save player performance data placeholder
-    UE_LOG(LogTemp, Log, TEXT("Saving player performance data - Skill Level: %d"), static_cast<int32>(PlayerPerformance.EstimatedSkillLevel));
+    FString SaveDir = FPaths::ProjectSavedDir() / TEXT("Difficulty");
+    IFileManager::Get().MakeDirectory(*SaveDir, true);
+    FString FilePath = SaveDir / TEXT("player_difficulty.dat");
+
+    FBufferArchive SaveArchive;
+
+    // Version for future compatibility
+    int32 Version = 1;
+    SaveArchive << Version;
+
+    // Save current preset
+    int32 PresetInt = static_cast<int32>(CurrentPreset);
+    SaveArchive << PresetInt;
+
+    // Save adaptive settings
+    SaveArchive << bAdaptiveDifficultyEnabled;
+    SaveArchive << AdaptationSensitivity;
+    SaveArchive << MinDifficultyBound;
+    SaveArchive << MaxDifficultyBound;
+
+    // Save player performance metrics
+    int32 SkillLevel = static_cast<int32>(PlayerPerformance.EstimatedSkillLevel);
+    SaveArchive << SkillLevel;
+    SaveArchive << PlayerPerformance.TotalRacesCompleted;
+    SaveArchive << PlayerPerformance.TotalWins;
+    SaveArchive << PlayerPerformance.TotalLosses;
+    SaveArchive << PlayerPerformance.AverageFinishPosition;
+    SaveArchive << PlayerPerformance.BestLapTimeDeviation;
+    SaveArchive << PlayerPerformance.AverageRaceCompletion;
+    SaveArchive << PlayerPerformance.CollisionRate;
+    SaveArchive << PlayerPerformance.OffroadRate;
+    SaveArchive << PlayerPerformance.ConsistencyScore;
+
+    // Save difficulty stats
+    SaveArchive << DifficultyStats.CurrentDifficultyLevel;
+    SaveArchive << DifficultyStats.HistoricalWinRate;
+    SaveArchive << DifficultyStats.RecentWinRate;
+    SaveArchive << DifficultyStats.PlayerSatisfactionEstimate;
+
+    // Save current modifiers
+    SaveArchive << CurrentModifiers.AISpeedMultiplier;
+    SaveArchive << CurrentModifiers.AIAggressionMultiplier;
+    SaveArchive << CurrentModifiers.RubberBandingStrength;
+    SaveArchive << CurrentModifiers.CatchUpAssistStrength;
+    SaveArchive << CurrentModifiers.PlayerDamageMultiplier;
+    SaveArchive << CurrentModifiers.AIErrorRate;
+
+    // Write to file
+    if (SaveArchive.Num() > 0)
+    {
+        FFileHelper::SaveArrayToFile(SaveArchive, *FilePath);
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("Saved player difficulty data - Skill Level: %d, Races: %d"),
+        SkillLevel, PlayerPerformance.TotalRacesCompleted);
 }
 
 // ============================================================================
