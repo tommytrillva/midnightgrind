@@ -1,0 +1,381 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Traffic and NPC Vehicle Configuration",
+
+  "TrafficSettings": {
+    "Enabled": true,
+    "MaxVehicles": 50,
+    "SpawnDistance": 500,
+    "DespawnDistance": 800,
+    "Density": {
+      "Low": 0.3,
+      "Medium": 0.6,
+      "High": 1.0,
+      "Rush": 1.5
+    },
+    "TimeOfDayDensity": {
+      "Dawn": 0.3,
+      "Morning": 0.7,
+      "Noon": 0.8,
+      "Afternoon": 0.9,
+      "Sunset": 0.7,
+      "Dusk": 0.5,
+      "Night": 0.3,
+      "LateNight": 0.1
+    }
+  },
+
+  "VehicleClasses": {
+    "Sedan": {
+      "ID": "TRAFFIC_SEDAN",
+      "SpawnWeight": 0.30,
+      "SpeedRange": { "Min": 40, "Max": 80 },
+      "LaneChangeProbability": 0.3,
+      "ReactionTime": 0.8,
+      "Variants": [
+        { "ID": "SEDAN_COMPACT", "Name": "Compact Sedan", "Color": "Random" },
+        { "ID": "SEDAN_MID", "Name": "Mid-size Sedan", "Color": "Random" },
+        { "ID": "SEDAN_FULL", "Name": "Full-size Sedan", "Color": "Random" },
+        { "ID": "SEDAN_LUXURY", "Name": "Luxury Sedan", "Color": ["Black", "Silver", "White"] }
+      ]
+    },
+    "SUV": {
+      "ID": "TRAFFIC_SUV",
+      "SpawnWeight": 0.20,
+      "SpeedRange": { "Min": 35, "Max": 75 },
+      "LaneChangeProbability": 0.2,
+      "ReactionTime": 0.9,
+      "Variants": [
+        { "ID": "SUV_COMPACT", "Name": "Compact SUV", "Color": "Random" },
+        { "ID": "SUV_MID", "Name": "Mid-size SUV", "Color": "Random" },
+        { "ID": "SUV_LARGE", "Name": "Large SUV", "Color": "Random" }
+      ]
+    },
+    "Truck": {
+      "ID": "TRAFFIC_TRUCK",
+      "SpawnWeight": 0.10,
+      "SpeedRange": { "Min": 30, "Max": 65 },
+      "LaneChangeProbability": 0.1,
+      "ReactionTime": 1.0,
+      "Variants": [
+        { "ID": "TRUCK_PICKUP", "Name": "Pickup Truck", "Color": "Random" },
+        { "ID": "TRUCK_WORK", "Name": "Work Truck", "Color": ["White", "Yellow"] }
+      ]
+    },
+    "Van": {
+      "ID": "TRAFFIC_VAN",
+      "SpawnWeight": 0.08,
+      "SpeedRange": { "Min": 30, "Max": 60 },
+      "LaneChangeProbability": 0.15,
+      "ReactionTime": 1.0,
+      "Variants": [
+        { "ID": "VAN_CARGO", "Name": "Cargo Van", "Color": ["White"] },
+        { "ID": "VAN_PASSENGER", "Name": "Passenger Van", "Color": "Random" },
+        { "ID": "VAN_DELIVERY", "Name": "Delivery Van", "Color": ["White", "Blue", "Brown"], "Logos": true }
+      ]
+    },
+    "Hatchback": {
+      "ID": "TRAFFIC_HATCH",
+      "SpawnWeight": 0.15,
+      "SpeedRange": { "Min": 45, "Max": 85 },
+      "LaneChangeProbability": 0.35,
+      "ReactionTime": 0.7,
+      "Variants": [
+        { "ID": "HATCH_ECONOMY", "Name": "Economy Hatch", "Color": "Random" },
+        { "ID": "HATCH_HOT", "Name": "Hot Hatch", "Color": "Random", "Sporty": true }
+      ]
+    },
+    "Coupe": {
+      "ID": "TRAFFIC_COUPE",
+      "SpawnWeight": 0.05,
+      "SpeedRange": { "Min": 50, "Max": 100 },
+      "LaneChangeProbability": 0.4,
+      "ReactionTime": 0.6,
+      "Variants": [
+        { "ID": "COUPE_SPORT", "Name": "Sport Coupe", "Color": "Random" },
+        { "ID": "COUPE_MUSCLE", "Name": "Muscle Car", "Color": "Random" }
+      ]
+    },
+    "Semi": {
+      "ID": "TRAFFIC_SEMI",
+      "SpawnWeight": 0.05,
+      "SpeedRange": { "Min": 25, "Max": 55 },
+      "LaneChangeProbability": 0.05,
+      "ReactionTime": 1.5,
+      "HighwayOnly": true,
+      "Variants": [
+        { "ID": "SEMI_TRAILER", "Name": "Semi Trailer", "Color": ["White", "Red", "Blue"] },
+        { "ID": "SEMI_TANKER", "Name": "Tanker Truck", "Color": ["Silver", "White"] },
+        { "ID": "SEMI_FLATBED", "Name": "Flatbed", "Color": ["Gray", "Blue"] }
+      ]
+    },
+    "Bus": {
+      "ID": "TRAFFIC_BUS",
+      "SpawnWeight": 0.04,
+      "SpeedRange": { "Min": 20, "Max": 45 },
+      "LaneChangeProbability": 0.1,
+      "ReactionTime": 1.2,
+      "UrbanOnly": true,
+      "Variants": [
+        { "ID": "BUS_CITY", "Name": "City Bus", "Color": "LocationBased" },
+        { "ID": "BUS_TOUR", "Name": "Tour Bus", "Color": ["Blue", "White"] }
+      ]
+    },
+    "Motorcycle": {
+      "ID": "TRAFFIC_MOTO",
+      "SpawnWeight": 0.03,
+      "SpeedRange": { "Min": 50, "Max": 120 },
+      "LaneChangeProbability": 0.5,
+      "ReactionTime": 0.5,
+      "LaneSplitting": true,
+      "Variants": [
+        { "ID": "MOTO_SPORT", "Name": "Sport Bike", "Color": "Random" },
+        { "ID": "MOTO_CRUISER", "Name": "Cruiser", "Color": ["Black", "Chrome"] },
+        { "ID": "MOTO_SCOOTER", "Name": "Scooter", "Color": "Random", "UrbanOnly": true }
+      ]
+    }
+  },
+
+  "SpecialVehicles": {
+    "Taxi": {
+      "ID": "TRAFFIC_TAXI",
+      "SpawnWeight": 0.03,
+      "UrbanOnly": true,
+      "Color": "Yellow",
+      "Behavior": "Aggressive",
+      "Variants": [
+        { "ID": "TAXI_STANDARD", "Name": "Standard Taxi" },
+        { "ID": "TAXI_LUXURY", "Name": "Black Car" }
+      ]
+    },
+    "Emergency": {
+      "Ambulance": {
+        "ID": "TRAFFIC_AMBULANCE",
+        "SpawnWeight": 0.01,
+        "Behavior": "Emergency",
+        "Sirens": true,
+        "YieldTo": true
+      },
+      "FireTruck": {
+        "ID": "TRAFFIC_FIRETRUCK",
+        "SpawnWeight": 0.005,
+        "Behavior": "Emergency",
+        "Sirens": true,
+        "YieldTo": true
+      }
+    },
+    "Service": {
+      "TowTruck": {
+        "ID": "TRAFFIC_TOW",
+        "SpawnWeight": 0.01,
+        "SpeedRange": { "Min": 30, "Max": 55 }
+      },
+      "GarbageTruck": {
+        "ID": "TRAFFIC_GARBAGE",
+        "SpawnWeight": 0.005,
+        "SpeedRange": { "Min": 15, "Max": 30 },
+        "MorningOnly": true
+      }
+    }
+  },
+
+  "TrafficBehavior": {
+    "Normal": {
+      "FollowLaws": true,
+      "StopAtLights": true,
+      "YieldToPedestrians": true,
+      "SpeedLimit": "Posted",
+      "Honking": 0.1
+    },
+    "Aggressive": {
+      "FollowLaws": false,
+      "StopAtLights": 0.7,
+      "SpeedLimit": "Posted+10",
+      "LaneChangeFrequency": "High",
+      "Honking": 0.5
+    },
+    "Passive": {
+      "FollowLaws": true,
+      "StopAtLights": true,
+      "SpeedLimit": "Posted-10",
+      "LaneChangeFrequency": "Low",
+      "Honking": 0.05
+    },
+    "Erratic": {
+      "FollowLaws": false,
+      "StopAtLights": 0.5,
+      "SpeedLimit": "Variable",
+      "LaneChangeFrequency": "Random",
+      "Honking": 0.3,
+      "SpawnChance": 0.05
+    }
+  },
+
+  "PlayerInteraction": {
+    "ReactionToPlayer": {
+      "NearMiss": {
+        "HonkChance": 0.8,
+        "Swerve": true,
+        "SlowDown": true
+      },
+      "Collision": {
+        "HonkChance": 1.0,
+        "PullOver": 0.3,
+        "ChasePlayer": 0.05,
+        "CallPolice": 0.1
+      },
+      "HighSpeed": {
+        "MoveAside": true,
+        "Threshold": 150
+      },
+      "WrongWay": {
+        "Panic": true,
+        "EmergencyStop": 0.5
+      }
+    },
+    "NearMissBonus": {
+      "BasePoints": 50,
+      "SpeedMultiplier": true,
+      "ComboEnabled": true
+    },
+    "CollisionPenalty": {
+      "CashFine": 100,
+      "REPLoss": 10,
+      "HeatIncrease": 1
+    }
+  },
+
+  "LocationSpecific": {
+    "NeoCityDowntown": {
+      "DensityMultiplier": 1.5,
+      "PredominantTypes": ["Sedan", "Taxi", "Bus"],
+      "NoSemis": true
+    },
+    "WanganHighway": {
+      "DensityMultiplier": 0.8,
+      "PredominantTypes": ["Sedan", "Coupe", "Semi"],
+      "HigherSpeeds": true,
+      "NoBuses": true
+    },
+    "IndustrialDocks": {
+      "DensityMultiplier": 0.6,
+      "PredominantTypes": ["Truck", "Van", "Semi"],
+      "NoMotorcycles": true
+    },
+    "HarunaPass": {
+      "DensityMultiplier": 0.3,
+      "PredominantTypes": ["Sedan", "SUV"],
+      "NoSemis": true,
+      "NoBuses": true
+    },
+    "RedRockCanyon": {
+      "DensityMultiplier": 0.2,
+      "PredominantTypes": ["Truck", "SUV"],
+      "TouristBuses": true
+    }
+  },
+
+  "TimeOfDayBehavior": {
+    "Dawn": {
+      "HeadlightsOn": 0.5,
+      "Types": ["Truck", "Van", "Sedan"]
+    },
+    "Morning": {
+      "HeadlightsOn": 0,
+      "RushHour": true,
+      "AggressiveDrivers": 0.3
+    },
+    "Noon": {
+      "HeadlightsOn": 0,
+      "DeliveryVans": true
+    },
+    "Afternoon": {
+      "HeadlightsOn": 0,
+      "RushHour": true,
+      "SchoolBuses": true
+    },
+    "Sunset": {
+      "HeadlightsOn": 0.5
+    },
+    "Dusk": {
+      "HeadlightsOn": 1.0
+    },
+    "Night": {
+      "HeadlightsOn": 1.0,
+      "ReducedDensity": 0.5,
+      "MoreCoupes": true
+    },
+    "LateNight": {
+      "HeadlightsOn": 1.0,
+      "ReducedDensity": 0.2,
+      "TaxisCommon": true,
+      "DrunkDrivers": 0.05
+    }
+  },
+
+  "WeatherBehavior": {
+    "Clear": {
+      "SpeedModifier": 1.0,
+      "CautionLevel": 0
+    },
+    "Rain": {
+      "SpeedModifier": 0.8,
+      "CautionLevel": 1,
+      "HeadlightsOn": true,
+      "WipersOn": true
+    },
+    "HeavyRain": {
+      "SpeedModifier": 0.6,
+      "CautionLevel": 2,
+      "HeadlightsOn": true,
+      "HazardsOn": 0.2
+    },
+    "Fog": {
+      "SpeedModifier": 0.7,
+      "CautionLevel": 2,
+      "HeadlightsOn": true,
+      "FogLights": true
+    },
+    "Snow": {
+      "SpeedModifier": 0.5,
+      "CautionLevel": 3,
+      "HeadlightsOn": true,
+      "HazardsOn": 0.3
+    }
+  },
+
+  "Spawning": {
+    "SpawnPoints": "LaneMarkers",
+    "MinPlayerDistance": 200,
+    "MinVehicleDistance": 15,
+    "DirectionAware": true,
+    "LanePreference": {
+      "SlowVehicles": "Right",
+      "FastVehicles": "Left",
+      "Trucks": "Right"
+    },
+    "Culling": {
+      "BehindPlayerDistance": 300,
+      "OutOfViewAngle": 120
+    }
+  },
+
+  "Performance": {
+    "LODDistances": {
+      "High": 100,
+      "Medium": 300,
+      "Low": 500
+    },
+    "PhysicsSimulation": {
+      "FullPhysics": 150,
+      "SimplifiedPhysics": 400,
+      "NoPhysics": 600
+    },
+    "MaxVisibleVehicles": {
+      "Low": 20,
+      "Medium": 35,
+      "High": 50,
+      "Ultra": 75
+    }
+  }
+}

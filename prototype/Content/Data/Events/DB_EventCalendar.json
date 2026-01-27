@@ -1,0 +1,344 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Live Events and Calendar System",
+
+  "EventTypes": {
+    "DailyRace": {
+      "ID": "EVENT_DAILY",
+      "Duration": 86400,
+      "ResetTime": "00:00 UTC",
+      "Rewards": {
+        "Participation": { "Cash": 1000, "REP": 100 },
+        "TopPercent": {
+          "1": { "Cash": 25000, "REP": 2500, "Title": "Daily Champion" },
+          "5": { "Cash": 15000, "REP": 1500 },
+          "10": { "Cash": 10000, "REP": 1000 },
+          "25": { "Cash": 5000, "REP": 500 }
+        }
+      }
+    },
+    "WeeklyChampionship": {
+      "ID": "EVENT_WEEKLY",
+      "Duration": 604800,
+      "ResetDay": "Monday",
+      "ResetTime": "00:00 UTC",
+      "Rounds": 5,
+      "Rewards": {
+        "Overall1st": { "Cash": 100000, "REP": 10000, "Vehicle": "Random_Rare" },
+        "Overall2nd": { "Cash": 75000, "REP": 7500 },
+        "Overall3rd": { "Cash": 50000, "REP": 5000 },
+        "PerRound": { "Cash": 5000, "REP": 500 }
+      }
+    },
+    "MonthlyShowdown": {
+      "ID": "EVENT_MONTHLY",
+      "Duration": 2592000,
+      "StartDay": 1,
+      "Phases": ["Qualifiers", "Semifinals", "Finals"],
+      "Rewards": {
+        "Champion": { "Cash": 500000, "REP": 50000, "ExclusiveVehicle": true, "Badge": "Monthly_Champion" },
+        "Finalist": { "Cash": 200000, "REP": 20000 },
+        "Semifinalist": { "Cash": 100000, "REP": 10000 }
+      }
+    },
+    "SpecialEvent": {
+      "ID": "EVENT_SPECIAL",
+      "Unique": true,
+      "LimitedTime": true,
+      "ExclusiveRewards": true
+    },
+    "SeasonalEvent": {
+      "ID": "EVENT_SEASONAL",
+      "Duration": "Season",
+      "ThemeSpecific": true
+    },
+    "CommunityChallenge": {
+      "ID": "EVENT_COMMUNITY",
+      "Collaborative": true,
+      "GlobalGoal": true,
+      "CommunityRewards": true
+    }
+  },
+
+  "RecurringEvents": {
+    "DoubleCashWeekend": {
+      "ID": "RECURRING_DOUBLE_CASH",
+      "Schedule": "Every_2nd_Weekend",
+      "Duration": 172800,
+      "Modifier": { "CashMultiplier": 2.0 },
+      "Description": "Earn double cash on all races!"
+    },
+    "DoubleREPWeekend": {
+      "ID": "RECURRING_DOUBLE_REP",
+      "Schedule": "Every_4th_Weekend",
+      "Duration": 172800,
+      "Modifier": { "REPMultiplier": 2.0 },
+      "Description": "Earn double REP on all activities!"
+    },
+    "TrialWeekend": {
+      "ID": "RECURRING_TRIAL",
+      "Schedule": "Monthly_First_Weekend",
+      "Duration": 172800,
+      "Feature": "UnlockAllVehicles",
+      "Description": "Test drive any vehicle in the game!"
+    },
+    "TunerTuesday": {
+      "ID": "RECURRING_TUNER",
+      "Schedule": "Every_Tuesday",
+      "Duration": 86400,
+      "Modifier": { "TuningCostDiscount": 0.5 },
+      "Description": "50% off all tuning and upgrades!"
+    },
+    "ThrowbackThursday": {
+      "ID": "RECURRING_THROWBACK",
+      "Schedule": "Every_Thursday",
+      "Duration": 86400,
+      "Feature": "ClassicCarsOnly",
+      "VehicleFilter": "Pre_2000",
+      "Description": "Classic cars only racing!"
+    },
+    "FreestyleFriday": {
+      "ID": "RECURRING_FREESTYLE",
+      "Schedule": "Every_Friday",
+      "Duration": 86400,
+      "Feature": "DriftScoreMultiplier",
+      "Modifier": { "DriftMultiplier": 1.5 },
+      "Description": "Drift scores worth 1.5x!"
+    },
+    "SpeedSunday": {
+      "ID": "RECURRING_SPEED",
+      "Schedule": "Every_Sunday",
+      "Duration": 86400,
+      "Feature": "HighwayFocus",
+      "Modifier": { "HighwayREPBonus": 2.0 },
+      "Description": "Highway races pay double REP!"
+    }
+  },
+
+  "SeasonalCalendar": {
+    "Spring": {
+      "Theme": "Cherry Blossom",
+      "StartMonth": 3,
+      "EndMonth": 5,
+      "SpecialEvents": [
+        {
+          "ID": "SPRING_SAKURA",
+          "Name": "Sakura Sprint Series",
+          "Tracks": ["HARUNA_PASS"],
+          "VisualTheme": "CherryBlossoms",
+          "ExclusiveRewards": ["Sakura_Livery", "Sakura_Banner"]
+        },
+        {
+          "ID": "SPRING_RACING",
+          "Name": "Spring Racing Festival",
+          "Type": "Championship",
+          "Duration": 14
+        }
+      ],
+      "WeatherBias": ["Clear", "LightRain"]
+    },
+    "Summer": {
+      "Theme": "Midnight Heat",
+      "StartMonth": 6,
+      "EndMonth": 8,
+      "SpecialEvents": [
+        {
+          "ID": "SUMMER_NIGHTS",
+          "Name": "Summer Nights Championship",
+          "TimeRestriction": "NightOnly",
+          "ExclusiveRewards": ["Neon_Kit", "Summer_Vibes_Title"]
+        },
+        {
+          "ID": "SUMMER_HIGHWAY",
+          "Name": "Highway Kings Tournament",
+          "Type": "TopSpeed",
+          "Tracks": ["WANGAN_HIGHWAY"]
+        }
+      ],
+      "WeatherBias": ["Clear", "Thunderstorm"]
+    },
+    "Fall": {
+      "Theme": "Autumn Rush",
+      "StartMonth": 9,
+      "EndMonth": 11,
+      "SpecialEvents": [
+        {
+          "ID": "FALL_TOUGE",
+          "Name": "Mountain Legend Series",
+          "Type": "Touge",
+          "ExclusiveRewards": ["Autumn_Wrap", "Legend_Badge"]
+        },
+        {
+          "ID": "FALL_DRIFT",
+          "Name": "Fall Drift Festival",
+          "Type": "Drift",
+          "ScoreMultiplier": 2.0
+        }
+      ],
+      "WeatherBias": ["PartlyCloudy", "Fog"]
+    },
+    "Winter": {
+      "Theme": "Winter Wonderland",
+      "StartMonth": 12,
+      "EndMonth": 2,
+      "SpecialEvents": [
+        {
+          "ID": "WINTER_ICE",
+          "Name": "Ice Road Challenge",
+          "WeatherForced": "Snow",
+          "ExclusiveRewards": ["Winter_Camo", "Ice_Crown"]
+        },
+        {
+          "ID": "WINTER_HOLIDAY",
+          "Name": "Holiday Grand Prix",
+          "DateRange": "Dec 20 - Jan 5",
+          "SpecialRewards": ["Holiday_Vehicle_Wrap"]
+        }
+      ],
+      "WeatherBias": ["Overcast", "Snow"]
+    }
+  },
+
+  "HolidayEvents": {
+    "NewYear": {
+      "ID": "HOLIDAY_NEWYEAR",
+      "DateRange": "Dec 31 - Jan 2",
+      "Theme": "Celebration",
+      "Rewards": ["NewYear_Livery", "Fireworks_Horn"],
+      "SpecialFeatures": ["Fireworks_VFX", "Countdown_Event"]
+    },
+    "ValentinesDay": {
+      "ID": "HOLIDAY_VALENTINE",
+      "DateRange": "Feb 10 - Feb 16",
+      "Theme": "Love",
+      "Rewards": ["Heart_Decal", "Pink_Underglow"],
+      "SpecialRaces": "Tandem_Drift"
+    },
+    "StPatricks": {
+      "ID": "HOLIDAY_STPATRICK",
+      "DateRange": "Mar 14 - Mar 18",
+      "Theme": "Lucky",
+      "Rewards": ["Shamrock_Decal", "Green_Smoke"],
+      "Modifier": { "LuckBoost": true }
+    },
+    "Easter": {
+      "ID": "HOLIDAY_EASTER",
+      "DateRange": "Variable",
+      "Theme": "Hunt",
+      "Feature": "CollectibleEggs",
+      "Rewards": ["Pastel_Wrap", "Bunny_Ornament"]
+    },
+    "Independence": {
+      "ID": "HOLIDAY_JULY4",
+      "DateRange": "Jul 1 - Jul 7",
+      "Theme": "Freedom",
+      "Region": "NA",
+      "Rewards": ["Stars_Stripes_Livery", "Eagle_Hood_Ornament"],
+      "SpecialFeatures": ["Fireworks_VFX"]
+    },
+    "Halloween": {
+      "ID": "HOLIDAY_HALLOWEEN",
+      "DateRange": "Oct 25 - Nov 2",
+      "Theme": "Spooky",
+      "VisualChanges": ["Fog_Density_Increased", "Spooky_NPCs"],
+      "Rewards": ["Skull_Livery", "Ghost_Smoke", "Pumpkin_Ornament"],
+      "SpecialRaces": "Haunted_Sprint"
+    },
+    "Thanksgiving": {
+      "ID": "HOLIDAY_THANKS",
+      "DateRange": "4th_Thursday_Nov",
+      "Theme": "Gratitude",
+      "Region": "NA",
+      "Modifier": { "CashBonus": 1.5 }
+    },
+    "Christmas": {
+      "ID": "HOLIDAY_CHRISTMAS",
+      "DateRange": "Dec 15 - Dec 28",
+      "Theme": "Winter_Celebration",
+      "VisualChanges": ["Snow_All_Tracks", "Decorations", "Santa_NPCs"],
+      "Rewards": ["Reindeer_Livery", "Gift_Box_Smoke", "Jingle_Horn"],
+      "Feature": "GiftExchange",
+      "DailyGifts": 12
+    }
+  },
+
+  "CommunityEvents": {
+    "GlobalChallenge": {
+      "ID": "COMMUNITY_GLOBAL",
+      "Type": "Collaborative",
+      "Goals": {
+        "Tier1": { "Target": 1000000, "Reward": "Community_Decal" },
+        "Tier2": { "Target": 5000000, "Reward": "Community_Title" },
+        "Tier3": { "Target": 10000000, "Reward": "Community_Vehicle" }
+      },
+      "Tracking": "GlobalCounter",
+      "Duration": 604800
+    },
+    "CrewWars": {
+      "ID": "COMMUNITY_CREWWARS",
+      "Type": "Competitive",
+      "Duration": 604800,
+      "Rewards": {
+        "WinningCrew": { "Cash": 1000000, "Title": "Crew_Champions" },
+        "TopContributor": { "Cash": 100000, "Badge": "MVP" }
+      }
+    },
+    "VotedEvent": {
+      "ID": "COMMUNITY_VOTE",
+      "Type": "PlayerChoice",
+      "VotingPeriod": 86400,
+      "Options": 4,
+      "WinnerRuntime": 604800
+    }
+  },
+
+  "LimitedTimeVehicles": {
+    "MonthlyExclusive": {
+      "AvailabilityWindow": 604800,
+      "PurchaseMethod": "Cash",
+      "NotifyOnAvailable": true
+    },
+    "EventReward": {
+      "EarnableOnly": true,
+      "LimitedEdition": true,
+      "TradeableAfter": 2592000
+    },
+    "SeasonPassExclusive": {
+      "RequiresPass": true,
+      "Tier": "Premium"
+    }
+  },
+
+  "Notifications": {
+    "EventStarting": {
+      "PreNotify": [86400, 3600, 1800],
+      "Sound": "SFX_Event_Alert"
+    },
+    "EventEnding": {
+      "PreNotify": [3600, 1800, 300],
+      "Sound": "SFX_Event_Ending"
+    },
+    "NewEventAvailable": {
+      "PushNotification": true,
+      "InGamePopup": true
+    }
+  },
+
+  "Schedule2026": {
+    "January": {
+      "WeeklyEvents": ["DoubleCashWeekend", "TrialWeekend"],
+      "SpecialEvent": "NewYear_Championship",
+      "SeasonPassStart": "Season_7"
+    },
+    "February": {
+      "WeeklyEvents": ["DoubleREPWeekend"],
+      "SpecialEvent": "Valentine_Tandem_Challenge",
+      "CommunityEvent": "Love_Miles_Challenge"
+    },
+    "March": {
+      "WeeklyEvents": ["DoubleCashWeekend"],
+      "SpecialEvent": "Spring_Kickoff_Series",
+      "SeasonStart": "Spring"
+    }
+  }
+}

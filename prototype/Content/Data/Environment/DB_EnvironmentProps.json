@@ -1,0 +1,518 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Environment Props and Interactive Objects",
+
+  "PropCategories": {
+    "Destructible": {
+      "Description": "Objects that can be destroyed by collision",
+      "DamageToPlayer": true,
+      "SpeedThreshold": 30
+    },
+    "Static": {
+      "Description": "Immovable environmental objects",
+      "DamageToPlayer": true,
+      "Solid": true
+    },
+    "Interactive": {
+      "Description": "Objects player can interact with",
+      "Triggerable": true
+    },
+    "Cosmetic": {
+      "Description": "Visual-only objects, no collision",
+      "DamageToPlayer": false,
+      "Collision": false
+    }
+  },
+
+  "StreetProps": {
+    "TrafficCones": {
+      "ID": "PROP_CONE",
+      "Category": "Destructible",
+      "Mass": 3.0,
+      "Variants": ["Orange", "Yellow", "Striped"],
+      "ImpactSound": "SFX_Cone_Hit",
+      "SpawnGroups": true,
+      "REPBonus": 5
+    },
+    "Barriers": {
+      "Plastic": {
+        "ID": "PROP_BARRIER_PLASTIC",
+        "Category": "Destructible",
+        "Mass": 15.0,
+        "Health": 50,
+        "Variants": ["Orange", "White", "Yellow"],
+        "ImpactSound": "SFX_Plastic_Crash"
+      },
+      "Concrete": {
+        "ID": "PROP_BARRIER_CONCRETE",
+        "Category": "Static",
+        "DamageMultiplier": 2.0,
+        "ImpactSound": "SFX_Concrete_Hit"
+      },
+      "Metal": {
+        "ID": "PROP_BARRIER_METAL",
+        "Category": "Static",
+        "DamageMultiplier": 1.5,
+        "ImpactSound": "SFX_Metal_Crash",
+        "Variants": ["Guardrail", "Fence", "Railing"]
+      }
+    },
+    "SignPosts": {
+      "ID": "PROP_SIGN",
+      "Category": "Destructible",
+      "Mass": 20.0,
+      "Health": 30,
+      "Variants": [
+        "StopSign", "YieldSign", "SpeedLimit",
+        "OneWay", "NoParking", "Directional"
+      ],
+      "ImpactSound": "SFX_Sign_Hit",
+      "FallPhysics": true
+    },
+    "StreetLights": {
+      "ID": "PROP_STREETLIGHT",
+      "Category": "Static",
+      "DamageMultiplier": 1.8,
+      "LightSource": true,
+      "Variants": ["Modern", "Classic", "Industrial"],
+      "ImpactSound": "SFX_Metal_Crash",
+      "SparksOnHit": true
+    },
+    "FireHydrant": {
+      "ID": "PROP_HYDRANT",
+      "Category": "Destructible",
+      "Mass": 80.0,
+      "Health": 100,
+      "ImpactSound": "SFX_Metal_Hit",
+      "OnDestroy": {
+        "WaterGeyser": true,
+        "Duration": 30.0,
+        "SlipperyArea": true
+      }
+    },
+    "Mailbox": {
+      "ID": "PROP_MAILBOX",
+      "Category": "Destructible",
+      "Mass": 25.0,
+      "Health": 40,
+      "Variants": ["Blue", "Residential"],
+      "ImpactSound": "SFX_Metal_Hit"
+    },
+    "TrashCan": {
+      "ID": "PROP_TRASHCAN",
+      "Category": "Destructible",
+      "Mass": 10.0,
+      "Health": 20,
+      "Variants": ["Metal", "Plastic", "Dumpster"],
+      "ImpactSound": "SFX_Trash_Hit",
+      "DebrisOnDestroy": true
+    },
+    "ParkingMeter": {
+      "ID": "PROP_PARKING_METER",
+      "Category": "Destructible",
+      "Mass": 30.0,
+      "Health": 50,
+      "ImpactSound": "SFX_Metal_Hit",
+      "CoinsOnDestroy": true
+    },
+    "Bench": {
+      "ID": "PROP_BENCH",
+      "Category": "Destructible",
+      "Mass": 50.0,
+      "Health": 60,
+      "Variants": ["Wood", "Metal", "Modern"],
+      "ImpactSound": "SFX_Wood_Crash"
+    },
+    "PhoneBooth": {
+      "ID": "PROP_PHONE",
+      "Category": "Destructible",
+      "Mass": 100.0,
+      "Health": 80,
+      "ImpactSound": "SFX_Glass_Shatter",
+      "GlassShatter": true
+    }
+  },
+
+  "RoadElements": {
+    "Barrels": {
+      "ID": "PROP_BARREL",
+      "Category": "Destructible",
+      "Mass": 25.0,
+      "Health": 30,
+      "Variants": ["Orange", "Blue", "Red", "Yellow"],
+      "ImpactSound": "SFX_Barrel_Hit",
+      "RollPhysics": true
+    },
+    "TireStack": {
+      "ID": "PROP_TIRES",
+      "Category": "Destructible",
+      "Mass": 100.0,
+      "AbsorbsImpact": true,
+      "DamageReduction": 0.5,
+      "ImpactSound": "SFX_Tire_Hit",
+      "ScattersOnHit": true
+    },
+    "HayBales": {
+      "ID": "PROP_HAY",
+      "Category": "Destructible",
+      "Mass": 150.0,
+      "AbsorbsImpact": true,
+      "DamageReduction": 0.7,
+      "LocationSpecific": ["Canyon", "Rural"],
+      "ImpactSound": "SFX_Hay_Hit"
+    },
+    "Ramp": {
+      "ID": "PROP_RAMP",
+      "Category": "Interactive",
+      "Jumpable": true,
+      "JumpMultiplier": 1.0,
+      "Variants": ["Small", "Medium", "Large"],
+      "AirTimeBonus": true
+    },
+    "SpeedBump": {
+      "ID": "PROP_SPEEDBUMP",
+      "Category": "Static",
+      "PhysicsInteraction": true,
+      "JumpMultiplier": 0.3,
+      "SpeedThreshold": 60
+    },
+    "OilSlick": {
+      "ID": "PROP_OIL",
+      "Category": "Interactive",
+      "Hazard": true,
+      "GripReduction": 0.3,
+      "Duration": 2.0,
+      "Visual": "Decal"
+    },
+    "WaterPuddle": {
+      "ID": "PROP_PUDDLE",
+      "Category": "Interactive",
+      "Hazard": true,
+      "GripReduction": 0.2,
+      "SprayEffect": true,
+      "WeatherSpawned": true
+    }
+  },
+
+  "UrbanProps": {
+    "Vendor": {
+      "FoodCart": {
+        "ID": "PROP_FOODCART",
+        "Category": "Destructible",
+        "Mass": 200.0,
+        "Health": 100,
+        "ImpactSound": "SFX_Cart_Crash",
+        "DebrisOnDestroy": true
+      },
+      "NewspaperStand": {
+        "ID": "PROP_NEWSSTAND",
+        "Category": "Destructible",
+        "Mass": 80.0,
+        "Health": 50,
+        "PapersScatter": true
+      }
+    },
+    "Construction": {
+      "Scaffolding": {
+        "ID": "PROP_SCAFFOLD",
+        "Category": "Destructible",
+        "Mass": 300.0,
+        "Health": 150,
+        "CollapsePhysics": true,
+        "ImpactSound": "SFX_Metal_Collapse"
+      },
+      "ConstructionBarrier": {
+        "ID": "PROP_CONST_BARRIER",
+        "Category": "Destructible",
+        "Mass": 50.0,
+        "Variants": ["Fence", "Sawhorse", "Tape"]
+      },
+      "PortaPotty": {
+        "ID": "PROP_PORTAPOTTY",
+        "Category": "Destructible",
+        "Mass": 100.0,
+        "Health": 60,
+        "ImpactSound": "SFX_Plastic_Crash"
+      }
+    },
+    "Seating": {
+      "OutdoorTable": {
+        "ID": "PROP_TABLE_OUTDOOR",
+        "Category": "Destructible",
+        "Mass": 40.0,
+        "Health": 40,
+        "Umbrella": true
+      },
+      "Chair": {
+        "ID": "PROP_CHAIR",
+        "Category": "Destructible",
+        "Mass": 10.0,
+        "Health": 15,
+        "ScattersOnHit": true
+      }
+    },
+    "Planters": {
+      "ID": "PROP_PLANTER",
+      "Category": "Static",
+      "Variants": ["Small", "Large", "Concrete"],
+      "DamageMultiplier": 1.3
+    }
+  },
+
+  "IndustrialProps": {
+    "Containers": {
+      "ShippingContainer": {
+        "ID": "PROP_CONTAINER",
+        "Category": "Static",
+        "DamageMultiplier": 2.0,
+        "Variants": ["Red", "Blue", "Green", "Rust"],
+        "Stackable": true
+      },
+      "Crate": {
+        "ID": "PROP_CRATE",
+        "Category": "Destructible",
+        "Mass": 200.0,
+        "Health": 80,
+        "Variants": ["Wood", "Metal"],
+        "ImpactSound": "SFX_Crate_Crash",
+        "DebrisOnDestroy": true
+      },
+      "Pallet": {
+        "ID": "PROP_PALLET",
+        "Category": "Destructible",
+        "Mass": 30.0,
+        "Health": 20,
+        "Stackable": true
+      }
+    },
+    "Equipment": {
+      "Forklift": {
+        "ID": "PROP_FORKLIFT",
+        "Category": "Static",
+        "DamageMultiplier": 1.5,
+        "Mass": 2000.0
+      },
+      "OilDrum": {
+        "ID": "PROP_OILDRUM",
+        "Category": "Destructible",
+        "Mass": 100.0,
+        "Health": 50,
+        "Explosive": false,
+        "RollPhysics": true,
+        "Variants": ["Full", "Empty", "Rusty"]
+      }
+    },
+    "Fencing": {
+      "ChainLink": {
+        "ID": "PROP_CHAINLINK",
+        "Category": "Destructible",
+        "Mass": 80.0,
+        "Health": 100,
+        "DeformOnHit": true
+      },
+      "WoodenFence": {
+        "ID": "PROP_WOODFENCE",
+        "Category": "Destructible",
+        "Mass": 50.0,
+        "Health": 40,
+        "SplinterOnHit": true
+      }
+    }
+  },
+
+  "NatureProps": {
+    "Trees": {
+      "SmallTree": {
+        "ID": "PROP_TREE_SMALL",
+        "Category": "Destructible",
+        "Mass": 200.0,
+        "Health": 150,
+        "FallPhysics": true
+      },
+      "LargeTree": {
+        "ID": "PROP_TREE_LARGE",
+        "Category": "Static",
+        "DamageMultiplier": 2.5
+      },
+      "PalmTree": {
+        "ID": "PROP_PALM",
+        "Category": "Static",
+        "DamageMultiplier": 2.0,
+        "LocationSpecific": ["Coastal"]
+      }
+    },
+    "Rocks": {
+      "SmallRock": {
+        "ID": "PROP_ROCK_SMALL",
+        "Category": "Destructible",
+        "Mass": 50.0,
+        "ScattersOnHit": true
+      },
+      "LargeRock": {
+        "ID": "PROP_ROCK_LARGE",
+        "Category": "Static",
+        "DamageMultiplier": 2.0
+      },
+      "Boulder": {
+        "ID": "PROP_BOULDER",
+        "Category": "Static",
+        "DamageMultiplier": 3.0,
+        "LocationSpecific": ["Canyon", "Mountain"]
+      }
+    },
+    "Vegetation": {
+      "Bush": {
+        "ID": "PROP_BUSH",
+        "Category": "Cosmetic",
+        "DriveThrough": true
+      },
+      "Hedge": {
+        "ID": "PROP_HEDGE",
+        "Category": "Destructible",
+        "Mass": 30.0,
+        "SlowsVehicle": true,
+        "SpeedReduction": 0.5
+      }
+    }
+  },
+
+  "InteractiveElements": {
+    "Collectibles": {
+      "REPToken": {
+        "ID": "PROP_REP_TOKEN",
+        "Category": "Interactive",
+        "Collision": "Overlap",
+        "OnCollect": { "REP": 100 },
+        "Visual": "GlowingOrb",
+        "Color": "#FF44AA",
+        "Sound": "SFX_Collect"
+      },
+      "CashBundle": {
+        "ID": "PROP_CASH",
+        "Category": "Interactive",
+        "Collision": "Overlap",
+        "OnCollect": { "Cash": 500 },
+        "Visual": "MoneyStack",
+        "Sound": "SFX_Cash_Collect"
+      },
+      "NitrousCanister": {
+        "ID": "PROP_NITROUS",
+        "Category": "Interactive",
+        "Collision": "Overlap",
+        "OnCollect": { "Nitrous": 25 },
+        "Visual": "NOSBottle",
+        "Color": "#00FFFF",
+        "Sound": "SFX_NOS_Collect"
+      },
+      "HealthPack": {
+        "ID": "PROP_HEALTH",
+        "Category": "Interactive",
+        "Collision": "Overlap",
+        "OnCollect": { "RepairPercent": 25 },
+        "Visual": "WrenchIcon",
+        "Color": "#44FF44",
+        "Sound": "SFX_Repair"
+      }
+    },
+    "Triggers": {
+      "SpeedTrap": {
+        "ID": "TRIGGER_SPEEDTRAP",
+        "Category": "Interactive",
+        "Type": "Zone",
+        "OnEnter": "RecordSpeed",
+        "Visual": "SpeedCamera",
+        "UIIndicator": true
+      },
+      "Checkpoint": {
+        "ID": "TRIGGER_CHECKPOINT",
+        "Category": "Interactive",
+        "Type": "Gate",
+        "OnPass": "AddTime",
+        "Visual": "CheckpointGate"
+      },
+      "DriftZone": {
+        "ID": "TRIGGER_DRIFT",
+        "Category": "Interactive",
+        "Type": "Zone",
+        "OnEnter": "StartDriftScore",
+        "OnExit": "EndDriftScore",
+        "Visual": "DriftMarkers"
+      },
+      "JumpZone": {
+        "ID": "TRIGGER_JUMP",
+        "Category": "Interactive",
+        "Type": "Zone",
+        "OnEnter": "TrackAirTime",
+        "Visual": "JumpIndicator"
+      }
+    }
+  },
+
+  "Explosives": {
+    "ExplosiveBarrel": {
+      "ID": "PROP_EXPLODE_BARREL",
+      "Category": "Destructible",
+      "Mass": 100.0,
+      "Health": 30,
+      "Explosive": true,
+      "ExplosionRadius": 5.0,
+      "ExplosionForce": 50000.0,
+      "DamageToPlayer": 200,
+      "ChainReaction": true,
+      "Variants": ["Red", "Yellow"],
+      "ImpactSound": "SFX_Explosion"
+    },
+    "GasTank": {
+      "ID": "PROP_GAS_TANK",
+      "Category": "Destructible",
+      "Mass": 500.0,
+      "Health": 100,
+      "Explosive": true,
+      "ExplosionRadius": 10.0,
+      "ExplosionForce": 100000.0,
+      "FireAftermath": true
+    }
+  },
+
+  "Ambient": {
+    "Birds": {
+      "ID": "AMBIENT_BIRDS",
+      "Category": "Cosmetic",
+      "FleeFromPlayer": true,
+      "FleeDistance": 20.0
+    },
+    "Papers": {
+      "ID": "AMBIENT_PAPERS",
+      "Category": "Cosmetic",
+      "WindAffected": true,
+      "ScatterOnNearby": true
+    },
+    "Leaves": {
+      "ID": "AMBIENT_LEAVES",
+      "Category": "Cosmetic",
+      "WindAffected": true,
+      "SeasonalColor": true
+    },
+    "Steam": {
+      "ID": "AMBIENT_STEAM",
+      "Category": "Cosmetic",
+      "Particle": true,
+      "UrbanOnly": true
+    }
+  },
+
+  "Performance": {
+    "LODDistances": {
+      "High": 50,
+      "Medium": 150,
+      "Low": 300,
+      "Cull": 500
+    },
+    "PhysicsSimulation": {
+      "ActiveDistance": 100,
+      "SleepDistance": 200
+    },
+    "MaxDestructiblesSimultaneous": 50,
+    "DebrisCleanupTime": 10.0
+  }
+}

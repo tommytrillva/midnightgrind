@@ -1,0 +1,299 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Credits and Acknowledgments",
+
+  "DisplaySettings": {
+    "ScrollSpeed": 50,
+    "BackgroundMusic": "MUS_CREDITS",
+    "AllowSkip": true,
+    "SkipAfterFirstView": true,
+    "ShowVehicleShowcase": true,
+    "EndWithLogo": true
+  },
+
+  "Sections": [
+    {
+      "ID": "CREDITS_HEADER",
+      "Type": "Logo",
+      "Content": {
+        "Logo": "MidnightGrind_Logo",
+        "Tagline": "The Grind Never Stops",
+        "Duration": 5.0
+      }
+    },
+    {
+      "ID": "CREDITS_LEADERSHIP",
+      "Type": "Team",
+      "Title": "LEADERSHIP",
+      "Roles": [
+        { "Role": "Game Director", "Name": "[Director Name]" },
+        { "Role": "Creative Director", "Name": "[Creative Director Name]" },
+        { "Role": "Technical Director", "Name": "[Tech Director Name]" },
+        { "Role": "Art Director", "Name": "[Art Director Name]" },
+        { "Role": "Audio Director", "Name": "[Audio Director Name]" },
+        { "Role": "Production Director", "Name": "[Production Director Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_DESIGN",
+      "Type": "Team",
+      "Title": "DESIGN",
+      "Roles": [
+        { "Role": "Lead Game Designer", "Name": "[Lead Designer Name]" },
+        { "Role": "Senior Game Designers", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Systems Designer", "Name": "[Systems Designer Name]" },
+        { "Role": "Level Designers", "Names": ["[Name 1]", "[Name 2]", "[Name 3]"] },
+        { "Role": "Vehicle Designer", "Name": "[Vehicle Designer Name]" },
+        { "Role": "Economy Designer", "Name": "[Economy Designer Name]" },
+        { "Role": "UX Designer", "Name": "[UX Designer Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_PROGRAMMING",
+      "Type": "Team",
+      "Title": "ENGINEERING",
+      "Roles": [
+        { "Role": "Lead Programmer", "Name": "[Lead Programmer Name]" },
+        { "Role": "Senior Engine Programmers", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Gameplay Programmers", "Names": ["[Name 1]", "[Name 2]", "[Name 3]"] },
+        { "Role": "Vehicle Physics Programmer", "Name": "[Physics Programmer Name]" },
+        { "Role": "AI Programmer", "Name": "[AI Programmer Name]" },
+        { "Role": "UI Programmer", "Name": "[UI Programmer Name]" },
+        { "Role": "Online/Networking", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Tools Programmer", "Name": "[Tools Programmer Name]" },
+        { "Role": "Graphics Programmer", "Name": "[Graphics Programmer Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_ART",
+      "Type": "Team",
+      "Title": "ART",
+      "Roles": [
+        { "Role": "Lead Artist", "Name": "[Lead Artist Name]" },
+        { "Role": "Senior Environment Artists", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Environment Artists", "Names": ["[Name 1]", "[Name 2]", "[Name 3]"] },
+        { "Role": "Vehicle Artists", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Character Artists", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "VFX Artists", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Lighting Artists", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Technical Artists", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Concept Artists", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "UI Artists", "Names": ["[Name 1]", "[Name 2]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_ANIMATION",
+      "Type": "Team",
+      "Title": "ANIMATION",
+      "Roles": [
+        { "Role": "Lead Animator", "Name": "[Lead Animator Name]" },
+        { "Role": "Vehicle Animators", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Character Animators", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Cinematic Animator", "Name": "[Cinematic Animator Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_AUDIO",
+      "Type": "Team",
+      "Title": "AUDIO",
+      "Roles": [
+        { "Role": "Lead Sound Designer", "Name": "[Lead Sound Name]" },
+        { "Role": "Sound Designers", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Composer", "Name": "[Composer Name]" },
+        { "Role": "Music Supervisor", "Name": "[Music Supervisor Name]" },
+        { "Role": "Audio Programmer", "Name": "[Audio Programmer Name]" },
+        { "Role": "Voice Director", "Name": "[Voice Director Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_PRODUCTION",
+      "Type": "Team",
+      "Title": "PRODUCTION",
+      "Roles": [
+        { "Role": "Executive Producer", "Name": "[Executive Producer Name]" },
+        { "Role": "Senior Producer", "Name": "[Senior Producer Name]" },
+        { "Role": "Producers", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Associate Producers", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Production Coordinators", "Names": ["[Name 1]", "[Name 2]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_QA",
+      "Type": "Team",
+      "Title": "QUALITY ASSURANCE",
+      "Roles": [
+        { "Role": "QA Lead", "Name": "[QA Lead Name]" },
+        { "Role": "Senior QA Analysts", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "QA Analysts", "Names": ["[Name 1]", "[Name 2]", "[Name 3]", "[Name 4]"] },
+        { "Role": "Compatibility Testers", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Localization QA", "Names": ["[Name 1]", "[Name 2]"] }
+      ]
+    },
+    {
+      "ID": "CREDITS_NARRATIVE",
+      "Type": "Team",
+      "Title": "NARRATIVE",
+      "Roles": [
+        { "Role": "Lead Writer", "Name": "[Lead Writer Name]" },
+        { "Role": "Writers", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Dialogue Writer", "Name": "[Dialogue Writer Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_LOCALIZATION",
+      "Type": "Team",
+      "Title": "LOCALIZATION",
+      "Languages": [
+        { "Language": "Japanese", "Translator": "[Translator Name]" },
+        { "Language": "German", "Translator": "[Translator Name]" },
+        { "Language": "French", "Translator": "[Translator Name]" },
+        { "Language": "Spanish", "Translator": "[Translator Name]" },
+        { "Language": "Portuguese", "Translator": "[Translator Name]" },
+        { "Language": "Italian", "Translator": "[Translator Name]" },
+        { "Language": "Korean", "Translator": "[Translator Name]" },
+        { "Language": "Chinese (Simplified)", "Translator": "[Translator Name]" },
+        { "Language": "Chinese (Traditional)", "Translator": "[Translator Name]" },
+        { "Language": "Russian", "Translator": "[Translator Name]" },
+        { "Language": "Polish", "Translator": "[Translator Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_MARKETING",
+      "Type": "Team",
+      "Title": "MARKETING & COMMUNITY",
+      "Roles": [
+        { "Role": "Marketing Director", "Name": "[Marketing Director Name]" },
+        { "Role": "Community Manager", "Name": "[Community Manager Name]" },
+        { "Role": "Social Media Manager", "Name": "[Social Media Manager Name]" },
+        { "Role": "Trailer Editor", "Name": "[Trailer Editor Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_BUSINESS",
+      "Type": "Team",
+      "Title": "BUSINESS & OPERATIONS",
+      "Roles": [
+        { "Role": "Studio Head", "Name": "[Studio Head Name]" },
+        { "Role": "Business Development", "Name": "[BD Name]" },
+        { "Role": "Legal", "Name": "[Legal Name]" },
+        { "Role": "Finance", "Name": "[Finance Name]" },
+        { "Role": "HR", "Name": "[HR Name]" },
+        { "Role": "IT Support", "Names": ["[Name 1]", "[Name 2]"] },
+        { "Role": "Office Management", "Name": "[Office Manager Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_PARTNERS",
+      "Type": "Partners",
+      "Title": "PARTNERS & COLLABORATORS",
+      "Entries": [
+        { "Category": "Motion Capture Studio", "Name": "[MoCap Studio]" },
+        { "Category": "Voice Recording Studio", "Name": "[Voice Studio]" },
+        { "Category": "External Art Support", "Name": "[Art Studio]" },
+        { "Category": "External QA", "Name": "[QA Company]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_MIDDLEWARE",
+      "Type": "Technology",
+      "Title": "TECHNOLOGY",
+      "Entries": [
+        { "Tech": "Game Engine", "Name": "Unreal Engine 5.7", "Company": "Epic Games" },
+        { "Tech": "Audio Middleware", "Name": "Wwise", "Company": "Audiokinetic" },
+        { "Tech": "Physics", "Name": "Chaos Physics", "Company": "Epic Games" },
+        { "Tech": "Multiplayer", "Name": "Epic Online Services", "Company": "Epic Games" }
+      ]
+    },
+    {
+      "ID": "CREDITS_VOICE",
+      "Type": "VoiceCast",
+      "Title": "VOICE CAST",
+      "Entries": [
+        { "Character": "Player Character", "Actor": "[Actor Name]" },
+        { "Character": "Rival 1 - Kenji Tanaka", "Actor": "[Actor Name]" },
+        { "Character": "Rival 2 - Sarah Storm", "Actor": "[Actor Name]" },
+        { "Character": "Mechanic", "Actor": "[Actor Name]" },
+        { "Character": "Police Dispatcher", "Actor": "[Actor Name]" },
+        { "Character": "Radio DJ", "Actor": "[Actor Name]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_MUSIC",
+      "Type": "Music",
+      "Title": "MUSIC",
+      "Entries": [
+        { "Category": "Original Score", "Composer": "[Composer Name]" },
+        { "Category": "Additional Music", "Artists": ["[Artist 1]", "[Artist 2]"] },
+        { "Category": "Music Licensing", "Company": "[Licensing Company]" }
+      ],
+      "LicensedTracks": [
+        { "Track": "[Track 1 Name]", "Artist": "[Artist]", "Label": "[Label]" },
+        { "Track": "[Track 2 Name]", "Artist": "[Artist]", "Label": "[Label]" },
+        { "Track": "[Track 3 Name]", "Artist": "[Artist]", "Label": "[Label]" }
+      ]
+    },
+    {
+      "ID": "CREDITS_SPECIAL_THANKS",
+      "Type": "SpecialThanks",
+      "Title": "SPECIAL THANKS",
+      "Names": [
+        "Our families and loved ones",
+        "The amazing racing game community",
+        "All our playtesters",
+        "Everyone who believed in this project",
+        "[Additional Thanks]"
+      ]
+    },
+    {
+      "ID": "CREDITS_COMMUNITY",
+      "Type": "Community",
+      "Title": "COMMUNITY CONTRIBUTORS",
+      "Description": "Special thanks to our beta testers and community members:",
+      "DynamicLoad": true,
+      "MaxDisplay": 100
+    },
+    {
+      "ID": "CREDITS_DEDICATION",
+      "Type": "Dedication",
+      "Content": {
+        "Text": "Dedicated to street racing enthusiasts everywhere.\nThe grind never stops.",
+        "Duration": 5.0
+      }
+    },
+    {
+      "ID": "CREDITS_LEGAL",
+      "Type": "Legal",
+      "Content": {
+        "Copyright": "© 2026 [Studio Name]. All rights reserved.",
+        "Trademarks": "All trademarks are property of their respective owners.",
+        "Disclaimer": "This is a work of fiction. The vehicles depicted are fictional and not endorsed by any real automotive manufacturer.",
+        "Rating": "Rated [Rating] by [Rating Board]"
+      }
+    },
+    {
+      "ID": "CREDITS_END",
+      "Type": "Logo",
+      "Content": {
+        "Logo": "Studio_Logo",
+        "Website": "www.midnightgrind.com",
+        "Social": "@MidnightGrindGame",
+        "Duration": 8.0
+      }
+    }
+  ],
+
+  "UnlockableCredits": {
+    "DeveloperCommentary": {
+      "UnlockCondition": "Beat_Game",
+      "Description": "Developer commentary track"
+    },
+    "BlooperReel": {
+      "UnlockCondition": "100_Percent_Completion",
+      "Description": "Development outtakes and funny moments"
+    },
+    "ConceptArtGallery": {
+      "UnlockCondition": "Beat_Game",
+      "Description": "Early concept art and designs"
+    }
+  }
+}

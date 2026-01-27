@@ -1,0 +1,382 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Scoring and Points System Configuration",
+
+  "RaceScoring": {
+    "Circuit": {
+      "PositionPoints": {
+        "1st": 100,
+        "2nd": 85,
+        "3rd": 70,
+        "4th": 60,
+        "5th": 50,
+        "6th": 45,
+        "7th": 40,
+        "8th": 35,
+        "9th": 30,
+        "10th": 25,
+        "11th": 20,
+        "12th": 15
+      },
+      "BonusPoints": {
+        "FastestLap": 15,
+        "PolePosition": 10,
+        "LedLap": 5,
+        "CleanRace": 20,
+        "Comeback": { "PositionsGained": 3, "Points": 10 },
+        "PhotoFinish": { "Margin": 0.1, "Points": 10 }
+      },
+      "Penalties": {
+        "Collision": -5,
+        "CuttingCorner": -10,
+        "WrongWay": -20,
+        "Disqualified": -100
+      }
+    },
+    "Sprint": {
+      "PositionPoints": {
+        "1st": 50,
+        "2nd": 40,
+        "3rd": 30,
+        "4th": 25,
+        "5th": 20,
+        "6th": 15,
+        "7th": 10,
+        "8th": 5
+      },
+      "BonusPoints": {
+        "FirstToCheckpoint": 5,
+        "CleanRace": 10,
+        "WinMargin": { "Over5Seconds": 10 }
+      }
+    },
+    "TimeAttack": {
+      "BasePoints": 100,
+      "TimeBonuses": {
+        "UnderTargetTime": { "PerSecond": 10 },
+        "PersonalBest": 50,
+        "TrackRecord": 200
+      },
+      "SectorBonuses": {
+        "PurpleSector": 15,
+        "AllPurple": 50
+      }
+    },
+    "Elimination": {
+      "SurvivalBonus": {
+        "PerRound": 15
+      },
+      "WinBonus": 100,
+      "LastManStanding": 25
+    }
+  },
+
+  "DriftScoring": {
+    "BasePoints": {
+      "DriftInitiation": 10,
+      "PerDegreeAngle": 2,
+      "PerMeterDistance": 5,
+      "PerSecondDuration": 50
+    },
+    "Multipliers": {
+      "AngleBonus": {
+        "30-45": 1.0,
+        "45-60": 1.25,
+        "60-75": 1.5,
+        "75-90": 2.0,
+        "90+": 2.5
+      },
+      "SpeedBonus": {
+        "Under50kmh": 0.5,
+        "50-80kmh": 1.0,
+        "80-120kmh": 1.5,
+        "120-160kmh": 2.0,
+        "Over160kmh": 3.0
+      },
+      "ComboMultiplier": {
+        "Enabled": true,
+        "BaseMultiplier": 1.0,
+        "IncrementPerDrift": 0.1,
+        "MaxMultiplier": 5.0,
+        "DecayTime": 3.0
+      }
+    },
+    "StyleBonuses": {
+      "WallTap": { "Distance": 0.5, "Points": 500 },
+      "ClippingPoint": { "Distance": 1.0, "Points": 300 },
+      "Tandem": { "Distance": 5.0, "Multiplier": 1.5 },
+      "Transition": 200,
+      "DonutStart": 100,
+      "ReverseEntry": 400,
+      "HandbrakeEntry": 150,
+      "Manji": 250,
+      "LongDrift": { "Distance": 100, "Bonus": 1000 }
+    },
+    "Grades": {
+      "D": { "MinScore": 0, "Color": "#AAAAAA" },
+      "C": { "MinScore": 5000, "Color": "#88FF88" },
+      "B": { "MinScore": 15000, "Color": "#44AAFF" },
+      "A": { "MinScore": 35000, "Color": "#FF88FF" },
+      "S": { "MinScore": 60000, "Color": "#FFD700" },
+      "SS": { "MinScore": 100000, "Color": "#FF4488" },
+      "SSS": { "MinScore": 150000, "Color": "#FF0000" }
+    },
+    "Penalties": {
+      "WallHit": { "Points": -500, "ResetCombo": true },
+      "SpinOut": { "Points": -1000, "ResetCombo": true },
+      "WrongDirection": { "Points": -200 },
+      "OffTrack": { "ResetCombo": true }
+    }
+  },
+
+  "SpeedTrapScoring": {
+    "BasePoints": 100,
+    "SpeedBonuses": {
+      "Under100kmh": 0,
+      "100-150kmh": 50,
+      "150-200kmh": 150,
+      "200-250kmh": 300,
+      "250-300kmh": 500,
+      "Over300kmh": 1000
+    },
+    "RecordBonus": {
+      "PersonalBest": 200,
+      "TrackRecord": 500,
+      "GlobalRecord": 2000
+    }
+  },
+
+  "PursuitScoring": {
+    "EvadeTime": {
+      "PerSecond": 10,
+      "MaxTimeBonus": 6000
+    },
+    "TacticalBonuses": {
+      "NearMiss": 100,
+      "Roadblock": 250,
+      "SpikeStrip": 500,
+      "Helicopter": 1000,
+      "InfamyBonus": { "PerHeatLevel": 500 }
+    },
+    "EscapeBonus": {
+      "HeatLevel1": 500,
+      "HeatLevel2": 1500,
+      "HeatLevel3": 3000,
+      "HeatLevel4": 6000,
+      "HeatLevel5": 10000
+    },
+    "Penalties": {
+      "Busted": { "CashLoss": 0.25, "REPLoss": 0.1 },
+      "VehicleImpounded": { "RecoveryCost": 5000 }
+    }
+  },
+
+  "SkillScoring": {
+    "NearMiss": {
+      "Traffic": 50,
+      "RacingCar": 100,
+      "Police": 150,
+      "Combo": { "TimeWindow": 2.0, "Multiplier": 1.5 }
+    },
+    "Overtake": {
+      "Clean": 100,
+      "OnCorner": 150,
+      "HighSpeed": 200,
+      "MultiCar": { "PerCar": 100 }
+    },
+    "AirTime": {
+      "PerSecond": 200,
+      "PerfectLanding": 100,
+      "FlatLanding": -50
+    },
+    "TwoWheels": {
+      "PerSecond": 150
+    },
+    "Burnout": {
+      "PerSecond": 25,
+      "MaxTime": 10
+    },
+    "J-Turn": 300,
+    "180Spin": 200,
+    "360Spin": 500,
+    "BarrelRoll": 1000,
+    "Threading": {
+      "Description": "Pass between two cars",
+      "Points": 300
+    },
+    "Oncoming": {
+      "PerSecond": 100,
+      "NearMiss": 200
+    }
+  },
+
+  "REPEarning": {
+    "Races": {
+      "Win": { "Base": 500, "PerOpponent": 50 },
+      "2nd": { "Base": 300, "PerOpponent": 30 },
+      "3rd": { "Base": 200, "PerOpponent": 20 },
+      "Participation": 50,
+      "PinkSlipWin": 2000,
+      "RivalDefeat": 500
+    },
+    "Pursuits": {
+      "EscapeBase": 200,
+      "PerHeatLevel": 100,
+      "Busted": -100
+    },
+    "Social": {
+      "CrewRaceWin": 100,
+      "HelpTeammate": 50,
+      "PhotoLiked": 25,
+      "PhotoFeatured": 500
+    },
+    "Exploration": {
+      "NewAreaDiscovered": 100,
+      "CollectibleFound": 50,
+      "SpeedTrapRecord": 200
+    },
+    "Multipliers": {
+      "Nighttime": 1.25,
+      "BadWeather": 1.5,
+      "HighStakes": 2.0
+    }
+  },
+
+  "CashEarning": {
+    "Races": {
+      "BasePayout": {
+        "QuickRace": 2000,
+        "CareerRace": 5000,
+        "Championship": 10000,
+        "SpecialEvent": 15000
+      },
+      "PositionMultiplier": {
+        "1st": 1.0,
+        "2nd": 0.7,
+        "3rd": 0.5,
+        "4th": 0.35,
+        "5th": 0.25,
+        "6th+": 0.15
+      },
+      "DifficultyBonus": {
+        "Easy": 0.8,
+        "Normal": 1.0,
+        "Hard": 1.3,
+        "Expert": 1.6
+      }
+    },
+    "Pursuits": {
+      "HeatLevelPayout": {
+        "1": 500,
+        "2": 1500,
+        "3": 4000,
+        "4": 8000,
+        "5": 15000
+      },
+      "BonusPerMinute": 100
+    },
+    "PinkSlips": {
+      "Win": "OpponentVehicleValue",
+      "Lose": "YourVehicleValue"
+    },
+    "Bounties": {
+      "PerBountyPoint": 10,
+      "MaxDaily": 50000
+    }
+  },
+
+  "LeaderboardScoring": {
+    "SeasonPoints": {
+      "WeeklyRace": {
+        "1st": 50,
+        "2nd": 40,
+        "3rd": 30,
+        "4th-10th": 20,
+        "11th-25th": 10,
+        "Participation": 5
+      },
+      "DailyChallenge": {
+        "Complete": 25,
+        "TopPercent": { "1": 50, "5": 30, "10": 20 }
+      }
+    },
+    "RankedMatch": {
+      "Win": { "Base": 25, "StreakBonus": 5 },
+      "Lose": { "Base": -15, "ProtectionMatches": 3 }
+    },
+    "DriftLeaderboard": {
+      "Calculation": "BestSingleRun",
+      "TieBreaker": "FastestTime"
+    },
+    "SpeedLeaderboard": {
+      "Calculation": "TopSpeed",
+      "TieBreaker": "ReachTime"
+    }
+  },
+
+  "ComboSystem": {
+    "Enabled": true,
+    "BaseDecayTime": 5.0,
+    "DecayRate": 1.0,
+    "MaxCombo": 99,
+    "ComboActions": [
+      "NearMiss", "Drift", "Overtake", "AirTime",
+      "SpeedTrap", "SkillMove", "PursuitEvade"
+    ],
+    "ComboMultiplier": {
+      "1-5": 1.0,
+      "6-10": 1.25,
+      "11-20": 1.5,
+      "21-50": 2.0,
+      "51+": 3.0
+    },
+    "ComboBreakers": [
+      "Crash", "SlowDown", "StopMoving", "Reset"
+    ]
+  },
+
+  "ChallengeScoring": {
+    "DailyChallenge": {
+      "BaseReward": 1000,
+      "BonusObjectives": 500,
+      "PerfectCompletion": 1500
+    },
+    "WeeklyChallenge": {
+      "Tiers": {
+        "Bronze": { "Threshold": 0.6, "Reward": 3000 },
+        "Silver": { "Threshold": 0.8, "Reward": 7500 },
+        "Gold": { "Threshold": 1.0, "Reward": 15000 }
+      }
+    },
+    "SeasonChallenge": {
+      "ProgressRewards": [
+        { "Progress": 25, "Reward": 10000 },
+        { "Progress": 50, "Reward": 25000 },
+        { "Progress": 75, "Reward": 50000 },
+        { "Progress": 100, "Reward": 100000 }
+      ]
+    }
+  },
+
+  "XPSystem": {
+    "LevelXP": {
+      "Formula": "BaseXP * Level * 1.15",
+      "BaseXP": 1000,
+      "MaxLevel": 100
+    },
+    "XPSources": {
+      "RaceComplete": 100,
+      "RaceWin": 250,
+      "FirstWinOfDay": 500,
+      "ChallengeComplete": 200,
+      "AchievementUnlock": 500,
+      "SkillPoints": { "Per1000Points": 10 },
+      "Discovery": 50
+    },
+    "Bonuses": {
+      "PremiumPass": 1.5,
+      "XPBoost": 2.0,
+      "FirstRaceBonus": 3.0
+    }
+  }
+}

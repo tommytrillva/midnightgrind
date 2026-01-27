@@ -1,0 +1,391 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Controller Layout Configurations",
+
+  "Platforms": {
+    "PlayStation": {
+      "ControllerName": "DualSense",
+      "ButtonLabels": {
+        "Cross": "X",
+        "Circle": "O",
+        "Square": "□",
+        "Triangle": "△",
+        "L1": "L1",
+        "R1": "R1",
+        "L2": "L2",
+        "R2": "R2",
+        "L3": "L3",
+        "R3": "R3",
+        "DPadUp": "D-Pad Up",
+        "DPadDown": "D-Pad Down",
+        "DPadLeft": "D-Pad Left",
+        "DPadRight": "D-Pad Right",
+        "Options": "Options",
+        "TouchPad": "Touch Pad",
+        "PS": "PS Button"
+      },
+      "Features": {
+        "HapticFeedback": true,
+        "AdaptiveTriggers": true,
+        "TouchPad": true,
+        "Gyroscope": true,
+        "Speaker": true,
+        "Microphone": true
+      }
+    },
+    "Xbox": {
+      "ControllerName": "Xbox Controller",
+      "ButtonLabels": {
+        "A": "A",
+        "B": "B",
+        "X": "X",
+        "Y": "Y",
+        "LB": "LB",
+        "RB": "RB",
+        "LT": "LT",
+        "RT": "RT",
+        "LS": "LS",
+        "RS": "RS",
+        "DPadUp": "D-Pad Up",
+        "DPadDown": "D-Pad Down",
+        "DPadLeft": "D-Pad Left",
+        "DPadRight": "D-Pad Right",
+        "Menu": "Menu",
+        "View": "View",
+        "Xbox": "Xbox Button"
+      },
+      "Features": {
+        "HapticFeedback": true,
+        "ImpulseTriggers": true
+      }
+    },
+    "PC": {
+      "KeyboardMouse": true,
+      "ControllerSupport": ["Xbox", "PlayStation", "Generic"],
+      "CustomBindings": true
+    }
+  },
+
+  "LayoutPresets": {
+    "Standard": {
+      "ID": "LAYOUT_STANDARD",
+      "Name": "Standard",
+      "Description": "Default racing game controls",
+      "Default": true,
+      "Mappings": {
+        "Throttle": { "PS": "R2", "Xbox": "RT", "Keyboard": "W" },
+        "Brake": { "PS": "L2", "Xbox": "LT", "Keyboard": "S" },
+        "Steering": { "PS": "LeftStick", "Xbox": "LeftStick", "Keyboard": "A/D" },
+        "Handbrake": { "PS": "Cross", "Xbox": "A", "Keyboard": "Space" },
+        "Nitrous": { "PS": "Circle", "Xbox": "B", "Keyboard": "LeftShift" },
+        "ShiftUp": { "PS": "R1", "Xbox": "RB", "Keyboard": "E" },
+        "ShiftDown": { "PS": "L1", "Xbox": "LB", "Keyboard": "Q" },
+        "Camera": { "PS": "Triangle", "Xbox": "Y", "Keyboard": "C" },
+        "LookBack": { "PS": "Square", "Xbox": "X", "Keyboard": "B" },
+        "Horn": { "PS": "L3", "Xbox": "LS", "Keyboard": "H" },
+        "Headlights": { "PS": "R3", "Xbox": "RS", "Keyboard": "L" },
+        "Map": { "PS": "TouchPad", "Xbox": "View", "Keyboard": "M" },
+        "Pause": { "PS": "Options", "Xbox": "Menu", "Keyboard": "Escape" },
+        "Reset": { "PS": "DPadUp", "Xbox": "DPadUp", "Keyboard": "R" },
+        "PhotoMode": { "PS": "DPadDown", "Xbox": "DPadDown", "Keyboard": "P" },
+        "RadioNext": { "PS": "DPadRight", "Xbox": "DPadRight", "Keyboard": "Period" },
+        "RadioPrev": { "PS": "DPadLeft", "Xbox": "DPadLeft", "Keyboard": "Comma" }
+      }
+    },
+    "Racing": {
+      "ID": "LAYOUT_RACING",
+      "Name": "Racing Pro",
+      "Description": "Optimized for competitive racing",
+      "Mappings": {
+        "Throttle": { "PS": "R2", "Xbox": "RT" },
+        "Brake": { "PS": "L2", "Xbox": "LT" },
+        "Steering": { "PS": "LeftStick", "Xbox": "LeftStick" },
+        "Handbrake": { "PS": "L1", "Xbox": "LB" },
+        "Nitrous": { "PS": "R1", "Xbox": "RB" },
+        "ShiftUp": { "PS": "Cross", "Xbox": "A" },
+        "ShiftDown": { "PS": "Square", "Xbox": "X" },
+        "Camera": { "PS": "Triangle", "Xbox": "Y" },
+        "LookBack": { "PS": "Circle", "Xbox": "B" }
+      }
+    },
+    "Drift": {
+      "ID": "LAYOUT_DRIFT",
+      "Name": "Drift Specialist",
+      "Description": "Optimized for drifting with quick handbrake access",
+      "Mappings": {
+        "Throttle": { "PS": "R2", "Xbox": "RT" },
+        "Brake": { "PS": "L2", "Xbox": "LT" },
+        "Steering": { "PS": "LeftStick", "Xbox": "LeftStick" },
+        "Handbrake": { "PS": "R1", "Xbox": "RB" },
+        "Nitrous": { "PS": "Cross", "Xbox": "A" },
+        "ShiftUp": { "PS": "DPadUp", "Xbox": "DPadUp" },
+        "ShiftDown": { "PS": "DPadDown", "Xbox": "DPadDown" },
+        "Camera": { "PS": "Triangle", "Xbox": "Y" },
+        "LookBack": { "PS": "Circle", "Xbox": "B" },
+        "QuickFlick": { "PS": "L1", "Xbox": "LB" }
+      }
+    },
+    "Casual": {
+      "ID": "LAYOUT_CASUAL",
+      "Name": "Casual",
+      "Description": "Simplified controls for new players",
+      "Mappings": {
+        "Throttle": { "PS": "R2", "Xbox": "RT" },
+        "Brake": { "PS": "L2", "Xbox": "LT" },
+        "Steering": { "PS": "LeftStick", "Xbox": "LeftStick" },
+        "Handbrake": { "PS": "Cross", "Xbox": "A" },
+        "Nitrous": { "PS": "Circle", "Xbox": "B" },
+        "Camera": { "PS": "Triangle", "Xbox": "Y" }
+      },
+      "Assists": {
+        "AutoShift": true,
+        "BrakeAssist": true,
+        "SteeringAssist": "Low"
+      }
+    },
+    "Simulator": {
+      "ID": "LAYOUT_SIM",
+      "Name": "Simulator",
+      "Description": "Realistic simulator-style controls",
+      "Mappings": {
+        "Throttle": { "PS": "R2", "Xbox": "RT" },
+        "Brake": { "PS": "L2", "Xbox": "LT" },
+        "Clutch": { "PS": "L1", "Xbox": "LB" },
+        "Steering": { "PS": "LeftStick", "Xbox": "LeftStick" },
+        "Handbrake": { "PS": "Cross", "Xbox": "A" },
+        "ShiftUp": { "PS": "R1", "Xbox": "RB" },
+        "ShiftDown": { "PS": "Square", "Xbox": "X" },
+        "Ignition": { "PS": "Triangle_Hold", "Xbox": "Y_Hold" },
+        "Camera": { "PS": "Circle", "Xbox": "B" },
+        "LookLeft": { "PS": "DPadLeft", "Xbox": "DPadLeft" },
+        "LookRight": { "PS": "DPadRight", "Xbox": "DPadRight" }
+      },
+      "Assists": {
+        "AutoShift": false,
+        "ClutchRequired": true
+      }
+    },
+    "Alternate": {
+      "ID": "LAYOUT_ALT",
+      "Name": "Alternate",
+      "Description": "Alternative layout with face button throttle/brake",
+      "Mappings": {
+        "Throttle": { "PS": "Cross", "Xbox": "A" },
+        "Brake": { "PS": "Square", "Xbox": "X" },
+        "Steering": { "PS": "LeftStick", "Xbox": "LeftStick" },
+        "Handbrake": { "PS": "Circle", "Xbox": "B" },
+        "Nitrous": { "PS": "Triangle", "Xbox": "Y" },
+        "ShiftUp": { "PS": "R1", "Xbox": "RB" },
+        "ShiftDown": { "PS": "L1", "Xbox": "LB" },
+        "Camera": { "PS": "R2", "Xbox": "RT" },
+        "LookBack": { "PS": "L2", "Xbox": "LT" }
+      }
+    }
+  },
+
+  "KeyboardLayouts": {
+    "WASD": {
+      "ID": "KB_WASD",
+      "Name": "WASD",
+      "Description": "Standard keyboard layout",
+      "Default": true,
+      "Mappings": {
+        "Throttle": "W",
+        "Brake": "S",
+        "SteerLeft": "A",
+        "SteerRight": "D",
+        "Handbrake": "Space",
+        "Nitrous": "LeftShift",
+        "ShiftUp": "E",
+        "ShiftDown": "Q",
+        "Camera": "C",
+        "LookBack": "B",
+        "Horn": "H",
+        "Headlights": "L",
+        "Map": "M",
+        "Pause": "Escape",
+        "Reset": "R",
+        "PhotoMode": "P",
+        "RadioNext": "Period",
+        "RadioPrev": "Comma",
+        "Respawn": "Delete"
+      }
+    },
+    "Arrows": {
+      "ID": "KB_ARROWS",
+      "Name": "Arrow Keys",
+      "Description": "Arrow key steering",
+      "Mappings": {
+        "Throttle": "Up",
+        "Brake": "Down",
+        "SteerLeft": "Left",
+        "SteerRight": "Right",
+        "Handbrake": "RightControl",
+        "Nitrous": "RightShift",
+        "ShiftUp": "Numpad8",
+        "ShiftDown": "Numpad2",
+        "Camera": "Numpad0",
+        "LookBack": "Numpad5"
+      }
+    },
+    "LeftHanded": {
+      "ID": "KB_LEFTY",
+      "Name": "Left-Handed",
+      "Description": "Optimized for left-handed players",
+      "Mappings": {
+        "Throttle": "I",
+        "Brake": "K",
+        "SteerLeft": "J",
+        "SteerRight": "L",
+        "Handbrake": "RightShift",
+        "Nitrous": "O",
+        "ShiftUp": "U",
+        "ShiftDown": "Y",
+        "Camera": "P"
+      }
+    }
+  },
+
+  "MouseSettings": {
+    "Steering": {
+      "Enabled": false,
+      "Sensitivity": 1.0,
+      "Deadzone": 0.05,
+      "Invert": false
+    },
+    "Camera": {
+      "Enabled": true,
+      "SensitivityX": 1.0,
+      "SensitivityY": 1.0,
+      "Invert": false
+    },
+    "PhotoMode": {
+      "CameraPan": "RightClick",
+      "CameraZoom": "ScrollWheel",
+      "TakePhoto": "LeftClick"
+    }
+  },
+
+  "StickSettings": {
+    "SteeringDeadzone": {
+      "Default": 0.05,
+      "Min": 0.0,
+      "Max": 0.3
+    },
+    "SteeringSensitivity": {
+      "Default": 1.0,
+      "Min": 0.5,
+      "Max": 2.0
+    },
+    "SteeringLinearity": {
+      "Default": 1.0,
+      "Min": 0.5,
+      "Max": 2.5,
+      "Description": "Higher values make steering less sensitive near center"
+    },
+    "TriggerDeadzone": {
+      "Default": 0.02,
+      "Min": 0.0,
+      "Max": 0.2
+    }
+  },
+
+  "ContextualActions": {
+    "Garage": {
+      "RotateVehicle": { "PS": "RightStick", "Xbox": "RightStick", "Mouse": "RightDrag" },
+      "ZoomVehicle": { "PS": "L2/R2", "Xbox": "LT/RT", "Mouse": "ScrollWheel" },
+      "SelectPart": { "PS": "Cross", "Xbox": "A", "Mouse": "LeftClick" },
+      "Back": { "PS": "Circle", "Xbox": "B", "Keyboard": "Escape" },
+      "BuyPart": { "PS": "Triangle", "Xbox": "Y" },
+      "CompareStats": { "PS": "Square", "Xbox": "X" }
+    },
+    "Menu": {
+      "Navigate": { "PS": "LeftStick/DPad", "Xbox": "LeftStick/DPad", "Keyboard": "WASD/Arrows" },
+      "Select": { "PS": "Cross", "Xbox": "A", "Mouse": "LeftClick" },
+      "Back": { "PS": "Circle", "Xbox": "B", "Keyboard": "Escape" },
+      "TabLeft": { "PS": "L1", "Xbox": "LB", "Keyboard": "Q" },
+      "TabRight": { "PS": "R1", "Xbox": "RB", "Keyboard": "E" }
+    },
+    "PhotoMode": {
+      "CameraMove": { "PS": "LeftStick", "Xbox": "LeftStick", "Keyboard": "WASD" },
+      "CameraRotate": { "PS": "RightStick", "Xbox": "RightStick", "Mouse": "Move" },
+      "CameraUp": { "PS": "R2", "Xbox": "RT", "Keyboard": "Space" },
+      "CameraDown": { "PS": "L2", "Xbox": "LT", "Keyboard": "LeftControl" },
+      "TakePhoto": { "PS": "Cross", "Xbox": "A", "Mouse": "LeftClick" },
+      "FocusMode": { "PS": "Triangle", "Xbox": "Y" },
+      "ToggleUI": { "PS": "Square", "Xbox": "X", "Keyboard": "U" },
+      "Aperture": { "PS": "DPad_UpDown", "Xbox": "DPad_UpDown" },
+      "FilterCycle": { "PS": "DPad_LeftRight", "Xbox": "DPad_LeftRight" },
+      "Exit": { "PS": "Options", "Xbox": "Menu", "Keyboard": "Escape" }
+    },
+    "Replay": {
+      "PlayPause": { "PS": "Cross", "Xbox": "A", "Keyboard": "Space" },
+      "FastForward": { "PS": "R1", "Xbox": "RB", "Keyboard": "Right" },
+      "Rewind": { "PS": "L1", "Xbox": "LB", "Keyboard": "Left" },
+      "SpeedUp": { "PS": "R2", "Xbox": "RT", "Keyboard": "Up" },
+      "SpeedDown": { "PS": "L2", "Xbox": "LT", "Keyboard": "Down" },
+      "CameraSwitch": { "PS": "Triangle", "Xbox": "Y", "Keyboard": "C" },
+      "FreeCamera": { "PS": "Square", "Xbox": "X", "Keyboard": "F" },
+      "Exit": { "PS": "Circle", "Xbox": "B", "Keyboard": "Escape" }
+    },
+    "Map": {
+      "Pan": { "PS": "LeftStick", "Xbox": "LeftStick", "Mouse": "Drag" },
+      "ZoomIn": { "PS": "R2", "Xbox": "RT", "Mouse": "ScrollUp" },
+      "ZoomOut": { "PS": "L2", "Xbox": "LT", "Mouse": "ScrollDown" },
+      "SetWaypoint": { "PS": "Cross", "Xbox": "A", "Mouse": "LeftClick" },
+      "ClearWaypoint": { "PS": "Square", "Xbox": "X", "Mouse": "RightClick" },
+      "Close": { "PS": "Circle", "Xbox": "B", "Keyboard": "M/Escape" }
+    }
+  },
+
+  "Accessibility": {
+    "RemapAll": {
+      "Enabled": true,
+      "Description": "Allow full button remapping"
+    },
+    "HoldToggle": {
+      "Nitrous": { "Default": "Hold", "Options": ["Hold", "Toggle"] },
+      "Handbrake": { "Default": "Hold", "Options": ["Hold", "Toggle"] },
+      "LookBack": { "Default": "Hold", "Options": ["Hold", "Toggle"] }
+    },
+    "OneHandedMode": {
+      "Enabled": false,
+      "Description": "Allows all essential functions on one side of controller",
+      "ThrottleBrake": "Triggers",
+      "Steering": "Stick",
+      "Modifiers": "Bumpers"
+    },
+    "ButtonHoldDuration": {
+      "Default": 0.5,
+      "Min": 0.2,
+      "Max": 2.0,
+      "Description": "How long to hold for 'hold' actions"
+    },
+    "VibrationIntensity": {
+      "Default": 1.0,
+      "Min": 0.0,
+      "Max": 1.0
+    }
+  },
+
+  "QuickChat": {
+    "Enabled": true,
+    "Bindings": {
+      "OpenWheel": { "PS": "DPadDown_Hold", "Xbox": "DPadDown_Hold" },
+      "Select1": { "PS": "DPadUp", "Xbox": "DPadUp" },
+      "Select2": { "PS": "DPadRight", "Xbox": "DPadRight" },
+      "Select3": { "PS": "DPadDown", "Xbox": "DPadDown" },
+      "Select4": { "PS": "DPadLeft", "Xbox": "DPadLeft" }
+    },
+    "Messages": [
+      "Good Race!",
+      "Nice Move!",
+      "Sorry!",
+      "Thanks!",
+      "Go!",
+      "Wait!",
+      "Yes",
+      "No"
+    ]
+  }
+}
