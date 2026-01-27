@@ -1,0 +1,295 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Player Marketplace and Trading System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "TaxRate": 0.05,
+    "ListingDuration": 604800,
+    "MaxActiveListings": 25,
+    "MinPlayerLevel": 10,
+    "TradeEnabled": true
+  },
+
+  "MarketCategories": {
+    "Vehicles": {
+      "ID": "MARKET_VEHICLES",
+      "Name": "Vehicles",
+      "Enabled": true,
+      "Restrictions": {
+        "StarterVehicles": false,
+        "GiftedVehicles": { "CooldownDays": 7 },
+        "RecentPurchase": { "CooldownHours": 24 }
+      },
+      "Fees": {
+        "ListingFee": 0.01,
+        "SaleFee": 0.05
+      },
+      "Pricing": {
+        "MinPrice": "50% MarketValue",
+        "MaxPrice": "200% MarketValue",
+        "SuggestedPrice": true
+      }
+    },
+    "Parts": {
+      "ID": "MARKET_PARTS",
+      "Name": "Performance Parts",
+      "Enabled": true,
+      "Restrictions": {
+        "InstalledParts": false,
+        "DamagedParts": false
+      },
+      "Fees": {
+        "ListingFee": 0,
+        "SaleFee": 0.05
+      }
+    },
+    "Cosmetics": {
+      "ID": "MARKET_COSMETICS",
+      "Name": "Cosmetic Items",
+      "Enabled": true,
+      "Categories": ["Liveries", "Wheels", "Vinyls", "Accessories"],
+      "Fees": {
+        "ListingFee": 0,
+        "SaleFee": 0.03
+      }
+    },
+    "Liveries": {
+      "ID": "MARKET_LIVERIES",
+      "Name": "Custom Liveries",
+      "Enabled": true,
+      "CreatorSystem": true,
+      "Fees": {
+        "ListingFee": 0,
+        "SaleFee": 0.1,
+        "CreatorShare": 0.7
+      },
+      "Pricing": {
+        "MinPrice": 0,
+        "MaxPrice": 50000
+      }
+    }
+  },
+
+  "ListingSystem": {
+    "Creation": {
+      "RequiredInfo": ["Title", "Price", "Category"],
+      "OptionalInfo": ["Description", "Photos"],
+      "PreviewRequired": true,
+      "ConfirmationStep": true
+    },
+    "Duration": {
+      "Options": [86400, 259200, 604800],
+      "Default": 604800,
+      "RenewAllowed": true,
+      "RenewCost": "ListingFee"
+    },
+    "Visibility": {
+      "FeaturedSlots": true,
+      "SearchOptimization": true,
+      "CategoryPlacement": true
+    },
+    "Management": {
+      "EditPrice": true,
+      "CancelListing": true,
+      "RefundOnCancel": "ListingFee"
+    }
+  },
+
+  "Transactions": {
+    "Purchase": {
+      "InstantBuy": true,
+      "ConfirmationRequired": true,
+      "FundsVerification": true,
+      "Transfer": "Immediate"
+    },
+    "Auction": {
+      "Enabled": true,
+      "MinBidIncrement": 0.05,
+      "SniperProtection": { "ExtendTime": 60 },
+      "ReservePrice": true,
+      "BuyNow": true
+    },
+    "History": {
+      "TransactionLog": true,
+      "RetentionDays": 90,
+      "Exportable": false
+    }
+  },
+
+  "DirectTrading": {
+    "Enabled": true,
+    "Requirements": {
+      "MinLevel": 15,
+      "MinREP": "TIER_KNOWN",
+      "FriendshipRequired": false
+    },
+    "TradeWindow": {
+      "MaxItemsPerSide": 5,
+      "CashIncluded": true,
+      "MaxCash": 500000,
+      "Confirmation": "BothParties",
+      "Timer": 300
+    },
+    "Protections": {
+      "ValueWarning": { "Threshold": 0.5 },
+      "ScamDetection": true,
+      "Cooldown": 3600
+    }
+  },
+
+  "Pricing": {
+    "MarketValue": {
+      "Algorithm": "DynamicPricing",
+      "Factors": {
+        "BasePrice": 0.4,
+        "RecentSales": 0.3,
+        "Supply": 0.15,
+        "Demand": 0.15
+      },
+      "UpdateFrequency": 3600
+    },
+    "PriceHistory": {
+      "Enabled": true,
+      "Visualization": "Graph",
+      "Duration": 30
+    },
+    "Trends": {
+      "ShowTrends": true,
+      "Rising": { "Threshold": 0.1 },
+      "Falling": { "Threshold": -0.1 }
+    }
+  },
+
+  "Search": {
+    "Filters": {
+      "Category": true,
+      "PriceRange": true,
+      "VehicleClass": true,
+      "Rarity": true,
+      "Seller": true,
+      "ListedWithin": true
+    },
+    "Sorting": {
+      "Options": ["PriceLow", "PriceHigh", "Newest", "Ending", "Popular"],
+      "Default": "Newest"
+    },
+    "SavedSearches": {
+      "Enabled": true,
+      "Max": 10,
+      "Notifications": true
+    }
+  },
+
+  "SellerTools": {
+    "Analytics": {
+      "Views": true,
+      "Watchers": true,
+      "SalesHistory": true,
+      "Revenue": true
+    },
+    "Promotion": {
+      "Featured": {
+        "Cost": 5000,
+        "Duration": 86400,
+        "Visibility": "Top"
+      },
+      "Highlight": {
+        "Cost": 1000,
+        "Duration": 86400,
+        "Visibility": "Colored"
+      }
+    },
+    "BulkActions": {
+      "Relist": true,
+      "PriceAdjust": true,
+      "Cancel": true
+    }
+  },
+
+  "BuyerTools": {
+    "Watchlist": {
+      "Enabled": true,
+      "Max": 50,
+      "Notifications": true
+    },
+    "PriceAlerts": {
+      "Enabled": true,
+      "Max": 20,
+      "NotifyOnMatch": true
+    },
+    "PurchaseHistory": {
+      "Enabled": true,
+      "RetentionDays": 365
+    }
+  },
+
+  "Moderation": {
+    "ListingReview": {
+      "AutoApprove": true,
+      "FlaggedKeywords": true,
+      "PriceAnomalies": true
+    },
+    "Reporting": {
+      "Enabled": true,
+      "Categories": ["Scam", "MissingItem", "PriceManipulation", "Offensive"],
+      "Response": "Review"
+    },
+    "Penalties": {
+      "FraudAttempt": "MarketBan",
+      "PriceManipulation": "TempBan",
+      "OffensiveContent": "ListingRemoval"
+    }
+  },
+
+  "Escrow": {
+    "Enabled": true,
+    "HoldPeriod": 0,
+    "DisputeWindow": 86400,
+    "AutoRelease": true
+  },
+
+  "UI": {
+    "MarketplaceHub": {
+      "FeaturedListings": true,
+      "RecentSales": true,
+      "TrendingItems": true,
+      "MyListings": true
+    },
+    "ListingPage": {
+      "LargeImages": true,
+      "DetailedSpecs": true,
+      "SellerInfo": true,
+      "SimilarItems": true
+    },
+    "Notifications": {
+      "ItemSold": true,
+      "WatchlistChange": true,
+      "OutbidAlert": true,
+      "AuctionEnding": true
+    }
+  },
+
+  "Statistics": {
+    "MarketStats": {
+      "TotalVolume": true,
+      "AveragePrice": true,
+      "MostTraded": true,
+      "TopSellers": true
+    },
+    "PersonalStats": {
+      "TotalSold": true,
+      "TotalBought": true,
+      "TotalRevenue": true,
+      "AvgRating": true
+    }
+  },
+
+  "SellerRatings": {
+    "Enabled": true,
+    "Scale": 5,
+    "ReviewRequired": false,
+    "DisplayOnProfile": true,
+    "ImpactsVisibility": true
+  }
+}

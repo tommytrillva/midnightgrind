@@ -1,0 +1,340 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Police Chase and Heat System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "HeatDecay": true,
+    "PersistentHeat": true,
+    "MaxHeatLevel": 5,
+    "CooldownZones": true
+  },
+
+  "HeatLevels": {
+    "Level0": {
+      "ID": "HEAT_NONE",
+      "Name": "Clean",
+      "Description": "No police attention",
+      "PoliceResponse": "None",
+      "DecayTime": 0
+    },
+    "Level1": {
+      "ID": "HEAT_LOW",
+      "Name": "Noticed",
+      "Description": "Minor infractions detected",
+      "Trigger": { "Speeding": true, "MinorViolations": true },
+      "PoliceResponse": {
+        "Units": 1,
+        "Type": "Patrol",
+        "Aggression": 0.2
+      },
+      "DecayTime": 60,
+      "REPMultiplier": 1.1
+    },
+    "Level2": {
+      "ID": "HEAT_MEDIUM",
+      "Name": "Pursuit",
+      "Description": "Active pursuit initiated",
+      "Trigger": { "EvadeLevel1": true, "DangerousDriving": true },
+      "PoliceResponse": {
+        "Units": 2,
+        "Type": "PursuitCar",
+        "Aggression": 0.4,
+        "Roadblocks": false
+      },
+      "DecayTime": 120,
+      "REPMultiplier": 1.25
+    },
+    "Level3": {
+      "ID": "HEAT_HIGH",
+      "Name": "Aggressive Pursuit",
+      "Description": "Multiple units in pursuit",
+      "Trigger": { "EvadeLevel2": true, "CopCarDamage": true },
+      "PoliceResponse": {
+        "Units": 4,
+        "Type": "PursuitCar",
+        "Aggression": 0.6,
+        "Roadblocks": true,
+        "Helicopter": false
+      },
+      "DecayTime": 180,
+      "REPMultiplier": 1.5
+    },
+    "Level4": {
+      "ID": "HEAT_CRITICAL",
+      "Name": "All Units",
+      "Description": "Maximum ground response",
+      "Trigger": { "EvadeLevel3": true, "MajorDamage": true },
+      "PoliceResponse": {
+        "Units": 6,
+        "Type": ["PursuitCar", "Interceptor"],
+        "Aggression": 0.8,
+        "Roadblocks": true,
+        "SpikeStrips": true,
+        "Helicopter": true
+      },
+      "DecayTime": 300,
+      "REPMultiplier": 2.0
+    },
+    "Level5": {
+      "ID": "HEAT_MAXIMUM",
+      "Name": "Most Wanted",
+      "Description": "Elite response, no escape",
+      "Trigger": { "EvadeLevel4": true, "ProlongedPursuit": 300 },
+      "PoliceResponse": {
+        "Units": 8,
+        "Type": ["Interceptor", "SUV", "Helicopter"],
+        "Aggression": 1.0,
+        "Roadblocks": true,
+        "SpikeStrips": true,
+        "Helicopter": true,
+        "SwatVan": true
+      },
+      "DecayTime": 600,
+      "REPMultiplier": 3.0,
+      "BountyGenerated": true
+    }
+  },
+
+  "PoliceVehicles": {
+    "Patrol": {
+      "ID": "COP_PATROL",
+      "Speed": 0.7,
+      "Handling": 0.6,
+      "Aggression": 0.3,
+      "Ramming": 0.2,
+      "Quantity": "Common"
+    },
+    "PursuitCar": {
+      "ID": "COP_PURSUIT",
+      "Speed": 0.85,
+      "Handling": 0.75,
+      "Aggression": 0.5,
+      "Ramming": 0.4,
+      "Quantity": "Common"
+    },
+    "Interceptor": {
+      "ID": "COP_INTERCEPTOR",
+      "Speed": 0.95,
+      "Handling": 0.85,
+      "Aggression": 0.7,
+      "Ramming": 0.6,
+      "Quantity": "Rare"
+    },
+    "SUV": {
+      "ID": "COP_SUV",
+      "Speed": 0.75,
+      "Handling": 0.6,
+      "Aggression": 0.8,
+      "Ramming": 0.9,
+      "Purpose": "Ramming",
+      "Quantity": "Uncommon"
+    },
+    "Helicopter": {
+      "ID": "COP_HELI",
+      "Speed": 1.0,
+      "Tracking": true,
+      "Spotlight": true,
+      "Quantity": "Rare"
+    },
+    "SwatVan": {
+      "ID": "COP_SWAT",
+      "Speed": 0.6,
+      "Handling": 0.4,
+      "Aggression": 1.0,
+      "SpikeDeployment": true,
+      "Quantity": "VeryRare"
+    }
+  },
+
+  "PoliceTactics": {
+    "Boxing": {
+      "ID": "TACTIC_BOX",
+      "Description": "Surround and slow target",
+      "UnitsRequired": 3,
+      "HeatLevel": 2
+    },
+    "PITManeuver": {
+      "ID": "TACTIC_PIT",
+      "Description": "Spin out target vehicle",
+      "UnitsRequired": 1,
+      "HeatLevel": 3,
+      "DamageToPlayer": true
+    },
+    "Roadblock": {
+      "ID": "TACTIC_BLOCK",
+      "Description": "Block road ahead",
+      "UnitsRequired": 4,
+      "HeatLevel": 3,
+      "Breakable": true,
+      "DamageOnImpact": true
+    },
+    "SpikeStrip": {
+      "ID": "TACTIC_SPIKE",
+      "Description": "Deploy tire shredders",
+      "HeatLevel": 4,
+      "TireDamage": "Severe",
+      "Avoidable": true
+    },
+    "HeliTracking": {
+      "ID": "TACTIC_HELI",
+      "Description": "Aerial tracking",
+      "HeatLevel": 4,
+      "SpotlightBlind": true,
+      "Escapable": { "Tunnels": true, "Parking": true }
+    }
+  },
+
+  "HeatGeneration": {
+    "Violations": {
+      "Speeding": { "Heat": 5, "Threshold": 80 },
+      "Reckless": { "Heat": 10, "TrafficNearMiss": true },
+      "HitAndRun": { "Heat": 25, "TrafficCollision": true },
+      "PropertyDamage": { "Heat": 15, "PerObject": true },
+      "NearMissPolice": { "Heat": 20 },
+      "EvadePolice": { "Heat": 30, "PerAttempt": true },
+      "RamPolice": { "Heat": 50, "PerHit": true },
+      "DisablePolice": { "Heat": 75, "PerVehicle": true }
+    },
+    "Escalation": {
+      "ContinuedViolations": true,
+      "TimeInPursuit": { "Per30Seconds": 10 },
+      "HighSpeedBonus": { "Over200": 1.5 }
+    }
+  },
+
+  "HeatDecay": {
+    "NaturalDecay": {
+      "Rate": 1,
+      "PerSecond": true,
+      "RequiresNoPolice": true
+    },
+    "CooldownZones": {
+      "Garage": { "Instant": false, "Rate": 10 },
+      "SafeHouse": { "Instant": true },
+      "HidingSpot": { "Rate": 5 }
+    },
+    "OutOfSight": {
+      "Timer": 30,
+      "DecayMultiplier": 3
+    }
+  },
+
+  "Escape": {
+    "Conditions": {
+      "OutOfSight": 30,
+      "NoPoliceNearby": 200,
+      "HeatDecayed": true
+    },
+    "Rewards": {
+      "BaseREP": 500,
+      "PerHeatLevel": 500,
+      "PursuitBonus": { "Per30Seconds": 250 },
+      "TakedownBonus": { "PerPolice": 100 }
+    },
+    "HidingSpots": {
+      "Enabled": true,
+      "Types": ["Alley", "Garage", "Underpass", "Container"],
+      "Cooldown": 60
+    }
+  },
+
+  "Busted": {
+    "Conditions": {
+      "VehicleStopped": 5,
+      "Surrounded": true,
+      "VehicleDisabled": true
+    },
+    "Penalties": {
+      "CashFine": {
+        "Level1": 1000,
+        "Level2": 2500,
+        "Level3": 5000,
+        "Level4": 10000,
+        "Level5": 25000
+      },
+      "REPLoss": {
+        "Level1": 100,
+        "Level2": 250,
+        "Level3": 500,
+        "Level4": 1000,
+        "Level5": 2500
+      },
+      "VehicleImpound": {
+        "Level4": { "Chance": 0.25 },
+        "Level5": { "Chance": 0.5 }
+      }
+    },
+    "Impound": {
+      "BailCost": "10% Vehicle Value",
+      "TimeLimit": 72,
+      "LoseVehicle": { "AfterTimeLimit": false }
+    }
+  },
+
+  "PursuitEvents": {
+    "FreeroamPursuit": {
+      "ID": "PURSUIT_FREEROAM",
+      "Trigger": "Violations",
+      "EndCondition": ["Escape", "Busted"]
+    },
+    "HotPursuit": {
+      "ID": "PURSUIT_HOT",
+      "Trigger": "Event",
+      "PresetHeat": 3,
+      "GoalDistance": 5000,
+      "TimeLimit": 300
+    },
+    "Getaway": {
+      "ID": "PURSUIT_GETAWAY",
+      "Trigger": "Event",
+      "StartHeat": 4,
+      "EscapeRequired": true,
+      "Checkpoints": false
+    }
+  },
+
+  "Multiplayer": {
+    "CrewPursuit": {
+      "SharedHeat": true,
+      "CoordinatedPolice": true
+    },
+    "CopsVsRacers": {
+      "Mode": "Asymmetric",
+      "PlayerCops": true,
+      "PlayerRacers": true
+    }
+  },
+
+  "Settings": {
+    "PlayerOptions": {
+      "PoliceEnabled": true,
+      "HeatPersistence": true,
+      "DifficultyScale": ["Easy", "Normal", "Hard", "Extreme"]
+    },
+    "RaceOptions": {
+      "NoCopsMode": true,
+      "HotPursuitMode": true
+    }
+  },
+
+  "UI": {
+    "HeatMeter": {
+      "Position": "TopRight",
+      "ShowLevel": true,
+      "ShowDecay": true,
+      "FlashOnIncrease": true
+    },
+    "Minimap": {
+      "ShowPolice": true,
+      "ShowSearchArea": true,
+      "ShowRoadblocks": true
+    },
+    "Alerts": {
+      "PursuitStarted": true,
+      "HeatIncrease": true,
+      "TacticsWarning": true,
+      "EscapeNear": true
+    }
+  }
+}
