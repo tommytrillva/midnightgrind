@@ -1,0 +1,301 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Guild System and Community Organizations",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxGuilds": 10000,
+    "MaxMembersPerGuild": 100,
+    "CrossCrewAllowed": true,
+    "GuildWars": true
+  },
+
+  "GuildTypes": {
+    "RacingTeam": {
+      "ID": "GUILD_RACING",
+      "Name": "Racing Team",
+      "Focus": "Competitive Racing",
+      "Bonuses": {
+        "REPMultiplier": 1.15,
+        "RaceRewards": 1.1
+      },
+      "Features": ["TeamRaces", "Leaderboards", "Tournaments"]
+    },
+    "TunerCrew": {
+      "ID": "GUILD_TUNER",
+      "Name": "Tuner Crew",
+      "Focus": "Vehicle Customization",
+      "Bonuses": {
+        "PartDiscounts": 0.1,
+        "SharedDesigns": true
+      },
+      "Features": ["SharedGarage", "PartTrading", "BuildShowcase"]
+    },
+    "DriftSquad": {
+      "ID": "GUILD_DRIFT",
+      "Name": "Drift Squad",
+      "Focus": "Drifting",
+      "Bonuses": {
+        "DriftScoreMultiplier": 1.2,
+        "DriftREP": 1.15
+      },
+      "Features": ["DriftEvents", "TandemPartners", "DriftLeaderboards"]
+    },
+    "CruiseCrew": {
+      "ID": "GUILD_CRUISE",
+      "Name": "Cruise Crew",
+      "Focus": "Free Roam and Social",
+      "Bonuses": {
+        "MeetREP": 1.25,
+        "ExplorationRewards": 1.15
+      },
+      "Features": ["GroupCruises", "PhotoMeetups", "SocialEvents"]
+    },
+    "StreetLegends": {
+      "ID": "GUILD_STREET",
+      "Name": "Street Legends",
+      "Focus": "Illegal Racing",
+      "Bonuses": {
+        "PinkSlipProtection": 0.1,
+        "HeatReduction": 1.1
+      },
+      "Features": ["PinkSlips", "PoliceEvasion", "TerritoryControl"]
+    }
+  },
+
+  "GuildCreation": {
+    "Requirements": {
+      "FounderLevel": 25,
+      "FoundingMembers": 3,
+      "CreationFee": 50000
+    },
+    "Setup": {
+      "Name": { "MinLength": 3, "MaxLength": 24, "Unique": true },
+      "Tag": { "Length": [2, 5], "Unique": true },
+      "Emblem": { "CustomDesign": true, "Templates": 50 },
+      "Colors": { "Primary": true, "Secondary": true },
+      "Motto": { "MaxLength": 100 },
+      "Description": { "MaxLength": 500 }
+    }
+  },
+
+  "GuildRanks": {
+    "Ranks": {
+      "Leader": {
+        "Permissions": "All",
+        "Limit": 1
+      },
+      "Officer": {
+        "Permissions": ["Invite", "Kick", "EventCreate", "SettingsModify"],
+        "Limit": 5
+      },
+      "Veteran": {
+        "Permissions": ["Invite", "EventCreate"],
+        "Requirement": { "DaysInGuild": 30 }
+      },
+      "Member": {
+        "Permissions": ["Participate", "Chat"],
+        "Default": true
+      },
+      "Recruit": {
+        "Permissions": ["Participate"],
+        "Duration": { "Days": 7 }
+      }
+    },
+    "CustomRanks": {
+      "Enabled": true,
+      "MaxCustom": 5,
+      "PermissionAssignment": true
+    }
+  },
+
+  "GuildProgression": {
+    "Levels": {
+      "Max": 50,
+      "XPSources": {
+        "MemberActivity": 0.3,
+        "EventParticipation": 0.25,
+        "Achievements": 0.2,
+        "Wins": 0.25
+      }
+    },
+    "Milestones": {
+      "Level5": { "Unlock": "CustomEmblem", "MemberCap": 25 },
+      "Level10": { "Unlock": "GuildGarage", "MemberCap": 40 },
+      "Level20": { "Unlock": "TerritoryControl", "MemberCap": 60 },
+      "Level30": { "Unlock": "GuildVehicle", "MemberCap": 80 },
+      "Level50": { "Unlock": "LegendaryStatus", "MemberCap": 100 }
+    },
+    "Perks": {
+      "Level10": { "REPBonus": 0.05 },
+      "Level20": { "CashBonus": 0.05 },
+      "Level30": { "XPBonus": 0.1 },
+      "Level40": { "AllBonuses": 0.05 },
+      "Level50": { "LegendaryPerks": true }
+    }
+  },
+
+  "GuildActivities": {
+    "GuildRaces": {
+      "Enabled": true,
+      "Types": ["Internal", "VsOtherGuilds"],
+      "Rewards": { "GuildXP": true, "IndividualRewards": true }
+    },
+    "GuildChallenges": {
+      "Weekly": true,
+      "Collaborative": true,
+      "Rewards": { "GuildBank": true, "IndividualBonus": true }
+    },
+    "TerritoryWars": {
+      "Enabled": true,
+      "ControlZones": true,
+      "Benefits": { "ZoneBonus": true }
+    },
+    "GuildTournaments": {
+      "Frequency": "Monthly",
+      "Stakes": "High",
+      "Prizes": { "GuildTrophy": true, "MemberRewards": true }
+    }
+  },
+
+  "GuildResources": {
+    "GuildBank": {
+      "Enabled": true,
+      "Contributions": { "Voluntary": true, "Percentage": "Optional" },
+      "Uses": ["Events", "Upgrades", "MemberRewards"],
+      "Management": { "LeaderOnly": true, "Transparency": true }
+    },
+    "SharedGarage": {
+      "Enabled": true,
+      "Slots": { "Base": 5, "MaxLevel": 20 },
+      "LoanSystem": true,
+      "MaintenanceFund": true
+    },
+    "PartPool": {
+      "Enabled": true,
+      "Donations": true,
+      "Distribution": { "Request": true, "Approval": true }
+    }
+  },
+
+  "GuildWars": {
+    "Declaration": {
+      "Requirements": { "BothGuildsLevel": 15 },
+      "AcceptanceRequired": true,
+      "Duration": { "Days": 7 }
+    },
+    "Competition": {
+      "Points": {
+        "RaceWins": 10,
+        "Challenges": 5,
+        "Territory": 15
+      },
+      "WarActivities": ["HeadToHead", "TerritoryCapture", "ChallengeCompletion"]
+    },
+    "Resolution": {
+      "Victor": { "Trophy": true, "BonusRewards": true },
+      "Loser": { "CooldownPeriod": true }
+    },
+    "Spectating": {
+      "PublicViewing": true,
+      "Commentary": true
+    }
+  },
+
+  "Recruitment": {
+    "Settings": {
+      "Open": { "AutoJoin": true },
+      "Application": { "ReviewRequired": true },
+      "InviteOnly": { "RequiresInvite": true },
+      "Closed": { "NoNewMembers": true }
+    },
+    "Requirements": {
+      "MinLevel": { "Configurable": true, "Default": 1 },
+      "MinREP": { "Configurable": true },
+      "Application": { "Questions": true }
+    },
+    "Discovery": {
+      "GuildBrowser": true,
+      "Recommendations": true,
+      "Recruitment Posts": true
+    }
+  },
+
+  "Communication": {
+    "GuildChat": {
+      "Enabled": true,
+      "Channels": ["General", "Racing", "Trading", "OffTopic"],
+      "CustomChannels": 3
+    },
+    "VoiceChannels": {
+      "Enabled": true,
+      "Channels": 3,
+      "MaxPerChannel": 20
+    },
+    "Announcements": {
+      "LeaderPosts": true,
+      "AutoNotifications": true,
+      "MOTD": true
+    },
+    "Forums": {
+      "Enabled": true,
+      "Categories": ["General", "Builds", "Events", "Recruitment"]
+    }
+  },
+
+  "GuildIdentity": {
+    "Emblem": {
+      "Layers": 5,
+      "Shapes": 100,
+      "Colors": "FullSpectrum",
+      "DisplayOn": ["Vehicles", "Profiles", "Leaderboards"]
+    },
+    "Tag": {
+      "DisplayFormat": "[TAG]Name",
+      "Color": "GuildColor"
+    },
+    "GuildVehicle": {
+      "Unlocked": "Level30",
+      "SharedLivery": true,
+      "Events": true
+    }
+  },
+
+  "Statistics": {
+    "Guild": {
+      "TotalWins": true,
+      "TotalRaces": true,
+      "TerritoryHeld": true,
+      "WarsWon": true,
+      "MemberGrowth": true
+    },
+    "Members": {
+      "Contribution": true,
+      "Activity": true,
+      "Performance": true,
+      "Ranking": true
+    },
+    "Leaderboards": {
+      "Regional": true,
+      "Global": true,
+      "ByType": true
+    }
+  },
+
+  "UI": {
+    "GuildHub": {
+      "Tabs": ["Overview", "Members", "Activities", "Wars", "Settings"],
+      "QuickActions": ["Invite", "CreateEvent", "ViewRoster"]
+    },
+    "GuildBrowser": {
+      "Filters": ["Type", "Size", "Level", "Region", "Recruiting"],
+      "Sorting": ["Level", "Members", "Activity", "WinRate"]
+    },
+    "Notifications": {
+      "NewMember": true,
+      "EventStart": true,
+      "WarDeclared": true,
+      "LevelUp": true
+    }
+  }
+}

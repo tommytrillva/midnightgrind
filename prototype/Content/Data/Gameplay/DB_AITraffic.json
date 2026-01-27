@@ -1,0 +1,337 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - AI Traffic System and Vehicle Behavior",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxVehicles": 100,
+    "DynamicDensity": true,
+    "RegionBasedSpawning": true,
+    "TimeOfDayAffects": true
+  },
+
+  "DensityLevels": {
+    "None": {
+      "ID": "TRAFFIC_NONE",
+      "VehicleCount": 0,
+      "Description": "No traffic"
+    },
+    "VeryLow": {
+      "ID": "TRAFFIC_VLOW",
+      "VehicleCount": 10,
+      "SpawnDistance": 500,
+      "Description": "Minimal traffic"
+    },
+    "Low": {
+      "ID": "TRAFFIC_LOW",
+      "VehicleCount": 25,
+      "SpawnDistance": 400,
+      "Description": "Light traffic"
+    },
+    "Medium": {
+      "ID": "TRAFFIC_MED",
+      "VehicleCount": 50,
+      "SpawnDistance": 300,
+      "Description": "Normal traffic"
+    },
+    "High": {
+      "ID": "TRAFFIC_HIGH",
+      "VehicleCount": 75,
+      "SpawnDistance": 250,
+      "Description": "Heavy traffic"
+    },
+    "VeryHigh": {
+      "ID": "TRAFFIC_VHIGH",
+      "VehicleCount": 100,
+      "SpawnDistance": 200,
+      "Description": "Rush hour traffic"
+    }
+  },
+
+  "TimeBasedDensity": {
+    "Schedule": {
+      "00:00-05:00": { "Multiplier": 0.2, "Label": "LateNight" },
+      "05:00-07:00": { "Multiplier": 0.5, "Label": "EarlyMorning" },
+      "07:00-09:00": { "Multiplier": 1.5, "Label": "MorningRush" },
+      "09:00-12:00": { "Multiplier": 0.8, "Label": "MidMorning" },
+      "12:00-14:00": { "Multiplier": 1.0, "Label": "Lunch" },
+      "14:00-17:00": { "Multiplier": 0.8, "Label": "Afternoon" },
+      "17:00-19:00": { "Multiplier": 1.5, "Label": "EveningRush" },
+      "19:00-22:00": { "Multiplier": 0.7, "Label": "Evening" },
+      "22:00-00:00": { "Multiplier": 0.4, "Label": "Night" }
+    },
+    "WeekendModifier": 0.8
+  },
+
+  "RegionDensity": {
+    "Downtown": {
+      "BaseMultiplier": 1.3,
+      "RushMultiplier": 1.5,
+      "NightMultiplier": 0.5
+    },
+    "Highway": {
+      "BaseMultiplier": 1.0,
+      "RushMultiplier": 1.8,
+      "NightMultiplier": 0.3
+    },
+    "Suburbs": {
+      "BaseMultiplier": 0.8,
+      "RushMultiplier": 1.2,
+      "NightMultiplier": 0.2
+    },
+    "Industrial": {
+      "BaseMultiplier": 0.6,
+      "RushMultiplier": 0.8,
+      "NightMultiplier": 0.1
+    },
+    "Mountain": {
+      "BaseMultiplier": 0.3,
+      "RushMultiplier": 0.4,
+      "NightMultiplier": 0.1
+    },
+    "Coastal": {
+      "BaseMultiplier": 0.5,
+      "WeekendMultiplier": 1.5,
+      "NightMultiplier": 0.2
+    }
+  },
+
+  "VehicleCategories": {
+    "Sedans": {
+      "SpawnWeight": 0.35,
+      "SpeedRange": { "Min": 0.9, "Max": 1.0 },
+      "Aggression": "Low",
+      "Examples": ["Commuter", "FamilyCar", "ExecutiveSedan"]
+    },
+    "SUVs": {
+      "SpawnWeight": 0.2,
+      "SpeedRange": { "Min": 0.85, "Max": 0.95 },
+      "Aggression": "Low",
+      "Examples": ["FamilySUV", "LuxurySUV", "CompactSUV"]
+    },
+    "Trucks": {
+      "SpawnWeight": 0.1,
+      "SpeedRange": { "Min": 0.7, "Max": 0.85 },
+      "Aggression": "VeryLow",
+      "Examples": ["PickupTruck", "DeliveryTruck", "ServiceVan"]
+    },
+    "Sports": {
+      "SpawnWeight": 0.08,
+      "SpeedRange": { "Min": 1.0, "Max": 1.15 },
+      "Aggression": "Medium",
+      "Examples": ["SportsCar", "Coupe", "HotHatch"]
+    },
+    "Commercial": {
+      "SpawnWeight": 0.12,
+      "SpeedRange": { "Min": 0.6, "Max": 0.8 },
+      "Aggression": "VeryLow",
+      "Highway": true,
+      "Examples": ["SemiTruck", "Bus", "DeliveryVan"]
+    },
+    "Motorcycles": {
+      "SpawnWeight": 0.05,
+      "SpeedRange": { "Min": 1.0, "Max": 1.2 },
+      "Aggression": "Medium",
+      "LaneSplitting": true
+    },
+    "Emergency": {
+      "SpawnWeight": 0.02,
+      "SpeedRange": { "Min": 1.2, "Max": 1.5 },
+      "Aggression": "High",
+      "SirensEnabled": true,
+      "YieldTo": true
+    },
+    "Exotic": {
+      "SpawnWeight": 0.03,
+      "SpeedRange": { "Min": 1.1, "Max": 1.3 },
+      "Aggression": "Medium",
+      "RareSpawn": true,
+      "LocationBased": ["Downtown", "Coastal"]
+    },
+    "Classic": {
+      "SpawnWeight": 0.05,
+      "SpeedRange": { "Min": 0.8, "Max": 0.95 },
+      "Aggression": "Low",
+      "WeekendOnly": true
+    }
+  },
+
+  "DriverBehavior": {
+    "SpeedCompliance": {
+      "Cautious": { "SpeedMultiplier": 0.85, "Weight": 0.2 },
+      "Normal": { "SpeedMultiplier": 1.0, "Weight": 0.5 },
+      "Aggressive": { "SpeedMultiplier": 1.15, "Weight": 0.25 },
+      "Reckless": { "SpeedMultiplier": 1.3, "Weight": 0.05 }
+    },
+    "LaneUsage": {
+      "StayInLane": { "Weight": 0.7 },
+      "FrequentChanges": { "Weight": 0.2 },
+      "Weaving": { "Weight": 0.1 }
+    },
+    "Reactions": {
+      "ToPlayerApproach": {
+        "Ignore": { "Weight": 0.3 },
+        "SlowDown": { "Weight": 0.3 },
+        "MoveOver": { "Weight": 0.3 },
+        "Panic": { "Weight": 0.1 }
+      },
+      "ToCollision": {
+        "Stop": { "Weight": 0.4 },
+        "FleeScene": { "Weight": 0.3 },
+        "Honk": { "Weight": 0.2 },
+        "RoadRage": { "Weight": 0.1 }
+      },
+      "ToPolice": {
+        "PullOver": { "Weight": 0.8 },
+        "SlowDown": { "Weight": 0.15 },
+        "Ignore": { "Weight": 0.05 }
+      }
+    },
+    "Distractions": {
+      "PhoneUse": { "Chance": 0.05, "ReactionDelay": 0.5 },
+      "DriftingLanes": { "Chance": 0.03 },
+      "SuddenBrake": { "Chance": 0.02 }
+    }
+  },
+
+  "TrafficLights": {
+    "Compliance": {
+      "StopOnRed": { "Weight": 0.95 },
+      "RunRed": { "Weight": 0.03 },
+      "SlowOnYellow": { "Weight": 0.02 }
+    },
+    "Timing": {
+      "GreenDuration": { "Min": 30, "Max": 60 },
+      "YellowDuration": 4,
+      "AllRedDuration": 2
+    },
+    "PlayerResponse": {
+      "IgnoreIfPlayerClose": false,
+      "HonkAtPlayer": true
+    }
+  },
+
+  "Spawning": {
+    "SpawnDistance": {
+      "Ahead": { "Min": 200, "Max": 500 },
+      "Behind": { "Min": 100, "Max": 300 },
+      "OnJoiningRoads": true
+    },
+    "Despawning": {
+      "Distance": 600,
+      "OutOfSight": true,
+      "Delay": 5
+    },
+    "Clustering": {
+      "AllowGroups": true,
+      "MaxGroupSize": 5,
+      "MinSpacing": 10
+    },
+    "AvoidSpawning": {
+      "NearPlayer": 100,
+      "InIntersections": true,
+      "DuringRace": { "RaceRoute": true }
+    }
+  },
+
+  "SpecialVehicles": {
+    "Taxi": {
+      "SpawnWeight": 0.05,
+      "Behavior": {
+        "StopsForPickup": true,
+        "ErraticLaneChanges": true
+      },
+      "Regions": ["Downtown", "Airport"]
+    },
+    "Bus": {
+      "SpawnWeight": 0.03,
+      "Behavior": {
+        "StopsAtStops": true,
+        "SlowAcceleration": true
+      },
+      "Routes": true
+    },
+    "Ambulance": {
+      "SpawnWeight": 0.01,
+      "Behavior": {
+        "Sirens": true,
+        "TrafficParts": true
+      },
+      "PlayerYields": false
+    },
+    "TowTruck": {
+      "SpawnWeight": 0.02,
+      "Behavior": {
+        "SlowMoving": true,
+        "HighwayOnly": true
+      }
+    }
+  },
+
+  "Interactions": {
+    "Honking": {
+      "AtPlayer": {
+        "WhenBlocked": true,
+        "WhenNearMiss": true,
+        "RandomChance": 0.3
+      },
+      "AtEachOther": true
+    },
+    "Gestures": {
+      "WaveThrough": { "Chance": 0.2 },
+      "AngryGesture": { "Chance": 0.1, "AfterCollision": true }
+    },
+    "PoliceReporting": {
+      "Enabled": true,
+      "TriggerConditions": ["HighSpeed", "Collision", "Reckless"],
+      "ReportDelay": 5,
+      "ReportChance": 0.3
+    }
+  },
+
+  "WeatherEffects": {
+    "Rain": {
+      "SpeedReduction": 0.85,
+      "FollowDistanceIncrease": 1.3,
+      "AccidentChance": 1.5
+    },
+    "Fog": {
+      "SpeedReduction": 0.7,
+      "FollowDistanceIncrease": 1.5,
+      "LightsOn": true
+    },
+    "Storm": {
+      "SpeedReduction": 0.6,
+      "DensityReduction": 0.5,
+      "AccidentChance": 2.0
+    }
+  },
+
+  "Performance": {
+    "LOD": {
+      "NearDetail": { "Distance": 100, "Quality": "Full" },
+      "MidDetail": { "Distance": 300, "Quality": "Medium" },
+      "FarDetail": { "Distance": 600, "Quality": "Low" }
+    },
+    "Culling": {
+      "BehindPlayer": true,
+      "OutOfFrustum": true
+    },
+    "PhysicsSimplification": {
+      "DistantVehicles": true,
+      "Threshold": 200
+    }
+  },
+
+  "UI": {
+    "Minimap": {
+      "ShowTraffic": true,
+      "IconColor": "Grey",
+      "FadeDistance": true
+    },
+    "Settings": {
+      "DensitySlider": true,
+      "DisableOption": true
+    }
+  }
+}

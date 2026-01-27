@@ -1,0 +1,313 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Garage System and Vehicle Storage",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "BaseCapacity": 10,
+    "MaxCapacity": 100,
+    "MultipleGarages": true,
+    "GarageUpgrades": true
+  },
+
+  "GarageTypes": {
+    "Starter": {
+      "ID": "GARAGE_STARTER",
+      "Name": "Street Garage",
+      "Description": "Basic starting garage",
+      "Capacity": 5,
+      "Features": ["Storage", "BasicRepairs"],
+      "Location": "Industrial",
+      "Cost": 0,
+      "UnlockLevel": 1
+    },
+    "Standard": {
+      "ID": "GARAGE_STANDARD",
+      "Name": "Standard Garage",
+      "Description": "Upgraded storage and features",
+      "Capacity": 15,
+      "Features": ["Storage", "Repairs", "BasicCustomization"],
+      "Locations": ["Downtown", "Suburbs", "Industrial"],
+      "Cost": 50000,
+      "UnlockLevel": 10
+    },
+    "Premium": {
+      "ID": "GARAGE_PREMIUM",
+      "Name": "Premium Garage",
+      "Description": "Full-featured performance garage",
+      "Capacity": 25,
+      "Features": ["Storage", "FullRepairs", "FullCustomization", "Dyno"],
+      "Locations": ["Downtown", "Waterfront"],
+      "Cost": 200000,
+      "UnlockLevel": 25
+    },
+    "Executive": {
+      "ID": "GARAGE_EXECUTIVE",
+      "Name": "Executive Showroom",
+      "Description": "Luxury vehicle showcase",
+      "Capacity": 35,
+      "Features": ["Storage", "FullRepairs", "FullCustomization", "Dyno", "Showroom", "Security"],
+      "Locations": ["Downtown Penthouse", "Mansion"],
+      "Cost": 500000,
+      "UnlockLevel": 40
+    },
+    "Warehouse": {
+      "ID": "GARAGE_WAREHOUSE",
+      "Name": "Warehouse",
+      "Description": "Maximum capacity storage",
+      "Capacity": 50,
+      "Features": ["MassStorage", "BasicRepairs"],
+      "Location": "Industrial",
+      "Cost": 300000,
+      "UnlockLevel": 30
+    },
+    "Secret": {
+      "ID": "GARAGE_SECRET",
+      "Name": "Underground Lair",
+      "Description": "Hidden elite garage",
+      "Capacity": 40,
+      "Features": ["Storage", "FullFeatures", "HeatCooldown", "SecretEntrance"],
+      "Location": "Hidden",
+      "Cost": 1000000,
+      "UnlockLevel": 50,
+      "UnlockRequirement": "Story"
+    }
+  },
+
+  "GarageFeatures": {
+    "Storage": {
+      "VehicleSlots": true,
+      "PartStorage": { "Capacity": 100 },
+      "DisplayStands": false
+    },
+    "BasicRepairs": {
+      "VisualRepair": true,
+      "MechanicalRepair": { "Percentage": 50 },
+      "Cost": "Standard"
+    },
+    "FullRepairs": {
+      "VisualRepair": true,
+      "MechanicalRepair": { "Percentage": 100 },
+      "QuickRepair": true,
+      "Cost": "Reduced"
+    },
+    "BasicCustomization": {
+      "Paint": true,
+      "Wheels": true,
+      "VisualParts": true,
+      "PerformanceParts": false
+    },
+    "FullCustomization": {
+      "Paint": true,
+      "Wheels": true,
+      "VisualParts": true,
+      "PerformanceParts": true,
+      "EngineSwaps": true,
+      "Tuning": true
+    },
+    "Dyno": {
+      "PowerMeasurement": true,
+      "TuningInterface": true,
+      "DataLogging": true
+    },
+    "Showroom": {
+      "DisplayMode": true,
+      "Lighting": true,
+      "Turntable": true,
+      "PhotoStudio": true
+    },
+    "Security": {
+      "TheftProtection": true,
+      "InsuranceDiscount": 0.1
+    },
+    "HeatCooldown": {
+      "ReduceHeatLevel": true,
+      "HideFromPolice": true
+    }
+  },
+
+  "GarageUpgrades": {
+    "CapacityExpansion": {
+      "Levels": [5, 10, 15, 20, 25],
+      "CostPerLevel": [25000, 50000, 100000, 200000, 400000]
+    },
+    "EquipmentUpgrades": {
+      "RepairBay": {
+        "Levels": ["Basic", "Advanced", "Professional"],
+        "Costs": [0, 50000, 150000],
+        "Benefits": ["50%Repair", "75%Repair", "100%Repair"]
+      },
+      "PaintBooth": {
+        "Levels": ["Basic", "Professional"],
+        "Costs": [0, 100000],
+        "Benefits": ["StandardPaints", "AllPaints"]
+      },
+      "DynoRoom": {
+        "Cost": 200000,
+        "Benefits": ["PowerTesting", "Tuning"]
+      },
+      "LiftCount": {
+        "Base": 1,
+        "Max": 4,
+        "CostPerLift": 50000
+      }
+    },
+    "Aesthetic": {
+      "Lighting": {
+        "Options": ["Standard", "Mood", "Showroom"],
+        "Costs": [0, 25000, 75000]
+      },
+      "Flooring": {
+        "Options": ["Concrete", "Epoxy", "CheckeredTile"],
+        "Costs": [0, 15000, 40000]
+      },
+      "Decor": {
+        "Posters": true,
+        "Trophies": true,
+        "NeonSigns": true
+      }
+    }
+  },
+
+  "VehicleManagement": {
+    "Sorting": {
+      "Options": ["Alphabetical", "Class", "Value", "DateAcquired", "Mileage", "Custom"],
+      "Grouping": ["None", "ByClass", "ByMake", "ByDrivetrain"]
+    },
+    "Filtering": {
+      "ByClass": true,
+      "ByMake": true,
+      "ByDrivetrain": true,
+      "Favorites": true,
+      "RecentlyUsed": true
+    },
+    "QuickActions": {
+      "SetAsPrimary": true,
+      "AddToFavorites": true,
+      "SendToGarage": true,
+      "QuickSell": true,
+      "Compare": true
+    },
+    "VehicleInfo": {
+      "Stats": true,
+      "Value": true,
+      "Modifications": true,
+      "History": true,
+      "Insurance": true
+    }
+  },
+
+  "PartStorage": {
+    "Capacity": {
+      "Base": 50,
+      "Expanded": 200
+    },
+    "Categories": {
+      "Engine": true,
+      "Drivetrain": true,
+      "Suspension": true,
+      "Brakes": true,
+      "Wheels": true,
+      "Cosmetic": true
+    },
+    "Actions": {
+      "Install": true,
+      "Sell": true,
+      "Trade": true,
+      "Scrap": true
+    }
+  },
+
+  "GarageInteraction": {
+    "WalkAround": {
+      "Enabled": true,
+      "FirstPerson": true,
+      "ThirdPerson": true
+    },
+    "VehicleInteraction": {
+      "OpenDoors": true,
+      "OpenHood": true,
+      "OpenTrunk": true,
+      "StartEngine": true,
+      "RevEngine": true
+    },
+    "EnvironmentInteraction": {
+      "Lifts": { "Raise": true, "Lower": true },
+      "Lights": { "Toggle": true, "Adjust": true },
+      "Music": { "Radio": true, "Playlist": true }
+    }
+  },
+
+  "PhotoStudio": {
+    "Enabled": true,
+    "Features": {
+      "Backdrops": 10,
+      "Lighting": { "Adjustable": true, "Presets": 5 },
+      "Turntable": true,
+      "Props": true
+    },
+    "Export": {
+      "Resolution": ["1080p", "4K"],
+      "Share": true
+    }
+  },
+
+  "DeliveryService": {
+    "Enabled": true,
+    "VehicleDelivery": {
+      "ToLocation": true,
+      "Cost": { "Base": 1000, "PerMile": 10 },
+      "Time": "Instant"
+    },
+    "PartDelivery": {
+      "FromShops": true,
+      "Cost": 500
+    }
+  },
+
+  "MultiGarage": {
+    "MaxGarages": 6,
+    "Transfer": {
+      "Vehicles": true,
+      "Parts": true,
+      "Cost": 0
+    },
+    "QuickTravel": {
+      "BetweenGarages": true,
+      "Cost": 0
+    }
+  },
+
+  "FastTravel": {
+    "FromGarage": true,
+    "ToGarage": true,
+    "ToEvents": true,
+    "ToShops": true,
+    "Cost": 0
+  },
+
+  "UI": {
+    "GarageMenu": {
+      "CarouselView": true,
+      "GridView": true,
+      "ListView": true,
+      "DetailPanel": true
+    },
+    "QuickSelect": {
+      "Favorites": true,
+      "RecentlyUsed": 5,
+      "KeyBindings": true
+    },
+    "Statistics": {
+      "TotalVehicles": true,
+      "TotalValue": true,
+      "StorageUsed": true,
+      "GarageLevel": true
+    },
+    "Notifications": {
+      "NewVehicle": true,
+      "RepairsComplete": true,
+      "UpgradeAvailable": true
+    }
+  }
+}

@@ -1,0 +1,311 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Body Kits and Exterior Modifications",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "AffectsAero": true,
+    "WeightChanges": true,
+    "PaintCompatible": true,
+    "CarbonVariants": true
+  },
+
+  "BodyKitTypes": {
+    "FrontBumper": {
+      "ID": "BODY_FRONT",
+      "Slot": "Front",
+      "AeroEffect": {
+        "Downforce": { "Range": [0, 50] },
+        "Drag": { "Range": [0, 0.05] }
+      },
+      "Components": ["Splitter", "Canards", "AirDam", "IntakeVents"],
+      "Styles": ["Stock", "Lip", "Aggressive", "WideBody", "TimAttack"]
+    },
+    "RearBumper": {
+      "ID": "BODY_REAR",
+      "Slot": "Rear",
+      "AeroEffect": {
+        "Diffuser": { "Downforce": [0, 40] }
+      },
+      "Components": ["Diffuser", "ExhaustCutouts", "TowHook"],
+      "Styles": ["Stock", "Smooth", "Aggressive", "WideBody", "Racing"]
+    },
+    "SideSkirts": {
+      "ID": "BODY_SIDES",
+      "Slot": "Sides",
+      "AeroEffect": {
+        "Airflow": "Improved"
+      },
+      "Styles": ["Stock", "Lip", "Extended", "WideBody", "Racing"]
+    },
+    "Hood": {
+      "ID": "BODY_HOOD",
+      "Slot": "Hood",
+      "Features": {
+        "Vents": { "HeatExtraction": true },
+        "Scoops": { "AirIntake": true },
+        "Cutouts": { "EngineExposed": true }
+      },
+      "Styles": ["Stock", "Vented", "Scooped", "Cowl", "Carbon"]
+    },
+    "Trunk": {
+      "ID": "BODY_TRUNK",
+      "Slot": "Trunk",
+      "Features": {
+        "Ducktail": { "Downforce": 15 },
+        "SpoilerMount": true
+      },
+      "Styles": ["Stock", "Ducktail", "Flat", "LipSpoiler", "Carbon"]
+    },
+    "Fenders": {
+      "ID": "BODY_FENDERS",
+      "Slot": "Fenders",
+      "WidthIncrease": { "Range": [0, 100], "Unit": "mm" },
+      "Styles": {
+        "Stock": { "Width": 0 },
+        "Flared": { "Width": 25 },
+        "WideBody": { "Width": 50 },
+        "Extreme": { "Width": 100 }
+      }
+    },
+    "RoofOptions": {
+      "ID": "BODY_ROOF",
+      "Slot": "Roof",
+      "Options": {
+        "Stock": { "Weight": 0 },
+        "CarbonRoof": { "Weight": -15 },
+        "VortexGenerator": { "Aero": true },
+        "RoofScoop": { "Intake": true }
+      }
+    }
+  },
+
+  "WideBodyKits": {
+    "Enabled": true,
+    "Types": {
+      "BoltOn": {
+        "ID": "WIDE_BOLT",
+        "Description": "Bolt-on fender flares",
+        "WidthIncrease": 30,
+        "InstallDifficulty": "Easy",
+        "Reversible": true,
+        "PriceRange": { "Min": 2000, "Max": 5000 }
+      },
+      "RivetStyle": {
+        "ID": "WIDE_RIVET",
+        "Description": "Exposed rivet wide body",
+        "WidthIncrease": 50,
+        "InstallDifficulty": "Medium",
+        "Reversible": true,
+        "PriceRange": { "Min": 4000, "Max": 8000 }
+      },
+      "Seamless": {
+        "ID": "WIDE_SEAMLESS",
+        "Description": "Blended wide body",
+        "WidthIncrease": 50,
+        "InstallDifficulty": "Hard",
+        "Reversible": false,
+        "PriceRange": { "Min": 8000, "Max": 15000 }
+      },
+      "Extreme": {
+        "ID": "WIDE_EXTREME",
+        "Description": "Extreme wide body conversion",
+        "WidthIncrease": 100,
+        "InstallDifficulty": "Expert",
+        "Reversible": false,
+        "RequiresCustomFab": true,
+        "PriceRange": { "Min": 15000, "Max": 30000 }
+      }
+    },
+    "WheelFitment": {
+      "RequiresWiderWheels": true,
+      "MaxOffset": { "Increased": true },
+      "Spacers": { "MayBeRequired": true }
+    }
+  },
+
+  "Spoilers": {
+    "Types": {
+      "LipSpoiler": {
+        "ID": "SPOILER_LIP",
+        "Downforce": 10,
+        "Drag": 0.01,
+        "Subtle": true,
+        "Price": 500
+      },
+      "Ducktail": {
+        "ID": "SPOILER_DUCK",
+        "Downforce": 20,
+        "Drag": 0.015,
+        "Price": 800
+      },
+      "LowWing": {
+        "ID": "SPOILER_LOWWING",
+        "Downforce": 40,
+        "Drag": 0.025,
+        "Adjustable": false,
+        "Price": 1500
+      },
+      "HighWing": {
+        "ID": "SPOILER_HIGHWING",
+        "Downforce": 70,
+        "Drag": 0.04,
+        "Adjustable": true,
+        "Price": 3000
+      },
+      "GTWing": {
+        "ID": "SPOILER_GTWING",
+        "Downforce": 100,
+        "Drag": 0.06,
+        "Adjustable": true,
+        "Stands": ["Low", "Medium", "High"],
+        "Price": 5000
+      },
+      "DTMWing": {
+        "ID": "SPOILER_DTM",
+        "Downforce": 120,
+        "Drag": 0.07,
+        "WidthMatches": "Body",
+        "Price": 7500
+      }
+    },
+    "Customization": {
+      "Angle": { "Adjustable": true, "Range": [-5, 30] },
+      "Endplates": { "Options": ["None", "Small", "Large"] },
+      "GurneyFlap": { "Available": true },
+      "Material": ["Fiberglass", "Carbon", "Aluminum"]
+    }
+  },
+
+  "Canards": {
+    "Types": {
+      "Small": { "Downforce": 5, "Drag": 0.005, "Price": 300 },
+      "Medium": { "Downforce": 10, "Drag": 0.01, "Price": 500 },
+      "Large": { "Downforce": 15, "Drag": 0.015, "Price": 800 },
+      "Extreme": { "Downforce": 25, "Drag": 0.025, "Price": 1200 }
+    },
+    "Mounting": ["BumperMounted", "FenderMounted"],
+    "Material": ["Carbon", "FRP"]
+  },
+
+  "Diffusers": {
+    "Types": {
+      "Lip": {
+        "ID": "DIFF_LIP",
+        "Downforce": 15,
+        "Price": 800
+      },
+      "Finned": {
+        "ID": "DIFF_FIN",
+        "Downforce": 30,
+        "FinCount": { "Options": [3, 5, 7] },
+        "Price": 2000
+      },
+      "FullRace": {
+        "ID": "DIFF_RACE",
+        "Downforce": 50,
+        "RequiresFlatFloor": true,
+        "Price": 4000
+      }
+    },
+    "Material": ["Plastic", "FRP", "Carbon"]
+  },
+
+  "FenderVents": {
+    "Front": {
+      "Types": ["Functional", "Decorative"],
+      "Effect": { "WheelwellCooling": true },
+      "Styles": ["Horizontal", "Vertical", "Gill"]
+    },
+    "Rear": {
+      "Types": ["Functional", "Decorative"],
+      "Effect": { "HeatExtraction": true }
+    }
+  },
+
+  "Mirrors": {
+    "Types": {
+      "Stock": { "ID": "MIRROR_STOCK" },
+      "Carbon": { "ID": "MIRROR_CARBON", "Weight": -1 },
+      "Aero": { "ID": "MIRROR_AERO", "Drag": -0.005 },
+      "Delete": { "ID": "MIRROR_DELETE", "Weight": -2, "Warning": true }
+    },
+    "Caps": {
+      "Options": ["Body", "Carbon", "Chrome", "Custom"]
+    }
+  },
+
+  "Materials": {
+    "FRP": {
+      "ID": "MAT_FRP",
+      "Name": "Fiberglass",
+      "WeightSaving": 0,
+      "Durability": 0.7,
+      "PriceMultiplier": 1.0
+    },
+    "PUF": {
+      "ID": "MAT_PUF",
+      "Name": "Polyurethane Flex",
+      "WeightSaving": 0,
+      "Durability": 0.9,
+      "PriceMultiplier": 1.1
+    },
+    "Carbon": {
+      "ID": "MAT_CARBON",
+      "Name": "Carbon Fiber",
+      "WeightSaving": 0.4,
+      "Durability": 0.8,
+      "PriceMultiplier": 2.5
+    },
+    "DryCarbon": {
+      "ID": "MAT_DRYCARBON",
+      "Name": "Dry Carbon",
+      "WeightSaving": 0.5,
+      "Durability": 0.75,
+      "PriceMultiplier": 4.0
+    }
+  },
+
+  "Brands": {
+    "Licensed": {
+      "RocketBunny": { "Style": "WideBody", "Quality": "Premium" },
+      "LibertyWalk": { "Style": "WideBody", "Quality": "Premium" },
+      "VARIS": { "Style": "Aero", "Quality": "Premium" },
+      "Voltex": { "Style": "TimeAttack", "Quality": "Premium" },
+      "APR": { "Style": "Performance", "Quality": "Premium" },
+      "Seibon": { "Style": "Carbon", "Quality": "Premium" }
+    },
+    "Generic": {
+      "Street": { "Style": "Mild", "Quality": "Standard" },
+      "Sport": { "Style": "Moderate", "Quality": "Standard" },
+      "Race": { "Style": "Aggressive", "Quality": "Standard" }
+    }
+  },
+
+  "Installation": {
+    "Requirements": {
+      "BodyShop": true,
+      "Painting": "Additional",
+      "Fitting": { "Time": "Varies" }
+    },
+    "Costs": {
+      "InstallLabor": 0.1,
+      "PaintMatch": 0.15
+    }
+  },
+
+  "UI": {
+    "BodyKitMenu": {
+      "3DPreview": true,
+      "MixAndMatch": true,
+      "FullKitOption": true,
+      "MaterialSelect": true
+    },
+    "Filters": {
+      "ByStyle": true,
+      "ByBrand": true,
+      "ByPrice": true,
+      "ByMaterial": true
+    }
+  }
+}

@@ -9,9 +9,12 @@ void UMGVehicleWearSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 
 	// Get economy subsystem for purchases
-	if (UGameInstance* GI = GetWorld()->GetGameInstance())
+	if (UWorld* World = GetWorld())
 	{
-		EconomySubsystem = GI->GetSubsystem<UMGEconomySubsystem>();
+		if (UGameInstance* GI = World->GetGameInstance())
+		{
+			EconomySubsystem = GI->GetSubsystem<UMGEconomySubsystem>();
+		}
 	}
 }
 

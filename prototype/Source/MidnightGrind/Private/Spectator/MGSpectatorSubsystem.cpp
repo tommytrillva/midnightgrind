@@ -435,7 +435,10 @@ void UMGSpectatorSubsystem::SetFreeCamPosition(FVector Position, FRotator Rotati
 	if (SpectatorPawn)
 	{
 		SpectatorPawn->SetActorLocation(Position);
-		SpectatorPawn->GetController()->SetControlRotation(Rotation);
+		if (AController* Controller = SpectatorPawn->GetController())
+		{
+			Controller->SetControlRotation(Rotation);
+		}
 	}
 }
 
