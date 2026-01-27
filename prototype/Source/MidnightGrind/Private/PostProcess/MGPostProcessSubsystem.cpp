@@ -534,8 +534,60 @@ void UMGPostProcessSubsystem::FlashScreen(FLinearColor Color, float Duration)
 
 void UMGPostProcessSubsystem::ShakeScreen(float Intensity, float Duration)
 {
-    // Camera shake would be handled by camera system
-    // This is a placeholder for post-process based shake
+    UWorld* World = GetWorld();
+    if (!World)
+    {
+        return;
+    }
+
+    // Store shake parameters for tick-based effect
+    ShakeIntensity = FMath::Clamp(Intensity, 0.0f, 1.0f);
+    ShakeTimeRemaining = Duration;
+    bShakeActive = true;
+
+    // Also apply visual effects during shake
+    // Add chromatic aberration for impact feel
+    float CAIntensity = Intensity * 0.5f;
+    CurrentProfile.ChromaticAberration.Intensity = FMath::Min(1.0f, CAIntensity);
+
+    // Boost vignette slightly
+    float VignetteBoost = Intensity * 0.2f;
+    CurrentProfile.Vignette.Intensity = FMath::Min(1.0f, CurrentProfile.Vignette.Intensity + VignetteBoost);
+
+    ApplyEffectsToPostProcessVolume();
+
+    // Set timer to restore effects
+    World->GetTimerManager().SetTimer(
+        ShakeTimerHandle,
+        [this]()
+        {
+            bShakeActive = false;
+            ShakeIntensity = 0.0f;
+
+            // Restore chromatic aberration
+            CurrentProfile.ChromaticAberration.Intensity = 0.0f;
+
+            // Restore vignette to normal
+            ApplyEffectsToPostProcessVolume();
+        },
+        Duration,
+        false
+    );
+
+    // Also request actual camera shake through player controller
+    APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+    if (PC && PC->PlayerCameraManager)
+    {
+        // Use built-in camera shake with oscillation pattern
+        PC->PlayerCameraManager->StartCameraShake(
+            nullptr, // No specific shake class - using parameters
+            Intensity,
+            ECameraShakePlaySpace::CameraLocal,
+            FRotator::ZeroRotator
+        );
+    }
+
+    OnEffectTriggered.Broadcast(EMGScreenEffect::CameraShake, Intensity);
 }
 
 void UMGPostProcessSubsystem::PulseVignette(float Intensity, float Duration)

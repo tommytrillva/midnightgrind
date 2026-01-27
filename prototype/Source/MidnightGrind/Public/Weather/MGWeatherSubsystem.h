@@ -12,6 +12,7 @@ class UPostProcessComponent;
 class ADirectionalLight;
 class ASkyAtmosphere;
 class AVolumetricCloud;
+class UMGWeatherRacingSubsystem;
 
 /**
  * Weather type

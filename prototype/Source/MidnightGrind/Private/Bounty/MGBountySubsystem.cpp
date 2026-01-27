@@ -166,6 +166,9 @@ void UMGBountySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			}
 		}, 1.0f, true);
 	}
+
+	// Load saved data
+	LoadBountyData();
 }
 
 void UMGBountySubsystem::Deinitialize()

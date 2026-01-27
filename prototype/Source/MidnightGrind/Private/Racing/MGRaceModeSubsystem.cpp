@@ -227,17 +227,22 @@ void UMGRaceModeSubsystem::StartRace()
 	// Start race update timer
 	if (UWorld* World = GetWorld())
 	{
+		TWeakObjectPtr<UMGRaceModeSubsystem> WeakThis(this);
 		World->GetTimerManager().SetTimer(
 			UpdateTimerHandle,
-			[this]()
+			[WeakThis]()
 			{
-				if (!bRacePaused && CurrentRaceState == EMGRaceState::Racing)
+				if (!WeakThis.IsValid())
+				{
+					return;
+				}
+				if (!WeakThis->bRacePaused && WeakThis->CurrentRaceState == EMGRaceState::Racing)
 				{
 					const float DeltaTime = 0.05f;
-					RaceTime += DeltaTime;
+					WeakThis->RaceTime += DeltaTime;
 
 					// Update all racer times
-					for (FMGRacerEntry& Racer : Racers)
+					for (FMGRacerEntry& Racer : WeakThis->Racers)
 					{
 						if (!Racer.bFinished && !Racer.bDNF && !Racer.bEliminated)
 						{
@@ -245,15 +250,15 @@ void UMGRaceModeSubsystem::StartRace()
 						}
 					}
 
-					UpdatePositions();
+					WeakThis->UpdatePositions();
 
 					// Handle elimination races
-					if (CurrentRaceConfig.RaceType == EMGRaceType::Elimination)
+					if (WeakThis->CurrentRaceConfig.RaceType == EMGRaceType::Elimination)
 					{
-						UpdateEliminationTimer(DeltaTime);
+						WeakThis->UpdateEliminationTimer(DeltaTime);
 					}
 
-					CheckRaceCompletion();
+					WeakThis->CheckRaceCompletion();
 				}
 			},
 			0.05f,
