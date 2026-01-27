@@ -445,9 +445,12 @@ void UMGCareerSubsystem::CompleteMilestone(EMGCareerMilestone Milestone)
 	OnMilestoneReached.Broadcast(Milestone);
 
 	// Award reputation for milestones
-	if (UMGCurrencySubsystem* Currency = GetGameInstance()->GetSubsystem<UMGCurrencySubsystem>())
+	if (UGameInstance* GI = GetGameInstance())
 	{
-		Currency->EarnCurrency(EMGCurrencyType::LegacyMarks, 50, EMGEarnSource::StoryMilestone, TEXT("Career milestone"));
+		if (UMGCurrencySubsystem* Currency = GI->GetSubsystem<UMGCurrencySubsystem>())
+		{
+			Currency->EarnCurrency(EMGCurrencyType::LegacyMarks, 50, EMGEarnSource::StoryMilestone, TEXT("Career milestone"));
+		}
 	}
 }
 
@@ -463,10 +466,13 @@ void UMGCareerSubsystem::AdvanceChapter()
 	OnChapterAdvanced.Broadcast(Progress.CurrentChapter);
 
 	// Award chapter completion bonus
-	if (UMGCurrencySubsystem* Currency = GetGameInstance()->GetSubsystem<UMGCurrencySubsystem>())
+	if (UGameInstance* GI = GetGameInstance())
 	{
-		int64 ChapterBonus = 5000 * (int32)Progress.CurrentChapter;
-		Currency->EarnCurrency(EMGCurrencyType::GrindCash, ChapterBonus, EMGEarnSource::StoryMilestone, TEXT("Chapter completion"));
+		if (UMGCurrencySubsystem* Currency = GI->GetSubsystem<UMGCurrencySubsystem>())
+		{
+			int64 ChapterBonus = 5000 * (int32)Progress.CurrentChapter;
+			Currency->EarnCurrency(EMGCurrencyType::GrindCash, ChapterBonus, EMGEarnSource::StoryMilestone, TEXT("Chapter completion"));
+		}
 	}
 
 	SaveCareerData();
@@ -474,12 +480,15 @@ void UMGCareerSubsystem::AdvanceChapter()
 
 void UMGCareerSubsystem::GrantObjectiveReward(const FMGCareerObjective& Objective)
 {
-	if (UMGCurrencySubsystem* Currency = GetGameInstance()->GetSubsystem<UMGCurrencySubsystem>())
+	if (UGameInstance* GI = GetGameInstance())
 	{
-		if (Objective.GrindCashReward > 0)
-			Currency->EarnCurrency(EMGCurrencyType::GrindCash, Objective.GrindCashReward, EMGEarnSource::StoryMilestone, TEXT("Objective reward"));
+		if (UMGCurrencySubsystem* Currency = GI->GetSubsystem<UMGCurrencySubsystem>())
+		{
+			if (Objective.GrindCashReward > 0)
+				Currency->EarnCurrency(EMGCurrencyType::GrindCash, Objective.GrindCashReward, EMGEarnSource::StoryMilestone, TEXT("Objective reward"));
 
-		if (Objective.ReputationReward > 0)
-			Progress.TotalReputation += Objective.ReputationReward;
+			if (Objective.ReputationReward > 0)
+				Progress.TotalReputation += Objective.ReputationReward;
+		}
 	}
 }

@@ -1,0 +1,271 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Notification System and Alert Management",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxOnScreen": 3,
+    "QueueSystem": true,
+    "PrioritySystem": true,
+    "DoNotDisturbMode": true
+  },
+
+  "NotificationCategories": {
+    "System": {
+      "ID": "NOTIF_SYSTEM",
+      "Priority": "Critical",
+      "Sound": "SystemAlert",
+      "CanMute": false,
+      "Types": {
+        "ConnectionLost": { "Persistent": true, "Blocking": true },
+        "ServerMaintenance": { "Advance": "24Hours", "Persistent": true },
+        "UpdateAvailable": { "Dismissible": true },
+        "SessionExpiring": { "Warning": "5Minutes" }
+      }
+    },
+    "Gameplay": {
+      "ID": "NOTIF_GAMEPLAY",
+      "Priority": "High",
+      "Sound": "GameplayPing",
+      "CanMute": true,
+      "Types": {
+        "RaceInvite": { "Timeout": 30, "ActionButtons": ["Accept", "Decline"] },
+        "ChallengeReceived": { "Timeout": 60 },
+        "PoliceAlert": { "Flashing": true },
+        "EventStarting": { "Countdown": true },
+        "ObjectiveComplete": { "Celebration": true }
+      }
+    },
+    "Social": {
+      "ID": "NOTIF_SOCIAL",
+      "Priority": "Medium",
+      "Sound": "SocialPing",
+      "CanMute": true,
+      "Types": {
+        "FriendOnline": { "ShowAvatar": true },
+        "FriendRequest": { "ActionButtons": ["Accept", "Decline", "View"] },
+        "Message": { "Preview": true, "QuickReply": true },
+        "CrewInvite": { "ActionButtons": ["Accept", "Decline"] },
+        "Mention": { "Highlight": true }
+      }
+    },
+    "Economy": {
+      "ID": "NOTIF_ECONOMY",
+      "Priority": "Medium",
+      "Sound": "CashRegister",
+      "CanMute": true,
+      "Types": {
+        "CashEarned": { "Amount": true, "Source": true },
+        "REPGained": { "Amount": true, "Source": true },
+        "ItemReceived": { "Preview": true },
+        "SaleComplete": { "Details": true },
+        "BidOutbid": { "Urgent": true }
+      }
+    },
+    "Progression": {
+      "ID": "NOTIF_PROGRESS",
+      "Priority": "Medium",
+      "Sound": "Achievement",
+      "CanMute": true,
+      "Types": {
+        "LevelUp": { "Celebration": true, "Rewards": true },
+        "AchievementUnlocked": { "Animation": true },
+        "ChallengeComplete": { "Rewards": true },
+        "NewUnlock": { "Preview": true },
+        "MilestoneReached": { "Celebration": true }
+      }
+    },
+    "Vehicle": {
+      "ID": "NOTIF_VEHICLE",
+      "Priority": "Low",
+      "Sound": "VehicleAlert",
+      "CanMute": true,
+      "Types": {
+        "DamageWarning": { "Threshold": 25, "Icon": true },
+        "LowFuel": { "Threshold": 10 },
+        "RepairsComplete": { "Actionable": true },
+        "ModificationReady": { "Actionable": true }
+      }
+    },
+    "Rewards": {
+      "ID": "NOTIF_REWARDS",
+      "Priority": "High",
+      "Sound": "Fanfare",
+      "CanMute": false,
+      "Types": {
+        "DailyReward": { "Claim": true, "Animation": true },
+        "SeasonReward": { "Claim": true, "Preview": true },
+        "SpecialDrop": { "Rare": true, "Celebration": true }
+      }
+    }
+  },
+
+  "NotificationDisplay": {
+    "Styles": {
+      "Toast": {
+        "Position": "TopRight",
+        "Duration": 5,
+        "Animation": "SlideIn",
+        "Width": 300
+      },
+      "Banner": {
+        "Position": "TopCenter",
+        "Duration": 3,
+        "FullWidth": true,
+        "Animation": "DropDown"
+      },
+      "Modal": {
+        "Position": "Center",
+        "RequiresAction": true,
+        "Overlay": true
+      },
+      "Subtle": {
+        "Position": "BottomRight",
+        "Duration": 3,
+        "Minimal": true
+      },
+      "HUD": {
+        "Position": "InGame",
+        "NonIntrusive": true,
+        "Duration": 2
+      }
+    },
+    "Elements": {
+      "Icon": true,
+      "Title": true,
+      "Body": true,
+      "ActionButtons": { "Max": 3 },
+      "ProgressBar": { "Optional": true },
+      "Timestamp": { "Optional": true }
+    }
+  },
+
+  "PrioritySystem": {
+    "Levels": {
+      "Critical": { "Value": 5, "Override": true, "Sound": "Always" },
+      "High": { "Value": 4, "Queue": "Front" },
+      "Medium": { "Value": 3, "Queue": "Normal" },
+      "Low": { "Value": 2, "Queue": "Back" },
+      "Minimal": { "Value": 1, "Queue": "Skip" }
+    },
+    "Stacking": {
+      "Similar": "Combine",
+      "Different": "Queue",
+      "MaxQueue": 10
+    },
+    "Interruption": {
+      "DuringRace": { "AllowOnly": ["Critical", "PoliceAlert"] },
+      "DuringCutscene": { "AllowOnly": ["Critical"] },
+      "InMenus": { "AllowAll": true }
+    }
+  },
+
+  "SoundSettings": {
+    "Categories": {
+      "System": { "Volume": 1.0, "Mutable": false },
+      "Gameplay": { "Volume": 0.8, "Mutable": true },
+      "Social": { "Volume": 0.6, "Mutable": true },
+      "Economy": { "Volume": 0.7, "Mutable": true },
+      "Progression": { "Volume": 0.9, "Mutable": true }
+    },
+    "GlobalVolume": { "Default": 0.8, "Range": [0, 1] },
+    "VibrationFeedback": { "Enabled": true, "Intensity": 0.5 }
+  },
+
+  "DoNotDisturb": {
+    "Modes": {
+      "Off": { "AllNotifications": true },
+      "Racing": { "OnlyEssential": true, "Auto": "DuringRace" },
+      "Full": { "OnlyCritical": true, "Manual": true }
+    },
+    "Schedule": {
+      "Enabled": true,
+      "CustomTimes": true,
+      "Repeat": ["Daily", "Weekly"]
+    },
+    "Exceptions": {
+      "FromFriends": { "Configurable": true },
+      "FromCrew": { "Configurable": true },
+      "CriticalAlerts": { "Always": true }
+    }
+  },
+
+  "NotificationHistory": {
+    "Enabled": true,
+    "Retention": { "Days": 7 },
+    "Categories": {
+      "All": true,
+      "ByType": true,
+      "Unread": true
+    },
+    "Actions": {
+      "MarkAsRead": true,
+      "Delete": true,
+      "Filter": true
+    },
+    "Storage": {
+      "MaxItems": 500,
+      "AutoPrune": true
+    }
+  },
+
+  "CustomNotifications": {
+    "UserCreated": {
+      "Reminders": {
+        "Enabled": true,
+        "Max": 10,
+        "Types": ["OneTime", "Recurring"]
+      },
+      "Triggers": {
+        "TimeBasedReminder": true,
+        "EventBasedAlert": true
+      }
+    },
+    "Templates": {
+      "Enabled": true,
+      "Shareable": false
+    }
+  },
+
+  "Localization": {
+    "MultiLanguage": true,
+    "DynamicContent": true,
+    "Formatting": {
+      "Numbers": "Localized",
+      "Dates": "Localized",
+      "Currency": "InGame"
+    }
+  },
+
+  "Analytics": {
+    "Tracking": {
+      "ViewRate": true,
+      "DismissRate": true,
+      "ActionRate": true,
+      "ResponseTime": true
+    },
+    "Optimization": {
+      "ABTesting": true,
+      "SmartTiming": true
+    }
+  },
+
+  "UI": {
+    "NotificationCenter": {
+      "Access": "MenuButton",
+      "UnreadBadge": true,
+      "GroupedView": true,
+      "FilterOptions": true
+    },
+    "QuickSettings": {
+      "InGameAccess": true,
+      "CategoryToggles": true,
+      "VolumeSlider": true
+    },
+    "Customization": {
+      "Position": { "Adjustable": true },
+      "Size": { "Options": ["Small", "Medium", "Large"] },
+      "Transparency": { "Range": [0.5, 1] }
+    }
+  }
+}

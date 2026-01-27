@@ -448,9 +448,12 @@ void UMGFTUESubsystem::GrantStepReward(const FMGOnboardingStep& Step)
 {
 	if (Step.RewardGrindCash > 0)
 	{
-		if (UMGCurrencySubsystem* Currency = GetGameInstance()->GetSubsystem<UMGCurrencySubsystem>())
+		if (UGameInstance* GI = GetGameInstance())
 		{
-			Currency->EarnCurrency(EMGCurrencyType::GrindCash, Step.RewardGrindCash, EMGEarnSource::FirstTimeBonus, TEXT("Onboarding reward"));
+			if (UMGCurrencySubsystem* Currency = GI->GetSubsystem<UMGCurrencySubsystem>())
+			{
+				Currency->EarnCurrency(EMGCurrencyType::GrindCash, Step.RewardGrindCash, EMGEarnSource::FirstTimeBonus, TEXT("Onboarding reward"));
+			}
 		}
 	}
 }

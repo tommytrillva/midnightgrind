@@ -1,0 +1,289 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Cross-Platform Play and Progression System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "OptIn": true,
+    "DefaultEnabled": true,
+    "Platforms": ["PC", "PlayStation", "Xbox", "Switch"],
+    "InputBasedMatchmaking": true
+  },
+
+  "CrossPlayFeatures": {
+    "Multiplayer": {
+      "Enabled": true,
+      "Modes": {
+        "FreeRoam": { "Enabled": true },
+        "QuickRace": { "Enabled": true },
+        "PrivateLobbies": { "Enabled": true },
+        "Tournaments": { "Enabled": true },
+        "CrewActivities": { "Enabled": true }
+      }
+    },
+    "Social": {
+      "Friends": {
+        "CrossPlatformFriends": true,
+        "UnifiedFriendsList": true,
+        "InviteAcrossPlatforms": true
+      },
+      "Communication": {
+        "TextChat": true,
+        "VoiceChat": true,
+        "QuickChat": true
+      },
+      "Crews": {
+        "CrossPlatformCrews": true,
+        "SharedCrewProgress": true
+      }
+    },
+    "Marketplace": {
+      "CrossPlatformTrades": false,
+      "ViewListings": true,
+      "Reason": "PlatformPolicyRestrictions"
+    }
+  },
+
+  "CrossProgression": {
+    "Enabled": true,
+    "LinkedAccount": {
+      "Required": true,
+      "Provider": "MidnightGrindAccount",
+      "LinkProcess": "InGame"
+    },
+    "SyncedData": {
+      "PlayerProfile": {
+        "Level": true,
+        "REP": true,
+        "Achievements": true,
+        "Statistics": true,
+        "Titles": true,
+        "Badges": true
+      },
+      "Currency": {
+        "Cash": true,
+        "PremiumCurrency": false,
+        "Reason": "PlatformCurrencyRestrictions"
+      },
+      "Vehicles": {
+        "OwnedVehicles": true,
+        "Modifications": true,
+        "Liveries": true,
+        "Settings": true
+      },
+      "Parts": {
+        "Inventory": true,
+        "InstalledParts": true
+      },
+      "Garage": {
+        "GarageOwnership": true,
+        "VehiclePlacement": true
+      },
+      "Story": {
+        "Progress": true,
+        "Choices": true,
+        "Unlocks": true
+      },
+      "Social": {
+        "Friends": true,
+        "CrewMembership": true,
+        "Messages": "Limited"
+      }
+    },
+    "NotSynced": {
+      "PlatformSpecificPurchases": true,
+      "PlatformAchievements": true,
+      "PlatformCurrency": true,
+      "PlatformExclusiveContent": true
+    }
+  },
+
+  "InputBasedMatchmaking": {
+    "Enabled": true,
+    "InputTypes": {
+      "Controller": {
+        "ID": "INPUT_CONTROLLER",
+        "Platforms": ["PlayStation", "Xbox", "PC", "Switch"]
+      },
+      "Wheel": {
+        "ID": "INPUT_WHEEL",
+        "Platforms": ["PC", "PlayStation", "Xbox"],
+        "Separate": true
+      },
+      "Keyboard": {
+        "ID": "INPUT_KEYBOARD",
+        "Platforms": ["PC"]
+      }
+    },
+    "Options": {
+      "SameInputOnly": { "Default": false },
+      "MixedInput": { "Default": true },
+      "PreferSameInput": { "Enabled": true }
+    },
+    "Balancing": {
+      "SteeringAssistByInput": true,
+      "TractionAssistByInput": false
+    }
+  },
+
+  "PlatformSettings": {
+    "PC": {
+      "ID": "PLATFORM_PC",
+      "Features": {
+        "AllFeatures": true,
+        "ModSupport": false,
+        "UnlockedFramerate": true
+      },
+      "InputSupport": ["Keyboard", "Controller", "Wheel"],
+      "ExclusiveContent": []
+    },
+    "PlayStation": {
+      "ID": "PLATFORM_PS",
+      "Features": {
+        "AllFeatures": true,
+        "TrophyIntegration": true,
+        "DualSenseFeatures": true
+      },
+      "InputSupport": ["Controller", "Wheel"],
+      "ExclusiveContent": ["PS_ExclusiveCar"]
+    },
+    "Xbox": {
+      "ID": "PLATFORM_XBOX",
+      "Features": {
+        "AllFeatures": true,
+        "AchievementIntegration": true,
+        "SmartDelivery": true
+      },
+      "InputSupport": ["Controller", "Wheel"],
+      "ExclusiveContent": ["Xbox_ExclusiveCar"]
+    },
+    "Switch": {
+      "ID": "PLATFORM_SWITCH",
+      "Features": {
+        "CoreFeatures": true,
+        "ReducedGraphics": true,
+        "PortableMode": true
+      },
+      "InputSupport": ["Controller"],
+      "ExclusiveContent": ["Switch_ExclusiveCar"],
+      "Limitations": ["ReducedLobbySize", "OptimizedAssets"]
+    }
+  },
+
+  "AccountLinking": {
+    "Process": {
+      "Step1": "CreateMidnightGrindAccount",
+      "Step2": "LinkPlatformAccounts",
+      "Step3": "SetPrimaryPlatform",
+      "Step4": "SyncProgress"
+    },
+    "PrimaryPlatform": {
+      "Description": "Main platform for progression",
+      "Changeable": true,
+      "Cooldown": "30Days"
+    },
+    "ConflictResolution": {
+      "Method": "HigherProgress",
+      "ManualMerge": true,
+      "BackupCreated": true
+    },
+    "Unlinking": {
+      "Allowed": true,
+      "Warning": "ProgressMayBeLost",
+      "Cooldown": "90Days"
+    }
+  },
+
+  "PrivacySettings": {
+    "Visibility": {
+      "ShowPlatform": { "Default": true, "Configurable": true },
+      "ShowInputType": { "Default": true, "Configurable": true }
+    },
+    "Matchmaking": {
+      "FilterByPlatform": true,
+      "FilterByInput": true,
+      "BlockPlatform": { "Enabled": false }
+    },
+    "DataSharing": {
+      "CrossPlatformStats": { "Default": true },
+      "LeaderboardVisibility": { "Default": true }
+    }
+  },
+
+  "Leaderboards": {
+    "Types": {
+      "Combined": {
+        "Description": "All platforms together",
+        "Default": true
+      },
+      "PlatformSpecific": {
+        "Description": "Separated by platform",
+        "Available": true
+      },
+      "InputSpecific": {
+        "Description": "Separated by input type",
+        "Available": true
+      }
+    },
+    "Filters": {
+      "Platform": true,
+      "Input": true,
+      "Friends": true,
+      "Region": true
+    }
+  },
+
+  "TechnicalImplementation": {
+    "Networking": {
+      "ServerBased": true,
+      "RelayServers": true,
+      "LatencyOptimization": true
+    },
+    "Synchronization": {
+      "CloudSave": true,
+      "ConflictResolution": "Automatic",
+      "SyncFrequency": "OnChange"
+    },
+    "Authentication": {
+      "MidnightGrindID": true,
+      "PlatformLink": true,
+      "TwoFactor": "Recommended"
+    }
+  },
+
+  "Restrictions": {
+    "PlatformPolicies": {
+      "Currency": "PlatformBound",
+      "Purchases": "PlatformBound",
+      "Refunds": "PlatformSpecific"
+    },
+    "ContentRatings": {
+      "RegionalVariations": true,
+      "AgeGating": "PlatformHandled"
+    }
+  },
+
+  "UI": {
+    "PlatformIndicators": {
+      "Icons": {
+        "PC": "PCIcon",
+        "PlayStation": "PSIcon",
+        "Xbox": "XboxIcon",
+        "Switch": "SwitchIcon"
+      },
+      "ShowInLobby": true,
+      "ShowOnProfile": true,
+      "ShowInRace": { "Configurable": true }
+    },
+    "Settings": {
+      "CrossPlayToggle": true,
+      "InputPreferences": true,
+      "AccountLinkingMenu": true
+    },
+    "Notifications": {
+      "CrossPlatformFriendOnline": true,
+      "AccountLinked": true,
+      "SyncComplete": true
+    }
+  }
+}

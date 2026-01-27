@@ -1,0 +1,301 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Neon Underglow and Light Customization",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "VisibleAtNight": true,
+    "AffectsEnvironment": true,
+    "PowerConsumption": false,
+    "LegalitySystem": true
+  },
+
+  "UnderglowTypes": {
+    "Standard": {
+      "ID": "NEON_STANDARD",
+      "Name": "Standard Underglow",
+      "Description": "Classic neon tube lighting",
+      "Zones": ["Front", "Rear", "LeftSide", "RightSide"],
+      "ColorOptions": "Full",
+      "Brightness": { "Min": 0, "Max": 100 },
+      "Price": 2000
+    },
+    "LED": {
+      "ID": "NEON_LED",
+      "Name": "LED Underglow",
+      "Description": "Modern LED strip lighting",
+      "Zones": ["Front", "Rear", "LeftSide", "RightSide", "WheelWells"],
+      "ColorOptions": "RGB",
+      "Brightness": { "Min": 0, "Max": 100 },
+      "Effects": true,
+      "Price": 3500
+    },
+    "Premium": {
+      "ID": "NEON_PREMIUM",
+      "Name": "Premium Underglow",
+      "Description": "High-end programmable system",
+      "Zones": ["All", "Individual", "Custom"],
+      "ColorOptions": "RGBAnimated",
+      "Brightness": { "Min": 0, "Max": 100 },
+      "Effects": true,
+      "Patterns": true,
+      "MusicSync": true,
+      "Price": 7500
+    },
+    "Competition": {
+      "ID": "NEON_COMP",
+      "Name": "Competition Underglow",
+      "Description": "Show-quality lighting system",
+      "Zones": ["Full360", "EngineHighlight", "InteriorSync"],
+      "ColorOptions": "FullSpectrum",
+      "Brightness": { "Min": 0, "Max": 100 },
+      "Effects": true,
+      "Patterns": true,
+      "MusicSync": true,
+      "AppControl": true,
+      "Price": 15000
+    }
+  },
+
+  "Colors": {
+    "Presets": {
+      "Red": { "Hex": "#FF0000", "Unlocked": true },
+      "Blue": { "Hex": "#0000FF", "Unlocked": true },
+      "Green": { "Hex": "#00FF00", "Unlocked": true },
+      "Purple": { "Hex": "#8B00FF", "Unlocked": true },
+      "Orange": { "Hex": "#FF8C00", "Unlocked": true },
+      "Yellow": { "Hex": "#FFFF00", "Unlocked": true },
+      "Pink": { "Hex": "#FF69B4", "Unlocked": true },
+      "Cyan": { "Hex": "#00FFFF", "Unlocked": true },
+      "White": { "Hex": "#FFFFFF", "Unlocked": true },
+      "UV": { "Hex": "#7F00FF", "Premium": true, "Price": 1000 },
+      "Gold": { "Hex": "#FFD700", "Premium": true, "Price": 1500 },
+      "Rainbow": { "Animated": true, "Premium": true, "Price": 2500 }
+    },
+    "Custom": {
+      "Enabled": true,
+      "ColorPicker": true,
+      "HexInput": true,
+      "SavedColors": 10
+    }
+  },
+
+  "Effects": {
+    "Static": {
+      "ID": "FX_STATIC",
+      "Name": "Static",
+      "Description": "Constant color",
+      "Speed": 0,
+      "Unlocked": true
+    },
+    "Pulse": {
+      "ID": "FX_PULSE",
+      "Name": "Pulse",
+      "Description": "Breathing effect",
+      "Speed": { "Min": 1, "Max": 10 },
+      "Unlocked": true
+    },
+    "Strobe": {
+      "ID": "FX_STROBE",
+      "Name": "Strobe",
+      "Description": "Rapid flashing",
+      "Speed": { "Min": 1, "Max": 10 },
+      "Warning": "PhotosensitivityWarning",
+      "Unlocked": true
+    },
+    "Wave": {
+      "ID": "FX_WAVE",
+      "Name": "Wave",
+      "Description": "Color flows around vehicle",
+      "Speed": { "Min": 1, "Max": 10 },
+      "Direction": ["Clockwise", "Counter", "FrontToBack"],
+      "Premium": true
+    },
+    "Chase": {
+      "ID": "FX_CHASE",
+      "Name": "Chase",
+      "Description": "Sequential lighting chase",
+      "Speed": { "Min": 1, "Max": 10 },
+      "Premium": true
+    },
+    "ColorCycle": {
+      "ID": "FX_CYCLE",
+      "Name": "Color Cycle",
+      "Description": "Smooth color transitions",
+      "Speed": { "Min": 1, "Max": 10 },
+      "Colors": { "Min": 2, "Max": 8 },
+      "Premium": true
+    },
+    "MusicReactive": {
+      "ID": "FX_MUSIC",
+      "Name": "Music Reactive",
+      "Description": "Responds to in-game audio",
+      "Sensitivity": { "Min": 1, "Max": 10 },
+      "Frequency": ["Bass", "Mid", "Treble", "Full"],
+      "Competition": true
+    },
+    "SpeedReactive": {
+      "ID": "FX_SPEED",
+      "Name": "Speed Reactive",
+      "Description": "Changes with vehicle speed",
+      "Modes": ["IntensityBySpeed", "ColorBySpeed", "PulseBySpeed"],
+      "Competition": true
+    },
+    "NitroSync": {
+      "ID": "FX_NITRO",
+      "Name": "Nitro Sync",
+      "Description": "Flashes with nitro usage",
+      "NitroColor": true,
+      "FlameSync": true,
+      "Competition": true
+    }
+  },
+
+  "ZoneControl": {
+    "Front": {
+      "Coverage": "FrontBumper",
+      "LEDCount": { "Standard": 20, "Premium": 40 },
+      "Independent": true
+    },
+    "Rear": {
+      "Coverage": "RearBumper",
+      "LEDCount": { "Standard": 20, "Premium": 40 },
+      "Independent": true
+    },
+    "LeftSide": {
+      "Coverage": "DriverSide",
+      "LEDCount": { "Standard": 30, "Premium": 60 },
+      "Independent": true
+    },
+    "RightSide": {
+      "Coverage": "PassengerSide",
+      "LEDCount": { "Standard": 30, "Premium": 60 },
+      "Independent": true
+    },
+    "WheelWells": {
+      "Coverage": "AllFourWheels",
+      "LEDCount": 40,
+      "SpinEffect": true,
+      "Premium": true
+    },
+    "Engine": {
+      "Coverage": "EngineBay",
+      "LEDCount": 30,
+      "HoodOpenSync": true,
+      "Competition": true
+    },
+    "Interior": {
+      "Coverage": "Cabin",
+      "LEDCount": 50,
+      "Zones": ["Footwell", "Dash", "Doors", "Roof"],
+      "Competition": true
+    }
+  },
+
+  "Patterns": {
+    "Racing": {
+      "ID": "PATTERN_RACE",
+      "Description": "Fast-paced racing theme",
+      "Colors": 2,
+      "Speed": "Fast"
+    },
+    "Police": {
+      "ID": "PATTERN_POLICE",
+      "Description": "Red/blue alternating",
+      "Colors": ["Red", "Blue"],
+      "Warning": "RestrictedInSomeAreas"
+    },
+    "Fire": {
+      "ID": "PATTERN_FIRE",
+      "Description": "Flame-like effect",
+      "Colors": ["Red", "Orange", "Yellow"],
+      "Flicker": true
+    },
+    "Ocean": {
+      "ID": "PATTERN_OCEAN",
+      "Description": "Calm wave effect",
+      "Colors": ["Blue", "Cyan", "Teal"],
+      "Speed": "Slow"
+    },
+    "Galaxy": {
+      "ID": "PATTERN_GALAXY",
+      "Description": "Space-inspired",
+      "Colors": ["Purple", "Blue", "Pink"],
+      "Sparkle": true,
+      "Premium": true
+    },
+    "Custom": {
+      "ID": "PATTERN_CUSTOM",
+      "Description": "User-created pattern",
+      "Slots": 5,
+      "Editor": true
+    }
+  },
+
+  "LegalitySystem": {
+    "Enabled": true,
+    "Regions": {
+      "Downtown": { "Legal": false, "PoliceAttention": true },
+      "Highway": { "Legal": true },
+      "Industrial": { "Legal": true },
+      "Suburbs": { "Legal": false, "PoliceAttention": true }
+    },
+    "Consequences": {
+      "Citation": { "Fine": 500 },
+      "HeatIncrease": { "Amount": 0.5 }
+    },
+    "AutoOff": {
+      "Enabled": true,
+      "InIllegalZones": true,
+      "Optional": true
+    }
+  },
+
+  "Synchronization": {
+    "CrewSync": {
+      "Enabled": true,
+      "MatchColors": true,
+      "MatchEffects": true,
+      "LeaderControl": true
+    },
+    "ConvoySync": {
+      "Enabled": true,
+      "WaveEffect": true
+    },
+    "PhotoMode": {
+      "Enhanced": true,
+      "ControlAll": true
+    }
+  },
+
+  "Performance": {
+    "LightQuality": {
+      "High": { "Shadows": true, "Reflections": true },
+      "Medium": { "Shadows": false, "Reflections": true },
+      "Low": { "Shadows": false, "Reflections": false }
+    },
+    "RenderDistance": {
+      "Near": 50,
+      "Far": 150
+    }
+  },
+
+  "UI": {
+    "NeonMenu": {
+      "ColorPicker": true,
+      "ZoneSelector": true,
+      "EffectBrowser": true,
+      "PreviewMode": true
+    },
+    "QuickToggle": {
+      "OnOff": true,
+      "BrightnessSlider": true,
+      "ColorPresets": true
+    },
+    "InCarControl": {
+      "Hotkey": true,
+      "CycleColors": true,
+      "CycleEffects": true
+    }
+  }
+}

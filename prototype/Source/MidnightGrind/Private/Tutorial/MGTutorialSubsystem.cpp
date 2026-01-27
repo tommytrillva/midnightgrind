@@ -64,9 +64,12 @@ void UMGTutorialSubsystem::StopTutorial()
 	}
 
 	// Clear timer
-	if (UWorld* World = GetGameInstance()->GetWorld())
+	if (UGameInstance* GI = GetGameInstance())
 	{
-		World->GetTimerManager().ClearTimer(AutoAdvanceTimerHandle);
+		if (UWorld* World = GI->GetWorld())
+		{
+			World->GetTimerManager().ClearTimer(AutoAdvanceTimerHandle);
+		}
 	}
 
 	bTutorialActive = false;
@@ -563,20 +566,23 @@ void UMGTutorialSubsystem::SetupCurrentStep()
 	}
 
 	// Clear any existing timer
-	if (UWorld* World = GetGameInstance()->GetWorld())
+	if (UGameInstance* GI = GetGameInstance())
 	{
-		World->GetTimerManager().ClearTimer(AutoAdvanceTimerHandle);
-
-		// Set auto-advance timer if needed
-		if (Step.AutoAdvanceDelay > 0.0f)
+		if (UWorld* World = GI->GetWorld())
 		{
-			World->GetTimerManager().SetTimer(
-				AutoAdvanceTimerHandle,
+			World->GetTimerManager().ClearTimer(AutoAdvanceTimerHandle);
+
+			// Set auto-advance timer if needed
+			if (Step.AutoAdvanceDelay > 0.0f)
+			{
+				World->GetTimerManager().SetTimer(
+					AutoAdvanceTimerHandle,
 				this,
 				&UMGTutorialSubsystem::OnAutoAdvanceTimer,
 				Step.AutoAdvanceDelay,
 				false
 			);
+			}
 		}
 	}
 

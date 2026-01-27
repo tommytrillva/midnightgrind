@@ -103,17 +103,23 @@ bool UMGDevToolsSubsystem::IsDevBuild() const
 
 void UMGDevToolsSubsystem::GiveGrindCash(int64 Amount)
 {
-	if (UMGCurrencySubsystem* Currency = GetGameInstance()->GetSubsystem<UMGCurrencySubsystem>())
+	if (UGameInstance* GI = GetGameInstance())
 	{
-		Currency->EarnCurrency(EMGCurrencyType::GrindCash, Amount, EMGEarnSource::FirstTimeBonus, TEXT("Dev cheat"));
+		if (UMGCurrencySubsystem* Currency = GI->GetSubsystem<UMGCurrencySubsystem>())
+		{
+			Currency->EarnCurrency(EMGCurrencyType::GrindCash, Amount, EMGEarnSource::FirstTimeBonus, TEXT("Dev cheat"));
+		}
 	}
 }
 
 void UMGDevToolsSubsystem::GiveNeonCredits(int64 Amount)
 {
-	if (UMGCurrencySubsystem* Currency = GetGameInstance()->GetSubsystem<UMGCurrencySubsystem>())
+	if (UGameInstance* GI = GetGameInstance())
 	{
-		Currency->EarnCurrency(EMGCurrencyType::NeonCredits, Amount, EMGEarnSource::FirstTimeBonus, TEXT("Dev cheat"));
+		if (UMGCurrencySubsystem* Currency = GI->GetSubsystem<UMGCurrencySubsystem>())
+		{
+			Currency->EarnCurrency(EMGCurrencyType::NeonCredits, Amount, EMGEarnSource::FirstTimeBonus, TEXT("Dev cheat"));
+		}
 	}
 }
 

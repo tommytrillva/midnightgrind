@@ -121,7 +121,10 @@ bool UMGStoreSubsystem::CanAffordItem(FName ItemID, bool bUseNeonCredits) const
 	FMGStoreItem Item = GetItem(ItemID);
 	if (Item.ItemID.IsNone()) return false;
 
-	UMGCurrencySubsystem* Currency = GetGameInstance()->GetSubsystem<UMGCurrencySubsystem>();
+	UGameInstance* GI = GetGameInstance();
+	if (!GI) return false;
+
+	UMGCurrencySubsystem* Currency = GI->GetSubsystem<UMGCurrencySubsystem>();
 	if (!Currency) return false;
 
 	if (bUseNeonCredits)
@@ -170,7 +173,10 @@ bool UMGStoreSubsystem::SendGift(FName ItemID, const FString& RecipientID, const
 	FMGStoreItem Item = GetItem(ItemID);
 	if (Item.ItemID.IsNone()) return false;
 
-	UMGCurrencySubsystem* Currency = GetGameInstance()->GetSubsystem<UMGCurrencySubsystem>();
+	UGameInstance* GI = GetGameInstance();
+	if (!GI) return false;
+
+	UMGCurrencySubsystem* Currency = GI->GetSubsystem<UMGCurrencySubsystem>();
 	if (!Currency || !Currency->CanAfford(EMGCurrencyType::GrindCash, Item.GrindCashPrice))
 		return false;
 

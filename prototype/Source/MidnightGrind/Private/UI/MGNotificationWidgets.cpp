@@ -20,7 +20,10 @@ void UMGNotificationWidgetBase::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	NotificationSubsystem = GetGameInstance()->GetSubsystem<UMGNotificationSubsystem>();
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		NotificationSubsystem = GI->GetSubsystem<UMGNotificationSubsystem>();
+	}
 }
 
 void UMGNotificationWidgetBase::SetNotificationData(const FMGNotificationData& Data)
@@ -567,7 +570,10 @@ void UMGNotificationContainerWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	NotificationSubsystem = GetGameInstance()->GetSubsystem<UMGNotificationSubsystem>();
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		NotificationSubsystem = GI->GetSubsystem<UMGNotificationSubsystem>();
+	}
 
 	if (NotificationSubsystem)
 	{
@@ -692,7 +698,10 @@ void UMGNotificationHistoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	NotificationSubsystem = GetGameInstance()->GetSubsystem<UMGNotificationSubsystem>();
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		NotificationSubsystem = GI->GetSubsystem<UMGNotificationSubsystem>();
+	}
 
 	RefreshHistory();
 }

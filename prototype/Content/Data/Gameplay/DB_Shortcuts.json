@@ -1,0 +1,309 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Shortcuts, Secret Routes, and Hidden Paths",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DiscoverySystem": true,
+    "RiskRewardBalance": true,
+    "RaceIntegration": true
+  },
+
+  "ShortcutTypes": {
+    "AlleyShortcut": {
+      "ID": "SHORT_ALLEY",
+      "Name": "Alley Shortcut",
+      "Description": "Narrow passages between buildings",
+      "Risk": "Medium",
+      "TimeSaved": { "Min": 2, "Max": 5 },
+      "Characteristics": {
+        "Width": "Narrow",
+        "Surface": "Mixed",
+        "Obstacles": ["Dumpsters", "Crates", "Fences"],
+        "Lighting": "Poor"
+      }
+    },
+    "JumpShortcut": {
+      "ID": "SHORT_JUMP",
+      "Name": "Jump Shortcut",
+      "Description": "Ramps and jumps to skip sections",
+      "Risk": "High",
+      "TimeSaved": { "Min": 3, "Max": 8 },
+      "Characteristics": {
+        "RequiresSpeed": true,
+        "LandingZone": "Important",
+        "DamageRisk": "High",
+        "Style": "Spectacular"
+      }
+    },
+    "DirtPath": {
+      "ID": "SHORT_DIRT",
+      "Name": "Dirt Path",
+      "Description": "Off-road alternative routes",
+      "Risk": "Low",
+      "TimeSaved": { "Min": 1, "Max": 4 },
+      "Characteristics": {
+        "Surface": "Dirt",
+        "TractionReduced": true,
+        "DustCloud": true,
+        "AllWeatherRisk": true
+      }
+    },
+    "ParkingStructure": {
+      "ID": "SHORT_PARKING",
+      "Name": "Parking Structure",
+      "Description": "Through parking garages",
+      "Risk": "Medium",
+      "TimeSaved": { "Min": 2, "Max": 6 },
+      "Characteristics": {
+        "TightTurns": true,
+        "Ramps": true,
+        "LowClearance": true,
+        "NPCVehicles": true
+      }
+    },
+    "ConstructionZone": {
+      "ID": "SHORT_CONSTRUCTION",
+      "Name": "Construction Zone",
+      "Description": "Unfinished roads and sites",
+      "Risk": "High",
+      "TimeSaved": { "Min": 4, "Max": 10 },
+      "Characteristics": {
+        "UnstableSurface": true,
+        "Debris": true,
+        "Ramps": true,
+        "WorkerNPCs": false
+      }
+    },
+    "WaterfrontDock": {
+      "ID": "SHORT_DOCK",
+      "Name": "Dock Shortcut",
+      "Description": "Along or across dock areas",
+      "Risk": "Extreme",
+      "TimeSaved": { "Min": 5, "Max": 12 },
+      "Characteristics": {
+        "WaterHazard": true,
+        "NarrowPaths": true,
+        "ContainerMaze": true
+      }
+    },
+    "TunnelBypass": {
+      "ID": "SHORT_TUNNEL",
+      "Name": "Tunnel Bypass",
+      "Description": "Underground maintenance tunnels",
+      "Risk": "Medium",
+      "TimeSaved": { "Min": 3, "Max": 7 },
+      "Characteristics": {
+        "NoLight": true,
+        "LimitedSpace": true,
+        "Echoing": true
+      }
+    },
+    "RooftopRoute": {
+      "ID": "SHORT_ROOF",
+      "Name": "Rooftop Route",
+      "Description": "Building-top paths",
+      "Risk": "Extreme",
+      "TimeSaved": { "Min": 6, "Max": 15 },
+      "Characteristics": {
+        "RequiresBigJump": true,
+        "FallRisk": true,
+        "Spectacular": true
+      }
+    }
+  },
+
+  "DiscoverySystem": {
+    "HiddenShortcuts": {
+      "Total": 50,
+      "Visibility": "HiddenUntilFound",
+      "HintSystem": {
+        "Enabled": true,
+        "NearbyPrompt": { "Distance": 100 },
+        "MapHints": { "AfterFirstUse": true }
+      }
+    },
+    "DiscoveryMethods": {
+      "Exploration": { "Primary": true },
+      "NPCTips": { "Enabled": true, "Cost": 1000 },
+      "MapPurchase": { "Enabled": true, "Cost": 5000, "RevealsArea": true }
+    },
+    "Rewards": {
+      "FirstDiscovery": { "REP": 250, "Cash": 1000 },
+      "MasterDiscovery": { "AllFound": true, "Reward": { "Title": "Pathfinder", "REP": 25000 } }
+    }
+  },
+
+  "ShortcutDatabase": {
+    "Downtown": {
+      "Shortcuts": [
+        {
+          "ID": "DT_ALLEY_01",
+          "Name": "Market Alley",
+          "Type": "AlleyShortcut",
+          "Start": { "Road": "MainStreet", "Position": "Block3" },
+          "End": { "Road": "2ndAvenue", "Position": "Block5" },
+          "TimeSaved": 3,
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "DT_GARAGE_01",
+          "Name": "Plaza Garage",
+          "Type": "ParkingStructure",
+          "Start": { "Road": "CommerceBlvd", "Position": "Plaza" },
+          "End": { "Road": "HighStreet", "Position": "Tower" },
+          "TimeSaved": 5,
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "DT_JUMP_01",
+          "Name": "Highway Leap",
+          "Type": "JumpShortcut",
+          "Start": { "Road": "Overpass", "Position": "Ramp" },
+          "End": { "Road": "Highway101", "Position": "OnRamp" },
+          "TimeSaved": 7,
+          "Difficulty": "Hard"
+        }
+      ],
+      "TotalShortcuts": 10
+    },
+    "Industrial": {
+      "Shortcuts": [
+        {
+          "ID": "IND_DOCK_01",
+          "Name": "Container Maze",
+          "Type": "WaterfrontDock",
+          "TimeSaved": 8,
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "IND_CONST_01",
+          "Name": "Building Site",
+          "Type": "ConstructionZone",
+          "TimeSaved": 6,
+          "Difficulty": "Medium"
+        }
+      ],
+      "TotalShortcuts": 8
+    },
+    "Highway": {
+      "Shortcuts": [
+        {
+          "ID": "HWY_SERVICE_01",
+          "Name": "Service Road",
+          "Type": "DirtPath",
+          "TimeSaved": 4,
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "HWY_UNDERPASS_01",
+          "Name": "Emergency Underpass",
+          "Type": "TunnelBypass",
+          "TimeSaved": 5,
+          "Difficulty": "Medium"
+        }
+      ],
+      "TotalShortcuts": 6
+    },
+    "Mountain": {
+      "Shortcuts": [
+        {
+          "ID": "MTN_CLIFF_01",
+          "Name": "Cliff Edge",
+          "Type": "DirtPath",
+          "TimeSaved": 6,
+          "Difficulty": "Hard",
+          "Risk": "Extreme"
+        },
+        {
+          "ID": "MTN_TUNNEL_01",
+          "Name": "Old Mine Tunnel",
+          "Type": "TunnelBypass",
+          "TimeSaved": 10,
+          "Difficulty": "Hard"
+        }
+      ],
+      "TotalShortcuts": 8
+    }
+  },
+
+  "RaceIntegration": {
+    "AllowedIn": {
+      "FreeRoam": { "Always": true },
+      "Sprint": { "IfOnRoute": true },
+      "Circuit": { "RarelyIncluded": true },
+      "FreeRoamRush": { "Encouraged": true }
+    },
+    "BalanceFactors": {
+      "RiskVsReward": {
+        "HighRisk": { "TimeSaved": "High", "CrashChance": "High" },
+        "LowRisk": { "TimeSaved": "Low", "CrashChance": "Low" }
+      },
+      "VehicleSuitability": {
+        "Sports": { "JumpShortcuts": "Good", "AlleyShortcuts": "Good" },
+        "Muscle": { "JumpShortcuts": "Medium", "AlleyShortcuts": "Poor" },
+        "Offroad": { "DirtPaths": "Excellent" }
+      }
+    }
+  },
+
+  "DynamicShortcuts": {
+    "TimeOfDay": {
+      "Night": { "UnlockedShortcuts": ["Warehouse_01", "Dock_02"] },
+      "Day": { "BlockedShortcuts": ["Warehouse_01"] }
+    },
+    "Weather": {
+      "Rain": { "DirtPathPenalty": true, "TractionLoss": 0.3 },
+      "Clear": { "NormalConditions": true }
+    },
+    "Events": {
+      "Construction": { "CreatesShortcuts": true, "TemporaryDuration": "2Weeks" },
+      "Roadwork": { "BlocksShortcuts": true }
+    }
+  },
+
+  "Hazards": {
+    "Obstacles": {
+      "Dumpster": { "Damage": 15, "SpeedLoss": 0.5 },
+      "Fence": { "Breakable": true, "Damage": 5 },
+      "Crate": { "Breakable": true, "Damage": 2 },
+      "Vehicle": { "Damage": 25, "SpeedLoss": 0.8 }
+    },
+    "SurfaceConditions": {
+      "Gravel": { "TractionLoss": 0.2 },
+      "Mud": { "TractionLoss": 0.4 },
+      "Water": { "TractionLoss": 0.3 },
+      "Ice": { "TractionLoss": 0.6 }
+    },
+    "FallRisks": {
+      "Water": { "Result": "Respawn", "TimePenalty": 10 },
+      "Cliff": { "Result": "Respawn", "TimePenalty": 15, "Damage": 50 }
+    }
+  },
+
+  "Achievements": {
+    "FirstShortcut": { "Reward": { "REP": 100 } },
+    "AllDowntownShortcuts": { "Reward": { "REP": 2500 } },
+    "AllShortcuts": { "Reward": { "REP": 25000, "Title": "Master Navigator" } },
+    "PerfectShortcutRun": { "Reward": { "REP": 1000 } },
+    "DaredevilJump": { "Reward": { "REP": 500 } }
+  },
+
+  "UI": {
+    "MiniMap": {
+      "ShowDiscovered": true,
+      "ShowHidden": false,
+      "HighlightNearby": true
+    },
+    "Notification": {
+      "NewDiscovery": true,
+      "NearbyShortcut": { "Prompt": true },
+      "TimeSavedDisplay": true
+    },
+    "ShortcutLog": {
+      "ListAll": true,
+      "ShowUndiscovered": "Silhouette",
+      "FilterByRegion": true
+    }
+  }
+}
