@@ -19,11 +19,14 @@
 #include "InputActionValue.h"
 #include "MGVehicleData.h"
 #include "MGTirePressureTypes.h"
+#include "MGVehicleDamageSystem.h"
 #include "MGVehiclePawn.generated.h"
 
 class UMGVehicleMovementComponent;
 class UMGVehicleVFXComponent;
 class UMGEngineAudioComponent;
+class UMGVehicleDamageSystem;
+class UMGVehicleSFXComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -222,6 +225,15 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
+	virtual void NotifyHit(
+		UPrimitiveComponent* MyComp,
+		AActor* Other,
+		UPrimitiveComponent* OtherComp,
+		bool bSelfMoved,
+		FVector HitLocation,
+		FVector HitNormal,
+		FVector NormalImpulse,
+		const FHitResult& Hit) override;
 	//~ End AActor Interface
 
 	// ==========================================
@@ -267,6 +279,14 @@ public:
 	/** Engine audio component - handles RPM/load-based engine sounds */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UMGEngineAudioComponent> VehicleEngineAudio;
+
+	/** @brief Vehicle damage and cosmetic damage system. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Vehicle|Components")
+	TObjectPtr<UMGVehicleDamageSystem> VehicleDamageSystem;
+
+	/** @brief Vehicle SFX component - handles collision, scrape, and tire sounds. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Vehicle|Components")
+	TObjectPtr<UMGVehicleSFXComponent> VehicleSFX;
 
 	// ==========================================
 	// VEHICLE CONFIGURATION
@@ -821,6 +841,26 @@ protected:
 	/** Handler for money shift - triggers transmission grind VFX */
 	UFUNCTION()
 	void HandleMoneyShift(float OverRevAmount);
+
+	// ==========================================
+	// DAMAGE EVENT HANDLERS
+	// ==========================================
+
+	/** Handler for damage taken - triggers impact VFX and SFX */
+	UFUNCTION()
+	void HandleDamageTaken(const FMGDamageEvent& DamageEvent);
+
+	/** Handler for component damaged - updates VFX for damage state */
+	UFUNCTION()
+	void HandleComponentDamaged(EMGDamageComponent Component, float NewHealth);
+
+	/** Handler for component broken - triggers breakdown VFX/SFX */
+	UFUNCTION()
+	void HandleComponentBroken(EMGDamageComponent Component);
+
+	/** Handler for visual damage updated - updates cosmetic damage VFX */
+	UFUNCTION()
+	void HandleVisualDamageUpdated(const FMGVisualDamageState& VisualState);
 
 public:
 	// ==========================================

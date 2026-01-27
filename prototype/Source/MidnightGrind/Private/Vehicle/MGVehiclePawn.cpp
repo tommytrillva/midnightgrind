@@ -2,8 +2,10 @@
 
 #include "Vehicle/MGVehiclePawn.h"
 #include "Vehicle/MGVehicleMovementComponent.h"
+#include "Vehicle/MGVehicleDamageSystem.h"
 #include "VFX/MGVehicleVFXComponent.h"
 #include "Audio/MGEngineAudioComponent.h"
+#include "Audio/MGVehicleSFXComponent.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -94,6 +96,12 @@ void AMGVehiclePawn::SetupComponents()
 
 	// Create engine audio component (handles RPM/load audio)
 	VehicleEngineAudio = CreateDefaultSubobject<UMGEngineAudioComponent>(TEXT("VehicleEngineAudio"));
+
+	// Create damage system component (handles collision damage, visual damage)
+	VehicleDamageSystem = CreateDefaultSubobject<UMGVehicleDamageSystem>(TEXT("VehicleDamageSystem"));
+
+	// Create vehicle SFX component (handles collision, scrape, tire sounds)
+	VehicleSFX = CreateDefaultSubobject<UMGVehicleSFXComponent>(TEXT("VehicleSFX"));
 }
 
 void AMGVehiclePawn::BeginPlay()
@@ -106,6 +114,15 @@ void AMGVehiclePawn::BeginPlay()
 	// Bind to movement component events
 	BindMovementEvents();
 
+	// Bind damage system events for VFX/SFX feedback
+	if (VehicleDamageSystem)
+	{
+		VehicleDamageSystem->OnDamageTaken.AddDynamic(this, &AMGVehiclePawn::HandleDamageTaken);
+		VehicleDamageSystem->OnComponentDamaged.AddDynamic(this, &AMGVehiclePawn::HandleComponentDamaged);
+		VehicleDamageSystem->OnComponentBroken.AddDynamic(this, &AMGVehiclePawn::HandleComponentBroken);
+		VehicleDamageSystem->OnVisualDamageUpdated.AddDynamic(this, &AMGVehiclePawn::HandleVisualDamageUpdated);
+	}
+
 	// Activate engine audio
 	if (EngineAudio)
 	{
@@ -114,6 +131,29 @@ void AMGVehiclePawn::BeginPlay()
 
 	// Set initial camera
 	SetCameraMode(EMGCameraMode::Chase);
+}
+
+void AMGVehiclePawn::NotifyHit(
+	UPrimitiveComponent* MyComp,
+	AActor* Other,
+	UPrimitiveComponent* OtherComp,
+	bool bSelfMoved,
+	FVector HitLocation,
+	FVector HitNormal,
+	FVector NormalImpulse,
+	const FHitResult& Hit)
+{
+	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+
+	// Route collision to damage system
+	if (VehicleDamageSystem)
+	{
+		// Calculate impact force from impulse magnitude
+		float ImpactForce = NormalImpulse.Size();
+
+		// Apply collision damage
+		VehicleDamageSystem->ApplyCollisionDamage(Hit, ImpactForce, Other);
+	}
 }
 
 void AMGVehiclePawn::Tick(float DeltaTime)
@@ -129,6 +169,35 @@ void AMGVehiclePawn::Tick(float DeltaTime)
 	// Update lap timer
 	RuntimeState.CurrentLapTime += DeltaTime;
 	RuntimeState.TotalRaceTime += DeltaTime;
+
+	// Update HUD with vehicle telemetry (only for locally controlled player)
+	if (IsLocallyControlled())
+	{
+		UpdateHUDTelemetry();
+	}
+}
+
+void AMGVehiclePawn::UpdateHUDTelemetry()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			// Build telemetry data from runtime state
+			FMGVehicleTelemetry Telemetry;
+			Telemetry.SpeedMPH = RuntimeState.SpeedMPH;
+			Telemetry.SpeedKPH = RuntimeState.SpeedKPH;
+			Telemetry.RPM = RuntimeState.RPM;
+			Telemetry.MaxRPM = 8000.0f; // Typical redline
+			Telemetry.CurrentGear = RuntimeState.CurrentGear;
+			Telemetry.NOSAmount = RuntimeState.NitrousPercent / 100.0f; // Convert 0-100 to 0-1
+			Telemetry.bNOSActive = RuntimeState.bNitrousActive;
+			Telemetry.bIsDrifting = RuntimeState.bIsDrifting;
+			Telemetry.DriftAngle = RuntimeState.DriftAngle;
+
+			HUDSubsystem->UpdateVehicleTelemetry(Telemetry);
+		}
+	}
 }
 
 void AMGVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -604,35 +673,6 @@ void AMGVehiclePawn::UpdateRuntimeState(float DeltaTime)
 		OnDriftEnded(RuntimeState.DriftScore);
 	}
 	bWasDrifting = RuntimeState.bIsDrifting;
-
-	// Update HUD subsystem with telemetry (only for player)
-	if (IsLocallyControlled())
-	{
-		UpdateHUDTelemetry();
-	}
-}
-
-void AMGVehiclePawn::UpdateHUDTelemetry()
-{
-	UMGRaceHUDSubsystem* HUDSubsystem = GetWorld()->GetSubsystem<UMGRaceHUDSubsystem>();
-	if (!HUDSubsystem)
-	{
-		return;
-	}
-
-	FMGVehicleTelemetry Telemetry;
-	Telemetry.SpeedMPH = RuntimeState.SpeedMPH;
-	Telemetry.SpeedKPH = RuntimeState.SpeedKPH;
-	Telemetry.RPM = RuntimeState.RPM;
-	Telemetry.MaxRPM = 8000.0f; // Typical redline
-	Telemetry.CurrentGear = RuntimeState.CurrentGear;
-	Telemetry.NOSAmount = RuntimeState.NitrousPercent / 100.0f;
-	Telemetry.bNOSActive = RuntimeState.bNitrousActive;
-	Telemetry.bHandbrakeOn = MGVehicleMovement ? MGVehicleMovement->IsHandbrakeEngaged() : false;
-	Telemetry.bIsDrifting = RuntimeState.bIsDrifting;
-	Telemetry.DriftAngle = RuntimeState.DriftAngle;
-
-	HUDSubsystem->UpdateVehicleTelemetry(Telemetry);
 }
 
 void AMGVehiclePawn::UpdateCamera(float DeltaTime)
@@ -825,6 +865,180 @@ void AMGVehiclePawn::HandleMoneyShift(float OverRevAmount)
 		if (OverRevAmount > 1000.0f)
 		{
 			VehicleVFX->TriggerEngineDamageSmoke(1); // Coolant steam from stress
+		}
+	}
+}
+
+// ==========================================
+// DAMAGE EVENT HANDLERS
+// ==========================================
+
+void AMGVehiclePawn::HandleDamageTaken(const FMGDamageEvent& DamageEvent)
+{
+	// Trigger collision impact VFX
+	if (VehicleVFX)
+	{
+		VehicleVFX->TriggerCollisionImpact(
+			DamageEvent.ImpactLocation,
+			DamageEvent.ImpactNormal,
+			DamageEvent.ImpactForce
+		);
+
+		// Spawn debris on significant impacts
+		if (DamageEvent.DamageDealt > 10.0f)
+		{
+			int32 DebrisCount = FMath::Clamp(FMath::FloorToInt(DamageEvent.DamageDealt / 10.0f), 3, 15);
+			VehicleVFX->SpawnDebris(DamageEvent.ImpactLocation, -DamageEvent.ImpactNormal, DebrisCount);
+		}
+	}
+
+	// Trigger collision SFX
+	if (VehicleSFX)
+	{
+		VehicleSFX->OnCollision(
+			DamageEvent.ImpactForce,
+			DamageEvent.ImpactLocation,
+			DamageEvent.ImpactNormal
+		);
+	}
+
+	// Call Blueprint event for additional effects
+	OnVehicleCollision(FHitResult(), DamageEvent.ImpactForce);
+}
+
+void AMGVehiclePawn::HandleComponentDamaged(EMGDamageComponent Component, float NewHealth)
+{
+	// Update VFX based on component damage
+	if (VehicleVFX)
+	{
+		// Engine damage triggers smoke
+		if (Component == EMGDamageComponent::Engine)
+		{
+			if (NewHealth < 30.0f)
+			{
+				// Heavy damage - severe smoke
+				VehicleVFX->TriggerEngineDamageSmoke(2);
+			}
+			else if (NewHealth < 60.0f)
+			{
+				// Medium damage - coolant/steam
+				VehicleVFX->TriggerEngineDamageSmoke(1);
+			}
+			else if (NewHealth < 80.0f)
+			{
+				// Light damage - oil leak smoke
+				VehicleVFX->TriggerEngineDamageSmoke(0);
+			}
+		}
+
+		// Cooling system damage causes overheating smoke
+		if (Component == EMGDamageComponent::Cooling && NewHealth < 50.0f)
+		{
+			float Intensity = 1.0f - (NewHealth / 50.0f);
+			VehicleVFX->TriggerEngineDamageSmoke(FMath::Clamp(FMath::FloorToInt(Intensity * 3.0f), 0, 2));
+		}
+	}
+
+	// Update runtime state for HUD
+	if (Component == EMGDamageComponent::Engine)
+	{
+		RuntimeState.EngineHealth = NewHealth;
+	}
+	else if (Component == EMGDamageComponent::Body)
+	{
+		RuntimeState.BodyHealth = NewHealth;
+	}
+}
+
+void AMGVehiclePawn::HandleComponentBroken(EMGDamageComponent Component)
+{
+	// Trigger breakdown VFX and SFX
+	if (VehicleVFX)
+	{
+		switch (Component)
+		{
+		case EMGDamageComponent::Engine:
+			// Engine failure - heavy smoke/possible fire
+			VehicleVFX->TriggerEngineDamageSmoke(2);
+			RuntimeState.bEngineStalled = true;
+			break;
+
+		case EMGDamageComponent::Transmission:
+			VehicleVFX->TriggerTransmissionGrind();
+			break;
+
+		case EMGDamageComponent::Cooling:
+			// Radiator blown - steam everywhere
+			VehicleVFX->TriggerEngineDamageSmoke(2);
+			break;
+
+		case EMGDamageComponent::Wheels:
+			// Note: Tire blowouts handled separately via wear system
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	// Update runtime state
+	if (Component == EMGDamageComponent::Engine)
+	{
+		RuntimeState.EngineHealth = 0.0f;
+		RuntimeState.bEngineStalled = true;
+	}
+	else if (Component == EMGDamageComponent::Body)
+	{
+		RuntimeState.BodyHealth = 0.0f;
+	}
+}
+
+void AMGVehiclePawn::HandleVisualDamageUpdated(const FMGVisualDamageState& VisualState)
+{
+	if (VehicleVFX)
+	{
+		// Convert visual damage state to VFX damage state
+		FMGVehicleDamageVFXState VFXState;
+
+		// Calculate zone damages for VFX
+		if (VisualState.ZoneDeformation.Contains(EMGDamageZone::Front))
+		{
+			VFXState.FrontDamage = VisualState.ZoneDeformation[EMGDamageZone::Front];
+		}
+		if (VisualState.ZoneDeformation.Contains(EMGDamageZone::Rear))
+		{
+			VFXState.RearDamage = VisualState.ZoneDeformation[EMGDamageZone::Rear];
+		}
+		if (VisualState.ZoneDeformation.Contains(EMGDamageZone::Left))
+		{
+			VFXState.LeftDamage = VisualState.ZoneDeformation[EMGDamageZone::Left];
+		}
+		if (VisualState.ZoneDeformation.Contains(EMGDamageZone::Right))
+		{
+			VFXState.RightDamage = VisualState.ZoneDeformation[EMGDamageZone::Right];
+		}
+
+		// Calculate overall damage from all zones
+		float TotalDeformation = 0.0f;
+		int32 ZoneCount = 0;
+		for (const auto& Pair : VisualState.ZoneDeformation)
+		{
+			TotalDeformation += Pair.Value;
+			ZoneCount++;
+		}
+		VFXState.OverallDamage = ZoneCount > 0 ? TotalDeformation / ZoneCount : 0.0f;
+
+		// Engine smoke state
+		VFXState.bEngineSmoking = VisualState.bIsSmoking;
+		VFXState.bOnFire = VisualState.bIsOnFire;
+
+		// Apply to VFX component
+		VehicleVFX->SetDamageState(VFXState);
+
+		// Glass break sound if windows damaged significantly
+		if (VehicleSFX && VisualState.WindowDamage > 0.5f)
+		{
+			VehicleSFX->PlayGlassBreak(GetActorLocation());
 		}
 	}
 }
