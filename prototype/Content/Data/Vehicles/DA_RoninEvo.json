@@ -1,0 +1,271 @@
+{
+  "VehicleID": "RONIN_EVO",
+  "DisplayName": "Ronin Evo",
+  "Manufacturer": "Ronin Motors",
+  "Year": 2006,
+  "Country": "Japan",
+  "Class": "B",
+  "Category": "JDM",
+  "Description": "The Ronin Evo is a rally-bred weapon built for all conditions. Its 4G63 turbocharged engine and advanced AWD system tear through corners that would leave RWD cars in the guardrail. Whether it's raining, snowing, or perfect tarmac, the Evo puts power down with surgical precision. This is the choice of those who believe grip is faster than drift.",
+
+  "BaseStats": {
+    "Power": 286,
+    "PowerUnit": "HP",
+    "Torque": 289,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3263,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 57,
+    "Drivetrain": "AWD",
+    "EnginePosition": "Front",
+    "Aspiration": "Turbocharged",
+    "Displacement": 2000,
+    "DisplacementUnit": "cc",
+    "Cylinders": 4,
+    "Configuration": "Inline",
+    "Redline": 7500,
+    "IdleRPM": 850,
+    "TopSpeed": 157,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 4.3,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 680,
+    "Class": "B",
+    "MaxPotential": 950
+  },
+
+  "Engine": {
+    "Code": "4G63T",
+    "Type": "Inline-4 Turbo",
+    "Block": {
+      "Material": "Cast Iron",
+      "BoostLimit": 35,
+      "MaxPowerPotential": 800
+    },
+    "Head": {
+      "Type": "DOHC MIVEC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 16
+    },
+    "Turbo": {
+      "Type": "Single",
+      "SpoolRPM": 3000,
+      "MaxBoost": 18
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 50, "Torque": 140 },
+      { "RPM": 2000, "HP": 100, "Torque": 210 },
+      { "RPM": 2500, "HP": 145, "Torque": 255 },
+      { "RPM": 3000, "HP": 190, "Torque": 285 },
+      { "RPM": 3500, "HP": 230, "Torque": 289 },
+      { "RPM": 4000, "HP": 260, "Torque": 285 },
+      { "RPM": 4500, "HP": 280, "Torque": 278 },
+      { "RPM": 5000, "HP": 286, "Torque": 268 },
+      { "RPM": 5500, "HP": 284, "Torque": 255 },
+      { "RPM": 6000, "HP": 278, "Torque": 240 },
+      { "RPM": 7000, "HP": 260, "Torque": 210 },
+      { "RPM": 7500, "HP": 245, "Torque": 190 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 5,
+    "GearRatios": [2.785, 1.950, 1.407, 1.031, 0.720],
+    "FinalDrive": 4.529,
+    "ReverseRatio": 3.416
+  },
+
+  "AWDSystem": {
+    "Type": "Active Center Differential",
+    "FrontRearSplit": { "Default": 50, "Min": 30, "Max": 70 },
+    "CenterDiff": "Active",
+    "FrontDiff": "LSD",
+    "RearDiff": "Active",
+    "TorqueVectoring": true
+  },
+
+  "Suspension": {
+    "FrontType": "MacPhersonStrut",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 370,
+    "RearSpringRate": 350,
+    "FrontDamping": 0.62,
+    "RearDamping": 0.60,
+    "FrontAntiRollBar": 26,
+    "RearAntiRollBar": 22,
+    "RideHeight": 5.5,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 340,
+    "RearDiameter": 300,
+    "DiameterUnit": "mm",
+    "BrakeBias": 60,
+    "ABSEquipped": true,
+    "Brembo": true
+  },
+
+  "Tires": {
+    "FrontWidth": 235,
+    "FrontAspectRatio": 45,
+    "FrontDiameter": 17,
+    "RearWidth": 235,
+    "RearAspectRatio": 45,
+    "RearDiameter": 17,
+    "Compound": "Sport",
+    "GripMultiplier": 1.02
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.36,
+    "FrontalArea": 2.1,
+    "DownforceMultiplier": 1.1,
+    "HasActiveSpoiler": true,
+    "LargeWing": true
+  },
+
+  "Dimensions": {
+    "Length": 4490,
+    "Width": 1770,
+    "Height": 1450,
+    "Wheelbase": 2625,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Sedan",
+    "Doors": 4,
+    "DefaultColor": {
+      "Primary": "#FFFFFF",
+      "Secondary": "#000000",
+      "Accent": "#FF0000"
+    },
+    "AvailableColors": [
+      { "Name": "Wicked White", "Hex": "#FFFFFF" },
+      { "Name": "Phantom Black", "Hex": "#0A0A0A" },
+      { "Name": "Rally Red", "Hex": "#CC0000" },
+      { "Name": "Graphite Grey", "Hex": "#4A4A4A" },
+      { "Name": "Lightning Yellow", "Hex": "#FFD700" },
+      { "Name": "Apex Silver", "Hex": "#C0C0C0" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineFour_Turbo",
+    "ExhaustProfile": "JDM_Rally",
+    "TurboWhine": true,
+    "BlowoffValve": true,
+    "BackfireOnShift": true,
+    "AWDWhine": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.0,
+    "TurnRadius": 5.5,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.3,
+    "OversteerTendency": 0.35,
+    "DriftCapability": 0.5,
+    "StabilityControl": true,
+    "TractionControl": true,
+    "AWDAdvantage": 0.25
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 85,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 7,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 48000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "B",
+    "MaintenanceCostMultiplier": 1.1,
+    "PartsPriceMultiplier": 1.0,
+    "StreetValue": 58000,
+    "LegendaryValue": 140000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "REGULAR",
+    "RequiredLevel": 18,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "HKS", "AMS", "Full Race"],
+      "Exhaust": ["Stock", "Cat-Back", "Turbo-Back", "Ti Racing"],
+      "Turbo": ["Stock", "GTX3076", "GTX3582", "GTX4088"],
+      "Intercooler": ["Stock", "FMIC Large", "V-Mount"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow", "E85", "Flex Fuel"],
+      "Internals": ["Stock", "Rods", "Pistons", "Stroker"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Triple Plate"],
+      "Transmission": ["Stock", "Dog Box", "Sequential"],
+      "FinalDrive": ["Stock", "4.9", "5.1"],
+      "CenterDiff": ["Stock", "Aggressive", "Rally"],
+      "RearDiff": ["Stock", "1.5Way", "2Way"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Rally"],
+      "Dampers": ["Stock", "Adjustable", "Racing", "Rally"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock", "6-Piston", "8-Piston"]
+    },
+    "Wheels": {
+      "Size": [17, 18],
+      "Width": [8.0, 8.5, 9.0, 9.5]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Gravel"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "Varis", "APR", "Wide"],
+      "RearBumper": ["Stock", "Varis", "Wide"],
+      "Spoiler": ["Stock", "Varis", "APR", "Rally"],
+      "Hood": ["Stock", "Vented", "Carbon"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "Varis", "APR"],
+      "Mirrors": ["Stock", "Carbon"],
+      "Lights": ["Stock", "Clear", "Rally Pods"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 800,
+    "MaxTorque": 600,
+    "MinWeight": 3000,
+    "MaxTopSpeed": 195,
+    "MaxPI": 950
+  },
+
+  "Tags": ["JDM", "AWD", "Turbo", "Rally", "Evo", "Lancer", "Grip", "All-Weather"],
+
+  "Lore": {
+    "Backstory": "Born from the World Rally Championship, the Ronin Evo brings motorsport technology to the street. That 4G63 engine is a legend in its own right - reliable, tunable, and capable of absurd power levels. The advanced AWD system puts power down in conditions that would leave other cars spinning. Rain, snow, gravel, tarmac - the Evo doesn't care. It just goes. For those who believe that the fastest way around a corner is on the limit of grip, not past it, the Evo is the answer.",
+    "FamousOwners": ["Rally Champion", "Time Attack Legend", "All-Weather Warrior"],
+    "RivalVehicles": ["WRX STI", "R34 GT-R", "S2000"]
+  }
+}

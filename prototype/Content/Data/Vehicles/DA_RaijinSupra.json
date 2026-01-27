@@ -1,0 +1,258 @@
+{
+  "VehicleID": "RAIJIN_SUPRA",
+  "DisplayName": "Raijin Supra",
+  "Manufacturer": "Raijin Motors",
+  "Year": 1998,
+  "Country": "Japan",
+  "Class": "A",
+  "Category": "JDM",
+  "Description": "The Raijin Supra is the stuff of legends. That 2JZ inline-six is one of the most overbuilt engines ever made, capable of handling over 1000 horsepower on stock internals. Factory twin turbos provide brutal acceleration, but swap in a big single and you'll be chasing land speed records. Whether you're hunting on the highway or building a show piece, the Supra delivers.",
+
+  "BaseStats": {
+    "Power": 320,
+    "PowerUnit": "HP",
+    "Torque": 315,
+    "TorqueUnit": "lb-ft",
+    "Weight": 3450,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 52,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "TwinTurbo",
+    "Displacement": 3000,
+    "DisplacementUnit": "cc",
+    "Cylinders": 6,
+    "Configuration": "Inline",
+    "Redline": 7000,
+    "IdleRPM": 750,
+    "TopSpeed": 175,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 4.6,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 720,
+    "Class": "A",
+    "MaxPotential": 999
+  },
+
+  "Engine": {
+    "Code": "2JZ-GTE",
+    "Type": "Inline-6 Twin Turbo",
+    "Block": {
+      "Material": "Cast Iron",
+      "BoostLimit": 45,
+      "MaxPowerPotential": 1200
+    },
+    "Head": {
+      "Type": "DOHC",
+      "ValvesPerCylinder": 4,
+      "TotalValves": 24
+    },
+    "Turbo": {
+      "Type": "Sequential Twin",
+      "SpoolRPM": 3200,
+      "MaxBoost": 17
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 55, "Torque": 180 },
+      { "RPM": 2000, "HP": 120, "Torque": 250 },
+      { "RPM": 2500, "HP": 165, "Torque": 290 },
+      { "RPM": 3000, "HP": 210, "Torque": 310 },
+      { "RPM": 3500, "HP": 255, "Torque": 315 },
+      { "RPM": 4000, "HP": 285, "Torque": 312 },
+      { "RPM": 4500, "HP": 305, "Torque": 305 },
+      { "RPM": 5000, "HP": 315, "Torque": 295 },
+      { "RPM": 5500, "HP": 320, "Torque": 280 },
+      { "RPM": 6000, "HP": 318, "Torque": 265 },
+      { "RPM": 6500, "HP": 312, "Torque": 248 },
+      { "RPM": 7000, "HP": 300, "Torque": 230 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 6,
+    "GearRatios": [3.827, 2.360, 1.685, 1.312, 1.000, 0.793],
+    "FinalDrive": 3.133,
+    "ReverseRatio": 3.382
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 380,
+    "RearSpringRate": 340,
+    "FrontDamping": 0.60,
+    "RearDamping": 0.58,
+    "FrontAntiRollBar": 26,
+    "RearAntiRollBar": 20,
+    "RideHeight": 5.1,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 324,
+    "RearDiameter": 315,
+    "DiameterUnit": "mm",
+    "BrakeBias": 57,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 235,
+    "FrontAspectRatio": 45,
+    "FrontDiameter": 17,
+    "RearWidth": 255,
+    "RearAspectRatio": 40,
+    "RearDiameter": 17,
+    "Compound": "Sport",
+    "GripMultiplier": 1.0
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.32,
+    "FrontalArea": 2.1,
+    "DownforceMultiplier": 0.95,
+    "HasActiveSpoiler": true
+  },
+
+  "Dimensions": {
+    "Length": 4515,
+    "Width": 1810,
+    "Height": 1275,
+    "Wheelbase": 2550,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#FFFFFF",
+      "Secondary": "#1C1C1C",
+      "Accent": "#FF6B00"
+    },
+    "AvailableColors": [
+      { "Name": "Super White", "Hex": "#FFFFFF" },
+      { "Name": "Black", "Hex": "#0A0A0A" },
+      { "Name": "Renaissance Red", "Hex": "#8B0000" },
+      { "Name": "Solar Yellow", "Hex": "#FFD700" },
+      { "Name": "Baltic Blue", "Hex": "#003366" },
+      { "Name": "Quicksilver", "Hex": "#C0C0C0" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "InlineSix_Turbo",
+    "ExhaustProfile": "JDM_Deep",
+    "TurboWhine": true,
+    "BlowoffValve": true,
+    "BackfireOnShift": true,
+    "SequentialTurbos": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 15.0,
+    "TurnRadius": 5.4,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.25,
+    "OversteerTendency": 0.6,
+    "DriftCapability": 0.75,
+    "StabilityControl": true,
+    "TractionControl": true
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 100,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.0,
+    "DurationUnit": "seconds",
+    "RechargeRate": 6,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 85000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "A",
+    "MaintenanceCostMultiplier": 1.2,
+    "PartsPriceMultiplier": 1.3,
+    "StreetValue": 100000,
+    "LegendaryValue": 250000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "RESPECTED",
+    "RequiredLevel": 25,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "HKS", "GReddy", "Full Race"],
+      "Exhaust": ["Stock", "Cat-Back", "Turbo-Back", "Ti Full Race"],
+      "Turbo": ["Stock Twins", "BB Twins", "Single T66", "Single T88", "GT47"],
+      "Intercooler": ["Stock", "FMIC", "V-Mount"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow", "E85", "Meth Injection"],
+      "Internals": ["Stock", "Rods", "Pistons", "Full Build"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Triple Disc"],
+      "Transmission": ["Stock", "CD009", "Sequential"],
+      "FinalDrive": ["Stock", "3.4", "3.6", "3.9"],
+      "LSD": ["Stock", "1.5Way", "2Way", "Solid"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Air"],
+      "Dampers": ["Stock", "Adjustable", "Racing"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece", "Carbon"],
+      "Calipers": ["Stock", "6-Piston", "8-Piston"]
+    },
+    "Wheels": {
+      "Size": [17, 18, 19],
+      "Width": [8.5, 9.0, 9.5, 10.0, 10.5]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Drag"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "TRD", "Ridox", "Wide"],
+      "RearBumper": ["Stock", "TRD", "Wide"],
+      "Spoiler": ["Stock", "TRD", "GT Wing", "APR"],
+      "Hood": ["Stock", "Vented", "Carbon", "Top Secret"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "TRD", "Varis", "Top Secret"],
+      "Mirrors": ["Stock", "Ganadors", "Carbon"],
+      "Lights": ["Stock", "Clear", "LED"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 1200,
+    "MaxTorque": 900,
+    "MinWeight": 3100,
+    "MaxTopSpeed": 230,
+    "MaxPI": 999
+  },
+
+  "Tags": ["JDM", "RWD", "Turbo", "2JZ", "Supra", "Highway", "Legend", "A80"],
+
+  "Lore": {
+    "Backstory": "When the Raijin Supra was new, it was already a legend. The 2JZ engine was absurdly overbuilt from the factory, designed to handle far more power than Toyota ever publicly rated it for. Drag racers discovered this first, then highway racers, then everyone else. Now, decades later, a well-built Supra is still one of the most feared machines on the street. The fact that stock internals can handle 700+ horsepower isn't a myth - it's just Tuesday for Supra owners.",
+    "FamousOwners": ["Wangan Legend", "Drag Strip King", "Internet Icon"],
+    "RivalVehicles": ["R34 GT-R", "RX-7 FD", "NSX"]
+  }
+}

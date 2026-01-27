@@ -1,0 +1,269 @@
+{
+  "VehicleID": "KARASU_RX7",
+  "DisplayName": "Karasu RX-7",
+  "Manufacturer": "Karasu Motors",
+  "Year": 1999,
+  "Country": "Japan",
+  "Class": "B",
+  "Category": "JDM",
+  "Description": "The Karasu RX-7 is poetry in motion. Its 13B rotary engine screams to 9000 RPM with a sound unlike anything else on earth. Perfectly balanced, wickedly light, and devastatingly beautiful, the FD is the ultimate expression of the sports car ideal. The rotary demands respect and knowledge - treat it right and it'll reward you with an experience no piston engine can match.",
+
+  "BaseStats": {
+    "Power": 276,
+    "PowerUnit": "HP",
+    "Torque": 232,
+    "TorqueUnit": "lb-ft",
+    "Weight": 2850,
+    "WeightUnit": "lbs",
+    "WeightDistribution": 50,
+    "Drivetrain": "RWD",
+    "EnginePosition": "Front",
+    "Aspiration": "SequentialTurbo",
+    "Displacement": 1300,
+    "DisplacementUnit": "cc",
+    "Cylinders": 0,
+    "Configuration": "Rotary",
+    "Rotors": 2,
+    "Redline": 8500,
+    "IdleRPM": 950,
+    "TopSpeed": 165,
+    "TopSpeedUnit": "MPH",
+    "Acceleration0to60": 4.8,
+    "AccelerationUnit": "seconds"
+  },
+
+  "PerformanceIndex": {
+    "Base": 650,
+    "Class": "B",
+    "MaxPotential": 920
+  },
+
+  "Engine": {
+    "Code": "13B-REW",
+    "Type": "Twin-Rotor Sequential Turbo",
+    "Block": {
+      "Material": "Aluminum",
+      "BoostLimit": 28,
+      "MaxPowerPotential": 700
+    },
+    "Head": {
+      "Type": "Rotary",
+      "Ports": "Side Port",
+      "Seals": "Apex"
+    },
+    "Turbo": {
+      "Type": "Sequential Twin",
+      "PrimarySpoolRPM": 2500,
+      "SecondarySpoolRPM": 4500,
+      "MaxBoost": 14
+    },
+    "PowerCurve": [
+      { "RPM": 1000, "HP": 45, "Torque": 120 },
+      { "RPM": 2000, "HP": 90, "Torque": 165 },
+      { "RPM": 3000, "HP": 140, "Torque": 200 },
+      { "RPM": 4000, "HP": 190, "Torque": 225 },
+      { "RPM": 4500, "HP": 220, "Torque": 232 },
+      { "RPM": 5000, "HP": 245, "Torque": 230 },
+      { "RPM": 5500, "HP": 260, "Torque": 225 },
+      { "RPM": 6000, "HP": 270, "Torque": 218 },
+      { "RPM": 7000, "HP": 276, "Torque": 205 },
+      { "RPM": 8000, "HP": 272, "Torque": 188 },
+      { "RPM": 8500, "HP": 265, "Torque": 175 }
+    ]
+  },
+
+  "Transmission": {
+    "Type": "Manual",
+    "Gears": 5,
+    "GearRatios": [3.483, 2.015, 1.391, 1.000, 0.719],
+    "FinalDrive": 4.100,
+    "ReverseRatio": 3.288
+  },
+
+  "Suspension": {
+    "FrontType": "DoubleWishbone",
+    "RearType": "MultiLink",
+    "FrontSpringRate": 350,
+    "RearSpringRate": 320,
+    "FrontDamping": 0.58,
+    "RearDamping": 0.55,
+    "FrontAntiRollBar": 24,
+    "RearAntiRollBar": 18,
+    "RideHeight": 4.8,
+    "RideHeightUnit": "inches"
+  },
+
+  "Brakes": {
+    "FrontType": "Disc",
+    "RearType": "Disc",
+    "FrontDiameter": 294,
+    "RearDiameter": 284,
+    "DiameterUnit": "mm",
+    "BrakeBias": 58,
+    "ABSEquipped": true
+  },
+
+  "Tires": {
+    "FrontWidth": 225,
+    "FrontAspectRatio": 50,
+    "FrontDiameter": 16,
+    "RearWidth": 255,
+    "RearAspectRatio": 50,
+    "RearDiameter": 16,
+    "Compound": "Sport",
+    "GripMultiplier": 0.98
+  },
+
+  "Aerodynamics": {
+    "DragCoefficient": 0.31,
+    "FrontalArea": 1.9,
+    "DownforceMultiplier": 0.9,
+    "HasActiveSpoiler": false
+  },
+
+  "Dimensions": {
+    "Length": 4285,
+    "Width": 1760,
+    "Height": 1230,
+    "Wheelbase": 2425,
+    "Unit": "mm"
+  },
+
+  "Visuals": {
+    "BodyStyle": "Coupe",
+    "Doors": 2,
+    "DefaultColor": {
+      "Primary": "#000000",
+      "Secondary": "#1C1C1C",
+      "Accent": "#FFD700"
+    },
+    "AvailableColors": [
+      { "Name": "Brilliant Black", "Hex": "#000000" },
+      { "Name": "Vintage Red", "Hex": "#8B0000" },
+      { "Name": "Pure White", "Hex": "#FFFFFF" },
+      { "Name": "Montego Blue", "Hex": "#003366" },
+      { "Name": "Competition Yellow", "Hex": "#FFD700" },
+      { "Name": "Titanium Grey", "Hex": "#4A4A4A" }
+    ]
+  },
+
+  "Audio": {
+    "EngineProfile": "Rotary_Turbo",
+    "ExhaustProfile": "JDM_Rotary",
+    "TurboWhine": true,
+    "BlowoffValve": true,
+    "BackfireOnShift": true,
+    "SequentialTurbos": true,
+    "RotaryBuzz": true
+  },
+
+  "Handling": {
+    "SteeringRatio": 14.8,
+    "TurnRadius": 4.9,
+    "TurnRadiusUnit": "meters",
+    "UndersteerTendency": 0.2,
+    "OversteerTendency": 0.65,
+    "DriftCapability": 0.85,
+    "StabilityControl": false,
+    "TractionControl": false
+  },
+
+  "Nitrous": {
+    "DefaultCapacity": 100,
+    "CapacityUnit": "percent",
+    "PowerBoost": 75,
+    "PowerBoostUnit": "HP",
+    "Duration": 4.5,
+    "DurationUnit": "seconds",
+    "RechargeRate": 8,
+    "RechargeRateUnit": "percent_per_lap"
+  },
+
+  "Economy": {
+    "BasePurchasePrice": 55000,
+    "Currency": "MG_CASH",
+    "InsuranceClass": "B",
+    "MaintenanceCostMultiplier": 1.5,
+    "PartsPriceMultiplier": 1.4,
+    "StreetValue": 70000,
+    "LegendaryValue": 180000
+  },
+
+  "Unlocks": {
+    "RequiredREPTier": "REGULAR",
+    "RequiredLevel": 18,
+    "SpecialConditions": []
+  },
+
+  "AvailableUpgrades": {
+    "Engine": {
+      "Intake": ["Stock", "HKS", "RE Amemiya", "Full Race"],
+      "Exhaust": ["Stock", "Cat-Back", "Turbo-Back", "Ti Racing"],
+      "Turbo": ["Stock Twins", "Single T04", "Single T78", "3-Rotor"],
+      "Intercooler": ["Stock", "FMIC", "V-Mount"],
+      "Porting": ["Stock", "Street Port", "Bridge Port", "Peripheral Port"],
+      "ECU": ["Stock", "Stage1", "Stage2", "Standalone"],
+      "FuelSystem": ["Stock", "HighFlow", "Secondary Injectors"]
+    },
+    "Drivetrain": {
+      "Clutch": ["Stock", "Sport", "Racing", "Twin Plate"],
+      "Transmission": ["Stock", "ShortThrow", "6-Speed"],
+      "FinalDrive": ["Stock", "4.3", "4.5"],
+      "LSD": ["Stock", "1.5Way", "2Way"]
+    },
+    "Suspension": {
+      "Springs": ["Stock", "Lowering", "Coilover", "Race"],
+      "Dampers": ["Stock", "Adjustable", "Racing"],
+      "Swaybars": ["Stock", "Sport", "Racing"],
+      "Bushings": ["Stock", "Poly", "Solid"],
+      "AngleKit": ["None", "Basic", "Pro"]
+    },
+    "Brakes": {
+      "Pads": ["Stock", "Sport", "Track", "Racing"],
+      "Rotors": ["Stock", "Slotted", "2-Piece"],
+      "Calipers": ["Stock", "4-Piston", "6-Piston"]
+    },
+    "Wheels": {
+      "Size": [16, 17, 18],
+      "Width": [8.0, 8.5, 9.0, 9.5, 10.0]
+    },
+    "Tires": {
+      "Compound": ["Sport", "Semi-Slick", "Slick", "Drift"]
+    },
+    "Aero": {
+      "FrontBumper": ["Stock", "RE Amemiya", "Feed", "Wide"],
+      "RearBumper": ["Stock", "RE Amemiya", "Feed"],
+      "Spoiler": ["Stock", "RE Amemiya", "GT Wing", "Kazama"],
+      "Hood": ["Stock", "Vented", "Carbon", "RE Amemiya"]
+    },
+    "Body": {
+      "Widebody": ["Stock", "RE Amemiya", "TCP Magic", "Feed"],
+      "Mirrors": ["Stock", "Ganadors", "Carbon"],
+      "Lights": ["Stock", "Clear", "99 Spec"]
+    }
+  },
+
+  "MaxBuildStats": {
+    "MaxPower": 700,
+    "MaxTorque": 450,
+    "MinWeight": 2600,
+    "MaxTopSpeed": 210,
+    "MaxPI": 920
+  },
+
+  "Tags": ["JDM", "RWD", "Rotary", "Turbo", "RX7", "FD", "Touge", "Drift", "Balanced"],
+
+  "Lore": {
+    "Backstory": "The Karasu RX-7 represents everything that made the 1990s JDM scene magical. That screaming rotary engine is unlike anything else - two spinning triangles producing a sound that haunts your dreams. The 50/50 weight distribution and compact dimensions make it dance through corners like nothing else. Yes, it drinks premix. Yes, apex seals are a thing. But for those who understand, there's simply no substitute. The FD is not just a car - it's a religion.",
+    "FamousOwners": ["Rotary Priest", "Mountain Pass Ghost", "Time Attack Legend"],
+    "RivalVehicles": ["Supra MK4", "NSX", "R34 GT-R"]
+  },
+
+  "SpecialFeatures": {
+    "RotaryEngine": true,
+    "RequiresPremix": true,
+    "ApexSealWear": true,
+    "SequentialTurbos": true,
+    "PerfectBalance": true
+  }
+}
