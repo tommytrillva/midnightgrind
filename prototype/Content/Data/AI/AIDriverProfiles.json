@@ -1,6 +1,6 @@
 {
-  "Version": "1.0",
-  "TotalProfiles": 15,
+  "Version": "2.0",
+  "TotalProfiles": 30,
 
   "PersonalityTypes": {
     "Aggressive": {
@@ -518,6 +518,439 @@
       "Backstory": "A mysterious rival who always seems to match your skill. They push you to be better.",
       "IsRival": true,
       "DynamicScaling": true
+    },
+    {
+      "ID": "AI_ROOKIE_03",
+      "Name": "First Timer",
+      "Personality": "Defensive",
+      "Tier": "D",
+      "Skill": {
+        "Braking": 0.45,
+        "LineAccuracy": 0.40,
+        "ReactionTime": 0.50,
+        "Consistency": 0.45,
+        "WetWeather": 0.30
+      },
+      "Aggression": {
+        "Overtake": 0.20,
+        "Defense": 0.25,
+        "RiskTaking": 0.15
+      },
+      "Racecraft": {
+        "Awareness": 0.35,
+        "Anticipation": 0.30,
+        "Strategy": 0.25
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.78,
+        "CatchUp": 0.15,
+        "SlowDown": 0.02
+      },
+      "PreferredVehicles": ["BEATER_SEDAN", "LIGHTNING_86"],
+      "Backstory": "Just discovered street racing. Nervous but determined to prove themselves."
+    },
+    {
+      "ID": "AI_ROOKIE_04",
+      "Name": "Hot Hatch Hero",
+      "Personality": "Aggressive",
+      "Tier": "D",
+      "Skill": {
+        "Braking": 0.52,
+        "LineAccuracy": 0.55,
+        "ReactionTime": 0.58,
+        "Consistency": 0.48,
+        "WetWeather": 0.45
+      },
+      "Aggression": {
+        "Overtake": 0.70,
+        "Defense": 0.45,
+        "RiskTaking": 0.65
+      },
+      "Racecraft": {
+        "Awareness": 0.50,
+        "Anticipation": 0.45,
+        "Strategy": 0.40
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.84,
+        "CatchUp": 0.10,
+        "SlowDown": 0.04
+      },
+      "PreferredVehicles": ["STORM_GTI", "KAZE_CIVIC", "INFERNO_FOCUS"],
+      "Backstory": "FWD enthusiast who proves small cars can hang with the big boys."
+    },
+    {
+      "ID": "AI_STREET_04",
+      "Name": "Euro Snob",
+      "Personality": "Calculated",
+      "Tier": "C",
+      "Skill": {
+        "Braking": 0.68,
+        "LineAccuracy": 0.70,
+        "ReactionTime": 0.62,
+        "Consistency": 0.68,
+        "WetWeather": 0.60
+      },
+      "Aggression": {
+        "Overtake": 0.55,
+        "Defense": 0.60,
+        "RiskTaking": 0.45
+      },
+      "Racecraft": {
+        "Awareness": 0.65,
+        "Anticipation": 0.62,
+        "Strategy": 0.58
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.89,
+        "CatchUp": 0.06,
+        "SlowDown": 0.05
+      },
+      "PreferredVehicles": ["GHOST_E46", "BLITZ_M4", "APEX_CAYMAN"],
+      "Backstory": "Believes German engineering is superior. Precise, clinical, and slightly arrogant."
+    },
+    {
+      "ID": "AI_STREET_05",
+      "Name": "Silvia Sister",
+      "Personality": "Smooth",
+      "Tier": "C",
+      "Skill": {
+        "Braking": 0.62,
+        "LineAccuracy": 0.58,
+        "ReactionTime": 0.65,
+        "Consistency": 0.60,
+        "WetWeather": 0.52,
+        "Drifting": 0.78
+      },
+      "Aggression": {
+        "Overtake": 0.48,
+        "Defense": 0.42,
+        "RiskTaking": 0.55
+      },
+      "Racecraft": {
+        "Awareness": 0.58,
+        "Anticipation": 0.55,
+        "Strategy": 0.50
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.87,
+        "CatchUp": 0.08,
+        "SlowDown": 0.05
+      },
+      "PreferredVehicles": ["DRIFT_KING_SILVIA", "TENSHI_240", "COBRA_S2000"],
+      "Backstory": "Part of an all-female drift crew. Style and finesse over raw aggression."
+    },
+    {
+      "ID": "AI_STREET_06",
+      "Name": "Quarter Mile King",
+      "Personality": "Reckless",
+      "Tier": "C",
+      "Skill": {
+        "Braking": 0.50,
+        "LineAccuracy": 0.45,
+        "ReactionTime": 0.75,
+        "Consistency": 0.60,
+        "WetWeather": 0.35,
+        "Launch": 0.82
+      },
+      "Aggression": {
+        "Overtake": 0.80,
+        "Defense": 0.30,
+        "RiskTaking": 0.85
+      },
+      "Racecraft": {
+        "Awareness": 0.55,
+        "Anticipation": 0.50,
+        "Strategy": 0.40
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.92,
+        "CatchUp": 0.02,
+        "SlowDown": 0.10
+      },
+      "PreferredVehicles": ["STALLION_GT", "RAMPAGE_CHARGER", "DEMON_CHALLENGER"],
+      "Backstory": "Drag racing specialist. Struggles with corners but unbeatable in a straight line."
+    },
+    {
+      "ID": "AI_RACER_04",
+      "Name": "Canyon Carver",
+      "Personality": "Calculated",
+      "Tier": "B",
+      "Skill": {
+        "Braking": 0.78,
+        "LineAccuracy": 0.80,
+        "ReactionTime": 0.72,
+        "Consistency": 0.75,
+        "WetWeather": 0.65,
+        "Elevation": 0.85
+      },
+      "Aggression": {
+        "Overtake": 0.60,
+        "Defense": 0.65,
+        "RiskTaking": 0.55
+      },
+      "Racecraft": {
+        "Awareness": 0.75,
+        "Anticipation": 0.78,
+        "Strategy": 0.70
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.91,
+        "CatchUp": 0.04,
+        "SlowDown": 0.05
+      },
+      "PreferredVehicles": ["KARASU_RX7", "APEX_CAYMAN", "RONIN_EVO"],
+      "Backstory": "Lives in the canyons. Master of elevation changes and blind corners."
+    },
+    {
+      "ID": "AI_RACER_05",
+      "Name": "AWD Monster",
+      "Personality": "Aggressive",
+      "Tier": "B",
+      "Skill": {
+        "Braking": 0.74,
+        "LineAccuracy": 0.70,
+        "ReactionTime": 0.75,
+        "Consistency": 0.72,
+        "WetWeather": 0.80,
+        "AWDControl": 0.88
+      },
+      "Aggression": {
+        "Overtake": 0.75,
+        "Defense": 0.55,
+        "RiskTaking": 0.68
+      },
+      "Racecraft": {
+        "Awareness": 0.70,
+        "Anticipation": 0.68,
+        "Strategy": 0.62
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.93,
+        "CatchUp": 0.04,
+        "SlowDown": 0.06
+      },
+      "PreferredVehicles": ["RONIN_EVO", "HAYATE_WRX", "INFERNO_FOCUS", "LEGEND_R35"],
+      "Backstory": "AWD specialist who dominates in any weather. Rally roots showing."
+    },
+    {
+      "ID": "AI_RACER_06",
+      "Name": "Garage Phantom",
+      "Personality": "Smooth",
+      "Tier": "B",
+      "Skill": {
+        "Braking": 0.76,
+        "LineAccuracy": 0.72,
+        "ReactionTime": 0.78,
+        "Consistency": 0.70,
+        "WetWeather": 0.55,
+        "Drifting": 0.88,
+        "TightSpaces": 0.92
+      },
+      "Aggression": {
+        "Overtake": 0.55,
+        "Defense": 0.60,
+        "RiskTaking": 0.62
+      },
+      "Racecraft": {
+        "Awareness": 0.80,
+        "Anticipation": 0.75,
+        "Strategy": 0.65
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.88,
+        "CatchUp": 0.06,
+        "SlowDown": 0.04
+      },
+      "PreferredVehicles": ["DRIFT_KING_SILVIA", "LIGHTNING_86", "KUMO_350Z"],
+      "Backstory": "King of the parking garage scene. Makes impossible angles look easy."
+    },
+    {
+      "ID": "AI_RACER_07",
+      "Name": "V8 Patriot",
+      "Personality": "Dirty",
+      "Tier": "B",
+      "Skill": {
+        "Braking": 0.70,
+        "LineAccuracy": 0.68,
+        "ReactionTime": 0.72,
+        "Consistency": 0.65,
+        "WetWeather": 0.50
+      },
+      "Aggression": {
+        "Overtake": 0.82,
+        "Defense": 0.70,
+        "RiskTaking": 0.75
+      },
+      "Racecraft": {
+        "Awareness": 0.65,
+        "Anticipation": 0.60,
+        "Strategy": 0.55
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.92,
+        "CatchUp": 0.05,
+        "SlowDown": 0.07
+      },
+      "PreferredVehicles": ["PHANTOM_CAMARO", "TITAN_CTS", "RAMPAGE_CHARGER", "NOVA_GT500"],
+      "Backstory": "Proud American muscle devotee. Will bump you if you're in the way."
+    },
+    {
+      "ID": "AI_PRO_04",
+      "Name": "Time Attack Specialist",
+      "Personality": "Calculated",
+      "Tier": "A",
+      "Skill": {
+        "Braking": 0.90,
+        "LineAccuracy": 0.92,
+        "ReactionTime": 0.85,
+        "Consistency": 0.88,
+        "WetWeather": 0.78
+      },
+      "Aggression": {
+        "Overtake": 0.65,
+        "Defense": 0.60,
+        "RiskTaking": 0.50
+      },
+      "Racecraft": {
+        "Awareness": 0.85,
+        "Anticipation": 0.88,
+        "Strategy": 0.85
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.96,
+        "CatchUp": 0.01,
+        "SlowDown": 0.03
+      },
+      "PreferredVehicles": ["RONIN_EVO", "LEGEND_R35", "SPECTER_911"],
+      "Backstory": "Obsessed with lap times. Every tenth of a second is calculated."
+    },
+    {
+      "ID": "AI_PRO_05",
+      "Name": "Night Runner",
+      "Personality": "Adaptive",
+      "Tier": "A",
+      "Skill": {
+        "Braking": 0.85,
+        "LineAccuracy": 0.83,
+        "ReactionTime": 0.88,
+        "Consistency": 0.82,
+        "WetWeather": 0.75,
+        "NightVision": 0.95
+      },
+      "Aggression": {
+        "Overtake": 0.72,
+        "Defense": 0.68,
+        "RiskTaking": 0.65
+      },
+      "Racecraft": {
+        "Awareness": 0.88,
+        "Anticipation": 0.85,
+        "Strategy": 0.78
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.94,
+        "CatchUp": 0.03,
+        "SlowDown": 0.04
+      },
+      "PreferredVehicles": ["SAKURA_GTR", "BLITZ_M4", "FLASH_AMG"],
+      "Backstory": "Only races after midnight. Eyes adapted to the dark, reflexes honed in shadows."
+    },
+    {
+      "ID": "AI_PRO_06",
+      "Name": "Exotic Hunter",
+      "Personality": "Aggressive",
+      "Tier": "A",
+      "Skill": {
+        "Braking": 0.86,
+        "LineAccuracy": 0.84,
+        "ReactionTime": 0.87,
+        "Consistency": 0.80,
+        "WetWeather": 0.72
+      },
+      "Aggression": {
+        "Overtake": 0.85,
+        "Defense": 0.70,
+        "RiskTaking": 0.78
+      },
+      "Racecraft": {
+        "Awareness": 0.82,
+        "Anticipation": 0.80,
+        "Strategy": 0.72
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.95,
+        "CatchUp": 0.02,
+        "SlowDown": 0.05
+      },
+      "PreferredVehicles": ["SHOGUN_NSX", "SPECTER_911", "VIPER_CORVETTE", "SHADOW_LFA"],
+      "Backstory": "Collector of exotic machines. Rich, skilled, and always hunting new prey."
+    },
+    {
+      "ID": "AI_BOSS_04",
+      "Name": "The Architect",
+      "Personality": "Calculated",
+      "Tier": "S",
+      "Skill": {
+        "Braking": 0.94,
+        "LineAccuracy": 0.96,
+        "ReactionTime": 0.90,
+        "Consistency": 0.94,
+        "WetWeather": 0.88
+      },
+      "Aggression": {
+        "Overtake": 0.70,
+        "Defense": 0.88,
+        "RiskTaking": 0.55
+      },
+      "Racecraft": {
+        "Awareness": 0.96,
+        "Anticipation": 0.94,
+        "Strategy": 0.95
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.97,
+        "CatchUp": 0.0,
+        "SlowDown": 0.02
+      },
+      "PreferredVehicles": ["SPECTER_911", "BLITZ_M4", "APEX_CAYMAN"],
+      "Backstory": "Former racing engineer. Knows every car's limit to the millimeter. Methodical destruction.",
+      "IsBoss": true,
+      "BossRace": "Technical Masterclass"
+    },
+    {
+      "ID": "AI_BOSS_05",
+      "Name": "Red Canyon Ghost",
+      "Personality": "Smooth",
+      "Tier": "S",
+      "Skill": {
+        "Braking": 0.93,
+        "LineAccuracy": 0.94,
+        "ReactionTime": 0.90,
+        "Consistency": 0.92,
+        "WetWeather": 0.85,
+        "Elevation": 0.98,
+        "BlindCorners": 0.96
+      },
+      "Aggression": {
+        "Overtake": 0.60,
+        "Defense": 0.92,
+        "RiskTaking": 0.65
+      },
+      "Racecraft": {
+        "Awareness": 0.94,
+        "Anticipation": 0.96,
+        "Strategy": 0.88
+      },
+      "SpeedParams": {
+        "BaseSpeed": 0.97,
+        "CatchUp": 0.0,
+        "SlowDown": 0.02
+      },
+      "PreferredVehicles": ["KARASU_RX7", "SHOGUN_NSX", "VIPER_CORVETTE"],
+      "Backstory": "Has never lost on Red Rock Canyon. Drives the cliffs like they have guardrails.",
+      "IsBoss": true,
+      "BossRace": "Canyon Gauntlet"
     }
   ],
 
