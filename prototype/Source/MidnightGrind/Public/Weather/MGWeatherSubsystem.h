@@ -469,6 +469,72 @@ public:
 	float GetVisibilityDistance() const { return CurrentWeather.Visibility; }
 
 	// ==========================================
+	// UNIFIED WEATHER API
+	// ==========================================
+	// These functions provide a single source of truth for weather effects,
+	// combining base weather state with racing-specific effects (aquaplaning,
+	// puddles, fog density, etc.) when MGWeatherRacingSubsystem is active.
+	// Use these functions for vehicle physics and AI calculations.
+
+	/**
+	 * @brief Get unified grip multiplier combining all weather effects
+	 *
+	 * This is the primary function for vehicle physics to query tire grip.
+	 * It combines:
+	 * - Base road condition grip (dry/wet/icy/snowy)
+	 * - Racing-specific effects (aquaplaning, puddle depth)
+	 * - Weather intensity modifiers
+	 *
+	 * @param VehicleLocation Optional vehicle location for position-specific effects
+	 * @param VehicleSpeedKPH Optional vehicle speed for speed-dependent effects (aquaplaning)
+	 * @return Combined grip multiplier (0.1 to 1.0, where 1.0 = full grip)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Weather|Unified")
+	float GetUnifiedGripMultiplier(const FVector& VehicleLocation = FVector::ZeroVector, float VehicleSpeedKPH = 0.0f) const;
+
+	/**
+	 * @brief Get unified visibility distance combining all weather effects
+	 *
+	 * Combines base weather visibility with:
+	 * - Fog effects
+	 * - Night/time-of-day effects
+	 * - Rain spray effects
+	 *
+	 * @param Location Optional location for position-specific fog density
+	 * @return Effective visibility distance in meters
+	 */
+	UFUNCTION(BlueprintPure, Category = "Weather|Unified")
+	float GetUnifiedVisibilityDistance(const FVector& Location = FVector::ZeroVector) const;
+
+	/**
+	 * @brief Get unified AI perception multiplier
+	 *
+	 * Returns a multiplier (0.1 to 1.0) for AI perception range based on:
+	 * - Visibility conditions (fog, rain, night)
+	 * - Weather intensity
+	 *
+	 * @return AI perception range multiplier
+	 */
+	UFUNCTION(BlueprintPure, Category = "Weather|Unified")
+	float GetUnifiedAIPerceptionMultiplier() const;
+
+	/**
+	 * @brief Check if conditions are hazardous for racing
+	 *
+	 * @return True if current conditions pose significant racing hazards
+	 */
+	UFUNCTION(BlueprintPure, Category = "Weather|Unified")
+	bool AreConditionsHazardous() const;
+
+	/**
+	 * @brief Get combined weather difficulty rating (1-5)
+	 *
+	 * @return Difficulty where 1=easy (clear day), 5=extreme (storm)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Weather|Unified")
+	int32 GetWeatherDifficultyRating() const;
+
+	// ==========================================
 	// WIND
 	// ==========================================
 
@@ -627,6 +693,12 @@ protected:
 	UPROPERTY()
 	ADirectionalLight* SunLight;
 
+	/** Cached reference to racing subsystem (optional, may be null) */
+	mutable TWeakObjectPtr<UMGWeatherRacingSubsystem> CachedRacingSubsystem;
+
+	/** Whether we've attempted to find the racing subsystem */
+	mutable bool bRacingSubsystemSearched = false;
+
 	// ==========================================
 	// INTERNAL
 	// ==========================================
@@ -672,4 +744,7 @@ protected:
 
 	/** Update material parameters */
 	void UpdateMaterialParameters();
+
+	/** Get racing subsystem if available (lazy initialization) */
+	UMGWeatherRacingSubsystem* GetRacingSubsystem() const;
 };

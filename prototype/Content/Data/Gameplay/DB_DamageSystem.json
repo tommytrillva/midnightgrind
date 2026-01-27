@@ -1,0 +1,344 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Damage and Repair System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DamageModel": "Cosmetic",
+    "MechanicalDamage": false,
+    "PerformanceImpact": false,
+    "RepairRequired": false,
+    "AutoRepairBetweenRaces": true
+  },
+
+  "DamageModels": {
+    "Off": {
+      "ID": "DAMAGE_OFF",
+      "Name": "Off",
+      "Description": "No visible damage",
+      "CosmeticDamage": false,
+      "MechanicalDamage": false,
+      "PerformanceImpact": false
+    },
+    "Cosmetic": {
+      "ID": "DAMAGE_COSMETIC",
+      "Name": "Cosmetic Only",
+      "Description": "Visual damage without performance impact",
+      "CosmeticDamage": true,
+      "MechanicalDamage": false,
+      "PerformanceImpact": false,
+      "Default": true
+    },
+    "Limited": {
+      "ID": "DAMAGE_LIMITED",
+      "Name": "Limited",
+      "Description": "Light mechanical damage possible",
+      "CosmeticDamage": true,
+      "MechanicalDamage": true,
+      "PerformanceImpact": true,
+      "ImpactMultiplier": 0.5
+    },
+    "Simulation": {
+      "ID": "DAMAGE_SIM",
+      "Name": "Simulation",
+      "Description": "Realistic damage with full impact",
+      "CosmeticDamage": true,
+      "MechanicalDamage": true,
+      "PerformanceImpact": true,
+      "ImpactMultiplier": 1.0,
+      "UnlockCondition": "LEVEL_20"
+    },
+    "Hardcore": {
+      "ID": "DAMAGE_HARDCORE",
+      "Name": "Hardcore",
+      "Description": "Extreme damage sensitivity",
+      "CosmeticDamage": true,
+      "MechanicalDamage": true,
+      "PerformanceImpact": true,
+      "ImpactMultiplier": 1.5,
+      "TotalLossPossible": true,
+      "UnlockCondition": "LEVEL_40"
+    }
+  },
+
+  "DamageZones": {
+    "Front": {
+      "ID": "ZONE_FRONT",
+      "Parts": ["Hood", "Bumper", "Fenders", "Headlights", "Grille", "Radiator"],
+      "DamageThreshold": 1.0,
+      "VisualEffects": ["Dents", "Scratches", "BrokenLights", "DeformedPanels"],
+      "MechanicalEffects": ["RadiatorLeak", "SteeringDamage"],
+      "RepairCost": { "Light": 500, "Medium": 1500, "Heavy": 4000 }
+    },
+    "Rear": {
+      "ID": "ZONE_REAR",
+      "Parts": ["Trunk", "Bumper", "Taillights", "Exhaust", "Spoiler"],
+      "DamageThreshold": 1.0,
+      "VisualEffects": ["Dents", "Scratches", "BrokenLights", "LoosePanels"],
+      "MechanicalEffects": ["ExhaustLeak", "FuelSystemDamage"],
+      "RepairCost": { "Light": 400, "Medium": 1200, "Heavy": 3000 }
+    },
+    "Left": {
+      "ID": "ZONE_LEFT",
+      "Parts": ["Door", "Mirror", "Fender", "Rocker"],
+      "DamageThreshold": 0.8,
+      "VisualEffects": ["Dents", "Scratches", "BrokenMirror", "Scrapes"],
+      "MechanicalEffects": ["DoorJammed"],
+      "RepairCost": { "Light": 300, "Medium": 1000, "Heavy": 2500 }
+    },
+    "Right": {
+      "ID": "ZONE_RIGHT",
+      "Parts": ["Door", "Mirror", "Fender", "Rocker"],
+      "DamageThreshold": 0.8,
+      "VisualEffects": ["Dents", "Scratches", "BrokenMirror", "Scrapes"],
+      "MechanicalEffects": ["DoorJammed"],
+      "RepairCost": { "Light": 300, "Medium": 1000, "Heavy": 2500 }
+    },
+    "Roof": {
+      "ID": "ZONE_ROOF",
+      "Parts": ["Roof", "Pillars", "Sunroof"],
+      "DamageThreshold": 1.5,
+      "VisualEffects": ["Dents", "BrokenGlass"],
+      "MechanicalEffects": [],
+      "RepairCost": { "Light": 200, "Medium": 800, "Heavy": 2000 }
+    },
+    "Undercarriage": {
+      "ID": "ZONE_UNDER",
+      "Parts": ["OilPan", "Exhaust", "Suspension", "Drivetrain"],
+      "DamageThreshold": 0.6,
+      "VisualEffects": ["Sparks", "Fluid Leak"],
+      "MechanicalEffects": ["OilLeak", "SuspensionDamage", "DrivetrainDamage"],
+      "RepairCost": { "Light": 600, "Medium": 2000, "Heavy": 5000 }
+    },
+    "Wheels": {
+      "ID": "ZONE_WHEELS",
+      "Parts": ["Rim", "Tire", "Suspension"],
+      "DamageThreshold": 0.5,
+      "VisualEffects": ["ScratchedRim", "FlatTire", "BentRim"],
+      "MechanicalEffects": ["PullToSide", "VibrationAtSpeed", "Blowout"],
+      "RepairCost": { "Light": 200, "Medium": 500, "Heavy": 1500 },
+      "PerWheel": true
+    },
+    "Engine": {
+      "ID": "ZONE_ENGINE",
+      "Parts": ["Engine", "Turbo", "Intercooler", "Intake"],
+      "DamageThreshold": 2.0,
+      "VisualEffects": ["Smoke", "Fire"],
+      "MechanicalEffects": ["PowerLoss", "Overheating", "EngineFailure"],
+      "RepairCost": { "Light": 1000, "Medium": 4000, "Heavy": 10000 }
+    }
+  },
+
+  "DamageCalculation": {
+    "ImpactForce": {
+      "Formula": "Mass * Velocity^2 / 2",
+      "MinimumForDamage": 50000,
+      "ScalingFactor": 0.001
+    },
+    "AngleFactor": {
+      "HeadOn": 1.0,
+      "Side": 0.8,
+      "Rear": 0.6,
+      "Glancing": 0.3
+    },
+    "SurfaceHardness": {
+      "Vehicle": 1.0,
+      "Barrier": 1.2,
+      "Wall": 1.5,
+      "Tree": 1.3,
+      "TrafficCone": 0.1,
+      "TireStack": 0.2,
+      "HayBale": 0.15
+    },
+    "SpeedThresholds": {
+      "NoDamage": 20,
+      "LightDamage": 40,
+      "MediumDamage": 80,
+      "HeavyDamage": 120
+    }
+  },
+
+  "CosmeticDamage": {
+    "DentGeneration": {
+      "Enabled": true,
+      "MaxDents": 10,
+      "MinSize": 0.05,
+      "MaxSize": 0.3,
+      "Deformation": {
+        "Method": "VertexDisplacement",
+        "MaxDepth": 0.1
+      }
+    },
+    "Scratches": {
+      "Enabled": true,
+      "MaxScratches": 20,
+      "PaintChip": true,
+      "Texture": "Damage_Scratches"
+    },
+    "BrokenParts": {
+      "Headlights": { "Threshold": 0.6, "Effect": "BrokenGlass" },
+      "Taillights": { "Threshold": 0.6, "Effect": "BrokenGlass" },
+      "Mirrors": { "Threshold": 0.4, "Effect": "BrokenOff" },
+      "Spoiler": { "Threshold": 0.7, "Effect": "Detach" },
+      "Bumper": { "Threshold": 0.8, "Effect": "Deform" }
+    },
+    "Dirt": {
+      "AccumulatesWithDamage": true,
+      "DirtTexture": "Vehicle_Dirt",
+      "MaxDirtLevel": 1.0
+    }
+  },
+
+  "MechanicalDamage": {
+    "Engine": {
+      "PowerReduction": {
+        "Light": 0.05,
+        "Medium": 0.15,
+        "Heavy": 0.30
+      },
+      "Overheating": {
+        "Enabled": true,
+        "TemperatureIncrease": 10,
+        "FailureTemperature": 130
+      },
+      "Failure": {
+        "Enabled": true,
+        "Threshold": 0.9,
+        "Effect": "EngineStall"
+      }
+    },
+    "Suspension": {
+      "HandlingImpact": {
+        "Light": 0.95,
+        "Medium": 0.85,
+        "Heavy": 0.70
+      },
+      "Alignment": {
+        "Affected": true,
+        "MaxDeviation": 5.0
+      }
+    },
+    "Steering": {
+      "ResponseReduction": {
+        "Light": 0.95,
+        "Medium": 0.85,
+        "Heavy": 0.65
+      },
+      "PlayIncrease": {
+        "Light": 0.02,
+        "Medium": 0.05,
+        "Heavy": 0.10
+      }
+    },
+    "Drivetrain": {
+      "PowerLoss": {
+        "Light": 0.03,
+        "Medium": 0.10,
+        "Heavy": 0.25
+      },
+      "TransmissionSlip": {
+        "Enabled": true,
+        "ChancePerShift": 0.05
+      }
+    },
+    "Tires": {
+      "GripReduction": {
+        "Light": 0.95,
+        "Medium": 0.80,
+        "Heavy": 0.60
+      },
+      "Blowout": {
+        "Enabled": true,
+        "Threshold": 0.8,
+        "Effect": "InstantGripLoss"
+      }
+    }
+  },
+
+  "Repair": {
+    "InRace": {
+      "Enabled": false,
+      "Locations": [],
+      "Time": 0,
+      "Cost": 0
+    },
+    "PostRace": {
+      "AutoRepair": true,
+      "Cost": 0
+    },
+    "Garage": {
+      "Enabled": true,
+      "RepairAll": true,
+      "RepairByZone": true,
+      "InstantRepair": true
+    },
+    "CostMultipliers": {
+      "ByVehicleClass": {
+        "D": 0.5,
+        "C": 0.75,
+        "B": 1.0,
+        "A": 1.5,
+        "S": 2.0
+      }
+    }
+  },
+
+  "VisualEffects": {
+    "Sparks": {
+      "Enabled": true,
+      "OnScrape": true,
+      "OnHeavyImpact": true
+    },
+    "Smoke": {
+      "EngineDamage": true,
+      "TireDamage": true,
+      "Color": { "Light": "#888888", "Heavy": "#333333" }
+    },
+    "Fire": {
+      "Enabled": true,
+      "Threshold": 0.95,
+      "Extinguishable": true
+    },
+    "FluidLeaks": {
+      "Oil": { "Color": "#222222", "Slippery": true },
+      "Coolant": { "Color": "#44FF44", "Slippery": false },
+      "Fuel": { "Color": "#FFCC00", "Slippery": true }
+    },
+    "Debris": {
+      "Enabled": true,
+      "MaxDebris": 20,
+      "PersistTime": 10.0
+    }
+  },
+
+  "Audio": {
+    "ImpactSounds": {
+      "Light": "SFX_Impact_Light",
+      "Medium": "SFX_Impact_Medium",
+      "Heavy": "SFX_Impact_Heavy",
+      "Glass": "SFX_Glass_Break",
+      "Metal": "SFX_Metal_Crunch"
+    },
+    "DamageSounds": {
+      "EngineDamage": "SFX_Engine_Damaged",
+      "TireFlat": "SFX_Tire_Flat",
+      "Scraping": "SFX_Metal_Scrape"
+    }
+  },
+
+  "RaceTypeOverrides": {
+    "Career": { "DamageModel": "Cosmetic" },
+    "QuickRace": { "DamageModel": "Cosmetic" },
+    "TimeAttack": { "DamageModel": "Off" },
+    "Drift": { "DamageModel": "Cosmetic" },
+    "Ranked": { "DamageModel": "Cosmetic" },
+    "Simulation": { "DamageModel": "Simulation" }
+  },
+
+  "Settings": {
+    "DamageEnabled": { "Default": true },
+    "DamageLevel": { "Default": "Cosmetic", "Options": ["Off", "Cosmetic", "Limited", "Simulation", "Hardcore"] },
+    "AutoRepair": { "Default": true },
+    "ShowDamageIndicator": { "Default": true }
+  }
+}

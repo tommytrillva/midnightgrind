@@ -19,11 +19,15 @@ void UMGLiveEventSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Start tick timer for event management
     if (UWorld* World = GetWorld())
     {
+        TWeakObjectPtr<UMGLiveEventSubsystem> WeakThis(this);
         World->GetTimerManager().SetTimer(
             TickTimerHandle,
-            [this]()
+            [WeakThis]()
             {
-                TickEvents(1.0f);
+                if (WeakThis.IsValid())
+                {
+                    WeakThis->TickEvents(1.0f);
+                }
             },
             1.0f,
             true
