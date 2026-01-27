@@ -67,6 +67,19 @@ void UMGEngineAudioComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		UpdateProceduralSound();
 	}
 
+	// Update damage audio (misfires)
+	if (bIsMisfiring)
+	{
+		TimeSinceLastMisfire += DeltaTime;
+		if (TimeSinceLastMisfire >= MisfireInterval)
+		{
+			TriggerMisfire();
+			TimeSinceLastMisfire = 0.0f;
+			// Randomize next misfire interval based on damage
+			MisfireInterval = FMath::RandRange(0.1f, 0.5f) / FMath::Max(EngineDamageLevel, 0.1f);
+		}
+	}
+
 	// Track throttle state
 	bWasOnThrottle = IsOnThrottle();
 }
@@ -490,4 +503,37 @@ void UMGEngineAudioComponent::TriggerBlowOffValve()
 	{
 		bBOVTriggered = false;
 	});
+}
+
+// ==========================================
+// ENGINE DAMAGE AUDIO
+// ==========================================
+
+void UMGEngineAudioComponent::SetEngineDamageLevel(float DamageLevel)
+{
+	EngineDamageLevel = FMath::Clamp(DamageLevel, 0.0f, 1.0f);
+
+	// Update misfire/knock state based on damage
+	bIsMisfiring = EngineDamageLevel > 0.3f;
+	bIsKnocking = EngineDamageLevel > 0.6f;
+
+	// Adjust pitch/volume for damaged engine
+	// More damage = rougher, lower pitch, unstable idle
+	if (EngineDamageLevel > 0.1f)
+	{
+		// Initial misfire interval - more damage = more frequent misfires
+		MisfireInterval = FMath::Lerp(2.0f, 0.2f, EngineDamageLevel);
+	}
+}
+
+void UMGEngineAudioComponent::TriggerMisfire()
+{
+	// Briefly cut power/pitch to simulate misfire
+	OnEngineMisfire.Broadcast();
+
+	// Also trigger a backfire for audible effect at higher damage levels
+	if (EngineDamageLevel > 0.5f && FMath::RandRange(0.0f, 1.0f) < EngineDamageLevel)
+	{
+		TriggerBackfire();
+	}
 }

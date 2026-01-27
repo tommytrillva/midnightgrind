@@ -30,7 +30,7 @@ void UMGVehicleDamageSystem::BeginPlay()
 	VehiclePawn = Cast<AMGVehiclePawn>(GetOwner());
 	if (VehiclePawn.IsValid())
 	{
-		MovementComponent = VehiclePawn->GetVehicleMovementComponent();
+		MovementComponent = VehiclePawn->GetMGVehicleMovement();
 	}
 
 	InitializeComponents();
@@ -42,6 +42,15 @@ void UMGVehicleDamageSystem::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	UpdateAutoRepair(DeltaTime);
 	UpdateRepairs(DeltaTime);
+
+	// Scrape detection - if no collision for a while, stop scraping
+	TimeSinceLastCollision += DeltaTime;
+	if (bIsScraping && TimeSinceLastCollision > ScrapeDetectionWindow)
+	{
+		bIsScraping = false;
+		RecentCollisionCount = 0;
+		OnScrapeEnd.Broadcast();
+	}
 }
 
 // ==========================================
@@ -77,6 +86,19 @@ void UMGVehicleDamageSystem::InitializeComponents()
 
 void UMGVehicleDamageSystem::ApplyCollisionDamage(const FHitResult& HitResult, float ImpactForce, AActor* OtherActor)
 {
+	// Track collisions for scrape detection even if damage is below threshold
+	RecentCollisionCount++;
+	TimeSinceLastCollision = 0.0f;
+	LastScrapePoint = HitResult.ImpactPoint;
+
+	// Detect scraping (multiple low-force impacts in quick succession)
+	if (RecentCollisionCount >= 3 && !bIsScraping)
+	{
+		bIsScraping = true;
+		float ScrapeIntensity = FMath::Clamp(ImpactForce / MaxImpactForce, 0.1f, 1.0f);
+		OnScrapeStart.Broadcast(HitResult.ImpactPoint, ScrapeIntensity);
+	}
+
 	if (bIsTotaled || ImpactForce < MinImpactForceForDamage)
 	{
 		return;
@@ -513,29 +535,43 @@ void UMGVehicleDamageSystem::ApplyPerformanceEffects()
 		return;
 	}
 
-	// Engine affects max power
+	// Engine affects max power and causes misfiring when damaged
 	float EngineMult = GetComponentPerformance(EMGDamageComponent::Engine);
-	// MovementComponent->SetPowerMultiplier(EngineMult);
+	MovementComponent->SetEngineDamageMultiplier(EngineMult);
 
-	// Transmission affects acceleration
+	// Transmission affects acceleration and gear changes
 	float TransMult = GetComponentPerformance(EMGDamageComponent::Transmission);
-	// MovementComponent->SetAccelerationMultiplier(TransMult);
+	MovementComponent->SetTransmissionDamageMultiplier(TransMult);
 
-	// Suspension affects handling
+	// Suspension affects handling and grip
 	float SuspMult = GetComponentPerformance(EMGDamageComponent::Suspension);
-	// MovementComponent->SetHandlingMultiplier(SuspMult);
+	MovementComponent->SetSuspensionDamageMultiplier(SuspMult);
 
 	// Steering affects turn response
 	float SteerMult = GetComponentPerformance(EMGDamageComponent::Steering);
-	// MovementComponent->SetSteeringMultiplier(SteerMult);
+	MovementComponent->SetSteeringDamageMultiplier(SteerMult);
 
 	// Brakes affect braking power
 	float BrakeMult = GetComponentPerformance(EMGDamageComponent::Brakes);
-	// MovementComponent->SetBrakeMultiplier(BrakeMult);
+	MovementComponent->SetBrakeDamageMultiplier(BrakeMult);
 
-	// Aero affects downforce
-	float AeroMult = GetComponentPerformance(EMGDamageComponent::Aero);
-	// MovementComponent->SetDownforceMultiplier(AeroMult);
+	// Cooling damage affects engine efficiency (overheating)
+	float CoolingMult = GetComponentPerformance(EMGDamageComponent::Cooling);
+	if (CoolingMult < 0.5f)
+	{
+		// Overheating causes additional power loss
+		float OverheatPenalty = 1.0f - ((0.5f - CoolingMult) * 0.5f);
+		MovementComponent->SetEngineDamageMultiplier(EngineMult * OverheatPenalty);
+	}
+
+	// Wheels/tires damage affects grip
+	float WheelMult = GetComponentPerformance(EMGDamageComponent::Wheels);
+	MovementComponent->SetTireGripMultiplier(WheelMult);
+
+	// Calculate overall max speed from combined damage
+	// Severe damage to any critical component limits max speed
+	float MinCriticalMult = FMath::Min3(EngineMult, TransMult, WheelMult);
+	MovementComponent->SetMaxSpeedMultiplier(FMath::Max(0.5f, MinCriticalMult));
 }
 
 void UMGVehicleDamageSystem::UpdateVisualDamage(EMGDamageZone Zone, float Damage)

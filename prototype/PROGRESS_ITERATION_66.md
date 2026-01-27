@@ -19,114 +19,157 @@
 - Added VehicleSFXComponent for collision sounds, scrape audio, glass breaks
 - Wired damage system events to VFX component for visual damage feedback
 
-**Damage Event Handlers:**
-- `HandleDamageTaken`: Triggers collision sparks, debris VFX, and impact SFX
-- `HandleComponentDamaged`: Updates engine smoke based on damage severity
-- `HandleComponentBroken`: Triggers breakdown effects (engine failure smoke, transmission grind)
-- `HandleVisualDamageUpdated`: Syncs cosmetic damage to VFX state, glass break audio
+### 2. Cosmetic Damage Rendering
 
-**Files Changed:**
-- MGVehiclePawn.h: +25 lines (damage handlers, SFX component, NotifyHit)
-- MGVehiclePawn.cpp: +180 lines (collision detection, event handlers)
+**Status:** COMPLETE
+
+**Material-Based Damage:**
+- Dynamic material instances created on damage
+- Shader parameters for zone-based damage (front/rear/left/right)
+- DamageOverall, DamageFront, DamageRear, DamageLeft, DamageRight params
+- DirtAmount parameter increases with damage for grime buildup
+
+### 3. Performance Degradation System
+
+**Status:** COMPLETE
+
+**Damage Effects on Handling:**
+| Component | Effect When Damaged |
+|-----------|---------------------|
+| Engine | Power output reduction, misfiring |
+| Transmission | Acceleration reduction |
+| Steering | Turn response reduction |
+| Brakes | Braking power reduction |
+| Suspension | Handling/grip reduction |
+| Cooling | Engine overheat (additional power loss) |
+| Wheels/Tires | Grip reduction |
+
+**Movement Component Additions:**
+- `SetEngineDamageMultiplier(float)` - 0.25-1.0
+- `SetTransmissionDamageMultiplier(float)` - 0.25-1.0
+- `SetSteeringDamageMultiplier(float)` - 0.25-1.0
+- `SetBrakeDamageMultiplier(float)` - 0.25-1.0
+- `SetSuspensionDamageMultiplier(float)` - 0.25-1.0
+- `IsEngineMisfiring()` - true when damage > 30%
+- `IsLimping()` - true when 2+ critical systems < 50%
+
+### 4. Engine Damage Audio
+
+**Status:** COMPLETE
+
+**Audio Feedback:**
+- Misfiring starts at engine health < 70%
+- Knocking starts at engine health < 40%
+- Misfire frequency increases with damage
+- Random backfires when misfiring at severe damage
+- `OnEngineMisfire` event for external handling
+
+### 5. Scrape Detection & Effects
+
+**Status:** COMPLETE
+
+**Scrape System:**
+- Detects 3+ collisions within 0.2s as scraping
+- `OnScrapeStart(FVector, float)` - triggers VFX/SFX
+- `OnScrapeEnd()` - stops effects when contact ends
+- VFX: StartScrapeSparks/StopScrapeSparks
+- SFX: StartScrape/StopScrape (metal grinding loop)
 
 ---
 
-### 2. Damage System Pipeline
-
-**Architecture:**
+## ARCHITECTURE
 
 ```
 Collision (NotifyHit)
     │
     ▼
-VehicleDamageSystem.ApplyCollisionDamage()
-    ├── Calculate damage from impact force
-    ├── Determine damage zone (front/rear/side)
-    ├── Apply resistance
+VehicleDamageSystem
+    ├── Track collision count (scrape detection)
+    ├── Calculate zone damage
+    ├── Update component health
+    ├── Apply performance effects to movement
     │
-    ├── Broadcast: OnDamageTaken
-    │   └── HandleDamageTaken()
-    │       ├── VehicleVFX->TriggerCollisionImpact()
-    │       ├── VehicleVFX->SpawnDebris()
-    │       └── VehicleSFX->OnCollision()
+    ├── OnDamageTaken
+    │   ├── VFX: Collision sparks, debris
+    │   └── SFX: Impact sounds
     │
-    ├── Broadcast: OnComponentDamaged
-    │   └── HandleComponentDamaged()
-    │       ├── TriggerEngineDamageSmoke() (severity-based)
-    │       └── Update RuntimeState health
+    ├── OnComponentDamaged
+    │   ├── VFX: Engine smoke (severity-based)
+    │   ├── Audio: Set engine damage level
+    │   └── Movement: Apply multipliers
     │
-    ├── Broadcast: OnComponentBroken
-    │   └── HandleComponentBroken()
-    │       ├── Engine: Heavy smoke, stall
-    │       ├── Transmission: Grind VFX
-    │       └── Cooling: Steam effects
+    ├── OnVisualDamageUpdated
+    │   ├── VFX: Material parameters for scratches
+    │   └── SFX: Glass break if windows damaged
     │
-    └── Broadcast: OnVisualDamageUpdated
-        └── HandleVisualDamageUpdated()
-            ├── VehicleVFX->SetDamageState()
-            └── VehicleSFX->PlayGlassBreak()
+    ├── OnScrapeStart
+    │   ├── VFX: Start scrape sparks
+    │   └── SFX: Start metal grinding
+    │
+    └── OnScrapeEnd
+        ├── VFX: Stop scrape sparks
+        └── SFX: Stop metal grinding
 ```
 
 ---
 
-### 3. Ghost Recording System
+## FILES CHANGED
 
-**Status:** PRE-EXISTING (Verified Complete)
+| File | Lines | Changes |
+|------|-------|---------|
+| MGVehiclePawn.h | +48 | Scrape handlers, damage handlers |
+| MGVehiclePawn.cpp | +226 | NotifyHit, all damage handlers |
+| MGVehicleMovementComponent.h | +84 | Damage multiplier setters |
+| MGVehicleMovementComponent.cpp | +50 | Setter implementations, IsLimping |
+| MGVehicleDamageSystem.h | +29 | Scrape events, state |
+| MGVehicleDamageSystem.cpp | +60 | Performance effects, scrape detection |
+| MGEngineAudioComponent.h | +49 | Damage audio API |
+| MGEngineAudioComponent.cpp | +46 | Misfire logic |
+| MGVehicleVFXComponent.cpp | +38 | Material damage params |
 
-Discovered comprehensive MGGhostSubsystem with:
-- FMGGhostFrame struct with position, rotation, velocity, inputs
-- FMGGhostData for full lap recording
-- Recording, playback, and save/load functionality
-- Personal best ghost comparison
-- Blueprint-exposed API
-
-**Location:** Ghost/MGGhostSubsystem.h/.cpp
-
----
-
-## VFX CAPABILITIES AVAILABLE
-
-The VFX system now supports:
-- `TriggerCollisionImpact()` - Sparks on impact
-- `SpawnDebris()` - Body panel pieces flying off
-- `TriggerEngineDamageSmoke(0/1/2)` - Light/Medium/Heavy smoke
-- `SetDamageState()` - Overall cosmetic damage rendering
-- `StartScrapeSparks()`/`StopScrapeSparks()` - Continuous scraping
-- `TriggerTireBlowout()` - Tire explosion effect
-- `TriggerTransmissionGrind()` - Gearbox sparks
-
-## SFX CAPABILITIES AVAILABLE
-
-The SFX system now supports:
-- `OnCollision()` - Light/Medium/Heavy/Extreme impact sounds
-- `StartScrape()`/`StopScrape()` - Metal grinding loop
-- `PlayGlassBreak()` - Window shatter sound
+**Total:** ~630 lines added
 
 ---
 
 ## COMMITS
 
 1. "Wire vehicle damage system to VFX and SFX for cosmetic damage feedback"
+2. "Add comprehensive vehicle damage feedback - cosmetic, audio, and performance"
 
 ---
 
-## SYSTEMS STATUS
+## DAMAGE FEEDBACK SUMMARY
 
-| System | Status | Notes |
-|--------|--------|-------|
-| Damage Detection | Complete | NotifyHit -> DamageSystem |
-| Damage VFX | Complete | Sparks, smoke, debris |
-| Damage SFX | Complete | Impacts, scrapes, glass |
-| Visual Damage State | Complete | Zone deformation tracking |
-| Ghost Recording | Pre-existing | Full implementation |
+**Visual (VFX):**
+- Collision sparks on impact
+- Debris particles on hard hits
+- Engine smoke (light/medium/heavy)
+- Engine fire at critical damage
+- Scrape sparks on wall grinding
+- Material scratches/dents/dirt
+
+**Audio (SFX):**
+- Impact sounds (light/medium/heavy/extreme)
+- Glass break sounds
+- Metal scrape loop
+- Engine misfiring/backfires
+- Engine knocking
+
+**Performance:**
+- Reduced power output
+- Slower acceleration
+- Reduced steering response
+- Weaker brakes
+- Reduced grip
+- Lower max speed
 
 ---
 
 ## NEXT STEPS (Iterations 67-70)
 
 ### Immediate (67):
-1. **Test damage feedback in-game** - Verify VFX/SFX triggers correctly
-2. **Add scrape detection** - Continuous metal-on-metal contact
+1. **Test damage system in-game** - Verify all feedback triggers
+2. **Add headlight/taillight damage visuals** - Broken light meshes
 
 ### Medium-term (68-70):
 3. **Polish race results UI** - Display history stats
@@ -135,7 +178,7 @@ The SFX system now supports:
 
 ---
 
-**STATUS:** Iteration 66 complete. Damage VFX/SFX fully wired.
+**STATUS:** Iteration 66 complete. Full damage feedback system implemented.
 
 **NEXT CHECKPOINT:** PROGRESS_ITERATION_70.md
 

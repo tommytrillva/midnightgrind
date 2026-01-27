@@ -4,7 +4,7 @@
 #include "ChaosVehicleWheel.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 #include "SimpleVehicle/SimpleWheelSim.h"
-#include "Environment/MGWeatherSubsystem.h"
+#include "Weather/MGWeatherSubsystem.h"
 
 UMGVehicleMovementComponent::UMGVehicleMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -228,6 +228,47 @@ void UMGVehicleMovementComponent::SetMaxSpeedMultiplier(float Multiplier)
 
 	// This affects max speed calculations
 	UE_LOG(LogTemp, Log, TEXT("Max speed multiplier set to: %.2f"), MaxSpeedMultiplier);
+}
+
+void UMGVehicleMovementComponent::SetEngineDamageMultiplier(float Multiplier)
+{
+	EngineDamageMultiplier = FMath::Clamp(Multiplier, 0.25f, 1.0f);
+	UE_LOG(LogTemp, Log, TEXT("Engine damage multiplier set to: %.2f"), EngineDamageMultiplier);
+}
+
+void UMGVehicleMovementComponent::SetTransmissionDamageMultiplier(float Multiplier)
+{
+	TransmissionDamageMultiplier = FMath::Clamp(Multiplier, 0.25f, 1.0f);
+	UE_LOG(LogTemp, Log, TEXT("Transmission damage multiplier set to: %.2f"), TransmissionDamageMultiplier);
+}
+
+void UMGVehicleMovementComponent::SetSteeringDamageMultiplier(float Multiplier)
+{
+	SteeringDamageMultiplier = FMath::Clamp(Multiplier, 0.25f, 1.0f);
+	UE_LOG(LogTemp, Log, TEXT("Steering damage multiplier set to: %.2f"), SteeringDamageMultiplier);
+}
+
+void UMGVehicleMovementComponent::SetBrakeDamageMultiplier(float Multiplier)
+{
+	BrakeDamageMultiplier = FMath::Clamp(Multiplier, 0.25f, 1.0f);
+	UE_LOG(LogTemp, Log, TEXT("Brake damage multiplier set to: %.2f"), BrakeDamageMultiplier);
+}
+
+void UMGVehicleMovementComponent::SetSuspensionDamageMultiplier(float Multiplier)
+{
+	SuspensionDamageMultiplier = FMath::Clamp(Multiplier, 0.25f, 1.0f);
+	UE_LOG(LogTemp, Log, TEXT("Suspension damage multiplier set to: %.2f"), SuspensionDamageMultiplier);
+}
+
+bool UMGVehicleMovementComponent::IsLimping() const
+{
+	// Vehicle is limping if multiple critical systems are below 50%
+	int32 CriticallyDamagedCount = 0;
+	if (EngineDamageMultiplier < 0.5f) CriticallyDamagedCount++;
+	if (TransmissionDamageMultiplier < 0.5f) CriticallyDamagedCount++;
+	if (SuspensionDamageMultiplier < 0.5f) CriticallyDamagedCount++;
+	if (SteeringDamageMultiplier < 0.5f) CriticallyDamagedCount++;
+	return CriticallyDamagedCount >= 2;
 }
 
 void UMGVehicleMovementComponent::PerformGearShift(int32 NewGear)
@@ -2176,8 +2217,14 @@ EMGSurfaceType UMGVehicleMovementComponent::DetectWheelSurfaceType(int32 WheelIn
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(GetOwner());
 
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return EMGSurfaceType::Asphalt;
+	}
+
 	// Perform line trace to detect surface
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+	if (World->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 	{
 		// Check physical material to determine surface type
 		if (UPhysicalMaterial* PhysMat = HitResult.PhysMaterial.Get())
@@ -3651,4 +3698,254 @@ void UMGVehicleMovementComponent::SetCurrentFuelWeightKg(float WeightKg)
 		UE_LOG(LogTemp, Verbose, TEXT("Fuel weight updated: %.1f kg (Total vehicle: %.1f kg)"),
 			CurrentFuelWeightKg, NewTotalMass);
 	}
+}
+
+// ==========================================
+// FORCE FEEDBACK INPUT DATA
+// ==========================================
+
+FMGFFBInputData UMGVehicleMovementComponent::GetFFBInputData() const
+{
+	FMGFFBInputData Data;
+
+	// Speed
+	Data.SpeedKmh = GetSpeedKPH();
+
+	// Steering
+	Data.SteeringAngle = CurrentSteering;
+
+	// Tire slip angles (average front and rear)
+	if (PVehicleOutput && PVehicleOutput->Wheels.Num() >= 4)
+	{
+		// Front slip angle (average of front wheels)
+		const float FLSlip = PVehicleOutput->Wheels[0].GetSlipAngle();
+		const float FRSlip = PVehicleOutput->Wheels[1].GetSlipAngle();
+		Data.FrontSlipAngle = FMath::RadiansToDegrees((FLSlip + FRSlip) * 0.5f);
+
+		// Rear slip angle (average of rear wheels)
+		const float RLSlip = PVehicleOutput->Wheels[2].GetSlipAngle();
+		const float RRSlip = PVehicleOutput->Wheels[3].GetSlipAngle();
+		Data.RearSlipAngle = FMath::RadiansToDegrees((RLSlip + RRSlip) * 0.5f);
+
+		// Slip ratios for front tires
+		Data.FrontLeftSlipRatio = PVehicleOutput->Wheels[0].GetSlipRatio();
+		Data.FrontRightSlipRatio = PVehicleOutput->Wheels[1].GetSlipRatio();
+	}
+
+	// G-forces
+	Data.LateralG = GetLateralG();
+	Data.LongitudinalG = GetLongitudinalG();
+
+	// Yaw rate
+	if (AActor* Owner = GetOwner())
+	{
+		Data.YawRate = Owner->GetActorRotation().IsNearlyZero() ? 0.0f :
+			FMath::RadiansToDegrees(Owner->GetVelocity().Size() > 10.0f ?
+				FVector::DotProduct(Owner->GetActorRightVector(), Owner->GetVelocity().GetSafeNormal()) /
+				(Owner->GetVelocity().Size() * 0.01f) : 0.0f);
+	}
+
+	// Under/oversteer detection
+	Data.bIsUndersteering = IsUndersteering();
+	Data.bIsOversteering = IsOversteering();
+
+	// Surface type - convert enum to FName
+	const EMGSurfaceType Surface = WheelSurfaceStates[0].CurrentSurface;
+	switch (Surface)
+	{
+	case EMGSurfaceType::Asphalt:     Data.SurfaceType = FName(TEXT("Asphalt")); break;
+	case EMGSurfaceType::Concrete:    Data.SurfaceType = FName(TEXT("Concrete")); break;
+	case EMGSurfaceType::Wet:         Data.SurfaceType = FName(TEXT("Wet")); break;
+	case EMGSurfaceType::Dirt:        Data.SurfaceType = FName(TEXT("Dirt")); break;
+	case EMGSurfaceType::Gravel:      Data.SurfaceType = FName(TEXT("Gravel")); break;
+	case EMGSurfaceType::Grass:       Data.SurfaceType = FName(TEXT("Grass")); break;
+	case EMGSurfaceType::Sand:        Data.SurfaceType = FName(TEXT("Sand")); break;
+	case EMGSurfaceType::Snow:        Data.SurfaceType = FName(TEXT("Snow")); break;
+	case EMGSurfaceType::Ice:         Data.SurfaceType = FName(TEXT("Ice")); break;
+	case EMGSurfaceType::OffRoad:     Data.SurfaceType = FName(TEXT("OffRoad")); break;
+	default:                          Data.SurfaceType = FName(TEXT("Asphalt")); break;
+	}
+
+	// Check for rumble strip (any wheel on rumble strip)
+	Data.bOnRumbleStrip = false;
+	for (int32 i = 0; i < 4; ++i)
+	{
+		if (WheelSurfaceStates[i].CurrentSurface == EMGSurfaceType::Asphalt &&
+			WheelSurfaceStates[i].RumbleStrength > 0.0f)
+		{
+			Data.bOnRumbleStrip = true;
+			break;
+		}
+	}
+
+	// Engine data
+	Data.EngineRPM = EngineState.CurrentRPM;
+	Data.MaxEngineRPM = CurrentConfiguration.Engine.RedlineRPM;
+
+	// Drift state
+	Data.bIsDrifting = DriftState.bIsDrifting;
+	Data.DriftAngle = DriftState.DriftAngle;
+
+	// Suspension travel (normalized)
+	if (PVehicleOutput && PVehicleOutput->Wheels.Num() >= 4)
+	{
+		// Normalized suspension compression (0 = fully extended, 1 = fully compressed)
+		Data.SuspensionFL = FMath::Clamp(PVehicleOutput->Wheels[0].GetSuspensionOffset() /
+			FMath::Max(1.0f, WheelSetups.Num() > 0 ? WheelSetups[0].SuspensionMaxRaise + WheelSetups[0].SuspensionMaxDrop : 30.0f), 0.0f, 1.0f);
+		Data.SuspensionFR = FMath::Clamp(PVehicleOutput->Wheels[1].GetSuspensionOffset() /
+			FMath::Max(1.0f, WheelSetups.Num() > 1 ? WheelSetups[1].SuspensionMaxRaise + WheelSetups[1].SuspensionMaxDrop : 30.0f), 0.0f, 1.0f);
+	}
+
+	// Front tire load (simplified - based on weight transfer)
+	Data.FrontTireLoad = 1.0f - (GetLongitudinalG() * 0.2f); // More load when braking
+
+	// Airborne state
+	Data.bIsAirborne = !bCachedIsGrounded;
+
+	// Collision data would be set externally when collisions occur
+	// Data.CollisionImpact and Data.CollisionDirection are left at defaults
+
+	return Data;
+}
+
+bool UMGVehicleMovementComponent::IsUndersteering() const
+{
+	// Understeer: front tires have more slip than rear tires
+	// This means the vehicle is not turning as much as the driver intends
+	if (!PVehicleOutput || PVehicleOutput->Wheels.Num() < 4)
+	{
+		return false;
+	}
+
+	// Only check when actively steering and moving
+	if (FMath::Abs(CurrentSteering) < 0.1f || GetSpeedKPH() < 20.0f)
+	{
+		return false;
+	}
+
+	// Calculate average slip angles
+	const float FrontSlip = (FMath::Abs(PVehicleOutput->Wheels[0].GetSlipAngle()) +
+	                         FMath::Abs(PVehicleOutput->Wheels[1].GetSlipAngle())) * 0.5f;
+	const float RearSlip = (FMath::Abs(PVehicleOutput->Wheels[2].GetSlipAngle()) +
+	                        FMath::Abs(PVehicleOutput->Wheels[3].GetSlipAngle())) * 0.5f;
+
+	// Understeer when front slip exceeds rear slip significantly
+	const float UndersteerThreshold = 0.1f; // radians
+	return FrontSlip > (RearSlip + UndersteerThreshold);
+}
+
+bool UMGVehicleMovementComponent::IsOversteering() const
+{
+	// Oversteer: rear tires have more slip than front tires
+	// This means the rear end is sliding out
+	if (!PVehicleOutput || PVehicleOutput->Wheels.Num() < 4)
+	{
+		return false;
+	}
+
+	// Only check when moving
+	if (GetSpeedKPH() < 20.0f)
+	{
+		return false;
+	}
+
+	// Calculate average slip angles
+	const float FrontSlip = (FMath::Abs(PVehicleOutput->Wheels[0].GetSlipAngle()) +
+	                         FMath::Abs(PVehicleOutput->Wheels[1].GetSlipAngle())) * 0.5f;
+	const float RearSlip = (FMath::Abs(PVehicleOutput->Wheels[2].GetSlipAngle()) +
+	                        FMath::Abs(PVehicleOutput->Wheels[3].GetSlipAngle())) * 0.5f;
+
+	// Oversteer when rear slip exceeds front slip significantly
+	const float OversteerThreshold = 0.15f; // radians - higher threshold as some rear slip is normal
+	return RearSlip > (FrontSlip + OversteerThreshold);
+}
+
+float UMGVehicleMovementComponent::GetDriftAngle() const
+{
+	return DriftState.DriftAngle;
+}
+
+float UMGVehicleMovementComponent::GetLateralG() const
+{
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return 0.0f;
+	}
+
+	const FVector Velocity = Owner->GetVelocity();
+	const FVector RightVector = Owner->GetActorRightVector();
+
+	// Lateral velocity component
+	const float LateralVelocity = FVector::DotProduct(Velocity, RightVector);
+
+	// Estimate lateral acceleration from centripetal force
+	// For a turning vehicle: a = v^2 / r
+	// We approximate using lateral velocity change
+	const float Speed = Velocity.Size();
+	if (Speed < 100.0f) // Less than 1 m/s
+	{
+		return 0.0f;
+	}
+
+	// Use steering angle to estimate turn radius and thus lateral acceleration
+	// This is a simplified model - actual physics would use centripetal force
+	const float SteeringRad = FMath::DegreesToRadians(CurrentSteering * 35.0f); // Assume 35 deg max
+	const float WheelBase = 280.0f; // cm, typical wheelbase
+
+	if (FMath::Abs(SteeringRad) < 0.01f)
+	{
+		// Nearly straight - use lateral velocity directly
+		return LateralVelocity / 981.0f; // Convert cm/s^2 to G (981 cm/s^2 = 1G)
+	}
+
+	// Turn radius approximation: R = L / tan(steering angle)
+	const float TurnRadius = WheelBase / FMath::Tan(FMath::Abs(SteeringRad));
+
+	// Centripetal acceleration: a = v^2 / r
+	const float CentripetalAccel = (Speed * Speed) / TurnRadius;
+
+	// Convert to G (1G = 981 cm/s^2)
+	const float LateralG = CentripetalAccel / 981.0f;
+
+	// Cap at reasonable maximum
+	return FMath::Clamp(LateralG * FMath::Sign(CurrentSteering), -3.0f, 3.0f);
+}
+
+float UMGVehicleMovementComponent::GetLongitudinalG() const
+{
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return 0.0f;
+	}
+
+	const FVector Velocity = Owner->GetVelocity();
+	const FVector ForwardVector = Owner->GetActorForwardVector();
+
+	// Get forward velocity
+	const float ForwardVelocity = FVector::DotProduct(Velocity, ForwardVector);
+
+	// Calculate acceleration from velocity change
+	// We need to track this over time for accuracy, but we can estimate from inputs
+	float LongitudinalAccel = 0.0f;
+
+	if (EngineState.ThrottlePosition > 0.1f && !bHandbrakeEngaged)
+	{
+		// Accelerating - estimate based on power-to-weight
+		const float PowerKW = EngineState.CurrentPower * 0.001f;
+		const float MassKg = BaseMassKg + CurrentFuelWeightKg;
+		// F = P/v, a = F/m = P/(m*v)
+		const float SpeedMS = FMath::Max(ForwardVelocity * 0.01f, 5.0f); // cm/s to m/s, min 5 m/s
+		LongitudinalAccel = (PowerKW * 1000.0f) / (MassKg * SpeedMS);
+	}
+	else if (GetBrakeInput() > 0.1f)
+	{
+		// Braking - estimate deceleration
+		// Typical car brakes can achieve ~1G deceleration
+		LongitudinalAccel = -GetBrakeInput() * 981.0f; // Up to -1G
+	}
+
+	// Convert to G
+	return FMath::Clamp(LongitudinalAccel / 981.0f, -2.0f, 2.0f);
 }

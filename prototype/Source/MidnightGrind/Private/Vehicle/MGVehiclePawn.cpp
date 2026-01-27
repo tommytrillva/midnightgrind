@@ -121,6 +121,8 @@ void AMGVehiclePawn::BeginPlay()
 		VehicleDamageSystem->OnComponentDamaged.AddDynamic(this, &AMGVehiclePawn::HandleComponentDamaged);
 		VehicleDamageSystem->OnComponentBroken.AddDynamic(this, &AMGVehiclePawn::HandleComponentBroken);
 		VehicleDamageSystem->OnVisualDamageUpdated.AddDynamic(this, &AMGVehiclePawn::HandleVisualDamageUpdated);
+		VehicleDamageSystem->OnScrapeStart.AddDynamic(this, &AMGVehiclePawn::HandleScrapeStart);
+		VehicleDamageSystem->OnScrapeEnd.AddDynamic(this, &AMGVehiclePawn::HandleScrapeEnd);
 	}
 
 	// Activate engine audio
@@ -939,6 +941,14 @@ void AMGVehiclePawn::HandleComponentDamaged(EMGDamageComponent Component, float 
 		}
 	}
 
+	// Update engine audio for damage effects (misfiring, knocking)
+	if (VehicleEngineAudio && Component == EMGDamageComponent::Engine)
+	{
+		// Convert health to damage level (0 = healthy, 1 = destroyed)
+		float DamageLevel = 1.0f - (NewHealth / 100.0f);
+		VehicleEngineAudio->SetEngineDamageLevel(DamageLevel);
+	}
+
 	// Update runtime state for HUD
 	if (Component == EMGDamageComponent::Engine)
 	{
@@ -961,6 +971,11 @@ void AMGVehiclePawn::HandleComponentBroken(EMGDamageComponent Component)
 			// Engine failure - heavy smoke/possible fire
 			VehicleVFX->TriggerEngineDamageSmoke(2);
 			RuntimeState.bEngineStalled = true;
+			// Max engine damage audio
+			if (VehicleEngineAudio)
+			{
+				VehicleEngineAudio->SetEngineDamageLevel(1.0f);
+			}
 			break;
 
 		case EMGDamageComponent::Transmission:
@@ -1040,5 +1055,36 @@ void AMGVehiclePawn::HandleVisualDamageUpdated(const FMGVisualDamageState& Visua
 		{
 			VehicleSFX->PlayGlassBreak(GetActorLocation());
 		}
+	}
+}
+
+void AMGVehiclePawn::HandleScrapeStart(FVector ContactPoint, float Intensity)
+{
+	// Start scrape VFX (sparks)
+	if (VehicleVFX)
+	{
+		FVector Direction = GetVelocity().GetSafeNormal();
+		VehicleVFX->StartScrapeSparks(ContactPoint, Direction);
+	}
+
+	// Start scrape SFX (metal grinding)
+	if (VehicleSFX)
+	{
+		VehicleSFX->StartScrape(Intensity);
+	}
+}
+
+void AMGVehiclePawn::HandleScrapeEnd()
+{
+	// Stop scrape VFX
+	if (VehicleVFX)
+	{
+		VehicleVFX->StopScrapeSparks();
+	}
+
+	// Stop scrape SFX
+	if (VehicleSFX)
+	{
+		VehicleSFX->StopScrape();
 	}
 }

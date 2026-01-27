@@ -1519,6 +1519,75 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
 	float GetMaxSpeedMultiplier() const { return MaxSpeedMultiplier; }
 
+	/**
+	 * @brief Set engine power multiplier from damage
+	 * @param Multiplier Power output multiplier (0.25-1.0)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Damage")
+	void SetEngineDamageMultiplier(float Multiplier);
+
+	/** Get engine damage multiplier */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	float GetEngineDamageMultiplier() const { return EngineDamageMultiplier; }
+
+	/**
+	 * @brief Set transmission efficiency from damage
+	 * @param Multiplier Transmission efficiency (0.25-1.0)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Damage")
+	void SetTransmissionDamageMultiplier(float Multiplier);
+
+	/** Get transmission damage multiplier */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	float GetTransmissionDamageMultiplier() const { return TransmissionDamageMultiplier; }
+
+	/**
+	 * @brief Set steering response from damage
+	 * @param Multiplier Steering response (0.25-1.0)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Damage")
+	void SetSteeringDamageMultiplier(float Multiplier);
+
+	/** Get steering damage multiplier */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	float GetSteeringDamageMultiplier() const { return SteeringDamageMultiplier; }
+
+	/**
+	 * @brief Set brake effectiveness from damage
+	 * @param Multiplier Brake power (0.25-1.0)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Damage")
+	void SetBrakeDamageMultiplier(float Multiplier);
+
+	/** Get brake damage multiplier */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	float GetBrakeDamageMultiplier() const { return BrakeDamageMultiplier; }
+
+	/**
+	 * @brief Set suspension handling from damage
+	 * @param Multiplier Handling response (0.25-1.0)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Vehicle|Damage")
+	void SetSuspensionDamageMultiplier(float Multiplier);
+
+	/** Get suspension damage multiplier */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	float GetSuspensionDamageMultiplier() const { return SuspensionDamageMultiplier; }
+
+	/**
+	 * @brief Check if engine is misfiring due to damage
+	 * @return True if engine is sputtering/misfiring
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	bool IsEngineMisfiring() const { return EngineDamageMultiplier < 0.7f; }
+
+	/**
+	 * @brief Check if vehicle is severely damaged and limping
+	 * @return True if multiple systems are critically damaged
+	 */
+	UFUNCTION(BlueprintPure, Category = "Vehicle|Damage")
+	bool IsLimping() const;
+
 	// ==========================================
 	// FUEL SYSTEM INTEGRATION
 	// ==========================================
@@ -2680,6 +2749,21 @@ protected:
 
 	UPROPERTY()
 	float MaxSpeedMultiplier = 1.0f;
+
+	UPROPERTY()
+	float EngineDamageMultiplier = 1.0f;
+
+	UPROPERTY()
+	float TransmissionDamageMultiplier = 1.0f;
+
+	UPROPERTY()
+	float SteeringDamageMultiplier = 1.0f;
+
+	UPROPERTY()
+	float BrakeDamageMultiplier = 1.0f;
+
+	UPROPERTY()
+	float SuspensionDamageMultiplier = 1.0f;
 
 	// Fuel system state
 	/** Power multiplier from fuel starvation (1.0 = normal, 0.0 = no fuel) */

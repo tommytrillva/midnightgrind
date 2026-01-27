@@ -862,6 +862,14 @@ protected:
 	UFUNCTION()
 	void HandleVisualDamageUpdated(const FMGVisualDamageState& VisualState);
 
+	/** Handler for scrape start - triggers scrape VFX/SFX */
+	UFUNCTION()
+	void HandleScrapeStart(FVector ContactPoint, float Intensity);
+
+	/** Handler for scrape end - stops scrape VFX/SFX */
+	UFUNCTION()
+	void HandleScrapeEnd();
+
 public:
 	// ==========================================
 	// STATE

@@ -347,6 +347,39 @@ public:
 	bool ShouldPlayBackfire() const { return bBackfireTriggered; }
 
 	// ==========================================
+	// ENGINE DAMAGE AUDIO
+	// ==========================================
+
+	/**
+	 * Set engine damage level for audio effects.
+	 * @param DamageLevel 0-1 where 0 = healthy, 1 = severe damage
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Engine Audio|Damage")
+	void SetEngineDamageLevel(float DamageLevel);
+
+	/** Get current engine damage level */
+	UFUNCTION(BlueprintPure, Category = "Engine Audio|Damage")
+	float GetEngineDamageLevel() const { return EngineDamageLevel; }
+
+	/** Is engine misfiring due to damage */
+	UFUNCTION(BlueprintPure, Category = "Engine Audio|Damage")
+	bool IsMisfiring() const { return bIsMisfiring; }
+
+	/** Is engine knocking due to damage */
+	UFUNCTION(BlueprintPure, Category = "Engine Audio|Damage")
+	bool IsKnocking() const { return bIsKnocking; }
+
+	/** Trigger a random misfire sound */
+	UFUNCTION(BlueprintCallable, Category = "Engine Audio|Damage")
+	void TriggerMisfire();
+
+	/** Called when engine misfire occurs */
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEngineMisfire);
+
+	UPROPERTY(BlueprintAssignable, Category = "Engine Audio|Events")
+	FOnEngineMisfire OnEngineMisfire;
+
+	// ==========================================
 	// EVENTS
 	// ==========================================
 
@@ -432,6 +465,22 @@ protected:
 
 	/** Maximum gear count for normalization */
 	int32 MaxGears = 6;
+
+	// Damage audio state
+	/** Engine damage level (0-1) */
+	float EngineDamageLevel = 0.0f;
+
+	/** Is engine misfiring */
+	bool bIsMisfiring = false;
+
+	/** Is engine knocking */
+	bool bIsKnocking = false;
+
+	/** Time since last misfire */
+	float TimeSinceLastMisfire = 0.0f;
+
+	/** Misfire interval based on damage */
+	float MisfireInterval = 1.0f;
 
 	// ==========================================
 	// AUDIO COMPONENTS

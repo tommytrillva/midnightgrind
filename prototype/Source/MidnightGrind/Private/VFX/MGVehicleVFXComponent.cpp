@@ -6,6 +6,7 @@
 #include "NiagaraComponent.h"
 #include "GameFramework/Actor.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/World.h"
 
 UMGVehicleVFXComponent::UMGVehicleVFXComponent()
@@ -475,6 +476,43 @@ void UMGVehicleVFXComponent::SetDamageState(const FMGVehicleDamageVFXState& Dama
 	{
 		float SmokeIntensity = FMath::Max(DamageState.FrontDamage, DamageState.OverallDamage);
 		EngineSmokeComp->SetNiagaraVariableFloat(FString("SmokeIntensity"), SmokeIntensity);
+	}
+
+	// Update vehicle mesh materials with damage parameters
+	// This enables shader-based scratches, dents, and dirt visualization
+	if (AActor* Owner = GetOwner())
+	{
+		if (USkeletalMeshComponent* Mesh = Owner->FindComponentByClass<USkeletalMeshComponent>())
+		{
+			// Update damage parameters on all materials
+			for (int32 i = 0; i < Mesh->GetNumMaterials(); i++)
+			{
+				UMaterialInstanceDynamic* DynMat = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(i));
+				if (!DynMat)
+				{
+					// Create dynamic instance if needed
+					UMaterialInterface* BaseMat = Mesh->GetMaterial(i);
+					if (BaseMat)
+					{
+						DynMat = UMaterialInstanceDynamic::Create(BaseMat, this);
+						Mesh->SetMaterial(i, DynMat);
+					}
+				}
+
+				if (DynMat)
+				{
+					// Set zone damage parameters (shader should use these for deformation/scratches)
+					DynMat->SetScalarParameterValue(FName("DamageOverall"), DamageState.OverallDamage);
+					DynMat->SetScalarParameterValue(FName("DamageFront"), DamageState.FrontDamage);
+					DynMat->SetScalarParameterValue(FName("DamageRear"), DamageState.RearDamage);
+					DynMat->SetScalarParameterValue(FName("DamageLeft"), DamageState.LeftDamage);
+					DynMat->SetScalarParameterValue(FName("DamageRight"), DamageState.RightDamage);
+
+					// Dirt/grime buildup based on overall damage
+					DynMat->SetScalarParameterValue(FName("DirtAmount"), DamageState.OverallDamage * 0.5f);
+				}
+			}
+		}
 	}
 }
 

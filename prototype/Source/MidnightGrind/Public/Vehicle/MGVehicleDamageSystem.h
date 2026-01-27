@@ -348,6 +348,20 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Damage|Events")
 	FOnVisualDamageUpdated OnVisualDamageUpdated;
 
+	/** Called when scraping starts */
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScrapeStart, FVector, ContactPoint, float, Intensity);
+	UPROPERTY(BlueprintAssignable, Category = "Damage|Events")
+	FOnScrapeStart OnScrapeStart;
+
+	/** Called when scraping ends */
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnScrapeEnd);
+	UPROPERTY(BlueprintAssignable, Category = "Damage|Events")
+	FOnScrapeEnd OnScrapeEnd;
+
+	/** Is currently scraping */
+	UFUNCTION(BlueprintPure, Category = "Damage|State")
+	bool IsScraping() const { return bIsScraping; }
+
 protected:
 	// ==========================================
 	// INTERNAL
@@ -402,6 +416,21 @@ private:
 
 	/** Was stationary last frame */
 	bool bWasStationary = false;
+
+	/** Is currently scraping against something */
+	bool bIsScraping = false;
+
+	/** Time since last collision (for scrape detection) */
+	float TimeSinceLastCollision = 0.0f;
+
+	/** Recent collision count for scrape detection */
+	int32 RecentCollisionCount = 0;
+
+	/** Last scrape contact point */
+	FVector LastScrapePoint = FVector::ZeroVector;
+
+	/** Scrape detection window (seconds) */
+	float ScrapeDetectionWindow = 0.2f;
 
 	// ==========================================
 	// REFERENCES
