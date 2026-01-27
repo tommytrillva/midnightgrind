@@ -10,6 +10,7 @@ class UMGCurrencySubsystem;
 class UMGWeatherSubsystem;
 class UMGEconomySubsystem;
 class UMGVehicleDamageSystem;
+class UMGAIDriverProfile;
 
 /**
  * Subsystem Unit Tests
@@ -144,6 +145,30 @@ public:
 	FMGTestResult TestVehicle_TotaledState();
 
 	// ==========================================
+	// AI TESTS
+	// ==========================================
+
+	/** Test AI driving state enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|AI")
+	FMGTestResult TestAI_DrivingStates();
+
+	/** Test AI skill parameters validation */
+	UFUNCTION(BlueprintCallable, Category = "Tests|AI")
+	FMGTestResult TestAI_SkillParams();
+
+	/** Test AI spawn configuration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|AI")
+	FMGTestResult TestAI_SpawnConfig();
+
+	/** Test AI driver personality system */
+	UFUNCTION(BlueprintCallable, Category = "Tests|AI")
+	FMGTestResult TestAI_DriverPersonality();
+
+	/** Test AI overtake/defense strategies */
+	UFUNCTION(BlueprintCallable, Category = "Tests|AI")
+	FMGTestResult TestAI_Strategies();
+
+	// ==========================================
 	// INTEGRATION TESTS
 	// ==========================================
 
@@ -178,6 +203,10 @@ public:
 	/** Run vehicle tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunVehicleTests();
+
+	/** Run AI tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunAITests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")

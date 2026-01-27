@@ -6,6 +6,9 @@
 #include "Weather/MGWeatherSubsystem.h"
 #include "Economy/MGEconomySubsystem.h"
 #include "Vehicle/MGVehicleDamageSystem.h"
+#include "AI/MGAIRacerController.h"
+#include "AI/MGAIRacerSubsystem.h"
+#include "AI/MGAIDriverProfile.h"
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
 
@@ -183,6 +186,54 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
+	// AI Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_AI_DrivingStates"));
+		Test.TestName = FText::FromString(TEXT("AI - Driving States"));
+		Test.Description = FText::FromString(TEXT("Verify AI driving states are properly defined"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("AI")));
+		Test.Tags.Add(FName(TEXT("Smoke")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_AI_SkillParams"));
+		Test.TestName = FText::FromString(TEXT("AI - Skill Parameters"));
+		Test.Description = FText::FromString(TEXT("Verify AI skill parameters are in valid ranges"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("AI")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_AI_SpawnConfig"));
+		Test.TestName = FText::FromString(TEXT("AI - Spawn Configuration"));
+		Test.Description = FText::FromString(TEXT("Verify AI spawn configuration has valid defaults"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("AI")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_AI_DriverPersonality"));
+		Test.TestName = FText::FromString(TEXT("AI - Driver Personality"));
+		Test.Description = FText::FromString(TEXT("Verify AI personality types are properly defined"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("AI")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_AI_Strategies"));
+		Test.TestName = FText::FromString(TEXT("AI - Racing Strategies"));
+		Test.Description = FText::FromString(TEXT("Verify AI overtake and defense strategies are defined"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("AI")));
+		TestFramework->RegisterTest(Test);
+	}
+
 	// Integration Tests
 	{
 		FMGTestCase Test;
@@ -203,7 +254,7 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 23);
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 28);
 }
 
 // ==========================================
