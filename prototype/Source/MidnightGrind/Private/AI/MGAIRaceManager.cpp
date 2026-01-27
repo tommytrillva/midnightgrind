@@ -15,7 +15,8 @@ UMGAIRaceManager::UMGAIRaceManager()
 	// Default configuration
 	Configuration.AIControllerClass = AMGRacingAIController::StaticClass();
 	Configuration.PositionUpdateRate = 10.0f;
-	Configuration.RubberBandingConfig.bEnabled = true;
+	Configuration.RubberBandingConfig.bEnableCatchUp = true;
+	Configuration.RubberBandingConfig.bEnableSlowDown = true;
 }
 
 void UMGAIRaceManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -129,7 +130,10 @@ int32 UMGAIRaceManager::SpawnAIOpponent(const FMGAIOpponentConfig& Config, const
 	}
 
 	// Setup the AI controller
-	AIController->SetTrackSpline(TrackSpline);
+	if (TrackSpline && TrackSpline->RacingLineSpline)
+	{
+		AIController->SetRacingLine(TrackSpline->RacingLineSpline);
+	}
 	AIController->SetDriverProfile(Config.DriverProfile);
 	AIController->SetRubberBandingConfig(Configuration.RubberBandingConfig);
 
@@ -191,7 +195,8 @@ TArray<int32> UMGAIRaceManager::GenerateAIField(int32 OpponentCount, EMGAIDiffic
 			Difficulty = static_cast<EMGAIDifficulty>(static_cast<int32>(BaseDifficulty) + 1);
 		}
 
-		Config.DriverProfile = FMGAIDriverProfile::CreateForDifficulty(Difficulty);
+		Config.DriverProfile = FMGAIDriverProfile();
+		Config.DriverProfile.GenerateFromDifficulty(Difficulty);
 
 		// Randomize personality
 		int32 PersonalityRoll = FMath::RandRange(0, 4);
@@ -277,9 +282,11 @@ void UMGAIRaceManager::InitializeForRace()
 {
 	for (FMGActiveAIOpponent& Opponent : ActiveOpponents)
 	{
+		// Reset AI state
 		if (Opponent.AIController)
 		{
-			Opponent.AIController->InitializeForRace();
+			Opponent.AIController->StopRacing();
+			Opponent.AIController->SetAIEnabled(true);
 		}
 
 		Opponent.CurrentLap = 0;
@@ -326,7 +333,7 @@ void UMGAIRaceManager::SetAllPaused(bool bPaused)
 	{
 		if (Opponent.AIController)
 		{
-			Opponent.AIController->SetPaused(bPaused);
+			Opponent.AIController->SetAIEnabled(!bPaused);
 		}
 	}
 }
@@ -462,10 +469,21 @@ void UMGAIRaceManager::UpdatePositions()
 		}
 	}
 
+	// Find the leader's total distance (could be player or AI)
+	float LeaderTotalDistance = PlayerTotalDistance;
+	for (const FMGActiveAIOpponent* Opponent : SortedOpponents)
+	{
+		if (!Opponent->bFinished && Opponent->TotalRaceDistance > LeaderTotalDistance)
+		{
+			LeaderTotalDistance = Opponent->TotalRaceDistance;
+		}
+	}
+
 	// Assign positions and update AI controllers
 	int32 Position = 1;
 	float PreviousDistance = FLT_MAX;
 	int32 PlayerInserted = 0;
+	int32 TotalRacers = SortedOpponents.Num() + (PlayerVehicle ? 1 : 0);
 
 	for (FMGActiveAIOpponent* Opponent : SortedOpponents)
 	{
@@ -488,17 +506,13 @@ void UMGAIRaceManager::UpdatePositions()
 		// Update AI controller with race info
 		if (Opponent->AIController)
 		{
-			float DistAhead = -1.0f;
-			float DistBehind = -1.0f;
+			// Set race position
+			Opponent->AIController->SetRacePosition(Position, TotalRacers);
 
-			// Calculate distance to vehicle ahead
-			if (Position > 1)
-			{
-				DistAhead = PreviousDistance - Opponent->TotalRaceDistance;
-			}
-
-			// Distance behind calculated on next iteration
-			Opponent->AIController->UpdateRacePosition(Position, DistAhead, DistBehind);
+			// Calculate and set distance to leader
+			// Positive = behind leader, Negative = ahead of leader (i.e., is the leader)
+			float DistanceToLeader = LeaderTotalDistance - Opponent->TotalRaceDistance;
+			Opponent->AIController->SetDistanceToLeader(DistanceToLeader);
 		}
 
 		PreviousDistance = Opponent->TotalRaceDistance;

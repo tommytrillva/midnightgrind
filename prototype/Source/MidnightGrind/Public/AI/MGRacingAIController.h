@@ -177,6 +177,48 @@ struct FMGAIDriverProfile
 };
 
 /**
+ * Rubber-banding configuration
+ * Controls how AI adjusts performance based on race position
+ */
+USTRUCT(BlueprintType)
+struct FMGRubberBandingConfig
+{
+	GENERATED_BODY()
+
+	/** Enable catch-up boost for AI behind the leader */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Catch-up")
+	bool bEnableCatchUp = true;
+
+	/** Enable slow-down for AI far ahead */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Catch-up")
+	bool bEnableSlowDown = true;
+
+	/** Maximum throttle boost when catching up (0-0.3) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Catch-up", meta = (ClampMin = "0.0", ClampMax = "0.3"))
+	float MaxCatchUpBoost = 0.15f;
+
+	/** Maximum throttle reduction when far ahead (0-0.2) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Catch-up", meta = (ClampMin = "0.0", ClampMax = "0.2"))
+	float MaxSlowDownPenalty = 0.1f;
+
+	/** Distance threshold (cm) to start applying catch-up (e.g., 5000 = 50m behind) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Catch-up", meta = (ClampMin = "1000.0"))
+	float CatchUpDistanceThreshold = 5000.0f;
+
+	/** Distance threshold (cm) to start applying slow-down (e.g., 10000 = 100m ahead) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Catch-up", meta = (ClampMin = "1000.0"))
+	float SlowDownDistanceThreshold = 10000.0f;
+
+	/** Maximum distance for full catch-up boost */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Catch-up", meta = (ClampMin = "5000.0"))
+	float MaxCatchUpDistance = 30000.0f;
+
+	/** Scale catch-up by difficulty (0 = same for all, 1 = harder difficulty = less help) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Catch-up", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float DifficultyScaling = 0.5f;
+};
+
+/**
  * Steering target info
  */
 USTRUCT(BlueprintType)
@@ -282,6 +324,18 @@ public:
 	/** Set race position info */
 	UFUNCTION(BlueprintCallable, Category = "AI|Race")
 	void SetRacePosition(int32 Position, int32 TotalRacers);
+
+	/** Set distance to leader for rubber-banding calculations */
+	UFUNCTION(BlueprintCallable, Category = "AI|Race")
+	void SetDistanceToLeader(float DistanceCm);
+
+	/** Set rubber-banding configuration */
+	UFUNCTION(BlueprintCallable, Category = "AI|Race")
+	void SetRubberBandingConfig(const FMGRubberBandingConfig& Config);
+
+	/** Get current rubber-banding adjustment (-1 to 1, negative = slowing, positive = boost) */
+	UFUNCTION(BlueprintPure, Category = "AI|Race")
+	float GetRubberBandingAdjustment() const { return CurrentRubberBandingAdjustment; }
 
 	/** Get current state */
 	UFUNCTION(BlueprintPure, Category = "AI|Race")
@@ -456,4 +510,18 @@ private:
 
 	/** Previous steering for smoothing */
 	float PreviousSteering = 0.0f;
+
+	// ==========================================
+	// RUBBER-BANDING
+	// ==========================================
+
+	/** Rubber-banding configuration */
+	UPROPERTY(EditAnywhere, Category = "AI|RubberBanding")
+	FMGRubberBandingConfig RubberBandingConfig;
+
+	/** Current distance to leader (cm, negative = ahead of leader) */
+	float DistanceToLeader = 0.0f;
+
+	/** Current rubber-banding adjustment being applied */
+	float CurrentRubberBandingAdjustment = 0.0f;
 };

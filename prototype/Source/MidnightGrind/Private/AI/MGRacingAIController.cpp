@@ -232,6 +232,16 @@ void AMGRacingAIController::SetRacePosition(int32 Position, int32 Total)
 	TotalRacers = Total;
 }
 
+void AMGRacingAIController::SetDistanceToLeader(float DistanceCm)
+{
+	DistanceToLeader = DistanceCm;
+}
+
+void AMGRacingAIController::SetRubberBandingConfig(const FMGRubberBandingConfig& Config)
+{
+	RubberBandingConfig = Config;
+}
+
 void AMGRacingAIController::UpdateState(float DeltaTime)
 {
 	if (CurrentState == EMGAIState::Waiting || CurrentState == EMGAIState::Finished)
@@ -376,11 +386,20 @@ void AMGRacingAIController::UpdateVehicleInputs(float DeltaTime)
 	// NOS decision
 	bWantsNOS = ShouldActivateNOS();
 
-	// Catchup boost
-	if (CurrentState == EMGAIState::CatchingUp)
+	// Apply rubber-banding adjustment (works in all racing states)
+	float RubberBandingAdjustment = CalculateCatchupBoost();
+	if (!FMath::IsNearlyZero(RubberBandingAdjustment))
 	{
-		float Boost = CalculateCatchupBoost();
-		ThrottleOutput = FMath::Min(1.0f, ThrottleOutput + Boost);
+		if (RubberBandingAdjustment > 0.0f)
+		{
+			// Catch-up boost - increase throttle
+			ThrottleOutput = FMath::Min(1.0f, ThrottleOutput + RubberBandingAdjustment);
+		}
+		else
+		{
+			// Slow-down penalty - reduce throttle (but don't go below minimum)
+			ThrottleOutput = FMath::Max(0.3f, ThrottleOutput + RubberBandingAdjustment);
+		}
 	}
 
 	// State-specific modifiers
@@ -607,14 +626,63 @@ float AMGRacingAIController::CalculateCatchupBoost() const
 		return 0.0f;
 	}
 
-	// More boost for being further behind
-	float PositionRatio = static_cast<float>(CurrentPosition) / TotalRacers;
-	if (PositionRatio > 0.5f)
+	// Calculate difficulty scaling factor (harder difficulty = less help)
+	float DifficultyFactor = 1.0f;
+	if (RubberBandingConfig.DifficultyScaling > 0.0f)
 	{
-		return (PositionRatio - 0.5f) * 0.3f; // Up to 15% boost for last place
+		// Scale from 1.0 (Rookie) to 0.0 (Legend)
+		float DifficultyRatio = static_cast<float>(DriverProfile.Difficulty) / static_cast<float>(EMGAIDifficulty::Legend);
+		DifficultyFactor = 1.0f - (DifficultyRatio * RubberBandingConfig.DifficultyScaling);
 	}
 
-	return 0.0f;
+	float Adjustment = 0.0f;
+
+	// Distance-based catch-up (behind leader)
+	if (RubberBandingConfig.bEnableCatchUp && DistanceToLeader > RubberBandingConfig.CatchUpDistanceThreshold)
+	{
+		// Calculate how far into the catch-up range we are
+		float DistanceIntoRange = DistanceToLeader - RubberBandingConfig.CatchUpDistanceThreshold;
+		float MaxRange = RubberBandingConfig.MaxCatchUpDistance - RubberBandingConfig.CatchUpDistanceThreshold;
+		float CatchUpRatio = FMath::Clamp(DistanceIntoRange / MaxRange, 0.0f, 1.0f);
+
+		// Apply boost (quadratic curve for more natural feel)
+		Adjustment = CatchUpRatio * CatchUpRatio * RubberBandingConfig.MaxCatchUpBoost;
+	}
+	// Distance-based slow-down (ahead of pack)
+	else if (RubberBandingConfig.bEnableSlowDown && DistanceToLeader < -RubberBandingConfig.SlowDownDistanceThreshold)
+	{
+		// We're the leader and far ahead - slow down
+		float DistanceAhead = FMath::Abs(DistanceToLeader) - RubberBandingConfig.SlowDownDistanceThreshold;
+		float MaxSlowDownRange = RubberBandingConfig.MaxCatchUpDistance; // Use same range for symmetry
+		float SlowDownRatio = FMath::Clamp(DistanceAhead / MaxSlowDownRange, 0.0f, 1.0f);
+
+		// Apply penalty (negative adjustment)
+		Adjustment = -SlowDownRatio * RubberBandingConfig.MaxSlowDownPenalty;
+	}
+
+	// Also consider position-based adjustment for races where distance isn't tracked
+	if (FMath::IsNearlyZero(DistanceToLeader))
+	{
+		float PositionRatio = static_cast<float>(CurrentPosition) / TotalRacers;
+		if (PositionRatio > 0.5f && RubberBandingConfig.bEnableCatchUp)
+		{
+			// Fallback to position-based catch-up
+			Adjustment = FMath::Max(Adjustment, (PositionRatio - 0.5f) * 0.2f * RubberBandingConfig.MaxCatchUpBoost / 0.15f);
+		}
+		else if (CurrentPosition == 1 && TotalRacers > 2 && RubberBandingConfig.bEnableSlowDown)
+		{
+			// Leader penalty
+			Adjustment = FMath::Min(Adjustment, -RubberBandingConfig.MaxSlowDownPenalty * 0.5f);
+		}
+	}
+
+	// Apply difficulty scaling
+	Adjustment *= DifficultyFactor;
+
+	// Store for debugging/queries
+	const_cast<AMGRacingAIController*>(this)->CurrentRubberBandingAdjustment = Adjustment;
+
+	return Adjustment;
 }
 
 bool AMGRacingAIController::ShouldMakeMistake() const
