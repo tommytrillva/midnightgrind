@@ -77,7 +77,7 @@
         "Class": "A",
         "Category": "JDM",
         "Inspiration": "MK4 Supra",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P2",
         "Notes": "2JZ power, top tier JDM"
       },
@@ -87,7 +87,7 @@
         "Class": "B",
         "Category": "JDM",
         "Inspiration": "FD RX-7",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P2",
         "Notes": "Rotary engine, unique sound and feel"
       },
@@ -97,29 +97,29 @@
         "Class": "B",
         "Category": "JDM",
         "Inspiration": "Evo IX",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P2",
         "Notes": "AWD rally-bred, GTR rival"
       },
       {
         "ID": "PHANTOM_CAMARO",
         "Name": "Phantom Camaro",
-        "Class": "B",
+        "Class": "A",
         "Category": "Muscle",
-        "Inspiration": "5th Gen Camaro SS",
-        "Status": "Planned",
+        "Inspiration": "6th Gen Camaro ZL1",
+        "Status": "Spec Complete",
         "Priority": "P2",
         "Notes": "Modern muscle power"
       },
       {
         "ID": "DEMON_CHALLENGER",
         "Name": "Demon Challenger",
-        "Class": "A",
+        "Class": "S",
         "Category": "Muscle",
-        "Inspiration": "Challenger Hellcat",
-        "Status": "Planned",
+        "Inspiration": "Challenger Demon",
+        "Status": "Spec Complete",
         "Priority": "P2",
-        "Notes": "Maximum American power"
+        "Notes": "Maximum American power, drag king"
       },
       {
         "ID": "VIPER_CORVETTE",
@@ -127,47 +127,47 @@
         "Class": "S",
         "Category": "Sports",
         "Inspiration": "C7 Corvette Z06",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P2",
         "Notes": "American supercar performance"
       },
       {
         "ID": "KUMO_350Z",
         "Name": "Kumo 350Z",
-        "Class": "C",
+        "Class": "B",
         "Category": "JDM",
         "Inspiration": "350Z",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P2",
         "Notes": "VQ power, drift capable"
       },
       {
         "ID": "HAYATE_WRX",
-        "Name": "Hayate WRX",
-        "Class": "C",
+        "Name": "Hayate WRX STI",
+        "Class": "B",
         "Category": "JDM",
         "Inspiration": "GD WRX STI",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P2",
         "Notes": "Boxer AWD, rally heritage"
       },
       {
         "ID": "COBRA_S2000",
         "Name": "Cobra S2000",
-        "Class": "C",
+        "Class": "B",
         "Category": "JDM",
         "Inspiration": "S2000 AP2",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P2",
         "Notes": "VTEC screamer, momentum car"
       },
       {
         "ID": "GHOST_E46",
-        "Name": "Ghost M3",
+        "Name": "Ghost E46",
         "Class": "B",
         "Category": "Euro",
         "Inspiration": "E46 M3",
-        "Status": "Planned",
+        "Status": "Spec Complete",
         "Priority": "P2",
         "Notes": "European precision, S54 inline-6"
       }
