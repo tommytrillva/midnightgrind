@@ -2,6 +2,9 @@
 
 #include "Social/MGRivalsIntegration.h"
 #include "GameModes/MGRaceGameMode.h"
+#include "Career/MGCareerSubsystem.h"
+#include "Progression/MGProgressionSubsystem.h"
+#include "Engine/GameInstance.h"
 
 void UMGRivalsIntegration::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -844,7 +847,19 @@ int32 UMGRivalsIntegration::GetIntensityThreshold(EMGRivalryIntensity Intensity)
 
 void UMGRivalsIntegration::CacheSubsystems()
 {
-	// Cache references to other subsystems
-	// CareerSubsystem = ...
-	// ProgressionSubsystem = ...
+	// Cache references to other subsystems via game instance
+	if (UGameInstance* GameInstance = GetGameInstance())
+	{
+		CareerSubsystem = GameInstance->GetSubsystem<UMGCareerSubsystem>();
+		ProgressionSubsystem = GameInstance->GetSubsystem<UMGProgressionSubsystem>();
+
+		if (!CareerSubsystem)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MGRivalsIntegration: CareerSubsystem not available"));
+		}
+		if (!ProgressionSubsystem)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MGRivalsIntegration: ProgressionSubsystem not available"));
+		}
+	}
 }
