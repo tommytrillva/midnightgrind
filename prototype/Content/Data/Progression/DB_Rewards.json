@@ -1,0 +1,384 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Rewards and Loot Tables",
+
+  "DailyLogin": {
+    "Enabled": true,
+    "ResetTime": "04:00:00",
+    "Timezone": "UTC",
+    "BaseRewards": [
+      { "Day": 1, "Cash": 500, "REP": 25 },
+      { "Day": 2, "Cash": 750, "REP": 35 },
+      { "Day": 3, "Cash": 1000, "REP": 50 },
+      { "Day": 4, "Cash": 1250, "REP": 65 },
+      { "Day": 5, "Cash": 1500, "REP": 80 },
+      { "Day": 6, "Cash": 2000, "REP": 100 },
+      { "Day": 7, "Cash": 3500, "REP": 150, "BonusItem": true }
+    ],
+    "StreakBonuses": [
+      { "Days": 7, "Multiplier": 1.25, "BonusCash": 5000 },
+      { "Days": 14, "Multiplier": 1.5, "BonusCash": 12500, "Part": "RANDOM_SPORT" },
+      { "Days": 30, "Multiplier": 2.0, "BonusCash": 35000, "Part": "RANDOM_RACE" },
+      { "Days": 60, "Multiplier": 2.5, "BonusCash": 75000, "Part": "RANDOM_ELITE", "ExclusiveItem": true },
+      { "Days": 100, "Multiplier": 3.0, "BonusCash": 150000, "ExclusiveVehicle": true }
+    ],
+    "BonusItemPool": [
+      { "Type": "Part", "Tier": "Sport", "Weight": 0.5 },
+      { "Type": "Cash", "Amount": 2500, "Weight": 0.25 },
+      { "Type": "Vinyl", "Rarity": "Common", "Weight": 0.15 },
+      { "Type": "Paint", "Rarity": "Common", "Weight": 0.10 }
+    ]
+  },
+
+  "FirstWinOfTheDay": {
+    "Enabled": true,
+    "ResetTime": "04:00:00",
+    "Rewards": {
+      "Circuit": { "Cash": 2000, "REP": 100 },
+      "Sprint": { "Cash": 2000, "REP": 100 },
+      "Drag": { "Cash": 1500, "REP": 75 },
+      "Drift": { "Cash": 1500, "REP": 75 },
+      "Touge": { "Cash": 2500, "REP": 125 },
+      "Highway": { "Cash": 2500, "REP": 125 }
+    },
+    "AllModesBonus": {
+      "Enabled": true,
+      "Cash": 10000,
+      "REP": 500,
+      "Part": "RANDOM_RACE"
+    }
+  },
+
+  "WeeklyRewards": {
+    "Enabled": true,
+    "ResetDay": "Monday",
+    "Milestones": [
+      { "Races": 5, "Cash": 5000, "REP": 250 },
+      { "Races": 10, "Cash": 10000, "REP": 500 },
+      { "Races": 20, "Cash": 20000, "REP": 1000, "Part": "RANDOM_SPORT" },
+      { "Races": 35, "Cash": 35000, "REP": 1750, "Part": "RANDOM_RACE" },
+      { "Races": 50, "Cash": 50000, "REP": 2500, "Part": "RANDOM_ELITE", "ExclusiveItem": true }
+    ]
+  },
+
+  "LevelUpRewards": {
+    "CashPerLevel": 1000,
+    "CashScaling": 1.1,
+    "REPPerLevel": 0,
+    "MilestoneRewards": [
+      { "Level": 5, "Unlock": "DYNO_ROOM", "Cash": 5000, "Part": "RANDOM_SPORT" },
+      { "Level": 10, "Unlock": "TUNING_BAY", "Cash": 10000, "Part": "RANDOM_SPORT" },
+      { "Level": 15, "Unlock": "PRIVATE_LISTINGS", "Cash": 15000, "Part": "RANDOM_RACE" },
+      { "Level": 20, "Unlock": "SHOWROOM", "Cash": 25000, "Part": "RANDOM_RACE" },
+      { "Level": 25, "Unlock": "CUSTOM_EMBLEM", "Cash": 35000, "Part": "RANDOM_ELITE" },
+      { "Level": 30, "Unlock": "CREW_CREATION", "Cash": 50000, "Vehicle": "RANDOM_CLASS_C" },
+      { "Level": 40, "Unlock": "BLACK_MARKET", "Cash": 75000, "Vehicle": "RANDOM_CLASS_B" },
+      { "Level": 50, "Unlock": "LEGEND_GARAGE", "Cash": 100000, "ExclusiveVehicle": true }
+    ]
+  },
+
+  "REPTierRewards": {
+    "ROOKIE": {
+      "Cash": 5000,
+      "Unlocks": ["GARAGE_SLOT_3"],
+      "Title": "TITLE_ROOKIE"
+    },
+    "STREET": {
+      "Cash": 15000,
+      "Part": "RANDOM_SPORT",
+      "Unlocks": ["PINK_SLIP_RACING", "GARAGE_SLOT_5", "JDM_DEALER", "MUSCLE_DEALER"],
+      "Title": "TITLE_STREET_RACER",
+      "Nameplate": "NP_STREET"
+    },
+    "PRO": {
+      "Cash": 35000,
+      "Part": "RANDOM_RACE",
+      "Unlocks": ["AUCTIONS", "BLACK_MARKET", "GARAGE_SLOT_8"],
+      "Title": "TITLE_PRO",
+      "Nameplate": "NP_PRO",
+      "Banner": "BANNER_PRO"
+    },
+    "ELITE": {
+      "Cash": 75000,
+      "Part": "RANDOM_ELITE",
+      "Unlocks": ["EXOTIC_DEALER", "GARAGE_SLOT_12", "THE_VAULT"],
+      "Title": "TITLE_ELITE",
+      "Nameplate": "NP_HOLOGRAPHIC",
+      "Banner": "BANNER_ELITE",
+      "ExclusiveVehicle": true
+    },
+    "LEGEND": {
+      "Cash": 200000,
+      "Vehicle": "EXCLUSIVE_LEGEND",
+      "Unlocks": ["LEGEND_GARAGE", "UNLIMITED_GARAGE"],
+      "Title": "TITLE_LEGEND",
+      "Nameplate": "NP_LEGENDARY",
+      "Banner": "BANNER_LEGEND",
+      "Avatar": "AVATAR_LEGEND"
+    }
+  },
+
+  "CareerMilestones": {
+    "TutorialComplete": {
+      "Cash": 2500,
+      "REP": 100,
+      "Part": "RANDOM_STOCK"
+    },
+    "Chapter1Complete": {
+      "Cash": 15000,
+      "REP": 500,
+      "Part": "RANDOM_SPORT",
+      "Vehicle": "UNLOCK_CLASS_C"
+    },
+    "Chapter2Complete": {
+      "Cash": 30000,
+      "REP": 1000,
+      "Part": "RANDOM_RACE",
+      "Vehicle": "UNLOCK_CLASS_B"
+    },
+    "Chapter3Complete": {
+      "Cash": 50000,
+      "REP": 1500,
+      "Part": "RANDOM_ELITE",
+      "Vehicle": "UNLOCK_CLASS_A"
+    },
+    "Chapter4Complete": {
+      "Cash": 75000,
+      "REP": 2000,
+      "Part": "RANDOM_ELITE",
+      "Vehicle": "UNLOCK_CLASS_S"
+    },
+    "Chapter5Complete": {
+      "Cash": 150000,
+      "REP": 5000,
+      "Vehicle": "EXCLUSIVE_STORY",
+      "Title": "TITLE_HALL_OF_FAME",
+      "Banner": "BANNER_CHAMPION"
+    }
+  },
+
+  "RaceRewards": {
+    "BaseByPosition": {
+      "1st": { "CashMultiplier": 1.0, "REPMultiplier": 1.0 },
+      "2nd": { "CashMultiplier": 0.6, "REPMultiplier": 0.6 },
+      "3rd": { "CashMultiplier": 0.4, "REPMultiplier": 0.4 },
+      "4th": { "CashMultiplier": 0.25, "REPMultiplier": 0.25 },
+      "5th": { "CashMultiplier": 0.15, "REPMultiplier": 0.15 },
+      "6th": { "CashMultiplier": 0.10, "REPMultiplier": 0.10 },
+      "7th": { "CashMultiplier": 0.08, "REPMultiplier": 0.08 },
+      "8th": { "CashMultiplier": 0.05, "REPMultiplier": 0.05 },
+      "DNF": { "CashMultiplier": 0.02, "REPMultiplier": 0.0 }
+    },
+    "BaseByRaceType": {
+      "Circuit": { "BaseCash": 3000, "BaseREP": 60 },
+      "Sprint": { "BaseCash": 2500, "BaseREP": 50 },
+      "Drag": { "BaseCash": 1500, "BaseREP": 30 },
+      "DriftAttack": { "BaseCash": 2000, "BaseREP": 40 },
+      "DriftBattle": { "BaseCash": 2500, "BaseREP": 50 },
+      "Touge": { "BaseCash": 4000, "BaseREP": 80 },
+      "Highway": { "BaseCash": 4500, "BaseREP": 90 },
+      "TimeAttack": { "BaseCash": 1000, "BaseREP": 20 }
+    },
+    "ClassMultipliers": {
+      "D": 0.75,
+      "C": 1.0,
+      "B": 1.25,
+      "A": 1.75,
+      "S": 2.5
+    },
+    "ConditionMultipliers": {
+      "Night": 1.15,
+      "Rain": 1.25,
+      "Traffic": 1.20,
+      "Police": 1.30,
+      "Ranked": 1.50
+    },
+    "BonusConditions": {
+      "ComebackVictory": { "CashBonus": 0.25, "REPBonus": 0.25 },
+      "UnderdogWin": { "CashBonus": 0.20, "REPBonus": 0.20 },
+      "FlawlessVictory": { "CashBonus": 0.30, "REPBonus": 0.30 },
+      "RivalryWin": { "CashBonus": 0.15, "REPBonus": 0.15 },
+      "PerfectStart": { "CashBonus": 0.05, "REPBonus": 0.05 },
+      "CleanRace": { "CashBonus": 0.10, "REPBonus": 0.10 },
+      "FastestLap": { "CashBonus": 0.10, "REPBonus": 0.10 }
+    }
+  },
+
+  "DriftRewards": {
+    "ScoreThresholds": [
+      { "MinScore": 1000, "Cash": 100, "REP": 5 },
+      { "MinScore": 5000, "Cash": 300, "REP": 15 },
+      { "MinScore": 10000, "Cash": 600, "REP": 30 },
+      { "MinScore": 25000, "Cash": 1200, "REP": 60 },
+      { "MinScore": 50000, "Cash": 2000, "REP": 100 },
+      { "MinScore": 100000, "Cash": 3500, "REP": 175 },
+      { "MinScore": 250000, "Cash": 6000, "REP": 300 }
+    ],
+    "GradeRewards": {
+      "D": { "CashMultiplier": 0.5 },
+      "C": { "CashMultiplier": 0.75 },
+      "B": { "CashMultiplier": 1.0 },
+      "A": { "CashMultiplier": 1.25 },
+      "S": { "CashMultiplier": 1.5 },
+      "SS": { "CashMultiplier": 2.0 },
+      "SSS": { "CashMultiplier": 3.0, "BonusPart": true }
+    }
+  },
+
+  "LootTables": {
+    "RANDOM_STOCK": {
+      "Description": "Random stock-tier part",
+      "Options": ["Intake", "Exhaust", "Suspension", "Brakes"],
+      "Tier": "Stock",
+      "VehicleRestriction": "Owned"
+    },
+    "RANDOM_SPORT": {
+      "Description": "Random sport-tier part",
+      "Categories": ["Engine", "Drivetrain", "Suspension", "Brakes", "Tires"],
+      "Tier": "Sport",
+      "Weights": { "Engine": 0.25, "Drivetrain": 0.20, "Suspension": 0.25, "Brakes": 0.15, "Tires": 0.15 }
+    },
+    "RANDOM_RACE": {
+      "Description": "Random race-tier part",
+      "Categories": ["Engine", "Drivetrain", "Suspension", "Brakes", "Aero"],
+      "Tier": "Race",
+      "Weights": { "Engine": 0.30, "Drivetrain": 0.25, "Suspension": 0.20, "Brakes": 0.10, "Aero": 0.15 }
+    },
+    "RANDOM_ELITE": {
+      "Description": "Random elite-tier part",
+      "Categories": ["Engine", "Drivetrain", "ForcedInduction"],
+      "Tier": "Elite",
+      "Weights": { "Engine": 0.40, "Drivetrain": 0.30, "ForcedInduction": 0.30 }
+    },
+    "RANDOM_CLASS_D": {
+      "Description": "Random Class D vehicle",
+      "Vehicles": ["KAZE_CIVIC", "BEATER_SEDAN", "LIGHTNING_86", "STORM_GTI"]
+    },
+    "RANDOM_CLASS_C": {
+      "Description": "Random Class C vehicle",
+      "Vehicles": ["TENSHI_240", "STALLION_GT", "DRIFT_KING_SILVIA", "INFERNO_FOCUS"]
+    },
+    "RANDOM_CLASS_B": {
+      "Description": "Random Class B vehicle",
+      "Vehicles": ["KUMO_350Z", "RONIN_EVO", "KARASU_RX7", "GHOST_E46", "HAYATE_WRX", "COBRA_S2000", "APEX_CAYMAN", "RAMPAGE_CHARGER", "THUNDER_370Z"]
+    },
+    "RANDOM_CLASS_A": {
+      "Description": "Random Class A vehicle",
+      "Vehicles": ["RAIJIN_SUPRA", "PHANTOM_CAMARO", "SHOGUN_NSX", "BLITZ_M4", "TITAN_CTS"]
+    },
+    "RANDOM_CLASS_S": {
+      "Description": "Random Class S vehicle",
+      "Vehicles": ["LEGEND_R35", "SHADOW_LFA", "SPECTER_911", "FLASH_AMG", "NOVA_GT500", "DEMON_CHALLENGER", "VIPER_CORVETTE"]
+    }
+  },
+
+  "MysteryRewards": {
+    "StandardCrate": {
+      "Cost": 5000,
+      "Contents": [
+        { "Type": "Cash", "Amount": [1000, 10000], "Weight": 0.30 },
+        { "Type": "Part", "Tier": "Sport", "Weight": 0.35 },
+        { "Type": "Part", "Tier": "Race", "Weight": 0.15 },
+        { "Type": "Vinyl", "Rarity": "Common", "Weight": 0.10 },
+        { "Type": "Paint", "Rarity": "Rare", "Weight": 0.08 },
+        { "Type": "Part", "Tier": "Elite", "Weight": 0.02 }
+      ]
+    },
+    "PremiumCrate": {
+      "Cost": 15000,
+      "Contents": [
+        { "Type": "Cash", "Amount": [5000, 25000], "Weight": 0.20 },
+        { "Type": "Part", "Tier": "Race", "Weight": 0.35 },
+        { "Type": "Part", "Tier": "Elite", "Weight": 0.20 },
+        { "Type": "Vinyl", "Rarity": "Rare", "Weight": 0.10 },
+        { "Type": "Paint", "Rarity": "Exclusive", "Weight": 0.10 },
+        { "Type": "Vehicle", "Class": "C", "Weight": 0.05 }
+      ]
+    },
+    "LegendaryCrate": {
+      "UnlockCondition": "REP_TIER_ELITE",
+      "Cost": 50000,
+      "Contents": [
+        { "Type": "Part", "Tier": "Elite", "Weight": 0.40 },
+        { "Type": "Cash", "Amount": [25000, 100000], "Weight": 0.20 },
+        { "Type": "Vinyl", "Rarity": "Exclusive", "Weight": 0.15 },
+        { "Type": "Vehicle", "Class": "B", "Weight": 0.12 },
+        { "Type": "Vehicle", "Class": "A", "Weight": 0.08 },
+        { "Type": "Vehicle", "Class": "S", "Weight": 0.05 }
+      ]
+    }
+  },
+
+  "WheelSpin": {
+    "Enabled": true,
+    "UnlockLevel": 15,
+    "FreeSpinsPerDay": 1,
+    "ExtraSpinCost": 2500,
+    "Segments": [
+      { "ID": "SPIN_CASH_LOW", "Display": "$1,000", "Reward": { "Cash": 1000 }, "Weight": 0.20 },
+      { "ID": "SPIN_CASH_MED", "Display": "$5,000", "Reward": { "Cash": 5000 }, "Weight": 0.15 },
+      { "ID": "SPIN_CASH_HIGH", "Display": "$15,000", "Reward": { "Cash": 15000 }, "Weight": 0.08 },
+      { "ID": "SPIN_REP", "Display": "500 REP", "Reward": { "REP": 500 }, "Weight": 0.12 },
+      { "ID": "SPIN_PART_SPORT", "Display": "Sport Part", "Reward": { "Part": "RANDOM_SPORT" }, "Weight": 0.15 },
+      { "ID": "SPIN_PART_RACE", "Display": "Race Part", "Reward": { "Part": "RANDOM_RACE" }, "Weight": 0.10 },
+      { "ID": "SPIN_PART_ELITE", "Display": "Elite Part", "Reward": { "Part": "RANDOM_ELITE" }, "Weight": 0.05 },
+      { "ID": "SPIN_VINYL", "Display": "Vinyl", "Reward": { "Vinyl": "RANDOM_RARE" }, "Weight": 0.08 },
+      { "ID": "SPIN_VEHICLE", "Display": "Vehicle!", "Reward": { "Vehicle": "RANDOM_CLASS_C" }, "Weight": 0.02 },
+      { "ID": "SPIN_JACKPOT", "Display": "JACKPOT", "Reward": { "Cash": 100000, "Part": "RANDOM_ELITE" }, "Weight": 0.01 },
+      { "ID": "SPIN_EMPTY", "Display": "Try Again", "Reward": { "Cash": 500 }, "Weight": 0.04 }
+    ]
+  },
+
+  "AchievementRewards": {
+    "TierRewards": {
+      "Bronze": { "Cash": 1000, "REP": 25 },
+      "Silver": { "Cash": 2500, "REP": 50 },
+      "Gold": { "Cash": 5000, "REP": 100 },
+      "Platinum": { "Cash": 10000, "REP": 250 }
+    },
+    "MilestoneRewards": {
+      "Achievements10": { "Cash": 5000, "Title": "TITLE_ACHIEVER" },
+      "Achievements25": { "Cash": 15000, "Banner": "BANNER_ACHIEVER" },
+      "Achievements50": { "Cash": 35000, "Part": "RANDOM_RACE" },
+      "Achievements75": { "Cash": 75000, "Vehicle": "RANDOM_CLASS_B" },
+      "AchievementsAll": { "Cash": 200000, "Vehicle": "EXCLUSIVE_COMPLETIONIST", "Title": "TITLE_PERFECTIONIST" }
+    }
+  },
+
+  "PinkSlipRewards": {
+    "Winner": {
+      "Vehicle": true,
+      "REPBonus": 500,
+      "Title": "TITLE_PINK_SLIP_SURVIVOR"
+    },
+    "Milestones": [
+      { "Wins": 5, "Title": "TITLE_COLLECTOR", "Cash": 10000 },
+      { "Wins": 10, "Title": "TITLE_PINK_SLIP_KING", "Cash": 25000, "Banner": "BANNER_PINK_SLIP" },
+      { "Wins": 25, "Title": "TITLE_LEGEND_KILLER", "Cash": 75000, "Vehicle": "EXCLUSIVE_PINK_SLIP" }
+    ]
+  },
+
+  "SeasonalRewards": {
+    "SeasonEnd": {
+      "ByTier": {
+        "Bronze": { "Cash": 10000, "REP": 250 },
+        "Silver": { "Cash": 25000, "REP": 500, "Part": "RANDOM_SPORT" },
+        "Gold": { "Cash": 50000, "REP": 1000, "Part": "RANDOM_RACE" },
+        "Platinum": { "Cash": 100000, "REP": 2000, "Part": "RANDOM_ELITE", "Vinyl": "VINYL_PLATINUM" },
+        "Diamond": { "Cash": 200000, "REP": 3500, "Part": "RANDOM_ELITE", "Vinyl": "VINYL_DIAMOND", "Wheel": "WHEEL_EXCLUSIVE" },
+        "Legend": { "Cash": 500000, "REP": 5000, "Vehicle": "EXCLUSIVE_SEASON", "Title": "TITLE_SEASON_LEGEND" }
+      }
+    },
+    "SeasonPassRewards": {
+      "FreeTrack": {
+        "Interval": 10,
+        "Rewards": ["Cash", "REP", "Vinyl", "Paint", "Part"]
+      },
+      "PremiumTrack": {
+        "Interval": 5,
+        "Rewards": ["Cash", "REP", "Vinyl", "Paint", "Part", "Vehicle", "Exclusive"],
+        "FinalReward": "EXCLUSIVE_SEASON_VEHICLE"
+      }
+    }
+  }
+}

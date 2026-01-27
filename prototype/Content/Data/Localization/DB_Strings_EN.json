@@ -1,0 +1,428 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Localization Strings (English)",
+  "Language": "en-US",
+  "TotalStrings": 500,
+
+  "UI": {
+    "MainMenu": {
+      "Play": "PLAY",
+      "Career": "CAREER",
+      "Garage": "GARAGE",
+      "Multiplayer": "MULTIPLAYER",
+      "Options": "OPTIONS",
+      "Quit": "QUIT",
+      "Continue": "CONTINUE",
+      "NewGame": "NEW GAME",
+      "LoadGame": "LOAD GAME"
+    },
+    "Garage": {
+      "Title": "GARAGE",
+      "Vehicles": "VEHICLES",
+      "Parts": "PARTS",
+      "Tuning": "TUNING",
+      "Paint": "PAINT",
+      "Vinyls": "VINYLS",
+      "Sell": "SELL",
+      "Compare": "COMPARE",
+      "Equip": "EQUIP",
+      "Unequip": "UNEQUIP",
+      "SlotEmpty": "EMPTY SLOT",
+      "AddVehicle": "ADD VEHICLE",
+      "NoVehicles": "NO VEHICLES",
+      "VehicleStats": "VEHICLE STATS",
+      "Performance": "PERFORMANCE",
+      "Handling": "HANDLING",
+      "Acceleration": "ACCELERATION",
+      "TopSpeed": "TOP SPEED",
+      "Braking": "BRAKING"
+    },
+    "Shop": {
+      "Title": "SHOP",
+      "Buy": "BUY",
+      "Sell": "SELL",
+      "Trade": "TRADE",
+      "Price": "PRICE",
+      "Value": "VALUE",
+      "Owned": "OWNED",
+      "Locked": "LOCKED",
+      "RequiresREP": "REQUIRES {tier} REP",
+      "RequiresLevel": "REQUIRES LEVEL {level}",
+      "InsufficientFunds": "INSUFFICIENT FUNDS",
+      "ConfirmPurchase": "CONFIRM PURCHASE?",
+      "PurchaseSuccess": "PURCHASE COMPLETE",
+      "PurchaseFailed": "PURCHASE FAILED"
+    },
+    "Race": {
+      "Ready": "READY",
+      "Set": "SET",
+      "Go": "GO!",
+      "Countdown3": "3",
+      "Countdown2": "2",
+      "Countdown1": "1",
+      "Position": "POSITION",
+      "Lap": "LAP",
+      "Time": "TIME",
+      "BestLap": "BEST LAP",
+      "LastLap": "LAST LAP",
+      "Finished": "FINISHED",
+      "Winner": "WINNER!",
+      "YouWin": "YOU WIN!",
+      "YouLose": "YOU LOSE",
+      "Retry": "RETRY",
+      "NextRace": "NEXT RACE",
+      "BackToGarage": "BACK TO GARAGE",
+      "WrongWay": "WRONG WAY",
+      "FinalLap": "FINAL LAP"
+    },
+    "Drift": {
+      "Score": "SCORE",
+      "Multiplier": "MULTIPLIER",
+      "Combo": "COMBO",
+      "Angle": "ANGLE",
+      "Speed": "SPEED",
+      "Zone": "ZONE",
+      "Perfect": "PERFECT!",
+      "Great": "GREAT!",
+      "Good": "GOOD",
+      "Miss": "MISS",
+      "ChainBroken": "CHAIN BROKEN",
+      "NewHighScore": "NEW HIGH SCORE!",
+      "GradeS": "S RANK",
+      "GradeSS": "SS RANK",
+      "GradeSSS": "SSS RANK"
+    },
+    "PinkSlip": {
+      "Title": "PINK SLIP",
+      "Warning": "WARNING: YOU WILL LOSE YOUR VEHICLE IF YOU LOSE",
+      "YourVehicle": "YOUR VEHICLE",
+      "TheirVehicle": "THEIR VEHICLE",
+      "Value": "VALUE",
+      "Confirm1": "ARE YOU SURE?",
+      "Confirm2": "ARE YOU REALLY SURE?",
+      "Confirm3": "FINAL CONFIRMATION",
+      "Accept": "ACCEPT THE RISK",
+      "Decline": "BACK OUT",
+      "YouWonVehicle": "YOU WON THEIR {vehicle}!",
+      "YouLostVehicle": "YOU LOST YOUR {vehicle}",
+      "VehicleTransferred": "VEHICLE TRANSFERRED"
+    },
+    "Police": {
+      "Pursuit": "PURSUIT",
+      "Heat": "HEAT LEVEL",
+      "Escaped": "ESCAPED!",
+      "Busted": "BUSTED!",
+      "FineAmount": "FINE: ${amount}",
+      "REPLost": "REP LOST: {amount}",
+      "WarningLevel1": "PATROL SPOTTED YOU",
+      "WarningLevel2": "UNITS RESPONDING",
+      "WarningLevel3": "AGGRESSIVE PURSUIT",
+      "WarningLevel4": "ROADBLOCKS DEPLOYED",
+      "WarningLevel5": "FULL FORCE RESPONSE"
+    },
+    "Crew": {
+      "Title": "CREW",
+      "Create": "CREATE CREW",
+      "Join": "JOIN CREW",
+      "Leave": "LEAVE CREW",
+      "Members": "MEMBERS",
+      "Territory": "TERRITORY",
+      "Treasury": "TREASURY",
+      "Rank": "RANK",
+      "Invite": "INVITE",
+      "Kick": "KICK",
+      "Promote": "PROMOTE",
+      "Demote": "DEMOTE"
+    },
+    "Social": {
+      "Friends": "FRIENDS",
+      "Online": "ONLINE",
+      "Offline": "OFFLINE",
+      "Invite": "INVITE",
+      "Join": "JOIN",
+      "Block": "BLOCK",
+      "Report": "REPORT",
+      "Message": "MESSAGE",
+      "Profile": "VIEW PROFILE"
+    },
+    "Common": {
+      "Back": "BACK",
+      "Cancel": "CANCEL",
+      "Confirm": "CONFIRM",
+      "Accept": "ACCEPT",
+      "Decline": "DECLINE",
+      "Yes": "YES",
+      "No": "NO",
+      "OK": "OK",
+      "Apply": "APPLY",
+      "Reset": "RESET",
+      "Default": "DEFAULT",
+      "Save": "SAVE",
+      "Load": "LOAD",
+      "Delete": "DELETE",
+      "Edit": "EDIT",
+      "Close": "CLOSE",
+      "Next": "NEXT",
+      "Previous": "PREVIOUS",
+      "Skip": "SKIP",
+      "Continue": "CONTINUE",
+      "Retry": "RETRY",
+      "Exit": "EXIT"
+    }
+  },
+
+  "HUD": {
+    "Speed": "{speed} MPH",
+    "SpeedKMH": "{speed} KM/H",
+    "Gear": "GEAR {gear}",
+    "RPM": "{rpm} RPM",
+    "NOS": "NOS",
+    "Nitrous": "NITROUS",
+    "Damage": "DAMAGE",
+    "Fuel": "FUEL",
+    "Position": "{pos}/{total}",
+    "Lap": "LAP {current}/{total}",
+    "Time": "{time}",
+    "Gap": "+{time}",
+    "Lead": "-{time}",
+    "CheckpointMissed": "CHECKPOINT MISSED",
+    "Respawning": "RESPAWNING..."
+  },
+
+  "Notifications": {
+    "LevelUp": "LEVEL UP! YOU ARE NOW LEVEL {level}",
+    "REPTierUp": "REP TIER ACHIEVED: {tier}",
+    "AchievementUnlocked": "ACHIEVEMENT UNLOCKED: {name}",
+    "NewVehicleUnlocked": "NEW VEHICLE UNLOCKED: {vehicle}",
+    "NewPartUnlocked": "NEW PART UNLOCKED: {part}",
+    "CashReceived": "+${amount}",
+    "REPReceived": "+{amount} REP",
+    "DailyLoginBonus": "DAILY LOGIN BONUS!",
+    "FirstWinBonus": "FIRST WIN OF THE DAY!",
+    "StreakBonus": "{days} DAY STREAK BONUS!",
+    "NewRivalry": "NEW RIVALRY: {driver}",
+    "CrewInvite": "{crew} INVITES YOU TO JOIN",
+    "PinkSlipChallenge": "{driver} CHALLENGES YOU TO A PINK SLIP RACE"
+  },
+
+  "Tutorials": {
+    "Welcome": "WELCOME TO MIDNIGHT GRIND",
+    "Accelerate": "PRESS {button} TO ACCELERATE",
+    "Brake": "PRESS {button} TO BRAKE",
+    "Steer": "USE {control} TO STEER",
+    "Handbrake": "PRESS {button} FOR HANDBRAKE",
+    "Nitrous": "PRESS {button} TO ACTIVATE NITROUS",
+    "Shift": "PRESS {button} TO SHIFT UP",
+    "Downshift": "PRESS {button} TO SHIFT DOWN",
+    "DriftStart": "INITIATE A DRIFT BY BRAKING INTO A CORNER",
+    "DriftMaintain": "CONTROL YOUR ANGLE WITH THROTTLE",
+    "DriftChain": "CHAIN DRIFTS TOGETHER FOR HIGHER SCORES",
+    "GarageIntro": "THIS IS YOUR GARAGE. CUSTOMIZE YOUR RIDE HERE.",
+    "ShopIntro": "BUY PARTS TO UPGRADE YOUR VEHICLE",
+    "RaceIntro": "RACE AGAINST RIVALS TO EARN CASH AND REP",
+    "PinkSlipWarning": "PINK SLIP RACES ARE PERMANENT. LOSE AND YOUR CAR IS GONE."
+  },
+
+  "Vehicles": {
+    "Classes": {
+      "D": "CLASS D - ENTRY",
+      "C": "CLASS C - STREET",
+      "B": "CLASS B - PERFORMANCE",
+      "A": "CLASS A - SUPER",
+      "S": "CLASS S - HYPERCAR"
+    },
+    "Categories": {
+      "JDM": "JDM",
+      "Muscle": "MUSCLE",
+      "Euro": "EUROPEAN",
+      "Economy": "ECONOMY",
+      "Sports": "SPORTS"
+    },
+    "Stats": {
+      "Power": "POWER",
+      "Torque": "TORQUE",
+      "Weight": "WEIGHT",
+      "PWRatio": "P/W RATIO",
+      "Drivetrain": "DRIVETRAIN",
+      "Engine": "ENGINE",
+      "Transmission": "TRANSMISSION",
+      "TopSpeed": "TOP SPEED",
+      "Acceleration": "0-60 MPH",
+      "PI": "PERFORMANCE INDEX"
+    }
+  },
+
+  "Parts": {
+    "Categories": {
+      "Engine": "ENGINE",
+      "ForcedInduction": "FORCED INDUCTION",
+      "FuelSystem": "FUEL SYSTEM",
+      "Exhaust": "EXHAUST",
+      "Drivetrain": "DRIVETRAIN",
+      "Suspension": "SUSPENSION",
+      "Brakes": "BRAKES",
+      "Tires": "TIRES",
+      "Wheels": "WHEELS",
+      "Aero": "AERO",
+      "Interior": "INTERIOR",
+      "Lighting": "LIGHTING",
+      "Nitrous": "NITROUS"
+    },
+    "Tiers": {
+      "Stock": "STOCK",
+      "Sport": "SPORT",
+      "Race": "RACE",
+      "Elite": "ELITE"
+    },
+    "Stats": {
+      "PowerGain": "+{hp} HP",
+      "TorqueGain": "+{tq} LB-FT",
+      "WeightChange": "{weight} LBS",
+      "GripBonus": "+{grip}% GRIP",
+      "HandlingBonus": "+{handling}% HANDLING"
+    }
+  },
+
+  "Events": {
+    "Types": {
+      "Circuit": "CIRCUIT RACE",
+      "Sprint": "SPRINT RACE",
+      "Drag": "DRAG RACE",
+      "DriftAttack": "DRIFT ATTACK",
+      "DriftBattle": "DRIFT BATTLE",
+      "Touge": "TOUGE BATTLE",
+      "Highway": "HIGHWAY BATTLE",
+      "TimeAttack": "TIME ATTACK",
+      "Pursuit": "POLICE PURSUIT",
+      "PinkSlip": "PINK SLIP",
+      "Tournament": "TOURNAMENT"
+    },
+    "Conditions": {
+      "Day": "DAY",
+      "Night": "NIGHT",
+      "Clear": "CLEAR",
+      "Rain": "RAIN",
+      "Traffic": "TRAFFIC",
+      "NoTraffic": "NO TRAFFIC",
+      "Police": "POLICE ACTIVE",
+      "NoPolice": "NO POLICE"
+    },
+    "Rewards": {
+      "Cash": "CASH: ${amount}",
+      "REP": "REP: {amount}",
+      "Part": "REWARD: {part}",
+      "Vehicle": "REWARD: {vehicle}"
+    }
+  },
+
+  "Achievements": {
+    "Categories": {
+      "Racing": "RACING",
+      "Drift": "DRIFTING",
+      "Collection": "COLLECTION",
+      "Social": "SOCIAL",
+      "Career": "CAREER",
+      "Mastery": "MASTERY",
+      "Hidden": "HIDDEN"
+    },
+    "Tiers": {
+      "Bronze": "BRONZE",
+      "Silver": "SILVER",
+      "Gold": "GOLD",
+      "Platinum": "PLATINUM"
+    }
+  },
+
+  "REPTiers": {
+    "UNKNOWN": "UNKNOWN",
+    "ROOKIE": "ROOKIE",
+    "STREET": "STREET",
+    "PRO": "PRO",
+    "ELITE": "ELITE",
+    "LEGEND": "LEGEND"
+  },
+
+  "Errors": {
+    "ConnectionFailed": "CONNECTION FAILED",
+    "ConnectionLost": "CONNECTION LOST",
+    "SessionExpired": "SESSION EXPIRED",
+    "SaveFailed": "SAVE FAILED",
+    "LoadFailed": "LOAD FAILED",
+    "InvalidData": "INVALID DATA",
+    "ServerError": "SERVER ERROR",
+    "TryAgain": "PLEASE TRY AGAIN",
+    "ContactSupport": "IF PROBLEM PERSISTS, CONTACT SUPPORT"
+  },
+
+  "Settings": {
+    "Categories": {
+      "Graphics": "GRAPHICS",
+      "Audio": "AUDIO",
+      "Controls": "CONTROLS",
+      "Gameplay": "GAMEPLAY",
+      "Accessibility": "ACCESSIBILITY"
+    },
+    "Graphics": {
+      "Resolution": "RESOLUTION",
+      "Fullscreen": "FULLSCREEN",
+      "VSync": "V-SYNC",
+      "FrameLimit": "FRAME LIMIT",
+      "Quality": "QUALITY PRESET",
+      "Shadows": "SHADOWS",
+      "Reflections": "REFLECTIONS",
+      "AntiAliasing": "ANTI-ALIASING",
+      "TextureQuality": "TEXTURE QUALITY",
+      "EffectsQuality": "EFFECTS QUALITY",
+      "MotionBlur": "MOTION BLUR",
+      "DepthOfField": "DEPTH OF FIELD"
+    },
+    "Audio": {
+      "Master": "MASTER VOLUME",
+      "Music": "MUSIC",
+      "SFX": "SOUND EFFECTS",
+      "Engine": "ENGINE VOLUME",
+      "Voice": "VOICE",
+      "Ambient": "AMBIENT"
+    },
+    "Controls": {
+      "Sensitivity": "SENSITIVITY",
+      "DeadZone": "DEAD ZONE",
+      "Vibration": "VIBRATION",
+      "InvertY": "INVERT Y-AXIS",
+      "Rebind": "REBIND CONTROLS"
+    },
+    "Gameplay": {
+      "Difficulty": "DIFFICULTY",
+      "Transmission": "TRANSMISSION",
+      "TractionControl": "TRACTION CONTROL",
+      "StabilityControl": "STABILITY CONTROL",
+      "ABSBraking": "ABS BRAKING",
+      "RacingLine": "RACING LINE",
+      "Units": "UNITS"
+    }
+  },
+
+  "Loading": {
+    "Tips": {
+      "Prefix": "TIP: "
+    },
+    "Messages": {
+      "Loading": "LOADING...",
+      "PleaseWait": "PLEASE WAIT",
+      "LoadingTrack": "LOADING TRACK",
+      "LoadingVehicles": "LOADING VEHICLES",
+      "InitializingRace": "INITIALIZING RACE",
+      "ConnectingToServer": "CONNECTING TO SERVER",
+      "SyncingData": "SYNCING DATA"
+    }
+  },
+
+  "Credits": {
+    "Development": "DEVELOPMENT",
+    "Art": "ART",
+    "Audio": "AUDIO",
+    "QA": "QUALITY ASSURANCE",
+    "SpecialThanks": "SPECIAL THANKS",
+    "ThankYou": "THANK YOU FOR PLAYING"
+  }
+}

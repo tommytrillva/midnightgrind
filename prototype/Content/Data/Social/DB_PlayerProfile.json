@@ -1,0 +1,292 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Player Profile Customization Options",
+
+  "ProfileBanners": {
+    "Default": [
+      { "ID": "BANNER_STARTER", "Name": "Street Starter", "Unlocked": true },
+      { "ID": "BANNER_MIDNIGHT", "Name": "Midnight Blue", "Unlocked": true },
+      { "ID": "BANNER_NEON", "Name": "Neon City", "Unlocked": true }
+    ],
+    "REPTier": [
+      { "ID": "BANNER_ROOKIE", "Name": "Rookie Runner", "Requirement": "REP_TIER_ROOKIE" },
+      { "ID": "BANNER_STREET", "Name": "Street Legend", "Requirement": "REP_TIER_STREET" },
+      { "ID": "BANNER_PRO", "Name": "Pro Circuit", "Requirement": "REP_TIER_PRO" },
+      { "ID": "BANNER_ELITE", "Name": "Elite Status", "Requirement": "REP_TIER_ELITE" },
+      { "ID": "BANNER_LEGEND", "Name": "Living Legend", "Requirement": "REP_TIER_LEGEND" }
+    ],
+    "Achievement": [
+      { "ID": "BANNER_DRIFT_MASTER", "Name": "Drift Master", "Requirement": "ACH_DRIFT_50K" },
+      { "ID": "BANNER_SPEED_DEMON", "Name": "Speed Demon", "Requirement": "ACH_TOP_SPEED_300" },
+      { "ID": "BANNER_COLLECTOR", "Name": "Collector", "Requirement": "ACH_OWN_10_CARS" },
+      { "ID": "BANNER_PINK_SLIP_KING", "Name": "Pink Slip King", "Requirement": "ACH_WIN_10_PINK_SLIPS" },
+      { "ID": "BANNER_TOUGE_LEGEND", "Name": "Touge Legend", "Requirement": "ACH_COMPLETE_ALL_TOUGE" },
+      { "ID": "BANNER_PERFECT_RACE", "Name": "Perfect Record", "Requirement": "ACH_WIN_100_RACES" }
+    ],
+    "Seasonal": [
+      { "ID": "BANNER_SEASON_1", "Name": "Season 1 Veteran", "Requirement": "COMPLETE_SEASON_1" },
+      { "ID": "BANNER_SEASON_2", "Name": "Season 2 Racer", "Requirement": "COMPLETE_SEASON_2" }
+    ],
+    "Special": [
+      { "ID": "BANNER_FOUNDER", "Name": "Founding Member", "Requirement": "PURCHASED_BEFORE_LAUNCH" },
+      { "ID": "BANNER_DEV", "Name": "Developer", "Requirement": "IS_DEVELOPER" },
+      { "ID": "BANNER_STREAMER", "Name": "Content Creator", "Requirement": "VERIFIED_CREATOR" }
+    ]
+  },
+
+  "Titles": {
+    "Default": [
+      { "ID": "TITLE_RACER", "Text": "Racer", "Unlocked": true },
+      { "ID": "TITLE_DRIVER", "Text": "Driver", "Unlocked": true },
+      { "ID": "TITLE_NIGHT_OWL", "Text": "Night Owl", "Unlocked": true }
+    ],
+    "CareerProgress": [
+      { "ID": "TITLE_NEWCOMER", "Text": "Newcomer", "Requirement": "COMPLETE_TUTORIAL" },
+      { "ID": "TITLE_RISING_STAR", "Text": "Rising Star", "Requirement": "COMPLETE_CHAPTER_1" },
+      { "ID": "TITLE_STREET_RACER", "Text": "Street Racer", "Requirement": "COMPLETE_CHAPTER_2" },
+      { "ID": "TITLE_UNDERGROUND_KING", "Text": "Underground King", "Requirement": "COMPLETE_CHAPTER_3" },
+      { "ID": "TITLE_MIDNIGHT_LEGEND", "Text": "Midnight Legend", "Requirement": "COMPLETE_CHAPTER_5" },
+      { "ID": "TITLE_HALL_OF_FAME", "Text": "Hall of Fame", "Requirement": "COMPLETE_ALL_CHAPTERS" }
+    ],
+    "Specialization": [
+      { "ID": "TITLE_DRIFT_KING", "Text": "Drift King", "Requirement": "DRIFT_SCORE_1M_TOTAL" },
+      { "ID": "TITLE_DRAG_QUEEN", "Text": "Drag Champion", "Requirement": "WIN_100_DRAG_RACES" },
+      { "ID": "TITLE_TOUGE_MASTER", "Text": "Touge Master", "Requirement": "WIN_50_TOUGE_RACES" },
+      { "ID": "TITLE_HIGHWAY_HUNTER", "Text": "Highway Hunter", "Requirement": "WIN_50_HIGHWAY_BATTLES" },
+      { "ID": "TITLE_CIRCUIT_ACE", "Text": "Circuit Ace", "Requirement": "WIN_100_CIRCUIT_RACES" },
+      { "ID": "TITLE_TIME_ATTACK_GOD", "Text": "Time Attack God", "Requirement": "SET_50_TRACK_RECORDS" }
+    ],
+    "VehicleAffinity": [
+      { "ID": "TITLE_JDM_ENTHUSIAST", "Text": "JDM Enthusiast", "Requirement": "OWN_5_JDM" },
+      { "ID": "TITLE_MUSCLE_FANATIC", "Text": "Muscle Fanatic", "Requirement": "OWN_5_MUSCLE" },
+      { "ID": "TITLE_EURO_PURIST", "Text": "Euro Purist", "Requirement": "OWN_5_EURO" },
+      { "ID": "TITLE_ROTARY_LOVER", "Text": "Rotary Lover", "Requirement": "WIN_50_WITH_ROTARY" },
+      { "ID": "TITLE_V8_THUNDER", "Text": "V8 Thunder", "Requirement": "WIN_50_WITH_V8" },
+      { "ID": "TITLE_TURBO_ADDICT", "Text": "Turbo Addict", "Requirement": "INSTALL_50_TURBOS" }
+    ],
+    "Social": [
+      { "ID": "TITLE_CREW_LEADER", "Text": "Crew Leader", "Requirement": "LEAD_CREW" },
+      { "ID": "TITLE_MENTOR", "Text": "Mentor", "Requirement": "HELP_10_NEW_PLAYERS" },
+      { "ID": "TITLE_PINK_SLIP_SURVIVOR", "Text": "Pink Slip Survivor", "Requirement": "SURVIVE_20_PINK_SLIPS" },
+      { "ID": "TITLE_PARTY_STARTER", "Text": "Party Starter", "Requirement": "HOST_50_MEETS" },
+      { "ID": "TITLE_PHOTO_MASTER", "Text": "Photo Master", "Requirement": "100_FEATURED_PHOTOS" }
+    ],
+    "Rare": [
+      { "ID": "TITLE_THE_ONE", "Text": "The One", "Requirement": "BEAT_ALL_BOSSES_FIRST_TRY" },
+      { "ID": "TITLE_GHOST", "Text": "Ghost", "Requirement": "WIN_50_WITHOUT_COLLISION" },
+      { "ID": "TITLE_UNTOUCHABLE", "Text": "Untouchable", "Requirement": "ESCAPE_100_PURSUITS" },
+      { "ID": "TITLE_PERFECTIONIST", "Text": "Perfectionist", "Requirement": "100_PERCENT_COMPLETION" }
+    ]
+  },
+
+  "Avatars": {
+    "Default": [
+      { "ID": "AVATAR_DEFAULT_M1", "Name": "Street Racer", "Icon": "AVT_Male_01" },
+      { "ID": "AVATAR_DEFAULT_F1", "Name": "Night Driver", "Icon": "AVT_Female_01" },
+      { "ID": "AVATAR_DEFAULT_M2", "Name": "Drift Veteran", "Icon": "AVT_Male_02" },
+      { "ID": "AVATAR_DEFAULT_F2", "Name": "Circuit Pro", "Icon": "AVT_Female_02" }
+    ],
+    "Unlockable": [
+      { "ID": "AVATAR_LEGEND", "Name": "The Legend", "Requirement": "REP_TIER_LEGEND", "Icon": "AVT_Legend" },
+      { "ID": "AVATAR_BOSS_1", "Name": "Shadow King", "Requirement": "DEFEAT_BOSS_1", "Icon": "AVT_Boss_01" },
+      { "ID": "AVATAR_BOSS_2", "Name": "Mountain Ghost", "Requirement": "DEFEAT_BOSS_2", "Icon": "AVT_Boss_02" },
+      { "ID": "AVATAR_BOSS_3", "Name": "Highway Devil", "Requirement": "DEFEAT_BOSS_3", "Icon": "AVT_Boss_03" },
+      { "ID": "AVATAR_BOSS_4", "Name": "Drift Master", "Requirement": "DEFEAT_BOSS_4", "Icon": "AVT_Boss_04" },
+      { "ID": "AVATAR_BOSS_5", "Name": "The Champion", "Requirement": "DEFEAT_BOSS_5", "Icon": "AVT_Boss_05" }
+    ],
+    "Vehicles": [
+      { "ID": "AVATAR_GTR", "Name": "GT-R", "Requirement": "OWN_LEGEND_R35", "Icon": "AVT_VEH_GTR" },
+      { "ID": "AVATAR_SUPRA", "Name": "Supra", "Requirement": "OWN_RAIJIN_SUPRA", "Icon": "AVT_VEH_SUPRA" },
+      { "ID": "AVATAR_RX7", "Name": "RX-7", "Requirement": "OWN_KARASU_RX7", "Icon": "AVT_VEH_RX7" },
+      { "ID": "AVATAR_911", "Name": "911", "Requirement": "OWN_SPECTER_911", "Icon": "AVT_VEH_911" }
+    ]
+  },
+
+  "Nameplates": {
+    "Styles": [
+      { "ID": "NP_SIMPLE", "Name": "Simple", "Unlocked": true, "Background": "Solid" },
+      { "ID": "NP_GRADIENT", "Name": "Gradient", "Requirement": "LEVEL_10", "Background": "Gradient" },
+      { "ID": "NP_METALLIC", "Name": "Metallic", "Requirement": "LEVEL_20", "Background": "Metallic" },
+      { "ID": "NP_CARBON", "Name": "Carbon Fiber", "Requirement": "LEVEL_30", "Background": "CarbonFiber" },
+      { "ID": "NP_HOLOGRAPHIC", "Name": "Holographic", "Requirement": "REP_TIER_PRO", "Background": "Holographic" },
+      { "ID": "NP_ANIMATED", "Name": "Animated Neon", "Requirement": "REP_TIER_ELITE", "Background": "AnimatedNeon" },
+      { "ID": "NP_LEGENDARY", "Name": "Legendary", "Requirement": "REP_TIER_LEGEND", "Background": "Legendary" }
+    ],
+    "Borders": [
+      { "ID": "NP_BORDER_NONE", "Name": "None", "Unlocked": true },
+      { "ID": "NP_BORDER_THIN", "Name": "Thin", "Unlocked": true },
+      { "ID": "NP_BORDER_THICK", "Name": "Thick", "Requirement": "LEVEL_5" },
+      { "ID": "NP_BORDER_GOLD", "Name": "Gold", "Requirement": "REP_TIER_ELITE" },
+      { "ID": "NP_BORDER_ANIMATED", "Name": "Animated", "Requirement": "REP_TIER_LEGEND" }
+    ],
+    "Colors": {
+      "Primary": {
+        "Default": ["White", "Black", "Red", "Blue", "Green", "Yellow"],
+        "Unlockable": [
+          { "Color": "Gold", "Requirement": "REP_TIER_STREET" },
+          { "Color": "Chrome", "Requirement": "REP_TIER_PRO" },
+          { "Color": "NeonPink", "Requirement": "LEVEL_25" },
+          { "Color": "NeonBlue", "Requirement": "LEVEL_25" },
+          { "Color": "NeonGreen", "Requirement": "LEVEL_25" },
+          { "Color": "RainbowShift", "Requirement": "REP_TIER_LEGEND" }
+        ]
+      },
+      "Secondary": {
+        "Default": ["None", "White", "Black"],
+        "Unlockable": [
+          { "Color": "CustomRGB", "Requirement": "LEVEL_30" }
+        ]
+      }
+    }
+  },
+
+  "Emblems": {
+    "Categories": {
+      "Shapes": [
+        { "ID": "EMB_CIRCLE", "Name": "Circle", "Unlocked": true },
+        { "ID": "EMB_SHIELD", "Name": "Shield", "Unlocked": true },
+        { "ID": "EMB_DIAMOND", "Name": "Diamond", "Requirement": "LEVEL_5" },
+        { "ID": "EMB_HEXAGON", "Name": "Hexagon", "Requirement": "LEVEL_10" },
+        { "ID": "EMB_STAR", "Name": "Star", "Requirement": "LEVEL_15" }
+      ],
+      "Icons": {
+        "Racing": [
+          { "ID": "ICO_CHECKERED", "Name": "Checkered Flag", "Unlocked": true },
+          { "ID": "ICO_WHEEL", "Name": "Racing Wheel", "Unlocked": true },
+          { "ID": "ICO_TURBO", "Name": "Turbo", "Requirement": "LEVEL_10" },
+          { "ID": "ICO_PISTON", "Name": "Piston", "Requirement": "LEVEL_15" },
+          { "ID": "ICO_ENGINE", "Name": "Engine", "Requirement": "LEVEL_20" }
+        ],
+        "Drift": [
+          { "ID": "ICO_SMOKE", "Name": "Tire Smoke", "Requirement": "DRIFT_10K" },
+          { "ID": "ICO_ANGLE", "Name": "Drift Angle", "Requirement": "DRIFT_50K" },
+          { "ID": "ICO_MANJI", "Name": "Manji", "Requirement": "DRIFT_100K" }
+        ],
+        "Achievements": [
+          { "ID": "ICO_TROPHY", "Name": "Trophy", "Requirement": "WIN_50_RACES" },
+          { "ID": "ICO_CROWN", "Name": "Crown", "Requirement": "REP_TIER_LEGEND" },
+          { "ID": "ICO_SKULL", "Name": "Skull", "Requirement": "WIN_20_PINK_SLIPS" },
+          { "ID": "ICO_PHOENIX", "Name": "Phoenix", "Requirement": "COMEBACK_WIN_50" }
+        ]
+      }
+    },
+    "CustomEmblem": {
+      "Enabled": true,
+      "UnlockLevel": 25,
+      "MaxLayers": 5,
+      "MaxColors": 6
+    }
+  },
+
+  "Statistics": {
+    "Display": {
+      "Featured": [
+        "TotalWins",
+        "WinRate",
+        "BestDriftScore",
+        "TopSpeed",
+        "TotalDistance",
+        "FavoriteVehicle"
+      ],
+      "Configurable": true,
+      "MaxFeatured": 6
+    },
+    "Categories": {
+      "Racing": [
+        "TotalRaces",
+        "TotalWins",
+        "TotalLosses",
+        "WinRate",
+        "PodiumFinishes",
+        "PerfectStarts",
+        "FastestLap",
+        "TotalDistance"
+      ],
+      "Drift": [
+        "TotalDriftScore",
+        "HighestSingleDrift",
+        "TandemDrifts",
+        "DriftCombos",
+        "PerfectDrifts"
+      ],
+      "Drag": [
+        "DragWins",
+        "BestReactionTime",
+        "Best60ft",
+        "BestQuarterMile",
+        "BestHalfMile"
+      ],
+      "Social": [
+        "CrewMembership",
+        "CrewRank",
+        "MeetsAttended",
+        "PhotosTaken",
+        "PhotosLiked",
+        "FriendsCount"
+      ],
+      "Collection": [
+        "TotalVehiclesOwned",
+        "CurrentVehicles",
+        "TotalPartsInstalled",
+        "UniquePartTypes",
+        "RarePartsOwned",
+        "TotalSpentOnParts"
+      ],
+      "Economy": [
+        "TotalCashEarned",
+        "TotalCashSpent",
+        "PinkSlipsWon",
+        "PinkSlipsLost",
+        "BiggestWager",
+        "WagerWinRate"
+      ],
+      "Career": [
+        "CareerLevel",
+        "REPTier",
+        "TotalREP",
+        "ChaptersCompleted",
+        "BossesDefeated",
+        "AchievementsUnlocked"
+      ]
+    }
+  },
+
+  "Showcase": {
+    "FeaturedVehicle": {
+      "Enabled": true,
+      "ShowInProfile": true,
+      "ShowInLobby": true,
+      "CustomPose": true,
+      "CustomLighting": true
+    },
+    "GaragePreview": {
+      "Enabled": true,
+      "MaxVehicles": 3,
+      "PrivacyOptions": ["Public", "FriendsOnly", "Private"]
+    },
+    "Achievements": {
+      "ShowRecent": true,
+      "ShowRare": true,
+      "MaxDisplayed": 6
+    }
+  },
+
+  "Privacy": {
+    "ProfileVisibility": {
+      "Options": ["Public", "FriendsOnly", "Private"],
+      "Default": "Public"
+    },
+    "StatsVisibility": {
+      "Options": ["Public", "FriendsOnly", "Private"],
+      "Default": "Public"
+    },
+    "GarageVisibility": {
+      "Options": ["Public", "FriendsOnly", "Private"],
+      "Default": "FriendsOnly"
+    },
+    "OnlineStatus": {
+      "Options": ["Visible", "FriendsOnly", "Invisible"],
+      "Default": "Visible"
+    }
+  }
+}

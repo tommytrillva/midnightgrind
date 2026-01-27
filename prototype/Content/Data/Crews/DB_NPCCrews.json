@@ -1,0 +1,535 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - NPC Crew Rosters and Backstories",
+  "TotalCrews": 8,
+
+  "Crews": [
+    {
+      "ID": "CREW_MIDNIGHT_RUNNERS",
+      "Name": "Midnight Runners",
+      "Tag": "MR",
+      "Founded": "2018",
+      "Territory": ["Downtown", "Entertainment"],
+      "Allegiance": "Neutral",
+      "Reputation": "Respected",
+      "Specialty": "Street Racing",
+      "Description": "The original street racing crew. They've been running these streets since before anyone can remember. Fair racers who respect the code.",
+      "Colors": {
+        "Primary": "#1A1A2E",
+        "Secondary": "#00D9FF",
+        "Accent": "#FF00FF"
+      },
+      "Emblem": "EMB_MR_MOON",
+      "Leader": {
+        "DriverID": "AI_THE_KING",
+        "Name": "Marcus 'The King' Chen",
+        "Vehicle": "LEGEND_R35",
+        "Backstory": "Marcus built this crew from nothing. Started with a beat-up Civic and a dream. Now he's the most respected racer in the city.",
+        "Personality": "Calm, calculating, leads by example"
+      },
+      "Officers": [
+        {
+          "DriverID": "AI_SHADOW_QUEEN",
+          "Name": "Lisa 'Shadow Queen' Park",
+          "Vehicle": "KARASU_RX7",
+          "Role": "Second in Command",
+          "Specialty": "Touge Racing",
+          "Backstory": "Lisa came from the mountains. Undefeated on the passes until she met Marcus. Now she runs the crew's touge operations."
+        },
+        {
+          "DriverID": "AI_CHROME",
+          "Name": "Danny 'Chrome' Williams",
+          "Vehicle": "PHANTOM_CAMARO",
+          "Role": "Recruitment",
+          "Specialty": "Drag Racing",
+          "Backstory": "The muscle of the crew. Danny spots talent and brings them into the fold. His Camaro is legendary at the strip."
+        }
+      ],
+      "Members": [
+        { "DriverID": "AI_ROOKIE_1", "Name": "Jake", "Vehicle": "KAZE_CIVIC", "Tier": "C" },
+        { "DriverID": "AI_ROOKIE_2", "Name": "Mei", "Vehicle": "TENSHI_240", "Tier": "C" },
+        { "DriverID": "AI_MEMBER_1", "Name": "Carlos", "Vehicle": "STALLION_GT", "Tier": "B" },
+        { "DriverID": "AI_MEMBER_2", "Name": "Yuki", "Vehicle": "KUMO_350Z", "Tier": "B" }
+      ],
+      "Relationships": {
+        "Allies": ["CREW_CANYON_KINGS"],
+        "Rivals": ["CREW_NEON_VIPERS"],
+        "Enemies": []
+      },
+      "ControlBonus": {
+        "REPMultiplier": 1.1,
+        "RacePayoutBonus": 0.05
+      },
+      "JoinRequirements": {
+        "MinREP": 1000,
+        "ChallengeBoss": true,
+        "InviteOnly": false
+      }
+    },
+
+    {
+      "ID": "CREW_NEON_VIPERS",
+      "Name": "Neon Vipers",
+      "Tag": "NV",
+      "Founded": "2020",
+      "Territory": ["Neon District", "Industrial"],
+      "Allegiance": "Aggressive",
+      "Reputation": "Feared",
+      "Specialty": "High Stakes",
+      "Description": "The newcomers who play dirty. They rose fast by any means necessary. Pink slips, sabotage, intimidation - nothing is off limits.",
+      "Colors": {
+        "Primary": "#000000",
+        "Secondary": "#39FF14",
+        "Accent": "#FF0066"
+      },
+      "Emblem": "EMB_NV_VIPER",
+      "Leader": {
+        "DriverID": "AI_VENOM",
+        "Name": "Victor 'Venom' Reyes",
+        "Vehicle": "DEMON_CHALLENGER",
+        "Backstory": "Victor came from nothing and took everything. He doesn't believe in fair racing - only winning. Has a collection of cars won through pink slips.",
+        "Personality": "Ruthless, calculating, never forgets a slight"
+      },
+      "Officers": [
+        {
+          "DriverID": "AI_TOXIN",
+          "Name": "Nina 'Toxin' Volkov",
+          "Vehicle": "BLITZ_M4",
+          "Role": "Enforcer",
+          "Specialty": "Intimidation",
+          "Backstory": "Nina handles the crew's dirty work. If someone owes the Vipers, Nina collects."
+        },
+        {
+          "DriverID": "AI_FANG",
+          "Name": "Derek 'Fang' Morrison",
+          "Vehicle": "VIPER_CORVETTE",
+          "Role": "Pink Slip Specialist",
+          "Specialty": "High Stakes Racing",
+          "Backstory": "Derek has never lost a pink slip race. His garage is filled with cars taken from broken racers."
+        }
+      ],
+      "Members": [
+        { "DriverID": "AI_VIPER_1", "Name": "Snake", "Vehicle": "DRIFT_KING_SILVIA", "Tier": "B" },
+        { "DriverID": "AI_VIPER_2", "Name": "Acid", "Vehicle": "TITAN_CTS", "Tier": "B" },
+        { "DriverID": "AI_VIPER_3", "Name": "Razor", "Vehicle": "NOVA_GT500", "Tier": "A" },
+        { "DriverID": "AI_VIPER_4", "Name": "Blade", "Vehicle": "RONIN_EVO", "Tier": "A" }
+      ],
+      "Relationships": {
+        "Allies": [],
+        "Rivals": ["CREW_MIDNIGHT_RUNNERS", "CREW_CANYON_KINGS"],
+        "Enemies": ["CREW_OLD_GUARD"]
+      },
+      "ControlBonus": {
+        "REPMultiplier": 1.2,
+        "PinkSlipProtection": 0.1
+      },
+      "JoinRequirements": {
+        "MinREP": 2000,
+        "PinkSlipWin": true,
+        "InviteOnly": true
+      }
+    },
+
+    {
+      "ID": "CREW_CANYON_KINGS",
+      "Name": "Canyon Kings",
+      "Tag": "CK",
+      "Founded": "2015",
+      "Territory": ["Mountains", "Canyon"],
+      "Allegiance": "Honorable",
+      "Reputation": "Legendary",
+      "Specialty": "Touge Racing",
+      "Description": "Masters of the mountain. They only race on the passes and canyons. Winning here means everything - they don't care about city racing.",
+      "Colors": {
+        "Primary": "#2C3E50",
+        "Secondary": "#E74C3C",
+        "Accent": "#F1C40F"
+      },
+      "Emblem": "EMB_CK_MOUNTAIN",
+      "Leader": {
+        "DriverID": "AI_MOUNTAIN_GHOST",
+        "Name": "Kenji 'Ghost' Tanaka",
+        "Vehicle": "LIGHTNING_86",
+        "Backstory": "Kenji grew up on these mountains. He knows every curve, every guardrail, every gutter. Nobody has ever beaten him on his home turf.",
+        "Personality": "Quiet, intense, lives for the mountain"
+      },
+      "Officers": [
+        {
+          "DriverID": "AI_LANDSLIDE",
+          "Name": "Maria 'Landslide' Santos",
+          "Vehicle": "HAYATE_WRX",
+          "Role": "Second in Command",
+          "Specialty": "Wet Conditions",
+          "Backstory": "Maria is unstoppable when it rains. Her AWD mastery on wet mountain roads is legendary."
+        },
+        {
+          "DriverID": "AI_CLIFF",
+          "Name": "Tom 'Cliff' Johnson",
+          "Vehicle": "RAIJIN_SUPRA",
+          "Role": "Trainer",
+          "Specialty": "Teaching New Drivers",
+          "Backstory": "Tom used to be reckless until an accident nearly ended his career. Now he teaches others to respect the mountain."
+        }
+      ],
+      "Members": [
+        { "DriverID": "AI_CK_1", "Name": "Takeshi", "Vehicle": "COBRA_S2000", "Tier": "B" },
+        { "DriverID": "AI_CK_2", "Name": "Elena", "Vehicle": "APEX_CAYMAN", "Tier": "B" },
+        { "DriverID": "AI_CK_3", "Name": "Ryu", "Vehicle": "GHOST_E46", "Tier": "A" }
+      ],
+      "Relationships": {
+        "Allies": ["CREW_MIDNIGHT_RUNNERS", "CREW_OLD_GUARD"],
+        "Rivals": ["CREW_HIGHWAY_DEVILS"],
+        "Enemies": []
+      },
+      "ControlBonus": {
+        "TougeDamageReduction": 0.2,
+        "MountainREPBonus": 1.25
+      },
+      "JoinRequirements": {
+        "MinREP": 1500,
+        "DefeatLeader": true,
+        "InviteOnly": false
+      }
+    },
+
+    {
+      "ID": "CREW_HIGHWAY_DEVILS",
+      "Name": "Highway Devils",
+      "Tag": "HD",
+      "Founded": "2019",
+      "Territory": ["Highway", "Harbor"],
+      "Allegiance": "Competitive",
+      "Reputation": "Notorious",
+      "Specialty": "Highway Racing",
+      "Description": "The kings of the highway. Speed is everything. They run the Wangan and coastal roads, chasing top speed records and Shuto battles.",
+      "Colors": {
+        "Primary": "#1B1B1B",
+        "Secondary": "#FF4500",
+        "Accent": "#FFD700"
+      },
+      "Emblem": "EMB_HD_DEVIL",
+      "Leader": {
+        "DriverID": "AI_WANGAN_DEVIL",
+        "Name": "Akira 'Devil' Nakamura",
+        "Vehicle": "RAIJIN_SUPRA",
+        "Backstory": "Akira only cares about one thing: top speed. His 1000HP Supra is the fastest thing on the highway. No one has ever passed him above 180mph.",
+        "Personality": "Speed-obsessed, risk-taker, lives for the thrill"
+      },
+      "Officers": [
+        {
+          "DriverID": "AI_HELLFIRE",
+          "Name": "Max 'Hellfire' Burns",
+          "Vehicle": "DEMON_CHALLENGER",
+          "Role": "Drag Specialist",
+          "Specialty": "Standing Starts",
+          "Backstory": "Max came from drag racing and brought that mindset to the highway. His launches are legendary."
+        },
+        {
+          "DriverID": "AI_PHANTOM_RIDER",
+          "Name": "Saya 'Phantom' Ishida",
+          "Vehicle": "SPECTER_911",
+          "Role": "Night Runner",
+          "Specialty": "Late Night Runs",
+          "Backstory": "Saya only appears after midnight. She's never seen in daylight. The rumors about her are endless."
+        }
+      ],
+      "Members": [
+        { "DriverID": "AI_HD_1", "Name": "Turbo", "Vehicle": "FLASH_AMG", "Tier": "A" },
+        { "DriverID": "AI_HD_2", "Name": "Boost", "Vehicle": "LEGEND_R35", "Tier": "S" },
+        { "DriverID": "AI_HD_3", "Name": "Nitro", "Vehicle": "NOVA_GT500", "Tier": "A" }
+      ],
+      "Relationships": {
+        "Allies": [],
+        "Rivals": ["CREW_CANYON_KINGS"],
+        "Enemies": []
+      },
+      "ControlBonus": {
+        "HighwaySpeedBonus": 0.02,
+        "TopSpeedREPBonus": 1.3
+      },
+      "JoinRequirements": {
+        "MinREP": 2500,
+        "TopSpeedRecord": true,
+        "InviteOnly": true
+      }
+    },
+
+    {
+      "ID": "CREW_OLD_GUARD",
+      "Name": "The Old Guard",
+      "Tag": "OG",
+      "Founded": "2005",
+      "Territory": ["Old Town", "Suburbs"],
+      "Allegiance": "Honorable",
+      "Reputation": "Legendary",
+      "Specialty": "Classic Racing",
+      "Description": "The veterans. They were racing these streets before anyone else. They don't race for money or fame - they race for the love of it.",
+      "Colors": {
+        "Primary": "#4A4A4A",
+        "Secondary": "#C0C0C0",
+        "Accent": "#8B0000"
+      },
+      "Emblem": "EMB_OG_CROWN",
+      "Leader": {
+        "DriverID": "AI_GRANDFATHER",
+        "Name": "Robert 'Grandfather' Martinez",
+        "Vehicle": "STALLION_GT",
+        "Backstory": "Robert has been racing for 30 years. He's beaten everyone, lost everything, won it back, and now races just to feel alive. He's the most respected racer in the city.",
+        "Personality": "Wise, patient, sees the big picture"
+      },
+      "Officers": [
+        {
+          "DriverID": "AI_IRON_LADY",
+          "Name": "Helen 'Iron Lady' Cross",
+          "Vehicle": "RAMPAGE_CHARGER",
+          "Role": "Historian",
+          "Specialty": "Classic Cars",
+          "Backstory": "Helen knows the history of every car in the city. She's forgotten more about racing than most will ever learn."
+        },
+        {
+          "DriverID": "AI_SILVERBACK",
+          "Name": "James 'Silverback' Thompson",
+          "Vehicle": "VIPER_CORVETTE",
+          "Role": "Mentor",
+          "Specialty": "Coaching",
+          "Backstory": "James used to be the fastest. Age has slowed him down, but his knowledge is invaluable to young racers."
+        }
+      ],
+      "Members": [
+        { "DriverID": "AI_OG_1", "Name": "Rusty", "Vehicle": "PHANTOM_CAMARO", "Tier": "B" },
+        { "DriverID": "AI_OG_2", "Name": "Grease", "Vehicle": "TITAN_CTS", "Tier": "B" }
+      ],
+      "Relationships": {
+        "Allies": ["CREW_CANYON_KINGS", "CREW_MIDNIGHT_RUNNERS"],
+        "Rivals": [],
+        "Enemies": ["CREW_NEON_VIPERS"]
+      },
+      "ControlBonus": {
+        "MentorXPBonus": 1.5,
+        "VeteranDiscount": 0.1
+      },
+      "JoinRequirements": {
+        "MinLevel": 40,
+        "Referral": true,
+        "InviteOnly": true
+      }
+    },
+
+    {
+      "ID": "CREW_DRIFT_SYNDICATE",
+      "Name": "Drift Syndicate",
+      "Tag": "DS",
+      "Founded": "2021",
+      "Territory": ["Industrial", "Docks"],
+      "Allegiance": "Neutral",
+      "Reputation": "Respected",
+      "Specialty": "Drifting",
+      "Description": "Pure sideways. They don't care about racing - only angle, smoke, and style. Every member is a drift specialist.",
+      "Colors": {
+        "Primary": "#2D2D2D",
+        "Secondary": "#FF1493",
+        "Accent": "#00FFFF"
+      },
+      "Emblem": "EMB_DS_SMOKE",
+      "Leader": {
+        "DriverID": "AI_DRIFT_LEGEND",
+        "Name": "Daiki 'Angle King' Yamamoto",
+        "Vehicle": "DRIFT_KING_SILVIA",
+        "Backstory": "Daiki doesn't race. He only drifts. His Silvia has the most extreme angle kit in the city. He's won every tandem battle he's ever entered.",
+        "Personality": "Showman, perfectionist, lives for style"
+      },
+      "Officers": [
+        {
+          "DriverID": "AI_SMOKESCREEN",
+          "Name": "Jade 'Smokescreen' Wu",
+          "Vehicle": "KUMO_350Z",
+          "Role": "Events Coordinator",
+          "Specialty": "Tandem Drifting",
+          "Backstory": "Jade organizes the best drift meets in the city. Her tandem runs are synchronized perfection."
+        },
+        {
+          "DriverID": "AI_BURNOUT",
+          "Name": "Rico 'Burnout' Fernandez",
+          "Vehicle": "TENSHI_240",
+          "Role": "Tire Supplier",
+          "Specialty": "Tire Management",
+          "Backstory": "Rico goes through more tires than anyone. He's got connections for cheap rubber."
+        }
+      ],
+      "Members": [
+        { "DriverID": "AI_DS_1", "Name": "Sideways", "Vehicle": "LIGHTNING_86", "Tier": "C" },
+        { "DriverID": "AI_DS_2", "Name": "Angle", "Vehicle": "COBRA_S2000", "Tier": "B" },
+        { "DriverID": "AI_DS_3", "Name": "Slide", "Vehicle": "KARASU_RX7", "Tier": "A" }
+      ],
+      "Relationships": {
+        "Allies": ["CREW_MIDNIGHT_RUNNERS"],
+        "Rivals": [],
+        "Enemies": []
+      },
+      "ControlBonus": {
+        "DriftScoreBonus": 1.15,
+        "TireDiscounts": 0.2
+      },
+      "JoinRequirements": {
+        "MinDriftScore": 50000,
+        "TandemChallenge": true,
+        "InviteOnly": false
+      }
+    },
+
+    {
+      "ID": "CREW_EURO_ELITE",
+      "Name": "Euro Elite",
+      "Tag": "EE",
+      "Founded": "2017",
+      "Territory": ["Uptown", "Business District"],
+      "Allegiance": "Exclusive",
+      "Reputation": "Prestigious",
+      "Specialty": "European Cars",
+      "Description": "Porsche, BMW, Mercedes, Audi - only the finest European machines. They're snobs, but they're fast.",
+      "Colors": {
+        "Primary": "#0D1117",
+        "Secondary": "#FFFFFF",
+        "Accent": "#DAA520"
+      },
+      "Emblem": "EMB_EE_CREST",
+      "Leader": {
+        "DriverID": "AI_BARON",
+        "Name": "Alexander 'Baron' Weber",
+        "Vehicle": "SPECTER_911",
+        "Backstory": "Alexander comes from old money. He races because he can, not because he needs to. His 911 is maintained by a personal Porsche technician.",
+        "Personality": "Arrogant, precise, expects perfection"
+      },
+      "Officers": [
+        {
+          "DriverID": "AI_COUNTESS",
+          "Name": "Sofia 'Countess' Lindberg",
+          "Vehicle": "FLASH_AMG",
+          "Role": "Treasurer",
+          "Specialty": "High Stakes",
+          "Backstory": "Sofia handles the crew's substantial treasury. She only wagers amounts that would make others faint."
+        },
+        {
+          "DriverID": "AI_BAVARIAN",
+          "Name": "Hans 'Bavarian' Muller",
+          "Vehicle": "BLITZ_M4",
+          "Role": "Technical Director",
+          "Specialty": "Tuning",
+          "Backstory": "Hans is a former BMW engineer. His M4 is tuned to perfection."
+        }
+      ],
+      "Members": [
+        { "DriverID": "AI_EE_1", "Name": "Sterling", "Vehicle": "GHOST_E46", "Tier": "B" },
+        { "DriverID": "AI_EE_2", "Name": "Monaco", "Vehicle": "APEX_CAYMAN", "Tier": "A" },
+        { "DriverID": "AI_EE_3", "Name": "Geneva", "Vehicle": "STORM_GTI", "Tier": "C" }
+      ],
+      "Relationships": {
+        "Allies": [],
+        "Rivals": ["CREW_HIGHWAY_DEVILS"],
+        "Enemies": []
+      },
+      "ControlBonus": {
+        "EuroPartsDiscount": 0.15,
+        "PremiumPartsAccess": true
+      },
+      "JoinRequirements": {
+        "MinCashWorth": 500000,
+        "EuroVehicleOnly": true,
+        "InviteOnly": true
+      }
+    },
+
+    {
+      "ID": "CREW_STREET_RATS",
+      "Name": "Street Rats",
+      "Tag": "SR",
+      "Founded": "2023",
+      "Territory": ["Slums", "Outskirts"],
+      "Allegiance": "Underdog",
+      "Reputation": "Growing",
+      "Specialty": "Budget Builds",
+      "Description": "They have no money, no fancy cars, just determination. They build fast cars from junk and prove that skill beats cash.",
+      "Colors": {
+        "Primary": "#3D3D3D",
+        "Secondary": "#FF6600",
+        "Accent": "#333333"
+      },
+      "Emblem": "EMB_SR_RAT",
+      "Leader": {
+        "DriverID": "AI_SCRAPPER",
+        "Name": "Miguel 'Scrapper' Ortiz",
+        "Vehicle": "BEATER_SEDAN",
+        "Backstory": "Miguel's car is worth less than most people's wheels, but he's beaten cars worth 10x more. He proves every night that money isn't everything.",
+        "Personality": "Resourceful, determined, chip on shoulder"
+      },
+      "Officers": [
+        {
+          "DriverID": "AI_JUNKYARD",
+          "Name": "Pete 'Junkyard' Collins",
+          "Vehicle": "KAZE_CIVIC",
+          "Role": "Parts Finder",
+          "Specialty": "Salvage",
+          "Backstory": "Pete knows every junkyard in the city. He can find any part for a fraction of the price."
+        },
+        {
+          "DriverID": "AI_WELDER",
+          "Name": "Rosa 'Welder' Diaz",
+          "Vehicle": "INFERNO_FOCUS",
+          "Role": "Fabricator",
+          "Specialty": "Custom Parts",
+          "Backstory": "Rosa makes parts others would pay thousands for. Her welding skills are legendary."
+        }
+      ],
+      "Members": [
+        { "DriverID": "AI_SR_1", "Name": "Scrap", "Vehicle": "BEATER_SEDAN", "Tier": "D" },
+        { "DriverID": "AI_SR_2", "Name": "Rust", "Vehicle": "STORM_GTI", "Tier": "D" },
+        { "DriverID": "AI_SR_3", "Name": "Dent", "Vehicle": "LIGHTNING_86", "Tier": "C" }
+      ],
+      "Relationships": {
+        "Allies": [],
+        "Rivals": ["CREW_EURO_ELITE"],
+        "Enemies": ["CREW_NEON_VIPERS"]
+      },
+      "ControlBonus": {
+        "SalvageBonus": 0.25,
+        "RepairDiscount": 0.3
+      },
+      "JoinRequirements": {
+        "MaxVehicleValue": 50000,
+        "BeatMemberInBudgetCar": true,
+        "InviteOnly": false
+      }
+    }
+  ],
+
+  "CrewInteractions": {
+    "TerritoryWars": {
+      "Enabled": true,
+      "ScheduledEvents": true,
+      "PlayerCanJoin": true,
+      "Rewards": {
+        "Winner": { "REP": 500, "Cash": 10000 },
+        "Participant": { "REP": 100, "Cash": 2000 }
+      }
+    },
+    "Recruitment": {
+      "NPCsRecruitPlayer": true,
+      "ReputationBasedOffers": true,
+      "BenefitsShown": true
+    },
+    "Reputation": {
+      "PositiveActions": ["WinAgainst", "HelpMember", "DefendTerritory"],
+      "NegativeActions": ["LoseAgainst", "Sabotage", "TerritoryLoss"],
+      "NeutralReset": 30
+    }
+  },
+
+  "StoryIntegration": {
+    "Chapter1Boss": "CREW_STREET_RATS",
+    "Chapter2Boss": "CREW_DRIFT_SYNDICATE",
+    "Chapter3Boss": "CREW_CANYON_KINGS",
+    "Chapter4Boss": "CREW_HIGHWAY_DEVILS",
+    "Chapter5Boss": "CREW_MIDNIGHT_RUNNERS",
+    "SecretBoss": "CREW_OLD_GUARD"
+  }
+}
