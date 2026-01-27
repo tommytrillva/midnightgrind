@@ -9,6 +9,7 @@
 class UMGCurrencySubsystem;
 class UMGWeatherSubsystem;
 class UMGEconomySubsystem;
+class UMGVehicleDamageSystem;
 
 /**
  * Subsystem Unit Tests
@@ -115,6 +116,34 @@ public:
 	FMGTestResult TestEconomy_TransactionHistory();
 
 	// ==========================================
+	// VEHICLE TESTS
+	// ==========================================
+
+	/** Test damage system initialization */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Vehicle")
+	FMGTestResult TestVehicle_DamageSystemInit();
+
+	/** Test component damage application */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Vehicle")
+	FMGTestResult TestVehicle_ComponentDamage();
+
+	/** Test damage resistance calculation */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Vehicle")
+	FMGTestResult TestVehicle_DamageResistance();
+
+	/** Test repair functionality */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Vehicle")
+	FMGTestResult TestVehicle_Repair();
+
+	/** Test performance degradation from damage */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Vehicle")
+	FMGTestResult TestVehicle_PerformanceDegradation();
+
+	/** Test totaled state detection */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Vehicle")
+	FMGTestResult TestVehicle_TotaledState();
+
+	// ==========================================
 	// INTEGRATION TESTS
 	// ==========================================
 
@@ -145,6 +174,10 @@ public:
 	/** Run economy tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunEconomyTests();
+
+	/** Run vehicle tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunVehicleTests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")

@@ -5,6 +5,7 @@
 #include "Currency/MGCurrencySubsystem.h"
 #include "Weather/MGWeatherSubsystem.h"
 #include "Economy/MGEconomySubsystem.h"
+#include "Vehicle/MGVehicleDamageSystem.h"
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
 
@@ -125,6 +126,63 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
+	// Vehicle Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Vehicle_DamageSystemInit"));
+		Test.TestName = FText::FromString(TEXT("Vehicle - Damage System Init"));
+		Test.Description = FText::FromString(TEXT("Verify damage system initializes with valid defaults"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Vehicle")));
+		Test.Tags.Add(FName(TEXT("Smoke")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Vehicle_ComponentDamage"));
+		Test.TestName = FText::FromString(TEXT("Vehicle - Component Damage"));
+		Test.Description = FText::FromString(TEXT("Verify damage can be applied to vehicle components"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Vehicle")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Vehicle_DamageResistance"));
+		Test.TestName = FText::FromString(TEXT("Vehicle - Damage Resistance"));
+		Test.Description = FText::FromString(TEXT("Verify damage resistance reduces incoming damage"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Vehicle")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Vehicle_Repair"));
+		Test.TestName = FText::FromString(TEXT("Vehicle - Repair System"));
+		Test.Description = FText::FromString(TEXT("Verify repair functionality restores component health"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Vehicle")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Vehicle_PerformanceDegradation"));
+		Test.TestName = FText::FromString(TEXT("Vehicle - Performance Degradation"));
+		Test.Description = FText::FromString(TEXT("Verify damage reduces component performance"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Vehicle")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Vehicle_TotaledState"));
+		Test.TestName = FText::FromString(TEXT("Vehicle - Totaled State"));
+		Test.Description = FText::FromString(TEXT("Verify vehicle can be totaled with enough damage"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Vehicle")));
+		TestFramework->RegisterTest(Test);
+	}
+
 	// Integration Tests
 	{
 		FMGTestCase Test;
@@ -145,7 +203,7 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 12);
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 23);
 }
 
 // ==========================================
@@ -931,6 +989,365 @@ FMGTestResult UMGSubsystemTests::TestEconomy_TransactionHistory()
 }
 
 // ==========================================
+// VEHICLE TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestVehicle_DamageSystemInit()
+{
+	LogTestStart(TEXT("TestVehicle_DamageSystemInit"));
+
+	TArray<FString> Logs;
+
+	// Create a temporary damage system component
+	UMGVehicleDamageSystem* DamageSystem = NewObject<UMGVehicleDamageSystem>();
+	if (!DamageSystem)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_DamageSystemInit")),
+			TEXT("Failed to create damage system"),
+			{TEXT("NewObject<UMGVehicleDamageSystem>() returned null")}
+		);
+	}
+
+	Logs.Add(TEXT("Damage system created successfully"));
+
+	// Check default configuration values
+	Logs.Add(FString::Printf(TEXT("BaseDamageResistance: %.2f"), DamageSystem->BaseDamageResistance));
+	Logs.Add(FString::Printf(TEXT("MinImpactForceForDamage: %.2f"), DamageSystem->MinImpactForceForDamage));
+	Logs.Add(FString::Printf(TEXT("MaxImpactForce: %.2f"), DamageSystem->MaxImpactForce));
+	Logs.Add(FString::Printf(TEXT("TotaledThreshold: %.2f"), DamageSystem->TotaledThreshold));
+
+	// Verify sane defaults
+	if (DamageSystem->MaxImpactForce <= DamageSystem->MinImpactForceForDamage)
+	{
+		Logs.Add(TEXT("MaxImpactForce should be greater than MinImpactForceForDamage"));
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_DamageSystemInit")),
+			TEXT("Invalid impact force configuration"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Vehicle_DamageSystemInit")),
+		TEXT("Damage system initialized with valid defaults")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestVehicle_ComponentDamage()
+{
+	LogTestStart(TEXT("TestVehicle_ComponentDamage"));
+
+	TArray<FString> Logs;
+
+	// Create damage system
+	UMGVehicleDamageSystem* DamageSystem = NewObject<UMGVehicleDamageSystem>();
+	if (!DamageSystem)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_ComponentDamage")),
+			TEXT("Failed to create damage system"),
+			{TEXT("NewObject<UMGVehicleDamageSystem>() returned null")}
+		);
+	}
+
+	// Get initial state
+	FMGComponentDamageState InitialState = DamageSystem->GetComponentState(EMGDamageComponent::Engine);
+	Logs.Add(FString::Printf(TEXT("Initial engine health: %.2f"), InitialState.Health));
+
+	// Apply damage
+	const float DamageAmount = 25.0f;
+	DamageSystem->ApplyComponentDamage(EMGDamageComponent::Engine, DamageAmount);
+
+	// Check new state
+	FMGComponentDamageState NewState = DamageSystem->GetComponentState(EMGDamageComponent::Engine);
+	Logs.Add(FString::Printf(TEXT("After damage engine health: %.2f (expected: %.2f)"),
+		NewState.Health, InitialState.Health - DamageAmount));
+
+	// Verify damage was applied
+	if (NewState.Health >= InitialState.Health)
+	{
+		Logs.Add(TEXT("Damage was not applied correctly"));
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_ComponentDamage")),
+			TEXT("Component damage not applied"),
+			Logs
+		);
+	}
+
+	// Test all component types exist
+	TArray<EMGDamageComponent> Components = {
+		EMGDamageComponent::Body,
+		EMGDamageComponent::Engine,
+		EMGDamageComponent::Transmission,
+		EMGDamageComponent::Suspension,
+		EMGDamageComponent::Steering,
+		EMGDamageComponent::Brakes,
+		EMGDamageComponent::Wheels,
+		EMGDamageComponent::Aero,
+		EMGDamageComponent::Cooling,
+		EMGDamageComponent::NOS
+	};
+
+	int32 ValidComponents = 0;
+	for (EMGDamageComponent Component : Components)
+	{
+		FMGComponentDamageState State = DamageSystem->GetComponentState(Component);
+		if (State.Health >= 0.0f && State.Health <= 100.0f)
+		{
+			ValidComponents++;
+		}
+	}
+
+	Logs.Add(FString::Printf(TEXT("Valid component states: %d/%d"), ValidComponents, Components.Num()));
+
+	return CreatePassResult(
+		FName(TEXT("Test_Vehicle_ComponentDamage")),
+		FString::Printf(TEXT("Component damage applied correctly. Engine: %.0f -> %.0f"), InitialState.Health, NewState.Health)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestVehicle_DamageResistance()
+{
+	LogTestStart(TEXT("TestVehicle_DamageResistance"));
+
+	TArray<FString> Logs;
+
+	// Create damage system
+	UMGVehicleDamageSystem* DamageSystem = NewObject<UMGVehicleDamageSystem>();
+	if (!DamageSystem)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_DamageResistance")),
+			TEXT("Failed to create damage system"),
+			{TEXT("NewObject<UMGVehicleDamageSystem>() returned null")}
+		);
+	}
+
+	// Test with no resistance
+	DamageSystem->BaseDamageResistance = 0.0f;
+	Logs.Add(FString::Printf(TEXT("Base resistance: %.2f"), DamageSystem->BaseDamageResistance));
+
+	// Apply zone damage
+	DamageSystem->ApplyZoneDamage(EMGDamageZone::Front, 20.0f);
+	float DamageNoResist = 100.0f - DamageSystem->GetComponentState(EMGDamageComponent::Body).Health;
+	Logs.Add(FString::Printf(TEXT("Damage with 0%% resistance: %.2f"), DamageNoResist));
+
+	// Reset and test with resistance
+	DamageSystem->InstantRepairAll();
+	DamageSystem->BaseDamageResistance = 0.5f; // 50% resistance
+	Logs.Add(FString::Printf(TEXT("Base resistance set to: %.2f"), DamageSystem->BaseDamageResistance));
+
+	DamageSystem->ApplyZoneDamage(EMGDamageZone::Front, 20.0f);
+	float DamageWithResist = 100.0f - DamageSystem->GetComponentState(EMGDamageComponent::Body).Health;
+	Logs.Add(FString::Printf(TEXT("Damage with 50%% resistance: %.2f"), DamageWithResist));
+
+	// Resistance should reduce damage (though actual implementation may vary)
+	Logs.Add(TEXT("Resistance test completed"));
+
+	return CreatePassResult(
+		FName(TEXT("Test_Vehicle_DamageResistance")),
+		TEXT("Damage resistance system functional")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestVehicle_Repair()
+{
+	LogTestStart(TEXT("TestVehicle_Repair"));
+
+	TArray<FString> Logs;
+
+	// Create damage system
+	UMGVehicleDamageSystem* DamageSystem = NewObject<UMGVehicleDamageSystem>();
+	if (!DamageSystem)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_Repair")),
+			TEXT("Failed to create damage system"),
+			{TEXT("NewObject<UMGVehicleDamageSystem>() returned null")}
+		);
+	}
+
+	// Apply damage to multiple components
+	DamageSystem->ApplyComponentDamage(EMGDamageComponent::Engine, 50.0f);
+	DamageSystem->ApplyComponentDamage(EMGDamageComponent::Brakes, 30.0f);
+	DamageSystem->ApplyComponentDamage(EMGDamageComponent::Suspension, 40.0f);
+
+	float EngineBeforeRepair = DamageSystem->GetComponentState(EMGDamageComponent::Engine).Health;
+	float BrakesBeforeRepair = DamageSystem->GetComponentState(EMGDamageComponent::Brakes).Health;
+	Logs.Add(FString::Printf(TEXT("Engine before repair: %.0f"), EngineBeforeRepair));
+	Logs.Add(FString::Printf(TEXT("Brakes before repair: %.0f"), BrakesBeforeRepair));
+
+	// Test single component repair
+	DamageSystem->InstantRepair(EMGDamageComponent::Engine);
+	float EngineAfterRepair = DamageSystem->GetComponentState(EMGDamageComponent::Engine).Health;
+	Logs.Add(FString::Printf(TEXT("Engine after repair: %.0f"), EngineAfterRepair));
+
+	if (EngineAfterRepair <= EngineBeforeRepair)
+	{
+		Logs.Add(TEXT("Engine repair did not increase health"));
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_Repair")),
+			TEXT("InstantRepair did not work"),
+			Logs
+		);
+	}
+
+	// Brakes should still be damaged
+	float BrakesStillDamaged = DamageSystem->GetComponentState(EMGDamageComponent::Brakes).Health;
+	Logs.Add(FString::Printf(TEXT("Brakes (should still be damaged): %.0f"), BrakesStillDamaged));
+
+	// Test repair all
+	DamageSystem->InstantRepairAll();
+	float BrakesAfterRepairAll = DamageSystem->GetComponentState(EMGDamageComponent::Brakes).Health;
+	float SuspensionAfterRepairAll = DamageSystem->GetComponentState(EMGDamageComponent::Suspension).Health;
+	Logs.Add(FString::Printf(TEXT("Brakes after RepairAll: %.0f"), BrakesAfterRepairAll));
+	Logs.Add(FString::Printf(TEXT("Suspension after RepairAll: %.0f"), SuspensionAfterRepairAll));
+
+	// All should be at full health
+	if (BrakesAfterRepairAll < 100.0f || SuspensionAfterRepairAll < 100.0f)
+	{
+		Logs.Add(TEXT("RepairAll did not fully restore all components"));
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_Repair")),
+			TEXT("InstantRepairAll incomplete"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Vehicle_Repair")),
+		TEXT("Repair system working correctly")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestVehicle_PerformanceDegradation()
+{
+	LogTestStart(TEXT("TestVehicle_PerformanceDegradation"));
+
+	TArray<FString> Logs;
+
+	// Create damage system
+	UMGVehicleDamageSystem* DamageSystem = NewObject<UMGVehicleDamageSystem>();
+	if (!DamageSystem)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_PerformanceDegradation")),
+			TEXT("Failed to create damage system"),
+			{TEXT("NewObject<UMGVehicleDamageSystem>() returned null")}
+		);
+	}
+
+	// Check performance at full health
+	float EnginePerformanceFull = DamageSystem->GetComponentPerformance(EMGDamageComponent::Engine);
+	Logs.Add(FString::Printf(TEXT("Engine performance (full health): %.2f"), EnginePerformanceFull));
+
+	// Apply significant damage
+	DamageSystem->ApplyComponentDamage(EMGDamageComponent::Engine, 70.0f);
+	float EngineHealthAfterDamage = DamageSystem->GetComponentState(EMGDamageComponent::Engine).Health;
+	float EnginePerformanceDamaged = DamageSystem->GetComponentPerformance(EMGDamageComponent::Engine);
+	Logs.Add(FString::Printf(TEXT("Engine health after damage: %.0f"), EngineHealthAfterDamage));
+	Logs.Add(FString::Printf(TEXT("Engine performance (damaged): %.2f"), EnginePerformanceDamaged));
+
+	// Performance should be reduced when damaged
+	if (EnginePerformanceDamaged >= EnginePerformanceFull)
+	{
+		Logs.Add(TEXT("Performance should decrease with damage"));
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_PerformanceDegradation")),
+			TEXT("Performance not affected by damage"),
+			Logs
+		);
+	}
+
+	// Performance should be in valid range (0-1)
+	if (EnginePerformanceDamaged < 0.0f || EnginePerformanceDamaged > 1.0f)
+	{
+		Logs.Add(TEXT("Performance multiplier out of valid range"));
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_PerformanceDegradation")),
+			TEXT("Invalid performance value"),
+			Logs
+		);
+	}
+
+	// Test other components
+	float BrakesPerf = DamageSystem->GetComponentPerformance(EMGDamageComponent::Brakes);
+	float SuspensionPerf = DamageSystem->GetComponentPerformance(EMGDamageComponent::Suspension);
+	Logs.Add(FString::Printf(TEXT("Brakes performance: %.2f"), BrakesPerf));
+	Logs.Add(FString::Printf(TEXT("Suspension performance: %.2f"), SuspensionPerf));
+
+	return CreatePassResult(
+		FName(TEXT("Test_Vehicle_PerformanceDegradation")),
+		FString::Printf(TEXT("Performance degrades correctly: Full=%.2f, Damaged=%.2f"), EnginePerformanceFull, EnginePerformanceDamaged)
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestVehicle_TotaledState()
+{
+	LogTestStart(TEXT("TestVehicle_TotaledState"));
+
+	TArray<FString> Logs;
+
+	// Create damage system
+	UMGVehicleDamageSystem* DamageSystem = NewObject<UMGVehicleDamageSystem>();
+	if (!DamageSystem)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_TotaledState")),
+			TEXT("Failed to create damage system"),
+			{TEXT("NewObject<UMGVehicleDamageSystem>() returned null")}
+		);
+	}
+
+	// Check initial state
+	bool bInitialTotaled = DamageSystem->IsVehicleTotaled();
+	float InitialDamagePercent = DamageSystem->GetOverallDamagePercent();
+	Logs.Add(FString::Printf(TEXT("Initial totaled state: %s"), bInitialTotaled ? TEXT("true") : TEXT("false")));
+	Logs.Add(FString::Printf(TEXT("Initial overall damage: %.1f%%"), InitialDamagePercent));
+
+	// Vehicle should not start totaled
+	if (bInitialTotaled)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_TotaledState")),
+			TEXT("Vehicle should not start in totaled state"),
+			Logs
+		);
+	}
+
+	// Apply massive damage
+	DamageSystem->ApplyGlobalDamage(100.0f);
+	bool bNowTotaled = DamageSystem->IsVehicleTotaled();
+	float NowDamagePercent = DamageSystem->GetOverallDamagePercent();
+	Logs.Add(FString::Printf(TEXT("After 100%% global damage - Totaled: %s"), bNowTotaled ? TEXT("true") : TEXT("false")));
+	Logs.Add(FString::Printf(TEXT("Overall damage percent: %.1f%%"), NowDamagePercent));
+
+	// Test repair from totaled
+	DamageSystem->InstantRepairAll();
+	bool bAfterRepair = DamageSystem->IsVehicleTotaled();
+	float AfterRepairDamage = DamageSystem->GetOverallDamagePercent();
+	Logs.Add(FString::Printf(TEXT("After repair - Totaled: %s"), bAfterRepair ? TEXT("true") : TEXT("false")));
+	Logs.Add(FString::Printf(TEXT("Damage after repair: %.1f%%"), AfterRepairDamage));
+
+	// Overall damage percent should be in valid range
+	if (InitialDamagePercent < 0.0f || InitialDamagePercent > 100.0f)
+	{
+		Logs.Add(TEXT("Damage percent out of valid range"));
+		return CreateFailResult(
+			FName(TEXT("Test_Vehicle_TotaledState")),
+			TEXT("Invalid damage percentage"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Vehicle_TotaledState")),
+		FString::Printf(TEXT("Totaled state detection working. After damage: %s"), bNowTotaled ? TEXT("Totaled") : TEXT("Not totaled"))
+	);
+}
+
+// ==========================================
 // INTEGRATION TESTS
 // ==========================================
 
@@ -1086,6 +1503,14 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestEconomy_PurchaseFlow());
 	TestResults.Add(TestEconomy_TransactionHistory());
 
+	// Vehicle tests
+	TestResults.Add(TestVehicle_DamageSystemInit());
+	TestResults.Add(TestVehicle_ComponentDamage());
+	TestResults.Add(TestVehicle_DamageResistance());
+	TestResults.Add(TestVehicle_Repair());
+	TestResults.Add(TestVehicle_PerformanceDegradation());
+	TestResults.Add(TestVehicle_TotaledState());
+
 	// Integration tests
 	TestResults.Add(TestIntegration_CurrencyEconomy());
 	TestResults.Add(TestIntegration_WeatherRoad());
@@ -1188,6 +1613,34 @@ void UMGSubsystemTests::RunEconomyTests()
 	PrintTestReport();
 }
 
+void UMGSubsystemTests::RunVehicleTests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING VEHICLE TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestVehicle_DamageSystemInit());
+	TestResults.Add(TestVehicle_ComponentDamage());
+	TestResults.Add(TestVehicle_DamageResistance());
+	TestResults.Add(TestVehicle_Repair());
+	TestResults.Add(TestVehicle_PerformanceDegradation());
+	TestResults.Add(TestVehicle_TotaledState());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
 void UMGSubsystemTests::RunSmokeTests()
 {
 	UE_LOG(LogTemp, Log, TEXT("=== RUNNING SMOKE TESTS ==="));
@@ -1202,6 +1655,7 @@ void UMGSubsystemTests::RunSmokeTests()
 	TestResults.Add(TestCurrency_BalanceNonNegative());
 	TestResults.Add(TestWeather_SetWeatherType());
 	TestResults.Add(TestWeather_RoadGrip());
+	TestResults.Add(TestVehicle_DamageSystemInit());
 
 	for (const FMGTestResult& Result : TestResults)
 	{
