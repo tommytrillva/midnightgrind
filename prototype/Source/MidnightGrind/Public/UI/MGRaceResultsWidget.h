@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "GameModes/MGRaceGameMode.h"
 #include "Race/MGRaceFlowSubsystem.h"
+#include "Race/MGRaceHistorySubsystem.h"
 #include "MGRaceResultsWidget.generated.h"
 
 class UTextBlock;
@@ -14,6 +15,7 @@ class UVerticalBox;
 class UButton;
 class UCanvasPanel;
 class UMGRaceFlowSubsystem;
+class UMGRaceHistorySubsystem;
 
 /**
  * Individual racer result row
@@ -157,6 +159,34 @@ public:
 	bool DidPlayerWin() const { return CachedResults.bPlayerWon; }
 
 	// ==========================================
+	// HISTORY STATS
+	// ==========================================
+
+	/** Get formatted win streak text */
+	UFUNCTION(BlueprintPure, Category = "Results|History")
+	FText GetWinStreakText() const;
+
+	/** Get track personal best comparison text */
+	UFUNCTION(BlueprintPure, Category = "Results|History")
+	FText GetPersonalBestText() const;
+
+	/** Get career stats text (wins/races) */
+	UFUNCTION(BlueprintPure, Category = "Results|History")
+	FText GetCareerStatsText() const;
+
+	/** Was this a new personal best? */
+	UFUNCTION(BlueprintPure, Category = "Results|History")
+	bool IsNewPersonalBest() const { return bIsNewPB; }
+
+	/** Get current win streak */
+	UFUNCTION(BlueprintPure, Category = "Results|History")
+	int32 GetCurrentWinStreak() const;
+
+	/** Get track win rate text */
+	UFUNCTION(BlueprintPure, Category = "Results|History")
+	FText GetTrackWinRateText() const;
+
+	// ==========================================
 	// EVENTS
 	// ==========================================
 
@@ -219,6 +249,22 @@ protected:
 	UTextBlock* PromptText;
 
 	// ==========================================
+	// HISTORY STATS UI
+	// ==========================================
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional))
+	UTextBlock* PersonalBestText;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional))
+	UTextBlock* WinStreakText;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional))
+	UTextBlock* CareerStatsText;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional))
+	UTextBlock* TrackRecordText;
+
+	// ==========================================
 	// STATE
 	// ==========================================
 
@@ -237,6 +283,19 @@ protected:
 	/** Cached flow subsystem reference */
 	UPROPERTY()
 	TWeakObjectPtr<UMGRaceFlowSubsystem> RaceFlowSubsystem;
+
+	/** Cached race history subsystem reference */
+	UPROPERTY()
+	TWeakObjectPtr<UMGRaceHistorySubsystem> RaceHistorySubsystem;
+
+	/** Was this race a new personal best? */
+	bool bIsNewPB = false;
+
+	/** Cached track stats for display */
+	FMGTrackStats CachedTrackStats;
+
+	/** Cached lifetime stats for display */
+	FMGLifetimeStats CachedLifetimeStats;
 
 	// ==========================================
 	// CONFIGURATION
@@ -283,4 +342,13 @@ private:
 	FTimerHandle RowRevealTimerHandle;
 	int32 CurrentRevealRow = 0;
 	void RevealNextRow();
+
+	/** Update history stats display */
+	void UpdateHistoryStatsDisplay(const FString& TrackId, float PlayerTime);
+
+	/** Create history stats UI elements */
+	void CreateHistoryStatsUI();
+
+	/** Get race history subsystem */
+	UMGRaceHistorySubsystem* GetHistorySubsystem();
 };

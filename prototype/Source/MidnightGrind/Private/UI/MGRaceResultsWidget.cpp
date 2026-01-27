@@ -12,6 +12,7 @@
 #include "Blueprint/WidgetTree.h"
 #include "TimerManager.h"
 #include "Race/MGRaceFlowSubsystem.h"
+#include "Race/MGRaceHistorySubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
 void UMGRaceResultsWidget::NativeConstruct()
@@ -136,6 +137,18 @@ void UMGRaceResultsWidget::DisplayResults(const FMGRaceResults& Results)
 		PromptText->SetText(FText::FromString(TEXT("[ENTER] Continue    [R] Restart    [ESC] Quit")));
 	}
 
+	// Update history stats display
+	float PlayerTime = 0.0f;
+	for (const FMGRacerData& Racer : Results.RacerResults)
+	{
+		if (!Racer.bIsAI)
+		{
+			PlayerTime = Racer.TotalTime;
+			break;
+		}
+	}
+	UpdateHistoryStatsDisplay(Results.Config.TrackLayoutID, PlayerTime);
+
 	OnResultsReady();
 
 	// Play appropriate animation
@@ -156,13 +169,19 @@ void UMGRaceResultsWidget::ShowResults()
 
 	// Start row reveal animation
 	CurrentRevealRow = 0;
-	GetWorld()->GetTimerManager().SetTimer(RowRevealTimerHandle, this, &UMGRaceResultsWidget::RevealNextRow, 0.2f, true);
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().SetTimer(RowRevealTimerHandle, this, &UMGRaceResultsWidget::RevealNextRow, 0.2f, true);
+	}
 }
 
 void UMGRaceResultsWidget::HideResults()
 {
 	SetVisibility(ESlateVisibility::Collapsed);
-	GetWorld()->GetTimerManager().ClearTimer(RowRevealTimerHandle);
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(RowRevealTimerHandle);
+	}
 }
 
 FText UMGRaceResultsWidget::GetCreditsEarnedText() const
@@ -442,6 +461,9 @@ void UMGRaceResultsWidget::CreateUIElements()
 			}
 		}
 	}
+
+	// Create history stats UI elements
+	CreateHistoryStatsUI();
 }
 
 UWidget* UMGRaceResultsWidget::CreateResultRow(const FMGResultRowData& RowData)
@@ -775,6 +797,10 @@ void UMGRaceResultsWidget::DisplayFlowResults(const FMGRaceFlowResult& FlowResul
 		}
 	}
 
+	// Update history stats display (use cached results track if available, otherwise empty)
+	FString TrackId = CachedResults.Config.TrackLayoutID.IsEmpty() ? TEXT("DefaultTrack") : CachedResults.Config.TrackLayoutID;
+	UpdateHistoryStatsDisplay(TrackId, FlowResult.PlayerTotalTime);
+
 	OnResultsReady();
 
 	if (FlowResult.bPlayerWon)
@@ -847,4 +873,280 @@ FText UMGRaceResultsWidget::GetPinkSlipVehicleText() const
 		return FText::FromString(FString::Printf(TEXT("LOST: %s"), *CachedFlowResult.PinkSlipLostVehicleID.ToString()));
 	}
 	return FText::GetEmpty();
+}
+
+// ==========================================
+// HISTORY STATS (Iteration 67)
+// ==========================================
+
+UMGRaceHistorySubsystem* UMGRaceResultsWidget::GetHistorySubsystem()
+{
+	if (!RaceHistorySubsystem.IsValid())
+	{
+		if (UGameInstance* GI = UGameplayStatics::GetGameInstance(this))
+		{
+			RaceHistorySubsystem = GI->GetSubsystem<UMGRaceHistorySubsystem>();
+		}
+	}
+	return RaceHistorySubsystem.Get();
+}
+
+void UMGRaceResultsWidget::UpdateHistoryStatsDisplay(const FString& TrackId, float PlayerTime)
+{
+	UMGRaceHistorySubsystem* HistorySub = GetHistorySubsystem();
+	if (!HistorySub)
+	{
+		return;
+	}
+
+	// Get track stats
+	CachedTrackStats = HistorySub->GetTrackStats(TrackId);
+	CachedLifetimeStats = HistorySub->GetLifetimeStats();
+
+	// Check for new personal best
+	float PrevBest = HistorySub->GetPersonalBestTime(TrackId);
+	bIsNewPB = (PrevBest <= 0.0f || PlayerTime < PrevBest) && PlayerTime > 0.0f;
+
+	// Update personal best text
+	if (PersonalBestText)
+	{
+		if (bIsNewPB)
+		{
+			if (PrevBest > 0.0f)
+			{
+				float Improvement = PrevBest - PlayerTime;
+				PersonalBestText->SetText(FText::FromString(FString::Printf(TEXT("NEW PB! (-%0.3fs)"), Improvement)));
+				PersonalBestText->SetColorAndOpacity(WinnerColor);
+			}
+			else
+			{
+				PersonalBestText->SetText(FText::FromString(TEXT("NEW PERSONAL BEST!")));
+				PersonalBestText->SetColorAndOpacity(WinnerColor);
+			}
+		}
+		else if (PrevBest > 0.0f)
+		{
+			float Diff = PlayerTime - PrevBest;
+			PersonalBestText->SetText(FText::FromString(FString::Printf(TEXT("PB: %s (+%0.3fs)"), *FormatTime(PrevBest).ToString(), Diff)));
+			PersonalBestText->SetColorAndOpacity(FSlateColor(FLinearColor(0.7f, 0.7f, 0.7f, 1.0f)));
+		}
+		else
+		{
+			PersonalBestText->SetText(FText::GetEmpty());
+		}
+	}
+
+	// Update win streak text
+	if (WinStreakText)
+	{
+		if (CachedLifetimeStats.CurrentWinStreak > 1)
+		{
+			WinStreakText->SetText(FText::FromString(FString::Printf(TEXT("WIN STREAK: %d"), CachedLifetimeStats.CurrentWinStreak)));
+			WinStreakText->SetColorAndOpacity(WinnerColor);
+		}
+		else if (CachedLifetimeStats.CurrentPodiumStreak > 2)
+		{
+			WinStreakText->SetText(FText::FromString(FString::Printf(TEXT("PODIUM STREAK: %d"), CachedLifetimeStats.CurrentPodiumStreak)));
+			WinStreakText->SetColorAndOpacity(FSlateColor(FLinearColor(0.8f, 0.4f, 0.0f, 1.0f)));
+		}
+		else
+		{
+			WinStreakText->SetText(FText::GetEmpty());
+		}
+	}
+
+	// Update career stats text
+	if (CareerStatsText)
+	{
+		float WinRate = CachedLifetimeStats.GetWinRate() * 100.0f;
+		CareerStatsText->SetText(FText::FromString(FString::Printf(TEXT("CAREER: %d WINS / %d RACES (%.0f%%)"),
+			CachedLifetimeStats.TotalWins,
+			CachedLifetimeStats.TotalRaces,
+			WinRate)));
+		CareerStatsText->SetColorAndOpacity(FSlateColor(FLinearColor(0.7f, 0.7f, 0.7f, 1.0f)));
+	}
+
+	// Update track record text
+	if (TrackRecordText)
+	{
+		if (CachedTrackStats.TotalRaces > 0)
+		{
+			TrackRecordText->SetText(FText::FromString(FString::Printf(TEXT("THIS TRACK: %d WINS / %d RACES"),
+				CachedTrackStats.Wins,
+				CachedTrackStats.TotalRaces)));
+			TrackRecordText->SetColorAndOpacity(FSlateColor(FLinearColor(0.6f, 0.6f, 0.6f, 1.0f)));
+		}
+		else
+		{
+			TrackRecordText->SetText(FText::FromString(TEXT("FIRST TIME ON THIS TRACK!")));
+			TrackRecordText->SetColorAndOpacity(PlayerHighlightColor);
+		}
+	}
+}
+
+void UMGRaceResultsWidget::CreateHistoryStatsUI()
+{
+	if (!RootCanvas) return;
+
+	// Personal Best display
+	if (!PersonalBestText)
+	{
+		PersonalBestText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (PersonalBestText)
+		{
+			PersonalBestText->SetText(FText::GetEmpty());
+			PersonalBestText->SetColorAndOpacity(WinnerColor);
+			PersonalBestText->SetJustification(ETextJustify::Center);
+
+			FSlateFontInfo FontInfo = PersonalBestText->GetFont();
+			FontInfo.Size = 28;
+			PersonalBestText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(PersonalBestText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(PersonalBestText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.5f, 0.0f, 0.5f, 0.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 0.0f));
+				Slot->SetPosition(FVector2D(0.0f, 175.0f));
+				Slot->SetSize(FVector2D(500.0f, 35.0f));
+			}
+		}
+	}
+
+	// Win streak display
+	if (!WinStreakText)
+	{
+		WinStreakText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (WinStreakText)
+		{
+			WinStreakText->SetText(FText::GetEmpty());
+			WinStreakText->SetColorAndOpacity(WinnerColor);
+			WinStreakText->SetJustification(ETextJustify::Right);
+
+			FSlateFontInfo FontInfo = WinStreakText->GetFont();
+			FontInfo.Size = 20;
+			WinStreakText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(WinStreakText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(WinStreakText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(1.0f, 0.0f, 1.0f, 0.0f));
+				Slot->SetAlignment(FVector2D(1.0f, 0.0f));
+				Slot->SetPosition(FVector2D(-30.0f, 60.0f));
+				Slot->SetSize(FVector2D(250.0f, 30.0f));
+			}
+		}
+	}
+
+	// Career stats display
+	if (!CareerStatsText)
+	{
+		CareerStatsText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (CareerStatsText)
+		{
+			CareerStatsText->SetText(FText::GetEmpty());
+			CareerStatsText->SetColorAndOpacity(FSlateColor(FLinearColor(0.7f, 0.7f, 0.7f, 1.0f)));
+			CareerStatsText->SetJustification(ETextJustify::Center);
+
+			FSlateFontInfo FontInfo = CareerStatsText->GetFont();
+			FontInfo.Size = 16;
+			CareerStatsText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(CareerStatsText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(CareerStatsText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.5f, 1.0f, 0.5f, 1.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 1.0f));
+				Slot->SetPosition(FVector2D(0.0f, -200.0f));
+				Slot->SetSize(FVector2D(500.0f, 25.0f));
+			}
+		}
+	}
+
+	// Track record display
+	if (!TrackRecordText)
+	{
+		TrackRecordText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+		if (TrackRecordText)
+		{
+			TrackRecordText->SetText(FText::GetEmpty());
+			TrackRecordText->SetColorAndOpacity(FSlateColor(FLinearColor(0.6f, 0.6f, 0.6f, 1.0f)));
+			TrackRecordText->SetJustification(ETextJustify::Center);
+
+			FSlateFontInfo FontInfo = TrackRecordText->GetFont();
+			FontInfo.Size = 14;
+			TrackRecordText->SetFont(FontInfo);
+
+			RootCanvas->AddChild(TrackRecordText);
+
+			if (UCanvasPanelSlot* Slot = Cast<UCanvasPanelSlot>(TrackRecordText->Slot))
+			{
+				Slot->SetAnchors(FAnchors(0.5f, 1.0f, 0.5f, 1.0f));
+				Slot->SetAlignment(FVector2D(0.5f, 1.0f));
+				Slot->SetPosition(FVector2D(0.0f, -175.0f));
+				Slot->SetSize(FVector2D(400.0f, 22.0f));
+			}
+		}
+	}
+}
+
+FText UMGRaceResultsWidget::GetWinStreakText() const
+{
+	if (CachedLifetimeStats.CurrentWinStreak > 1)
+	{
+		return FText::FromString(FString::Printf(TEXT("WIN STREAK: %d"), CachedLifetimeStats.CurrentWinStreak));
+	}
+	else if (CachedLifetimeStats.CurrentPodiumStreak > 2)
+	{
+		return FText::FromString(FString::Printf(TEXT("PODIUM STREAK: %d"), CachedLifetimeStats.CurrentPodiumStreak));
+	}
+	return FText::GetEmpty();
+}
+
+FText UMGRaceResultsWidget::GetPersonalBestText() const
+{
+	UMGRaceHistorySubsystem* HistorySub = const_cast<UMGRaceResultsWidget*>(this)->GetHistorySubsystem();
+	if (!HistorySub)
+	{
+		return FText::GetEmpty();
+	}
+
+	FString TrackId = CachedResults.Config.TrackLayoutID;
+	float PB = HistorySub->GetPersonalBestTime(TrackId);
+	if (PB > 0.0f)
+	{
+		return FText::FromString(FString::Printf(TEXT("PERSONAL BEST: %s"), *FormatTime(PB).ToString()));
+	}
+	return FText::GetEmpty();
+}
+
+FText UMGRaceResultsWidget::GetCareerStatsText() const
+{
+	float WinRate = CachedLifetimeStats.GetWinRate() * 100.0f;
+	return FText::FromString(FString::Printf(TEXT("CAREER: %d WINS / %d RACES (%.0f%%)"),
+		CachedLifetimeStats.TotalWins,
+		CachedLifetimeStats.TotalRaces,
+		WinRate));
+}
+
+int32 UMGRaceResultsWidget::GetCurrentWinStreak() const
+{
+	return CachedLifetimeStats.CurrentWinStreak;
+}
+
+FText UMGRaceResultsWidget::GetTrackWinRateText() const
+{
+	if (CachedTrackStats.TotalRaces > 0)
+	{
+		float TrackWinRate = CachedTrackStats.TotalRaces > 0 ?
+			(float)CachedTrackStats.Wins / CachedTrackStats.TotalRaces * 100.0f : 0.0f;
+		return FText::FromString(FString::Printf(TEXT("THIS TRACK: %d/%d WINS (%.0f%%)"),
+			CachedTrackStats.Wins,
+			CachedTrackStats.TotalRaces,
+			TrackWinRate));
+	}
+	return FText::FromString(TEXT("FIRST TIME ON THIS TRACK"));
 }

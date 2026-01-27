@@ -204,6 +204,34 @@ public:
 	void SpawnDebris(FVector Location, FVector Direction, int32 DebrisCount = 5);
 
 	// ==========================================
+	// LIGHT DAMAGE
+	// ==========================================
+
+	/**
+	 * Set headlights broken state.
+	 * Updates material emissive and spawns glass debris.
+	 * @param bBroken True if headlights are broken
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Damage")
+	void SetHeadlightsBroken(bool bBroken);
+
+	/**
+	 * Set taillights broken state.
+	 * Updates material emissive and spawns glass debris.
+	 * @param bBroken True if taillights are broken
+	 */
+	UFUNCTION(BlueprintCallable, Category = "VFX|Damage")
+	void SetTaillightsBroken(bool bBroken);
+
+	/** Are headlights currently broken */
+	UFUNCTION(BlueprintPure, Category = "VFX|Damage")
+	bool AreHeadlightsBroken() const { return bHeadlightsBroken; }
+
+	/** Are taillights currently broken */
+	UFUNCTION(BlueprintPure, Category = "VFX|Damage")
+	bool AreTaillightsBroken() const { return bTaillightsBroken; }
+
+	// ==========================================
 	// WEAR SYSTEM VFX HOOKS
 	// ==========================================
 
@@ -425,6 +453,22 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "VFX|Config")
 	FName EngineSocketName = FName("Engine");
 
+	/** Headlight socket names (left, right) */
+	UPROPERTY(EditDefaultsOnly, Category = "VFX|Config")
+	TArray<FName> HeadlightSocketNames = { FName("Headlight_L"), FName("Headlight_R") };
+
+	/** Taillight socket names (left, right) */
+	UPROPERTY(EditDefaultsOnly, Category = "VFX|Config")
+	TArray<FName> TaillightSocketNames = { FName("Taillight_L"), FName("Taillight_R") };
+
+	/** Material parameter name for headlight emissive */
+	UPROPERTY(EditDefaultsOnly, Category = "VFX|Config")
+	FName HeadlightEmissiveParam = FName("HeadlightEmissive");
+
+	/** Material parameter name for taillight emissive */
+	UPROPERTY(EditDefaultsOnly, Category = "VFX|Config")
+	FName TaillightEmissiveParam = FName("TaillightEmissive");
+
 	/** Speed threshold for speed effects (KPH) */
 	UPROPERTY(EditDefaultsOnly, Category = "VFX|Config")
 	float SpeedEffectsThreshold = 120.0f;
@@ -472,6 +516,10 @@ protected:
 	/** Speed effects enabled */
 	bool bSpeedLinesEnabled = true;
 	bool bHeatDistortionEnabled = true;
+
+	/** Light damage state */
+	bool bHeadlightsBroken = false;
+	bool bTaillightsBroken = false;
 
 	// ==========================================
 	// ACTIVE COMPONENTS

@@ -135,6 +135,32 @@ void AMGVehiclePawn::BeginPlay()
 	SetCameraMode(EMGCameraMode::Chase);
 }
 
+void AMGVehiclePawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Unbind damage system delegates
+	if (VehicleDamageSystem)
+	{
+		VehicleDamageSystem->OnDamageTaken.RemoveDynamic(this, &AMGVehiclePawn::HandleDamageTaken);
+		VehicleDamageSystem->OnComponentDamaged.RemoveDynamic(this, &AMGVehiclePawn::HandleComponentDamaged);
+		VehicleDamageSystem->OnComponentBroken.RemoveDynamic(this, &AMGVehiclePawn::HandleComponentBroken);
+		VehicleDamageSystem->OnVisualDamageUpdated.RemoveDynamic(this, &AMGVehiclePawn::HandleVisualDamageUpdated);
+		VehicleDamageSystem->OnScrapeStart.RemoveDynamic(this, &AMGVehiclePawn::HandleScrapeStart);
+		VehicleDamageSystem->OnScrapeEnd.RemoveDynamic(this, &AMGVehiclePawn::HandleScrapeEnd);
+	}
+
+	// Unbind movement component delegates
+	if (MGVehicleMovement)
+	{
+		MGVehicleMovement->OnGearChanged.RemoveDynamic(this, &AMGVehiclePawn::OnGearChanged);
+		MGVehicleMovement->OnClutchOverheating.RemoveDynamic(this, &AMGVehiclePawn::HandleClutchOverheat);
+		MGVehicleMovement->OnClutchBurnout.RemoveDynamic(this, &AMGVehiclePawn::HandleClutchBurnout);
+		MGVehicleMovement->OnTireBlowout.RemoveDynamic(this, &AMGVehiclePawn::HandleTireBlowout);
+		MGVehicleMovement->OnMoneyShift.RemoveDynamic(this, &AMGVehiclePawn::HandleMoneyShift);
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void AMGVehiclePawn::NotifyHit(
 	UPrimitiveComponent* MyComp,
 	AActor* Other,
@@ -198,6 +224,18 @@ void AMGVehiclePawn::UpdateHUDTelemetry()
 			Telemetry.DriftAngle = RuntimeState.DriftAngle;
 
 			HUDSubsystem->UpdateVehicleTelemetry(Telemetry);
+
+			// Update drift score data if drifting
+			if (RuntimeState.bIsDrifting || RuntimeState.DriftScore > 0.0f)
+			{
+				FMGDriftScoreData DriftData;
+				DriftData.CurrentDriftScore = static_cast<int32>(RuntimeState.DriftScore);
+				DriftData.TotalDriftScore = static_cast<int32>(RuntimeState.DriftScore);
+				DriftData.bInDriftChain = RuntimeState.bIsDrifting;
+				DriftData.DriftMultiplier = FMath::Clamp(FMath::Abs(RuntimeState.DriftAngle) / 45.0f, 1.0f, 3.0f);
+
+				HUDSubsystem->UpdateDriftScore(DriftData);
+			}
 		}
 	}
 }
@@ -1049,6 +1087,10 @@ void AMGVehiclePawn::HandleVisualDamageUpdated(const FMGVisualDamageState& Visua
 
 		// Apply to VFX component
 		VehicleVFX->SetDamageState(VFXState);
+
+		// Update light damage state
+		VehicleVFX->SetHeadlightsBroken(VisualState.bHeadlightsBroken);
+		VehicleVFX->SetTaillightsBroken(VisualState.bTaillightsBroken);
 
 		// Glass break sound if windows damaged significantly
 		if (VehicleSFX && VisualState.WindowDamage > 0.5f)

@@ -150,13 +150,15 @@ void UMGVehicleVFXComponent::UpdateTireState(int32 WheelIndex, float SlipRatio, 
 	State.bIsDrifting = bShouldDrift;
 
 	// Update tire temperature (heat builds with slip, cools without)
+	UWorld* World = GetWorld();
+	float DeltaSeconds = World ? World->GetDeltaSeconds() : 0.016f;
 	if (bShouldSmoke || bShouldDrift)
 	{
-		State.TireTemperature = FMath::Min(State.TireTemperature + TireHeatRate * State.SlipAmount * GetWorld()->GetDeltaSeconds(), 1.0f);
+		State.TireTemperature = FMath::Min(State.TireTemperature + TireHeatRate * State.SlipAmount * DeltaSeconds, 1.0f);
 	}
 	else
 	{
-		State.TireTemperature = FMath::Max(State.TireTemperature - TireCoolRate * GetWorld()->GetDeltaSeconds(), 0.0f);
+		State.TireTemperature = FMath::Max(State.TireTemperature - TireCoolRate * DeltaSeconds, 0.0f);
 	}
 }
 
@@ -621,6 +623,104 @@ void UMGVehicleVFXComponent::SpawnDebris(FVector Location, FVector Direction, in
 	}
 }
 
+void UMGVehicleVFXComponent::SetHeadlightsBroken(bool bBroken)
+{
+	if (bHeadlightsBroken == bBroken)
+	{
+		return;
+	}
+
+	bHeadlightsBroken = bBroken;
+
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return;
+	}
+
+	USkeletalMeshComponent* Mesh = Owner->FindComponentByClass<USkeletalMeshComponent>();
+	if (!Mesh)
+	{
+		return;
+	}
+
+	// Update emissive parameter on materials
+	for (int32 i = 0; i < Mesh->GetNumMaterials(); i++)
+	{
+		UMaterialInstanceDynamic* DynMat = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(i));
+		if (DynMat)
+		{
+			// Set headlight emissive to 0 when broken
+			DynMat->SetScalarParameterValue(HeadlightEmissiveParam, bBroken ? 0.0f : 1.0f);
+		}
+	}
+
+	// Spawn glass debris when breaking
+	if (bBroken)
+	{
+		for (const FName& SocketName : HeadlightSocketNames)
+		{
+			if (Mesh->DoesSocketExist(SocketName))
+			{
+				FVector SocketLocation = Mesh->GetSocketLocation(SocketName);
+				FVector Forward = Owner->GetActorForwardVector();
+
+				// Spawn glass debris flying forward
+				SpawnDebris(SocketLocation, Forward, 8);
+			}
+		}
+	}
+}
+
+void UMGVehicleVFXComponent::SetTaillightsBroken(bool bBroken)
+{
+	if (bTaillightsBroken == bBroken)
+	{
+		return;
+	}
+
+	bTaillightsBroken = bBroken;
+
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return;
+	}
+
+	USkeletalMeshComponent* Mesh = Owner->FindComponentByClass<USkeletalMeshComponent>();
+	if (!Mesh)
+	{
+		return;
+	}
+
+	// Update emissive parameter on materials
+	for (int32 i = 0; i < Mesh->GetNumMaterials(); i++)
+	{
+		UMaterialInstanceDynamic* DynMat = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(i));
+		if (DynMat)
+		{
+			// Set taillight emissive to 0 when broken
+			DynMat->SetScalarParameterValue(TaillightEmissiveParam, bBroken ? 0.0f : 1.0f);
+		}
+	}
+
+	// Spawn glass debris when breaking
+	if (bBroken)
+	{
+		for (const FName& SocketName : TaillightSocketNames)
+		{
+			if (Mesh->DoesSocketExist(SocketName))
+			{
+				FVector SocketLocation = Mesh->GetSocketLocation(SocketName);
+				FVector Backward = -Owner->GetActorForwardVector();
+
+				// Spawn glass debris flying backward
+				SpawnDebris(SocketLocation, Backward, 6);
+			}
+		}
+	}
+}
+
 // ==========================================
 // ENVIRONMENT INTERACTION
 // ==========================================
@@ -905,7 +1005,9 @@ void UMGVehicleVFXComponent::UpdateDamageEffects(float DeltaTime)
 	if (EngineSmokeComp && EngineSmokeComp->IsActive())
 	{
 		// Add flicker/variation to smoke
-		float FlickerAmount = FMath::PerlinNoise1D(GetWorld()->GetTimeSeconds() * 3.0f) * 0.2f;
+		UWorld* World = GetWorld();
+		float TimeSeconds = World ? World->GetTimeSeconds() : 0.0f;
+		float FlickerAmount = FMath::PerlinNoise1D(TimeSeconds * 3.0f) * 0.2f;
 		float BaseIntensity = FMath::Max(CurrentDamageState.FrontDamage, CurrentDamageState.OverallDamage);
 		EngineSmokeComp->SetNiagaraVariableFloat(FString("SmokeIntensity"), BaseIntensity + FlickerAmount);
 	}
