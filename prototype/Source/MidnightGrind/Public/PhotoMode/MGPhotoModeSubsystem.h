@@ -68,28 +68,32 @@ enum class EMGPhotoCamera : uint8
 };
 
 /**
- * Photo filter preset
+ * @brief Photo filter presets for visual styling.
+ *
+ * Predefined visual filters that modify color grading, contrast, saturation,
+ * and other post-processing effects to achieve specific artistic looks.
+ * Use Custom to apply user-defined settings from FMGPhotoVisualSettings.
  */
 UENUM(BlueprintType)
 enum class EMGPhotoFilter : uint8
 {
-	/** No filter */
+	/** No filter - Raw captured image without post-processing modifications */
 	None,
-	/** Vintage/sepia */
+	/** Vintage/sepia - Warm tones with faded colors, nostalgic film look */
 	Vintage,
-	/** High contrast */
+	/** High contrast - Dramatic shadows and highlights, punchy colors */
 	Dramatic,
-	/** Film noir */
+	/** Film noir - Black and white with high contrast, classic cinema style */
 	Noir,
-	/** Neon glow */
+	/** Neon glow - Enhanced bloom with vibrant neon color palette */
 	Neon,
-	/** VHS/Retro */
+	/** VHS/Retro - Scan lines, chromatic aberration, 80s/90s aesthetic */
 	VHS,
-	/** Blueprint style */
+	/** Blueprint style - Technical wireframe look with blue tint */
 	Blueprint,
-	/** Night vision */
+	/** Night vision - Green tinted with enhanced brightness, military style */
 	NightVision,
-	/** Custom settings */
+	/** Custom settings - Uses manually configured FMGPhotoVisualSettings values */
 	Custom
 };
 

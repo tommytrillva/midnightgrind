@@ -1,5 +1,41 @@
-// Copyright Midnight Grind. All Rights Reserved.
-// Stage 51: Race Flow Subsystem - MVP Game Flow Orchestration
+/**
+ * @file MGRaceFlowSubsystem.h
+ * @brief Race Flow Subsystem - The central orchestrator for the complete race lifecycle
+ *
+ * This subsystem serves as the primary coordinator between all race-related systems in
+ * Midnight Grind. It manages the entire race flow from the moment a player selects a race
+ * in the garage through track loading, race execution, results display, and reward
+ * distribution.
+ *
+ * ## Key Responsibilities
+ * - Receiving and validating race setup requests from the garage/menu UI
+ * - Coordinating track level loading and unloading
+ * - Spawning player and AI vehicles at starting positions
+ * - Connecting to the RaceGameMode for active race management
+ * - Processing race results and calculating rewards
+ * - Managing the return flow back to the garage
+ *
+ * ## Race Flow States
+ * The subsystem operates as a state machine progressing through:
+ * Idle -> Setup -> Loading -> PreRace -> Countdown -> Racing -> Cooldown -> Results -> ProcessingRewards -> Returning
+ *
+ * ## Usage Example
+ * @code
+ * UMGRaceFlowSubsystem* RaceFlow = GetGameInstance()->GetSubsystem<UMGRaceFlowSubsystem>();
+ * FMGRaceSetupRequest Request;
+ * Request.TrackID = FName("Downtown_Circuit");
+ * Request.PlayerVehicleID = FName("Nissan_GTR");
+ * Request.LapCount = 3;
+ * RaceFlow->StartRace(Request);
+ * @endcode
+ *
+ * @note This is a GameInstanceSubsystem, meaning it persists across level transitions
+ * @see UMGRaceDirectorSubsystem for AI pacing and drama control
+ * @see UMGRaceModeSubsystem for race type and scoring logic
+ *
+ * Copyright Midnight Grind. All Rights Reserved.
+ * Stage 51: Race Flow Subsystem - MVP Game Flow Orchestration
+ */
 
 #pragma once
 
@@ -7,19 +43,41 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MGRaceFlowSubsystem.generated.h"
 
+// ============================================================================
+// FORWARD DECLARATIONS
+// ============================================================================
+
 class UMGGameStateSubsystem;
 class UMGVehicleManagerSubsystem;
 class UMGRaceDirectorSubsystem;
 class UMGEconomySubsystem;
 class UMGGarageSubsystem;
 
+// ============================================================================
+// RACE SETUP REQUEST
+// ============================================================================
+
 /**
- * Race setup request from garage
+ * @struct FMGRaceSetupRequest
+ * @brief Complete configuration for initiating a race from the garage/menu
+ *
+ * This struct contains all parameters needed to set up and start a race.
+ * It is typically populated by the garage UI when the player selects race options.
+ *
+ * The request includes:
+ * - Track and race type selection
+ * - Player vehicle choice
+ * - AI opponent configuration
+ * - Environmental conditions (time, weather)
+ * - Pink slip (vehicle wagering) settings
+ * - Reward multipliers
  */
 USTRUCT(BlueprintType)
 struct FMGRaceSetupRequest
 {
 	GENERATED_BODY()
+
+	// ---- Track Selection ----
 
 	/** Track ID to race on */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
@@ -33,6 +91,8 @@ struct FMGRaceSetupRequest
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
 	int32 LapCount = 3;
 
+	// ---- AI Configuration ----
+
 	/** Number of AI opponents */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
 	int32 AICount = 7;
@@ -41,9 +101,13 @@ struct FMGRaceSetupRequest
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
 	float AIDifficulty = 0.5f;
 
+	// ---- Player Vehicle ----
+
 	/** Player's selected vehicle ID */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
 	FName PlayerVehicleID;
+
+	// ---- Environmental Conditions ----
 
 	/** Time of day (0 = midnight, 0.5 = noon, 1 = midnight) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
@@ -53,6 +117,8 @@ struct FMGRaceSetupRequest
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
 	float Weather = 0.0f;
 
+	// ---- Pink Slip Settings ----
+
 	/** Is this a pink slip race? */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
 	bool bIsPinkSlip = false;
@@ -61,6 +127,8 @@ struct FMGRaceSetupRequest
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
 	FName PinkSlipVehicleID;
 
+	// ---- Multiplayer Settings ----
+
 	/** Is ranked multiplayer */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
 	bool bIsRanked = false;
@@ -68,6 +136,8 @@ struct FMGRaceSetupRequest
 	/** Session ID for multiplayer */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
 	FString SessionID;
+
+	// ---- Reward Configuration ----
 
 	/** Base cash reward */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Race")
@@ -78,13 +148,29 @@ struct FMGRaceSetupRequest
 	int32 BaseRepReward = 100;
 };
 
+// ============================================================================
+// RACE FLOW RESULT
+// ============================================================================
+
 /**
- * Race result returned to garage/menu
+ * @struct FMGRaceFlowResult
+ * @brief Complete race results returned to the garage/menu after race completion
+ *
+ * Contains all outcome data from a completed race including:
+ * - Player finishing position and completion status
+ * - Timing data (total time, lap times, best lap)
+ * - Rewards earned (cash, reputation, XP)
+ * - Special achievements (track records, personal bests)
+ * - Pink slip outcomes (vehicles won/lost)
+ *
+ * This data is used by the results screen and progression systems.
  */
 USTRUCT(BlueprintType)
 struct FMGRaceFlowResult
 {
 	GENERATED_BODY()
+
+	// ---- Completion Status ----
 
 	/** Did the player finish? */
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
@@ -98,6 +184,8 @@ struct FMGRaceFlowResult
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
 	int32 TotalRacers = 0;
 
+	// ---- Timing Data ----
+
 	/** Player's total time */
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
 	float PlayerTotalTime = 0.0f;
@@ -110,9 +198,13 @@ struct FMGRaceFlowResult
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
 	TArray<float> PlayerLapTimes;
 
+	// ---- Win/Loss Status ----
+
 	/** Did player win? */
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
 	bool bPlayerWon = false;
+
+	// ---- Rewards ----
 
 	/** Cash earned */
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
@@ -130,6 +222,8 @@ struct FMGRaceFlowResult
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
 	int64 DriftScore = 0;
 
+	// ---- Pink Slip Outcomes ----
+
 	/** Pink slip won vehicle (if applicable) */
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
 	FName PinkSlipWonVehicleID;
@@ -137,6 +231,8 @@ struct FMGRaceFlowResult
 	/** Pink slip lost vehicle (if applicable) */
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
 	FName PinkSlipLostVehicleID;
+
+	// ---- Records and Achievements ----
 
 	/** Track record beaten? */
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
@@ -150,86 +246,159 @@ struct FMGRaceFlowResult
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
 	bool bRaceCompleted = false;
 
+	// ---- Leaderboard Data ----
+
 	/** All racer results for leaderboard display */
 	UPROPERTY(BlueprintReadOnly, Category = "Results")
 	TArray<FName> FinishOrder;
 };
 
+// ============================================================================
+// AI RACER SETUP
+// ============================================================================
+
 /**
- * AI racer info for race setup
+ * @struct FMGAIRacerSetup
+ * @brief Configuration for a single AI opponent in the race
+ *
+ * Defines the vehicle, personality, and behavior traits for an AI racer.
+ * The Race Flow Subsystem generates these based on difficulty settings
+ * or accepts manually configured opponents for story/rival races.
  */
 USTRUCT(BlueprintType)
 struct FMGAIRacerSetup
 {
 	GENERATED_BODY()
 
+	/// The vehicle definition ID this AI will drive
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName VehicleID;
 
+	/// Display name shown in race UI (e.g., "Street King", "Shadow")
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString DisplayName;
 
+	/// Skill level from 0.0 (novice) to 1.0 (expert) - affects racing line adherence and speed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SkillLevel = 0.5f;
 
+	/// Aggression from 0.0 (passive) to 1.0 (aggressive) - affects blocking and overtaking behavior
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Aggression = 0.5f;
 
+	/// Is this a story/career rival with special behaviors and narrative significance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsRival = false;
 };
 
+// ============================================================================
+// RACE FLOW STATE ENUMERATION
+// ============================================================================
+
 /**
- * Current race flow state
+ * @enum EMGRaceFlowState
+ * @brief State machine states representing the complete race lifecycle
+ *
+ * The Race Flow Subsystem progresses through these states sequentially.
+ * Each state has associated setup and teardown logic, and transitions
+ * are triggered by various game events or timers.
+ *
+ * ## State Transition Diagram
+ * @verbatim
+ * Idle -> Setup -> Loading -> PreRace -> Countdown -> Racing
+ *                                                        |
+ *   Error <-----------------------------------------+    v
+ *                                                   Cooldown
+ *                                                       |
+ *                                                       v
+ *                                                    Results
+ *                                                       |
+ *                                                       v
+ *                                              ProcessingRewards
+ *                                                       |
+ *                                                       v
+ *                                                   Returning -> Idle
+ * @endverbatim
  */
 UENUM(BlueprintType)
 enum class EMGRaceFlowState : uint8
 {
-	/** No race active */
+	/** No race active - waiting for race request from garage */
 	Idle,
-	/** Setting up race */
+	/** Setting up race - validating request and preparing data */
 	Setup,
-	/** Loading track */
+	/** Loading track - streaming in the race level */
 	Loading,
-	/** Pre-race grid/intro */
+	/** Pre-race grid/intro - vehicles on grid, camera flyover */
 	PreRace,
-	/** Countdown active */
+	/** Countdown active - 3, 2, 1, GO! sequence */
 	Countdown,
-	/** Race in progress */
+	/** Race in progress - active racing */
 	Racing,
-	/** Race finished, cooldown */
+	/** Race finished, cooldown - brief pause after finish */
 	Cooldown,
-	/** Showing results */
+	/** Showing results - results screen displayed to player */
 	Results,
-	/** Processing rewards */
+	/** Processing rewards - applying cash/rep/XP to player profile */
 	ProcessingRewards,
-	/** Returning to garage */
+	/** Returning to garage - unloading race level, loading garage */
 	Returning,
-	/** Error state */
+	/** Error state - something went wrong, requires recovery */
 	Error
 };
 
-// Delegates
+// ============================================================================
+// EVENT DELEGATES
+// ============================================================================
+
+/// Broadcast when the race flow state machine transitions to a new state
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRaceFlowStateChanged, EMGRaceFlowState, NewState);
+
+/// Broadcast when race setup phase completes (success or failure)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRaceSetupComplete, bool, bSuccess);
+
+/// Broadcast periodically during track loading with progress (0.0 to 1.0)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRaceLoadProgress, float, Progress);
+
+/// Broadcast when the countdown ends and race officially starts
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRaceStarted);
+
+/// Broadcast when the race ends (player finishes or race concludes)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRaceFinished, const FMGRaceFlowResult&, Result);
+
+/// Broadcast when rewards have been calculated and applied to player profile
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRewardsProcessed, const FMGRaceFlowResult&, Result);
+
+/// Broadcast when an error occurs during any phase of the race flow
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRaceError, const FString&, ErrorMessage);
 
+// ============================================================================
+// RACE FLOW SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Race Flow Subsystem
+ * @class UMGRaceFlowSubsystem
+ * @brief Central orchestrator for the complete race lifecycle in Midnight Grind
  *
- * Orchestrates the entire race flow from garage to results:
- * - Receives race requests from garage/menu
- * - Handles track loading
- * - Spawns player and AI vehicles
- * - Connects to RaceGameMode for race execution
- * - Processes results and rewards
- * - Returns player to garage
+ * ## Overview
+ * This subsystem coordinates all race-related systems from garage selection through
+ * post-race rewards. It acts as the primary interface for UI systems to initiate
+ * and monitor races.
  *
- * This is the main coordinator that connects all race systems for MVP.
+ * ## Architecture
+ * - Operates as a state machine (see EMGRaceFlowState)
+ * - Persists across level loads as a GameInstanceSubsystem
+ * - Communicates with specialized subsystems for specific functionality:
+ *   - UMGRaceDirectorSubsystem: AI pacing and rubber-banding
+ *   - UMGRaceModeSubsystem: Race type logic and scoring
+ *   - UMGEconomySubsystem: Reward calculations
+ *   - UMGGarageSubsystem: Vehicle data
+ *
+ * ## For New Developers
+ * 1. Call StartRace() with a configured FMGRaceSetupRequest to begin a race
+ * 2. Subscribe to OnFlowStateChanged to track race progress
+ * 3. Subscribe to OnRaceFinished to receive results
+ * 4. Call ContinueToGarage() when player is done viewing results
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGRaceFlowSubsystem : public UGameInstanceSubsystem
@@ -246,6 +415,7 @@ public:
 
 	// ==========================================
 	// EVENTS
+	// Bind to these delegates to receive race flow notifications
 	// ==========================================
 
 	/** Called when flow state changes */
@@ -278,11 +448,14 @@ public:
 
 	// ==========================================
 	// RACE FLOW CONTROL
+	// Primary API for initiating and controlling races
 	// ==========================================
 
 	/**
 	 * Start race from garage
 	 * Main entry point for starting any race
+	 * @param Request Fully configured race setup request
+	 * @return True if race setup began successfully, false if preconditions not met
 	 */
 	UFUNCTION(BlueprintCallable, Category = "RaceFlow")
 	bool StartRace(const FMGRaceSetupRequest& Request);
@@ -290,36 +463,44 @@ public:
 	/**
 	 * Start a quick race with default settings
 	 * Convenience for testing/quick play
+	 * @param TrackID ID of the track to race on
+	 * @param VehicleID ID of the player's vehicle
+	 * @return True if race setup began successfully
 	 */
 	UFUNCTION(BlueprintCallable, Category = "RaceFlow")
 	bool StartQuickRace(FName TrackID, FName VehicleID);
 
 	/**
 	 * Abort current race and return to garage
+	 * Can be called at any point during the race flow
 	 */
 	UFUNCTION(BlueprintCallable, Category = "RaceFlow")
 	void AbortRace();
 
 	/**
 	 * Restart current race with same settings
+	 * Reloads track and resets all race state
 	 */
 	UFUNCTION(BlueprintCallable, Category = "RaceFlow")
 	void RestartRace();
 
 	/**
 	 * Continue to garage after viewing results
+	 * Called by results screen when player presses continue
 	 */
 	UFUNCTION(BlueprintCallable, Category = "RaceFlow")
 	void ContinueToGarage();
 
 	/**
 	 * Continue to next race (quick rematch)
+	 * Restarts with same settings for rapid iteration
 	 */
 	UFUNCTION(BlueprintCallable, Category = "RaceFlow")
 	void ContinueToNextRace();
 
 	// ==========================================
 	// STATE QUERIES
+	// Check current race flow status
 	// ==========================================
 
 	/** Get current flow state */
@@ -352,6 +533,7 @@ public:
 
 	// ==========================================
 	// TRACK DATA
+	// Query available tracks and their status
 	// ==========================================
 
 	/** Get available tracks */
@@ -372,9 +554,16 @@ public:
 
 	// ==========================================
 	// AI SETUP
+	// Configure AI opponents for the race
 	// ==========================================
 
-	/** Generate AI opponents for race */
+	/**
+	 * Generate AI opponents for race
+	 * @param Count Number of AI racers to generate
+	 * @param Difficulty Difficulty level (0.0 to 1.0)
+	 * @param PlayerVehicleClass Player's vehicle class for balanced matchmaking
+	 * @return Array of configured AI racer setups
+	 */
 	UFUNCTION(BlueprintCallable, Category = "RaceFlow|AI")
 	TArray<FMGAIRacerSetup> GenerateAIOpponents(int32 Count, float Difficulty, FName PlayerVehicleClass);
 
@@ -384,6 +573,7 @@ public:
 
 	// ==========================================
 	// QUICK RACE PRESETS
+	// Convenience methods for common race configurations
 	// ==========================================
 
 	/** Get a quick race setup for testing */
@@ -408,7 +598,8 @@ public:
 
 protected:
 	// ==========================================
-	// STATE
+	// INTERNAL STATE
+	// Runtime state tracked by the subsystem
 	// ==========================================
 
 	/** Current flow state */
@@ -430,7 +621,8 @@ protected:
 	FString ErrorMessage;
 
 	// ==========================================
-	// CACHED SUBSYSTEMS
+	// CACHED SUBSYSTEM REFERENCES
+	// Weak references to other subsystems for coordination
 	// ==========================================
 
 	UPROPERTY()
@@ -450,7 +642,8 @@ protected:
 	TWeakObjectPtr<class AMGRaceGameMode> CachedRaceGameMode;
 
 	// ==========================================
-	// INTERNAL FLOW
+	// INTERNAL FLOW METHODS
+	// State machine execution logic
 	// ==========================================
 
 	/** Set flow state */
@@ -488,6 +681,7 @@ protected:
 
 	// ==========================================
 	// CALLBACKS
+	// Event handlers for external systems
 	// ==========================================
 
 	/** Called when level loading completes */
@@ -506,7 +700,8 @@ protected:
 	void ApplyRewards(const FMGRaceFlowResult& Result);
 
 	// ==========================================
-	// HELPERS
+	// HELPER METHODS
+	// Utility functions for race flow operations
 	// ==========================================
 
 	/** Validate race setup */

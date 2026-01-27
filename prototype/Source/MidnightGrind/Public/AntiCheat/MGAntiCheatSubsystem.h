@@ -69,16 +69,20 @@ enum class EMGViolationType : uint8
 };
 
 /**
- * Violation Severity
+ * @brief Severity levels for detected violations
+ *
+ * Severity determines the response to a violation. Lower severities may just
+ * log data for analysis, while higher severities trigger immediate action.
+ * The penalty system uses severity to determine ban duration and trust impact.
  */
 UENUM(BlueprintType)
 enum class EMGViolationSeverity : uint8
 {
-	Info		UMETA(DisplayName = "Info"),
-	Warning		UMETA(DisplayName = "Warning"),
-	Minor		UMETA(DisplayName = "Minor"),
-	Major		UMETA(DisplayName = "Major"),
-	Critical	UMETA(DisplayName = "Critical")
+	Info		UMETA(DisplayName = "Info"),		///< Logged for analysis, no action taken
+	Warning		UMETA(DisplayName = "Warning"),		///< Suspicious but not conclusive
+	Minor		UMETA(DisplayName = "Minor"),		///< Confirmed minor violation, small penalty
+	Major		UMETA(DisplayName = "Major"),		///< Serious violation, significant penalty
+	Critical	UMETA(DisplayName = "Critical")		///< Severe violation, immediate ban considered
 };
 
 /**

@@ -266,29 +266,56 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Save")
 	bool IsSaving() const { return bIsSaving; }
 
-	// ==========================================
+	// ============================================================================
 	// AUTOSAVE
-	// ==========================================
+	// ============================================================================
+	// Automatic save functionality that periodically saves player progress.
+	// Configure the interval and enable/disable as needed. Autosave uses
+	// async operations to minimize gameplay interruption.
+	// ============================================================================
 
-	/** Enable/disable autosave */
+	/**
+	 * @brief Enables or disables the autosave feature.
+	 *
+	 * When enabled, the game will automatically save at regular intervals
+	 * defined by SetAutosaveInterval(). Disabled by default during tutorials
+	 * or cinematics.
+	 *
+	 * @param bEnabled true to enable autosave, false to disable.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save|Autosave")
 	void SetAutosaveEnabled(bool bEnabled);
 
-	/** Set autosave interval (seconds) */
+	/**
+	 * @brief Sets how frequently autosave triggers.
+	 *
+	 * @param Seconds Time between autosaves. Default is 300 seconds (5 minutes).
+	 *                Values below 60 seconds are not recommended.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save|Autosave")
 	void SetAutosaveInterval(float Seconds);
 
-	/** Trigger autosave now */
+	/**
+	 * @brief Forces an immediate autosave.
+	 *
+	 * Call this at important gameplay moments (e.g., after completing a race,
+	 * making a purchase) to ensure progress is not lost. Resets the autosave timer.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save|Autosave")
 	void TriggerAutosave();
 
-	// ==========================================
-	// EVENTS
-	// ==========================================
+	// ============================================================================
+	// EVENTS / DELEGATES
+	// ============================================================================
+	// Blueprint-assignable events for responding to save/load completion.
+	// Bind to these to update UI, trigger notifications, etc.
+	// ============================================================================
 
+	/// Broadcast when a save operation completes. Check bSuccess for the result.
 	UPROPERTY(BlueprintAssignable, Category = "Save|Events")
 	FOnSaveCompleted OnSaveCompleted;
 
+	/// Broadcast when a load operation completes. Check bSuccess for the result.
 	UPROPERTY(BlueprintAssignable, Category = "Save|Events")
 	FOnLoadCompleted OnLoadCompleted;
 

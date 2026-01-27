@@ -111,8 +111,17 @@ enum class EMGChallengeType : uint8
 	CommunityTotal   ///< Aggregates contributions from all players server-wide
 };
 
+// ============================================================================
+// DATA STRUCTURES - Rewards and Objectives
+// ============================================================================
+
 /**
- * Event reward
+ * @brief Describes a single reward item that can be earned from events.
+ *
+ * Rewards can be currency, cosmetic items, XP boosts, or exclusive event items.
+ * The RewardType field determines how the reward is processed when claimed.
+ * Exclusive rewards (bIsExclusive=true) are only available during the event
+ * and may never return, creating collector value.
  */
 USTRUCT(BlueprintType)
 struct FMGEventReward
