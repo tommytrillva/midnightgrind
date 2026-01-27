@@ -184,6 +184,72 @@ struct FMGDriftScoreData
 };
 
 /**
+ * Damage feedback data for HUD
+ */
+USTRUCT(BlueprintType)
+struct FMGDamageHUDData
+{
+	GENERATED_BODY()
+
+	/** Overall vehicle damage (0-1) */
+	UPROPERTY(BlueprintReadWrite)
+	float OverallDamage = 0.0f;
+
+	/** Engine health (0-1, 1 = healthy) */
+	UPROPERTY(BlueprintReadWrite)
+	float EngineHealth = 1.0f;
+
+	/** Is engine smoking */
+	UPROPERTY(BlueprintReadWrite)
+	bool bEngineSmoking = false;
+
+	/** Is engine on fire */
+	UPROPERTY(BlueprintReadWrite)
+	bool bEngineOnFire = false;
+
+	/** Are headlights broken */
+	UPROPERTY(BlueprintReadWrite)
+	bool bHeadlightsBroken = false;
+
+	/** Are taillights broken */
+	UPROPERTY(BlueprintReadWrite)
+	bool bTaillightsBroken = false;
+
+	/** Is currently scraping */
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsScraping = false;
+
+	/** Is vehicle limping (critically damaged) */
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsLimping = false;
+};
+
+/**
+ * Impact feedback for HUD effects
+ */
+USTRUCT(BlueprintType)
+struct FMGImpactFeedback
+{
+	GENERATED_BODY()
+
+	/** Impact intensity (0-1) */
+	UPROPERTY(BlueprintReadWrite)
+	float Intensity = 0.0f;
+
+	/** Impact direction (normalized, in screen space) */
+	UPROPERTY(BlueprintReadWrite)
+	FVector2D Direction = FVector2D::ZeroVector;
+
+	/** Should show vignette flash */
+	UPROPERTY(BlueprintReadWrite)
+	bool bShowVignette = false;
+
+	/** Should trigger screen shake */
+	UPROPERTY(BlueprintReadWrite)
+	bool bTriggerShake = false;
+};
+
+/**
  * Race HUD Subsystem
  * Central management for all racing UI elements
  *
@@ -194,6 +260,7 @@ struct FMGDriftScoreData
  * - Notification overlay
  * - Multiple display modes
  * - Customizable HUD layouts
+ * - Damage feedback indicators
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGRaceHUDSubsystem : public UWorldSubsystem
@@ -290,6 +357,38 @@ public:
 	void ShowWrongWayWarning(bool bShow);
 
 	// ==========================================
+	// DAMAGE FEEDBACK
+	// ==========================================
+
+	/** Update damage state for HUD indicators */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Damage")
+	void UpdateDamageState(const FMGDamageHUDData& DamageData);
+
+	/** Get current damage state */
+	UFUNCTION(BlueprintPure, Category = "HUD|Damage")
+	FMGDamageHUDData GetDamageState() const { return CurrentDamageData; }
+
+	/** Trigger impact feedback (flash, shake, vignette) */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Damage")
+	void TriggerImpactFeedback(const FMGImpactFeedback& Feedback);
+
+	/** Show damage warning notification */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Damage")
+	void ShowDamageWarning(const FText& Message, float Duration = 2.0f);
+
+	/** Set damage vignette intensity (0-1) */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Damage")
+	void SetDamageVignetteIntensity(float Intensity);
+
+	/** Get damage vignette intensity */
+	UFUNCTION(BlueprintPure, Category = "HUD|Damage")
+	float GetDamageVignetteIntensity() const { return DamageVignetteIntensity; }
+
+	/** Is vehicle in critical damage state */
+	UFUNCTION(BlueprintPure, Category = "HUD|Damage")
+	bool IsVehicleCriticallyDamaged() const { return CurrentDamageData.bIsLimping || CurrentDamageData.bEngineOnFire; }
+
+	// ==========================================
 	// RACE EVENTS
 	// ==========================================
 
@@ -364,6 +463,8 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHUDModeChanged, EMGHUDMode, NewMode);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPositionChanged, int32, OldPosition, int32, NewPosition);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLapCompleted, int32, LapNumber);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStateChanged, const FMGDamageHUDData&, DamageData);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnImpactReceived, const FMGImpactFeedback&, Feedback);
 
 	UPROPERTY(BlueprintAssignable, Category = "HUD|Events")
 	FOnHUDModeChanged OnHUDModeChanged;
@@ -373,6 +474,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "HUD|Events")
 	FOnLapCompleted OnLapCompleted;
+
+	UPROPERTY(BlueprintAssignable, Category = "HUD|Events")
+	FOnDamageStateChanged OnDamageStateChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "HUD|Events")
+	FOnImpactReceived OnImpactReceived;
 
 protected:
 	// ==========================================
@@ -414,6 +521,18 @@ protected:
 
 	/** Is showing wrong way */
 	bool bShowingWrongWay = false;
+
+	/** Current damage state */
+	FMGDamageHUDData CurrentDamageData;
+
+	/** Damage vignette intensity (0-1) */
+	float DamageVignetteIntensity = 0.0f;
+
+	/** Target vignette intensity for smooth interpolation */
+	float TargetVignetteIntensity = 0.0f;
+
+	/** Current impact flash alpha */
+	float ImpactFlashAlpha = 0.0f;
 
 	// ==========================================
 	// WIDGETS (References)

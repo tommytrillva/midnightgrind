@@ -207,6 +207,92 @@ void UMGRaceHUDSubsystem::ShowWrongWayWarning(bool bShow)
 }
 
 // ==========================================
+// DAMAGE FEEDBACK
+// ==========================================
+
+void UMGRaceHUDSubsystem::UpdateDamageState(const FMGDamageHUDData& DamageData)
+{
+	bool bWasLimping = CurrentDamageData.bIsLimping;
+	bool bWasOnFire = CurrentDamageData.bEngineOnFire;
+	bool bWasSmoking = CurrentDamageData.bEngineSmoking;
+
+	CurrentDamageData = DamageData;
+
+	// Calculate target vignette intensity based on damage
+	TargetVignetteIntensity = 0.0f;
+	if (DamageData.bEngineOnFire)
+	{
+		TargetVignetteIntensity = 0.6f;
+	}
+	else if (DamageData.bIsLimping)
+	{
+		TargetVignetteIntensity = 0.4f;
+	}
+	else if (DamageData.bEngineSmoking)
+	{
+		TargetVignetteIntensity = 0.2f;
+	}
+	else if (DamageData.OverallDamage > 0.5f)
+	{
+		TargetVignetteIntensity = DamageData.OverallDamage * 0.3f;
+	}
+
+	// Show warnings for state transitions
+	if (DamageData.bEngineOnFire && !bWasOnFire)
+	{
+		ShowDamageWarning(FText::FromString(TEXT("ENGINE FIRE!")), 3.0f);
+	}
+	else if (DamageData.bIsLimping && !bWasLimping)
+	{
+		ShowDamageWarning(FText::FromString(TEXT("CRITICAL DAMAGE!")), 2.5f);
+	}
+	else if (DamageData.bEngineSmoking && !bWasSmoking)
+	{
+		ShowDamageWarning(FText::FromString(TEXT("ENGINE DAMAGE")), 2.0f);
+	}
+
+	// Broadcast state change
+	OnDamageStateChanged.Broadcast(DamageData);
+}
+
+void UMGRaceHUDSubsystem::TriggerImpactFeedback(const FMGImpactFeedback& Feedback)
+{
+	// Set impact flash
+	ImpactFlashAlpha = FMath::Clamp(Feedback.Intensity, 0.0f, 1.0f);
+
+	// Broadcast for widgets to handle
+	OnImpactReceived.Broadcast(Feedback);
+
+	if (Feedback.bShowVignette)
+	{
+		// Temporarily boost vignette
+		DamageVignetteIntensity = FMath::Max(DamageVignetteIntensity, Feedback.Intensity * 0.8f);
+	}
+
+	if (Feedback.bTriggerShake && Feedback.Intensity > 0.3f)
+	{
+		// Camera shake would be triggered here via player camera manager
+		// The actual shake is handled by the player controller
+		UE_LOG(LogTemp, Log, TEXT("MGRaceHUD: Impact shake triggered (intensity: %.2f)"), Feedback.Intensity);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MGRaceHUD: Impact feedback (intensity: %.2f, direction: %.2f, %.2f)"),
+		Feedback.Intensity, Feedback.Direction.X, Feedback.Direction.Y);
+}
+
+void UMGRaceHUDSubsystem::ShowDamageWarning(const FText& Message, float Duration)
+{
+	// Show warning notification with red/orange color
+	FLinearColor WarningColor = FLinearColor(1.0f, 0.3f, 0.1f, 1.0f);
+	ShowNotification(Message, Duration, WarningColor);
+}
+
+void UMGRaceHUDSubsystem::SetDamageVignetteIntensity(float Intensity)
+{
+	DamageVignetteIntensity = FMath::Clamp(Intensity, 0.0f, 1.0f);
+}
+
+// ==========================================
 // RACE EVENTS
 // ==========================================
 

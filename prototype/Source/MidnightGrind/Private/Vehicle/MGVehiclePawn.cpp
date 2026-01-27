@@ -236,6 +236,29 @@ void AMGVehiclePawn::UpdateHUDTelemetry()
 
 				HUDSubsystem->UpdateDriftScore(DriftData);
 			}
+
+			// Update damage state for HUD
+			if (VehicleDamageSystem)
+			{
+				FMGDamageHUDData DamageData;
+				DamageData.OverallDamage = VehicleDamageSystem->GetOverallDamagePercent() / 100.0f;
+				DamageData.EngineHealth = VehicleDamageSystem->GetComponentPerformance(EMGDamageComponent::Engine);
+
+				FMGVisualDamageState VisualState = VehicleDamageSystem->GetVisualDamageState();
+				DamageData.bEngineSmoking = VisualState.bIsSmoking;
+				DamageData.bEngineOnFire = VisualState.bIsOnFire;
+				DamageData.bHeadlightsBroken = VisualState.bHeadlightsBroken;
+				DamageData.bTaillightsBroken = VisualState.bTaillightsBroken;
+				DamageData.bIsScraping = VehicleDamageSystem->IsScraping();
+
+				// Check if limping (multiple critical systems damaged)
+				if (MGVehicleMovement)
+				{
+					DamageData.bIsLimping = MGVehicleMovement->IsLimping();
+				}
+
+				HUDSubsystem->UpdateDamageState(DamageData);
+			}
 		}
 	}
 }
@@ -940,6 +963,41 @@ void AMGVehiclePawn::HandleDamageTaken(const FMGDamageEvent& DamageEvent)
 			DamageEvent.ImpactLocation,
 			DamageEvent.ImpactNormal
 		);
+	}
+
+	// Trigger HUD impact feedback (for locally controlled player)
+	if (IsLocallyControlled())
+	{
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+			{
+				FMGImpactFeedback Feedback;
+
+				// Calculate normalized intensity (scale impact force to 0-1 range)
+				Feedback.Intensity = FMath::Clamp(DamageEvent.ImpactForce / 50000.0f, 0.0f, 1.0f);
+
+				// Calculate screen-space direction from impact
+				if (APlayerController* PC = Cast<APlayerController>(GetController()))
+				{
+					FVector2D ScreenPos;
+					if (PC->ProjectWorldLocationToScreen(DamageEvent.ImpactLocation, ScreenPos))
+					{
+						FVector2D ViewportCenter(0.5f, 0.5f);
+						FVector2D ViewportSize;
+						GEngine->GameViewport->GetViewportSize(ViewportSize);
+						ScreenPos /= ViewportSize;
+						Feedback.Direction = (ScreenPos - ViewportCenter).GetSafeNormal();
+					}
+				}
+
+				// Enable vignette for medium impacts, shake for heavy impacts
+				Feedback.bShowVignette = Feedback.Intensity > 0.2f;
+				Feedback.bTriggerShake = Feedback.Intensity > 0.4f;
+
+				HUDSubsystem->TriggerImpactFeedback(Feedback);
+			}
+		}
 	}
 
 	// Call Blueprint event for additional effects
