@@ -1,0 +1,321 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Career Mode Structure and Progression",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "ChapterCount": 5,
+    "TotalMilestones": 50,
+    "NewGamePlusEnabled": true,
+    "DifficultyScaling": true
+  },
+
+  "CareerStart": {
+    "Introduction": {
+      "ID": "INTRO_SEQUENCE",
+      "Name": "Arrival",
+      "Description": "Your journey into the midnight racing scene begins",
+      "Cinematics": ["Opening", "MeetMentor", "FirstCar"],
+      "StarterCash": 7500,
+      "StarterVehicles": {
+        "Choice": true,
+        "Options": [
+          { "ID": "CIVIC_EK", "Name": "Civic EK Hatchback", "Class": "D" },
+          { "ID": "MIATA_NA", "Name": "Miata NA", "Class": "D" },
+          { "ID": "COROLLA_AE86", "Name": "Corolla AE86", "Class": "D" }
+        ]
+      },
+      "TutorialRequired": true
+    },
+    "Tutorial": {
+      "Sections": {
+        "BasicControls": { "Mandatory": true, "Duration": 5 },
+        "Racing": { "Mandatory": true, "Duration": 10 },
+        "Drifting": { "Mandatory": false, "Duration": 5 },
+        "Customization": { "Mandatory": true, "Duration": 5 },
+        "Garage": { "Mandatory": true, "Duration": 5 }
+      },
+      "SkipOption": "AfterFirstPlaythrough"
+    }
+  },
+
+  "Chapters": {
+    "Chapter1": {
+      "ID": "CHAPTER_PROVING_GROUNDS",
+      "Name": "Proving Grounds",
+      "Subtitle": "Make a name for yourself",
+      "Description": "Start from nothing. Earn your first reputation on the streets.",
+      "LevelRange": [1, 10],
+      "UnlockCondition": "TutorialComplete",
+      "Setting": "LocalScene",
+      "Acts": {
+        "Act1": {
+          "Name": "Fresh Meat",
+          "Missions": 10,
+          "Focus": "Learning the ropes",
+          "KeyEvents": ["FirstRace", "FirstUpgrade", "MeetRival1"]
+        },
+        "Act2": {
+          "Name": "Building Rep",
+          "Missions": 10,
+          "Focus": "Earning respect",
+          "KeyEvents": ["FirstCrewInvite", "FirstPinkSlip", "BossRace1"]
+        }
+      },
+      "Rewards": {
+        "Completion": {
+          "Cash": 25000,
+          "REP": 5000,
+          "Unlock": ["Chapter2", "NewRegion"]
+        }
+      },
+      "BossRace": {
+        "Name": "Local Legend Challenge",
+        "Opponent": "Local_Champion",
+        "Stakes": "PinkSlip",
+        "Difficulty": "Challenging"
+      }
+    },
+    "Chapter2": {
+      "ID": "CHAPTER_RISING_STAR",
+      "Name": "Rising Star",
+      "Subtitle": "Your name is spreading",
+      "Description": "Word of your skills has spread. Bigger crews take notice.",
+      "LevelRange": [11, 20],
+      "UnlockCondition": "Chapter1Complete",
+      "Setting": "RegionalScene",
+      "Acts": {
+        "Act1": {
+          "Name": "Crew Wars",
+          "Missions": 12,
+          "Focus": "Crew rivalries",
+          "KeyEvents": ["JoinCrew", "CrewRace", "Betrayal"]
+        },
+        "Act2": {
+          "Name": "Making Moves",
+          "Missions": 12,
+          "Focus": "Bigger stakes",
+          "KeyEvents": ["HighStakesPinkSlip", "PoliceHeat", "BossRace2"]
+        }
+      },
+      "Rewards": {
+        "Completion": {
+          "Cash": 75000,
+          "REP": 15000,
+          "Vehicle": "ChapterReward_2",
+          "Unlock": ["Chapter3", "AdvancedTuning"]
+        }
+      },
+      "BossRace": {
+        "Name": "Crew Leader Showdown",
+        "Opponent": "Rival_Crew_Leader",
+        "Stakes": "TerritoryControl",
+        "Difficulty": "Hard"
+      }
+    },
+    "Chapter3": {
+      "ID": "CHAPTER_UNDERGROUND_KING",
+      "Name": "Underground King",
+      "Subtitle": "The scene knows your name",
+      "Description": "You've proven yourself. Now the real competition begins.",
+      "LevelRange": [21, 35],
+      "UnlockCondition": "Chapter2Complete",
+      "Setting": "CityWide",
+      "Acts": {
+        "Act1": {
+          "Name": "Elite Circuit",
+          "Missions": 15,
+          "Focus": "Elite racing scene",
+          "KeyEvents": ["EliteInvitation", "LuxuryCar", "NemesisIntro"]
+        },
+        "Act2": {
+          "Name": "Crown Pursuit",
+          "Missions": 15,
+          "Focus": "Path to the top",
+          "KeyEvents": ["Championship", "MajorPinkSlip", "BossRace3"]
+        }
+      },
+      "Rewards": {
+        "Completion": {
+          "Cash": 200000,
+          "REP": 35000,
+          "Vehicle": "ChapterReward_3",
+          "Title": "Underground King"
+        }
+      },
+      "BossRace": {
+        "Name": "Champion's Challenge",
+        "Opponent": "City_Champion",
+        "Stakes": "Championship",
+        "Difficulty": "Expert"
+      }
+    },
+    "Chapter4": {
+      "ID": "CHAPTER_LEGEND_RISING",
+      "Name": "Legend Rising",
+      "Subtitle": "Beyond the streets",
+      "Description": "You're no longer just a street racer. You're becoming a legend.",
+      "LevelRange": [36, 45],
+      "UnlockCondition": "Chapter3Complete",
+      "Setting": "NationalScene",
+      "Acts": {
+        "Act1": {
+          "Name": "National Stage",
+          "Missions": 12,
+          "Focus": "National recognition",
+          "KeyEvents": ["NationalChampionship", "MediaAttention", "Sponsors"]
+        },
+        "Act2": {
+          "Name": "The Gauntlet",
+          "Missions": 12,
+          "Focus": "Ultimate challenges",
+          "KeyEvents": ["EpicPinkSlip", "FinalRivalConfrontation", "BossRace4"]
+        }
+      },
+      "Rewards": {
+        "Completion": {
+          "Cash": 500000,
+          "REP": 75000,
+          "Vehicle": "ChapterReward_4",
+          "Title": "Legend"
+        }
+      },
+      "BossRace": {
+        "Name": "Legend Maker",
+        "Opponent": "National_Legend",
+        "Stakes": "LegacyCar",
+        "Difficulty": "Extreme"
+      }
+    },
+    "Chapter5": {
+      "ID": "CHAPTER_MIDNIGHT_GRIND",
+      "Name": "Midnight Grind",
+      "Subtitle": "The final chapter",
+      "Description": "One final challenge. Everything you've built leads to this moment.",
+      "LevelRange": [46, 50],
+      "UnlockCondition": "Chapter4Complete",
+      "Setting": "Ultimate",
+      "Acts": {
+        "FinalAct": {
+          "Name": "The Grind",
+          "Missions": 10,
+          "Focus": "Ultimate challenge",
+          "KeyEvents": ["FinalShowdown", "NemesisResolution", "EndingChoice"]
+        }
+      },
+      "Rewards": {
+        "Completion": {
+          "Cash": 1000000,
+          "REP": 100000,
+          "Vehicle": "LegendaryReward",
+          "Title": "Midnight Legend",
+          "Unlock": "NewGamePlus"
+        }
+      },
+      "FinalBoss": {
+        "Name": "Midnight Showdown",
+        "Opponent": "Ultimate_Rival",
+        "Stakes": "Everything",
+        "Difficulty": "Legend"
+      }
+    }
+  },
+
+  "MissionTypes": {
+    "Race": {
+      "Circuit": { "Laps": "Variable", "Opponents": "Variable" },
+      "Sprint": { "PointToPoint": true },
+      "Drag": { "QuarterMile": true },
+      "TimeTrial": { "Solo": true, "GhostOpponent": true }
+    },
+    "Drift": {
+      "ZoneScore": { "HitTargetScore": true },
+      "Tandem": { "HeadToHead": true }
+    },
+    "Special": {
+      "Pursuit": { "EscapePolice": true },
+      "Delivery": { "TimeLimit": true, "NoDamage": true },
+      "Showdown": { "BossRace": true },
+      "Story": { "Cinematic": true }
+    }
+  },
+
+  "Milestones": {
+    "Count": 50,
+    "Types": {
+      "Story": { "MainMissions": true, "Required": true },
+      "Optional": { "SideMissions": true, "Required": false },
+      "Challenge": { "SkillChallenges": true, "Required": false }
+    },
+    "ChapterMilestones": {
+      "Chapter1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "Chapter2": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+      "Chapter3": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
+      "Chapter4": [36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
+      "Chapter5": [46, 47, 48, 49, 50]
+    }
+  },
+
+  "NewGamePlus": {
+    "Enabled": true,
+    "Carries": {
+      "Vehicles": true,
+      "Cash": "Partial",
+      "CashPercentage": 0.5,
+      "Parts": true,
+      "Unlocks": true,
+      "REP": false
+    },
+    "Changes": {
+      "DifficultyIncrease": 1.25,
+      "NewRewards": true,
+      "AlternateEndings": true,
+      "HiddenContent": true
+    }
+  },
+
+  "Characters": {
+    "Mentor": {
+      "ID": "CHAR_MENTOR",
+      "Name": "TBD",
+      "Role": "Guide",
+      "AppearsIn": ["Chapter1", "Chapter5"]
+    },
+    "Rivals": {
+      "Rival1": { "Chapter": 1, "Name": "TBD", "Style": "Aggressive" },
+      "Rival2": { "Chapter": 2, "Name": "TBD", "Style": "Calculated" },
+      "Nemesis": { "Chapter": 3, "Name": "TBD", "Style": "Elite" }
+    },
+    "Bosses": {
+      "Chapter1Boss": { "Name": "TBD", "Vehicle": "TBD" },
+      "Chapter2Boss": { "Name": "TBD", "Vehicle": "TBD" },
+      "Chapter3Boss": { "Name": "TBD", "Vehicle": "TBD" },
+      "Chapter4Boss": { "Name": "TBD", "Vehicle": "TBD" },
+      "FinalBoss": { "Name": "TBD", "Vehicle": "TBD" }
+    }
+  },
+
+  "Difficulty": {
+    "Story": {
+      "Description": "Focus on narrative, reduced challenge",
+      "AIMultiplier": 0.8,
+      "RewardMultiplier": 0.75
+    },
+    "Normal": {
+      "Description": "Balanced challenge and rewards",
+      "AIMultiplier": 1.0,
+      "RewardMultiplier": 1.0
+    },
+    "Hard": {
+      "Description": "Increased challenge, better rewards",
+      "AIMultiplier": 1.2,
+      "RewardMultiplier": 1.25
+    },
+    "Legendary": {
+      "Description": "Maximum challenge, premium rewards",
+      "AIMultiplier": 1.5,
+      "RewardMultiplier": 1.5,
+      "UnlockCondition": "NewGamePlus"
+    }
+  }
+}

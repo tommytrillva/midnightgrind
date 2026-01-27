@@ -1,0 +1,375 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Weather System Gameplay Effects",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DynamicWeather": true,
+    "AffectsPhysics": true,
+    "AffectsVisibility": true,
+    "AffectsAI": true
+  },
+
+  "WeatherTypes": {
+    "Clear": {
+      "ID": "WEATHER_CLEAR",
+      "Name": "Clear",
+      "Description": "Perfect racing conditions",
+      "Effects": {
+        "Grip": 1.0,
+        "Visibility": 1.0,
+        "TopSpeed": 1.0,
+        "TireWear": 1.0,
+        "DriftMultiplier": 1.0
+      },
+      "Frequency": 0.35
+    },
+    "Cloudy": {
+      "ID": "WEATHER_CLOUDY",
+      "Name": "Cloudy",
+      "Description": "Overcast but dry conditions",
+      "Effects": {
+        "Grip": 1.0,
+        "Visibility": 0.95,
+        "TireTemp": "Cooler",
+        "DriftMultiplier": 1.0
+      },
+      "Frequency": 0.20
+    },
+    "LightRain": {
+      "ID": "WEATHER_LIGHTRAIN",
+      "Name": "Light Rain",
+      "Description": "Damp track with reduced grip",
+      "Effects": {
+        "Grip": 0.85,
+        "Visibility": 0.85,
+        "SprayEffect": true,
+        "PuddleDepth": 0.2,
+        "TireWear": 0.9,
+        "DriftDifficulty": 1.2
+      },
+      "Frequency": 0.15
+    },
+    "HeavyRain": {
+      "ID": "WEATHER_HEAVYRAIN",
+      "Name": "Heavy Rain",
+      "Description": "Severe conditions, standing water",
+      "Effects": {
+        "Grip": 0.65,
+        "Visibility": 0.6,
+        "SprayEffect": true,
+        "PuddleDepth": 0.8,
+        "Aquaplaning": true,
+        "TireWear": 0.75,
+        "DriftDifficulty": 1.5
+      },
+      "Frequency": 0.08
+    },
+    "Storm": {
+      "ID": "WEATHER_STORM",
+      "Name": "Thunderstorm",
+      "Description": "Extreme weather with lightning",
+      "Effects": {
+        "Grip": 0.55,
+        "Visibility": 0.4,
+        "Lightning": true,
+        "Wind": "Strong",
+        "Aquaplaning": true,
+        "TireWear": 0.6,
+        "DriftDifficulty": 2.0
+      },
+      "Frequency": 0.03
+    },
+    "Fog": {
+      "ID": "WEATHER_FOG",
+      "Name": "Fog",
+      "Description": "Limited visibility conditions",
+      "Effects": {
+        "Grip": 0.95,
+        "Visibility": 0.3,
+        "ViewDistance": 50,
+        "DampTrack": true,
+        "DriftMultiplier": 1.1
+      },
+      "Frequency": 0.07
+    },
+    "Snow": {
+      "ID": "WEATHER_SNOW",
+      "Name": "Snow",
+      "Description": "Snowy conditions",
+      "Effects": {
+        "Grip": 0.45,
+        "Visibility": 0.6,
+        "Accumulation": true,
+        "IcePatches": true,
+        "TireWear": 0.5,
+        "DriftMultiplier": 1.5
+      },
+      "Frequency": 0.05,
+      "SeasonalOnly": true
+    },
+    "Ice": {
+      "ID": "WEATHER_ICE",
+      "Name": "Ice",
+      "Description": "Frozen track surface",
+      "Effects": {
+        "Grip": 0.25,
+        "Visibility": 0.9,
+        "BlackIce": true,
+        "TireWear": 0.4,
+        "DriftMultiplier": 2.0
+      },
+      "Frequency": 0.02,
+      "SeasonalOnly": true
+    },
+    "Dust": {
+      "ID": "WEATHER_DUST",
+      "Name": "Dust Storm",
+      "Description": "Desert dust conditions",
+      "Effects": {
+        "Grip": 0.9,
+        "Visibility": 0.5,
+        "DustClouds": true,
+        "ViewDistance": 75,
+        "TireWear": 1.2
+      },
+      "Frequency": 0.05,
+      "LocationBased": ["Desert"]
+    }
+  },
+
+  "TrackConditions": {
+    "Dry": {
+      "ID": "CONDITION_DRY",
+      "Grip": 1.0,
+      "Color": "Normal",
+      "RubberBuildup": true
+    },
+    "Damp": {
+      "ID": "CONDITION_DAMP",
+      "Grip": 0.9,
+      "Color": "Darkened",
+      "TransitionFrom": ["LightRain"]
+    },
+    "Wet": {
+      "ID": "CONDITION_WET",
+      "Grip": 0.75,
+      "Color": "Reflective",
+      "Puddles": true,
+      "TransitionFrom": ["HeavyRain"]
+    },
+    "StandingWater": {
+      "ID": "CONDITION_STANDING",
+      "Grip": 0.6,
+      "Aquaplaning": true,
+      "SprayIntense": true,
+      "TransitionFrom": ["Storm"]
+    },
+    "Drying": {
+      "ID": "CONDITION_DRYING",
+      "Grip": { "Start": 0.8, "End": 0.95 },
+      "DryingLine": true,
+      "OptimalLine": "Dry"
+    }
+  },
+
+  "WindEffects": {
+    "Enabled": true,
+    "Types": {
+      "Calm": {
+        "ID": "WIND_CALM",
+        "Speed": 0,
+        "Effect": "None"
+      },
+      "Light": {
+        "ID": "WIND_LIGHT",
+        "Speed": { "Min": 5, "Max": 15 },
+        "Effect": "Minimal",
+        "SpeedImpact": 0.02
+      },
+      "Moderate": {
+        "ID": "WIND_MODERATE",
+        "Speed": { "Min": 15, "Max": 30 },
+        "Effect": "Noticeable",
+        "SpeedImpact": 0.05,
+        "HandlingImpact": 0.03
+      },
+      "Strong": {
+        "ID": "WIND_STRONG",
+        "Speed": { "Min": 30, "Max": 50 },
+        "Effect": "Significant",
+        "SpeedImpact": 0.1,
+        "HandlingImpact": 0.08
+      },
+      "Gale": {
+        "ID": "WIND_GALE",
+        "Speed": { "Min": 50, "Max": 75 },
+        "Effect": "Severe",
+        "SpeedImpact": 0.15,
+        "HandlingImpact": 0.15,
+        "Dangerous": true
+      }
+    },
+    "Direction": {
+      "Headwind": { "DragIncrease": 0.1, "TopSpeedReduction": 0.05 },
+      "Tailwind": { "DragDecrease": 0.1, "TopSpeedIncrease": 0.03 },
+      "Crosswind": { "StabilityReduction": 0.1, "DriftBias": true }
+    }
+  },
+
+  "VisibilityEffects": {
+    "RainOnWindshield": {
+      "Enabled": true,
+      "Wipers": {
+        "Auto": true,
+        "ManualControl": true,
+        "Speeds": ["Off", "Intermittent", "Normal", "Fast"]
+      },
+      "DropletDensity": "WeatherBased"
+    },
+    "SprayFromVehicles": {
+      "Enabled": true,
+      "Intensity": "SpeedBased",
+      "Range": 30,
+      "ReducesVisibility": true
+    },
+    "FogDensity": {
+      "Enabled": true,
+      "Types": ["Light", "Medium", "Dense"],
+      "ViewDistanceEffect": true
+    },
+    "LightReflections": {
+      "WetSurface": true,
+      "Puddles": true,
+      "NightEnhanced": true
+    }
+  },
+
+  "PhysicsEffects": {
+    "Aquaplaning": {
+      "Enabled": true,
+      "Threshold": 0.7,
+      "SpeedTrigger": 100,
+      "TireWidthFactor": true,
+      "RecoveryDifficulty": "TireDependent"
+    },
+    "HydroplanePrevention": {
+      "TreadDepth": "Factor",
+      "Speed": "InverseRelation",
+      "Weight": "PositiveFactor"
+    },
+    "IcePhysics": {
+      "RandomSlip": true,
+      "RecoveryDifficulty": "High",
+      "BlackIceZones": true
+    },
+    "SnowPhysics": {
+      "AccumulationGrip": true,
+      "Rutting": true,
+      "FreshVsCompacted": true
+    }
+  },
+
+  "TireInteraction": {
+    "WetTires": {
+      "Grip": {
+        "OnDry": 0.85,
+        "OnWet": 1.0
+      },
+      "TreadPattern": "Enhanced"
+    },
+    "DryTires": {
+      "Grip": {
+        "OnDry": 1.0,
+        "OnWet": 0.7
+      },
+      "Aquaplaning": "High"
+    },
+    "IntermediateTires": {
+      "Grip": {
+        "OnDry": 0.95,
+        "OnWet": 0.9
+      },
+      "Versatile": true
+    },
+    "Temperature": {
+      "WetCooling": 0.7,
+      "RainOptimal": "Lower"
+    }
+  },
+
+  "WeatherTransitions": {
+    "Enabled": true,
+    "Duration": {
+      "Gradual": { "Min": 300, "Max": 900 },
+      "Rapid": { "Min": 60, "Max": 180 }
+    },
+    "Patterns": {
+      "BuildingStorm": ["Clear", "Cloudy", "LightRain", "HeavyRain", "Storm"],
+      "PassingShower": ["Clear", "LightRain", "Clear"],
+      "FogRollIn": ["Clear", "Fog"],
+      "Clearing": ["HeavyRain", "LightRain", "Cloudy", "Clear"]
+    },
+    "TrackDrying": {
+      "Rate": "TemperatureBased",
+      "RacingLine": "DriesFirst",
+      "FullDryTime": { "Min": 600, "Max": 1800 }
+    }
+  },
+
+  "AIBehavior": {
+    "WeatherAwareness": true,
+    "Adjustments": {
+      "Rain": {
+        "Aggression": -0.2,
+        "BrakingDistance": 1.3,
+        "CornerSpeed": 0.85
+      },
+      "Storm": {
+        "Aggression": -0.4,
+        "BrakingDistance": 1.5,
+        "CornerSpeed": 0.7
+      },
+      "Fog": {
+        "Aggression": -0.1,
+        "FollowDistance": 1.4
+      },
+      "Snow": {
+        "Aggression": -0.5,
+        "BrakingDistance": 2.0,
+        "CornerSpeed": 0.5
+      }
+    },
+    "TireChoice": "Optimal",
+    "MistakeIncrease": "WeatherBased"
+  },
+
+  "Scoring": {
+    "WeatherMultipliers": {
+      "Clear": 1.0,
+      "LightRain": 1.15,
+      "HeavyRain": 1.35,
+      "Storm": 1.6,
+      "Snow": 1.5,
+      "Fog": 1.2
+    },
+    "DriftBonus": {
+      "WetDrift": 1.25,
+      "SnowDrift": 1.5,
+      "IceDrift": 2.0
+    }
+  },
+
+  "Settings": {
+    "PlayerChoice": {
+      "FixedWeather": true,
+      "DynamicWeather": true,
+      "WeatherIntensity": { "Min": 0.5, "Max": 1.5 }
+    },
+    "RaceOptions": {
+      "StartWeather": true,
+      "AllowChanges": true,
+      "ChangeFrequency": ["None", "Rare", "Common"]
+    }
+  }
+}

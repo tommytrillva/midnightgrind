@@ -1,0 +1,337 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Tutorial and Training System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "ForceFirstTime": true,
+    "SkipAfterComplete": true,
+    "ContextualHints": true,
+    "HintsEnabled": true
+  },
+
+  "TutorialSequence": {
+    "Mandatory": {
+      "Order": [
+        "BasicControls",
+        "RacingFundamentals",
+        "GarageBasics"
+      ],
+      "SkipOption": "AfterCompletion",
+      "FirstTimeOnly": true
+    },
+    "Optional": {
+      "Available": [
+        "AdvancedDriving",
+        "DriftingTechniques",
+        "TuningBasics",
+        "MultiplayerIntro",
+        "CustomizationDeep"
+      ],
+      "AccessFrom": "TrainingMenu"
+    }
+  },
+
+  "Tutorials": {
+    "BasicControls": {
+      "ID": "TUT_CONTROLS",
+      "Name": "Basic Controls",
+      "Description": "Learn the fundamentals of vehicle control",
+      "Duration": 5,
+      "Mandatory": true,
+      "Steps": {
+        "Acceleration": {
+          "Instruction": "Press the accelerator to move forward",
+          "Input": "Throttle",
+          "Completion": "ReachSpeed:30"
+        },
+        "Braking": {
+          "Instruction": "Press the brake to slow down",
+          "Input": "Brake",
+          "Completion": "StopVehicle"
+        },
+        "Steering": {
+          "Instruction": "Use the steering to navigate the track",
+          "Input": "Steering",
+          "Completion": "CompleteSlalom"
+        },
+        "Camera": {
+          "Instruction": "Change camera views to find your preference",
+          "Input": "CameraSwitch",
+          "Completion": "CycleCameras:3"
+        },
+        "Nitro": {
+          "Instruction": "Activate nitro for a speed boost",
+          "Input": "Nitro",
+          "Completion": "UseNitro"
+        }
+      },
+      "Rewards": {
+        "Completion": { "Cash": 500, "REP": 100 }
+      }
+    },
+    "RacingFundamentals": {
+      "ID": "TUT_RACING",
+      "Name": "Racing Fundamentals",
+      "Description": "Learn how to compete in races",
+      "Duration": 10,
+      "Mandatory": true,
+      "Prerequisite": "BasicControls",
+      "Steps": {
+        "RaceStart": {
+          "Instruction": "Launch from the start line when the lights go green",
+          "Completion": "GoodLaunch"
+        },
+        "RacingLine": {
+          "Instruction": "Follow the racing line through corners",
+          "Overlay": "RacingLineGuide",
+          "Completion": "FollowLine:3Corners"
+        },
+        "Braking": {
+          "Instruction": "Brake before corners, accelerate through",
+          "Overlay": "BrakingZones",
+          "Completion": "CleanCorner:3"
+        },
+        "Overtaking": {
+          "Instruction": "Pass the AI opponent cleanly",
+          "Completion": "CleanOvertake"
+        },
+        "Finishing": {
+          "Instruction": "Cross the finish line to complete the race",
+          "Completion": "FinishRace"
+        }
+      },
+      "Rewards": {
+        "Completion": { "Cash": 1000, "REP": 250 }
+      }
+    },
+    "GarageBasics": {
+      "ID": "TUT_GARAGE",
+      "Name": "Garage Basics",
+      "Description": "Navigate your garage and manage vehicles",
+      "Duration": 5,
+      "Mandatory": true,
+      "Steps": {
+        "EnterGarage": {
+          "Instruction": "Enter your garage to see your vehicles",
+          "Completion": "OpenGarage"
+        },
+        "SelectVehicle": {
+          "Instruction": "Select a vehicle to customize",
+          "Completion": "SelectCar"
+        },
+        "ViewStats": {
+          "Instruction": "View your vehicle's performance stats",
+          "Completion": "OpenStats"
+        },
+        "BasicCustomization": {
+          "Instruction": "Change your vehicle's color",
+          "Completion": "ApplyPaint"
+        }
+      },
+      "Rewards": {
+        "Completion": { "Cash": 500, "Unlock": "CustomizationMenu" }
+      }
+    },
+    "AdvancedDriving": {
+      "ID": "TUT_ADVANCED",
+      "Name": "Advanced Driving",
+      "Description": "Master advanced driving techniques",
+      "Duration": 15,
+      "Mandatory": false,
+      "Steps": {
+        "TrailBraking": {
+          "Instruction": "Trail brake into corners for faster entry",
+          "Demonstration": true,
+          "Completion": "TrailBrake:5"
+        },
+        "Heel-Toe": {
+          "Instruction": "Rev-match downshifts for smooth deceleration",
+          "Demonstration": true,
+          "Completion": "RevMatch:5"
+        },
+        "Slipstream": {
+          "Instruction": "Draft behind opponents to gain speed",
+          "Completion": "DraftFor:5seconds"
+        },
+        "DefensiveDriving": {
+          "Instruction": "Block overtake attempts legally",
+          "Completion": "BlockOvertake:3"
+        }
+      },
+      "Rewards": {
+        "Completion": { "Cash": 2500, "REP": 500, "Title": "Advanced Driver" }
+      }
+    },
+    "DriftingTechniques": {
+      "ID": "TUT_DRIFT",
+      "Name": "Drifting Techniques",
+      "Description": "Learn the art of controlled sliding",
+      "Duration": 15,
+      "Mandatory": false,
+      "Steps": {
+        "InitiateDrift": {
+          "Instruction": "Initiate a drift using handbrake or throttle",
+          "Methods": ["Handbrake", "PowerOver", "FeintDrift"],
+          "Completion": "InitiateDrift:3"
+        },
+        "MaintainAngle": {
+          "Instruction": "Maintain your drift angle with counter-steer",
+          "Completion": "HoldDrift:5seconds"
+        },
+        "TransitionDrift": {
+          "Instruction": "Transition between left and right drifts",
+          "Completion": "TransitionDrift:3"
+        },
+        "DriftScoring": {
+          "Instruction": "Build combo multipliers for higher scores",
+          "Completion": "ReachCombo:5x"
+        },
+        "TandemDrift": {
+          "Instruction": "Follow the lead car while maintaining proximity",
+          "Completion": "CompleteTandem"
+        }
+      },
+      "Rewards": {
+        "Completion": { "Cash": 3000, "REP": 750, "Title": "Drift Initiate" }
+      }
+    },
+    "TuningBasics": {
+      "ID": "TUT_TUNING",
+      "Name": "Tuning Basics",
+      "Description": "Understand vehicle tuning fundamentals",
+      "Duration": 10,
+      "Mandatory": false,
+      "Steps": {
+        "AccessTuning": {
+          "Instruction": "Open the tuning menu for your vehicle",
+          "Completion": "OpenTuning"
+        },
+        "Suspension": {
+          "Instruction": "Adjust suspension for handling balance",
+          "Explanation": "Lower = more grip, Higher = more stability",
+          "Completion": "AdjustSuspension"
+        },
+        "Gearing": {
+          "Instruction": "Tune gear ratios for acceleration or top speed",
+          "Explanation": "Short gears = acceleration, Long gears = top speed",
+          "Completion": "AdjustGearing"
+        },
+        "TestChanges": {
+          "Instruction": "Test your tuning changes on track",
+          "Completion": "CompleteLap"
+        }
+      },
+      "Rewards": {
+        "Completion": { "Cash": 2000, "REP": 400, "Unlock": "AdvancedTuning" }
+      }
+    },
+    "MultiplayerIntro": {
+      "ID": "TUT_MULTIPLAYER",
+      "Name": "Multiplayer Introduction",
+      "Description": "Learn how to race online",
+      "Duration": 8,
+      "Mandatory": false,
+      "Steps": {
+        "Matchmaking": {
+          "Instruction": "Find a race using Quick Match",
+          "Completion": "StartMatchmaking"
+        },
+        "Lobby": {
+          "Instruction": "Navigate the race lobby and ready up",
+          "Completion": "ReadyUp"
+        },
+        "OnlineEtiquette": {
+          "Instruction": "Learn about fair racing and penalties",
+          "Presentation": true,
+          "Completion": "ViewPresentation"
+        },
+        "VoiceChat": {
+          "Instruction": "Configure voice chat settings",
+          "Completion": "AdjustVoice"
+        }
+      },
+      "Rewards": {
+        "Completion": { "REP": 500, "Unlock": "RankedRacing" }
+      }
+    }
+  },
+
+  "ContextualHints": {
+    "Enabled": true,
+    "Triggers": {
+      "FirstTimeEvent": true,
+      "RepeatedFailure": { "Count": 3, "ShowHint": true },
+      "NewFeatureUnlock": true
+    },
+    "Hints": {
+      "DriftHelp": {
+        "Trigger": "DriftFail:3",
+        "Message": "Try using less throttle to maintain your drift",
+        "Duration": 5
+      },
+      "CornerHelp": {
+        "Trigger": "CornerExit:Slow",
+        "Message": "Brake before the corner, accelerate through",
+        "Duration": 5
+      },
+      "NitroHelp": {
+        "Trigger": "NitroUnused",
+        "Message": "Use nitro on straights for maximum effect",
+        "Duration": 5
+      }
+    },
+    "DisableOption": true
+  },
+
+  "TrainingMode": {
+    "FreePractice": {
+      "Enabled": true,
+      "AnyTrack": true,
+      "AnyVehicle": true,
+      "NoTimeLimits": true
+    },
+    "Challenges": {
+      "Categories": {
+        "Speed": ["SpeedTraps", "TopSpeed"],
+        "Handling": ["Slalom", "Cornering"],
+        "Drifting": ["DriftScore", "DriftAngle"],
+        "Precision": ["TargetTime", "PerfectLaps"]
+      },
+      "Medals": ["Bronze", "Silver", "Gold", "Platinum"]
+    },
+    "GhostRacing": {
+      "OwnGhost": true,
+      "DeveloperGhosts": true,
+      "TopPlayerGhosts": true
+    }
+  },
+
+  "UI": {
+    "Overlay": {
+      "InstructionBox": { "Position": "Top", "Style": "Clear" },
+      "ProgressBar": { "ShowSteps": true },
+      "SkipButton": { "AfterFirstTime": true }
+    },
+    "VisualGuides": {
+      "RacingLine": true,
+      "BrakingZones": true,
+      "ApexMarkers": true,
+      "SpeedIndicators": true
+    },
+    "Narration": {
+      "VoiceOver": true,
+      "Subtitles": true,
+      "Language": "Localized"
+    }
+  },
+
+  "Rewards": {
+    "AllTutorialsComplete": {
+      "Cash": 10000,
+      "REP": 2500,
+      "Title": "Graduate",
+      "Badge": "TutorialMaster"
+    }
+  }
+}

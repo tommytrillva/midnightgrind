@@ -1,0 +1,475 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Aerodynamic Parts and Customization",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "AffectsPerformance": true,
+    "VisualOnly": false,
+    "WindTunnelAvailable": true
+  },
+
+  "AeroPrinciples": {
+    "Downforce": {
+      "Description": "Increased grip at high speeds",
+      "TradeOff": "Increased drag",
+      "Units": "kgf"
+    },
+    "Drag": {
+      "Description": "Air resistance reducing top speed",
+      "TradeOff": "Stability",
+      "Units": "Cd"
+    },
+    "Balance": {
+      "Description": "Front/rear downforce distribution",
+      "Range": [40, 60],
+      "Optimal": 50
+    }
+  },
+
+  "FrontAero": {
+    "Splitters": {
+      "Stock": {
+        "ID": "SPLITTER_STOCK",
+        "Name": "Stock",
+        "Downforce": 0,
+        "Drag": 0,
+        "UnlockMethod": "Default"
+      },
+      "LipSplitter": {
+        "ID": "SPLITTER_LIP",
+        "Name": "Lip Splitter",
+        "Downforce": 15,
+        "Drag": 2,
+        "Material": ["ABS", "Carbon"],
+        "UnlockLevel": 10
+      },
+      "FlatSplitter": {
+        "ID": "SPLITTER_FLAT",
+        "Name": "Flat Splitter",
+        "Downforce": 30,
+        "Drag": 5,
+        "Material": ["ABS", "Carbon", "Aluminum"],
+        "UnlockLevel": 20
+      },
+      "RaceSplitter": {
+        "ID": "SPLITTER_RACE",
+        "Name": "Race Splitter",
+        "Downforce": 50,
+        "Drag": 8,
+        "Material": ["Carbon"],
+        "EndPlates": true,
+        "UnlockLevel": 35
+      },
+      "DTMSplitter": {
+        "ID": "SPLITTER_DTM",
+        "Name": "DTM Style Splitter",
+        "Downforce": 65,
+        "Drag": 12,
+        "Material": ["Carbon"],
+        "DivePlanes": true,
+        "UnlockLevel": 45
+      }
+    },
+    "Canards": {
+      "None": { "ID": "CANARD_NONE", "Downforce": 0 },
+      "Small": {
+        "ID": "CANARD_SMALL",
+        "Name": "Small Canards",
+        "Downforce": 10,
+        "Drag": 3,
+        "Pairs": 1,
+        "UnlockLevel": 15
+      },
+      "Large": {
+        "ID": "CANARD_LARGE",
+        "Name": "Large Canards",
+        "Downforce": 20,
+        "Drag": 6,
+        "Pairs": 1,
+        "UnlockLevel": 25
+      },
+      "Double": {
+        "ID": "CANARD_DOUBLE",
+        "Name": "Double Canards",
+        "Downforce": 35,
+        "Drag": 10,
+        "Pairs": 2,
+        "UnlockLevel": 35
+      },
+      "Racing": {
+        "ID": "CANARD_RACING",
+        "Name": "Racing Canards",
+        "Downforce": 45,
+        "Drag": 12,
+        "Adjustable": true,
+        "UnlockLevel": 45
+      }
+    },
+    "FrontBumper": {
+      "Stock": { "ID": "FRONT_STOCK", "Downforce": 0 },
+      "Vented": {
+        "ID": "FRONT_VENTED",
+        "Name": "Vented Bumper",
+        "Downforce": 5,
+        "Cooling": 10,
+        "Styles": 5,
+        "UnlockLevel": 10
+      },
+      "AeroStyle": {
+        "ID": "FRONT_AERO",
+        "Name": "Aero Bumper",
+        "Downforce": 15,
+        "Drag": 3,
+        "Styles": 8,
+        "UnlockLevel": 20
+      },
+      "WideBody": {
+        "ID": "FRONT_WIDE",
+        "Name": "Wide Body Front",
+        "Downforce": 10,
+        "AirDam": true,
+        "RequiresKit": "WideBody",
+        "Styles": 4,
+        "UnlockLevel": 30
+      },
+      "Race": {
+        "ID": "FRONT_RACE",
+        "Name": "Race Bumper",
+        "Downforce": 25,
+        "IntegratedSplitter": true,
+        "Styles": 3,
+        "UnlockLevel": 40
+      }
+    }
+  },
+
+  "RearAero": {
+    "Wings": {
+      "None": {
+        "ID": "WING_NONE",
+        "Downforce": 0,
+        "Drag": 0
+      },
+      "Lip": {
+        "ID": "WING_LIP",
+        "Name": "Lip Spoiler",
+        "Downforce": 15,
+        "Drag": 1,
+        "Styles": 8,
+        "UnlockLevel": 5
+      },
+      "DuckTail": {
+        "ID": "WING_DUCKTAIL",
+        "Name": "Ducktail Spoiler",
+        "Downforce": 25,
+        "Drag": 2,
+        "Styles": 5,
+        "UnlockLevel": 15
+      },
+      "LowProfile": {
+        "ID": "WING_LOW",
+        "Name": "Low Profile Wing",
+        "Downforce": 40,
+        "Drag": 5,
+        "Styles": 6,
+        "UnlockLevel": 20
+      },
+      "MidMount": {
+        "ID": "WING_MID",
+        "Name": "Mid-Mount Wing",
+        "Downforce": 60,
+        "Drag": 10,
+        "Adjustable": true,
+        "Styles": 8,
+        "UnlockLevel": 25
+      },
+      "HighMount": {
+        "ID": "WING_HIGH",
+        "Name": "High-Mount Wing",
+        "Downforce": 85,
+        "Drag": 15,
+        "Adjustable": true,
+        "Styles": 6,
+        "UnlockLevel": 35
+      },
+      "GT": {
+        "ID": "WING_GT",
+        "Name": "GT Wing",
+        "Downforce": 110,
+        "Drag": 20,
+        "Adjustable": true,
+        "StandHeight": "Variable",
+        "Styles": 10,
+        "UnlockLevel": 40
+      },
+      "Swan": {
+        "ID": "WING_SWAN",
+        "Name": "Swan Neck Wing",
+        "Downforce": 120,
+        "Drag": 18,
+        "CleanAirflow": true,
+        "Styles": 4,
+        "UnlockLevel": 45
+      },
+      "TimeAttack": {
+        "ID": "WING_TIMEATTACK",
+        "Name": "Time Attack Wing",
+        "Downforce": 150,
+        "Drag": 25,
+        "Adjustable": true,
+        "EndPlates": "Full",
+        "Styles": 3,
+        "UnlockLevel": 50
+      }
+    },
+    "Diffusers": {
+      "None": { "ID": "DIFF_NONE", "Downforce": 0 },
+      "Basic": {
+        "ID": "DIFF_BASIC",
+        "Name": "Basic Diffuser",
+        "Downforce": 20,
+        "Fins": 3,
+        "UnlockLevel": 15
+      },
+      "Extended": {
+        "ID": "DIFF_EXTENDED",
+        "Name": "Extended Diffuser",
+        "Downforce": 40,
+        "Fins": 5,
+        "UnlockLevel": 25
+      },
+      "Race": {
+        "ID": "DIFF_RACE",
+        "Name": "Race Diffuser",
+        "Downforce": 65,
+        "Fins": 7,
+        "TunnelDesign": true,
+        "UnlockLevel": 40
+      },
+      "FullFloor": {
+        "ID": "DIFF_FULLFLOOR",
+        "Name": "Full Floor Diffuser",
+        "Downforce": 90,
+        "GroundEffect": true,
+        "RequiresFlat": true,
+        "UnlockLevel": 50
+      }
+    },
+    "RearBumper": {
+      "Stock": { "ID": "REAR_STOCK" },
+      "Vented": {
+        "ID": "REAR_VENTED",
+        "Name": "Vented Rear",
+        "HeatExtraction": true,
+        "Styles": 5,
+        "UnlockLevel": 10
+      },
+      "AeroStyle": {
+        "ID": "REAR_AERO",
+        "Name": "Aero Rear Bumper",
+        "DiffuserSpace": true,
+        "Styles": 6,
+        "UnlockLevel": 20
+      },
+      "WideBody": {
+        "ID": "REAR_WIDE",
+        "Name": "Wide Body Rear",
+        "RequiresKit": "WideBody",
+        "Styles": 4,
+        "UnlockLevel": 30
+      }
+    }
+  },
+
+  "SideAero": {
+    "SideSkirts": {
+      "Stock": { "ID": "SKIRT_STOCK" },
+      "LowProfile": {
+        "ID": "SKIRT_LOW",
+        "Name": "Low Profile Skirts",
+        "AirSealing": 10,
+        "Styles": 8,
+        "UnlockLevel": 10
+      },
+      "Aggressive": {
+        "ID": "SKIRT_AGGRESSIVE",
+        "Name": "Aggressive Skirts",
+        "AirSealing": 20,
+        "Downforce": 5,
+        "Styles": 6,
+        "UnlockLevel": 20
+      },
+      "WideBody": {
+        "ID": "SKIRT_WIDE",
+        "Name": "Wide Body Skirts",
+        "AirSealing": 25,
+        "RequiresKit": "WideBody",
+        "Styles": 4,
+        "UnlockLevel": 30
+      },
+      "Vented": {
+        "ID": "SKIRT_VENTED",
+        "Name": "Vented Race Skirts",
+        "AirSealing": 30,
+        "Cooling": 15,
+        "Styles": 3,
+        "UnlockLevel": 40
+      }
+    },
+    "FenderVents": {
+      "None": { "ID": "FVENT_NONE" },
+      "Louvers": {
+        "ID": "FVENT_LOUVER",
+        "Name": "Fender Louvers",
+        "WheelWellPressure": -10,
+        "Styles": 4,
+        "UnlockLevel": 15
+      },
+      "Vents": {
+        "ID": "FVENT_VENT",
+        "Name": "Fender Vents",
+        "WheelWellPressure": -15,
+        "Cooling": 10,
+        "Styles": 5,
+        "UnlockLevel": 25
+      },
+      "NACA": {
+        "ID": "FVENT_NACA",
+        "Name": "NACA Ducts",
+        "WheelWellPressure": -20,
+        "Efficiency": "High",
+        "Styles": 3,
+        "UnlockLevel": 35
+      }
+    }
+  },
+
+  "BodyKits": {
+    "WideBody": {
+      "Types": {
+        "Bolt-On": {
+          "ID": "WIDE_BOLT",
+          "Name": "Bolt-On Flares",
+          "WidthIncrease": 50,
+          "Style": "Street",
+          "Styles": 5,
+          "UnlockLevel": 25
+        },
+        "Seamless": {
+          "ID": "WIDE_SEAMLESS",
+          "Name": "Seamless Wide Body",
+          "WidthIncrease": 75,
+          "Style": "OEM+",
+          "Styles": 4,
+          "UnlockLevel": 35
+        },
+        "Race": {
+          "ID": "WIDE_RACE",
+          "Name": "Race Wide Body",
+          "WidthIncrease": 100,
+          "Style": "Competition",
+          "Styles": 3,
+          "UnlockLevel": 45
+        }
+      },
+      "Effects": {
+        "WiderTires": true,
+        "AeroSealing": true,
+        "WeightPenalty": 25
+      }
+    }
+  },
+
+  "ActiveAero": {
+    "Enabled": true,
+    "Systems": {
+      "ActiveWing": {
+        "ID": "ACTIVE_WING",
+        "Name": "Active Wing System",
+        "SpeedActivation": 150,
+        "AngleRange": [0, 45],
+        "Automatic": true,
+        "UnlockLevel": 50
+      },
+      "DRS": {
+        "ID": "ACTIVE_DRS",
+        "Name": "Drag Reduction System",
+        "Effect": "ReduceDrag",
+        "Reduction": 30,
+        "Activation": "Manual",
+        "StraightOnly": true,
+        "UnlockLevel": 50
+      },
+      "AirBrake": {
+        "ID": "ACTIVE_BRAKE",
+        "Name": "Air Brake",
+        "Effect": "IncreaseDrag",
+        "BrakingAssist": true,
+        "Activation": "OnBraking",
+        "UnlockLevel": 45
+      }
+    }
+  },
+
+  "Tuning": {
+    "WingAngle": {
+      "Range": [0, 45],
+      "Effects": {
+        "LowAngle": { "Drag": "Low", "Downforce": "Low" },
+        "MidAngle": { "Drag": "Medium", "Downforce": "Medium" },
+        "HighAngle": { "Drag": "High", "Downforce": "High" }
+      }
+    },
+    "RideHeight": {
+      "Effect": "GroundEffect",
+      "Lower": "MoreDownforce",
+      "Higher": "LessBottoming"
+    },
+    "Balance": {
+      "Front": { "Min": 0, "Max": 100 },
+      "Rear": { "Min": 0, "Max": 100 }
+    }
+  },
+
+  "WindTunnel": {
+    "Enabled": true,
+    "UnlockLevel": 30,
+    "Features": {
+      "DownforceVisualization": true,
+      "DragCoefficient": true,
+      "AirflowParticles": true,
+      "PressureMap": true
+    },
+    "Testing": {
+      "StaticTest": true,
+      "SpeedSweep": true,
+      "YawAngle": true
+    }
+  },
+
+  "Materials": {
+    "ABS": {
+      "Weight": 1.0,
+      "Cost": 1.0,
+      "Durability": 0.7
+    },
+    "FRP": {
+      "Weight": 0.85,
+      "Cost": 1.3,
+      "Durability": 0.8
+    },
+    "Carbon": {
+      "Weight": 0.5,
+      "Cost": 3.0,
+      "Durability": 0.9,
+      "UnlockLevel": 30
+    },
+    "DryCarbon": {
+      "Weight": 0.4,
+      "Cost": 5.0,
+      "Durability": 0.95,
+      "UnlockLevel": 45
+    }
+  }
+}
