@@ -229,125 +229,198 @@ struct FMGCloudSaveMetadata
 	FString OriginPlatform;
 };
 
+// ============================================================================
+// DATA STRUCTURES - CONFLICT & PROGRESS
+// ============================================================================
+
 /**
- * Save Conflict Data
+ * @struct FMGSaveConflict
+ * @brief Information about a detected save conflict.
+ *
+ * When both local and cloud saves have diverged, this struct provides
+ * the details needed to resolve the conflict (either automatically or
+ * by presenting options to the player).
  */
 USTRUCT(BlueprintType)
 struct FMGSaveConflict
 {
 	GENERATED_BODY()
 
+	/// Metadata about the local save file
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conflict")
 	FMGSaveSlotInfo LocalSave;
 
+	/// Metadata about the cloud save file
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conflict")
 	FMGCloudSaveMetadata CloudSave;
 
+	/// Which category of data has the conflict
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conflict")
 	EMGSaveDataType DataType = EMGSaveDataType::All;
 
+	/// When the local save was last modified
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conflict")
 	FDateTime LocalTimestamp;
 
+	/// When the cloud save was last modified
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Conflict")
 	FDateTime CloudTimestamp;
 };
 
 /**
- * Sync Progress
+ * @struct FMGSyncProgress
+ * @brief Real-time progress information during cloud sync operations.
+ *
+ * Use this to display a progress bar or status message during sync.
+ * Updated frequently via the OnCloudSyncProgress delegate.
  */
 USTRUCT(BlueprintType)
 struct FMGSyncProgress
 {
 	GENERATED_BODY()
 
+	/// Which data type is currently being synced
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	EMGSaveDataType CurrentDataType = EMGSaveDataType::All;
 
+	/// Total number of items to process
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	int32 TotalItems = 0;
 
+	/// Number of items completed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	int32 ProcessedItems = 0;
 
+	/// Total data size in bytes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	int64 TotalBytes = 0;
 
+	/// Bytes transferred so far
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	int64 TransferredBytes = 0;
 
+	/// Overall progress from 0.0 to 1.0
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	float ProgressPercent = 0.0f;
 
+	/// True if uploading, false if downloading
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Progress")
 	bool bIsUploading = false;
 };
 
+// ============================================================================
+// DATA STRUCTURES - AUTO-SAVE CONFIGURATION
+// ============================================================================
+
 /**
- * Auto-Save Settings
+ * @struct FMGAutoSaveSettings
+ * @brief Configuration for automatic save behavior.
+ *
+ * Controls when the game automatically saves. Players can customize these
+ * settings to balance data safety against potential performance impacts.
  */
 USTRUCT(BlueprintType)
 struct FMGAutoSaveSettings
 {
 	GENERATED_BODY()
 
+	/// Master toggle for auto-save functionality
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AutoSave")
 	bool bEnabled = true;
 
+	/// Time between periodic auto-saves (in minutes)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AutoSave")
 	float IntervalMinutes = 5.0f;
 
+	/// Automatically save after completing a race
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AutoSave")
 	bool bSaveAfterRace = true;
 
+	/// Automatically save after purchasing items or vehicles
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AutoSave")
 	bool bSaveOnPurchase = true;
 
+	/// Automatically save when the player levels up
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AutoSave")
 	bool bSaveOnLevelUp = true;
 
+	/// Automatically save when an achievement is unlocked
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AutoSave")
 	bool bSaveOnAchievement = true;
 
+	/// Also sync to cloud during auto-saves (requires network)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AutoSave")
 	bool bCloudSyncOnAutoSave = false;
 };
 
+// ============================================================================
+// DATA STRUCTURES - BACKUP MANAGEMENT
+// ============================================================================
+
 /**
- * Backup Info
+ * @struct FMGSaveBackup
+ * @brief Information about a save backup.
+ *
+ * Backups are snapshots of save data that can be restored if the primary
+ * save becomes corrupted or if the player wants to revert changes.
  */
 USTRUCT(BlueprintType)
 struct FMGSaveBackup
 {
 	GENERATED_BODY()
 
+	/// Unique identifier for this backup
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Backup")
 	FString BackupID;
 
+	/// When this backup was created
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Backup")
 	FDateTime BackupTime;
 
+	/// Why this backup was created: "Manual", "Pre-Update", "Auto"
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Backup")
-	FString Reason; // "Manual", "Pre-Update", "Auto"
+	FString Reason;
 
+	/// Size of the backup in bytes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Backup")
 	int64 DataSize = 0;
 
+	/// True if this backup is stored in the cloud
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Backup")
 	bool bIsCloudBackup = false;
 };
 
-// Delegates
+// ============================================================================
+// DELEGATE DECLARATIONS
+// ============================================================================
+
+/// Broadcast when a local save operation completes
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveCompleted, bool, bSuccess);
+/// Broadcast when a local load operation completes
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoadCompleted, bool, bSuccess);
+/// Broadcast when cloud sync status changes (e.g., Syncing -> Synced)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCloudSyncStatusChanged, EMGCloudSyncStatus, NewStatus);
+/// Broadcast periodically during sync with progress updates
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCloudSyncProgress, const FMGSyncProgress&, Progress);
+/// Broadcast when a conflict is detected that needs resolution
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveConflictDetected, const FMGSaveConflict&, Conflict);
+/// Broadcast when an auto-save is triggered (before the save starts)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAutoSaveTriggered);
 
 /**
- * Cloud Save Subsystem
- * Manages local saves, cloud synchronization, and backup/restore
+ * @class UMGCloudSaveSubsystem
+ * @brief Manages local saves, cloud synchronization, backup, and restore operations.
+ *
+ * This subsystem provides comprehensive save management including:
+ * - Multiple local save slots with rich metadata
+ * - Background cloud synchronization
+ * - Conflict detection and resolution
+ * - Automatic backup creation
+ * - Save data import/export for sharing or migration
+ *
+ * The subsystem operates on a "local-first" principle: saves are always written
+ * locally first, then synced to the cloud when possible. This ensures saves
+ * work reliably even without network connectivity.
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGCloudSaveSubsystem : public UGameInstanceSubsystem
@@ -355,72 +428,124 @@ class MIDNIGHTGRIND_API UMGCloudSaveSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	/// @brief Initialize the subsystem. Sets up save slots and starts auto-save timer.
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	/// @brief Cleanup the subsystem. Ensures pending saves complete before shutdown.
 	virtual void Deinitialize() override;
 
-	// ==========================================
-	// EVENTS
-	// ==========================================
+	// ============================================================================
+	// EVENTS / DELEGATES
+	// ============================================================================
+	// Blueprint-assignable events for responding to save system operations.
+	// Bind to these to update UI elements and handle save-related logic.
+	// ============================================================================
 
+	/// Fires when a local save completes. Check bSuccess for the result.
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnSaveCompleted OnSaveCompleted;
 
+	/// Fires when a local load completes. Check bSuccess for the result.
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnLoadCompleted OnLoadCompleted;
 
+	/// Fires when cloud sync status changes. Update your UI cloud icon here.
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCloudSyncStatusChanged OnCloudSyncStatusChanged;
 
+	/// Fires periodically during sync with progress information.
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCloudSyncProgress OnCloudSyncProgress;
 
+	/// Fires when a conflict is detected. Show a dialog or resolve automatically.
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnSaveConflictDetected OnSaveConflictDetected;
 
+	/// Fires just before an auto-save begins. Use for showing "Saving..." indicator.
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnAutoSaveTriggered OnAutoSaveTriggered;
 
-	// ==========================================
-	// LOCAL SAVE/LOAD
-	// ==========================================
+	// ============================================================================
+	// LOCAL SAVE/LOAD OPERATIONS
+	// ============================================================================
+	// Functions for saving and loading data to/from local storage.
+	// These work offline and are the foundation for cloud sync.
+	// ============================================================================
 
-	/** Save game to slot */
+	/**
+	 * @brief Saves all game data to the specified slot.
+	 * @param SlotIndex The save slot index (0 to MaxSaveSlots-1).
+	 * @return true if the save succeeded.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool SaveGame(int32 SlotIndex = 0);
 
-	/** Save specific data type */
+	/**
+	 * @brief Saves only a specific data type to the slot.
+	 *
+	 * Use this for partial saves (e.g., just saving settings without
+	 * touching game progress).
+	 *
+	 * @param DataType Which category of data to save.
+	 * @param SlotIndex The target save slot.
+	 * @return true if successful.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool SaveDataType(EMGSaveDataType DataType, int32 SlotIndex = 0);
 
-	/** Load game from slot */
+	/**
+	 * @brief Loads game data from the specified slot.
+	 * @param SlotIndex The save slot to load from.
+	 * @return true if the load succeeded.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool LoadGame(int32 SlotIndex = 0);
 
-	/** Load specific data type */
+	/**
+	 * @brief Loads only a specific data type from the slot.
+	 * @param DataType Which category of data to load.
+	 * @param SlotIndex The save slot to load from.
+	 * @return true if successful.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool LoadDataType(EMGSaveDataType DataType, int32 SlotIndex = 0);
 
-	/** Delete save slot */
+	/**
+	 * @brief Permanently deletes a save slot.
+	 * @param SlotIndex The slot to delete.
+	 * @return true if deletion succeeded.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	bool DeleteSaveSlot(int32 SlotIndex);
 
-	/** Get save slot info */
+	/**
+	 * @brief Gets metadata for a specific save slot.
+	 * @param SlotIndex The slot to query.
+	 * @return Slot info including player name, level, play time, etc.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	FMGSaveSlotInfo GetSaveSlotInfo(int32 SlotIndex) const;
 
-	/** Get all save slots */
+	/**
+	 * @brief Gets metadata for all save slots.
+	 * @return Array of slot info for populating a save selection UI.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Save")
 	TArray<FMGSaveSlotInfo> GetAllSaveSlots() const;
 
-	/** Does save slot exist */
+	/**
+	 * @brief Checks if a save slot contains data.
+	 * @param SlotIndex The slot to check.
+	 * @return true if the slot has save data.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Save")
 	bool DoesSaveSlotExist(int32 SlotIndex) const;
 
-	/** Get current slot index */
+	/// @brief Gets the currently active save slot index.
 	UFUNCTION(BlueprintPure, Category = "Save")
 	int32 GetCurrentSlotIndex() const { return CurrentSlotIndex; }
 
-	/** Get max save slots */
+	/// @brief Gets the maximum number of save slots available.
 	UFUNCTION(BlueprintPure, Category = "Save")
 	int32 GetMaxSaveSlots() const { return MaxSaveSlots; }
 

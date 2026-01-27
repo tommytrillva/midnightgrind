@@ -1,0 +1,341 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Interior Customization and Cockpit Upgrades",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "FirstPersonView": true,
+    "CockpitCamera": true,
+    "InteractionEnabled": true,
+    "AffectsImmersion": true
+  },
+
+  "SeatUpgrades": {
+    "Categories": {
+      "Stock": {
+        "ID": "SEAT_STOCK",
+        "Name": "Stock Seats",
+        "Description": "Factory original seats",
+        "Comfort": 1.0,
+        "Support": 0.5,
+        "Weight": 0
+      },
+      "Sport": {
+        "ID": "SEAT_SPORT",
+        "Name": "Sport Seats",
+        "Description": "Enhanced bolstering for spirited driving",
+        "Comfort": 0.9,
+        "Support": 0.7,
+        "Weight": -5,
+        "Price": 1500
+      },
+      "Bucket": {
+        "ID": "SEAT_BUCKET",
+        "Name": "Bucket Seats",
+        "Description": "Fixed-back racing buckets",
+        "Comfort": 0.6,
+        "Support": 0.9,
+        "Weight": -15,
+        "Price": 3000
+      },
+      "Recaro": {
+        "ID": "SEAT_RECARO",
+        "Name": "Recaro Racing",
+        "Description": "Professional motorsport seats",
+        "Comfort": 0.7,
+        "Support": 1.0,
+        "Weight": -20,
+        "Price": 5000
+      },
+      "Carbon": {
+        "ID": "SEAT_CARBON",
+        "Name": "Carbon Fiber Shells",
+        "Description": "Ultralight carbon fiber racing seats",
+        "Comfort": 0.5,
+        "Support": 1.0,
+        "Weight": -30,
+        "Price": 10000
+      }
+    },
+    "Materials": {
+      "Cloth": { "Durability": 0.7, "PriceModifier": 1.0 },
+      "Leather": { "Durability": 0.9, "PriceModifier": 1.3 },
+      "Alcantara": { "Durability": 0.85, "PriceModifier": 1.5 },
+      "Synthetic": { "Durability": 0.95, "PriceModifier": 1.2 }
+    },
+    "Colors": {
+      "Standard": ["Black", "Red", "Blue", "Grey"],
+      "Premium": ["White", "Tan", "Purple", "Orange"],
+      "Custom": { "ColorPicker": true }
+    },
+    "Stitching": {
+      "Patterns": ["Standard", "Diamond", "Honeycomb", "Racing"],
+      "Colors": { "Contrast": true, "Match": true, "Custom": true }
+    }
+  },
+
+  "SteeringWheels": {
+    "Types": {
+      "Stock": {
+        "ID": "WHEEL_STOCK",
+        "Name": "Stock Wheel",
+        "Diameter": 380,
+        "Material": "Leather",
+        "Price": 0
+      },
+      "Sport": {
+        "ID": "WHEEL_SPORT",
+        "Name": "Sport Wheel",
+        "Diameter": 350,
+        "Material": "Perforated Leather",
+        "FlatBottom": false,
+        "Price": 500
+      },
+      "Racing": {
+        "ID": "WHEEL_RACE",
+        "Name": "Racing Wheel",
+        "Diameter": 330,
+        "Material": "Alcantara",
+        "FlatBottom": true,
+        "Price": 1500
+      },
+      "Drift": {
+        "ID": "WHEEL_DRIFT",
+        "Name": "Deep Dish Wheel",
+        "Diameter": 340,
+        "Material": "Suede",
+        "DeepDish": true,
+        "Price": 1200
+      },
+      "Carbon": {
+        "ID": "WHEEL_CARBON",
+        "Name": "Carbon Fiber Wheel",
+        "Diameter": 320,
+        "Material": "Carbon/Alcantara",
+        "FlatBottom": true,
+        "Price": 3000
+      }
+    },
+    "QuickRelease": {
+      "Enabled": true,
+      "Types": ["Standard", "Tilt", "SnapOff"],
+      "Colors": ["Black", "Chrome", "Titanium", "Gold", "Custom"]
+    }
+  },
+
+  "ShiftKnobs": {
+    "Types": {
+      "Stock": { "ID": "KNOB_STOCK", "Price": 0 },
+      "Weighted": { "ID": "KNOB_WEIGHT", "Material": "Steel", "Price": 100 },
+      "Short": { "ID": "KNOB_SHORT", "Height": "Low", "Price": 150 },
+      "Ball": { "ID": "KNOB_BALL", "Shape": "Sphere", "Price": 200 },
+      "Pistol": { "ID": "KNOB_PISTOL", "Shape": "PistolGrip", "Price": 250 },
+      "JDM": { "ID": "KNOB_JDM", "Style": "Japanese", "Price": 300 }
+    },
+    "Materials": {
+      "Plastic": { "Weight": "Light" },
+      "Aluminum": { "Weight": "Medium" },
+      "Steel": { "Weight": "Heavy" },
+      "Titanium": { "Weight": "Medium", "Premium": true },
+      "Carbon": { "Weight": "Light", "Premium": true },
+      "Wood": { "Weight": "Medium", "Classic": true }
+    },
+    "Customization": {
+      "Engraving": true,
+      "ShiftPattern": ["Standard", "Reverse", "Sequential"],
+      "LEDIndicator": true
+    }
+  },
+
+  "Dashboard": {
+    "Gauges": {
+      "GaugePods": {
+        "Positions": ["APillar", "Dashboard", "SteeringColumn"],
+        "Sizes": ["52mm", "60mm"],
+        "MaxPods": 6
+      },
+      "Types": {
+        "Boost": { "ID": "GAUGE_BOOST", "Price": 200 },
+        "OilPressure": { "ID": "GAUGE_OIL", "Price": 200 },
+        "OilTemp": { "ID": "GAUGE_OILTEMP", "Price": 200 },
+        "WaterTemp": { "ID": "GAUGE_WATER", "Price": 200 },
+        "AFR": { "ID": "GAUGE_AFR", "Price": 300 },
+        "EGT": { "ID": "GAUGE_EGT", "Price": 300 },
+        "Voltage": { "ID": "GAUGE_VOLT", "Price": 150 },
+        "FuelPressure": { "ID": "GAUGE_FUEL", "Price": 250 }
+      },
+      "Styles": ["Analog", "Digital", "Hybrid"],
+      "Lighting": ["White", "Red", "Blue", "Green", "Amber", "Custom"]
+    },
+    "DigitalDisplays": {
+      "HeadUnit": {
+        "Types": ["Stock", "Aftermarket", "Racing"],
+        "ScreenSize": [7, 9, 10],
+        "Features": ["Navigation", "DataLogging", "TuningInterface"]
+      },
+      "DigitalDash": {
+        "Enabled": true,
+        "Layouts": ["Stock", "Racing", "Drift", "Minimal", "Custom"],
+        "DataChannels": 20
+      }
+    },
+    "TrimPanels": {
+      "Materials": ["Stock", "Carbon", "Alcantara", "Aluminum", "Wood"],
+      "Pieces": ["Center Console", "Door Cards", "Dash Trim", "Pillar Covers"]
+    }
+  },
+
+  "RollCage": {
+    "Types": {
+      "None": { "ID": "CAGE_NONE", "Weight": 0, "Safety": 0 },
+      "HalfCage": {
+        "ID": "CAGE_HALF",
+        "Weight": 25,
+        "Safety": 0.5,
+        "Price": 1500,
+        "RearSeatsRemoved": false
+      },
+      "FullCage": {
+        "ID": "CAGE_FULL",
+        "Weight": 45,
+        "Safety": 0.8,
+        "Price": 3500,
+        "RearSeatsRemoved": true
+      },
+      "WeldIn": {
+        "ID": "CAGE_WELD",
+        "Weight": 50,
+        "Safety": 1.0,
+        "Price": 6000,
+        "RearSeatsRemoved": true,
+        "Permanent": true
+      }
+    },
+    "Materials": {
+      "Steel": { "Weight": 1.0, "Strength": 1.0, "Price": 1.0 },
+      "ChroMoly": { "Weight": 0.8, "Strength": 1.2, "Price": 1.5 },
+      "Titanium": { "Weight": 0.6, "Strength": 1.1, "Price": 3.0 }
+    },
+    "Padding": {
+      "Required": true,
+      "Colors": ["Black", "Red", "Blue", "Custom"]
+    }
+  },
+
+  "Harnesses": {
+    "Types": {
+      "Stock": { "ID": "BELT_STOCK", "Points": 3, "Price": 0 },
+      "FourPoint": { "ID": "BELT_4PT", "Points": 4, "Price": 300 },
+      "FivePoint": { "ID": "BELT_5PT", "Points": 5, "Price": 500 },
+      "SixPoint": { "ID": "BELT_6PT", "Points": 6, "Price": 700 }
+    },
+    "Brands": ["Stock", "Sabelt", "Sparco", "OMP", "Schroth"],
+    "Colors": ["Black", "Red", "Blue", "Green", "Yellow", "Custom"],
+    "QuickRelease": ["Standard", "Cam-Lock", "Latch"]
+  },
+
+  "Pedals": {
+    "Types": {
+      "Stock": { "ID": "PEDAL_STOCK", "Price": 0 },
+      "Aluminum": { "ID": "PEDAL_ALU", "Price": 100 },
+      "RacingStyle": { "ID": "PEDAL_RACE", "Price": 250 },
+      "Adjustable": { "ID": "PEDAL_ADJ", "Price": 400 }
+    },
+    "Customization": {
+      "Covers": true,
+      "Spacing": { "Adjustable": true },
+      "HeelToe": { "HeelPlate": true }
+    }
+  },
+
+  "FloorMats": {
+    "Types": {
+      "Stock": { "ID": "MAT_STOCK", "Price": 0 },
+      "AllWeather": { "ID": "MAT_WEATHER", "Price": 100 },
+      "Racing": { "ID": "MAT_RACE", "DeadPedal": true, "Price": 200 },
+      "Carbon": { "ID": "MAT_CARBON", "Price": 500 },
+      "Delete": { "ID": "MAT_DELETE", "WeightSave": 2, "Price": 0 }
+    },
+    "Customization": {
+      "Logo": true,
+      "Colors": true,
+      "Stitching": true
+    }
+  },
+
+  "InteriorLighting": {
+    "AmbientLighting": {
+      "Enabled": true,
+      "Zones": ["Footwell", "Door", "Console", "Roof"],
+      "Colors": { "Single": true, "RGB": true, "Animated": true },
+      "Brightness": { "Min": 0, "Max": 100 }
+    },
+    "GaugeLighting": {
+      "Backlight": true,
+      "Colors": ["Stock", "White", "Red", "Blue", "Green", "Custom"],
+      "Brightness": { "Adjustable": true }
+    }
+  },
+
+  "WeightReduction": {
+    "RearSeatDelete": {
+      "Enabled": true,
+      "WeightSave": 30,
+      "Price": 0,
+      "Effect": "RemovesRearSeats"
+    },
+    "SoundDeadening": {
+      "Remove": true,
+      "WeightSave": 20,
+      "NoiseIncrease": 1.3
+    },
+    "CarpetDelete": {
+      "Enabled": true,
+      "WeightSave": 10,
+      "Price": 0
+    },
+    "StripInterior": {
+      "Enabled": true,
+      "WeightSave": 50,
+      "Levels": ["Partial", "Full", "Race"]
+    }
+  },
+
+  "SafetyEquipment": {
+    "FireExtinguisher": {
+      "Mounted": true,
+      "Positions": ["CenterConsole", "FloorTunnel", "RollCage"],
+      "Types": ["Standard", "Racing"],
+      "Price": 200
+    },
+    "KillSwitch": {
+      "Enabled": true,
+      "Positions": ["Dashboard", "RoofPillar"],
+      "Price": 100
+    },
+    "HarnessBar": {
+      "Enabled": true,
+      "RequiredFor": ["4Point+"],
+      "Price": 300
+    }
+  },
+
+  "UI": {
+    "CustomizationMenu": {
+      "3DPreview": true,
+      "FirstPersonPreview": true,
+      "RotateCamera": true,
+      "ColorPicker": true
+    },
+    "Categories": [
+      "Seats",
+      "Steering",
+      "Shifter",
+      "Dashboard",
+      "Safety",
+      "Lighting",
+      "Trim",
+      "Weight"
+    ]
+  }
+}

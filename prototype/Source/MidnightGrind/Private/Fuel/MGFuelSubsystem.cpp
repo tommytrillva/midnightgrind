@@ -613,6 +613,11 @@ void UMGFuelSubsystem::CycleFuelMode(FName VehicleID, bool bForward)
 	EMGFuelMode CurrentMode = VehicleFuelStates[VehicleID].FuelMode;
 	TArray<EMGFuelMode> Modes = GetAvailableFuelModes();
 
+	if (Modes.Num() == 0)
+	{
+		return;
+	}
+
 	int32 CurrentIndex = Modes.Find(CurrentMode);
 	if (CurrentIndex == INDEX_NONE) CurrentIndex = 0;
 

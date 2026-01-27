@@ -1,5 +1,37 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGTuningSubsystem.h
+ * @brief Vehicle fine-tuning subsystem for adjusting performance parameters
+ *
+ * The Tuning Subsystem handles detailed vehicle customization beyond basic parts.
+ * While the Garage Subsystem manages what parts are installed, the Tuning Subsystem
+ * manages HOW those parts are configured - suspension geometry, gear ratios,
+ * differential settings, and more.
+ *
+ * ## Key Responsibilities
+ * - **Part Upgrades**: Managing tiered performance parts (Street, Sport, Race, Pro, etc.)
+ * - **Slider Tuning**: Fine-tuning parameters via slider controls (ride height, camber, etc.)
+ * - **Advanced Tuning**: Gear ratios, differential lock, drivetrain swaps
+ * - **Preset Management**: Saving, loading, and sharing tuning configurations
+ * - **Stats Calculation**: Computing final vehicle stats from base + parts + tuning
+ *
+ * ## Tuning Philosophy
+ * The system is designed to be approachable for beginners while offering depth
+ * for experienced players:
+ * - **Casual Players**: Install pre-configured parts, use community presets
+ * - **Intermediate**: Adjust key sliders (ride height, downforce, brake bias)
+ * - **Advanced**: Fine-tune gear ratios, suspension geometry, differential behavior
+ *
+ * ## Integration
+ * Works closely with UMGGarageSubsystem - parts must be installed in the garage
+ * before they can be tuned here. The dyno subsystem can verify tuning changes.
+ *
+ * @see UMGGarageSubsystem for part installation
+ * @see UMGDynoSubsystem for power verification
+ * @see FMGVehicleTuning for the tuning data structure
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,28 +39,72 @@
 #include "MGPartInstallation.h"
 #include "MGTuningSubsystem.generated.h"
 
+// ============================================================================
+// TUNING ENUMERATIONS
+// ============================================================================
+
+/**
+ * @enum EMGTuningCategory
+ * @brief Categories of tunable vehicle systems
+ *
+ * Each category groups related parts and sliders. Mechanics may specialize
+ * in specific categories, affecting installation quality and cost.
+ */
 UENUM(BlueprintType)
 enum class EMGTuningCategory : uint8
 {
+	/// Engine power modifications (intake, exhaust, ECU, forced induction)
 	Engine,
+	/// Gearbox and drivetrain (ratios, clutch, differential)
 	Transmission,
+	/// Handling setup (springs, dampers, geometry)
 	Suspension,
+	/// Stopping power (rotors, calipers, lines)
 	Brakes,
+	/// Tire compound and pressure settings
 	Tires,
+	/// Nitrous oxide system configuration
 	Nitro,
+	/// Weight reduction and ballast
 	Weight,
+	/// Downforce and drag (wings, splitters, diffusers)
 	Aerodynamics
 };
 
+/**
+ * @enum EMGTuningLevel
+ * @brief Upgrade tiers for performance parts
+ *
+ * Higher tiers provide better performance but cost more and may have
+ * stricter installation requirements.
+ *
+ * ## Tier Progression
+ * | Tier     | Target PI | Unlock Requirement |
+ * |----------|-----------|-------------------|
+ * | Stock    | 100-300   | Default           |
+ * | Street   | 200-400   | Player Level 5    |
+ * | Sport    | 300-500   | Player Level 15   |
+ * | Race     | 400-600   | Player Level 30   |
+ * | Pro      | 500-700   | Player Level 50   |
+ * | Elite    | 600-800   | Player Level 75   |
+ * | Ultimate | 700-999   | Player Level 100  |
+ */
 UENUM(BlueprintType)
 enum class EMGTuningLevel : uint8
 {
+	/// Factory original parts - baseline performance
 	Stock,
+	/// Entry-level aftermarket - mild improvements
 	Street,
+	/// Enthusiast grade - noticeable gains
 	Sport,
+	/// Track-focused - significant performance
 	Race,
+	/// Professional grade - near-maximum potential
 	Pro,
+	/// Top-tier - exceptional performance
 	Elite,
+	/// Maximum performance - no compromises
 	Ultimate
 };
 

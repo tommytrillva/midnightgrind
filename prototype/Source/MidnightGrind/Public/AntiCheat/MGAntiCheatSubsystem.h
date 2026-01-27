@@ -301,14 +301,49 @@ struct FMGIntegrityCheckResult
 	FDateTime CheckTime;
 };
 
-// Delegates
+// ============================================================================
+// DELEGATES
+// ============================================================================
+
+/// Broadcast when any violation is detected, regardless of severity
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnViolationDetected, const FMGViolationRecord&, Violation);
+
+/// Broadcast when a player's trust level changes (up or down)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTrustLevelChanged, EMGTrustLevel, NewLevel);
+
+/// Broadcast when a player is banned (includes the ban reason)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerBanned, const FString&, Reason);
 
+// ============================================================================
+// ANTI-CHEAT SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Anti-Cheat Subsystem
- * Detects cheating, validates game state, and handles reports
+ * @brief Core anti-cheat subsystem for detecting and preventing cheating
+ *
+ * This GameInstanceSubsystem provides comprehensive cheat detection through
+ * real-time validation, statistical analysis, and integrity checking. It
+ * maintains player trust scores and handles both automated detection and
+ * player-submitted reports.
+ *
+ * Usage Example:
+ * @code
+ * // Get the subsystem from the game instance
+ * UMGAntiCheatSubsystem* AntiCheat = GameInstance->GetSubsystem<UMGAntiCheatSubsystem>();
+ *
+ * // Validate a player's speed during gameplay
+ * if (!AntiCheat->ValidateSpeed(PlayerID, CurrentSpeed, VehicleID))
+ * {
+ *     // Violation was detected and recorded automatically
+ * }
+ *
+ * // Check player trust before allowing ranked matches
+ * EMGTrustLevel Trust = AntiCheat->GetPlayerTrustLevel(PlayerID);
+ * if (Trust == EMGTrustLevel::Banned)
+ * {
+ *     // Reject player from match
+ * }
+ * @endcode
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGAntiCheatSubsystem : public UGameInstanceSubsystem
@@ -316,112 +351,219 @@ class MIDNIGHTGRIND_API UMGAntiCheatSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	/// Initializes the anti-cheat system, sets up periodic checks, and loads checksums
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	/// Cleans up timers and pending reports before shutdown
 	virtual void Deinitialize() override;
 
 	// ==========================================
 	// EVENTS
 	// ==========================================
+	// Subscribe to these delegates to react to anti-cheat events in your game code
 
+	/// Fires when any violation is detected (use for logging, UI alerts)
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnViolationDetected OnViolationDetected;
 
+	/// Fires when a player's trust level changes (use to update matchmaking eligibility)
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnTrustLevelChanged OnTrustLevelChanged;
 
+	/// Fires when a player is banned (use to show ban screen, disconnect player)
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPlayerBanned OnPlayerBanned;
 
 	// ==========================================
 	// REAL-TIME VALIDATION
 	// ==========================================
+	// These functions should be called during gameplay to validate state changes.
+	// They return false and record a violation if cheating is detected.
 
-	/** Validate player position */
+	/**
+	 * @brief Validates player position change for teleport detection
+	 * @param PlayerID Unique identifier of the player
+	 * @param Position Current world position
+	 * @param PreviousPosition Position from last frame
+	 * @param DeltaTime Time elapsed since last check
+	 * @return True if movement is valid, false if teleportation detected
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Validation")
 	bool ValidatePosition(const FString& PlayerID, FVector Position, FVector PreviousPosition, float DeltaTime);
 
-	/** Validate player speed */
+	/**
+	 * @brief Validates that vehicle speed is within acceptable limits
+	 * @param PlayerID Unique identifier of the player
+	 * @param CurrentSpeed Current speed in km/h
+	 * @param VehicleID The vehicle being driven (for per-vehicle limits)
+	 * @return True if speed is valid, false if speed hack detected
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Validation")
 	bool ValidateSpeed(const FString& PlayerID, float CurrentSpeed, FName VehicleID);
 
-	/** Validate lap time */
+	/**
+	 * @brief Validates that a lap time is physically possible
+	 * @param PlayerID Unique identifier of the player
+	 * @param LapTime The recorded lap time in seconds
+	 * @param TrackID The track being raced (for per-track minimums)
+	 * @return True if lap time is valid, false if impossibly fast
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Validation")
 	bool ValidateLapTime(const FString& PlayerID, float LapTime, FName TrackID);
 
-	/** Validate race result */
+	/**
+	 * @brief Validates complete race results including rewards
+	 * @param PlayerID Unique identifier of the player
+	 * @param Position Final race position (1st, 2nd, etc.)
+	 * @param RaceTime Total race time in seconds
+	 * @param CashEarned In-game currency earned
+	 * @param XPEarned Experience points earned
+	 * @return True if results are valid, false if manipulation detected
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Validation")
 	bool ValidateRaceResult(const FString& PlayerID, int32 Position, float RaceTime, int32 CashEarned, int32 XPEarned);
 
-	/** Validate currency transaction */
+	/**
+	 * @brief Validates currency transactions for resource hacking
+	 * @param PlayerID Unique identifier of the player
+	 * @param Amount Currency amount being added
+	 * @param Source Where the currency came from (race, purchase, etc.)
+	 * @return True if transaction is valid, false if hack detected
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Validation")
 	bool ValidateCurrencyTransaction(const FString& PlayerID, int32 Amount, const FString& Source);
 
-	/** Validate vehicle stats */
+	/**
+	 * @brief Validates vehicle stats against data-driven limits
+	 * @param VehicleID The vehicle to validate
+	 * @param Speed Maximum speed stat
+	 * @param Acceleration Acceleration stat
+	 * @param Handling Handling stat
+	 * @return True if stats are within bounds, false if modified
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Validation")
 	bool ValidateVehicleStats(FName VehicleID, float Speed, float Acceleration, float Handling);
 
 	// ==========================================
 	// INTEGRITY CHECKS
 	// ==========================================
+	// These functions verify game file and memory integrity to detect tampering.
+	// They are called periodically but can also be triggered manually.
 
-	/** Run full integrity check */
+	/**
+	 * @brief Runs all integrity checks and returns comprehensive results
+	 * @return Results structure with details on all checks performed
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Integrity")
 	FMGIntegrityCheckResult RunIntegrityCheck();
 
-	/** Check for modified game files */
+	/**
+	 * @brief Verifies game files match expected checksums
+	 * @return True if all critical files are unmodified
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Integrity")
 	bool CheckFileIntegrity();
 
-	/** Check for memory modifications */
+	/**
+	 * @brief Scans for memory modifications in critical game regions
+	 * @return True if memory appears unmodified
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Integrity")
 	bool CheckMemoryIntegrity();
 
-	/** Check for debuggers/injectors */
+	/**
+	 * @brief Detects if a debugger or code injector is attached
+	 * @return True if debugging tools are detected (potential cheating)
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Integrity")
 	bool CheckForDebugger();
 
-	/** Check for virtual machine */
+	/**
+	 * @brief Detects if running inside a virtual machine
+	 * @return True if VM detected (may indicate cheat development)
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Integrity")
 	bool CheckForVirtualMachine();
 
-	/** Verify server time sync */
+	/**
+	 * @brief Verifies client time is synchronized with server
+	 * @return True if time difference is within acceptable threshold
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Integrity")
 	bool VerifyTimeSync();
 
 	// ==========================================
 	// ANOMALY DETECTION
 	// ==========================================
+	// Statistical and behavioral analysis for detecting subtle cheating patterns
+	// that may not trigger immediate threshold violations.
 
-	/** Report anomalous behavior */
+	/**
+	 * @brief Manually report suspicious behavior detected by game systems
+	 * @param PlayerID Player exhibiting the anomaly
+	 * @param Type Classification of the anomaly
+	 * @param Description Human-readable explanation
+	 * @param Evidence Key-value data supporting the detection
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Anomaly")
 	void ReportAnomaly(const FString& PlayerID, EMGViolationType Type, const FString& Description,
 		const TMap<FString, FString>& Evidence);
 
-	/** Check for statistical anomalies */
+	/**
+	 * @brief Checks if a stat value is statistically anomalous for this player
+	 * @param PlayerID Player to check
+	 * @param StatType Type of stat (e.g., "win_rate", "avg_speed")
+	 * @param Value Current stat value
+	 * @return True if the value is a statistical outlier
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Anomaly")
 	bool CheckStatisticalAnomaly(const FString& PlayerID, const FString& StatType, float Value);
 
-	/** Detect input anomalies */
+	/**
+	 * @brief Analyzes input patterns for inhuman behavior (bots, macros)
+	 * @param InputHistory Recent input samples (stick positions, timings)
+	 * @return True if input appears automated or inhuman
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Anomaly")
 	bool DetectInputAnomaly(const TArray<FVector2D>& InputHistory);
 
 	// ==========================================
 	// PLAYER REPORTS
 	// ==========================================
+	// Community-driven reporting system allowing players to flag suspicious behavior.
+	// Reports are rate-limited to prevent abuse.
 
-	/** Report player */
+	/**
+	 * @brief Submit a player report for suspected cheating
+	 * @param ReportedPlayerID The player being reported
+	 * @param Reason Category of the report (e.g., "Speed Hack")
+	 * @param Description Additional details from the reporter
+	 * @return True if report was submitted, false if on cooldown or invalid
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Reports")
 	bool ReportPlayer(const FString& ReportedPlayerID, const FString& Reason, const FString& Description);
 
-	/** Get player reports */
+	/**
+	 * @brief Gets all reports filed against a specific player
+	 * @param PlayerID The player to look up
+	 * @return Array of reports against this player
+	 */
 	UFUNCTION(BlueprintPure, Category = "Reports")
 	TArray<FMGPlayerReport> GetPlayerReports(const FString& PlayerID) const;
 
-	/** Get report count for player */
+	/**
+	 * @brief Gets the total number of reports against a player
+	 * @param PlayerID The player to look up
+	 * @return Number of reports filed
+	 */
 	UFUNCTION(BlueprintPure, Category = "Reports")
 	int32 GetReportCount(const FString& PlayerID) const;
 
-	/** Can report player (cooldown check) */
+	/**
+	 * @brief Checks if the local player can submit a report (cooldown check)
+	 * @param PlayerID The player to potentially report
+	 * @return True if a report can be submitted, false if on cooldown
+	 */
 	UFUNCTION(BlueprintPure, Category = "Reports")
 	bool CanReportPlayer(const FString& PlayerID) const;
 

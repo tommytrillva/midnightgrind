@@ -556,9 +556,26 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCommunityGoalTierReached, FName,
 /// Broadcast at midnight UTC when daily challenges refresh
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDailyChallengesRefreshed);
 
+// ============================================================================
+// LIVE EVENTS SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Live Events Subsystem
- * Manages time-limited events, challenges, and community goals
+ * @class UMGLiveEventsSubsystem
+ * @brief Manages time-limited events, challenges, and community goals.
+ *
+ * This GameInstanceSubsystem is the primary interface for all live event functionality.
+ * It persists for the lifetime of the game instance and automatically handles event
+ * lifecycle, progress tracking, and reward distribution.
+ *
+ * ## Integration Points:
+ * - Race completion system should call ReportChallengeProgress() with race stats
+ * - UI should bind to delegates for real-time updates
+ * - Login flow should call RefreshEvents() to sync latest event data
+ *
+ * ## Thread Safety:
+ * All public methods are designed to be called from the game thread only.
+ * Server sync operations are asynchronous but callbacks execute on game thread.
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGLiveEventsSubsystem : public UGameInstanceSubsystem
@@ -566,96 +583,169 @@ class MIDNIGHTGRIND_API UMGLiveEventsSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	/// Called when the subsystem is created; initializes event data and starts tick timer
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	/// Called when the game instance is destroyed; saves progress and cleans up
 	virtual void Deinitialize() override;
+
+	/// Called every frame; updates event statuses and checks for expirations
 	virtual void Tick(float DeltaTime);
 
 	// ==========================================
-	// EVENTS
+	// BLUEPRINT DELEGATE PROPERTIES
+	// Bind to these in UI widgets for real-time event updates
 	// ==========================================
 
+	/// Fired when a new event becomes active; update event list UI
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnEventStarted OnEventStarted;
 
+	/// Fired when an event ends; show summary and final rewards
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnEventEnded OnEventEnded;
 
+	/// Fired on any challenge progress; update progress bars and counters
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnChallengeProgress OnChallengeProgress;
 
+	/// Fired when challenge is complete; show completion fanfare and claim button
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnChallengeCompleted OnChallengeCompleted;
 
+	/// Fired when community goal progress syncs from server
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCommunityGoalProgress OnCommunityGoalProgress;
 
+	/// Fired when community unlocks a new reward tier; celebration moment
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCommunityGoalTierReached OnCommunityGoalTierReached;
 
+	/// Fired at midnight UTC when new daily challenges are available
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnDailyChallengesRefreshed OnDailyChallengesRefreshed;
 
 	// ==========================================
-	// LIVE EVENTS
+	// LIVE EVENTS - Query and Management
+	// Core functions for accessing event data
 	// ==========================================
 
-	/** Get all active events */
+	/**
+	 * @brief Returns all events currently in Active or EndingSoon status.
+	 * @return Array of active events sorted by end time (soonest first)
+	 */
 	UFUNCTION(BlueprintPure, Category = "Live Events")
 	TArray<FMGLiveEvent> GetActiveEvents() const;
 
-	/** Get upcoming events */
+	/**
+	 * @brief Returns events in Upcoming status (not yet started).
+	 * @return Array of upcoming events sorted by start time (soonest first)
+	 */
 	UFUNCTION(BlueprintPure, Category = "Live Events")
 	TArray<FMGLiveEvent> GetUpcomingEvents() const;
 
-	/** Get event by ID */
+	/**
+	 * @brief Retrieves a specific event by its unique identifier.
+	 * @param EventID Unique identifier for the event
+	 * @return The event data, or empty struct if not found
+	 */
 	UFUNCTION(BlueprintPure, Category = "Live Events")
 	FMGLiveEvent GetEventByID(FName EventID) const;
 
-	/** Is event active */
+	/**
+	 * @brief Checks if an event is currently active and playable.
+	 * @param EventID Unique identifier for the event
+	 * @return True if event status is Active or EndingSoon
+	 */
 	UFUNCTION(BlueprintPure, Category = "Live Events")
 	bool IsEventActive(FName EventID) const;
 
-	/** Get time remaining for event */
+	/**
+	 * @brief Gets the time remaining before an event ends.
+	 * @param EventID Unique identifier for the event
+	 * @return Time remaining as FTimespan; zero if event not found or ended
+	 */
 	UFUNCTION(BlueprintPure, Category = "Live Events")
 	FTimespan GetEventTimeRemaining(FName EventID) const;
 
-	/** Refresh events from server */
+	/**
+	 * @brief Syncs event data from the server.
+	 * Call this at login and periodically to ensure fresh data.
+	 * Results are asynchronous; listen to delegates for updates.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Live Events")
 	void RefreshEvents();
 
 	// ==========================================
-	// CHALLENGES
+	// CHALLENGES - Progress Tracking and Rewards
+	// The main gameplay loop for event participation
 	// ==========================================
 
-	/** Get challenge progress */
+	/**
+	 * @brief Gets current progress for a specific challenge.
+	 * @param EventID Parent event identifier
+	 * @param ChallengeID Challenge identifier within the event
+	 * @return Challenge data with current progress values
+	 */
 	UFUNCTION(BlueprintPure, Category = "Challenges")
 	FMGEventChallenge GetChallengeProgress(FName EventID, FName ChallengeID) const;
 
-	/** Report challenge progress */
+	/**
+	 * @brief Reports gameplay progress toward challenges.
+	 *
+	 * Call this after races with the player's stats. The subsystem will find
+	 * all matching challenges and update their progress appropriately.
+	 *
+	 * @param Type The type of achievement being reported
+	 * @param Value The value to add (e.g., distance driven, races won)
+	 * @param TrackID Optional track ID for track-specific challenges
+	 * @param VehicleID Optional vehicle ID for vehicle-specific challenges
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Challenges")
 	void ReportChallengeProgress(EMGChallengeType Type, int32 Value, FName TrackID = NAME_None, FName VehicleID = NAME_None);
 
-	/** Claim challenge reward */
+	/**
+	 * @brief Claims rewards for a completed challenge.
+	 * @param EventID Parent event identifier
+	 * @param ChallengeID Challenge identifier to claim
+	 * @return True if rewards were successfully claimed
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Challenges")
 	bool ClaimChallengeReward(FName EventID, FName ChallengeID);
 
-	/** Get unclaimed challenges */
+	/**
+	 * @brief Gets all challenges that are complete but not yet claimed.
+	 * Use this to show a notification badge for pending rewards.
+	 * @return Array of completed but unclaimed challenges across all events
+	 */
 	UFUNCTION(BlueprintPure, Category = "Challenges")
 	TArray<FMGEventChallenge> GetUnclaimedChallenges() const;
 
 	// ==========================================
-	// DAILY CHALLENGES
+	// DAILY CHALLENGES - Recurring Daily Content
+	// Refreshes at midnight UTC each day
 	// ==========================================
 
-	/** Get today's daily challenges */
+	/**
+	 * @brief Gets the current day's challenge set.
+	 * @return Today's challenges with progress and bonus reward info
+	 */
 	UFUNCTION(BlueprintPure, Category = "Daily")
 	FMGDailyChallenges GetDailyChallenges() const;
 
-	/** Get daily challenge streak */
+	/**
+	 * @brief Gets the player's consecutive days completing all daily challenges.
+	 * Streak increases player engagement and may unlock bonus multipliers.
+	 * @return Number of consecutive days with all dailies completed
+	 */
 	UFUNCTION(BlueprintPure, Category = "Daily")
 	int32 GetDailyStreak() const { return DailyStreak; }
 
-	/** Claim daily bonus reward */
+	/**
+	 * @brief Claims the bonus reward for completing all daily challenges.
+	 * Only available when all challenges for the day are complete.
+	 * @return True if bonus was claimed successfully
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Daily")
 	bool ClaimDailyBonusReward();
 

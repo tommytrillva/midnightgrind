@@ -1,0 +1,280 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Spectator Mode and Broadcast System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxSpectators": 100,
+    "DelayOption": true,
+    "StreamerFriendly": true,
+    "ReplayIntegration": true
+  },
+
+  "SpectatorModes": {
+    "FreeCam": {
+      "ID": "SPEC_FREE",
+      "Name": "Free Camera",
+      "Description": "Full camera control anywhere",
+      "Controls": {
+        "Movement": "WASD",
+        "Height": "QE",
+        "Speed": "Shift/Ctrl",
+        "Rotation": "Mouse"
+      },
+      "Restrictions": {
+        "MapBounds": true,
+        "NoClipping": false,
+        "SpeedLimit": 200
+      }
+    },
+    "FollowCam": {
+      "ID": "SPEC_FOLLOW",
+      "Name": "Follow Camera",
+      "Description": "Track a specific vehicle",
+      "Views": {
+        "Chase": { "Distance": 10, "Height": 3 },
+        "Close": { "Distance": 5, "Height": 2 },
+        "Cinematic": { "Distance": 15, "Height": 4, "Smoothing": "High" },
+        "Hood": { "Attached": true },
+        "Bumper": { "Attached": true },
+        "Cockpit": { "Attached": true, "DriverView": true }
+      },
+      "AutoSwitch": {
+        "Enabled": true,
+        "Triggers": ["Overtake", "Crash", "Close Battle"]
+      }
+    },
+    "TrackCam": {
+      "ID": "SPEC_TRACK",
+      "Name": "Track Cameras",
+      "Description": "Fixed broadcast-style cameras",
+      "CameraPositions": {
+        "PrePlaced": true,
+        "KeyPoints": ["Start", "Corners", "Straights", "Finish"],
+        "AutoCut": true,
+        "ManualSelect": true
+      }
+    },
+    "BirdsEye": {
+      "ID": "SPEC_BIRDS",
+      "Name": "Bird's Eye",
+      "Description": "Top-down map view",
+      "Height": { "Min": 50, "Max": 500 },
+      "Rotation": true,
+      "Zoom": true
+    },
+    "Replay": {
+      "ID": "SPEC_REPLAY",
+      "Name": "Replay Mode",
+      "Description": "Review past race footage",
+      "Controls": {
+        "PlayPause": true,
+        "Rewind": true,
+        "FastForward": { "Speeds": [2, 4, 8] },
+        "SlowMo": { "Speeds": [0.25, 0.5] },
+        "Scrubbing": true
+      }
+    }
+  },
+
+  "HUDOptions": {
+    "RaceInfo": {
+      "Standings": { "Enabled": true, "Positions": "All" },
+      "LapTimes": { "Enabled": true, "ShowDelta": true },
+      "Timer": { "Enabled": true },
+      "MiniMap": { "Enabled": true, "ShowAll": true }
+    },
+    "DriverInfo": {
+      "NameOverlay": { "Enabled": true, "ShowTags": true },
+      "SpeedDisplay": { "Enabled": true },
+      "GearDisplay": { "Enabled": true },
+      "Telemetry": { "Enabled": true, "Detailed": true }
+    },
+    "BroadcastOverlays": {
+      "LeaderBoard": { "Animated": true },
+      "BattleGraphic": { "ShowWhenClose": true },
+      "SectorTimes": { "Enabled": true },
+      "FinishGraphic": { "Enabled": true }
+    },
+    "Customization": {
+      "HideAll": true,
+      "SelectiveToggle": true,
+      "PositionAdjust": true
+    }
+  },
+
+  "CameraFeatures": {
+    "FocusEffects": {
+      "DepthOfField": {
+        "Enabled": true,
+        "FocusOnVehicle": true,
+        "Adjustable": true
+      },
+      "MotionBlur": {
+        "Enabled": true,
+        "Intensity": { "Min": 0, "Max": 1 }
+      }
+    },
+    "CinematicTools": {
+      "SlowMotion": {
+        "Enabled": true,
+        "Speeds": [0.1, 0.25, 0.5],
+        "Triggers": ["Manual", "Crash", "PhotoFinish"]
+      },
+      "CameraShake": {
+        "Enabled": true,
+        "OnCrash": true,
+        "OnNearMiss": true
+      },
+      "DynamicZoom": {
+        "Enabled": true,
+        "OnOvertake": true,
+        "OnHighSpeed": true
+      }
+    },
+    "Transitions": {
+      "CutTransition": true,
+      "SmoothPan": true,
+      "FadeTransition": true,
+      "WipeTransition": true
+    }
+  },
+
+  "BroadcastMode": {
+    "Enabled": true,
+    "Features": {
+      "MultiCamera": { "Simultaneous": 4 },
+      "PictureInPicture": { "Enabled": true, "Positions": 4 },
+      "ReplayInsert": { "Enabled": true, "SeamlessSwitch": true },
+      "GraphicsOverlay": { "Custom": true }
+    },
+    "Controls": {
+      "DirectorMode": {
+        "AutoDirector": true,
+        "ManualOverride": true,
+        "CuePreviews": true
+      },
+      "CameraOperator": {
+        "AssignToCamera": true,
+        "LiveControl": true
+      }
+    },
+    "Presets": {
+      "eSports": { "Optimized": true },
+      "Casual": { "Simplified": true },
+      "Custom": { "FullControl": true }
+    }
+  },
+
+  "Delay": {
+    "Options": {
+      "None": { "Seconds": 0, "Risk": "Ghosting" },
+      "Short": { "Seconds": 30, "Risk": "Minimal" },
+      "Medium": { "Seconds": 60, "Risk": "None" },
+      "Long": { "Seconds": 120, "Risk": "None" }
+    },
+    "StreamerDefault": 60,
+    "HostControl": true
+  },
+
+  "StreamerMode": {
+    "Enabled": true,
+    "Features": {
+      "HideNames": { "Enabled": true, "ReplacementStyle": "Anonymous" },
+      "DelayChat": { "Enabled": true },
+      "PrivateSession": { "HideFromLists": true },
+      "OverlaySupport": { "OBSIntegration": true }
+    },
+    "ViewerInteraction": {
+      "Polls": { "Enabled": true },
+      "CameraRequests": { "Enabled": true, "Moderated": true },
+      "ChatCommands": { "Enabled": true }
+    }
+  },
+
+  "TournamentSpectating": {
+    "Enabled": true,
+    "Features": {
+      "OfficialBroadcast": { "Priority": true },
+      "MultiPOV": { "Enabled": true, "SelectableDrivers": true },
+      "CommentatorSupport": { "AudioChannel": true }
+    },
+    "Restrictions": {
+      "DelayMandatory": true,
+      "CameraLimits": { "NoDriverCockpit": true }
+    }
+  },
+
+  "Recording": {
+    "SpectatorRecording": {
+      "Enabled": true,
+      "Quality": ["720p", "1080p", "4K"],
+      "Format": ["MP4", "WebM"],
+      "Storage": { "Local": true, "Cloud": "Optional" }
+    },
+    "Highlights": {
+      "AutoCapture": true,
+      "Triggers": ["Overtake", "Crash", "PolePosition", "FastestLap"],
+      "Duration": { "Default": 15, "Max": 60 }
+    },
+    "Export": {
+      "ShareDirect": true,
+      "SocialMedia": true,
+      "Download": true
+    }
+  },
+
+  "Performance": {
+    "SpectatorLoad": {
+      "OptimizedRendering": true,
+      "LODManagement": true,
+      "NetworkOptimization": true
+    },
+    "Scalability": {
+      "LowSpec": { "MaxSpectators": 50 },
+      "HighSpec": { "MaxSpectators": 100 }
+    }
+  },
+
+  "Permissions": {
+    "WhoCanSpectate": {
+      "Anyone": { "PublicRaces": true },
+      "FriendsOnly": { "PrivateRaces": true },
+      "Invited": { "ClosedEvents": true },
+      "Nobody": { "Disabled": true }
+    },
+    "HostControls": {
+      "KickSpectator": true,
+      "MuteSpectator": true,
+      "SetDelay": true,
+      "DisableChat": true
+    }
+  },
+
+  "Chat": {
+    "SpectatorChat": {
+      "Enabled": true,
+      "VisibleTo": ["Spectators", "Racers", "Both"],
+      "Moderation": { "Filter": true, "SlowMode": true }
+    },
+    "Emotes": {
+      "Enabled": true,
+      "Reactions": ["Cheer", "Wow", "RIP", "LetsGo"]
+    }
+  },
+
+  "UI": {
+    "SpectatorMenu": {
+      "DriverList": true,
+      "CameraSelect": true,
+      "HUDToggles": true,
+      "ChatBox": true
+    },
+    "QuickControls": {
+      "NextDriver": "Tab",
+      "PrevDriver": "Shift+Tab",
+      "ToggleHUD": "H",
+      "ToggleMap": "M"
+    }
+  }
+}

@@ -1,5 +1,63 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * ============================================================================
+ * MGAudioSubsystem.h
+ * ============================================================================
+ *
+ * PURPOSE:
+ * This file defines the central audio management system for Midnight Grind.
+ * Think of it as the "audio control center" that manages all sounds in the game.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ *
+ * 1. GAME INSTANCE SUBSYSTEM:
+ *    - A "subsystem" is a helper object that lives as long as the game is running
+ *    - "GameInstance" means it persists across level changes (unlike actors)
+ *    - You can access it from anywhere using: GetGameInstance()->GetSubsystem<UMGAudioSubsystem>()
+ *
+ * 2. SOUND CATEGORIES:
+ *    - Games organize sounds into categories (Music, SFX, Voice, etc.)
+ *    - Each category can have its own volume slider in the options menu
+ *    - This allows players to customize their audio experience
+ *
+ * 3. AUDIO DUCKING:
+ *    - "Ducking" means temporarily lowering one sound to make another more audible
+ *    - Example: Lower music volume when a character speaks, then restore it
+ *    - Essential for creating a professional audio mix
+ *
+ * 4. POOLING:
+ *    - Instead of creating/destroying audio components constantly, we reuse them
+ *    - This improves performance, especially with many simultaneous sounds
+ *
+ * HOW IT FITS IN THE GAME ARCHITECTURE:
+ *
+ *    [Game Instance] (lives for entire game session)
+ *          |
+ *          +-- [UMGAudioSubsystem] (this class - manages all audio)
+ *                    |
+ *                    +-- Controls volume for all categories
+ *                    +-- Plays 2D sounds (UI, music)
+ *                    +-- Plays 3D sounds (engine, collisions)
+ *                    +-- Handles ducking during cutscenes/dialogs
+ *
+ * USAGE EXAMPLE (in Blueprint or C++):
+ *
+ *    // Get the audio subsystem
+ *    UMGAudioSubsystem* AudioSys = GetGameInstance()->GetSubsystem<UMGAudioSubsystem>();
+ *
+ *    // Set music volume to 50%
+ *    AudioSys->SetCategoryVolume(EMGSoundCategory::Music, 0.5f);
+ *
+ *    // Play a UI click sound
+ *    AudioSys->PlaySound2D(this, ClickSound, EMGSoundCategory::UI);
+ *
+ *    // Play engine sound at vehicle location
+ *    AudioSys->PlaySoundAtLocation(this, EngineSound, VehicleLocation, EMGSoundCategory::Engine);
+ *
+ * ============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,22 +66,37 @@
 #include "Sound/SoundMix.h"
 #include "MGAudioSubsystem.generated.h"
 
-class USoundBase;
-class UAudioComponent;
+// Forward declarations - tells the compiler these classes exist without including their full headers
+// This speeds up compilation and reduces dependencies between files
+class USoundBase;      // Base class for all sound assets (SoundWave, SoundCue, MetaSound, etc.)
+class UAudioComponent; // Component that actually plays sounds in the world
 
 /**
- * Sound categories for volume control
+ * Sound categories for volume control.
+ *
+ * WHAT IS THIS?
+ * An enumeration (enum) that defines the different "buckets" of sounds in the game.
+ * Each category can have its own volume setting, allowing players to customize
+ * their audio experience (e.g., "I want loud engine sounds but quiet music").
+ *
+ * WHY SEPARATE CATEGORIES?
+ * - Player preference: Some players want music off during competitive play
+ * - Accessibility: Hard-of-hearing players may want voice louder than SFX
+ * - Game design: Certain sounds should never be muted (like engine feedback)
+ *
+ * BLUEPRINTTYPE:
+ * This macro exposes the enum to Blueprints, so designers can use it in visual scripting.
  */
 UENUM(BlueprintType)
 enum class EMGSoundCategory : uint8
 {
-	Master,
-	Music,
-	SFX,
-	Engine,
-	Environment,
-	UI,
-	Voice
+	Master,      // Overall game volume - affects ALL other categories
+	Music,       // Background music, radio, soundtrack
+	SFX,         // General sound effects (explosions, UI clicks, etc.)
+	Engine,      // Vehicle engine sounds - separate so racers can prioritize this
+	Environment, // Ambient sounds (wind, crowd noise, city ambiance)
+	UI,          // Menu clicks, notifications, HUD sounds
+	Voice        // Character dialog, announcer, voice chat
 };
 
 /**

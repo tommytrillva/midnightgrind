@@ -1,5 +1,35 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRouteGeneratorSubsystem.h
+ * @brief Procedural Route Generation Subsystem for Midnight Grind
+ *
+ * This subsystem is responsible for dynamically generating racing routes at runtime.
+ * It creates complete tracks with segments, checkpoints, spawn points, shortcuts,
+ * and optimal racing lines. The generation system supports multiple route styles
+ * (urban streets, highways, mountains, etc.) and complexity levels.
+ *
+ * Key Features:
+ * - Deterministic generation using seed values for reproducible routes
+ * - Bezier curve-based segment generation for smooth road geometry
+ * - Automatic checkpoint and spawn point placement
+ * - Hidden shortcut path generation
+ * - Racing line computation for AI and ghost data
+ * - Route validation and metrics calculation
+ *
+ * Usage Example:
+ * @code
+ *   UMGRouteGeneratorSubsystem* RouteGen = GameInstance->GetSubsystem<UMGRouteGeneratorSubsystem>();
+ *   FMGRouteParams Params;
+ *   Params.Style = EMGRouteStyle::Street;
+ *   Params.TargetLength = 5000.0f;
+ *   FMGGeneratedRoute Route = RouteGen->GenerateRoute(Params);
+ * @endcode
+ *
+ * @see UMGProceduralContentSubsystem for higher-level content generation
+ * @see FMGGeneratedRoute for the complete route data structure
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,141 +39,204 @@
 // Forward declarations
 class UMGRouteGeneratorSubsystem;
 
+// ============================================================================
+// Route Style Enumeration
+// ============================================================================
+
 /**
  * Route generation style
+ *
+ * Defines the visual theme and layout characteristics of generated routes.
+ * Each style influences segment types, road widths, elevation changes,
+ * and environmental hazards that appear in the route.
  */
 UENUM(BlueprintType)
 enum class EMGRouteStyle : uint8
 {
-    Street          UMETA(DisplayName = "Street"),         // Urban street racing
-    Highway         UMETA(DisplayName = "Highway"),        // High-speed highway runs
-    Mountain        UMETA(DisplayName = "Mountain"),       // Winding mountain roads
-    Industrial      UMETA(DisplayName = "Industrial"),     // Industrial zones
-    Coastal         UMETA(DisplayName = "Coastal"),        // Beachfront routes
-    Downtown        UMETA(DisplayName = "Downtown"),       // Dense city center
-    Suburban        UMETA(DisplayName = "Suburban"),       // Residential areas
-    Mixed           UMETA(DisplayName = "Mixed")           // Varied terrain
+    Street          UMETA(DisplayName = "Street"),         /// Urban street racing with tight corners and traffic
+    Highway         UMETA(DisplayName = "Highway"),        /// High-speed highway runs with long straights
+    Mountain        UMETA(DisplayName = "Mountain"),       /// Winding mountain roads with elevation changes
+    Industrial      UMETA(DisplayName = "Industrial"),     /// Industrial zones with wide roads and obstacles
+    Coastal         UMETA(DisplayName = "Coastal"),        /// Beachfront routes with scenic ocean views
+    Downtown        UMETA(DisplayName = "Downtown"),       /// Dense city center with complex intersections
+    Suburban        UMETA(DisplayName = "Suburban"),       /// Residential areas with moderate traffic
+    Mixed           UMETA(DisplayName = "Mixed")           /// Varied terrain combining multiple styles
 };
+
+// ============================================================================
+// Segment Type Enumeration
+// ============================================================================
 
 /**
  * Route segment type
+ *
+ * Defines individual road segment geometry types. Segments are the building
+ * blocks of routes and are connected together to form the complete track.
+ * Each type has different handling characteristics and visual appearance.
  */
 UENUM(BlueprintType)
 enum class EMGSegmentType : uint8
 {
-    Straight        UMETA(DisplayName = "Straight"),
-    GentleCurve     UMETA(DisplayName = "Gentle Curve"),
-    SharpCurve      UMETA(DisplayName = "Sharp Curve"),
-    Hairpin         UMETA(DisplayName = "Hairpin"),
-    SShape          UMETA(DisplayName = "S-Curve"),
-    Chicane         UMETA(DisplayName = "Chicane"),
-    Intersection    UMETA(DisplayName = "Intersection"),
-    Roundabout      UMETA(DisplayName = "Roundabout"),
-    Tunnel          UMETA(DisplayName = "Tunnel"),
-    Bridge          UMETA(DisplayName = "Bridge"),
-    Jump            UMETA(DisplayName = "Jump"),
-    Split           UMETA(DisplayName = "Split Path"),
-    Merge           UMETA(DisplayName = "Merge"),
-    Finish          UMETA(DisplayName = "Finish")
+    Straight        UMETA(DisplayName = "Straight"),       /// Straight road section for high-speed runs
+    GentleCurve     UMETA(DisplayName = "Gentle Curve"),   /// Wide radius curve, minimal speed reduction needed
+    SharpCurve      UMETA(DisplayName = "Sharp Curve"),    /// Tight curve requiring significant braking
+    Hairpin         UMETA(DisplayName = "Hairpin"),        /// 180-degree turn, very tight radius
+    SShape          UMETA(DisplayName = "S-Curve"),        /// Alternating left-right curve sequence
+    Chicane         UMETA(DisplayName = "Chicane"),        /// Quick left-right-left or vice versa
+    Intersection    UMETA(DisplayName = "Intersection"),   /// Cross-traffic intersection point
+    Roundabout      UMETA(DisplayName = "Roundabout"),     /// Circular junction with multiple exits
+    Tunnel          UMETA(DisplayName = "Tunnel"),         /// Enclosed tunnel segment with limited visibility
+    Bridge          UMETA(DisplayName = "Bridge"),         /// Elevated bridge crossing
+    Jump            UMETA(DisplayName = "Jump"),           /// Ramp jump requiring air control
+    Split           UMETA(DisplayName = "Split Path"),     /// Route branches into multiple paths
+    Merge           UMETA(DisplayName = "Merge"),          /// Multiple paths rejoin into one
+    Finish          UMETA(DisplayName = "Finish")          /// Final segment before finish line
 };
+
+// ============================================================================
+// Complexity Level Enumeration
+// ============================================================================
 
 /**
  * Route complexity level
+ *
+ * Determines the overall difficulty of generated routes. Higher complexity
+ * adds more challenging elements like sharp curves, hazards, and narrower
+ * roads. Used to match route difficulty to player skill level.
  */
 UENUM(BlueprintType)
 enum class EMGRouteComplexity : uint8
 {
-    Beginner        UMETA(DisplayName = "Beginner"),
-    Intermediate    UMETA(DisplayName = "Intermediate"),
-    Advanced        UMETA(DisplayName = "Advanced"),
-    Expert          UMETA(DisplayName = "Expert"),
-    Extreme         UMETA(DisplayName = "Extreme")
+    Beginner        UMETA(DisplayName = "Beginner"),       /// Simple layouts, wide roads, few hazards
+    Intermediate    UMETA(DisplayName = "Intermediate"),   /// Moderate challenge, mixed segment types
+    Advanced        UMETA(DisplayName = "Advanced"),       /// Challenging routes with technical sections
+    Expert          UMETA(DisplayName = "Expert"),         /// High difficulty, narrow roads, many hazards
+    Extreme         UMETA(DisplayName = "Extreme")         /// Maximum challenge, requires mastery
 };
+
+// ============================================================================
+// Hazard Type Enumeration
+// ============================================================================
 
 /**
  * Route hazard type
+ *
+ * Defines obstacles and dangers that can appear on route segments.
+ * Hazards affect vehicle handling and require driver skill to navigate safely.
  */
 UENUM(BlueprintType)
 enum class EMGRouteHazard : uint8
 {
-    None            UMETA(DisplayName = "None"),
-    Traffic         UMETA(DisplayName = "Traffic"),
-    Pedestrians     UMETA(DisplayName = "Pedestrians"),
-    Construction    UMETA(DisplayName = "Construction"),
-    WetSurface      UMETA(DisplayName = "Wet Surface"),
-    OilSlick        UMETA(DisplayName = "Oil Slick"),
-    Debris          UMETA(DisplayName = "Debris"),
-    NarrowPath      UMETA(DisplayName = "Narrow Path"),
-    Oncoming        UMETA(DisplayName = "Oncoming Traffic"),
-    RoadWork        UMETA(DisplayName = "Road Work")
+    None            UMETA(DisplayName = "None"),           /// Clean road, no hazards
+    Traffic         UMETA(DisplayName = "Traffic"),        /// Civilian vehicles on the road
+    Pedestrians     UMETA(DisplayName = "Pedestrians"),    /// Pedestrians near the road (avoid!)
+    Construction    UMETA(DisplayName = "Construction"),   /// Road work zones with barriers
+    WetSurface      UMETA(DisplayName = "Wet Surface"),    /// Reduced grip from rain/water
+    OilSlick        UMETA(DisplayName = "Oil Slick"),      /// Extremely slippery patches
+    Debris          UMETA(DisplayName = "Debris"),         /// Scattered objects on road
+    NarrowPath      UMETA(DisplayName = "Narrow Path"),    /// Road narrows significantly
+    Oncoming        UMETA(DisplayName = "Oncoming Traffic"), /// Wrong-way traffic danger
+    RoadWork        UMETA(DisplayName = "Road Work")       /// Active construction equipment
 };
+
+// ============================================================================
+// Surface Type Enumeration
+// ============================================================================
 
 /**
  * Surface type for segments
+ *
+ * Defines the road surface material which affects tire grip, handling,
+ * and vehicle physics. Different surfaces require different driving techniques.
  */
 UENUM(BlueprintType)
 enum class EMGSurfaceType : uint8
 {
-    Asphalt         UMETA(DisplayName = "Asphalt"),
-    Concrete        UMETA(DisplayName = "Concrete"),
-    Cobblestone     UMETA(DisplayName = "Cobblestone"),
-    Gravel          UMETA(DisplayName = "Gravel"),
-    Dirt            UMETA(DisplayName = "Dirt"),
-    Sand            UMETA(DisplayName = "Sand"),
-    WetAsphalt      UMETA(DisplayName = "Wet Asphalt"),
-    Ice             UMETA(DisplayName = "Ice"),
-    Metal           UMETA(DisplayName = "Metal Grating")
+    Asphalt         UMETA(DisplayName = "Asphalt"),        /// Standard road surface, good grip
+    Concrete        UMETA(DisplayName = "Concrete"),       /// Slightly less grip than asphalt
+    Cobblestone     UMETA(DisplayName = "Cobblestone"),    /// Bumpy, reduced grip and stability
+    Gravel          UMETA(DisplayName = "Gravel"),         /// Loose surface, sliding encouraged
+    Dirt            UMETA(DisplayName = "Dirt"),           /// Off-road, low grip
+    Sand            UMETA(DisplayName = "Sand"),           /// Very low grip, speed penalty
+    WetAsphalt      UMETA(DisplayName = "Wet Asphalt"),    /// Rain-soaked, reduced grip
+    Ice             UMETA(DisplayName = "Ice"),            /// Extremely low grip, dangerous
+    Metal           UMETA(DisplayName = "Metal Grating")   /// Bridge/industrial grating surface
 };
+
+// ============================================================================
+// Scenic Element Enumeration
+// ============================================================================
 
 /**
  * Scenic element type
+ *
+ * Defines visual points of interest that can appear along route segments.
+ * These elements enhance the atmosphere and provide visual landmarks
+ * for players to orient themselves on the track.
  */
 UENUM(BlueprintType)
 enum class EMGScenicElement : uint8
 {
-    None            UMETA(DisplayName = "None"),
-    Skyline         UMETA(DisplayName = "City Skyline"),
-    Ocean           UMETA(DisplayName = "Ocean View"),
-    Mountain        UMETA(DisplayName = "Mountain View"),
-    NeonSigns       UMETA(DisplayName = "Neon Signs"),
-    Graffiti        UMETA(DisplayName = "Street Art"),
-    Landmarks       UMETA(DisplayName = "Landmarks"),
-    Billboard       UMETA(DisplayName = "Billboards"),
-    Sunset          UMETA(DisplayName = "Sunset View")
+    None            UMETA(DisplayName = "None"),           /// No special scenic elements
+    Skyline         UMETA(DisplayName = "City Skyline"),   /// Urban cityscape view
+    Ocean           UMETA(DisplayName = "Ocean View"),     /// Waterfront/ocean panorama
+    Mountain        UMETA(DisplayName = "Mountain View"),  /// Mountain range vista
+    NeonSigns       UMETA(DisplayName = "Neon Signs"),     /// Y2K-era neon advertisements
+    Graffiti        UMETA(DisplayName = "Street Art"),     /// Urban graffiti and murals
+    Landmarks       UMETA(DisplayName = "Landmarks"),      /// Notable buildings/monuments
+    Billboard       UMETA(DisplayName = "Billboards"),     /// Advertisement boards
+    Sunset          UMETA(DisplayName = "Sunset View")     /// Dramatic sunset/sunrise vista
 };
+
+// ============================================================================
+// Route Checkpoint Structure
+// ============================================================================
 
 /**
  * Route checkpoint data
+ *
+ * Represents a checkpoint gate that players must pass through during a race.
+ * Checkpoints are used for lap timing, position tracking, and time extensions
+ * in time-limited race modes.
  */
 USTRUCT(BlueprintType)
 struct FMGRouteCheckpoint
 {
     GENERATED_BODY()
 
+    /// Sequential index of this checkpoint (0 = start line)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
     int32 CheckpointIndex;
 
+    /// World position of the checkpoint center
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
     FVector Location;
 
+    /// Checkpoint orientation (forward direction of travel)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
     FRotator Rotation;
 
+    /// Width of the checkpoint trigger zone in world units
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
     float Width;
 
+    /// Distance from race start in world units
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
     float DistanceFromStart;
 
+    /// Recommended speed when passing through this checkpoint
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
     float SuggestedSpeed;
 
+    /// True if this checkpoint marks a sector boundary for split times
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
     bool bIsSector;
 
+    /// True if this is the finish line checkpoint
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
     bool bIsFinishLine;
 
+    /// Seconds added to timer in time-attack modes
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
     float TimeExtension;
 
@@ -160,74 +253,103 @@ struct FMGRouteCheckpoint
     {}
 };
 
+// ============================================================================
+// Route Segment Structure
+// ============================================================================
+
 /**
  * Route segment data
+ *
+ * Represents a single segment of the route - a continuous piece of road
+ * with consistent characteristics. Segments are connected end-to-end
+ * to form the complete route. Uses Bezier curves for smooth geometry.
  */
 USTRUCT(BlueprintType)
 struct FMGRouteSegment
 {
     GENERATED_BODY()
 
+    /// Sequential index of this segment in the route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     int32 SegmentIndex;
 
+    /// Geometric type of this segment (straight, curve, etc.)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     EMGSegmentType Type;
 
+    /// World position where this segment begins
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     FVector StartPoint;
 
+    /// World position where this segment ends
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     FVector EndPoint;
 
+    /// First Bezier control point for curve shaping
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     FVector ControlPoint1;
 
+    /// Second Bezier control point for curve shaping
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     FVector ControlPoint2;
 
+    /// Total length of the segment in world units
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float Length;
 
+    /// Road width in world units
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float Width;
 
+    /// Radius of curvature for curved segments (0 for straights)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float CurveRadius;
 
+    /// Total angle of curve in degrees (0 for straights)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float CurveAngle;
 
+    /// Base elevation at segment start
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float Elevation;
 
+    /// Change in elevation from start to end (positive = uphill)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float ElevationChange;
 
+    /// Road banking angle in degrees (positive = banked into curve)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float Banking;
 
+    /// Road surface material type
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     EMGSurfaceType Surface;
 
+    /// List of hazards present on this segment
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     TArray<EMGRouteHazard> Hazards;
 
+    /// Visual scenic element associated with this segment
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     EMGScenicElement ScenicElement;
 
+    /// Recommended speed for safe navigation
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float SuggestedSpeed;
 
+    /// Maximum safe speed before losing control
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float MaxSpeed;
 
+    /// True if a shortcut entrance exists on this segment
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     bool bHasShortcut;
 
+    /// True if this segment contains hidden/secret content
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     bool bIsSecret;
 
+    /// Suitability for drifting (0.0 = bad, 1.0 = excellent)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Segment")
     float DriftPotential;
 
@@ -255,26 +377,38 @@ struct FMGRouteSegment
     {}
 };
 
+// ============================================================================
+// Route Spawn Point Structure
+// ============================================================================
+
 /**
  * Route spawn point for vehicles/objects
+ *
+ * Defines a position where vehicles can spawn at the start of a race.
+ * Multiple spawn points form a starting grid with staggered positions.
  */
 USTRUCT(BlueprintType)
 struct FMGRouteSpawnPoint
 {
     GENERATED_BODY()
 
+    /// World position of the spawn point
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
     FVector Location;
 
+    /// Initial facing direction for spawned vehicle
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
     FRotator Rotation;
 
+    /// Grid position number (1 = pole position, higher = further back)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
     int32 GridPosition;
 
+    /// Distance from the actual start/finish line
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
     float DistanceFromStart;
 
+    /// True if this is part of the initial starting grid
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
     bool bIsStartingGrid;
 
@@ -287,44 +421,63 @@ struct FMGRouteSpawnPoint
     {}
 };
 
+// ============================================================================
+// Shortcut Path Structure
+// ============================================================================
+
 /**
  * Shortcut path definition
+ *
+ * Defines an alternate route that allows players to save time by taking
+ * a more challenging or risky path. Shortcuts reward skilled driving
+ * with time advantages.
  */
 USTRUCT(BlueprintType)
 struct FMGShortcut
 {
     GENERATED_BODY()
 
+    /// Unique identifier for this shortcut
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     FGuid ShortcutId;
 
+    /// Display name for UI/announcements
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     FString Name;
 
+    /// Main route segment index where shortcut begins
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     int32 EntrySegmentIndex;
 
+    /// Main route segment index where shortcut rejoins
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     int32 ExitSegmentIndex;
 
+    /// Waypoints defining the shortcut path
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     TArray<FVector> PathPoints;
 
+    /// Estimated time saved when using this shortcut
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     float TimeSaved;
 
+    /// Difficulty/danger level (0.0 = safe, 1.0 = very risky)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     float RiskLevel;
 
+    /// Surface type of the shortcut path
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     EMGSurfaceType Surface;
 
+    /// True if shortcut requires a jump to access
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     bool bRequiresJump;
 
+    /// True if shortcut requires breaking through barriers
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     bool bRequiresDestruction;
 
+    /// True if shortcut entrance is visually obscured
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shortcut")
     bool bIsHidden;
 
@@ -340,71 +493,99 @@ struct FMGShortcut
     {}
 };
 
+// ============================================================================
+// Route Generation Parameters Structure
+// ============================================================================
+
 /**
  * Route generation parameters
+ *
+ * Configuration settings that control how routes are procedurally generated.
+ * Adjust these parameters to create routes with specific characteristics
+ * like length, difficulty, and style.
  */
 USTRUCT(BlueprintType)
 struct FMGRouteParams
 {
     GENERATED_BODY()
 
+    /// Visual and layout style of the route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     EMGRouteStyle Style;
 
+    /// Overall difficulty/complexity level
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     EMGRouteComplexity Complexity;
 
+    /// Desired total route length in world units
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float TargetLength;
 
+    /// Minimum acceptable route length
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float MinLength;
 
+    /// Maximum acceptable route length
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float MaxLength;
 
+    /// Minimum number of segments to generate
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     int32 MinSegments;
 
+    /// Maximum number of segments to generate
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     int32 MaxSegments;
 
+    /// How often curves appear (0.0 = all straight, 1.0 = all curves)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float CurveFrequency;
 
+    /// Probability of generating sharp curves vs gentle ones
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float SharpCurveChance;
 
+    /// Probability of generating hairpin turns
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float HairpinChance;
 
+    /// Bias toward straight segments (higher = more straights)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float StraightPreference;
 
+    /// Maximum elevation variation between segments
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float ElevationVariance;
 
+    /// Maximum height above starting elevation
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float MaxElevation;
 
+    /// Probability of generating shortcut paths
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float ShortcutChance;
 
+    /// Density of hazards placed on segments
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float HazardDensity;
 
+    /// Density of scenic elements placed on segments
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     float ScenicDensity;
 
+    /// True to generate a closed loop track
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     bool bIsCircuit;
 
+    /// True to allow jump ramp segments
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     bool bAllowJumps;
 
+    /// True to allow route branching and merging
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     bool bAllowSplitPaths;
 
+    /// Seed for deterministic generation (0 = random)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Params")
     int32 RandomSeed;
 
@@ -432,80 +613,111 @@ struct FMGRouteParams
     {}
 };
 
+// ============================================================================
+// Complete Generated Route Structure
+// ============================================================================
+
 /**
  * Complete generated route
+ *
+ * Contains all data for a fully generated route including geometry,
+ * checkpoints, spawn points, shortcuts, and computed metrics.
+ * This is the primary output of the route generation system.
  */
 USTRUCT(BlueprintType)
 struct FMGGeneratedRoute
 {
     GENERATED_BODY()
 
+    /// Unique identifier for this route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     FGuid RouteId;
 
+    /// Display name for the route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     FString RouteName;
 
+    /// Style theme of the route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     EMGRouteStyle Style;
 
+    /// Complexity/difficulty level
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     EMGRouteComplexity Complexity;
 
+    /// All road segments that make up the route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     TArray<FMGRouteSegment> Segments;
 
+    /// All checkpoint gates on the route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     TArray<FMGRouteCheckpoint> Checkpoints;
 
+    /// Vehicle spawn positions (starting grid)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     TArray<FMGRouteSpawnPoint> SpawnPoints;
 
+    /// Available shortcuts on this route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     TArray<FMGShortcut> Shortcuts;
 
+    /// Total route length in world units
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     float TotalLength;
 
+    /// Average road width across all segments
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     float AverageWidth;
 
+    /// Highest elevation point on the route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     float MaxElevation;
 
+    /// Lowest elevation point on the route
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     float MinElevation;
 
+    /// Cumulative uphill distance (climbing metric)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     float TotalElevationGain;
 
+    /// Number of curve segments
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     int32 TotalCurves;
 
+    /// Number of sharp/tight curve segments
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     int32 SharpCurves;
 
+    /// Number of hairpin turn segments
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     int32 Hairpins;
 
+    /// Estimated completion time in seconds
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     float EstimatedTime;
 
+    /// Computed difficulty rating (0.0 = easy, 1.0 = extreme)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     float DifficultyRating;
 
+    /// True if this is a closed circuit (loop) track
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     bool bIsCircuit;
 
+    /// Random seed used for generation (for recreation)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     int32 GenerationSeed;
 
+    /// Timestamp when route was generated
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     FDateTime GenerationDate;
 
+    /// Minimum corner of the route's axis-aligned bounding box
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     FVector BoundsMin;
 
+    /// Maximum corner of the route's axis-aligned bounding box
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
     FVector BoundsMax;
 
@@ -530,35 +742,51 @@ struct FMGGeneratedRoute
     {}
 };
 
+// ============================================================================
+// Racing Line Point Structure
+// ============================================================================
+
 /**
  * Spline point for racing line
+ *
+ * Represents a single point along the optimal racing line.
+ * Racing lines are used for AI navigation, ghost data, and
+ * visual racing line assists. Includes speed and zone markers.
  */
 USTRUCT(BlueprintType)
 struct FMGRacingLinePoint
 {
     GENERATED_BODY()
 
+    /// World position of this racing line point
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RacingLine")
     FVector Location;
 
+    /// Direction of travel at this point
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RacingLine")
     FVector Tangent;
 
+    /// Track width at this point (for deviation calculations)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RacingLine")
     float Width;
 
+    /// Optimal speed at this point
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RacingLine")
     float Speed;
 
+    /// Distance from race start along the racing line
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RacingLine")
     float Distance;
 
+    /// True if this is a braking zone (should show brake indicator)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RacingLine")
     bool bIsBrakingZone;
 
+    /// True if this area is suitable for drifting
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RacingLine")
     bool bIsDriftZone;
 
+    /// True if nitro/boost is recommended here
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RacingLine")
     bool bIsNitroZone;
 
@@ -574,38 +802,55 @@ struct FMGRacingLinePoint
     {}
 };
 
+// ============================================================================
+// Route Style Parameters Structure
+// ============================================================================
+
 /**
  * Style parameters for route generation
+ *
+ * Defines specific configuration for each route style, including
+ * road dimensions, preferred segment types, surfaces, and hazards.
+ * Used internally to customize generation based on selected style.
  */
 USTRUCT(BlueprintType)
 struct FMGRouteStyleParams
 {
     GENERATED_BODY()
 
+    /// The style these parameters apply to
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style")
     EMGRouteStyle Style;
 
+    /// Minimum road width for this style
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style")
     float MinRoadWidth;
 
+    /// Maximum road width for this style
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style")
     float MaxRoadWidth;
 
+    /// Bias toward curves vs straights for this style
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style")
     float CurvePreference;
 
+    /// Multiplier for elevation changes in this style
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style")
     float ElevationScale;
 
+    /// Segment types commonly used in this style
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style")
     TArray<EMGSegmentType> PreferredSegments;
 
+    /// Surface types commonly used in this style
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style")
     TArray<EMGSurfaceType> PreferredSurfaces;
 
+    /// Scenic elements commonly used in this style
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style")
     TArray<EMGScenicElement> PreferredScenic;
 
+    /// Hazards that can appear in this style
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style")
     TArray<EMGRouteHazard> PossibleHazards;
 
@@ -618,18 +863,38 @@ struct FMGRouteStyleParams
     {}
 };
 
-// Delegates
+// ============================================================================
+// Delegate Declarations
+// ============================================================================
+
+/// Broadcast when a route has finished generating
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMGOnRouteGenerated, const FMGGeneratedRoute&, Route);
+
+/// Broadcast during async generation with progress updates
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMGOnGenerationProgress, float, Progress, const FString&, Status);
+
+/// Broadcast when route generation fails
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMGOnGenerationFailed, const FString&, ErrorMessage);
+
+/// Broadcast when each individual segment completes generation
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMGOnSegmentGenerated, int32, SegmentIndex, const FMGRouteSegment&, Segment);
+
+// ============================================================================
+// Route Generator Subsystem Class
+// ============================================================================
 
 /**
  * Route Generator Subsystem
  *
- * Procedurally generates racing routes with varied terrain, curves,
- * hazards, and scenic elements. Creates checkpoints, spawn points,
+ * Game instance subsystem that procedurally generates racing routes with varied
+ * terrain, curves, hazards, and scenic elements. Creates checkpoints, spawn points,
  * shortcuts, and racing lines for dynamic track generation.
+ *
+ * The subsystem supports both synchronous and asynchronous generation modes.
+ * Use synchronous for loading screens, async for background generation.
+ *
+ * Routes can be saved and loaded using seed codes for sharing between players.
+ * The deterministic generation ensures identical routes from the same seed.
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGRouteGeneratorSubsystem : public UGameInstanceSubsystem
@@ -644,188 +909,406 @@ public:
     virtual void Deinitialize() override;
     //~ End USubsystem Interface
 
-    // Route generation
+    // ========================================================================
+    // Route Generation
+    // ========================================================================
+
+    /**
+     * Generates a complete route synchronously (blocking).
+     * @param Params Configuration parameters for generation
+     * @return The fully generated route data
+     */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator")
     FMGGeneratedRoute GenerateRoute(const FMGRouteParams& Params);
 
+    /**
+     * Begins asynchronous route generation. Listen to OnRouteGenerated for completion.
+     * @param Params Configuration parameters for generation
+     */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator")
     void GenerateRouteAsync(const FMGRouteParams& Params);
 
+    /** Cancels any in-progress async generation. */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator")
     void CancelGeneration();
 
+    /** Returns true if async generation is currently in progress. */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator")
     bool IsGenerating() const;
 
+    /** Returns current generation progress (0.0 to 1.0). */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator")
     float GetGenerationProgress() const;
 
-    // Route management
+    // ========================================================================
+    // Route Management (Save/Load)
+    // ========================================================================
+
+    /**
+     * Saves a generated route to persistent storage.
+     * @param Route The route data to save
+     * @param SlotName Unique identifier for the save slot
+     * @return True if save was successful
+     */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator")
     bool SaveRoute(const FMGGeneratedRoute& Route, const FString& SlotName);
 
+    /**
+     * Loads a previously saved route.
+     * @param SlotName The save slot to load from
+     * @return The loaded route data (empty if not found)
+     */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator")
     FMGGeneratedRoute LoadRoute(const FString& SlotName);
 
+    /**
+     * Deletes a saved route.
+     * @param SlotName The save slot to delete
+     * @return True if deletion was successful
+     */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator")
     bool DeleteRoute(const FString& SlotName);
 
+    /** Returns names of all saved route slots. */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator")
     TArray<FString> GetSavedRouteNames() const;
 
-    // Route queries
+    // ========================================================================
+    // Current Route Queries
+    // ========================================================================
+
+    /** Returns the currently active route. */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator")
     FMGGeneratedRoute GetCurrentRoute() const;
 
+    /** Sets the current active route. */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator")
     void SetCurrentRoute(const FMGGeneratedRoute& Route);
 
+    /** Returns true if a route is currently loaded. */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator")
     bool HasCurrentRoute() const;
 
-    // Segment queries
+    // ========================================================================
+    // Segment Queries
+    // ========================================================================
+
+    /**
+     * Gets the segment at a specific distance along the route.
+     * @param Distance Distance from start in world units
+     * @return The segment data at that distance
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Segments")
     FMGRouteSegment GetSegmentAtDistance(float Distance) const;
 
+    /**
+     * Gets the segment index at a specific distance.
+     * @param Distance Distance from start in world units
+     * @return Index of the segment (-1 if invalid)
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Segments")
     int32 GetSegmentIndexAtDistance(float Distance) const;
 
+    /**
+     * Calculates the world position at a distance along the route.
+     * @param Distance Distance from start in world units
+     * @return World position on the route centerline
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Segments")
     FVector GetPointOnRoute(float Distance) const;
 
+    /**
+     * Calculates the route direction at a distance.
+     * @param Distance Distance from start in world units
+     * @return Rotation facing the direction of travel
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Segments")
     FRotator GetRotationOnRoute(float Distance) const;
 
+    /**
+     * Gets the road width at a distance along the route.
+     * @param Distance Distance from start in world units
+     * @return Road width in world units
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Segments")
     float GetWidthAtDistance(float Distance) const;
 
+    /**
+     * Gets the surface type at a distance along the route.
+     * @param Distance Distance from start in world units
+     * @return The surface material type
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Segments")
     EMGSurfaceType GetSurfaceAtDistance(float Distance) const;
 
-    // Checkpoint queries
+    // ========================================================================
+    // Checkpoint Queries
+    // ========================================================================
+
+    /**
+     * Gets checkpoint data by index.
+     * @param Index Zero-based checkpoint index
+     * @return The checkpoint data
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Checkpoints")
     FMGRouteCheckpoint GetCheckpoint(int32 Index) const;
 
+    /** Returns total number of checkpoints on the route. */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Checkpoints")
     int32 GetCheckpointCount() const;
 
+    /**
+     * Finds the checkpoint nearest to a world location.
+     * @param Location World position to search from
+     * @return The nearest checkpoint data
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Checkpoints")
     FMGRouteCheckpoint GetNearestCheckpoint(const FVector& Location) const;
 
+    /**
+     * Calculates distance to the next checkpoint.
+     * @param CurrentDistance Current position along route
+     * @return Distance to the next checkpoint
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Checkpoints")
     float GetDistanceToNextCheckpoint(float CurrentDistance) const;
 
-    // Spawn points
+    // ========================================================================
+    // Spawn Points
+    // ========================================================================
+
+    /**
+     * Gets starting grid spawn positions.
+     * @param MaxPositions Maximum number of grid positions to return
+     * @return Array of spawn points forming the starting grid
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Spawns")
     TArray<FMGRouteSpawnPoint> GetStartingGrid(int32 MaxPositions = 12) const;
 
+    /**
+     * Gets a specific grid position spawn point.
+     * @param GridPosition Position number (1 = pole)
+     * @return The spawn point data
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Spawns")
     FMGRouteSpawnPoint GetSpawnPoint(int32 GridPosition) const;
 
+    // ========================================================================
     // Shortcuts
+    // ========================================================================
+
+    /** Returns all shortcuts defined on the current route. */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Shortcuts")
     TArray<FMGShortcut> GetShortcuts() const;
 
+    /**
+     * Finds the nearest shortcut entrance to a location.
+     * @param Location World position to search from
+     * @param MaxDistance Maximum search radius
+     * @return The nearest shortcut (empty if none found)
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Shortcuts")
     FMGShortcut GetNearestShortcut(const FVector& Location, float MaxDistance = 100.0f) const;
 
+    /**
+     * Checks if a location is currently on a shortcut path.
+     * @param Location World position to check
+     * @param OutShortcutId Filled with shortcut ID if on a shortcut
+     * @return True if location is on a shortcut
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Shortcuts")
     bool IsOnShortcut(const FVector& Location, FGuid& OutShortcutId) const;
 
-    // Racing line
+    // ========================================================================
+    // Racing Line
+    // ========================================================================
+
+    /**
+     * Generates the optimal racing line for the current route.
+     * @param Resolution Number of points to generate
+     * @return Array of racing line points
+     */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator|RacingLine")
     TArray<FMGRacingLinePoint> GenerateRacingLine(int32 Resolution = 100);
 
+    /**
+     * Gets racing line data at a specific distance.
+     * @param Distance Distance along the route
+     * @return Racing line point data
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|RacingLine")
     FMGRacingLinePoint GetRacingLinePoint(float Distance) const;
 
+    /** Returns the cached racing line (must call GenerateRacingLine first). */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|RacingLine")
     TArray<FMGRacingLinePoint> GetRacingLine() const;
 
-    // Style configuration
+    // ========================================================================
+    // Style Configuration
+    // ========================================================================
+
+    /**
+     * Sets custom parameters for a route style.
+     * @param Style The style to configure
+     * @param Params The new style parameters
+     */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator|Style")
     void SetStyleParams(EMGRouteStyle Style, const FMGRouteStyleParams& Params);
 
+    /**
+     * Gets current parameters for a route style.
+     * @param Style The style to query
+     * @return The style's configuration parameters
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Style")
     FMGRouteStyleParams GetStyleParams(EMGRouteStyle Style) const;
 
+    // ========================================================================
     // Validation
+    // ========================================================================
+
+    /**
+     * Validates a route for playability.
+     * @param Route The route to validate
+     * @param OutError Filled with error description if invalid
+     * @return True if route is valid and playable
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Validation")
     bool ValidateRoute(const FMGGeneratedRoute& Route, FString& OutError) const;
 
+    /**
+     * Checks if a world location is on the route surface.
+     * @param Location World position to check
+     * @param Tolerance Distance tolerance from route centerline
+     * @return True if location is on the route
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Validation")
     bool IsLocationOnRoute(const FVector& Location, float Tolerance = 50.0f) const;
 
+    /**
+     * Projects a world location onto the route and returns distance.
+     * @param Location World position to project
+     * @return Distance along route to the projected point
+     */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Validation")
     float GetDistanceAlongRoute(const FVector& Location) const;
 
+    // ========================================================================
     // Presets
+    // ========================================================================
+
+    /**
+     * Gets generation parameters for a named preset.
+     * @param PresetName Name of the preset configuration
+     * @return The preset's route parameters
+     */
     UFUNCTION(BlueprintCallable, Category = "RouteGenerator|Presets")
     FMGRouteParams GetPresetParams(const FString& PresetName) const;
 
+    /** Returns names of all available preset configurations. */
     UFUNCTION(BlueprintPure, Category = "RouteGenerator|Presets")
     TArray<FString> GetAvailablePresets() const;
 
+    // ========================================================================
     // Events
+    // ========================================================================
+
+    /// Broadcast when route generation completes successfully
     UPROPERTY(BlueprintAssignable, Category = "RouteGenerator|Events")
     FMGOnRouteGenerated OnRouteGenerated;
 
+    /// Broadcast periodically during async generation with progress
     UPROPERTY(BlueprintAssignable, Category = "RouteGenerator|Events")
     FMGOnGenerationProgress OnGenerationProgress;
 
+    /// Broadcast when route generation fails
     UPROPERTY(BlueprintAssignable, Category = "RouteGenerator|Events")
     FMGOnGenerationFailed OnGenerationFailed;
 
+    /// Broadcast when each segment completes during generation
     UPROPERTY(BlueprintAssignable, Category = "RouteGenerator|Events")
     FMGOnSegmentGenerated OnSegmentGenerated;
 
 protected:
-    // Current route
+    // ========================================================================
+    // Internal State
+    // ========================================================================
+
+    /// The currently active route
     UPROPERTY()
     FMGGeneratedRoute CurrentRoute;
 
+    /// True if a route is currently loaded
     UPROPERTY()
     bool bHasRoute;
 
-    // Generation state
+    /// True if async generation is in progress
     UPROPERTY()
     bool bIsGenerating;
 
+    /// True if cancel was requested during async generation
     UPROPERTY()
     bool bCancelRequested;
 
+    /// Current generation progress (0.0 to 1.0)
     UPROPERTY()
     float GenerationProgress;
 
-    // Racing line cache
+    /// Cached racing line for current route
     UPROPERTY()
     TArray<FMGRacingLinePoint> CachedRacingLine;
 
-    // Style configurations
+    /// Style-specific configuration parameters
     UPROPERTY()
     TMap<EMGRouteStyle, FMGRouteStyleParams> StyleConfigs;
 
-    // Route presets
+    /// Named preset configurations
     UPROPERTY()
     TMap<FString, FMGRouteParams> RoutePresets;
 
-    // Random stream for deterministic generation
+    /// Random number generator for deterministic generation
     FRandomStream RandomStream;
 
-    // Generation helpers
+    // ========================================================================
+    // Internal Generation Helpers
+    // ========================================================================
+
+    /** Initializes default style configurations for all route styles. */
     void InitializeStyleConfigs();
+
+    /** Initializes preset route parameter configurations. */
     void InitializePresets();
 
+    /** Generates a single segment based on parameters and previous segment. */
     FMGRouteSegment GenerateSegment(const FMGRouteParams& Params, const FMGRouteSegment& PreviousSegment, int32 Index);
+
+    /** Selects the next segment type based on parameters and previous type. */
     EMGSegmentType ChooseNextSegmentType(const FMGRouteParams& Params, EMGSegmentType Previous);
+
+    /** Calculates the endpoint of a segment based on its geometry. */
     FVector CalculateSegmentEndPoint(const FMGRouteSegment& Segment);
+
+    /** Generates checkpoint positions for a route. */
     void GenerateCheckpoints(FMGGeneratedRoute& Route);
+
+    /** Generates starting grid spawn positions. */
     void GenerateSpawnPoints(FMGGeneratedRoute& Route, int32 MaxSpawns = 12);
+
+    /** Generates shortcut paths for a route. */
     void GenerateShortcuts(FMGGeneratedRoute& Route, const FMGRouteParams& Params);
+
+    /** Calculates metrics like length, difficulty, estimated time. */
     void CalculateRouteMetrics(FMGGeneratedRoute& Route);
+
+    /** Applies style-specific modifications to a segment. */
     void ApplyStyleToSegment(FMGRouteSegment& Segment, EMGRouteStyle Style);
 
+    /** Evaluates a cubic Bezier curve at parameter T. */
     FVector BezierPoint(const FVector& P0, const FVector& P1, const FVector& P2, const FVector& P3, float T) const;
+
+    /** Calculates the arc length of a curved segment. */
     float CalculateCurveLength(const FMGRouteSegment& Segment) const;
+
+    /** Calculates rotation at a point along a segment. */
     FRotator CalculateSegmentRotation(const FMGRouteSegment& Segment, float T) const;
 };

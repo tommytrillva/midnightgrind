@@ -1,0 +1,331 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Collision Physics and Damage System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "VisualDamage": true,
+    "MechanicalDamage": true,
+    "CollisionPhysics": "Realistic",
+    "DeformationSystem": true
+  },
+
+  "CollisionTypes": {
+    "VehicleToVehicle": {
+      "ID": "COL_V2V",
+      "PhysicsModel": "MassBasedMomentum",
+      "DamageCalculation": "RelativeVelocity",
+      "PushForce": true,
+      "SpinOuts": true
+    },
+    "VehicleToEnvironment": {
+      "ID": "COL_V2E",
+      "PhysicsModel": "ImpactAbsorption",
+      "DamageCalculation": "ImpactVelocity",
+      "Bounce": true,
+      "Deformation": true
+    },
+    "VehicleToTraffic": {
+      "ID": "COL_V2T",
+      "PhysicsModel": "SimplifiedMass",
+      "DamageCalculation": "Moderate",
+      "TrafficReaction": true
+    },
+    "Scraping": {
+      "ID": "COL_SCRAPE",
+      "PhysicsModel": "FrictionBased",
+      "DamageCalculation": "ContactDuration",
+      "SparkEffects": true
+    }
+  },
+
+  "DamageZones": {
+    "Front": {
+      "ID": "ZONE_FRONT",
+      "HealthPool": 100,
+      "Components": ["Bumper", "Hood", "Headlights", "Grille", "Radiator"],
+      "MechanicalEffects": {
+        "RadiatorDamage": { "Threshold": 50, "Effect": "OverheatRisk" },
+        "EngineDamage": { "Threshold": 80, "Effect": "PowerLoss" }
+      }
+    },
+    "Rear": {
+      "ID": "ZONE_REAR",
+      "HealthPool": 100,
+      "Components": ["Bumper", "Trunk", "Taillights", "Exhaust"],
+      "MechanicalEffects": {
+        "FuelTankDamage": { "Threshold": 70, "Effect": "FuelLeak" },
+        "ExhaustDamage": { "Threshold": 40, "Effect": "PerformanceLoss" }
+      }
+    },
+    "LeftSide": {
+      "ID": "ZONE_LEFT",
+      "HealthPool": 80,
+      "Components": ["Door", "Mirror", "Fender", "Wheels"],
+      "MechanicalEffects": {
+        "WheelDamage": { "Threshold": 60, "Effect": "HandlingLoss" },
+        "SuspensionDamage": { "Threshold": 70, "Effect": "AlignmentOff" }
+      }
+    },
+    "RightSide": {
+      "ID": "ZONE_RIGHT",
+      "HealthPool": 80,
+      "Components": ["Door", "Mirror", "Fender", "Wheels"],
+      "MechanicalEffects": {
+        "WheelDamage": { "Threshold": 60, "Effect": "HandlingLoss" },
+        "SuspensionDamage": { "Threshold": 70, "Effect": "AlignmentOff" }
+      }
+    },
+    "Roof": {
+      "ID": "ZONE_ROOF",
+      "HealthPool": 60,
+      "Components": ["Roof", "Pillars", "Sunroof"],
+      "MechanicalEffects": {
+        "RollCageDamage": { "Threshold": 80, "Effect": "StructuralWeakness" }
+      }
+    },
+    "Undercarriage": {
+      "ID": "ZONE_UNDER",
+      "HealthPool": 70,
+      "Components": ["FloorPan", "OilPan", "FuelLines", "Exhaust"],
+      "MechanicalEffects": {
+        "OilPanDamage": { "Threshold": 50, "Effect": "OilLeak" },
+        "FuelLineDamage": { "Threshold": 60, "Effect": "FuelLeak" }
+      }
+    }
+  },
+
+  "VisualDamage": {
+    "DeformationSystem": {
+      "Enabled": true,
+      "MeshDeformation": true,
+      "LODLevels": 4,
+      "MaxDeformation": 0.3
+    },
+    "DamageStates": {
+      "Pristine": { "Range": [100, 100], "Visual": "None" },
+      "Light": { "Range": [75, 99], "Visual": "Scratches" },
+      "Moderate": { "Range": [50, 74], "Visual": "Dents" },
+      "Heavy": { "Range": [25, 49], "Visual": "Crumpled" },
+      "Severe": { "Range": [1, 24], "Visual": "Destroyed" },
+      "Totaled": { "Range": [0, 0], "Visual": "Wreck" }
+    },
+    "DetailedEffects": {
+      "Scratches": { "Decals": true, "PaintChip": true },
+      "Dents": { "MeshDeform": true, "PanelGaps": true },
+      "Crumpled": { "MajorDeform": true, "PartsDangling": true },
+      "Destroyed": { "PartsMissing": true, "FrameDamage": true }
+    },
+    "PartSpecific": {
+      "Bumpers": { "CanDetach": true, "DragEffect": true },
+      "Hood": { "CanBuckle": true, "CanFlyOpen": true },
+      "Doors": { "CanDent": true, "CanJam": true },
+      "Windows": { "CanCrack": true, "CanShatter": true },
+      "Mirrors": { "CanBreak": true, "CanFold": true },
+      "Lights": { "CanBreak": true, "FlickerWhenDamaged": true },
+      "Wheels": { "CanBend": true, "CanPuncture": true }
+    }
+  },
+
+  "MechanicalDamage": {
+    "Engine": {
+      "Health": 100,
+      "Effects": {
+        "Minor": { "Threshold": 75, "PowerReduction": 0.05 },
+        "Moderate": { "Threshold": 50, "PowerReduction": 0.15, "Misfires": true },
+        "Major": { "Threshold": 25, "PowerReduction": 0.35, "SmokingEngine": true },
+        "Critical": { "Threshold": 10, "PowerReduction": 0.5, "StallRisk": true }
+      }
+    },
+    "Transmission": {
+      "Health": 100,
+      "Effects": {
+        "Minor": { "Threshold": 75, "ShiftDelay": 0.1 },
+        "Moderate": { "Threshold": 50, "ShiftDelay": 0.3, "GrindingGears": true },
+        "Major": { "Threshold": 25, "RandomSlip": true },
+        "Critical": { "Threshold": 10, "GearLock": true }
+      }
+    },
+    "Suspension": {
+      "Health": 100,
+      "Effects": {
+        "Minor": { "Threshold": 75, "HandlingLoss": 0.05 },
+        "Moderate": { "Threshold": 50, "HandlingLoss": 0.15, "Pulling": true },
+        "Major": { "Threshold": 25, "HandlingLoss": 0.3, "Bouncy": true },
+        "Critical": { "Threshold": 10, "Undriveable": true }
+      }
+    },
+    "Steering": {
+      "Health": 100,
+      "Effects": {
+        "Minor": { "Threshold": 75, "SloppySteering": true },
+        "Moderate": { "Threshold": 50, "Drift": 0.1 },
+        "Major": { "Threshold": 25, "Drift": 0.25 },
+        "Critical": { "Threshold": 10, "LockToSide": true }
+      }
+    },
+    "Brakes": {
+      "Health": 100,
+      "Effects": {
+        "Minor": { "Threshold": 75, "BrakeReduction": 0.1 },
+        "Moderate": { "Threshold": 50, "BrakeReduction": 0.25, "Fade": true },
+        "Major": { "Threshold": 25, "BrakeReduction": 0.5, "Pulling": true },
+        "Critical": { "Threshold": 10, "BrakeFailure": true }
+      }
+    },
+    "Wheels": {
+      "Health": 100,
+      "PerWheel": true,
+      "Effects": {
+        "Minor": { "Threshold": 75, "Vibration": true },
+        "Moderate": { "Threshold": 50, "GripLoss": 0.15 },
+        "Major": { "Threshold": 25, "GripLoss": 0.35, "Wobble": true },
+        "Critical": { "Threshold": 10, "Blowout": true }
+      }
+    }
+  },
+
+  "CollisionForces": {
+    "ImpactCalculation": {
+      "BaseDamage": "Mass * Velocity * ImpactAngle",
+      "MinDamageSpeed": 15,
+      "DamageScaling": "Exponential"
+    },
+    "VehicleMassClasses": {
+      "Light": { "Mass": 1000, "PushResist": 0.7 },
+      "Medium": { "Mass": 1500, "PushResist": 1.0 },
+      "Heavy": { "Mass": 2000, "PushResist": 1.3 },
+      "Truck": { "Mass": 3000, "PushResist": 1.8 }
+    },
+    "ImpactAngles": {
+      "HeadOn": { "DamageMultiplier": 1.0, "AngleRange": [0, 30] },
+      "Angled": { "DamageMultiplier": 0.7, "AngleRange": [30, 60] },
+      "Side": { "DamageMultiplier": 0.85, "AngleRange": [60, 120] },
+      "Rear": { "DamageMultiplier": 0.6, "AngleRange": [150, 180] }
+    }
+  },
+
+  "EnvironmentCollisions": {
+    "Barriers": {
+      "Concrete": { "Damage": "High", "Bounce": 0.2, "Deceleration": "Harsh" },
+      "Metal": { "Damage": "Medium", "Bounce": 0.4, "Deceleration": "Medium" },
+      "TireWall": { "Damage": "Low", "Bounce": 0.6, "Deceleration": "Soft" },
+      "Fence": { "Damage": "VeryLow", "Breakable": true }
+    },
+    "Props": {
+      "TrashCan": { "Damage": 0, "Physics": "Scatter" },
+      "Cone": { "Damage": 0, "Physics": "Knockover" },
+      "FireHydrant": { "Damage": 10, "WaterSpray": true },
+      "LightPole": { "Damage": 25, "Breakable": true },
+      "Tree": { "Damage": 40, "Solid": true }
+    },
+    "Terrain": {
+      "Curb": { "Damage": 5, "LaunchEffect": true },
+      "Pothole": { "Damage": 10, "SuspensionHit": true },
+      "RockOutcrop": { "Damage": 30, "UndercarriageHit": true }
+    }
+  },
+
+  "Repair": {
+    "AutoRepair": {
+      "Enabled": true,
+      "VisualOnly": true,
+      "InGarage": true,
+      "Cost": 0
+    },
+    "FullRepair": {
+      "ResetsAllDamage": true,
+      "Cost": "BasedOnDamage",
+      "Locations": ["Garage", "RepairShop"]
+    },
+    "QuickRepair": {
+      "Enabled": true,
+      "PartialRestore": 0.5,
+      "Cost": "Reduced",
+      "Locations": ["GasStation", "Safehouse"]
+    },
+    "InRaceRepair": {
+      "Enabled": false,
+      "PitStopRequired": true,
+      "TimeDelay": true
+    }
+  },
+
+  "GameModeSettings": {
+    "Arcade": {
+      "DamageMultiplier": 0.5,
+      "MechanicalDamage": false,
+      "AutoRepairRate": 0.01
+    },
+    "Simulation": {
+      "DamageMultiplier": 1.0,
+      "MechanicalDamage": true,
+      "AutoRepairRate": 0
+    },
+    "Hardcore": {
+      "DamageMultiplier": 1.5,
+      "MechanicalDamage": true,
+      "PermanentDamage": true
+    },
+    "NoCollision": {
+      "Damage": false,
+      "GhostMode": true
+    }
+  },
+
+  "Effects": {
+    "Visual": {
+      "Sparks": { "OnScrape": true, "OnMetalHit": true },
+      "Smoke": { "OnHeavyImpact": true, "EngineDamage": true },
+      "Fire": { "OnCriticalDamage": true, "Rare": true },
+      "Debris": { "OnImpact": true, "Physics": true },
+      "Glass": { "OnWindowBreak": true, "Scatter": true }
+    },
+    "Audio": {
+      "Crash": { "Layers": 5, "VelocityBased": true },
+      "Scrape": { "MaterialBased": true },
+      "MetalCreak": { "OnDeformation": true },
+      "GlassShatter": { "OnWindowBreak": true },
+      "EngineStutter": { "OnDamage": true }
+    },
+    "Haptic": {
+      "ImpactRumble": true,
+      "ScrapingVibration": true,
+      "DamagePulse": true
+    }
+  },
+
+  "Performance": {
+    "CollisionLOD": {
+      "High": { "MaxSimultaneous": 16 },
+      "Medium": { "MaxSimultaneous": 8 },
+      "Low": { "MaxSimultaneous": 4 }
+    },
+    "DeformationQuality": {
+      "High": { "VertexDetail": "Full" },
+      "Medium": { "VertexDetail": "Reduced" },
+      "Low": { "VertexDetail": "Minimal" }
+    },
+    "DebrisLimit": {
+      "High": 100,
+      "Medium": 50,
+      "Low": 25
+    }
+  },
+
+  "UI": {
+    "DamageIndicator": {
+      "Position": "BottomLeft",
+      "ShowZones": true,
+      "ColorCoding": true
+    },
+    "HealthBars": {
+      "ShowOverall": true,
+      "ShowComponents": "OnDamage"
+    },
+    "RepairPrompt": {
+      "ShowCost": true,
+      "QuickAccess": true
+    }
+  }
+}

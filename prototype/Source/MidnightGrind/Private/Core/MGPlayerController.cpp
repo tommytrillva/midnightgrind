@@ -3225,3 +3225,105 @@ void AMGPlayerController::OnSecretShortcutFound(const FString& ShortcutId, int32
 		}
 	}
 }
+
+void AMGPlayerController::OnCareerChapterAdvanced(EMGCareerChapter NewChapter)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString ChapterStr;
+			switch (NewChapter)
+			{
+				case EMGCareerChapter::Prologue: ChapterStr = TEXT("PROLOGUE"); break;
+				case EMGCareerChapter::RisingStar: ChapterStr = TEXT("RISING STAR"); break;
+				case EMGCareerChapter::Underground: ChapterStr = TEXT("UNDERGROUND"); break;
+				case EMGCareerChapter::ProCircuit: ChapterStr = TEXT("PRO CIRCUIT"); break;
+				case EMGCareerChapter::Championship: ChapterStr = TEXT("CHAMPIONSHIP"); break;
+				case EMGCareerChapter::Legend: ChapterStr = TEXT("LEGEND"); break;
+				default: ChapterStr = TEXT("NEW CHAPTER"); break;
+			}
+
+			FText ChapterMessage = FText::FromString(FString::Printf(TEXT("CHAPTER UNLOCKED: %s"), *ChapterStr));
+			FLinearColor ChapterColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+			HUDSubsystem->ShowNotification(ChapterMessage, 6.0f, ChapterColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnCareerMilestoneReached(EMGCareerMilestone Milestone)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText MilestoneMessage = FText::FromString(TEXT("CAREER MILESTONE REACHED!"));
+			FLinearColor MilestoneColor = FLinearColor(0.9f, 0.95f, 1.0f, 1.0f); // Platinum
+			HUDSubsystem->ShowNotification(MilestoneMessage, 5.0f, MilestoneColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnCareerObjectiveCompleted(const FMGCareerObjective& Objective)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText ObjectiveMessage = FText::FromString(FString::Printf(TEXT("OBJECTIVE: %s"), *Objective.DisplayName.ToString()));
+			FLinearColor ObjectiveColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f); // Cyan-green
+			HUDSubsystem->ShowNotification(ObjectiveMessage, 3.0f, ObjectiveColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnNewRivalDiscovered(const FMGRival& Rival)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText RivalMessage = FText::FromString(FString::Printf(TEXT("NEW RIVAL: %s"), *Rival.DisplayName.ToString()));
+			FLinearColor RivalColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+			HUDSubsystem->ShowNotification(RivalMessage, 4.0f, RivalColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnRivalDefeated(const FMGRival& Rival, bool bWasCloseRace)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText DefeatMessage;
+			FLinearColor DefeatColor;
+
+			if (bWasCloseRace)
+			{
+				DefeatMessage = FText::FromString(FString::Printf(TEXT("RIVAL DEFEATED! (CLOSE RACE) - %s"), *Rival.DisplayName.ToString()));
+				DefeatColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+			}
+			else
+			{
+				DefeatMessage = FText::FromString(FString::Printf(TEXT("RIVAL DEFEATED! - %s"), *Rival.DisplayName.ToString()));
+				DefeatColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f); // Green
+			}
+
+			HUDSubsystem->ShowNotification(DefeatMessage, 5.0f, DefeatColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnNemesisDesignated(const FMGRival& Nemesis)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText NemesisMessage = FText::FromString(FString::Printf(TEXT("NEMESIS: %s"), *Nemesis.DisplayName.ToString()));
+			FLinearColor NemesisColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
+			HUDSubsystem->ShowNotification(NemesisMessage, 5.0f, NemesisColor);
+		}
+	}
+}

@@ -1,5 +1,63 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGDynoTuningSubsystem.h
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * This file defines the Dyno (Dynamometer) and Tuning Subsystem for MIDNIGHT GRIND.
+ * A dynamometer (dyno) is a machine that measures an engine's horsepower and torque
+ * output across its RPM range - this system simulates that experience in-game.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ *
+ * 1. DYNAMOMETER (DYNO):
+ *    - A real-world device that measures engine power output
+ *    - The car's wheels spin on rollers while sensors measure force
+ *    - Results in a "dyno chart" showing HP and torque vs RPM
+ *    - In our game, players can dyno their cars to see power gains from upgrades
+ *
+ * 2. TUNING:
+ *    - Adjusting vehicle parameters to optimize performance for specific uses
+ *    - ECU tuning: Adjusting engine computer settings (fuel maps, ignition timing)
+ *    - Suspension tuning: Adjusting springs, dampers, anti-roll bars
+ *    - Alignment: Adjusting camber, toe, caster angles
+ *    - Differential: Adjusting how power is split between wheels
+ *
+ * 3. GAME INSTANCE SUBSYSTEM:
+ *    - A subsystem that persists across level loads
+ *    - Perfect for systems that need to remember state between races
+ *    - Dyno results and tune profiles are preserved during a game session
+ *
+ * HOW IT FITS IN THE GAME ARCHITECTURE:
+ * - Players visit the garage to tune their vehicles before races
+ * - The dyno allows them to measure and compare power gains
+ * - Tune profiles can be saved, loaded, and shared with other players
+ * - Different driving style presets (Grip, Drift, Drag, etc.) provide starting points
+ *
+ * USAGE EXAMPLE:
+ * @code
+ * // Get the subsystem
+ * UMGDynoTuningSubsystem* DynoSystem = GetGameInstance()->GetSubsystem<UMGDynoTuningSubsystem>();
+ *
+ * // Start a dyno session
+ * FGuid SessionID = DynoSystem->StartDynoSession(PlayerID, VehicleID);
+ *
+ * // Run the dyno and get results
+ * DynoSystem->StartDynoRun(SessionID);
+ * // ... wait for OnDynoRunComplete delegate ...
+ *
+ * // Create and apply a tune
+ * FGuid TuneID = DynoSystem->CreateTuneProfile(PlayerID, VehicleID, "Track Day Setup");
+ * DynoSystem->LoadPreset(TuneID, EMGDrivingStylePreset::Grip);
+ * DynoSystem->ApplyTuneProfile(VehicleID, TuneID);
+ * @endcode
+ *
+ * @see FMGVehicleData for the vehicle data this tuning modifies
+ * @see UMGVehicleMovementComponent where the tune is actually applied to physics
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,7 +65,13 @@
 #include "MGDynoTuningSubsystem.generated.h"
 
 /**
- * Dyno run status
+ * @brief Current status of a dyno run session.
+ *
+ * The dyno process follows a state machine:
+ * Idle -> WarmingUp -> Running -> Complete (or Failed)
+ *                   -> Cooling (if needed between runs)
+ *
+ * Players see visual feedback for each state (exhaust smoke, RPM climbing, etc.)
  */
 UENUM(BlueprintType)
 enum class EMGDynoStatus : uint8

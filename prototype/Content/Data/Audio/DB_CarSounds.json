@@ -1,0 +1,389 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Sound Design and Audio Systems",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DynamicSounds": true,
+    "EnvironmentalEffects": true,
+    "DopplerEffect": true,
+    "SpatialAudio": true
+  },
+
+  "EngineSoundLayers": {
+    "BaseLayer": {
+      "Description": "Fundamental engine tone",
+      "RPMLinked": true,
+      "LoadModulated": true,
+      "Priority": "High"
+    },
+    "ExhaustLayer": {
+      "Description": "Exhaust note and resonance",
+      "RPMLinked": true,
+      "ThrottleModulated": true,
+      "PoppBangs": true
+    },
+    "IntakeLayer": {
+      "Description": "Air intake and induction sounds",
+      "ThrottleLinked": true,
+      "TurboWhine": true
+    },
+    "MechanicalLayer": {
+      "Description": "Valve train, timing chain, accessories",
+      "RPMLinked": true,
+      "SubtleMix": true
+    },
+    "TransmissionLayer": {
+      "Description": "Gear whine and clutch sounds",
+      "GearLinked": true,
+      "LoadModulated": true
+    }
+  },
+
+  "EngineProfiles": {
+    "InlineFour": {
+      "ID": "SND_I4",
+      "Character": "Buzzy",
+      "Harmonics": [1, 2, 4],
+      "RPMRange": { "Idle": 800, "Redline": 8000 },
+      "Examples": ["K20", "SR20", "4AGE"]
+    },
+    "InlineSix": {
+      "ID": "SND_I6",
+      "Character": "Smooth",
+      "Harmonics": [1, 2, 3, 6],
+      "RPMRange": { "Idle": 750, "Redline": 8500 },
+      "Examples": ["2JZ", "RB26", "S54"]
+    },
+    "V6": {
+      "ID": "SND_V6",
+      "Character": "Throaty",
+      "Harmonics": [1.5, 3, 6],
+      "RPMRange": { "Idle": 700, "Redline": 7500 },
+      "Examples": ["VQ35", "J35", "VR38"]
+    },
+    "V8American": {
+      "ID": "SND_V8US",
+      "Character": "Rumble",
+      "Harmonics": [0.5, 1, 2, 4],
+      "RPMRange": { "Idle": 600, "Redline": 7000 },
+      "CrossplaneCrankle": true,
+      "Examples": ["LS", "Coyote", "Hemi"]
+    },
+    "V8European": {
+      "ID": "SND_V8EU",
+      "Character": "Wail",
+      "Harmonics": [1, 2, 4, 8],
+      "RPMRange": { "Idle": 800, "Redline": 8500 },
+      "FlatPlaneCrank": true,
+      "Examples": ["Ferrari", "Maserati"]
+    },
+    "Boxer": {
+      "ID": "SND_BOX",
+      "Character": "Burble",
+      "Harmonics": [0.5, 1, 2],
+      "RPMRange": { "Idle": 750, "Redline": 8000 },
+      "UnequalHeaders": true,
+      "Examples": ["EJ25", "FA20"]
+    },
+    "Rotary": {
+      "ID": "SND_ROT",
+      "Character": "Brap",
+      "Harmonics": [1.5, 3],
+      "RPMRange": { "Idle": 900, "Redline": 9500 },
+      "UniqueCharacter": true,
+      "Examples": ["13B", "20B"]
+    },
+    "Electric": {
+      "ID": "SND_EV",
+      "Character": "Whine",
+      "Harmonics": ["Continuous"],
+      "SpeedLinked": true,
+      "Subtle": true
+    }
+  },
+
+  "ForcedInduction": {
+    "Turbo": {
+      "SpoolWhine": {
+        "FrequencyRange": { "Min": 500, "Max": 15000 },
+        "BoostLinked": true
+      },
+      "BlowOffValve": {
+        "Triggers": ["ThrottleLift", "GearChange"],
+        "Types": {
+          "Atmospheric": { "Sound": "Pshhh", "Volume": "Loud" },
+          "Recirculating": { "Sound": "Flutter", "Volume": "Quiet" },
+          "Hybrid": { "Sound": "Mixed", "Volume": "Medium" }
+        }
+      },
+      "WastegateChatter": {
+        "Enabled": true,
+        "OnBoost": true,
+        "Character": "Flutter"
+      },
+      "Compressor Surge": {
+        "Enabled": true,
+        "OnDecel": true
+      }
+    },
+    "Supercharger": {
+      "WhineCharacter": {
+        "Types": {
+          "Roots": { "Sound": "Growl", "RPMLinked": true },
+          "TwinScrew": { "Sound": "Whine", "RPMLinked": true },
+          "Centrifugal": { "Sound": "Whistle", "RPMLinked": true }
+        }
+      },
+      "BypassValve": {
+        "Enabled": true,
+        "OnDecel": true
+      }
+    }
+  },
+
+  "ExhaustSystems": {
+    "Types": {
+      "Stock": {
+        "ID": "EXH_STOCK",
+        "Volume": 0.5,
+        "Character": "Muffled",
+        "Pops": false
+      },
+      "Sport": {
+        "ID": "EXH_SPORT",
+        "Volume": 0.7,
+        "Character": "Deeper",
+        "Pops": "Occasional"
+      },
+      "Performance": {
+        "ID": "EXH_PERF",
+        "Volume": 0.85,
+        "Character": "Aggressive",
+        "Pops": "Frequent"
+      },
+      "Race": {
+        "ID": "EXH_RACE",
+        "Volume": 1.0,
+        "Character": "Loud",
+        "Pops": "Heavy",
+        "Crackles": true
+      },
+      "Straight Pipe": {
+        "ID": "EXH_STRAIGHT",
+        "Volume": 1.0,
+        "Character": "Raw",
+        "Pops": "Extreme",
+        "Drone": true
+      }
+    },
+    "ExhaustEffects": {
+      "Pops": {
+        "OnDecel": true,
+        "OnShift": true,
+        "Intensity": { "Min": 0, "Max": 1 }
+      },
+      "Crackles": {
+        "OnDecel": true,
+        "AntiLagEnhanced": true
+      },
+      "Backfire": {
+        "Enabled": true,
+        "WithFlames": true,
+        "Rare": true
+      },
+      "Burble": {
+        "OnIdle": true,
+        "OnOverrun": true
+      }
+    }
+  },
+
+  "TransmissionSounds": {
+    "GearWhine": {
+      "Enabled": true,
+      "VolumeByLoad": true,
+      "PitchBySpeed": true
+    },
+    "ShiftSounds": {
+      "Manual": {
+        "ClutchEngage": true,
+        "GearSlot": true,
+        "SynchroMesh": true
+      },
+      "Automatic": {
+        "ShiftThump": true,
+        "TorqueConverter": true
+      },
+      "Sequential": {
+        "ClackSound": true,
+        "Pneumatic": "Optional"
+      },
+      "DCT": {
+        "QuickClack": true,
+        "EngineBlip": true
+      }
+    },
+    "MissedShift": {
+      "GrindingGears": true,
+      "MoneyShift": true
+    }
+  },
+
+  "TireSounds": {
+    "RollingNoise": {
+      "SurfaceDependent": true,
+      "SpeedScaled": true,
+      "TireTypeVariation": true
+    },
+    "Squealing": {
+      "OnHardCorner": true,
+      "OnBraking": true,
+      "SlipAngleLinked": true
+    },
+    "Drifting": {
+      "SmokeIntensity": true,
+      "ContinuousSqueal": true,
+      "SurfaceVariation": true
+    },
+    "Burnout": {
+      "Intensity": "High",
+      "SmokeBased": true
+    },
+    "Blowout": {
+      "Enabled": true,
+      "Dramatic": true
+    }
+  },
+
+  "AerodynamicSounds": {
+    "WindNoise": {
+      "SpeedDependent": true,
+      "WindowPosition": true,
+      "SunroofEffect": true
+    },
+    "BodyAero": {
+      "SpoilerWhistle": "Subtle",
+      "DiffuserRoar": "AtHighSpeed"
+    }
+  },
+
+  "EnvironmentalAudio": {
+    "Tunnels": {
+      "ReverbIncrease": 2.0,
+      "EchoEffect": true,
+      "EnhancedExhaust": true
+    },
+    "Bridges": {
+      "MetalGratingSound": true,
+      "OpenAirEffect": true
+    },
+    "Parking Garage": {
+      "HeavyReverb": true,
+      "EchoDelay": 0.3
+    },
+    "Canyon": {
+      "NaturalReverb": true,
+      "DelayedEcho": true
+    },
+    "Rain": {
+      "RoofPatter": true,
+      "TireSpray": true,
+      "ReducedTireSqueal": true
+    }
+  },
+
+  "InteriorVsExterior": {
+    "CameraBasedMix": true,
+    "InteriorEffects": {
+      "Muffled": true,
+      "CabinResonance": true,
+      "RattlesOnRough": true
+    },
+    "ExteriorEffects": {
+      "FullVolume": true,
+      "EnvironmentalReflections": true,
+      "DopplerOnPassing": true
+    },
+    "TransitionSmoothing": true
+  },
+
+  "DamageSounds": {
+    "Collision": {
+      "MetalCrunch": true,
+      "GlassShatter": true,
+      "PartsFalling": true
+    },
+    "EngineKnock": {
+      "OnDamage": true,
+      "Intensity": "DamageLevel"
+    },
+    "Misfires": {
+      "OnEngineDamage": true,
+      "Random": true
+    },
+    "BrakeSqueal": {
+      "OnWornBrakes": true,
+      "Persistent": true
+    },
+    "SuspensionClunk": {
+      "OnDamage": true,
+      "OverBumps": true
+    }
+  },
+
+  "HornSounds": {
+    "Stock": { "ID": "HORN_STOCK", "Character": "Standard" },
+    "European": { "ID": "HORN_EU", "Character": "Dual Tone" },
+    "Train": { "ID": "HORN_TRAIN", "Character": "Air Horn" },
+    "Musical": { "ID": "HORN_MUSIC", "Character": "Melody", "Customizable": true },
+    "Classic": { "ID": "HORN_CLASSIC", "Character": "Oooga" }
+  },
+
+  "Customization": {
+    "ExhaustTone": {
+      "Adjustable": true,
+      "Parameters": ["Volume", "Depth", "Raspiness", "Pops"]
+    },
+    "BOVSound": {
+      "Selectable": true,
+      "Options": ["Atmospheric", "Recirc", "Flutter", "Hybrid"]
+    },
+    "HornSelection": {
+      "Unlockable": true,
+      "Custom": true
+    }
+  },
+
+  "Performance": {
+    "AudioChannels": {
+      "PerVehicle": 16,
+      "Environment": 8,
+      "UI": 4
+    },
+    "LOD": {
+      "NearbyVehicles": "Full",
+      "MidRange": "Reduced",
+      "Distant": "Minimal"
+    },
+    "Streaming": {
+      "PreloadEngine": true,
+      "DynamicLoading": true
+    }
+  },
+
+  "UI": {
+    "SoundSettings": {
+      "MasterVolume": true,
+      "EngineVolume": true,
+      "ExhaustVolume": true,
+      "TireVolume": true,
+      "EnvironmentVolume": true
+    },
+    "ExhaustPreview": {
+      "InGarage": true,
+      "RevEngine": true,
+      "CompareOptions": true
+    }
+  }
+}

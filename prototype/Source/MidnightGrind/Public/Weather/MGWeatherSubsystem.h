@@ -1,5 +1,50 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGWeatherSubsystem.h
+ * @brief Dynamic Weather and Environmental Conditions Subsystem
+ *
+ * This subsystem manages all weather-related systems in Midnight Grind, providing
+ * a comprehensive simulation of environmental conditions that affect gameplay.
+ *
+ * ## Overview
+ * The Weather Subsystem is responsible for:
+ * - Dynamic weather states (clear, rain, fog, snow, storms, etc.)
+ * - Time of day management and lighting transitions
+ * - Road surface conditions that affect vehicle physics
+ * - Visual effects integration (precipitation, fog, lightning)
+ * - Track-specific weather configurations
+ *
+ * ## Architecture
+ * This is a World Subsystem, meaning one instance exists per game world.
+ * It integrates with:
+ * - Vehicle physics systems (grip, handling)
+ * - Visual rendering (materials, post-processing)
+ * - Audio systems (ambient weather sounds)
+ * - AI systems (perception, behavior)
+ *
+ * ## Key Concepts
+ * - **Weather State**: Complete description of current conditions (type, intensity, wind, etc.)
+ * - **Weather Transition**: Smooth interpolation between two weather states over time
+ * - **Road Condition**: Surface state (dry, wet, icy) derived from weather
+ * - **Lighting Preset**: Sun/sky settings for different times of day
+ *
+ * ## Usage Example
+ * @code
+ * // Get the weather subsystem
+ * UMGWeatherSubsystem* Weather = GetWorld()->GetSubsystem<UMGWeatherSubsystem>();
+ *
+ * // Change weather with 30-second transition
+ * Weather->SetWeather(EMGWeatherType::HeavyRain, 30.0f);
+ *
+ * // Check road conditions for physics
+ * float Grip = Weather->GetUnifiedGripMultiplier(VehicleLocation, SpeedKPH);
+ * @endcode
+ *
+ * @see UMGWeatherRacingSubsystem for racing-specific weather effects (aquaplaning, puddles)
+ * @see EMGWeatherType for available weather conditions
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -14,330 +59,445 @@ class ASkyAtmosphere;
 class AVolumetricCloud;
 class UMGWeatherRacingSubsystem;
 
+// ============================================================================
+// WEATHER TYPE ENUMERATION
+// ============================================================================
+
 /**
- * Weather type
+ * @brief Defines all available weather conditions in the game
+ *
+ * Weather types are organized by atmospheric conditions and affect:
+ * - Visual rendering (sky, fog, precipitation particles)
+ * - Road surface conditions
+ * - Vehicle physics (grip, visibility)
+ * - AI behavior and perception
+ *
+ * Some weather types are time-specific (NightClear, NightRain) and are
+ * typically set automatically based on time of day.
  */
 UENUM(BlueprintType)
 enum class EMGWeatherType : uint8
 {
-	/** Clear skies */
+	/** Clear skies - Optimal racing conditions with full visibility */
 	Clear,
-	/** Partly cloudy */
+	/** Partly cloudy - Scattered clouds, no precipitation */
 	PartlyCloudy,
-	/** Overcast */
+	/** Overcast - Full cloud cover, reduced light, no precipitation */
 	Overcast,
-	/** Light rain */
+	/** Light rain - Mild precipitation, slightly reduced grip */
 	LightRain,
-	/** Heavy rain */
+	/** Heavy rain - Significant precipitation, major grip reduction */
 	HeavyRain,
-	/** Thunderstorm */
+	/** Thunderstorm - Heavy rain with lightning, dangerous conditions */
 	Thunderstorm,
-	/** Fog */
+	/** Fog - Reduced visibility, normal road surface */
 	Fog,
-	/** Heavy fog */
+	/** Heavy fog - Severely reduced visibility (<100m) */
 	HeavyFog,
-	/** Snow */
+	/** Snow - Light snowfall, icy road conditions possible */
 	Snow,
-	/** Blizzard */
+	/** Blizzard - Heavy snow, extremely reduced visibility and grip */
 	Blizzard,
-	/** Dust storm */
+	/** Dust storm - Sand/dust particles, very low visibility */
 	DustStorm,
-	/** Night clear */
+	/** Night clear - Clear skies at night, street lights active */
 	NightClear,
-	/** Night rain */
+	/** Night rain - Rain during nighttime hours */
 	NightRain
 };
 
+// ============================================================================
+// TIME OF DAY ENUMERATION
+// ============================================================================
+
 /**
- * Time of day
+ * @brief Time periods that affect lighting, traffic, and game events
+ *
+ * Each time period has associated lighting presets and can trigger
+ * specific gameplay events. The time system affects:
+ * - Sun position and lighting intensity
+ * - Street light and neon sign activation
+ * - Traffic and pedestrian density
+ * - Available race types
  */
 UENUM(BlueprintType)
 enum class EMGTimeOfDay : uint8
 {
-	/** Dawn (5-7 AM) */
+	/** Dawn (5-7 AM) - Sunrise, golden hour lighting */
 	Dawn,
-	/** Morning (7-10 AM) */
+	/** Morning (7-10 AM) - Bright daylight, moderate traffic */
 	Morning,
-	/** Midday (10 AM - 2 PM) */
+	/** Midday (10 AM - 2 PM) - Peak sunlight, harsh shadows */
 	Midday,
-	/** Afternoon (2-5 PM) */
+	/** Afternoon (2-5 PM) - Warm lighting, increasing traffic */
 	Afternoon,
-	/** Sunset (5-7 PM) */
+	/** Sunset (5-7 PM) - Golden hour, dramatic sky colors */
 	Sunset,
-	/** Evening (7-10 PM) */
+	/** Evening (7-10 PM) - Twilight transitioning to night */
 	Evening,
-	/** Night (10 PM - 5 AM) */
+	/** Night (10 PM - 5 AM) - Full darkness, street racing prime time */
 	Night
 };
 
+// ============================================================================
+// ROAD CONDITION ENUMERATION
+// ============================================================================
+
 /**
- * Road surface condition
+ * @brief Surface conditions affecting tire grip and vehicle handling
+ *
+ * Road conditions are automatically derived from the current weather state
+ * and duration of precipitation. They directly influence:
+ * - Tire grip multipliers
+ * - Braking distances
+ * - Hydroplaning risk at high speeds
+ * - AI driving behavior
  */
 UENUM(BlueprintType)
 enum class EMGRoadCondition : uint8
 {
-	/** Dry road */
+	/** Dry road - Full grip, optimal handling */
 	Dry,
-	/** Damp road */
+	/** Damp road - Slightly wet, minor grip reduction */
 	Damp,
-	/** Wet road */
+	/** Wet road - Moderate grip loss, visible water on surface */
 	Wet,
-	/** Standing water */
+	/** Standing water - Puddles present, high hydroplaning risk */
 	StandingWater,
-	/** Icy road */
+	/** Icy road - Extremely low grip, very dangerous */
 	Icy,
-	/** Snowy road */
+	/** Snowy road - Packed snow, significantly reduced grip */
 	Snowy
 };
 
+// ============================================================================
+// WEATHER INTENSITY STRUCTURE
+// ============================================================================
+
 /**
- * Weather intensity
+ * @brief Normalized intensity values (0-1) for various weather parameters
+ *
+ * These values control the visual and physical intensity of weather effects.
+ * All values are normalized between 0.0 (none) and 1.0 (maximum).
+ * Used for smooth interpolation during weather transitions.
  */
 USTRUCT(BlueprintType)
 struct FMGWeatherIntensity
 {
 	GENERATED_BODY()
 
-	/** Precipitation intensity (0-1) */
+	/// Precipitation intensity: 0 = none, 1 = maximum rain/snow rate
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Precipitation = 0.0f;
 
-	/** Wind intensity (0-1) */
+	/// Wind intensity: 0 = calm, 1 = maximum wind speed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Wind = 0.0f;
 
-	/** Fog density (0-1) */
+	/// Fog density: 0 = clear, 1 = dense fog with minimal visibility
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float FogDensity = 0.0f;
 
-	/** Cloud coverage (0-1) */
+	/// Cloud coverage: 0 = clear sky, 1 = complete overcast
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CloudCoverage = 0.0f;
 
-	/** Lightning frequency (0-1) */
+	/// Lightning frequency: 0 = none, 1 = frequent strikes (thunderstorms only)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float LightningFrequency = 0.0f;
 };
 
+// ============================================================================
+// WEATHER STATE STRUCTURE
+// ============================================================================
+
 /**
- * Weather state data
+ * @brief Complete description of current weather conditions
+ *
+ * This struct represents the full weather state at any given moment,
+ * including type, intensity values, road conditions, and atmospheric data.
+ * Weather states can be interpolated for smooth transitions.
  */
 USTRUCT(BlueprintType)
 struct FMGWeatherState
 {
 	GENERATED_BODY()
 
-	/** Weather type */
+	/// The categorical weather type
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGWeatherType Type = EMGWeatherType::Clear;
 
-	/** Intensity values */
+	/// Normalized intensity values for all weather parameters
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FMGWeatherIntensity Intensity;
 
-	/** Road condition */
+	/// Current road surface condition derived from weather
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGRoadCondition RoadCondition = EMGRoadCondition::Dry;
 
-	/** Temperature (Celsius) */
+	/// Ambient temperature in Celsius (affects ice/snow formation)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Temperature = 20.0f;
 
-	/** Visibility range (meters) */
+	/// Maximum visibility range in meters (affects rendering and AI)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Visibility = 10000.0f;
 
-	/** Wind direction */
+	/// Normalized wind direction vector
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector WindDirection = FVector(1, 0, 0);
 
-	/** Wind speed (m/s) */
+	/// Wind speed in meters per second
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float WindSpeed = 0.0f;
 };
 
+// ============================================================================
+// LIGHTING PRESET STRUCTURE
+// ============================================================================
+
 /**
- * Lighting preset for time of day
+ * @brief Lighting configuration for a specific time of day
+ *
+ * Defines all lighting parameters needed to render a particular time period.
+ * Presets are interpolated during time transitions for smooth day/night cycles.
  */
 USTRUCT(BlueprintType)
 struct FMGLightingPreset
 {
 	GENERATED_BODY()
 
-	/** Sun intensity */
+	/// Directional light (sun/moon) intensity in lux
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SunIntensity = 10.0f;
 
-	/** Sun color */
+	/// Color tint of the directional light
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FLinearColor SunColor = FLinearColor::White;
 
-	/** Sun pitch angle */
+	/// Sun elevation angle in degrees (0 = horizon, 90 = overhead)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SunPitch = 45.0f;
 
-	/** Sky light intensity */
+	/// Sky light ambient intensity
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SkyLightIntensity = 1.0f;
 
-	/** Ambient color */
+	/// Ambient fill light color (shadows and indirect areas)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FLinearColor AmbientColor = FLinearColor(0.05f, 0.05f, 0.1f);
 
-	/** Fog color */
+	/// Atmospheric fog color
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FLinearColor FogColor = FLinearColor(0.5f, 0.6f, 0.7f);
 
-	/** Fog start distance */
+	/// Distance where fog begins to affect visibility (meters)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float FogStartDistance = 500.0f;
 
-	/** Horizon color */
+	/// Color at the horizon line
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FLinearColor HorizonColor = FLinearColor(0.7f, 0.8f, 1.0f);
 };
 
+// ============================================================================
+// WEATHER TRANSITION STRUCTURE
+// ============================================================================
+
 /**
- * Weather transition
+ * @brief Tracks the state of an ongoing weather transition
+ *
+ * When weather changes, this struct manages the interpolation between
+ * the previous and target states over the specified duration.
  */
 USTRUCT(BlueprintType)
 struct FMGWeatherTransition
 {
 	GENERATED_BODY()
 
-	/** From state */
+	/// The weather state being transitioned from
 	UPROPERTY(BlueprintReadOnly)
 	FMGWeatherState FromState;
 
-	/** To state */
+	/// The target weather state being transitioned to
 	UPROPERTY(BlueprintReadOnly)
 	FMGWeatherState ToState;
 
-	/** Transition progress (0-1) */
+	/// Current transition progress: 0 = start, 1 = complete
 	UPROPERTY(BlueprintReadOnly)
 	float Progress = 0.0f;
 
-	/** Transition duration */
+	/// Total transition duration in seconds
 	UPROPERTY(BlueprintReadOnly)
 	float Duration = 30.0f;
 
-	/** Is transitioning */
+	/// True while a transition is actively in progress
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsTransitioning = false;
 };
 
+// ============================================================================
+// WEATHER SCHEDULE STRUCTURE
+// ============================================================================
+
 /**
- * Weather schedule entry
+ * @brief Defines a scheduled weather change at a specific game time
+ *
+ * Used to create weather schedules for races or free roam sessions.
+ * Multiple entries can be combined to create realistic weather patterns.
  */
 USTRUCT(BlueprintType)
 struct FMGWeatherScheduleEntry
 {
 	GENERATED_BODY()
 
-	/** Game time (minutes from midnight) */
+	/// Game time when this weather should begin (minutes from midnight, 0-1440)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 GameTimeMinutes = 0;
 
-	/** Weather type */
+	/// The weather type to transition to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGWeatherType WeatherType = EMGWeatherType::Clear;
 
-	/** Transition duration */
+	/// How long the transition should take in seconds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TransitionDuration = 60.0f;
 };
 
+// ============================================================================
+// TRACK WEATHER SETTINGS STRUCTURE
+// ============================================================================
+
 /**
- * Track weather settings
+ * @brief Per-track weather configuration
+ *
+ * Each race track can define its own weather constraints, including
+ * which weather types are allowed and whether dynamic changes occur.
+ * This allows for weather-appropriate track designs (e.g., no snow on desert tracks).
  */
 USTRUCT(BlueprintType)
 struct FMGTrackWeatherSettings
 {
 	GENERATED_BODY()
 
-	/** Track ID */
+	/// Unique identifier for the track
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName TrackID;
 
-	/** Allowed weather types */
+	/// List of weather types permitted on this track
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<EMGWeatherType> AllowedWeather;
 
-	/** Default weather */
+	/// Weather type used when no specific weather is requested
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGWeatherType DefaultWeather = EMGWeatherType::Clear;
 
-	/** Allow dynamic weather changes */
+	/// If true, weather can change dynamically during a race
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAllowDynamicWeather = true;
 
-	/** Time of day settings */
+	/// Starting time of day for races on this track
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGTimeOfDay DefaultTimeOfDay = EMGTimeOfDay::Midday;
 
-	/** Allow time progression */
+	/// If true, time will advance during gameplay on this track
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAllowTimeProgression = false;
 };
 
+// ============================================================================
+// WEATHER EFFECT CONFIG STRUCTURE
+// ============================================================================
+
 /**
- * Weather effect config
+ * @brief Visual and audio assets for a specific weather type
+ *
+ * Defines all the effects (particles, materials, sounds) needed to
+ * represent a particular weather condition. Each weather type has
+ * its own configuration.
  */
 USTRUCT(BlueprintType)
 struct FMGWeatherEffectConfig
 {
 	GENERATED_BODY()
 
-	/** Particle system for precipitation */
+	/// Niagara system for rain, snow, or other precipitation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraSystem* PrecipitationEffect = nullptr;
 
-	/** Particle spawn rate multiplier */
+	/// Multiplier for particle spawn rate (scales with intensity)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ParticleRateMultiplier = 1.0f;
 
-	/** Ground splash effect */
+	/// Niagara system for rain splashing on ground surfaces
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraSystem* GroundSplashEffect = nullptr;
 
-	/** Windshield effect material */
+	/// Material for rain droplets/effects on vehicle windshield
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* WindshieldMaterial = nullptr;
 
-	/** Post process settings */
+	/// Post-process settings (color grading, blur, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FPostProcessSettings PostProcessSettings;
 
-	/** Ambient sound */
+	/// Looping ambient sound (rain, wind, thunder)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USoundBase* AmbientSound = nullptr;
 
-	/** Ambient sound volume */
+	/// Volume level for ambient sound (0-1)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AmbientVolume = 1.0f;
 };
 
-/**
- * Delegates
- */
+// ============================================================================
+// EVENT DELEGATES
+// ============================================================================
+
+/// Broadcast when weather state changes (after transition completes or instant change)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeatherChanged, const FMGWeatherState&, NewWeather);
+
+/// Broadcast when a weather transition begins
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeatherTransitionStarted, EMGWeatherType, FromType, EMGWeatherType, ToType);
+
+/// Broadcast when a weather transition finishes
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeatherTransitionCompleted, EMGWeatherType, NewType);
+
+/// Broadcast when time of day period changes (e.g., Midday -> Afternoon)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimeOfDayChanged, EMGTimeOfDay, NewTimeOfDay);
+
+/// Broadcast when road surface condition changes
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoadConditionChanged, EMGRoadCondition, NewCondition);
+
+/// Broadcast when a lightning strike occurs (for visual/audio effects)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLightningStrike);
 
+// ============================================================================
+// WEATHER SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Weather Subsystem
- * Manages dynamic weather and time of day
+ * @brief Core subsystem managing dynamic weather and time of day
  *
- * Features:
- * - Multiple weather types
- * - Smooth transitions
- * - Time of day system
- * - Road condition effects
- * - Visual effects integration
- * - Track-specific settings
+ * This World Subsystem provides a centralized interface for all weather
+ * and environmental condition management in Midnight Grind.
+ *
+ * ## Features
+ * - Multiple weather types with smooth transitions
+ * - Time of day system with lighting presets
+ * - Road condition calculations for physics
+ * - Wind simulation for particle effects
+ * - Track-specific weather configurations
+ * - Scheduled weather changes for races
+ * - Unified API for physics and AI integration
+ *
+ * ## Thread Safety
+ * All public methods should be called from the game thread only.
+ *
+ * ## Performance Notes
+ * - Weather transitions are evaluated every tick
+ * - Material parameter updates are batched
+ * - Lightning strikes use cooldown timers
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGWeatherSubsystem : public UWorldSubsystem
@@ -353,128 +513,194 @@ public:
 	// ==========================================
 	// EVENTS
 	// ==========================================
+	/** @name Event Delegates
+	 *  Subscribe to these delegates to respond to weather changes.
+	 *  All events are broadcast on the game thread.
+	 */
+	///@{
 
+	/// Fires when the weather state changes
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnWeatherChanged OnWeatherChanged;
 
+	/// Fires when a weather transition begins
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnWeatherTransitionStarted OnWeatherTransitionStarted;
 
+	/// Fires when a weather transition completes
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnWeatherTransitionCompleted OnWeatherTransitionCompleted;
 
+	/// Fires when time of day period changes
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnTimeOfDayChanged OnTimeOfDayChanged;
 
+	/// Fires when road condition changes
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnRoadConditionChanged OnRoadConditionChanged;
 
+	/// Fires when lightning strikes occur
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnLightningStrike OnLightningStrike;
+
+	///@}
 
 	// ==========================================
 	// WEATHER CONTROL
 	// ==========================================
+	/** @name Weather Control
+	 *  Functions for getting and setting weather conditions.
+	 */
+	///@{
 
-	/** Set weather type with transition */
+	/**
+	 * @brief Initiates a gradual transition to a new weather type
+	 * @param NewWeather The target weather type
+	 * @param TransitionTime Duration of the transition in seconds
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Weather")
 	void SetWeather(EMGWeatherType NewWeather, float TransitionTime = 30.0f);
 
-	/** Set weather instantly */
+	/**
+	 * @brief Immediately changes to a new weather type without transition
+	 * @param NewWeather The weather type to set immediately
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Weather")
 	void SetWeatherInstant(EMGWeatherType NewWeather);
 
-	/** Get current weather state */
+	/// Returns the complete current weather state
 	UFUNCTION(BlueprintPure, Category = "Weather")
 	FMGWeatherState GetCurrentWeather() const { return CurrentWeather; }
 
-	/** Get current weather type */
+	/// Returns just the current weather type enum value
 	UFUNCTION(BlueprintPure, Category = "Weather")
 	EMGWeatherType GetCurrentWeatherType() const { return CurrentWeather.Type; }
 
-	/** Get weather transition */
+	/// Returns the current transition state (check bIsTransitioning)
 	UFUNCTION(BlueprintPure, Category = "Weather")
 	FMGWeatherTransition GetWeatherTransition() const { return WeatherTransition; }
 
-	/** Is weather transitioning */
+	/// Returns true if weather is currently transitioning between states
 	UFUNCTION(BlueprintPure, Category = "Weather")
 	bool IsWeatherTransitioning() const { return WeatherTransition.bIsTransitioning; }
 
-	/** Set weather intensity */
+	/**
+	 * @brief Adjusts the intensity of the current weather
+	 * @param Intensity Normalized value 0-1 affecting precipitation/fog/wind
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Weather")
 	void SetWeatherIntensity(float Intensity);
 
-	/** Get weather intensity (precipitation) */
+	/// Returns current precipitation intensity (0-1)
 	UFUNCTION(BlueprintPure, Category = "Weather")
 	float GetWeatherIntensity() const { return CurrentWeather.Intensity.Precipitation; }
+
+	///@}
 
 	// ==========================================
 	// TIME OF DAY
 	// ==========================================
+	/** @name Time of Day
+	 *  Functions for controlling the game's time system.
+	 *  Time affects lighting, NPC schedules, and available events.
+	 */
+	///@{
 
-	/** Set time of day */
+	/**
+	 * @brief Transitions to a new time of day with smooth lighting change
+	 * @param NewTime The target time period
+	 * @param TransitionTime Duration of the lighting transition in seconds
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Time")
 	void SetTimeOfDay(EMGTimeOfDay NewTime, float TransitionTime = 60.0f);
 
-	/** Set time of day instantly */
+	/**
+	 * @brief Immediately sets time of day without transition
+	 * @param NewTime The time period to set immediately
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Time")
 	void SetTimeOfDayInstant(EMGTimeOfDay NewTime);
 
-	/** Get current time of day */
+	/// Returns the current time period
 	UFUNCTION(BlueprintPure, Category = "Time")
 	EMGTimeOfDay GetTimeOfDay() const { return CurrentTimeOfDay; }
 
-	/** Set game time (0-1440 minutes) */
+	/**
+	 * @brief Sets the exact game time
+	 * @param TimeInMinutes Minutes from midnight (0-1440), wraps at 1440
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Time")
 	void SetGameTime(float TimeInMinutes);
 
-	/** Get game time */
+	/// Returns current game time in minutes from midnight
 	UFUNCTION(BlueprintPure, Category = "Time")
 	float GetGameTime() const { return GameTimeMinutes; }
 
-	/** Get formatted time string */
+	/// Returns time as displayable text (e.g., "10:30 PM")
 	UFUNCTION(BlueprintPure, Category = "Time")
 	FText GetFormattedTime() const;
 
-	/** Set time progression enabled */
+	/// Enables or disables automatic time progression
 	UFUNCTION(BlueprintCallable, Category = "Time")
 	void SetTimeProgressionEnabled(bool bEnabled) { bTimeProgressionEnabled = bEnabled; }
 
-	/** Is time progression enabled */
+	/// Returns true if time is automatically advancing
 	UFUNCTION(BlueprintPure, Category = "Time")
 	bool IsTimeProgressionEnabled() const { return bTimeProgressionEnabled; }
 
-	/** Set time scale (real seconds per game minute) */
+	/**
+	 * @brief Sets how fast game time progresses
+	 * @param SecondsPerGameMinute Real seconds per game minute (1.0 = real-time)
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Time")
 	void SetTimeScale(float SecondsPerGameMinute) { TimeScale = SecondsPerGameMinute; }
+
+	///@}
 
 	// ==========================================
 	// ROAD CONDITIONS
 	// ==========================================
+	/** @name Road Conditions
+	 *  Functions for querying road surface state for physics calculations.
+	 */
+	///@{
 
-	/** Get current road condition */
+	/// Returns the current road surface condition
 	UFUNCTION(BlueprintPure, Category = "Road")
 	EMGRoadCondition GetRoadCondition() const { return CurrentWeather.RoadCondition; }
 
-	/** Get road grip multiplier */
+	/**
+	 * @brief Returns tire grip multiplier based on road condition
+	 * @return Multiplier where 1.0 = full grip, lower = less grip
+	 */
 	UFUNCTION(BlueprintPure, Category = "Road")
 	float GetRoadGripMultiplier() const;
 
-	/** Get hydroplaning risk (0-1) */
+	/**
+	 * @brief Returns hydroplaning risk based on speed and water depth
+	 * @return Risk factor 0-1, where 1.0 = certain hydroplaning
+	 */
 	UFUNCTION(BlueprintPure, Category = "Road")
 	float GetHydroplaningRisk() const;
 
-	/** Get visibility distance */
+	/// Returns maximum visibility distance in meters
 	UFUNCTION(BlueprintPure, Category = "Road")
 	float GetVisibilityDistance() const { return CurrentWeather.Visibility; }
+
+	///@}
 
 	// ==========================================
 	// UNIFIED WEATHER API
 	// ==========================================
-	// These functions provide a single source of truth for weather effects,
-	// combining base weather state with racing-specific effects (aquaplaning,
-	// puddles, fog density, etc.) when MGWeatherRacingSubsystem is active.
-	// Use these functions for vehicle physics and AI calculations.
+	/**
+	 * @name Unified Weather API
+	 * These functions provide a single source of truth for weather effects,
+	 * combining base weather state with racing-specific effects (aquaplaning,
+	 * puddles, fog density, etc.) when MGWeatherRacingSubsystem is active.
+	 *
+	 * **Use these functions for vehicle physics and AI calculations.**
+	 */
+	///@{
 
 	/**
 	 * @brief Get unified grip multiplier combining all weather effects
@@ -534,113 +760,151 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Weather|Unified")
 	int32 GetWeatherDifficultyRating() const;
 
+	///@}
+
 	// ==========================================
 	// WIND
 	// ==========================================
+	/** @name Wind
+	 *  Functions for querying wind conditions (affects particles and high-profile vehicles).
+	 */
+	///@{
 
-	/** Get wind direction */
+	/// Returns normalized wind direction vector
 	UFUNCTION(BlueprintPure, Category = "Wind")
 	FVector GetWindDirection() const { return CurrentWeather.WindDirection; }
 
-	/** Get wind speed */
+	/// Returns wind speed in meters per second
 	UFUNCTION(BlueprintPure, Category = "Wind")
 	float GetWindSpeed() const { return CurrentWeather.WindSpeed; }
 
-	/** Get wind force vector */
+	/// Returns wind as a force vector (direction * speed)
 	UFUNCTION(BlueprintPure, Category = "Wind")
 	FVector GetWindForce() const { return CurrentWeather.WindDirection * CurrentWeather.WindSpeed; }
+
+	///@}
 
 	// ==========================================
 	// TRACK SETTINGS
 	// ==========================================
+	/** @name Track Settings
+	 *  Functions for managing track-specific weather configurations.
+	 */
+	///@{
 
-	/** Set track weather settings */
+	/**
+	 * @brief Applies weather settings for a specific track
+	 * @param Settings The track's weather configuration
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Track")
 	void SetTrackWeatherSettings(const FMGTrackWeatherSettings& Settings);
 
-	/** Get track weather settings */
+	/// Returns current track weather settings
 	UFUNCTION(BlueprintPure, Category = "Track")
 	FMGTrackWeatherSettings GetTrackWeatherSettings() const { return TrackSettings; }
 
-	/** Apply track default weather */
+	/// Resets weather to track's default settings
 	UFUNCTION(BlueprintCallable, Category = "Track")
 	void ApplyTrackDefaults();
+
+	///@}
 
 	// ==========================================
 	// WEATHER SCHEDULE
 	// ==========================================
+	/** @name Weather Schedule
+	 *  Functions for managing timed weather sequences.
+	 */
+	///@{
 
-	/** Set weather schedule */
+	/**
+	 * @brief Sets up a weather schedule for automatic changes
+	 * @param Schedule Array of scheduled weather entries
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Schedule")
 	void SetWeatherSchedule(const TArray<FMGWeatherScheduleEntry>& Schedule);
 
-	/** Clear weather schedule */
+	/// Removes all scheduled weather changes
 	UFUNCTION(BlueprintCallable, Category = "Schedule")
 	void ClearWeatherSchedule();
 
-	/** Enable scheduled weather */
+	/// Enables or disables scheduled weather system
 	UFUNCTION(BlueprintCallable, Category = "Schedule")
 	void SetScheduledWeatherEnabled(bool bEnabled) { bScheduledWeatherEnabled = bEnabled; }
+
+	///@}
 
 	// ==========================================
 	// UTILITY
 	// ==========================================
+	/** @name Utility Functions
+	 *  Static helper functions for weather-related operations.
+	 */
+	///@{
 
-	/** Get weather display name */
+	/// Returns localized display name for a weather type
 	UFUNCTION(BlueprintPure, Category = "Utility")
 	static FText GetWeatherDisplayName(EMGWeatherType Type);
 
-	/** Get time of day display name */
+	/// Returns localized display name for a time of day
 	UFUNCTION(BlueprintPure, Category = "Utility")
 	static FText GetTimeOfDayDisplayName(EMGTimeOfDay Time);
 
-	/** Get road condition display name */
+	/// Returns localized display name for a road condition
 	UFUNCTION(BlueprintPure, Category = "Utility")
 	static FText GetRoadConditionDisplayName(EMGRoadCondition Condition);
 
-	/** Is precipitation weather */
+	/// Returns true if the weather type includes precipitation
 	UFUNCTION(BlueprintPure, Category = "Utility")
 	static bool IsPrecipitationWeather(EMGWeatherType Type);
 
-	/** Get default state for weather type */
+	/// Returns default weather state values for a weather type
 	UFUNCTION(BlueprintPure, Category = "Utility")
 	static FMGWeatherState GetDefaultWeatherState(EMGWeatherType Type);
 
-	/** Get default lighting for time of day */
+	/// Returns default lighting preset for a time of day
 	UFUNCTION(BlueprintPure, Category = "Utility")
 	static FMGLightingPreset GetDefaultLighting(EMGTimeOfDay Time);
+
+	///@}
 
 protected:
 	// ==========================================
 	// CURRENT STATE
 	// ==========================================
+	/** @name State Variables
+	 *  Internal state tracking for weather and time systems.
+	 */
+	///@{
 
-	/** Current weather state */
+	/// Active weather state being rendered
 	UPROPERTY()
 	FMGWeatherState CurrentWeather;
 
-	/** Weather transition data */
+	/// Transition state (valid when bIsTransitioning is true)
 	UPROPERTY()
 	FMGWeatherTransition WeatherTransition;
 
-	/** Current time of day */
+	/// Current time period
 	UPROPERTY()
 	EMGTimeOfDay CurrentTimeOfDay = EMGTimeOfDay::Midday;
 
-	/** Game time in minutes (0-1440) */
+	/// Precise game time in minutes (0-1440), wraps at midnight
 	float GameTimeMinutes = 720.0f; // Noon
 
-	/** Time progression enabled */
+	/// Whether time automatically advances
 	bool bTimeProgressionEnabled = false;
 
-	/** Time scale (real seconds per game minute) */
+	/// Real seconds per game minute (affects time progression speed)
 	float TimeScale = 1.0f;
+
+	///@}
 
 	// ==========================================
 	// TRACK SETTINGS
 	// ==========================================
 
-	/** Current track settings */
+	/// Current track's weather configuration
 	UPROPERTY()
 	FMGTrackWeatherSettings TrackSettings;
 
@@ -648,103 +912,127 @@ protected:
 	// SCHEDULE
 	// ==========================================
 
-	/** Weather schedule */
+	/// List of scheduled weather changes
 	UPROPERTY()
 	TArray<FMGWeatherScheduleEntry> WeatherSchedule;
 
-	/** Scheduled weather enabled */
+	/// Whether scheduled weather system is active
 	bool bScheduledWeatherEnabled = false;
 
 	// ==========================================
 	// LIGHTING
 	// ==========================================
+	/** @name Lighting State
+	 *  Variables for lighting transition management.
+	 */
+	///@{
 
-	/** Current lighting preset */
+	/// Current applied lighting values
 	FMGLightingPreset CurrentLighting;
 
-	/** Target lighting preset */
+	/// Lighting values being transitioned to
 	FMGLightingPreset TargetLighting;
 
-	/** Lighting transition progress */
+	/// Lighting transition progress (0-1)
 	float LightingTransitionProgress = 1.0f;
 
-	/** Lighting transition duration */
+	/// Duration of current lighting transition
 	float LightingTransitionDuration = 60.0f;
+
+	///@}
 
 	// ==========================================
 	// LIGHTNING
 	// ==========================================
+	/** @name Lightning State
+	 *  Variables for thunderstorm lightning effects.
+	 */
+	///@{
 
-	/** Time until next lightning */
+	/// Countdown to next lightning strike (seconds)
 	float NextLightningTime = 0.0f;
 
-	/** Lightning cooldown */
+	/// Minimum time between lightning strikes
 	float LightningCooldown = 5.0f;
+
+	///@}
 
 	// ==========================================
 	// EFFECT REFERENCES
 	// ==========================================
+	/** @name Scene References
+	 *  Cached references to world actors/components for weather effects.
+	 */
+	///@{
 
-	/** Material parameter collection */
+	/// Material parameter collection for weather shader values
 	UPROPERTY()
 	UMaterialParameterCollection* WeatherMPC;
 
-	/** Sun light reference */
+	/// Reference to the main directional light (sun)
 	UPROPERTY()
 	ADirectionalLight* SunLight;
 
-	/** Cached reference to racing subsystem (optional, may be null) */
+	/// Optional racing subsystem for advanced effects (aquaplaning, etc.)
 	mutable TWeakObjectPtr<UMGWeatherRacingSubsystem> CachedRacingSubsystem;
 
-	/** Whether we've attempted to find the racing subsystem */
+	/// Flag to avoid repeated failed lookups
 	mutable bool bRacingSubsystemSearched = false;
+
+	///@}
 
 	// ==========================================
 	// INTERNAL
 	// ==========================================
+	/** @name Internal Methods
+	 *  Private implementation methods for weather system updates.
+	 */
+	///@{
 
-	/** Update weather transition */
+	/// Advances weather transition and applies interpolated state
 	void UpdateWeatherTransition(float DeltaTime);
 
-	/** Update time progression */
+	/// Advances game time and checks for period changes
 	void UpdateTimeProgression(float DeltaTime);
 
-	/** Update lighting transition */
+	/// Advances lighting transition and applies interpolated values
 	void UpdateLightingTransition(float DeltaTime);
 
-	/** Update weather schedule */
+	/// Checks schedule and triggers weather changes if needed
 	void UpdateWeatherSchedule();
 
-	/** Update road condition based on weather */
+	/// Calculates road condition from current weather state
 	void UpdateRoadCondition();
 
-	/** Update lightning */
+	/// Manages lightning strike timing during thunderstorms
 	void UpdateLightning(float DeltaTime);
 
-	/** Apply weather state */
+	/// Applies a complete weather state to all systems
 	void ApplyWeatherState(const FMGWeatherState& State);
 
-	/** Apply lighting preset */
+	/// Applies a lighting preset to scene lights
 	void ApplyLightingPreset(const FMGLightingPreset& Preset);
 
-	/** Blend weather states */
+	/// Interpolates between two weather states
 	FMGWeatherState BlendWeatherStates(const FMGWeatherState& A, const FMGWeatherState& B, float Alpha);
 
-	/** Blend lighting presets */
+	/// Interpolates between two lighting presets
 	FMGLightingPreset BlendLightingPresets(const FMGLightingPreset& A, const FMGLightingPreset& B, float Alpha);
 
-	/** Get time of day from game time */
+	/// Converts game time to time of day period
 	EMGTimeOfDay GetTimeOfDayFromGameTime(float TimeMinutes) const;
 
-	/** Trigger lightning strike */
+	/// Executes a lightning strike effect
 	void TriggerLightningStrike();
 
-	/** Find scene references */
+	/// Finds and caches references to scene actors
 	void FindSceneReferences();
 
-	/** Update material parameters */
+	/// Updates material parameter collection with current weather values
 	void UpdateMaterialParameters();
 
-	/** Get racing subsystem if available (lazy initialization) */
+	/// Lazy getter for optional racing subsystem
 	UMGWeatherRacingSubsystem* GetRacingSubsystem() const;
+
+	///@}
 };

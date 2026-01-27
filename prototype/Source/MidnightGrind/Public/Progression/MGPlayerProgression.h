@@ -111,29 +111,43 @@ enum class EMGUnlockType : uint8
 	Feature		///< Game feature unlock (tuning shop, pink slips, etc.)
 };
 
+// =============================================================================
+// STRUCTURES - Unlock System
+// =============================================================================
+
 /**
- * A single unlock entry
+ * @brief Represents a single piece of content that has been unlocked
+ *
+ * This struct is created when a player earns a new unlock and is stored
+ * in their progression data. It contains both identification data and
+ * display metadata for UI presentation.
  */
 USTRUCT(BlueprintType)
 struct FMGUnlock
 {
 	GENERATED_BODY()
 
+	/** Unique identifier for this unlock, used for lookups and persistence */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Unlock")
 	FName UnlockID;
 
+	/** Category of unlock for filtering and routing */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Unlock")
 	EMGUnlockType Type = EMGUnlockType::Vehicle;
 
+	/** Localized name shown in unlock notifications */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Unlock")
 	FText DisplayName;
 
+	/** Localized description for unlock details screen */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Unlock")
 	FText Description;
 
+	/** Icon texture for UI display (soft reference for lazy loading) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Unlock")
 	TSoftObjectPtr<UTexture2D> Icon;
 
+	/** Timestamp when unlock was acquired (for sorting/display) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Unlock")
 	FDateTime UnlockedAt;
 
@@ -144,136 +158,210 @@ struct FMGUnlock
 };
 
 /**
- * Unlock requirement
+ * @brief Defines the conditions required to unlock content
+ *
+ * Unlock requirements can combine multiple conditions (AND logic).
+ * All specified requirements must be met for the unlock to trigger.
+ * Zero/None values are ignored (not required).
+ *
+ * @note Requirements are evaluated in CheckAndGrantNewUnlocks() which
+ *       should be called after any progression-affecting action.
  */
 USTRUCT(BlueprintType)
 struct FMGUnlockRequirement
 {
 	GENERATED_BODY()
 
-	/** Unique ID of the unlock */
+	// --- Identification ---
+
+	/** Unique ID of the content this requirement unlocks */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	FName UnlockID;
 
-	/** Type of unlock */
+	/** Type of unlock for routing */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	EMGUnlockType Type = EMGUnlockType::Vehicle;
 
-	/** Display name */
+	/** Display name for UI */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	FText DisplayName;
 
-	/** Required player level */
+	// --- Level Requirements ---
+
+	/** Minimum player level required (0 = no requirement) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	int32 RequiredLevel = 0;
 
-	/** Required reputation with specific crew */
+	// --- Crew Requirements ---
+
+	/** Specific crew reputation required (None = any/no crew needed) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	EMGCrew RequiredCrew = EMGCrew::None;
 
+	/** Minimum reputation points with RequiredCrew */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	int32 RequiredCrewReputation = 0;
 
-	/** Required total wins */
+	// --- Race Requirements ---
+
+	/** Total race wins needed across all modes */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	int32 RequiredWins = 0;
 
-	/** Required races completed */
+	/** Total races completed (win or lose) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	int32 RequiredRaces = 0;
 
-	/** Specific race/event that must be won */
+	/** Specific race/event that must be won (empty = no specific race) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	FName RequiredRaceID;
 
-	/** Other unlocks that must be acquired first */
+	// --- Prerequisite Requirements ---
+
+	/** Other unlocks that must be acquired first (dependency chain) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Requirement")
 	TArray<FName> RequiredUnlocks;
 };
 
+// =============================================================================
+// STRUCTURES - Reputation System
+// =============================================================================
+
 /**
- * Reputation with a single crew
+ * @brief Player's standing with a single racing crew
+ *
+ * Tracks both the raw reputation points and derived tier, along with
+ * crew-specific statistics. This data determines access to crew content
+ * and is displayed on the player's profile.
  */
 USTRUCT(BlueprintType)
 struct FMGCrewReputation
 {
 	GENERATED_BODY()
 
+	/** Which crew this reputation is for */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	EMGCrew Crew = EMGCrew::None;
 
+	/** Raw reputation points (determines tier) */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 ReputationPoints = 0;
 
+	/** Calculated tier based on ReputationPoints thresholds */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	EMGReputationTier Tier = EMGReputationTier::Unknown;
 
+	/** Total races completed for this crew */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 RacesForCrew = 0;
 
+	/** Total races won for this crew */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 WinsForCrew = 0;
 };
 
+// =============================================================================
+// STRUCTURES - Statistics Tracking
+// =============================================================================
+
 /**
- * Race statistics
+ * @brief Comprehensive racing statistics for a player
+ *
+ * Tracks lifetime statistics across all race types and gameplay activities.
+ * Used for achievements, leaderboards, and player profile display.
+ * All fields are marked SaveGame for automatic persistence.
  */
 USTRUCT(BlueprintType)
 struct FMGRaceStatistics
 {
 	GENERATED_BODY()
 
+	// --- Core Race Stats ---
+
+	/** Total number of races started */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 TotalRaces = 0;
 
+	/** Total first-place finishes */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 TotalWins = 0;
 
+	/** Top-3 finishes (includes wins) */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 TotalPodiums = 0;
 
+	// --- Pink Slip Stats (High-Stakes) ---
+
+	/** Vehicles won in pink slip races */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 PinkSlipWins = 0;
 
+	/** Vehicles lost in pink slip races */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 PinkSlipLosses = 0;
 
+	// --- Race Type Breakdown ---
+
+	/** Multi-lap closed circuit races */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 CircuitRaces = 0;
 
+	/** Point-to-point sprint races */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 SprintRaces = 0;
 
+	/** Drift scoring events */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 DriftEvents = 0;
 
+	/** Quarter-mile drag races */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 DragRaces = 0;
 
+	/** Solo time attack runs */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 TimeTrials = 0;
 
+	// --- Performance Records ---
+
+	/** Cumulative distance across all sessions */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	float TotalDistanceDrivenKm = 0.0f;
 
+	/** Personal best top speed (any vehicle) */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	float TopSpeedAchievedMPH = 0.0f;
 
+	/** Best single drift chain score */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	float BestDriftScore = 0.0f;
 
+	/** Cumulative drift points earned */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	float TotalDriftScore = 0.0f;
 
+	// --- Skill Metrics ---
+
+	/** Laps completed without wall contact or leaving track */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 PerfectLaps = 0;
 
+	/** Close passes with traffic/opponents without collision */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	int32 NearMisses = 0;
 
+	// --- Time Tracking ---
+
+	/** Total time spent in races and free roam */
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	FTimespan TotalPlayTime;
 
+	// --- Utility Functions ---
+
+	/**
+	 * @brief Calculate win percentage
+	 * @return Win rate as 0.0-1.0 (multiply by 100 for percentage)
+	 */
 	float GetWinRate() const
 	{
 		return TotalRaces > 0 ? (float)TotalWins / (float)TotalRaces : 0.0f;

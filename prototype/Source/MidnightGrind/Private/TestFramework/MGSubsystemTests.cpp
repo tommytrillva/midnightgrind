@@ -3480,6 +3480,403 @@ FMGTestResult UMGSubsystemTests::TestStress_RapidStateChanges()
 }
 
 // ==========================================
+// UI DATA TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestUIData_HUDDataDefaults()
+{
+	LogTestStart(TEXT("TestUIData_HUDDataDefaults"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Create default HUD data structure
+	FMGRaceHUDData HUDData;
+
+	// Verify default values are sensible
+	Logs.Add(FString::Printf(TEXT("Speed: %.1f"), HUDData.Speed));
+	Logs.Add(FString::Printf(TEXT("CurrentGear: %d"), HUDData.CurrentGear));
+	Logs.Add(FString::Printf(TEXT("MaxGear: %d"), HUDData.MaxGear));
+	Logs.Add(FString::Printf(TEXT("MaxRPM: %.0f"), HUDData.MaxRPM));
+	Logs.Add(FString::Printf(TEXT("Position: %d/%d"), HUDData.Position, HUDData.TotalRacers));
+	Logs.Add(FString::Printf(TEXT("Lap: %d/%d"), HUDData.CurrentLap, HUDData.TotalLaps));
+
+	// Speed should start at 0
+	if (HUDData.Speed != 0.0f)
+	{
+		Logs.Add(TEXT("FAIL: Default speed should be 0"));
+		bAllPassed = false;
+	}
+
+	// Gear should be 0 (neutral)
+	if (HUDData.CurrentGear != 0)
+	{
+		Logs.Add(TEXT("FAIL: Default gear should be 0 (neutral)"));
+		bAllPassed = false;
+	}
+
+	// MaxGear should be reasonable (4-8)
+	if (HUDData.MaxGear < 4 || HUDData.MaxGear > 10)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: MaxGear %d out of expected range (4-10)"), HUDData.MaxGear));
+		bAllPassed = false;
+	}
+
+	// MaxRPM should be reasonable (6000-12000)
+	if (HUDData.MaxRPM < 6000.0f || HUDData.MaxRPM > 12000.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: MaxRPM %.0f out of expected range (6000-12000)"), HUDData.MaxRPM));
+		bAllPassed = false;
+	}
+
+	// Position should be 1
+	if (HUDData.Position < 1)
+	{
+		Logs.Add(TEXT("FAIL: Default position should be >= 1"));
+		bAllPassed = false;
+	}
+
+	// NOSAmount should be full (1.0)
+	if (HUDData.NOSAmount != 1.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Default NOS should be 1.0, got %.2f"), HUDData.NOSAmount));
+		bAllPassed = false;
+	}
+
+	// Booleans should default to false
+	if (HUDData.bNOSActive || HUDData.bInRedline || HUDData.bIsDrifting || HUDData.bInPursuit)
+	{
+		Logs.Add(TEXT("FAIL: Boolean flags should default to false"));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_UIData_HUDDataDefaults")),
+			TEXT("HUD data defaults have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_UIData_HUDDataDefaults")),
+		TEXT("All HUD data defaults are valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestUIData_RaceStatusDefaults()
+{
+	LogTestStart(TEXT("TestUIData_RaceStatusDefaults"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Create default race status structure
+	FMGRaceStatus RaceStatus;
+
+	Logs.Add(FString::Printf(TEXT("Position: %d/%d"), RaceStatus.CurrentPosition, RaceStatus.TotalRacers));
+	Logs.Add(FString::Printf(TEXT("Lap: %d/%d"), RaceStatus.CurrentLap, RaceStatus.TotalLaps));
+	Logs.Add(FString::Printf(TEXT("CurrentLapTime: %.2f"), RaceStatus.CurrentLapTime));
+	Logs.Add(FString::Printf(TEXT("BestLapTime: %.2f"), RaceStatus.BestLapTime));
+	Logs.Add(FString::Printf(TEXT("RaceProgress: %.2f"), RaceStatus.RaceProgress));
+
+	// Position should be 1
+	if (RaceStatus.CurrentPosition != 1)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Default position should be 1, got %d"), RaceStatus.CurrentPosition));
+		bAllPassed = false;
+	}
+
+	// Total racers should be reasonable (1-16)
+	if (RaceStatus.TotalRacers < 1 || RaceStatus.TotalRacers > 16)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: TotalRacers %d out of expected range (1-16)"), RaceStatus.TotalRacers));
+		bAllPassed = false;
+	}
+
+	// Current lap should be 1
+	if (RaceStatus.CurrentLap != 1)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Default lap should be 1, got %d"), RaceStatus.CurrentLap));
+		bAllPassed = false;
+	}
+
+	// Total laps should be reasonable (1-99)
+	if (RaceStatus.TotalLaps < 1 || RaceStatus.TotalLaps > 99)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: TotalLaps %d out of expected range (1-99)"), RaceStatus.TotalLaps));
+		bAllPassed = false;
+	}
+
+	// Times should start at 0
+	if (RaceStatus.CurrentLapTime != 0.0f || RaceStatus.TotalRaceTime != 0.0f)
+	{
+		Logs.Add(TEXT("FAIL: Default times should be 0"));
+		bAllPassed = false;
+	}
+
+	// Progress should be 0
+	if (RaceStatus.RaceProgress != 0.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Default progress should be 0, got %.2f"), RaceStatus.RaceProgress));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_UIData_RaceStatusDefaults")),
+			TEXT("Race status defaults have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_UIData_RaceStatusDefaults")),
+		TEXT("All race status defaults are valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestUIData_TelemetryDefaults()
+{
+	LogTestStart(TEXT("TestUIData_TelemetryDefaults"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Create default telemetry structure
+	FMGVehicleTelemetry Telemetry;
+
+	Logs.Add(FString::Printf(TEXT("SpeedKPH: %.1f"), Telemetry.SpeedKPH));
+	Logs.Add(FString::Printf(TEXT("SpeedMPH: %.1f"), Telemetry.SpeedMPH));
+	Logs.Add(FString::Printf(TEXT("RPM: %.0f"), Telemetry.RPM));
+	Logs.Add(FString::Printf(TEXT("MaxRPM: %.0f"), Telemetry.MaxRPM));
+	Logs.Add(FString::Printf(TEXT("CurrentGear: %d"), Telemetry.CurrentGear));
+	Logs.Add(FString::Printf(TEXT("TotalGears: %d"), Telemetry.TotalGears));
+
+	// Speeds should start at 0
+	if (Telemetry.SpeedKPH != 0.0f || Telemetry.SpeedMPH != 0.0f)
+	{
+		Logs.Add(TEXT("FAIL: Default speeds should be 0"));
+		bAllPassed = false;
+	}
+
+	// RPM should start at 0
+	if (Telemetry.RPM != 0.0f)
+	{
+		Logs.Add(TEXT("FAIL: Default RPM should be 0"));
+		bAllPassed = false;
+	}
+
+	// MaxRPM should be reasonable
+	if (Telemetry.MaxRPM < 6000.0f || Telemetry.MaxRPM > 12000.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: MaxRPM %.0f out of expected range"), Telemetry.MaxRPM));
+		bAllPassed = false;
+	}
+
+	// Current gear should be 1 (first)
+	if (Telemetry.CurrentGear < 0 || Telemetry.CurrentGear > 8)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: CurrentGear %d out of expected range (0-8)"), Telemetry.CurrentGear));
+		bAllPassed = false;
+	}
+
+	// Total gears should be reasonable (4-8)
+	if (Telemetry.TotalGears < 4 || Telemetry.TotalGears > 10)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: TotalGears %d out of expected range (4-10)"), Telemetry.TotalGears));
+		bAllPassed = false;
+	}
+
+	// Input values should be 0
+	if (Telemetry.ThrottlePosition != 0.0f || Telemetry.BrakePosition != 0.0f || Telemetry.SteeringAngle != 0.0f)
+	{
+		Logs.Add(TEXT("FAIL: Default inputs should be 0"));
+		bAllPassed = false;
+	}
+
+	// NOS should be full
+	if (Telemetry.NOSAmount != 1.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Default NOS should be 1.0, got %.2f"), Telemetry.NOSAmount));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_UIData_TelemetryDefaults")),
+			TEXT("Telemetry defaults have issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_UIData_TelemetryDefaults")),
+		TEXT("All telemetry defaults are valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestUIData_HUDModes()
+{
+	LogTestStart(TEXT("TestUIData_HUDModes"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test all HUD modes exist and are distinct
+	TArray<EMGHUDMode> Modes = {
+		EMGHUDMode::Full,
+		EMGHUDMode::Minimal,
+		EMGHUDMode::Hidden,
+		EMGHUDMode::PhotoMode,
+		EMGHUDMode::Replay
+	};
+
+	Logs.Add(FString::Printf(TEXT("Total HUD modes: %d"), Modes.Num()));
+
+	// Verify we have expected number of modes
+	if (Modes.Num() != 5)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Expected 5 HUD modes, found %d"), Modes.Num()));
+		bAllPassed = false;
+	}
+
+	// Verify modes are distinct
+	TSet<uint8> UniqueValues;
+	for (EMGHUDMode Mode : Modes)
+	{
+		uint8 Value = static_cast<uint8>(Mode);
+		if (UniqueValues.Contains(Value))
+		{
+			Logs.Add(FString::Printf(TEXT("FAIL: Duplicate HUD mode value: %d"), Value));
+			bAllPassed = false;
+		}
+		UniqueValues.Add(Value);
+		Logs.Add(FString::Printf(TEXT("  Mode %d: value %d"), UniqueValues.Num() - 1, Value));
+	}
+
+	// Test speed display modes
+	TArray<EMGSpeedDisplayMode> SpeedModes = {
+		EMGSpeedDisplayMode::KPH,
+		EMGSpeedDisplayMode::MPH
+	};
+
+	Logs.Add(FString::Printf(TEXT("Total speed display modes: %d"), SpeedModes.Num()));
+
+	if (SpeedModes.Num() != 2)
+	{
+		Logs.Add(FString::Printf(TEXT("FAIL: Expected 2 speed display modes, found %d"), SpeedModes.Num()));
+		bAllPassed = false;
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_UIData_HUDModes")),
+			TEXT("HUD mode enumeration issues"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_UIData_HUDModes")),
+		FString::Printf(TEXT("All %d HUD modes and %d speed modes validated"), Modes.Num(), SpeedModes.Num())
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestUIData_DataProvider()
+{
+	LogTestStart(TEXT("TestUIData_DataProvider"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_UIData_DataProvider")),
+			TEXT("GameInstance not found"),
+			{TEXT("Cannot access GameInstance")}
+		);
+	}
+
+	UMGHUDDataProvider* DataProvider = GameInstance->GetSubsystem<UMGHUDDataProvider>();
+	if (!DataProvider)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_UIData_DataProvider")),
+			TEXT("HUD Data Provider not found"),
+			{TEXT("GetSubsystem<UMGHUDDataProvider> returned nullptr")}
+		);
+	}
+
+	Logs.Add(TEXT("HUD Data Provider found"));
+
+	// Test getting HUD data
+	FMGRaceHUDData HUDData = DataProvider->GetRaceHUDData();
+	Logs.Add(FString::Printf(TEXT("HUD Speed: %.1f"), HUDData.Speed));
+	Logs.Add(FString::Printf(TEXT("HUD Position: %d"), HUDData.Position));
+
+	// Test getting minimap data
+	FMGMinimapData MinimapData = DataProvider->GetMinimapData();
+	Logs.Add(FString::Printf(TEXT("Minimap scale: %.2f"), MinimapData.MapScale));
+
+	// Test speed display mode
+	EMGSpeedDisplayMode SpeedMode = DataProvider->GetSpeedDisplayMode();
+	Logs.Add(FString::Printf(TEXT("Speed mode: %d"), static_cast<int32>(SpeedMode)));
+
+	// Test formatting functions
+	FText FormattedSpeed = DataProvider->GetFormattedSpeed();
+	if (FormattedSpeed.IsEmpty())
+	{
+		Logs.Add(TEXT("WARNING: GetFormattedSpeed returned empty text"));
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("Formatted speed: %s"), *FormattedSpeed.ToString()));
+	}
+
+	FText FormattedPosition = DataProvider->GetFormattedPosition(1);
+	if (FormattedPosition.IsEmpty())
+	{
+		Logs.Add(TEXT("WARNING: GetFormattedPosition returned empty text"));
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("Formatted position: %s"), *FormattedPosition.ToString()));
+	}
+
+	// Test lap time formatting
+	FText FormattedLapTime = DataProvider->GetFormattedLapTime(65.5f);
+	if (FormattedLapTime.IsEmpty())
+	{
+		Logs.Add(TEXT("WARNING: GetFormattedLapTime returned empty text"));
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("Formatted lap time (65.5s): %s"), *FormattedLapTime.ToString()));
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_UIData_DataProvider")),
+			TEXT("Data provider issues found"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_UIData_DataProvider")),
+		TEXT("HUD Data Provider functioning correctly")
+	);
+}
+
+// ==========================================
 // CONSOLE COMMANDS
 // ==========================================
 

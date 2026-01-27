@@ -1,5 +1,35 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGEsportsSubsystem.h
+ * @brief Core esports and professional tournament support subsystem for Midnight Grind.
+ *
+ * This subsystem provides the foundation for professional competitive play and esports
+ * production in Midnight Grind. It handles the complete tournament lifecycle from
+ * bracket generation to match completion, along with broadcast-quality production tools.
+ *
+ * Key Features:
+ * - Tournament bracket management (Single/Double Elimination, Round Robin, Swiss)
+ * - Professional caster tools with live stat overlays
+ * - Auto-director system for intelligent camera work
+ * - Instant replay capture and playback
+ * - Match history and VOD management
+ *
+ * Usage Example:
+ * @code
+ *     // Create and start a tournament
+ *     UMGEsportsSubsystem* Esports = GetGameInstance()->GetSubsystem<UMGEsportsSubsystem>();
+ *     FMGTournamentInfo TournamentInfo;
+ *     TournamentInfo.TournamentName = FText::FromString("Midnight Championship");
+ *     TournamentInfo.Format = EMGTournamentFormat::DoubleElimination;
+ *     Esports->CreateTournament(TournamentInfo);
+ * @endcode
+ *
+ * @note This is a GameInstanceSubsystem - it persists across level transitions.
+ * @see UMGBroadcastSubsystem for additional broadcast production features
+ * @see UMGCasterToolsSubsystem for in-depth caster camera controls
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -16,391 +46,725 @@
  * - Match history and vods
  */
 
+//=============================================================================
+// Enums - Tournament and Match Configuration
+//=============================================================================
+
+/**
+ * @brief Tournament bracket formats supported by the esports system.
+ *
+ * Different tournament formats suit different competitive scenarios:
+ * - SingleElimination: Fast, high-stakes (one loss = elimination)
+ * - DoubleElimination: More forgiving (two losses required to eliminate)
+ * - RoundRobin: Everyone plays everyone (best for small groups)
+ * - Swiss: Efficient pairing system for large player pools
+ */
 UENUM(BlueprintType)
 enum class EMGTournamentFormat : uint8
 {
-	SingleElimination,
-	DoubleElimination,
-	RoundRobin,
-	Swiss,
-	Custom
+	SingleElimination,   ///< One loss eliminates a player/team
+	DoubleElimination,   ///< Players move to losers bracket on first loss
+	RoundRobin,          ///< Every participant plays every other participant
+	Swiss,               ///< Pairing system based on similar win/loss records
+	Custom               ///< Custom bracket structure defined externally
 };
 
+/**
+ * @brief Current state of a tournament match.
+ *
+ * Matches progress through these states in order during normal operation.
+ * The Cancelled state is used when a match cannot proceed (e.g., player no-show).
+ */
 UENUM(BlueprintType)
 enum class EMGMatchState : uint8
 {
-	Scheduled,
-	Lobby,
-	InProgress,
-	Completed,
-	Cancelled
+	Scheduled,    ///< Match is planned but not yet started
+	Lobby,        ///< Players are in the pre-race lobby
+	InProgress,   ///< Match is currently being played
+	Completed,    ///< Match has finished with a winner
+	Cancelled     ///< Match was cancelled (forfeit, technical issues, etc.)
 };
 
+/**
+ * @brief Auto-director camera behavior modes for broadcast production.
+ *
+ * The auto-director automatically selects which player to focus on during races.
+ * Each mode prioritizes different types of action for the broadcast feed.
+ */
 UENUM(BlueprintType)
 enum class EMGAutoDirectorMode : uint8
 {
-	Disabled,
-	BattlesFocus,    // Focus on close battles
-	LeaderFocus,     // Focus on race leader
-	DramaFocus,      // Follow interesting storylines
-	Balanced         // Mix of everything
+	Disabled,      ///< Manual camera control only
+	BattlesFocus,  ///< Prioritize close racing battles between players
+	LeaderFocus,   ///< Keep camera on the race leader
+	DramaFocus,    ///< Follow developing storylines (comebacks, rivalries)
+	Balanced       ///< Mix of battle, leader, and drama coverage
 };
 
+//=============================================================================
+// Structs - Tournament Data Containers
+//=============================================================================
+
+/**
+ * @brief Complete information about a tournament.
+ *
+ * Contains all metadata needed to describe and manage a tournament, including
+ * format, participant limits, scheduling, and prize information.
+ */
 USTRUCT(BlueprintType)
 struct FMGTournamentInfo
 {
 	GENERATED_BODY()
 
+	/// Unique identifier for this tournament (used for lookups and networking)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString TournamentID;
 
+	/// Human-readable tournament name displayed in UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText TournamentName;
 
+	/// Bracket format determining how matches are structured
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGTournamentFormat Format = EMGTournamentFormat::SingleElimination;
 
+	/// Maximum number of participants allowed to register
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxParticipants = 16;
 
+	/// Current round number (0 = not started, 1 = first round, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CurrentRound = 0;
 
+	/// Total number of rounds in this tournament format
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalRounds = 4;
 
+	/// Scheduled start time for the tournament
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FDateTime StartTime;
 
+	/// Total prize pool amount in the game's currency
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int64 PrizePool = 0;
 
+	/// Whether this is an officially sanctioned tournament
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsOfficial = false;
 
+	/// Whether the tournament is currently live/in-progress
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsLive = false;
 };
 
+/**
+ * @brief Represents a single match within a tournament bracket.
+ *
+ * Contains scheduling, participants, and result information for one match.
+ * Matches are typically best-of-X series (configurable via NumRaces).
+ */
 USTRUCT(BlueprintType)
 struct FMGTournamentMatch
 {
 	GENERATED_BODY()
 
+	/// Unique identifier for this match
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString MatchID;
 
+	/// ID of the tournament this match belongs to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString TournamentID;
 
+	/// Tournament round number (1 = Round of 16, 2 = Quarterfinals, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Round = 0;
 
+	/// Position of this match within its round (for bracket display)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MatchNumber = 0;
 
+	/// Player/Team IDs competing in this match
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> ParticipantIDs;
 
+	/// Current state of the match
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGMatchState State = EMGMatchState::Scheduled;
 
+	/// ID of the winning participant (empty until match completes)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString WinnerID;
 
+	/// When this match is scheduled to begin
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FDateTime ScheduledTime;
 
+	/// Track/map selected for this match
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName TrackID;
 
+	/// Number of races in the series (e.g., 3 = Best of 3)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 NumRaces = 3; // Best of X
+	int32 NumRaces = 3;
 };
 
+/**
+ * @brief Statistics and information for a tournament participant.
+ *
+ * Tracks performance metrics throughout the tournament for standings,
+ * seeding, and broadcast overlays.
+ */
 USTRUCT(BlueprintType)
 struct FMGParticipantStats
 {
 	GENERATED_BODY()
 
+	/// Unique player identifier
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString PlayerID;
 
+	/// Display name shown in UI and broadcasts
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString DisplayName;
 
+	/// Team/organization name (if applicable)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString TeamName;
 
+	/// Total match wins in the tournament
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Wins = 0;
 
+	/// Total match losses in the tournament
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Losses = 0;
 
+	/// Accumulated points (for point-based formats)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 TotalPoints = 0;
 
+	/// Average finishing position across all races
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AverageFinishPosition = 0.0f;
 
+	/// Number of fastest lap achievements
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 FastestLaps = 0;
 
+	/// Best lap time achieved in the tournament
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTimespan BestLapTime;
 
+	/// Tournament seeding position (1 = highest seed)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Seed = 0;
 };
 
+//=============================================================================
+// Structs - Broadcast and Caster Tools
+//=============================================================================
+
+/**
+ * @brief Information about a broadcast caster/commentator.
+ *
+ * Casters can have different permission levels for controlling the broadcast,
+ * from view-only observers to full camera and replay control.
+ */
 USTRUCT(BlueprintType)
 struct FMGCasterInfo
 {
 	GENERATED_BODY()
 
+	/// Unique caster identifier
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString CasterID;
 
+	/// Caster's display name for on-screen credits
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString DisplayName;
 
+	/// Primary caster has priority for camera control conflicts
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsPrimaryCaster = false;
 
+	/// Whether this caster can control the broadcast camera
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bHasCameraControl = false;
 
+	/// Whether this caster can trigger and control instant replays
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bHasReplayControl = false;
 };
 
+/**
+ * @brief Configuration for caster overlay and stat display options.
+ *
+ * Controls which statistics and visual elements are shown on the broadcast
+ * overlay. Casters can toggle these in real-time during the broadcast.
+ */
 USTRUCT(BlueprintType)
 struct FMGCasterToolsState
 {
 	GENERATED_BODY()
 
+	/// Show detailed player statistics panel
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bShowExtendedStats = true;
 
+	/// Display time gaps between racers
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bShowGapTiming = true;
 
+	/// Show individual sector split times
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bShowSectorTimes = true;
 
+	/// Display vehicle tire wear indicators
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bShowTireCondition = true;
 
+	/// Show nitro/boost meter status
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bShowNitroStatus = true;
 
+	/// Display historical performance comparisons
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bShowHistoricalData = true;
 
+	/// Player ID currently being highlighted/focused
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString FocusedPlayerID;
 
+	/// Player IDs shown in side-by-side comparison view
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> ComparePlayerIDs;
 };
 
+//=============================================================================
+// Structs - Replay System
+//=============================================================================
+
+/**
+ * @brief Data for an instant replay clip.
+ *
+ * Instant replays can be manually marked by casters or automatically generated
+ * by the auto-director when significant events occur (overtakes, crashes, etc.).
+ */
 USTRUCT(BlueprintType)
 struct FMGInstantReplay
 {
 	GENERATED_BODY()
 
+	/// Unique identifier for this replay clip
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ReplayID;
 
+	/// Descriptive label shown in replay selection UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Label;
 
+	/// Race time when the replay segment begins
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float StartTime = 0.0f;
 
+	/// Race time when the replay segment ends
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float EndTime = 0.0f;
 
+	/// Playback speed multiplier (0.25 = quarter speed, 1.0 = real-time)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PlaybackSpeed = 1.0f;
 
+	/// Player IDs involved in the replay moment
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> InvolvedPlayers;
 
+	/// True if the auto-director created this replay automatically
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsAutoGenerated = false;
 };
 
+/**
+ * @brief Configuration settings for the auto-director system.
+ *
+ * The auto-director intelligently switches cameras to follow the most
+ * interesting action during a race. These settings control its behavior.
+ */
 USTRUCT(BlueprintType)
 struct FMGAutoDirectorSettings
 {
 	GENERATED_BODY()
 
+	/// Which type of action the auto-director should prioritize
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGAutoDirectorMode Mode = EMGAutoDirectorMode::Balanced;
 
+	/// Minimum seconds to stay on one camera before switching
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinCameraDuration = 3.0f;
 
+	/// Maximum seconds on one camera before forcing a switch
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaxCameraDuration = 15.0f;
 
+	/// Distance (in meters) between racers to consider them "in battle"
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float BattleProximityThreshold = 50.0f; // meters
+	float BattleProximityThreshold = 50.0f;
 
+	/// Automatically generate replay clips for significant moments
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAutoReplay = true;
 
+	/// Seconds to wait after an event before showing its replay
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ReplayDelay = 5.0f;
 };
 
+//=============================================================================
+// Delegates - Event Notifications
+//=============================================================================
+
+/// Broadcast when a match changes state (started, completed, etc.)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMGOnMatchStateChanged, const FMGTournamentMatch&, Match);
+
+/// Broadcast when a tournament advances to the next round
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMGOnTournamentAdvanced, const FMGTournamentInfo&, Tournament, int32, NewRound);
+
+/// Broadcast when a new instant replay becomes available
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMGOnReplayAvailable, const FMGInstantReplay&, Replay);
+
+/// Broadcast when the auto-director switches to a different player
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMGOnAutoDirectorCameraSwitch, const FString&, NewFocusPlayerID);
 
+//=============================================================================
+// UMGEsportsSubsystem - Main Subsystem Class
+//=============================================================================
+
+/**
+ * @brief Core subsystem managing esports tournaments and broadcast production.
+ *
+ * This GameInstanceSubsystem provides comprehensive tournament management and
+ * professional broadcast tools. It handles:
+ *
+ * - Tournament lifecycle (creation, bracket generation, advancement)
+ * - Match management (scheduling, results, standings)
+ * - Caster tools (stat overlays, player focus, comparisons)
+ * - Auto-director (intelligent camera switching)
+ * - Instant replay (manual and automatic clip creation)
+ *
+ * @note Access via: GetGameInstance()->GetSubsystem<UMGEsportsSubsystem>()
+ */
 UCLASS()
 class MIDNIGHTGRIND_API UMGEsportsSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
 public:
+	//-------------------------------------------------------------------------
+	// Lifecycle
+	//-------------------------------------------------------------------------
+
+	/** Initialize the subsystem and set up default state. */
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	/** Clean up resources when the subsystem is destroyed. */
 	virtual void Deinitialize() override;
 
+	//-------------------------------------------------------------------------
 	// Tournament Management
+	//-------------------------------------------------------------------------
+
+	/**
+	 * @brief Create a new tournament with the specified settings.
+	 * @param Info Tournament configuration including format, size, and scheduling.
+	 * @note Generates an automatic bracket based on the tournament format.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Tournament")
 	void CreateTournament(const FMGTournamentInfo& Info);
 
+	/**
+	 * @brief Begin a tournament, transitioning it to live status.
+	 * @param TournamentID Unique ID of the tournament to start.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Tournament")
 	void StartTournament(const FString& TournamentID);
 
+	/**
+	 * @brief Progress the tournament to the next round.
+	 * @param TournamentID Unique ID of the tournament to advance.
+	 * @note Only advances if all matches in the current round are complete.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Tournament")
 	void AdvanceToNextRound(const FString& TournamentID);
 
+	/**
+	 * @brief Register a player/team as a tournament participant.
+	 * @param TournamentID Tournament to register for.
+	 * @param Participant Player stats and information.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Tournament")
 	void RegisterParticipant(const FString& TournamentID, const FMGParticipantStats& Participant);
 
+	/**
+	 * @brief Retrieve tournament information by ID.
+	 * @param TournamentID Unique ID of the tournament.
+	 * @return Tournament info struct (empty if not found).
+	 */
 	UFUNCTION(BlueprintPure, Category = "Esports|Tournament")
 	FMGTournamentInfo GetTournamentInfo(const FString& TournamentID) const;
 
+	/**
+	 * @brief Get the complete match bracket for a tournament.
+	 * @param TournamentID Unique ID of the tournament.
+	 * @return Array of all matches in bracket order.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Esports|Tournament")
 	TArray<FMGTournamentMatch> GetBracket(const FString& TournamentID) const;
 
+	/**
+	 * @brief Get current standings/leaderboard for a tournament.
+	 * @param TournamentID Unique ID of the tournament.
+	 * @return Array of participants sorted by standing.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Esports|Tournament")
 	TArray<FMGParticipantStats> GetStandings(const FString& TournamentID) const;
 
+	//-------------------------------------------------------------------------
 	// Match Management
+	//-------------------------------------------------------------------------
+
+	/**
+	 * @brief Begin a scheduled match.
+	 * @param MatchID Unique ID of the match to start.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Match")
 	void StartMatch(const FString& MatchID);
 
+	/**
+	 * @brief Complete a match and record the winner.
+	 * @param MatchID Unique ID of the match.
+	 * @param WinnerID Participant ID of the match winner.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Match")
 	void EndMatch(const FString& MatchID, const FString& WinnerID);
 
+	/**
+	 * @brief Record results for a single race within a match series.
+	 * @param MatchID Unique ID of the match.
+	 * @param FinishOrder Player IDs in finishing order (first = winner).
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Match")
 	void RecordRaceResult(const FString& MatchID, const TArray<FString>& FinishOrder);
 
+	/** @return The currently active match (if any). */
 	UFUNCTION(BlueprintPure, Category = "Esports|Match")
 	FMGTournamentMatch GetCurrentMatch() const { return CurrentMatch; }
 
+	/** @return True if a match is currently in progress. */
 	UFUNCTION(BlueprintPure, Category = "Esports|Match")
 	bool IsMatchInProgress() const { return CurrentMatch.State == EMGMatchState::InProgress; }
 
+	//-------------------------------------------------------------------------
 	// Caster Tools
+	//-------------------------------------------------------------------------
+
+	/**
+	 * @brief Join the broadcast as a caster with the specified permissions.
+	 * @param CasterInfo Caster profile and permission settings.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Caster")
 	void JoinAsCaster(const FMGCasterInfo& CasterInfo);
 
+	/** @brief Leave the caster role and disconnect from broadcast controls. */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Caster")
 	void LeaveCaster();
 
+	/**
+	 * @brief Update the caster overlay and statistics display settings.
+	 * @param State New caster tools configuration.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Caster")
 	void SetCasterToolsState(const FMGCasterToolsState& State);
 
+	/** @return Current caster overlay settings. */
 	UFUNCTION(BlueprintPure, Category = "Esports|Caster")
 	FMGCasterToolsState GetCasterToolsState() const { return CasterTools; }
 
+	/** @return True if currently in caster mode. */
 	UFUNCTION(BlueprintPure, Category = "Esports|Caster")
 	bool IsCasting() const { return bIsCasting; }
 
+	/**
+	 * @brief Focus the broadcast camera on a specific player.
+	 * @param PlayerID Player to focus on.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Caster")
 	void FocusOnPlayer(const FString& PlayerID);
 
+	/**
+	 * @brief Set up a side-by-side comparison view between players.
+	 * @param PlayerIDs Array of player IDs to compare (typically 2-3).
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Caster")
 	void SetComparisonPlayers(const TArray<FString>& PlayerIDs);
 
+	/**
+	 * @brief Get live racing statistics for a player.
+	 * @param PlayerID Player to get stats for.
+	 * @return Current participant stats (real-time updated).
+	 */
 	UFUNCTION(BlueprintPure, Category = "Esports|Caster")
 	FMGParticipantStats GetLivePlayerStats(const FString& PlayerID) const;
 
+	//-------------------------------------------------------------------------
 	// Auto-Director
+	//-------------------------------------------------------------------------
+
+	/**
+	 * @brief Enable automatic camera direction with the specified settings.
+	 * @param Settings Auto-director behavior configuration.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Director")
 	void EnableAutoDirector(const FMGAutoDirectorSettings& Settings);
 
+	/** @brief Disable the auto-director and return to manual camera control. */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Director")
 	void DisableAutoDirector();
 
+	/** @return True if the auto-director is currently active. */
 	UFUNCTION(BlueprintPure, Category = "Esports|Director")
 	bool IsAutoDirectorEnabled() const { return bAutoDirectorEnabled; }
 
+	/**
+	 * @brief Temporarily override auto-director to focus on a specific player.
+	 * @param FocusPlayerID Player to focus on.
+	 * @param Duration How long to maintain the override (seconds).
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Director")
 	void OverrideAutoDirector(const FString& FocusPlayerID, float Duration);
 
+	//-------------------------------------------------------------------------
 	// Instant Replay
+	//-------------------------------------------------------------------------
+
+	/**
+	 * @brief Mark the current moment for instant replay with a label.
+	 * @param Label Descriptive text for the replay (e.g., "Amazing Overtake!").
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Replay")
 	void MarkReplayMoment(const FText& Label);
 
+	/**
+	 * @brief Play an instant replay clip on the broadcast.
+	 * @param Replay The replay clip to play.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Replay")
 	void PlayInstantReplay(const FMGInstantReplay& Replay);
 
+	/** @brief Stop the currently playing instant replay. */
 	UFUNCTION(BlueprintCallable, Category = "Esports|Replay")
 	void StopReplay();
 
+	/** @return Array of all available replay clips for the current session. */
 	UFUNCTION(BlueprintPure, Category = "Esports|Replay")
 	TArray<FMGInstantReplay> GetAvailableReplays() const { return AvailableReplays; }
 
+	/** @return True if an instant replay is currently playing. */
 	UFUNCTION(BlueprintPure, Category = "Esports|Replay")
 	bool IsReplayPlaying() const { return bReplayPlaying; }
 
-	// Events
+	//-------------------------------------------------------------------------
+	// Events - Bindable Delegates
+	//-------------------------------------------------------------------------
+
+	/// Fired when any match changes state (use for UI updates, logging)
 	UPROPERTY(BlueprintAssignable, Category = "Esports|Events")
 	FMGOnMatchStateChanged OnMatchStateChanged;
 
+	/// Fired when a tournament progresses to its next round
 	UPROPERTY(BlueprintAssignable, Category = "Esports|Events")
 	FMGOnTournamentAdvanced OnTournamentAdvanced;
 
+	/// Fired when a new instant replay clip becomes available
 	UPROPERTY(BlueprintAssignable, Category = "Esports|Events")
 	FMGOnReplayAvailable OnReplayAvailable;
 
+	/// Fired when auto-director switches camera focus to a new player
 	UPROPERTY(BlueprintAssignable, Category = "Esports|Events")
 	FMGOnAutoDirectorCameraSwitch OnAutoDirectorCameraSwitch;
 
 protected:
+	//-------------------------------------------------------------------------
+	// Internal Methods
+	//-------------------------------------------------------------------------
+
+	/** Update auto-director logic each tick. */
 	void UpdateAutoDirector(float DeltaTime);
+
+	/** Generate an automatic replay clip for a significant event. */
 	void GenerateAutoReplay(const TArray<FString>& InvolvedPlayers, float Duration);
+
+	/** Generate bracket matches for a tournament based on its format. */
 	void GenerateBracket(const FString& TournamentID);
+
+	/** Determine which player the auto-director should focus on next. */
 	FString DetermineNextFocus();
 
 private:
+	//-------------------------------------------------------------------------
+	// Tournament Data Storage
+	//-------------------------------------------------------------------------
+
+	/// Map of tournament ID to tournament info
 	UPROPERTY()
 	TMap<FString, FMGTournamentInfo> Tournaments;
 
+	/// Map of tournament ID to its bracket (array of matches)
 	UPROPERTY()
 	TMap<FString, TArray<FMGTournamentMatch>> TournamentBrackets;
 
+	/// Map of tournament ID to its registered participants
 	UPROPERTY()
 	TMap<FString, TArray<FMGParticipantStats>> TournamentParticipants;
 
+	//-------------------------------------------------------------------------
+	// Runtime State
+	//-------------------------------------------------------------------------
+
+	/// The match currently in progress (if any)
 	FMGTournamentMatch CurrentMatch;
+
+	/// Local caster information (when in caster mode)
 	FMGCasterInfo LocalCaster;
+
+	/// Current caster overlay settings
 	FMGCasterToolsState CasterTools;
+
+	/// Auto-director configuration
 	FMGAutoDirectorSettings AutoDirectorSettings;
+
+	/// Collection of available replay clips
 	TArray<FMGInstantReplay> AvailableReplays;
+
+	/// Timer for auto-director updates
 	FTimerHandle AutoDirectorTimerHandle;
+
+	/// Time elapsed since the last camera switch
 	float TimeSinceLastCameraSwitch = 0.0f;
+
+	/// Player ID currently focused by the auto-director
 	FString CurrentAutoDirectorFocus;
+
+	/// Whether currently in caster mode
 	bool bIsCasting = false;
+
+	/// Whether the auto-director is active
 	bool bAutoDirectorEnabled = false;
+
+	/// Whether an instant replay is playing
 	bool bReplayPlaying = false;
+
+	/// Maximum number of replay clips to retain
 	int32 MaxReplaysStored = 20;
 };

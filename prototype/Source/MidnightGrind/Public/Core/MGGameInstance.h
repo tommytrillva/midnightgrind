@@ -59,108 +59,156 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "MGGameInstance.generated.h"
 
-class UMGGameStateSubsystem;
-class UMGSessionSubsystem;
-class UMGAccountLinkSubsystem;
-class UMGProgressionSubsystem;
-class UMGCurrencySubsystem;
-class UMGVehicleManagerSubsystem;
-class UMGInputRemapSubsystem;
-class UMGAccessibilitySubsystem;
-class UMGCloudSaveSubsystem;
-class UMGAnalyticsSubsystem;
-class UMGAntiCheatSubsystem;
-class UMGServerAuthSubsystem;
-class UMGAudioMixSubsystem;
-class UMGLocalizationSubsystem;
+// Forward declarations for subsystems managed by the game instance
+class UMGGameStateSubsystem;      ///< Game flow state machine
+class UMGSessionSubsystem;        ///< Multiplayer session management
+class UMGAccountLinkSubsystem;    ///< Cross-platform account linking
+class UMGProgressionSubsystem;    ///< Player XP, level, and unlocks
+class UMGCurrencySubsystem;       ///< In-game currency (credits, premium)
+class UMGVehicleManagerSubsystem; ///< Vehicle collection and garage
+class UMGInputRemapSubsystem;     ///< Controller/keyboard remapping
+class UMGAccessibilitySubsystem;  ///< Accessibility options
+class UMGCloudSaveSubsystem;      ///< Cloud save synchronization
+class UMGAnalyticsSubsystem;      ///< Telemetry and analytics
+class UMGAntiCheatSubsystem;      ///< Anti-cheat validation
+class UMGServerAuthSubsystem;     ///< Server authentication
+class UMGAudioMixSubsystem;       ///< Audio mixing and volume
+class UMGLocalizationSubsystem;   ///< Language and localization
+
+// ============================================================================
+// ENUMS - Network and Platform States
+// ============================================================================
 
 /**
- * Network connection state
+ * @brief Network connection state for online features
+ *
+ * Tracks the current connectivity status with backend services.
+ * Used to determine if online features (multiplayer, leaderboards) are available.
  */
 UENUM(BlueprintType)
 enum class EMGNetworkState : uint8
 {
-	/** Offline */
+	/** Not connected to any network services */
 	Offline,
-	/** Connecting to backend */
+	/** Currently establishing connection to backend */
 	Connecting,
-	/** Connected and authenticated */
+	/** Successfully connected and authenticated - online features available */
 	Online,
-	/** Connection lost, attempting reconnect */
+	/** Lost connection, automatically attempting to reconnect */
 	Reconnecting,
-	/** Maintenance mode */
+	/** Backend is in maintenance mode - check again later */
 	Maintenance
 };
 
 /**
- * Platform type
+ * @brief Platform/storefront the game is running on
+ *
+ * Identifies which platform services to use for achievements,
+ * friends lists, matchmaking, and account features.
  */
 UENUM(BlueprintType)
 enum class EMGPlatform : uint8
 {
-	Unknown,
-	Steam,
-	Epic,
-	PlayStation,
-	Xbox,
-	Switch
+	Unknown,      ///< Platform not yet detected or running standalone
+	Steam,        ///< Valve Steam (PC)
+	Epic,         ///< Epic Games Store (PC)
+	PlayStation,  ///< Sony PlayStation (PS4/PS5)
+	Xbox,         ///< Microsoft Xbox (One/Series)
+	Switch        ///< Nintendo Switch
 };
 
+// ============================================================================
+// STRUCTS - Player Data
+// ============================================================================
+
 /**
- * Player profile data
+ * @brief Local player profile information
+ *
+ * Contains the authenticated player's identity and basic stats.
+ * Populated during login from platform services and backend.
+ * Used throughout the game for displaying player info.
  */
 USTRUCT(BlueprintType)
 struct FMGPlayerProfile
 {
 	GENERATED_BODY()
 
+	/// Unique backend identifier for this player (not platform-specific)
 	UPROPERTY(BlueprintReadOnly)
 	FString PlayerID;
 
+	/// Name shown to other players
 	UPROPERTY(BlueprintReadOnly)
 	FString DisplayName;
 
+	/// URL to player's avatar image (from platform or custom)
 	UPROPERTY(BlueprintReadOnly)
 	FString AvatarURL;
 
+	/// Player's current level (1-100)
 	UPROPERTY(BlueprintReadOnly)
 	int32 Level = 1;
 
+	/// Total experience points earned
 	UPROPERTY(BlueprintReadOnly)
 	int64 TotalXP = 0;
 
+	/// Name of the player's crew/club (empty if not in one)
 	UPROPERTY(BlueprintReadOnly)
 	FString CrewName;
 
+	/// Short crew tag shown in races (e.g., "[MG]")
 	UPROPERTY(BlueprintReadOnly)
 	FString CrewTag;
 
+	/// Which platform this profile is from
 	UPROPERTY(BlueprintReadOnly)
 	EMGPlatform Platform = EMGPlatform::Unknown;
 
+	/// Whether the player is currently online
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsOnline = false;
 };
 
-/**
- * Delegates
- */
+// ============================================================================
+// DELEGATES - Event Signatures
+// ============================================================================
+
+/// Broadcast when network connectivity state changes
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNetworkStateChanged, EMGNetworkState, NewState);
+
+/// Broadcast when player profile is loaded and ready to use
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerProfileReady, const FMGPlayerProfile&, Profile);
+
+/// Broadcast when login attempt completes (success or failure)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoginComplete, bool, bSuccess);
+
+/// Broadcast when player logs out
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLogout);
+
+/// Broadcast when all subsystems finish initialization
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSubsystemsReady, bool, bSuccess);
 
+// ============================================================================
+// CLASS - UMGGameInstance
+// ============================================================================
+
 /**
- * Game Instance
- * Central manager for game-wide state and subsystem initialization
+ * @brief Game Instance - Central manager for game-wide state and subsystems
  *
- * Features:
- * - Steam/Platform initialization
- * - Subsystem orchestration
- * - Player profile management
- * - Network state tracking
- * - Save/Load coordination
+ * The root class that initializes platform services, manages subsystems,
+ * tracks player profile and network state, and coordinates save/load operations.
+ *
+ * @section Lifetime
+ * Created when the game starts, destroyed when the game exits.
+ * Persists across all level transitions.
+ *
+ * @section Features
+ * - Platform detection and initialization (Steam, Epic, consoles)
+ * - Subsystem creation and orchestration
+ * - Player profile management (login, profile data)
+ * - Network state tracking with auto-reconnect
+ * - Coordinated save/load across all subsystems
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGGameInstance : public UGameInstance
@@ -170,255 +218,394 @@ class MIDNIGHTGRIND_API UMGGameInstance : public UGameInstance
 public:
 	UMGGameInstance();
 
+	/// Called very early during engine initialization
 	virtual void Init() override;
+
+	/// Called when game is shutting down - cleanup
 	virtual void Shutdown() override;
+
+	/// Called to start the game instance
 	virtual void StartGameInstance() override;
+
+	/// Called when game instance is ready to start gameplay
 	virtual void OnStart() override;
 
 	// ==========================================
 	// EVENTS
+	// Bind to these to react to game-wide state changes.
+	// Essential for UI systems that need to respond to connectivity/login.
 	// ==========================================
 
+	/**
+	 * @brief Fired when network state changes
+	 * Use to show/hide online-only features
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnNetworkStateChanged OnNetworkStateChanged;
 
+	/**
+	 * @brief Fired when player profile is loaded
+	 * Safe to access GetPlayerProfile() after this fires
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPlayerProfileReady OnPlayerProfileReady;
 
+	/**
+	 * @brief Fired when login attempt completes
+	 * Check bSuccess to determine if login succeeded
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnLoginComplete OnLoginComplete;
 
+	/**
+	 * @brief Fired when player logs out
+	 * Clear any cached profile data when this fires
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnLogout OnLogout;
 
+	/**
+	 * @brief Fired when all subsystems finish initialization
+	 * Safe to access all subsystems after this fires
+	 */
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnSubsystemsReady OnSubsystemsReady;
 
 	// ==========================================
 	// INITIALIZATION
+	// Query startup progress for loading screens.
 	// ==========================================
 
-	/** Check if all subsystems are initialized */
+	/**
+	 * @brief Check if all subsystems have finished initializing
+	 * @return True when all subsystems are ready to use
+	 * Wait for this before accessing subsystem functionality
+	 */
 	UFUNCTION(BlueprintPure, Category = "Init")
 	bool AreSubsystemsReady() const { return bSubsystemsReady; }
 
-	/** Get initialization progress (0-1) */
+	/**
+	 * @brief Get overall initialization progress
+	 * @return Value from 0.0 (starting) to 1.0 (complete)
+	 * Useful for boot/splash screen progress bars
+	 */
 	UFUNCTION(BlueprintPure, Category = "Init")
 	float GetInitProgress() const { return InitProgress; }
 
-	/** Force reinitialize subsystems */
+	/**
+	 * @brief Force reinitialize all subsystems
+	 * Use for error recovery - triggers full re-init sequence
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Init")
 	void ReinitializeSubsystems();
 
 	// ==========================================
 	// PLATFORM/STEAM
+	// Query platform-specific information.
 	// ==========================================
 
-	/** Get current platform */
+	/**
+	 * @brief Get which platform we're running on
+	 * @return The detected platform type
+	 */
 	UFUNCTION(BlueprintPure, Category = "Platform")
 	EMGPlatform GetPlatform() const { return CurrentPlatform; }
 
-	/** Is Steam available */
+	/**
+	 * @brief Check if Steam API is available and initialized
+	 * @return True if Steam features can be used
+	 */
 	UFUNCTION(BlueprintPure, Category = "Platform")
 	bool IsSteamAvailable() const;
 
-	/** Get Steam ID */
+	/**
+	 * @brief Get the player's Steam ID (if on Steam)
+	 * @return Steam64 ID as string, or empty if not on Steam
+	 */
 	UFUNCTION(BlueprintPure, Category = "Platform")
 	FString GetSteamID() const;
 
-	/** Get Steam display name */
+	/**
+	 * @brief Get the player's Steam persona name
+	 * @return Steam display name, or empty if not on Steam
+	 */
 	UFUNCTION(BlueprintPure, Category = "Platform")
 	FString GetSteamDisplayName() const;
 
-	/** Check if running through Steam */
+	/**
+	 * @brief Check if game was launched through Steam client
+	 * @return True if Steam overlay and API are available
+	 */
 	UFUNCTION(BlueprintPure, Category = "Platform")
 	bool IsRunningSteam() const;
 
 	// ==========================================
 	// NETWORK STATE
+	// Query and control network connectivity.
 	// ==========================================
 
-	/** Get network state */
+	/**
+	 * @brief Get current network connection state
+	 * @return The current connectivity status
+	 */
 	UFUNCTION(BlueprintPure, Category = "Network")
 	EMGNetworkState GetNetworkState() const { return NetworkState; }
 
-	/** Is online */
+	/**
+	 * @brief Check if fully connected to online services
+	 * @return True if online features (multiplayer, leaderboards) work
+	 */
 	UFUNCTION(BlueprintPure, Category = "Network")
 	bool IsOnline() const { return NetworkState == EMGNetworkState::Online; }
 
-	/** Is connecting */
+	/**
+	 * @brief Check if currently attempting to connect
+	 * @return True during initial connect or reconnect attempts
+	 */
 	UFUNCTION(BlueprintPure, Category = "Network")
 	bool IsConnecting() const { return NetworkState == EMGNetworkState::Connecting || NetworkState == EMGNetworkState::Reconnecting; }
 
-	/** Attempt to go online */
+	/**
+	 * @brief Attempt to establish connection to online services
+	 * Results delivered via OnNetworkStateChanged
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void GoOnline();
 
-	/** Go offline */
+	/**
+	 * @brief Disconnect from online services
+	 * Use when player wants offline mode
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void GoOffline();
 
 	// ==========================================
 	// PLAYER PROFILE
+	// Query the local player's identity and stats.
 	// ==========================================
 
-	/** Get local player profile */
+	/**
+	 * @brief Get the local player's full profile
+	 * @return Profile struct with all player data
+	 * Wait for OnPlayerProfileReady before calling
+	 */
 	UFUNCTION(BlueprintPure, Category = "Profile")
 	FMGPlayerProfile GetPlayerProfile() const { return LocalPlayerProfile; }
 
-	/** Is logged in */
+	/**
+	 * @brief Check if player is logged in
+	 * @return True if authenticated with backend
+	 */
 	UFUNCTION(BlueprintPure, Category = "Profile")
 	bool IsLoggedIn() const { return bIsLoggedIn; }
 
-	/** Get player ID */
+	/**
+	 * @brief Get unique player ID
+	 * @return Backend player ID (not platform-specific)
+	 */
 	UFUNCTION(BlueprintPure, Category = "Profile")
 	FString GetPlayerID() const { return LocalPlayerProfile.PlayerID; }
 
-	/** Get display name */
+	/**
+	 * @brief Get player's display name
+	 * @return Name shown in-game to other players
+	 */
 	UFUNCTION(BlueprintPure, Category = "Profile")
 	FString GetDisplayName() const { return LocalPlayerProfile.DisplayName; }
 
 	// ==========================================
 	// SUBSYSTEM ACCESS (Convenience)
+	// Shortcut getters for commonly-used subsystems.
+	// Can also use GetSubsystem<T>() for any subsystem type.
 	// ==========================================
 
-	/** Get game state subsystem */
+	/**
+	 * @brief Get the game state subsystem
+	 * @return Game flow state machine subsystem
+	 * @see UMGGameStateSubsystem
+	 */
 	UFUNCTION(BlueprintPure, Category = "Subsystems")
 	UMGGameStateSubsystem* GetGameStateSubsystem() const;
 
-	/** Get session subsystem */
+	/**
+	 * @brief Get the session subsystem
+	 * @return Multiplayer session management subsystem
+	 */
 	UFUNCTION(BlueprintPure, Category = "Subsystems")
 	UMGSessionSubsystem* GetSessionSubsystem() const;
 
-	/** Get account link subsystem */
+	/**
+	 * @brief Get the account link subsystem
+	 * @return Cross-platform account linking subsystem
+	 */
 	UFUNCTION(BlueprintPure, Category = "Subsystems")
 	UMGAccountLinkSubsystem* GetAccountLinkSubsystem() const;
 
-	/** Get input remap subsystem */
+	/**
+	 * @brief Get the input remap subsystem
+	 * @return Controller/keyboard remapping subsystem
+	 */
 	UFUNCTION(BlueprintPure, Category = "Subsystems")
 	UMGInputRemapSubsystem* GetInputRemapSubsystem() const;
 
-	/** Get accessibility subsystem */
+	/**
+	 * @brief Get the accessibility subsystem
+	 * @return Accessibility features subsystem
+	 */
 	UFUNCTION(BlueprintPure, Category = "Subsystems")
 	UMGAccessibilitySubsystem* GetAccessibilitySubsystem() const;
 
-	/** Get cloud save subsystem */
+	/**
+	 * @brief Get the cloud save subsystem
+	 * @return Cloud save synchronization subsystem
+	 */
 	UFUNCTION(BlueprintPure, Category = "Subsystems")
 	UMGCloudSaveSubsystem* GetCloudSaveSubsystem() const;
 
 	// ==========================================
 	// GAME FLOW
+	// High-level game navigation from main menu.
 	// ==========================================
 
-	/** Start new game (go to garage) */
+	/**
+	 * @brief Start a new game
+	 * Creates fresh save data and transitions to garage
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Flow")
 	void StartNewGame();
 
-	/** Continue from save */
+	/**
+	 * @brief Continue from existing save
+	 * Loads save data and transitions to garage
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Flow")
 	void ContinueGame();
 
-	/** Return to main menu */
+	/**
+	 * @brief Return to main menu from anywhere
+	 * Saves progress and resets to main menu state
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Flow")
 	void ReturnToMainMenu();
 
-	/** Quit game */
+	/**
+	 * @brief Quit the game
+	 * Saves progress and exits the application
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Flow")
 	void QuitGame();
 
 	// ==========================================
 	// SAVE/LOAD
+	// Coordinate saving/loading across all subsystems.
 	// ==========================================
 
-	/** Save all game data */
+	/**
+	 * @brief Save all game data to disk (and cloud if enabled)
+	 * Coordinates save across all subsystems that have saveable data
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	void SaveAll();
 
-	/** Load all game data */
+	/**
+	 * @brief Load all game data from disk (or cloud)
+	 * Coordinates load across all subsystems
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Save")
 	void LoadAll();
 
-	/** Has save data */
+	/**
+	 * @brief Check if save data exists
+	 * @return True if there's existing save data to continue from
+	 * Use to determine if "Continue" button should be enabled
+	 */
 	UFUNCTION(BlueprintPure, Category = "Save")
 	bool HasSaveData() const;
 
-	/** Get last save time */
+	/**
+	 * @brief Get when the game was last saved
+	 * @return DateTime of most recent save
+	 * Display this in save/load UI
+	 */
 	UFUNCTION(BlueprintPure, Category = "Save")
 	FDateTime GetLastSaveTime() const { return LastSaveTime; }
 
 protected:
 	// ==========================================
 	// STATE
+	// Internal state - do not modify directly from outside.
 	// ==========================================
 
-	/** Current platform */
+	/// Detected platform (set during Init)
 	EMGPlatform CurrentPlatform = EMGPlatform::Unknown;
 
-	/** Network state */
+	/// Current network connectivity state
 	EMGNetworkState NetworkState = EMGNetworkState::Offline;
 
-	/** Local player profile */
+	/// Cached local player profile data
 	FMGPlayerProfile LocalPlayerProfile;
 
-	/** Is logged in */
+	/// True if player has successfully authenticated
 	bool bIsLoggedIn = false;
 
-	/** Subsystems ready */
+	/// True when all subsystems have finished initialization
 	bool bSubsystemsReady = false;
 
-	/** Init progress */
+	/// Initialization progress (0.0 to 1.0) for loading UI
 	float InitProgress = 0.0f;
 
-	/** Steam initialized */
+	/// True if Steam API initialized successfully
 	bool bSteamInitialized = false;
 
-	/** Last save time */
+	/// When game was last saved (for display in UI)
 	FDateTime LastSaveTime;
 
 	// ==========================================
 	// INITIALIZATION
+	// Internal initialization sequence functions.
 	// ==========================================
 
-	/** Detect platform */
+	/// Detect which platform we're running on
 	void DetectPlatform();
 
-	/** Initialize Steam */
+	/// Initialize Steam API if available
 	void InitializeSteam();
 
-	/** Initialize subsystems */
+	/// Create and initialize all game subsystems
 	void InitializeSubsystems();
 
-	/** Load player profile from platform */
+	/// Load player profile from platform services
 	void LoadPlayerProfile();
 
-	/** Handle Steam login result */
+	/// Callback when Steam authentication completes
 	void OnSteamLoginComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error);
 
 	// ==========================================
 	// NETWORK
+	// Internal network state management.
 	// ==========================================
 
-	/** Set network state */
+	/// Update network state and broadcast change event
 	void SetNetworkState(EMGNetworkState NewState);
 
-	/** Handle connection status change */
+	/// Callback when platform connection status changes
 	void OnConnectionStatusChanged(const FString& ServiceName, EOnlineServerConnectionStatus::Type LastConnectionStatus, EOnlineServerConnectionStatus::Type ConnectionStatus);
 
-	/** Handle network error */
+	/// Callback when network error occurs during gameplay
 	void OnNetworkError(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 
-	/** Handle travel error */
+	/// Callback when level travel fails
 	void OnTravelError(UWorld* World, ETravelFailure::Type FailureType, const FString& ErrorString);
 
-	/** Timer handle for auto-reconnect */
+	/// Timer for scheduling reconnection attempts
 	FTimerHandle ReconnectTimerHandle;
 
-	/** Reconnect attempt */
+	/// Attempt to reconnect to online services
 	void AttemptReconnect();
 
-	/** Current reconnect attempt */
+	/// How many times we've tried to reconnect (resets on success)
 	int32 ReconnectAttempt = 0;
 
-	/** Max reconnect attempts */
+	/// Maximum reconnection attempts before giving up
 	static constexpr int32 MaxReconnectAttempts = 5;
 };

@@ -1,64 +1,111 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehicleDatabase.h
+ * @brief Vehicle database and definition system for MIDNIGHT GRIND.
+ *
+ * This file contains the complete vehicle catalog system including:
+ * - Vehicle identity (make, model, year, generation)
+ * - Classification (body style, drivetrain, rarity, performance index)
+ * - Technical specifications (engine, transmission, suspension, weight)
+ * - Performance data (0-60, quarter mile, top speed, lateral G)
+ * - Visual assets and customization options
+ * - Audio configuration
+ * - Economy data (pricing, unlock requirements)
+ * - Lore and flavor text
+ *
+ * The database system uses Unreal Engine's Primary Data Asset system for
+ * efficient loading and asset management. Vehicles are defined as data assets
+ * and loaded on-demand through the Asset Manager.
+ *
+ * @note This system focuses on Y2K-era Japanese tuner culture (1990-2009),
+ *       featuring iconic vehicles from the golden age of street racing.
+ *
+ * @see UMGVehicleDefinition For individual vehicle data
+ * @see UMGVehicleDatabase For the master vehicle catalog
+ * @see FMGVehicleData For runtime vehicle configuration (MGVehicleData.h)
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "MGVehicleDatabase.generated.h"
 
+// ============================================================================
+// VEHICLE IDENTITY ENUMS
+// ============================================================================
+
 /**
- * Vehicle manufacturer/make
+ * @brief Vehicle manufacturer/make enumeration.
+ *
+ * Defines all supported vehicle manufacturers in MIDNIGHT GRIND.
+ * Organized by region of origin for easy categorization.
  */
 UENUM(BlueprintType)
 enum class EMGVehicleMake : uint8
 {
-	// Japanese
-	Nissan UMETA(DisplayName = "Nissan"),
-	Toyota UMETA(DisplayName = "Toyota"),
-	Honda UMETA(DisplayName = "Honda"),
-	Mazda UMETA(DisplayName = "Mazda"),
-	Mitsubishi UMETA(DisplayName = "Mitsubishi"),
-	Subaru UMETA(DisplayName = "Subaru"),
-	Lexus UMETA(DisplayName = "Lexus"),
-	Acura UMETA(DisplayName = "Acura"),
-	Infiniti UMETA(DisplayName = "Infiniti"),
+	/// @name Japanese Manufacturers
+	/// @{
+	Nissan UMETA(DisplayName = "Nissan"),           ///< Nissan Motor Co. (Skyline, 240SX, 350Z)
+	Toyota UMETA(DisplayName = "Toyota"),           ///< Toyota Motor Corp. (Supra, AE86, MR2)
+	Honda UMETA(DisplayName = "Honda"),             ///< Honda Motor Co. (Civic, S2000, NSX)
+	Mazda UMETA(DisplayName = "Mazda"),             ///< Mazda Motor Corp. (RX-7, Miata, RX-8)
+	Mitsubishi UMETA(DisplayName = "Mitsubishi"),   ///< Mitsubishi Motors (Lancer Evo, Eclipse, 3000GT)
+	Subaru UMETA(DisplayName = "Subaru"),           ///< Subaru Corp. (WRX STI, Legacy, BRZ)
+	Lexus UMETA(DisplayName = "Lexus"),             ///< Toyota's luxury division (IS300, SC300)
+	Acura UMETA(DisplayName = "Acura"),             ///< Honda's luxury division (Integra, NSX)
+	Infiniti UMETA(DisplayName = "Infiniti"),       ///< Nissan's luxury division (G35, Q45)
+	/// @}
 
-	// American
-	Ford UMETA(DisplayName = "Ford"),
-	Chevrolet UMETA(DisplayName = "Chevrolet"),
-	Dodge UMETA(DisplayName = "Dodge"),
-	Pontiac UMETA(DisplayName = "Pontiac"),
-	Shelby UMETA(DisplayName = "Shelby"),
+	/// @name American Manufacturers
+	/// @{
+	Ford UMETA(DisplayName = "Ford"),               ///< Ford Motor Company (Mustang, Focus, GT)
+	Chevrolet UMETA(DisplayName = "Chevrolet"),     ///< General Motors (Camaro, Corvette, Cobalt SS)
+	Dodge UMETA(DisplayName = "Dodge"),             ///< Stellantis (Viper, Neon SRT-4, Charger)
+	Pontiac UMETA(DisplayName = "Pontiac"),         ///< General Motors (GTO, Firebird, G8)
+	Shelby UMETA(DisplayName = "Shelby"),           ///< Shelby American (GT500, GT350)
+	/// @}
 
-	// European
-	BMW UMETA(DisplayName = "BMW"),
-	Mercedes UMETA(DisplayName = "Mercedes-Benz"),
-	Audi UMETA(DisplayName = "Audi"),
-	Volkswagen UMETA(DisplayName = "Volkswagen"),
-	Porsche UMETA(DisplayName = "Porsche"),
+	/// @name European Manufacturers
+	/// @{
+	BMW UMETA(DisplayName = "BMW"),                 ///< Bayerische Motoren Werke (E46 M3, E30)
+	Mercedes UMETA(DisplayName = "Mercedes-Benz"),  ///< Mercedes-Benz AG (C63 AMG, SL)
+	Audi UMETA(DisplayName = "Audi"),               ///< Audi AG (S4, RS4, TT)
+	Volkswagen UMETA(DisplayName = "Volkswagen"),   ///< Volkswagen AG (Golf R32, Jetta GLI)
+	Porsche UMETA(DisplayName = "Porsche"),         ///< Porsche AG (911, Cayman, Boxster)
+	/// @}
 
-	// Korean
-	Hyundai UMETA(DisplayName = "Hyundai"),
-	Kia UMETA(DisplayName = "Kia"),
+	/// @name Korean Manufacturers
+	/// @{
+	Hyundai UMETA(DisplayName = "Hyundai"),         ///< Hyundai Motor Group (Genesis Coupe, Tiburon)
+	Kia UMETA(DisplayName = "Kia"),                 ///< Kia Corporation (Stinger)
+	/// @}
 
-	// Generic/Fictional
-	Generic UMETA(DisplayName = "Generic")
+	/// @name Generic/Fictional
+	/// @{
+	Generic UMETA(DisplayName = "Generic")          ///< Generic/fictional vehicles for testing
+	/// @}
 };
 
 /**
- * Vehicle body style
+ * @brief Vehicle body style classification.
+ *
+ * Defines the physical form factor of the vehicle, affecting both
+ * visual appearance and some physics characteristics (weight distribution,
+ * center of gravity height, drag coefficient).
  */
 UENUM(BlueprintType)
 enum class EMGBodyStyle : uint8
 {
-	Coupe UMETA(DisplayName = "Coupe"),
-	Sedan UMETA(DisplayName = "Sedan"),
-	Hatchback UMETA(DisplayName = "Hatchback"),
-	Wagon UMETA(DisplayName = "Wagon"),
-	Convertible UMETA(DisplayName = "Convertible"),
-	Truck UMETA(DisplayName = "Truck"),
-	SUV UMETA(DisplayName = "SUV"),
-	Van UMETA(DisplayName = "Van")
+	Coupe UMETA(DisplayName = "Coupe"),             ///< Two-door sports car (Supra, RX-7, 350Z)
+	Sedan UMETA(DisplayName = "Sedan"),             ///< Four-door sedan (Skyline R34, Lancer Evo)
+	Hatchback UMETA(DisplayName = "Hatchback"),     ///< Compact hatchback (Civic Si, Golf R32)
+	Wagon UMETA(DisplayName = "Wagon"),             ///< Station wagon (Legacy GT, IS SportCross)
+	Convertible UMETA(DisplayName = "Convertible"), ///< Open-top vehicle (S2000, Miata)
+	Truck UMETA(DisplayName = "Truck"),             ///< Pickup truck (Ford Lightning, SRT-10)
+	SUV UMETA(DisplayName = "SUV"),                 ///< Sport utility vehicle (Evo X SUV concept)
+	Van UMETA(DisplayName = "Van")                  ///< Van/minivan (Odyssey, Alphard)
 };
 
 /**

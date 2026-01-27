@@ -381,164 +381,247 @@ public:
 	/// @}
 
 	// ==========================================
-	// PHOTO MODE CONTROL
+	/// @name Photo Mode Control
+	/// @brief Core functions to enter, exit, and query photo mode state.
 	// ==========================================
+	/// @{
 
-	/** Enter photo mode */
+	/**
+	 * @brief Enter photo mode and take control of the camera.
+	 *
+	 * Pauses the scene (if enabled), hides HUD, stores original camera state,
+	 * and enables photo mode controls. Broadcasts OnPhotoModeEntered.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode")
 	void EnterPhotoMode();
 
-	/** Exit photo mode */
+	/**
+	 * @brief Exit photo mode and restore normal gameplay.
+	 *
+	 * Restores original camera position, unpauses scene, shows HUD,
+	 * and returns input control. Broadcasts OnPhotoModeExited.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode")
 	void ExitPhotoMode();
 
-	/** Is photo mode active */
+	/** @brief Check if photo mode is currently active. */
 	UFUNCTION(BlueprintPure, Category = "PhotoMode")
 	bool IsPhotoModeActive() const { return bIsActive; }
 
-	/** Toggle photo mode */
+	/** @brief Toggle photo mode on/off based on current state. */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode")
 	void TogglePhotoMode();
 
-	// ==========================================
-	// CAMERA CONTROL
-	// ==========================================
+	/// @}
 
-	/** Set camera mode */
+	// ==========================================
+	/// @name Camera Control
+	/// @brief Functions for camera positioning, movement, and lens settings.
+	/// Camera behavior varies based on the active EMGPhotoCamera mode.
+	// ==========================================
+	/// @{
+
+	/**
+	 * @brief Set the camera movement mode.
+	 * @param Mode The camera mode to activate (Free, Orbit, Track, or Locked).
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void SetCameraMode(EMGPhotoCamera Mode);
 
-	/** Get camera mode */
+	/** @brief Get the currently active camera mode. */
 	UFUNCTION(BlueprintPure, Category = "PhotoMode|Camera")
 	EMGPhotoCamera GetCameraMode() const { return CurrentCameraMode; }
 
-	/** Move camera (free mode) */
+	/**
+	 * @brief Move camera by delta in world space. Only effective in Free mode.
+	 * @param Delta Movement vector in world coordinates.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void MoveCamera(FVector Delta);
 
-	/** Rotate camera */
+	/**
+	 * @brief Rotate camera by delta. Works in all camera modes.
+	 * @param Delta Rotation delta (pitch, yaw, roll).
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void RotateCamera(FRotator Delta);
 
-	/** Orbit camera (orbit mode) */
+	/**
+	 * @brief Orbit camera around target. Only effective in Orbit mode.
+	 * @param YawDelta Horizontal orbit angle change in degrees.
+	 * @param PitchDelta Vertical orbit angle change in degrees.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void OrbitCamera(float YawDelta, float PitchDelta);
 
-	/** Zoom camera */
+	/**
+	 * @brief Adjust camera zoom/distance.
+	 * @param Delta Positive zooms in, negative zooms out.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void ZoomCamera(float Delta);
 
-	/** Reset camera */
+	/** @brief Reset camera to default position relative to target vehicle. */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void ResetCamera();
 
-	/** Get camera settings */
+	/** @brief Get current camera settings structure. */
 	UFUNCTION(BlueprintPure, Category = "PhotoMode|Camera")
 	FMGPhotoCameraSettings GetCameraSettings() const { return CameraSettings; }
 
-	/** Set camera settings */
+	/** @brief Apply a complete camera settings configuration. */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void SetCameraSettings(const FMGPhotoCameraSettings& Settings);
 
-	/** Set field of view */
+	/**
+	 * @brief Set camera field of view.
+	 * @param FOV Field of view in degrees. Lower values zoom in, higher values show more.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void SetFieldOfView(float FOV);
 
-	/** Set focal distance */
+	/**
+	 * @brief Set depth of field focal distance.
+	 * @param Distance Distance in centimeters where focus is sharpest.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void SetFocalDistance(float Distance);
 
-	/** Set aperture */
+	/**
+	 * @brief Set camera aperture for depth of field.
+	 * @param FStop Aperture value (f-stop). Lower values = more blur, shallower DOF.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void SetAperture(float FStop);
 
-	/** Enable/disable DOF */
+	/** @brief Enable or disable depth of field effect. */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void SetDepthOfFieldEnabled(bool bEnabled);
 
-	/** Set camera roll */
+	/**
+	 * @brief Set camera roll angle for Dutch angle effects.
+	 * @param Roll Roll angle in degrees (-90 to 90).
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Camera")
 	void SetCameraRoll(float Roll);
 
-	// ==========================================
-	// VISUAL SETTINGS
-	// ==========================================
+	/// @}
 
-	/** Set filter */
+	// ==========================================
+	/// @name Visual Settings
+	/// @brief Functions for filters, color grading, and post-processing effects.
+	/// These settings modify the final captured image appearance.
+	// ==========================================
+	/// @{
+
+	/**
+	 * @brief Apply a filter preset to the view.
+	 * @param Filter The filter preset to apply. Use Custom to keep manual settings.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Visual")
 	void SetFilter(EMGPhotoFilter Filter);
 
-	/** Get current filter */
+	/** @brief Get the currently active filter preset. */
 	UFUNCTION(BlueprintPure, Category = "PhotoMode|Visual")
 	EMGPhotoFilter GetCurrentFilter() const { return VisualSettings.Filter; }
 
-	/** Get visual settings */
+	/** @brief Get all current visual settings. */
 	UFUNCTION(BlueprintPure, Category = "PhotoMode|Visual")
 	FMGPhotoVisualSettings GetVisualSettings() const { return VisualSettings; }
 
-	/** Set visual settings */
+	/** @brief Apply a complete visual settings configuration. */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Visual")
 	void SetVisualSettings(const FMGPhotoVisualSettings& Settings);
 
-	/** Set exposure */
+	/**
+	 * @brief Adjust image exposure (brightness).
+	 * @param Value Exposure compensation in EV (-3 to +3). 0 is neutral.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Visual")
 	void SetExposure(float Value);
 
-	/** Set contrast */
+	/**
+	 * @brief Adjust image contrast.
+	 * @param Value Contrast multiplier (0.5 to 1.5). 1.0 is neutral.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Visual")
 	void SetContrast(float Value);
 
-	/** Set saturation */
+	/**
+	 * @brief Adjust color saturation.
+	 * @param Value Saturation multiplier (0 to 2). 0 = grayscale, 1 = normal, 2 = vivid.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Visual")
 	void SetSaturation(float Value);
 
-	/** Reset visual settings */
+	/** @brief Reset all visual settings to defaults (no filter, neutral values). */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Visual")
 	void ResetVisualSettings();
 
-	// ==========================================
-	// OVERLAYS
-	// ==========================================
+	/// @}
 
-	/** Get overlay settings */
+	// ==========================================
+	/// @name Overlays
+	/// @brief Functions for watermarks, frames, and informational overlays.
+	/// Overlays are rendered on top of the captured image.
+	// ==========================================
+	/// @{
+
+	/** @brief Get current overlay configuration. */
 	UFUNCTION(BlueprintPure, Category = "PhotoMode|Overlay")
 	FMGPhotoOverlaySettings GetOverlaySettings() const { return OverlaySettings; }
 
-	/** Set overlay settings */
+	/** @brief Apply a complete overlay settings configuration. */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Overlay")
 	void SetOverlaySettings(const FMGPhotoOverlaySettings& Settings);
 
-	/** Toggle logo */
+	/** @brief Toggle the game logo watermark on/off. */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Overlay")
 	void ToggleLogo();
 
-	/** Cycle frame style */
+	/** @brief Cycle through available decorative frame styles. */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Overlay")
 	void CycleFrameStyle();
 
-	// ==========================================
-	// SCENE CONTROL
-	// ==========================================
+	/// @}
 
-	/** Pause/unpause scene */
+	// ==========================================
+	/// @name Scene Control
+	/// @brief Functions for controlling scene state during photo mode.
+	/// Allows pausing action and hiding elements for clean shots.
+	// ==========================================
+	/// @{
+
+	/**
+	 * @brief Pause or unpause the game scene.
+	 * @param bPaused True to freeze all gameplay, false to allow motion.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Scene")
 	void SetScenePaused(bool bPaused);
 
-	/** Is scene paused */
+	/** @brief Check if the scene is currently paused/frozen. */
 	UFUNCTION(BlueprintPure, Category = "PhotoMode|Scene")
 	bool IsScenePaused() const { return bScenePaused; }
 
-	/** Toggle scene pause */
+	/** @brief Toggle scene pause state. Useful for capturing motion. */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Scene")
 	void ToggleScenePause();
 
-	/** Hide player vehicle */
+	/**
+	 * @brief Show or hide the player's vehicle in the shot.
+	 * @param bHidden True to hide vehicle, false to show.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Scene")
 	void SetVehicleHidden(bool bHidden);
 
-	/** Hide HUD elements */
+	/**
+	 * @brief Show or hide HUD elements during photo mode.
+	 * @param bHidden True to hide HUD, false to show.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "PhotoMode|Scene")
 	void SetHUDHidden(bool bHidden);
+
+	/// @}
 
 	// ==========================================
 	// CAPTURE

@@ -519,23 +519,48 @@ struct FMGOwnedVehicle
 	bool IsValid() const { return VehicleId.IsValid() && !VehicleModelData.IsNull(); }
 };
 
+// ============================================================================
+// OPERATION RESULT
+// ============================================================================
+
 /**
- * Result of a garage operation
+ * @struct FMGGarageResult
+ * @brief Result of a garage operation (install, remove, purchase, etc.)
+ *
+ * Provides a standardized way to return success/failure status along with
+ * relevant information like error messages and costs.
+ *
+ * ## Usage Pattern
+ * @code
+ * FMGGarageResult Result = Garage->InstallPart(VehicleId, Part);
+ * if (Result.bSuccess)
+ * {
+ *     UE_LOG(LogGarage, Log, TEXT("Part installed, cost: %lld"), Result.CostOrRefund);
+ * }
+ * else
+ * {
+ *     ShowErrorUI(Result.ErrorMessage);
+ * }
+ * @endcode
  */
 USTRUCT(BlueprintType)
 struct FMGGarageResult
 {
 	GENERATED_BODY()
 
+	/// Whether the operation completed successfully
 	UPROPERTY(BlueprintReadOnly)
 	bool bSuccess = false;
 
+	/// Human-readable error message (only valid if bSuccess is false)
 	UPROPERTY(BlueprintReadOnly)
 	FText ErrorMessage;
 
+	/// Cost charged or refund given (positive = cost, negative = refund)
 	UPROPERTY(BlueprintReadOnly)
 	int64 CostOrRefund = 0;
 
+	/** Create a successful result with optional cost */
 	static FMGGarageResult Success(int64 Cost = 0)
 	{
 		FMGGarageResult Result;
@@ -544,6 +569,7 @@ struct FMGGarageResult
 		return Result;
 	}
 
+	/** Create a failure result with error message */
 	static FMGGarageResult Failure(const FText& Error)
 	{
 		FMGGarageResult Result;
@@ -553,17 +579,57 @@ struct FMGGarageResult
 	}
 };
 
-/** Delegate for garage events */
+// ============================================================================
+// EVENT DELEGATES
+// ============================================================================
+
+/** Broadcast when any property of a vehicle changes (parts, paint, stats, etc.) */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVehicleChanged, const FGuid&, VehicleId);
+
+/** Broadcast when a part is successfully installed on a vehicle */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPartInstalled, const FGuid&, VehicleId, EMGPartSlot, Slot);
+
+/** Broadcast when a part is removed from a vehicle */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPartRemoved, const FGuid&, VehicleId, EMGPartSlot, Slot);
+
+/** Broadcast when a new vehicle is added to the garage */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVehicleAdded, const FGuid&, VehicleId);
+
+/** Broadcast when a vehicle is removed from the garage (sold or deleted) */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVehicleRemoved, const FGuid&, VehicleId);
+
+/** Broadcast when the player selects a different vehicle for racing */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVehicleSelected, const FGuid&, VehicleId);
 
+// ============================================================================
+// GARAGE SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Game Instance Subsystem for managing the player's garage
- * Handles vehicle collection, customization, and stat calculations
+ * @class UMGGarageSubsystem
+ * @brief Game Instance Subsystem for managing the player's vehicle garage
+ *
+ * The garage subsystem is the central authority for all vehicle ownership and
+ * customization. It provides a complete API for:
+ *
+ * - Managing the player's vehicle collection (add, remove, sell, select)
+ * - Installing and removing aftermarket parts with compatibility validation
+ * - Applying paint configurations
+ * - Calculating vehicle performance statistics and PI ratings
+ * - Tracking vehicle wear and maintenance state
+ * - Exporting/importing vehicle builds for sharing
+ * - Spawning configured vehicles into the world
+ *
+ * ## Thread Safety
+ * All operations are designed to run on the game thread. Do not call from
+ * worker threads.
+ *
+ * ## Events
+ * Subscribe to delegate events (OnVehicleChanged, OnPartInstalled, etc.) to
+ * react to garage state changes in UI and other systems.
+ *
+ * @see FMGOwnedVehicle for vehicle data structure
+ * @see UMGTuningSubsystem for fine-tuning parameters
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGGarageSubsystem : public UGameInstanceSubsystem
@@ -571,9 +637,10 @@ class MIDNIGHTGRIND_API UMGGarageSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	// USubsystem interface
+	//~ Begin USubsystem Interface
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
+	//~ End USubsystem Interface
 
 	// ==========================================
 	// VEHICLE COLLECTION

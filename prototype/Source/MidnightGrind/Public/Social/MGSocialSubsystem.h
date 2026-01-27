@@ -39,363 +39,414 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MGSocialSubsystem.generated.h"
 
+// ============================================================================
+// ENUMERATIONS - Player Status & Request Types
+// ============================================================================
+
 /**
- * Friend status
+ * @brief Represents a friend's current activity status in the game
+ *
+ * Used to display presence information in friends lists and determine
+ * whether a player can be joined or invited to activities.
  */
 UENUM(BlueprintType)
 enum class EMGFriendStatus : uint8
 {
-	/** Offline */
-	Offline,
-	/** Online in menus */
-	Online,
-	/** In garage */
-	InGarage,
-	/** In lobby */
-	InLobby,
-	/** Racing */
-	Racing,
-	/** Watching replay */
-	WatchingReplay,
-	/** Away */
-	Away
+	Offline,        ///< Player is not connected to the game
+	Online,         ///< Player is online, browsing menus
+	InGarage,       ///< Player is customizing vehicles in their garage
+	InLobby,        ///< Player is in a race lobby, may be joinable
+	Racing,         ///< Player is actively in a race
+	WatchingReplay, ///< Player is viewing a replay
+	Away            ///< Player is idle/AFK
 };
 
 /**
- * Friend request status
+ * @brief Status of a friend request between two players
+ *
+ * Tracks the lifecycle of friend requests from initial send through
+ * acceptance, rejection, or blocking.
  */
 UENUM(BlueprintType)
 enum class EMGRequestStatus : uint8
 {
-	/** Pending */
-	Pending,
-	/** Accepted */
-	Accepted,
-	/** Declined */
-	Declined,
-	/** Blocked */
-	Blocked
+	Pending,  ///< Request sent, awaiting response from recipient
+	Accepted, ///< Request accepted, players are now friends
+	Declined, ///< Request declined by recipient
+	Blocked   ///< Recipient blocked the sender
 };
 
 /**
- * Crew rank
+ * @brief Hierarchical rank within a crew determining permissions
+ *
+ * Higher ranks have more permissions for crew management. Used in the
+ * simplified crew system; see Crew/MGCrewSubsystem.h for extended ranks.
  */
 UENUM(BlueprintType)
 enum class EMGCrewRank : uint8
 {
-	/** Regular member */
-	Member,
-	/** Officer with invite permissions */
-	Officer,
-	/** Leader with full control */
-	Leader
+	Member,  ///< Regular member - can participate but no management rights
+	Officer, ///< Officer - can invite new members and kick lower ranks
+	Leader   ///< Leader - full control including disbanding and promotions
 };
 
+// ============================================================================
+// STRUCTURES - Friend & Player Data
+// ============================================================================
+
 /**
- * Friend data
+ * @brief Complete data for a single friend in the friends list
+ *
+ * Contains all information needed to display a friend in the UI and
+ * determine available social actions (join, invite, etc.).
  */
 USTRUCT(BlueprintType)
 struct FMGFriendData
 {
 	GENERATED_BODY()
 
-	/** Player ID */
+	/// Unique identifier for this player (persistent across sessions)
 	UPROPERTY(BlueprintReadOnly)
 	FString PlayerID;
 
-	/** Display name */
+	/// Player's chosen display name shown in UI
 	UPROPERTY(BlueprintReadOnly)
 	FString DisplayName;
 
-	/** Current status */
+	/// Current activity status (online, racing, etc.)
 	UPROPERTY(BlueprintReadOnly)
 	EMGFriendStatus Status = EMGFriendStatus::Offline;
 
-	/** Status text */
+	/// Custom status message set by the player
 	UPROPERTY(BlueprintReadOnly)
 	FString StatusText;
 
-	/** Current track (if racing) */
+	/// Track ID if player is currently racing (empty otherwise)
 	UPROPERTY(BlueprintReadOnly)
 	FName CurrentTrack;
 
-	/** Session ID (if in lobby/racing) */
+	/// Session ID for join-in-progress functionality
 	UPROPERTY(BlueprintReadOnly)
 	FString SessionID;
 
-	/** Crew name */
+	/// Name of the crew this player belongs to (empty if none)
 	UPROPERTY(BlueprintReadOnly)
 	FString CrewName;
 
-	/** Profile level */
+	/// Player's account level (1 = new player)
 	UPROPERTY(BlueprintReadOnly)
 	int32 Level = 1;
 
-	/** Reputation */
+	/// Accumulated reputation points from races
 	UPROPERTY(BlueprintReadOnly)
 	int32 Reputation = 0;
 
-	/** Total wins */
+	/// Lifetime race wins
 	UPROPERTY(BlueprintReadOnly)
 	int32 TotalWins = 0;
 
-	/** Last online time */
+	/// Timestamp of last online activity (for "last seen" display)
 	UPROPERTY(BlueprintReadOnly)
 	FDateTime LastOnline;
 
-	/** Avatar ID */
+	/// Reference to player's avatar/profile picture asset
 	UPROPERTY(BlueprintReadOnly)
 	FName AvatarID;
 
-	/** Is favorite friend */
+	/// True if player has been marked as a favorite for quick access
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsFavorite = false;
 
-	/** Can join their session */
+	/// True if the player's current session is joinable
 	UPROPERTY(BlueprintReadOnly)
 	bool bCanJoin = false;
 };
 
 /**
- * Friend request
+ * @brief Data for a pending friend request (incoming or outgoing)
+ *
+ * Represents a friend request that has been sent but not yet fully resolved.
+ * Used to populate friend request lists and notifications.
  */
 USTRUCT(BlueprintType)
 struct FMGFriendRequest
 {
 	GENERATED_BODY()
 
-	/** Request ID */
+	/// Unique identifier for this specific request
 	UPROPERTY(BlueprintReadOnly)
 	FString RequestID;
 
-	/** Sender player ID */
+	/// Player ID of the person who sent the request
 	UPROPERTY(BlueprintReadOnly)
 	FString SenderID;
 
-	/** Sender display name */
+	/// Display name of the sender
 	UPROPERTY(BlueprintReadOnly)
 	FString SenderName;
 
-	/** Sender level */
+	/// Sender's account level (helps recipient gauge experience)
 	UPROPERTY(BlueprintReadOnly)
 	int32 SenderLevel = 1;
 
-	/** Request timestamp */
+	/// When the request was sent
 	UPROPERTY(BlueprintReadOnly)
 	FDateTime Timestamp;
 
-	/** Status */
+	/// Current status of this request
 	UPROPERTY(BlueprintReadOnly)
 	EMGRequestStatus Status = EMGRequestStatus::Pending;
 
-	/** Is incoming (vs outgoing) */
+	/// True = someone sent this to us; False = we sent this to someone
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsIncoming = true;
 };
 
+// ============================================================================
+// STRUCTURES - Crew Data
+// ============================================================================
+
 /**
- * Crew member data
+ * @brief Information about a single member within a crew
+ *
+ * Tracks each crew member's rank, contributions, and activity within the crew.
  */
 USTRUCT(BlueprintType)
 struct FMGCrewMember
 {
 	GENERATED_BODY()
 
-	/** Player ID */
+	/// Unique player identifier
 	UPROPERTY(BlueprintReadOnly)
 	FString PlayerID;
 
-	/** Display name */
+	/// Player's display name
 	UPROPERTY(BlueprintReadOnly)
 	FString DisplayName;
 
-	/** Crew rank */
+	/// Member's rank within the crew hierarchy
 	UPROPERTY(BlueprintReadOnly)
 	EMGCrewRank Rank = EMGCrewRank::Member;
 
-	/** Join date */
+	/// When this player joined the crew
 	UPROPERTY(BlueprintReadOnly)
 	FDateTime JoinDate;
 
-	/** Contribution to crew XP */
+	/// XP contributed to crew this week (resets weekly)
 	UPROPERTY(BlueprintReadOnly)
 	int32 WeeklyContribution = 0;
 
-	/** Total contribution */
+	/// Lifetime XP contributed to this crew
 	UPROPERTY(BlueprintReadOnly)
 	int32 TotalContribution = 0;
 
-	/** Online status */
+	/// Current online/activity status
 	UPROPERTY(BlueprintReadOnly)
 	EMGFriendStatus Status = EMGFriendStatus::Offline;
 
-	/** Player level */
+	/// Player's account level
 	UPROPERTY(BlueprintReadOnly)
 	int32 Level = 1;
 };
 
 /**
- * Crew data
+ * @brief Complete data structure for a crew/club
+ *
+ * Contains all information about a crew including identity, progression,
+ * statistics, and member roster. Used for crew display and management UIs.
  */
 USTRUCT(BlueprintType)
 struct FMGCrewData
 {
 	GENERATED_BODY()
 
-	/** Crew ID */
+	/// Unique identifier for this crew
 	UPROPERTY(BlueprintReadOnly)
 	FString CrewID;
 
-	/** Crew name */
+	/// Full display name of the crew
 	UPROPERTY(BlueprintReadOnly)
 	FString CrewName;
 
-	/** Crew tag (short) */
+	/// Short tag shown next to player names (e.g., "[TAG]")
 	UPROPERTY(BlueprintReadOnly)
 	FString CrewTag;
 
-	/** Crew description */
+	/// Crew description/bio set by leadership
 	UPROPERTY(BlueprintReadOnly)
 	FString Description;
 
-	/** Crew emblem ID */
+	/// Reference to crew emblem/logo asset
 	UPROPERTY(BlueprintReadOnly)
 	FName EmblemID;
 
-	/** Crew color */
+	/// Primary crew color used for UI and liveries
 	UPROPERTY(BlueprintReadOnly)
 	FLinearColor CrewColor = FLinearColor::White;
 
-	/** Crew level */
+	/// Current crew level (unlocks perks and capacity)
 	UPROPERTY(BlueprintReadOnly)
 	int32 Level = 1;
 
-	/** Crew XP */
+	/// Current XP progress toward next level
 	UPROPERTY(BlueprintReadOnly)
 	int32 CrewXP = 0;
 
-	/** XP needed for next level */
+	/// XP threshold required to reach next level
 	UPROPERTY(BlueprintReadOnly)
 	int32 NextLevelXP = 1000;
 
-	/** Member count */
+	/// Current number of members in the crew
 	UPROPERTY(BlueprintReadOnly)
 	int32 MemberCount = 0;
 
-	/** Max members */
+	/// Maximum allowed members (increases with crew level)
 	UPROPERTY(BlueprintReadOnly)
 	int32 MaxMembers = 50;
 
-	/** Total wins */
+	/// Combined race wins from all crew members
 	UPROPERTY(BlueprintReadOnly)
 	int32 TotalWins = 0;
 
-	/** Weekly ranking */
+	/// Crew's position on the weekly leaderboard
 	UPROPERTY(BlueprintReadOnly)
 	int32 WeeklyRank = 0;
 
-	/** Is recruiting */
+	/// True if crew is accepting new member applications
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsRecruiting = true;
 
-	/** Created date */
+	/// When the crew was founded
 	UPROPERTY(BlueprintReadOnly)
 	FDateTime CreatedDate;
 
-	/** Members */
+	/// Full roster of crew members
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FMGCrewMember> Members;
 };
 
 /**
- * Crew invite
+ * @brief An invitation to join a crew
+ *
+ * Represents a pending crew invitation sent by an officer or leader.
  */
 USTRUCT(BlueprintType)
 struct FMGCrewInvite
 {
 	GENERATED_BODY()
 
-	/** Invite ID */
+	/// Unique identifier for this invite
 	UPROPERTY(BlueprintReadOnly)
 	FString InviteID;
 
-	/** Crew ID */
+	/// ID of the crew extending the invitation
 	UPROPERTY(BlueprintReadOnly)
 	FString CrewID;
 
-	/** Crew name */
+	/// Display name of the inviting crew
 	UPROPERTY(BlueprintReadOnly)
 	FString CrewName;
 
-	/** Inviter name */
+	/// Name of the player who sent the invite
 	UPROPERTY(BlueprintReadOnly)
 	FString InviterName;
 
-	/** Timestamp */
+	/// When the invitation was sent
 	UPROPERTY(BlueprintReadOnly)
 	FDateTime Timestamp;
 };
 
+// ============================================================================
+// STRUCTURES - Recent Players
+// ============================================================================
+
 /**
- * Recent player
+ * @brief Record of a player encountered in a recent race
+ *
+ * Tracks players you've raced against for easy friend adding or reporting.
+ * Automatically populated after each race completes.
  */
 USTRUCT(BlueprintType)
 struct FMGRecentPlayer
 {
 	GENERATED_BODY()
 
-	/** Player ID */
+	/// Unique player identifier
 	UPROPERTY(BlueprintReadOnly)
 	FString PlayerID;
 
-	/** Display name */
+	/// Player's display name
 	UPROPERTY(BlueprintReadOnly)
 	FString DisplayName;
 
-	/** When we last raced */
+	/// Timestamp of the most recent race together
 	UPROPERTY(BlueprintReadOnly)
 	FDateTime LastRaced;
 
-	/** Track raced on */
+	/// Track where the race occurred
 	UPROPERTY(BlueprintReadOnly)
 	FName TrackID;
 
-	/** Their finish position */
+	/// Their finishing position in that race
 	UPROPERTY(BlueprintReadOnly)
 	int32 TheirPosition = 0;
 
-	/** Our finish position */
+	/// Your finishing position in that race
 	UPROPERTY(BlueprintReadOnly)
 	int32 OurPosition = 0;
 
-	/** Is already friend */
+	/// True if this player is already on your friends list
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsFriend = false;
 
-	/** Is blocked */
+	/// True if you have blocked this player
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsBlocked = false;
 };
 
-/**
- * Delegates
- */
+// ============================================================================
+// DELEGATES - Event Callbacks
+// ============================================================================
+
+/// Broadcast when the friends list is refreshed or modified
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFriendListUpdated, const TArray<FMGFriendData>&, Friends);
+
+/// Broadcast when a specific friend's status changes (online, racing, etc.)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFriendStatusChanged, const FMGFriendData&, Friend);
+
+/// Broadcast when a new friend request is received
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFriendRequestReceived, const FMGFriendRequest&, Request);
+
+/// Broadcast when crew data is updated (level up, member changes, etc.)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCrewDataUpdated, const FMGCrewData&, Crew);
+
+/// Broadcast when an invitation to join a crew is received
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCrewInviteReceived, const FMGCrewInvite&, Invite);
+
+/// Broadcast when a friend invites you to join their game session
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameInviteReceived, const FMGFriendData&, FromFriend, const FString&, SessionID);
 
+// ============================================================================
+// SOCIAL SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Social Subsystem
- * Manages friends, crews, and social features
+ * @brief Central subsystem for all social features in Midnight Grind
  *
- * Features:
- * - Friends list management
- * - Crew system
- * - Game invites
- * - Recent players
+ * UMGSocialSubsystem is a GameInstanceSubsystem that persists for the lifetime
+ * of the game instance. It manages:
+ * - Friends list with presence tracking
+ * - Basic crew membership and management
+ * - Game invites and join-in-progress
+ * - Recent players from completed races
+ *
+ * @note For advanced crew features, use UMGCrewSubsystem from Crew/MGCrewSubsystem.h
+ *
+ * @section subsystem_access Accessing the Subsystem
+ * @code
+ * UGameInstance* GI = GetWorld()->GetGameInstance();
+ * UMGSocialSubsystem* Social = GI->GetSubsystem<UMGSocialSubsystem>();
+ * @endcode
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGSocialSubsystem : public UGameInstanceSubsystem
@@ -403,28 +454,37 @@ class MIDNIGHTGRIND_API UMGSocialSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	/** Initialize the subsystem when the game instance is created */
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	/** Clean up when the game instance is destroyed */
 	virtual void Deinitialize() override;
 
 	// ==========================================
-	// EVENTS
+	// EVENTS - Subscribe to receive social notifications
 	// ==========================================
 
+	/// Fires when the friends list is refreshed (call RefreshFriendsList() to trigger)
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnFriendListUpdated OnFriendListUpdated;
 
+	/// Fires when any friend's presence status changes
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnFriendStatusChanged OnFriendStatusChanged;
 
+	/// Fires when someone sends you a friend request
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnFriendRequestReceived OnFriendRequestReceived;
 
+	/// Fires when your crew's data changes
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCrewDataUpdated OnCrewDataUpdated;
 
+	/// Fires when you receive a crew invitation
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCrewInviteReceived OnCrewInviteReceived;
 
+	/// Fires when a friend invites you to their game session
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnGameInviteReceived OnGameInviteReceived;
 

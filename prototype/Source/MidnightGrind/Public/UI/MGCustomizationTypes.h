@@ -1,5 +1,56 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGCustomizationTypes.h
+ * =============================================================================
+ *
+ * PURPOSE:
+ * This file defines all the data types (enums and structs) used by the vehicle
+ * customization/garage UI system. It contains no logic - only type definitions
+ * that describe how customization data is structured and categorized.
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. ENUMS (Enumerated Types):
+ *    - EMGCustomizationCategory: Categories like Engine, Tires, Paint, etc.
+ *    - EMGPartFilter: How to filter parts (All, Owned, Locked, etc.)
+ *    - EMGPartSortMode: How to sort part lists (by name, price, tier, etc.)
+ *    - EMGUINavigationDirection: Input directions for gamepad/keyboard navigation
+ *    - EMGCustomizationMenuState: What screen/state the menu is currently in
+ *
+ * 2. STRUCTS (Data Containers):
+ *    - FMGUIPartData: All display info for a single upgrade part
+ *    - FMGStatChange: Before/after stat comparison for a single stat
+ *    - FMGPartComparison: Full comparison when previewing a part
+ *    - FMGTuningSliderConfig: Settings for a tuning slider (like suspension stiffness)
+ *    - FMGPaintColorData: Color and finish settings for paint jobs
+ *    - FMGVinylPlacement: Position/scale/rotation of a vinyl decal on the car
+ *
+ * ARCHITECTURE NOTES:
+ * - This is a "types-only" header - it defines data structures but no behavior
+ * - Other classes (like UMGCustomizationWidget) use these types
+ * - The USTRUCT and UENUM macros make these usable in Blueprints
+ * - UPROPERTY macros expose struct members to Unreal's reflection system
+ *
+ * USAGE EXAMPLE:
+ * ```cpp
+ * // Creating part data to display in the UI
+ * FMGUIPartData PartData;
+ * PartData.DisplayName = FText::FromString("Stage 2 Turbo Kit");
+ * PartData.Category = EMGCustomizationCategory::ForcedInduction;
+ * PartData.Tier = EMGPartTier::Sport;
+ * PartData.Price = 15000;
+ * PartData.bOwned = false;
+ * ```
+ *
+ * RELATED FILES:
+ * - MGCustomizationWidget.h: The main UI widget that uses these types
+ * - MGPartListItemWidget.h: Individual part items in the list
+ * - MGVehicleData.h: Defines EMGPartTier and EMGPerformanceClass used here
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,6 +59,12 @@
 
 /**
  * UI Categories for customization menu
+ *
+ * These categories organize upgrade parts into logical groups that players
+ * can browse. The three main groups are:
+ * - Performance: Parts that affect how the car drives (Engine, Tires, etc.)
+ * - Visual: Parts that change how the car looks (Paint, Body Kits, etc.)
+ * - Tuning: Fine-tuning adjustments to existing parts (gear ratios, alignment, etc.)
  */
 UENUM(BlueprintType)
 enum class EMGCustomizationCategory : uint8

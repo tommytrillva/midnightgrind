@@ -7,7 +7,9 @@
  * in the garage through track loading, race execution, results display, and reward
  * distribution.
  *
- * ## Key Responsibilities
+ * ============================================================================
+ * KEY RESPONSIBILITIES
+ * ============================================================================
  * - Receiving and validating race setup requests from the garage/menu UI
  * - Coordinating track level loading and unloading
  * - Spawning player and AI vehicles at starting positions
@@ -15,23 +17,123 @@
  * - Processing race results and calculating rewards
  * - Managing the return flow back to the garage
  *
- * ## Race Flow States
- * The subsystem operates as a state machine progressing through:
- * Idle -> Setup -> Loading -> PreRace -> Countdown -> Racing -> Cooldown -> Results -> ProcessingRewards -> Returning
+ * ============================================================================
+ * STATE MACHINE DOCUMENTATION
+ * ============================================================================
+ * The subsystem operates as a finite state machine with the following states
+ * and valid transitions:
  *
- * ## Usage Example
+ * ## State Diagram
+ * @verbatim
+ *                                    +-------+
+ *                                    | Error |<-----------------+
+ *                                    +-------+                  |
+ *                                        ^                      |
+ *         (any state on failure)         |                      |
+ *                                        |                      |
+ *  +------+     +-------+     +---------+|    +---------+    +-------+
+ *  | Idle |---->| Setup |---->| Loading |---->| PreRace |--->| Count |
+ *  +------+     +-------+     +---------+     +---------+    | down  |
+ *      ^                                                     +-------+
+ *      |                                                         |
+ *      |    +-----------+    +---------+    +----------+    +--------+
+ *      +----| Returning |<---| Process |<---| Results  |<---| Racing |<--+
+ *           |           |    | Rewards |    +----------+    +--------+   |
+ *           +-----------+    +---------+         ^               |       |
+ *                                                |               v       |
+ *                                                |         +----------+  |
+ *                                                +---------| Cooldown |--+
+ *                                                          +----------+
+ * @endverbatim
+ *
+ * ## State Descriptions and Transitions
+ *
+ * | State             | Entry Trigger                | Exit Condition                    | Duration         |
+ * |-------------------|------------------------------|-----------------------------------|------------------|
+ * | Idle              | Default/Return complete      | StartRace() called               | Indefinite       |
+ * | Setup             | StartRace() called           | Validation complete              | <100ms           |
+ * | Loading           | Setup successful             | Level fully loaded               | 2-30 seconds     |
+ * | PreRace           | Level loaded                 | Camera flyover complete          | 3-10 seconds     |
+ * | Countdown         | PreRace complete             | Countdown reaches 0              | 4 seconds        |
+ * | Racing            | Countdown complete           | All racers finish/time expires   | Variable         |
+ * | Cooldown          | Race ends                    | Cooldown timer expires           | 3 seconds        |
+ * | Results           | Cooldown complete            | ContinueToGarage() called        | User-controlled  |
+ * | ProcessingRewards | Results acknowledged         | Rewards applied to profile       | <500ms           |
+ * | Returning         | Rewards processed            | Garage level loaded              | 2-10 seconds     |
+ * | Error             | Any failure condition        | Recovery action taken            | User-controlled  |
+ *
+ * ============================================================================
+ * TYPICAL RACE FLOW SEQUENCE
+ * ============================================================================
+ * 1. UI calls StartRace(Request) from garage menu
+ * 2. Flow validates request, generates AI opponents (Setup)
+ * 3. Track level begins streaming (Loading)
+ * 4. Vehicles spawn on grid, camera flyover plays (PreRace)
+ * 5. Countdown sequence: 3...2...1...GO! (Countdown)
+ * 6. Race GameMode takes control until finish (Racing)
+ * 7. Brief pause after checkered flag (Cooldown)
+ * 8. Results screen displayed to player (Results)
+ * 9. Cash/Rep/XP applied to save game (ProcessingRewards)
+ * 10. Track unloads, garage loads (Returning)
+ * 11. Ready for next race (Idle)
+ *
+ * ============================================================================
+ * ERROR HANDLING
+ * ============================================================================
+ * - Invalid TrackID: Transitions to Error state, broadcasts OnRaceError
+ * - Invalid VehicleID: Transitions to Error state, broadcasts OnRaceError
+ * - Level load failure: Transitions to Error state, attempts recovery
+ * - GameMode not found: Transitions to Error state, logs critical error
+ * - Reward processing failure: Logs error but continues to Returning state
+ *
+ * Error Recovery:
+ * - Call AbortRace() to safely return to Idle state from any Error
+ * - Error state preserves ErrorMessage for UI display
+ * - OnRaceError delegate provides error details for UI feedback
+ *
+ * ============================================================================
+ * THREAD SAFETY
+ * ============================================================================
+ * - All public methods must be called from the Game Thread only
+ * - Level streaming callbacks are marshaled to Game Thread internally
+ * - Delegate broadcasts occur on Game Thread
+ * - State transitions are atomic (single-frame)
+ *
+ * ============================================================================
+ * USAGE EXAMPLE
+ * ============================================================================
  * @code
+ * // From garage/menu UI
  * UMGRaceFlowSubsystem* RaceFlow = GetGameInstance()->GetSubsystem<UMGRaceFlowSubsystem>();
+ *
+ * // Subscribe to events
+ * RaceFlow->OnFlowStateChanged.AddDynamic(this, &UMyWidget::HandleStateChanged);
+ * RaceFlow->OnRaceFinished.AddDynamic(this, &UMyWidget::HandleRaceFinished);
+ * RaceFlow->OnRaceError.AddDynamic(this, &UMyWidget::HandleError);
+ *
+ * // Configure and start race
  * FMGRaceSetupRequest Request;
  * Request.TrackID = FName("Downtown_Circuit");
  * Request.PlayerVehicleID = FName("Nissan_GTR");
+ * Request.RaceType = FName("Circuit");
  * Request.LapCount = 3;
- * RaceFlow->StartRace(Request);
+ * Request.AICount = 7;
+ * Request.AIDifficulty = 0.5f;
+ *
+ * if (!RaceFlow->StartRace(Request))
+ * {
+ *     // Handle immediate validation failure
+ *     UE_LOG(LogRace, Warning, TEXT("Failed to start race - check request parameters"));
+ * }
  * @endcode
  *
- * @note This is a GameInstanceSubsystem, meaning it persists across level transitions
+ * @note This is a GameInstanceSubsystem, meaning it persists across level transitions.
+ *       State is preserved when loading/unloading race tracks.
+ *
  * @see UMGRaceDirectorSubsystem for AI pacing and drama control
  * @see UMGRaceModeSubsystem for race type and scoring logic
+ * @see UMGCheckpointSubsystem for checkpoint/timing management
+ * @see UMGTrackSubsystem for track data and racer progress
  *
  * Copyright Midnight Grind. All Rights Reserved.
  * Stage 51: Race Flow Subsystem - MVP Game Flow Orchestration

@@ -65,6 +65,10 @@ enum class EMGReputationTier : uint8;
 struct FMGReputationUnlock;
 struct FMGGhostComparator;
 enum class EMGGhostComparison : uint8;
+enum class EMGCareerChapter : uint8;
+enum class EMGCareerMilestone : uint8;
+struct FMGCareerObjective;
+struct FMGRival;
 
 /**
  * Vehicle input state - replicated for multiplayer
@@ -784,4 +788,28 @@ protected:
 	/** Handle secret shortcut found from shortcut subsystem */
 	UFUNCTION()
 	void OnSecretShortcutFound(const FString& ShortcutId, int32 BonusPoints);
+
+	/** Handle career chapter advanced from career subsystem */
+	UFUNCTION()
+	void OnCareerChapterAdvanced(EMGCareerChapter NewChapter);
+
+	/** Handle career milestone reached from career subsystem */
+	UFUNCTION()
+	void OnCareerMilestoneReached(EMGCareerMilestone Milestone);
+
+	/** Handle career objective completed from career subsystem */
+	UFUNCTION()
+	void OnCareerObjectiveCompleted(const FMGCareerObjective& Objective);
+
+	/** Handle new rival discovered from rivals subsystem */
+	UFUNCTION()
+	void OnNewRivalDiscovered(const FMGRival& Rival);
+
+	/** Handle rival defeated from rivals subsystem */
+	UFUNCTION()
+	void OnRivalDefeated(const FMGRival& Rival, bool bWasCloseRace);
+
+	/** Handle nemesis designated from rivals subsystem */
+	UFUNCTION()
+	void OnNemesisDesignated(const FMGRival& Nemesis);
 };

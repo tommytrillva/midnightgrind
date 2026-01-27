@@ -1,5 +1,52 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGCheckpointActor.h
+ * =============================================================================
+ *
+ * PURPOSE:
+ * This file defines the AMGCheckpointActor class, which represents physical
+ * checkpoint markers placed in the game world. Checkpoints are invisible
+ * trigger volumes that detect when vehicles pass through them, enabling the
+ * game to track race progress, lap times, and sector splits.
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. CHECKPOINT: An invisible trigger zone that vehicles must pass through.
+ *    Think of checkpoints like gates on a ski course - racers must pass
+ *    through them in order to complete a valid lap.
+ *
+ * 2. TRIGGER VOLUME: A 3D box (UBoxComponent) that fires an "overlap" event
+ *    when another actor (like a vehicle) enters or exits its bounds.
+ *    The overlap event is how Unreal Engine detects collisions without
+ *    actually blocking movement.
+ *
+ * 3. SECTOR SPLIT: Checkpoints can optionally mark sector boundaries.
+ *    Racing tracks are typically divided into 3 sectors (S1, S2, S3),
+ *    allowing players to compare their performance in each track section.
+ *
+ * 4. FINISH LINE: A special checkpoint that marks the end of each lap.
+ *    When a racer crosses the finish line after passing all checkpoints,
+ *    their lap is complete.
+ *
+ * HOW IT FITS IN THE ARCHITECTURE:
+ * - AMGCheckpointActor is placed in the level by designers (one per checkpoint)
+ * - On BeginPlay, it registers itself with UMGTrackSubsystem
+ * - UMGTrackSubsystem tracks all checkpoints and calculates race positions
+ * - When a vehicle overlaps the trigger box, this actor notifies the subsystem
+ * - The subsystem validates the checkpoint (correct order) and updates timing
+ *
+ * USAGE EXAMPLE:
+ * 1. Drag AMGCheckpointActor into your level
+ * 2. Set CheckpointIndex (0 = start/finish, 1 = first checkpoint, etc.)
+ * 3. Adjust CheckpointWidth/Height/Depth to fit your track
+ * 4. For sector timing, enable bIsSectorSplit and set SectorIndex
+ * 5. The actor automatically registers with the Track Subsystem at runtime
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,9 +54,11 @@
 #include "Track/MGTrackSubsystem.h"
 #include "MGCheckpointActor.generated.h"
 
-class UBoxComponent;
-class UArrowComponent;
-class UBillboardComponent;
+// Forward declarations - these tell the compiler these classes exist without
+// including their full headers. This speeds up compilation.
+class UBoxComponent;      // Unreal's box-shaped collision component
+class UArrowComponent;    // Visual arrow showing direction (editor only)
+class UBillboardComponent; // 2D sprite that always faces the camera (editor only)
 
 /**
  * Checkpoint trigger mode
