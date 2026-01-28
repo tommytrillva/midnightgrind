@@ -1,0 +1,295 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Speedometer and Tachometer HUD System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultStyle": "Digital",
+    "Units": "Auto",
+    "Customizable": true
+  },
+
+  "SpeedometerStyles": {
+    "Digital": {
+      "ID": "SPEEDO_DIGITAL",
+      "Description": "Modern digital display",
+      "Layout": "Numeric",
+      "Features": ["Speed", "Gear", "RPM"],
+      "Default": true
+    },
+    "Analog": {
+      "ID": "SPEEDO_ANALOG",
+      "Description": "Classic analog gauge",
+      "Layout": "Circular",
+      "Features": ["SpeedNeedle", "RPMNeedle", "Gear"],
+      "Authenticity": "High"
+    },
+    "Racing": {
+      "ID": "SPEEDO_RACING",
+      "Description": "Racing-focused HUD",
+      "Layout": "Compact",
+      "Features": ["Speed", "Gear", "RPMBar", "Shift"],
+      "Minimal": true
+    },
+    "Vintage": {
+      "ID": "SPEEDO_VINTAGE",
+      "Description": "Classic car style",
+      "Layout": "DualGauge",
+      "Features": ["SpeedNeedle", "RPMNeedle"],
+      "Aesthetic": "Retro"
+    },
+    "Futuristic": {
+      "ID": "SPEEDO_FUTURE",
+      "Description": "Sci-fi holographic style",
+      "Layout": "Holographic",
+      "Features": ["Speed", "Gear", "RPM", "Power"],
+      "Effects": "Glow"
+    },
+    "Minimal": {
+      "ID": "SPEEDO_MINIMAL",
+      "Description": "Clean minimal display",
+      "Layout": "SimpleNumeric",
+      "Features": ["Speed", "Gear"],
+      "Distraction": "Low"
+    }
+  },
+
+  "DisplayElements": {
+    "Speed": {
+      "Enabled": true,
+      "Format": { "Options": ["Integer", "OneDecimal"] },
+      "Units": {
+        "KMH": { "Label": "KM/H", "Conversion": 1.0 },
+        "MPH": { "Label": "MPH", "Conversion": 0.621371 }
+      },
+      "MaxDisplay": 500,
+      "Animation": { "Smooth": true }
+    },
+    "Tachometer": {
+      "Enabled": true,
+      "Display": {
+        "Options": ["Bar", "Arc", "Needle", "LEDs"],
+        "Default": "Bar"
+      },
+      "Redline": {
+        "Show": true,
+        "Color": "#FF0000",
+        "Flash": true,
+        "FlashSpeed": "Fast"
+      },
+      "Scale": {
+        "MaxRPM": 10000,
+        "DynamicMax": true,
+        "Divisions": 10
+      }
+    },
+    "Gear": {
+      "Enabled": true,
+      "Display": { "Options": ["Number", "Letter", "Both"] },
+      "Neutral": { "Label": "N" },
+      "Reverse": { "Label": "R" },
+      "Position": "Center"
+    },
+    "ShiftIndicator": {
+      "Enabled": true,
+      "Types": {
+        "Light": { "Color": "#00FF00", "Position": "Top" },
+        "Arrow": { "Direction": "Up", "Pulse": true },
+        "Bar": { "FillColor": "#FF0000" },
+        "LEDRow": { "Count": 5, "Sequential": true }
+      },
+      "Threshold": { "Percentage": 95 }
+    }
+  },
+
+  "AdditionalGauges": {
+    "Boost": {
+      "Enabled": true,
+      "Display": { "Options": ["Bar", "Gauge", "Numeric"] },
+      "Units": { "PSI": true, "Bar": true },
+      "MaxBoost": 30,
+      "Color": { "Low": "#00AAFF", "High": "#FF0000" }
+    },
+    "NitroMeter": {
+      "Enabled": true,
+      "Display": "Bar",
+      "Color": "#00FFFF",
+      "Segments": { "Optional": true, "Count": 3 },
+      "Refill": { "Animation": true }
+    },
+    "Temperature": {
+      "Engine": {
+        "Enabled": true,
+        "Display": { "Options": ["Gauge", "Numeric", "Warning"] },
+        "Normal": { "Range": [80, 100], "Color": "#00FF00" },
+        "Warning": { "Threshold": 110, "Color": "#FF0000" }
+      },
+      "Tires": {
+        "Enabled": true,
+        "PerTire": true,
+        "Optimal": { "Range": [80, 100], "Color": "#00FF00" },
+        "Cold": { "Color": "#0088FF" },
+        "Hot": { "Color": "#FF0000" }
+      }
+    },
+    "Fuel": {
+      "Enabled": true,
+      "Display": { "Options": ["Bar", "Gauge", "Numeric"] },
+      "Warning": { "Percentage": 15, "Flash": true }
+    },
+    "LapTimer": {
+      "Enabled": true,
+      "Display": { "CurrentLap": true, "BestLap": true, "Delta": true },
+      "DeltaColors": { "Faster": "#00FF00", "Slower": "#FF0000" }
+    }
+  },
+
+  "PositionSettings": {
+    "Location": {
+      "Options": ["BottomCenter", "BottomRight", "BottomLeft", "Custom"],
+      "Default": "BottomCenter"
+    },
+    "CustomPosition": {
+      "Enabled": true,
+      "X": { "Min": 0, "Max": 100 },
+      "Y": { "Min": 0, "Max": 100 }
+    },
+    "Size": {
+      "Options": ["Small", "Medium", "Large"],
+      "Default": "Medium",
+      "CustomScale": { "Min": 0.5, "Max": 1.5 }
+    },
+    "Opacity": {
+      "Min": 30,
+      "Max": 100,
+      "Default": 100
+    }
+  },
+
+  "ColorSchemes": {
+    "Presets": {
+      "Default": {
+        "Primary": "#FFFFFF",
+        "Secondary": "#00AAFF",
+        "Accent": "#FF0000"
+      },
+      "Racing": {
+        "Primary": "#00FF00",
+        "Secondary": "#FFFF00",
+        "Accent": "#FF0000"
+      },
+      "Midnight": {
+        "Primary": "#00FFFF",
+        "Secondary": "#FF00FF",
+        "Accent": "#FFFF00"
+      },
+      "Classic": {
+        "Primary": "#FFD700",
+        "Secondary": "#FFFFFF",
+        "Accent": "#FF4500"
+      }
+    },
+    "Custom": {
+      "Enabled": true,
+      "PrimaryColor": true,
+      "SecondaryColor": true,
+      "AccentColor": true,
+      "BackgroundColor": true
+    }
+  },
+
+  "Animations": {
+    "SpeedChanges": {
+      "Smooth": true,
+      "Responsiveness": { "Min": 0.1, "Max": 1.0, "Default": 0.5 }
+    },
+    "RPMNeedle": {
+      "Bounce": { "Enabled": true, "Amount": 0.1 },
+      "Smoothing": true
+    },
+    "GearChange": {
+      "Flash": { "Enabled": true },
+      "Scale": { "Enabled": true }
+    },
+    "RedlineFlash": {
+      "Enabled": true,
+      "Speed": { "Options": ["Slow", "Medium", "Fast"] }
+    },
+    "NitroActivation": {
+      "Glow": true,
+      "Pulse": true
+    }
+  },
+
+  "ContextualDisplay": {
+    "RaceMode": {
+      "ShowLapTimer": true,
+      "ShowPosition": true,
+      "ShowDelta": true,
+      "HideUnnecessary": true
+    },
+    "DriftMode": {
+      "ShowDriftScore": true,
+      "ShowMultiplier": true,
+      "ShowAngle": { "Optional": true }
+    },
+    "FreeRoam": {
+      "Standard": true,
+      "ShowSpeed": true,
+      "ShowGear": true
+    }
+  },
+
+  "PerformanceDisplay": {
+    "PowerMeter": {
+      "Enabled": true,
+      "ShowHP": true,
+      "ShowTorque": { "Optional": true },
+      "RealTime": true
+    },
+    "GForce": {
+      "Enabled": true,
+      "Display": { "Options": ["Numeric", "Visual", "Both"] },
+      "Axes": { "Lateral": true, "Longitudinal": true }
+    },
+    "TractionIndicator": {
+      "Enabled": true,
+      "PerWheel": true,
+      "Colors": { "Grip": "#00FF00", "Slip": "#FF0000" }
+    }
+  },
+
+  "VehicleSpecific": {
+    "MatchVehicleStyle": {
+      "Enabled": true,
+      "JDM": "Digital",
+      "Euro": "Analog",
+      "Muscle": "Vintage",
+      "Modern": "Futuristic"
+    },
+    "CustomPerVehicle": {
+      "Enabled": true,
+      "SaveWithVehicle": true
+    }
+  },
+
+  "UI": {
+    "Customization": {
+      "StyleSelector": true,
+      "ElementToggles": true,
+      "PositionDrag": true,
+      "ColorPicker": true,
+      "PreviewMode": true
+    },
+    "QuickSettings": {
+      "UnitToggle": true,
+      "StyleCycle": true,
+      "VisibilityToggle": true
+    },
+    "Presets": {
+      "Save": true,
+      "Load": true,
+      "Share": true
+    }
+  }
+}

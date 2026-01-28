@@ -1,0 +1,285 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Proximity Radar and Opponent Display System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultVisible": true,
+    "ShowInRace": true,
+    "ShowInFreeRoam": true,
+    "Customizable": true
+  },
+
+  "RadarModes": {
+    "Proximity": {
+      "ID": "RADAR_PROXIMITY",
+      "Description": "Shows nearby vehicles",
+      "Range": 50,
+      "AllDirections": true,
+      "Default": true
+    },
+    "Race": {
+      "ID": "RADAR_RACE",
+      "Description": "Racing-focused display",
+      "Range": 100,
+      "ShowAhead": true,
+      "ShowBehind": true,
+      "Position": "TopCenter"
+    },
+    "Traffic": {
+      "ID": "RADAR_TRAFFIC",
+      "Description": "Traffic awareness",
+      "Range": 75,
+      "ShowTraffic": true,
+      "ShowPlayers": true
+    },
+    "Police": {
+      "ID": "RADAR_POLICE",
+      "Description": "Police detection",
+      "Range": 200,
+      "PoliceOnly": true,
+      "ShowWantedLevel": true
+    }
+  },
+
+  "DisplayStyles": {
+    "Circular": {
+      "ID": "STYLE_CIRCULAR",
+      "Shape": "Circle",
+      "PlayerCenter": true,
+      "Rotation": "PlayerDirection",
+      "Default": true
+    },
+    "LinearHorizontal": {
+      "ID": "STYLE_LINEAR_H",
+      "Shape": "Bar",
+      "Orientation": "Horizontal",
+      "ShowAheadBehind": true,
+      "Position": "Top"
+    },
+    "LinearVertical": {
+      "ID": "STYLE_LINEAR_V",
+      "Shape": "Bar",
+      "Orientation": "Vertical",
+      "ShowLeftRight": true,
+      "Position": "Side"
+    },
+    "Arrows": {
+      "ID": "STYLE_ARROWS",
+      "Shape": "DirectionalArrows",
+      "ScreenEdge": true,
+      "Minimal": true
+    },
+    "ThreeSixty": {
+      "ID": "STYLE_360",
+      "Shape": "Ring",
+      "AroundPlayer": true,
+      "ShowDistance": true
+    }
+  },
+
+  "RangeSettings": {
+    "Levels": {
+      "Close": { "Meters": 25, "Priority": "High" },
+      "Near": { "Meters": 50, "Priority": "Medium" },
+      "Medium": { "Meters": 100, "Priority": "Low" },
+      "Far": { "Meters": 200, "Priority": "VeryLow" }
+    },
+    "DynamicRange": {
+      "Enabled": true,
+      "BasedOnSpeed": true,
+      "IncreaseAtSpeed": { "Speed": 150, "RangeMultiplier": 1.5 }
+    },
+    "CustomRange": {
+      "Enabled": true,
+      "Min": 25,
+      "Max": 200
+    }
+  },
+
+  "BlipSystem": {
+    "VehicleBlips": {
+      "Player": {
+        "Color": "#00FF00",
+        "Shape": "Arrow",
+        "AlwaysCenter": true
+      },
+      "Opponent": {
+        "Color": "#FF0000",
+        "Shape": "Dot",
+        "SizeByDistance": true
+      },
+      "Friend": {
+        "Color": "#00AAFF",
+        "Shape": "Dot",
+        "Highlight": true
+      },
+      "CrewMember": {
+        "Color": "#FF00FF",
+        "Shape": "Dot",
+        "Highlight": true
+      },
+      "Traffic": {
+        "Color": "#888888",
+        "Shape": "SmallDot",
+        "Opacity": 0.5
+      },
+      "Police": {
+        "Color": "#FF0000",
+        "Shape": "Triangle",
+        "Flash": true
+      }
+    },
+    "SizeScaling": {
+      "Enabled": true,
+      "CloseSize": 1.5,
+      "FarSize": 0.5,
+      "MinimumSize": 4
+    },
+    "DirectionIndicator": {
+      "Enabled": true,
+      "ShowHeading": true,
+      "ArrowStyle": true
+    }
+  },
+
+  "RaceSpecific": {
+    "PositionBar": {
+      "Enabled": true,
+      "Style": "Horizontal",
+      "ShowPositionNumbers": true,
+      "ShowPlayerHighlight": true
+    },
+    "ProximityWarning": {
+      "Enabled": true,
+      "Range": 10,
+      "VisualWarning": { "Flash": true, "Color": "#FFFF00" },
+      "AudioWarning": { "Optional": true }
+    },
+    "OvertakeIndicator": {
+      "Enabled": true,
+      "ShowApproaching": true,
+      "ShowOvertaking": true,
+      "Colors": { "Approaching": "#FFFF00", "Overtaking": "#FF0000" }
+    },
+    "GapDisplay": {
+      "ToAhead": true,
+      "ToBehind": true,
+      "Units": { "Options": ["Seconds", "Meters"] }
+    }
+  },
+
+  "WarningSystem": {
+    "CollisionWarning": {
+      "Enabled": true,
+      "Sensitivity": { "Min": 1, "Max": 10, "Default": 5 },
+      "VisualAlert": { "ScreenFlash": true, "Color": "#FF0000" },
+      "AudioAlert": { "Optional": true }
+    },
+    "BlindSpotWarning": {
+      "Enabled": true,
+      "LeftRight": true,
+      "IconPosition": "SideMirrors",
+      "Color": "#FFFF00"
+    },
+    "RearApproach": {
+      "Enabled": true,
+      "Threshold": { "SpeedDifference": 30 },
+      "Alert": { "Visual": true, "Audio": false }
+    }
+  },
+
+  "PoliceRadar": {
+    "WhenWanted": {
+      "AutoEnable": true,
+      "ExtendedRange": 200,
+      "ShowPatrolRoutes": false
+    },
+    "Detection": {
+      "ShowPoliceVehicles": true,
+      "ShowHelicopters": true,
+      "ShowRoadblocks": { "WhenVisible": true }
+    },
+    "HeatMap": {
+      "Optional": true,
+      "ShowHighActivityAreas": true,
+      "Colors": { "Low": "#00FF00", "Medium": "#FFFF00", "High": "#FF0000" }
+    }
+  },
+
+  "Customization": {
+    "Opacity": {
+      "Min": 20,
+      "Max": 100,
+      "Default": 80
+    },
+    "Size": {
+      "Options": ["Small", "Medium", "Large"],
+      "CustomScale": { "Min": 0.5, "Max": 1.5 }
+    },
+    "Position": {
+      "Presets": ["TopLeft", "TopRight", "BottomLeft", "BottomRight", "Center"],
+      "Custom": { "Enabled": true }
+    },
+    "Colors": {
+      "Background": { "Customizable": true },
+      "Border": { "Customizable": true },
+      "Blips": { "IndividualColors": true }
+    }
+  },
+
+  "ContextualBehavior": {
+    "InRace": {
+      "AutoEnable": true,
+      "Mode": "Race",
+      "ShowOpponentsOnly": true
+    },
+    "InFreeRoam": {
+      "AutoEnable": true,
+      "Mode": "Proximity",
+      "ShowAll": true
+    },
+    "WhenWanted": {
+      "SwitchToPolice": true,
+      "OverrideNormal": true
+    },
+    "InGarage": {
+      "Disable": true
+    }
+  },
+
+  "Performance": {
+    "UpdateRate": {
+      "Options": [15, 30, 60],
+      "Default": 30
+    },
+    "MaxBlips": {
+      "Default": 20,
+      "Performance": 10,
+      "Quality": 50
+    },
+    "LOD": {
+      "Enabled": true,
+      "ReduceAtDistance": true
+    }
+  },
+
+  "UI": {
+    "RadarSettings": {
+      "ModeSelector": true,
+      "StyleSelector": true,
+      "RangeSlider": true,
+      "ColorPicker": true
+    },
+    "QuickToggles": {
+      "ShowHide": true,
+      "ModeSwitch": true,
+      "SizeToggle": true
+    },
+    "Presets": {
+      "Save": true,
+      "Load": true,
+      "Default": true
+    }
+  }
+}

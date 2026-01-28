@@ -1,0 +1,295 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Pit Lane and Pit Stop Mechanics",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "AvailableInModes": ["Endurance", "TeamRace", "LongRace"],
+    "SpeedLimit": 60,
+    "PenaltyForSpeeding": true
+  },
+
+  "PitLaneLayout": {
+    "Entry": {
+      "SpeedLimitStart": true,
+      "EntryIndicator": true,
+      "CommitPoint": { "NoReturn": true },
+      "MinimumSpeed": 40
+    },
+    "PitRoad": {
+      "SpeedLimit": 60,
+      "Lanes": 2,
+      "OvertakingAllowed": false,
+      "Length": { "Typical": 200 }
+    },
+    "PitBox": {
+      "PerTeam": true,
+      "Width": 4,
+      "Length": 8,
+      "Equipment": ["Jacks", "TireGuns", "FuelRig"]
+    },
+    "Exit": {
+      "SpeedLimitEnd": true,
+      "MergeZone": true,
+      "SafeRelease": true
+    }
+  },
+
+  "PitStopServices": {
+    "Tires": {
+      "Enabled": true,
+      "Types": {
+        "AllFour": { "Duration": 3.0, "Default": true },
+        "FrontOnly": { "Duration": 1.8 },
+        "RearOnly": { "Duration": 1.8 },
+        "TwoTires": { "Duration": 2.2 }
+      },
+      "TireCompounds": {
+        "Soft": { "Available": true },
+        "Medium": { "Available": true },
+        "Hard": { "Available": true },
+        "Wet": { "IfRaining": true }
+      }
+    },
+    "Fuel": {
+      "Enabled": true,
+      "Method": "TimeBasedFill",
+      "Rate": { "LitersPerSecond": 10 },
+      "Options": {
+        "Full": { "ToMaximum": true },
+        "Splash": { "Liters": 20, "Duration": 2.0 },
+        "Custom": { "SelectAmount": true }
+      }
+    },
+    "Repairs": {
+      "Enabled": true,
+      "Types": {
+        "QuickRepair": { "Duration": 5.0, "Restores": 50 },
+        "FullRepair": { "Duration": 15.0, "Restores": 100 },
+        "BodyworkOnly": { "Duration": 3.0, "Cosmetic": true },
+        "MechanicalOnly": { "Duration": 8.0, "Performance": true }
+      },
+      "RequiredForDamage": {
+        "Critical": true,
+        "Optional": { "Minor": true }
+      }
+    },
+    "DriverChange": {
+      "Enabled": { "InTeamRaces": true },
+      "Duration": 5.0,
+      "MaxStints": { "Optional": true }
+    },
+    "Adjustments": {
+      "Enabled": true,
+      "Types": {
+        "WingAngle": { "Duration": 2.0 },
+        "BrakeBias": { "Duration": 1.0 },
+        "TirePressure": { "Duration": 1.5 }
+      }
+    }
+  },
+
+  "PitStopStrategy": {
+    "PreRacePlanning": {
+      "Enabled": true,
+      "ScheduleStops": true,
+      "SelectServices": true,
+      "FuelCalculator": true,
+      "TireStrategy": true
+    },
+    "InRaceAdjustment": {
+      "ChangeStrategy": true,
+      "RequestPitIn": true,
+      "ModifyServices": { "BeforeEntry": true }
+    },
+    "AIStrategy": {
+      "Enabled": true,
+      "Adaptive": true,
+      "ReactToConditions": true
+    }
+  },
+
+  "PitCrewSystem": {
+    "CrewMembers": {
+      "TireChangers": { "Count": 4, "PerWheel": true },
+      "JackOperator": { "Front": 1, "Rear": 1 },
+      "FuelOperator": { "Count": 1 },
+      "LollipopMan": { "Count": 1, "SafeRelease": true }
+    },
+    "CrewUpgrades": {
+      "Enabled": true,
+      "Levels": ["Rookie", "Standard", "Professional", "Elite"],
+      "Effects": {
+        "SpeedBonus": { "PerLevel": 5 },
+        "ErrorReduction": { "PerLevel": 10 }
+      },
+      "UnlockMethod": { "REP": true, "Level": true }
+    },
+    "CrewErrors": {
+      "Enabled": { "RealisticMode": true },
+      "Types": {
+        "WheelNotSecure": { "Delay": 2.0, "Chance": 0.02 },
+        "CrossThread": { "Delay": 5.0, "Chance": 0.01 },
+        "FuelSpill": { "Delay": 3.0, "Chance": 0.01 }
+      },
+      "Mitigation": { "HigherCrewLevel": true }
+    }
+  },
+
+  "PitStopTiming": {
+    "BaseTime": {
+      "Entry": 3.0,
+      "Stationary": { "Variable": true, "MinServices": true },
+      "Exit": 2.0
+    },
+    "ServiceTimes": {
+      "Simultaneous": {
+        "Enabled": true,
+        "TiresAndFuel": true,
+        "TotalTime": "LongestService"
+      },
+      "Sequential": {
+        "Optional": true,
+        "TotalTime": "SumOfServices"
+      }
+    },
+    "Penalties": {
+      "Speeding": { "TimeAddition": 5.0 },
+      "UnsafeRelease": { "TimeAddition": 10.0 },
+      "EquipmentViolation": { "TimeAddition": 15.0 }
+    }
+  },
+
+  "PitLimiter": {
+    "Enabled": true,
+    "AutoActivate": { "OnEntry": true },
+    "ManualControl": { "Available": true },
+    "SpeedLimit": 60,
+    "Tolerance": 2,
+    "Indicator": {
+      "OnScreen": true,
+      "Color": "#FFFF00",
+      "Audio": { "Beep": true }
+    }
+  },
+
+  "SafetyFeatures": {
+    "SafeRelease": {
+      "Enabled": true,
+      "CheckForTraffic": true,
+      "HoldIfUnsafe": true,
+      "IndicatorLight": { "Green": "Go", "Red": "Wait" }
+    },
+    "FireSafety": {
+      "Enabled": true,
+      "FuelFireRisk": { "OnSpill": true },
+      "Extinguishers": { "Available": true }
+    },
+    "SpeedEnforcement": {
+      "Automatic": true,
+      "Penalty": { "DriveThrough": true }
+    }
+  },
+
+  "MandatoryStops": {
+    "Enabled": { "InEndurance": true },
+    "Requirements": {
+      "MinimumStops": { "BasedOnRaceLength": true },
+      "TireChange": { "AtLeastOnce": true },
+      "DriverChange": { "InTeamRaces": true }
+    },
+    "Window": {
+      "Enabled": true,
+      "OpenLap": { "Percentage": 25 },
+      "CloseLap": { "Percentage": 75 }
+    },
+    "Penalty": {
+      "ForMissing": { "StopAndGo": true }
+    }
+  },
+
+  "Visualization": {
+    "PitBoard": {
+      "Enabled": true,
+      "ShowGap": true,
+      "ShowPosition": true,
+      "ShowLapsRemaining": true,
+      "ShowFuelLevel": true,
+      "ShowTireWear": true
+    },
+    "PitStopAnimation": {
+      "Enabled": true,
+      "CrewAnimations": true,
+      "EquipmentAnimations": true,
+      "CameraAngles": { "Options": ["Overhead", "Side", "Dynamic"] }
+    },
+    "InCarDisplay": {
+      "PitWindowOpen": true,
+      "RecommendedLap": true,
+      "CurrentStrategy": true
+    }
+  },
+
+  "Telemetry": {
+    "PitStopData": {
+      "TotalTime": true,
+      "ServiceBreakdown": true,
+      "TimeInPitLane": true,
+      "TimeLost": true
+    },
+    "Comparison": {
+      "ToOpponents": true,
+      "ToBestStop": true,
+      "ToStrategy": true
+    },
+    "History": {
+      "AllStops": true,
+      "AverageTime": true,
+      "Improvements": true
+    }
+  },
+
+  "GameModeIntegration": {
+    "Endurance": {
+      "FullSystem": true,
+      "MandatoryStops": true,
+      "FuelManagement": true,
+      "TireWear": true
+    },
+    "TeamRace": {
+      "DriverChanges": true,
+      "SharedStrategy": true,
+      "CrewCoordination": true
+    },
+    "Sprint": {
+      "Disabled": true
+    },
+    "Practice": {
+      "PracticeStops": true,
+      "NoTimeLimit": true,
+      "CrewTraining": true
+    }
+  },
+
+  "UI": {
+    "PitMenu": {
+      "QuickAccess": true,
+      "ServiceSelection": true,
+      "FuelAmount": true,
+      "TireCompound": true,
+      "ConfirmRequest": true
+    },
+    "StrategyOverlay": {
+      "PitWindow": true,
+      "RecommendedLap": true,
+      "FuelCalculator": true,
+      "TireWearDisplay": true
+    },
+    "PitLaneHUD": {
+      "SpeedLimit": true,
+      "LimiterStatus": true,
+      "BoxLocation": true,
+      "Progress": true
+    }
+  }
+}

@@ -1,0 +1,282 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Mini-Map and Navigation Display System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultVisible": true,
+    "Customizable": true,
+    "DynamicZoom": true,
+    "RotationMode": "PlayerRotates"
+  },
+
+  "MapModes": {
+    "Standard": {
+      "ID": "MAP_STANDARD",
+      "Description": "Default mini-map view",
+      "Shape": "Circle",
+      "ShowRoads": true,
+      "ShowBuildings": false,
+      "Default": true
+    },
+    "Detailed": {
+      "ID": "MAP_DETAILED",
+      "Description": "Enhanced detail view",
+      "Shape": "Rectangle",
+      "ShowRoads": true,
+      "ShowBuildings": true,
+      "ShowLandmarks": true
+    },
+    "Minimal": {
+      "ID": "MAP_MINIMAL",
+      "Description": "Clean minimal view",
+      "Shape": "Circle",
+      "ShowRoads": true,
+      "ShowBuildings": false,
+      "Opacity": 0.5
+    },
+    "Race": {
+      "ID": "MAP_RACE",
+      "Description": "Racing-focused view",
+      "Shape": "Rectangle",
+      "ShowCheckpoints": true,
+      "ShowOpponents": true,
+      "ShowRaceLine": true
+    },
+    "Navigation": {
+      "ID": "MAP_NAV",
+      "Description": "Turn-by-turn navigation",
+      "Shape": "Rectangle",
+      "ShowRoute": true,
+      "ShowNextTurn": true,
+      "ShowDistance": true
+    }
+  },
+
+  "DisplaySettings": {
+    "Shape": {
+      "Options": ["Circle", "Rectangle", "Square", "Rounded"],
+      "Default": "Circle"
+    },
+    "Size": {
+      "Options": ["Small", "Medium", "Large", "ExtraLarge"],
+      "Default": "Medium",
+      "CustomScale": { "Min": 0.5, "Max": 2.0 }
+    },
+    "Position": {
+      "Options": ["TopLeft", "TopRight", "BottomLeft", "BottomRight"],
+      "Default": "BottomLeft",
+      "CustomPosition": { "Enabled": true }
+    },
+    "Opacity": {
+      "Min": 20,
+      "Max": 100,
+      "Default": 80
+    },
+    "Border": {
+      "Enabled": true,
+      "Color": { "Customizable": true },
+      "Width": { "Min": 1, "Max": 5 }
+    }
+  },
+
+  "ZoomSettings": {
+    "Levels": {
+      "CloseUp": { "Scale": 1.5, "Meters": 100 },
+      "Near": { "Scale": 1.0, "Meters": 200 },
+      "Medium": { "Scale": 0.7, "Meters": 400 },
+      "Far": { "Scale": 0.5, "Meters": 800 },
+      "Overview": { "Scale": 0.3, "Meters": 1600 }
+    },
+    "DynamicZoom": {
+      "Enabled": true,
+      "BasedOnSpeed": true,
+      "SpeedThresholds": {
+        "Low": { "Speed": 50, "Zoom": "CloseUp" },
+        "Medium": { "Speed": 100, "Zoom": "Near" },
+        "High": { "Speed": 150, "Zoom": "Medium" },
+        "VeryHigh": { "Speed": 200, "Zoom": "Far" }
+      },
+      "SmoothTransition": true
+    },
+    "ManualZoom": {
+      "Enabled": true,
+      "Controls": { "ZoomIn": "NumPlus", "ZoomOut": "NumMinus" }
+    }
+  },
+
+  "RotationModes": {
+    "PlayerRotates": {
+      "Description": "Map fixed, player rotates",
+      "NorthAlwaysUp": true
+    },
+    "MapRotates": {
+      "Description": "Player fixed, map rotates",
+      "ForwardAlwaysUp": true
+    },
+    "Hybrid": {
+      "Description": "Smooth rotation with limits",
+      "MaxRotation": 45
+    }
+  },
+
+  "IconSystem": {
+    "PlayerIcon": {
+      "Shape": { "Options": ["Arrow", "Car", "Dot", "Custom"] },
+      "Color": { "Customizable": true, "Default": "#00FF00" },
+      "Size": { "Relative": true }
+    },
+    "OpponentIcons": {
+      "Enabled": true,
+      "Colors": {
+        "Neutral": "#FFFFFF",
+        "Friend": "#00FF00",
+        "Crew": "#00AAFF",
+        "Rival": "#FF0000"
+      },
+      "ShowDistance": { "Optional": true }
+    },
+    "POIIcons": {
+      "Garage": { "Icon": "GarageIcon", "Color": "#00FF00" },
+      "Shop": { "Icon": "ShopIcon", "Color": "#FFAA00" },
+      "Race": { "Icon": "RaceIcon", "Color": "#FF0000" },
+      "Event": { "Icon": "EventIcon", "Color": "#FF00FF" },
+      "Collectible": { "Icon": "StarIcon", "Color": "#FFFF00" },
+      "Custom": { "Icon": "MarkerIcon", "Color": "#FFFFFF" }
+    },
+    "RaceIcons": {
+      "Checkpoint": { "Icon": "CheckpointIcon", "Color": "#FFFF00" },
+      "NextCheckpoint": { "Icon": "CheckpointIcon", "Color": "#00FF00", "Pulse": true },
+      "FinishLine": { "Icon": "FinishIcon", "Color": "#FFFFFF" }
+    }
+  },
+
+  "RouteDisplay": {
+    "NavigationLine": {
+      "Enabled": true,
+      "Color": { "Default": "#00AAFF", "Customizable": true },
+      "Style": { "Options": ["Solid", "Dashed", "Dotted"] },
+      "Width": { "Min": 2, "Max": 8 }
+    },
+    "RacingLine": {
+      "Enabled": true,
+      "Color": { "Optimal": "#00FF00", "Current": "#FFFF00" },
+      "ShowDuringRace": true
+    },
+    "Waypoints": {
+      "ShowMarkers": true,
+      "ShowDistance": true,
+      "ShowETA": true
+    }
+  },
+
+  "InformationOverlay": {
+    "Compass": {
+      "Enabled": true,
+      "Position": "Top",
+      "ShowCardinals": true,
+      "ShowHeading": { "Optional": true }
+    },
+    "Coordinates": {
+      "Enabled": false,
+      "Format": "GameCoords"
+    },
+    "DistanceToWaypoint": {
+      "Enabled": true,
+      "Position": "Below",
+      "Units": { "Options": ["Metric", "Imperial"] }
+    },
+    "AreaName": {
+      "Enabled": true,
+      "ShowOnChange": true,
+      "FadeDelay": 3
+    }
+  },
+
+  "TrafficDisplay": {
+    "ShowTraffic": {
+      "Enabled": true,
+      "IconType": "Dot",
+      "Color": "#888888",
+      "MaxDisplayed": 20
+    },
+    "ShowPolice": {
+      "Enabled": true,
+      "WhenWanted": true,
+      "Range": 300,
+      "Color": "#FF0000",
+      "FlashingIcon": true
+    }
+  },
+
+  "RaceMode": {
+    "PositionIndicator": {
+      "ShowPosition": true,
+      "ShowTotalRacers": true,
+      "Position": "TopRight"
+    },
+    "OpponentDistance": {
+      "ShowAhead": true,
+      "ShowBehind": true,
+      "Units": "Meters"
+    },
+    "LapIndicator": {
+      "ShowCurrentLap": true,
+      "ShowTotalLaps": true
+    },
+    "CheckpointPreview": {
+      "ShowNext": true,
+      "ShowAfterNext": { "Optional": true }
+    }
+  },
+
+  "InteractiveFeatures": {
+    "ClickToWaypoint": {
+      "Enabled": true,
+      "OnFullMap": true
+    },
+    "QuickZoom": {
+      "Enabled": true,
+      "HoldToExpand": true,
+      "ExpandSize": 2.0
+    },
+    "ToggleVisibility": {
+      "Enabled": true,
+      "Keybind": "N"
+    }
+  },
+
+  "PerformanceSettings": {
+    "UpdateRate": {
+      "Options": [15, 30, 60],
+      "Default": 30
+    },
+    "DetailLevel": {
+      "Options": ["Low", "Medium", "High"],
+      "Default": "Medium"
+    },
+    "MaxIcons": {
+      "Default": 50,
+      "ReduceWhenBusy": true
+    }
+  },
+
+  "UI": {
+    "CustomizationMenu": {
+      "ShapeSelect": true,
+      "SizeSlider": true,
+      "PositionPicker": true,
+      "OpacitySlider": true,
+      "IconToggles": true
+    },
+    "QuickSettings": {
+      "ZoomPresets": true,
+      "ModeSwitch": true,
+      "VisibilityToggle": true
+    },
+    "Preview": {
+      "LivePreview": true,
+      "TestMode": true
+    }
+  }
+}
