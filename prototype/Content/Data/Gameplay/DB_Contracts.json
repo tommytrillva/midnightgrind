@@ -1,0 +1,300 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Contract and Mission System",
+
+  "ContractSystem": {
+    "Enabled": true,
+    "MaxActiveContracts": 5,
+    "RefreshTime": "00:00",
+    "BoardLocation": "Garage"
+  },
+
+  "ContractTypes": {
+    "Delivery": {
+      "ID": "CONTRACT_DELIVERY",
+      "Name": "Delivery Contracts",
+      "Description": "Transport cargo across the city",
+      "Icon": "ICO_Contract_Delivery",
+      "Color": "#00FF00",
+      "BaseReward": { "Cash": 3000, "REP": 150 },
+      "Variants": [
+        {
+          "ID": "DELIVERY_STANDARD",
+          "Name": "Standard Delivery",
+          "TimeLimit": 300,
+          "DamageAllowed": true,
+          "Multiplier": 1.0
+        },
+        {
+          "ID": "DELIVERY_FRAGILE",
+          "Name": "Fragile Cargo",
+          "TimeLimit": 360,
+          "DamageAllowed": false,
+          "CollisionPenalty": true,
+          "Multiplier": 1.5
+        },
+        {
+          "ID": "DELIVERY_URGENT",
+          "Name": "Urgent Delivery",
+          "TimeLimit": 180,
+          "DamageAllowed": true,
+          "Multiplier": 2.0
+        },
+        {
+          "ID": "DELIVERY_HOT",
+          "Name": "Hot Cargo",
+          "TimeLimit": 240,
+          "PoliceAttention": true,
+          "HeatLevel": 2,
+          "Multiplier": 2.5
+        }
+      ]
+    },
+    "Racing": {
+      "ID": "CONTRACT_RACE",
+      "Name": "Racing Contracts",
+      "Description": "Compete in sponsored races",
+      "Icon": "ICO_Contract_Race",
+      "Color": "#FF6600",
+      "BaseReward": { "Cash": 5000, "REP": 250 },
+      "Variants": [
+        {
+          "ID": "RACE_CIRCUIT",
+          "Name": "Circuit Race",
+          "Type": "Circuit",
+          "RequiredPosition": 3,
+          "Multiplier": 1.0
+        },
+        {
+          "ID": "RACE_SPRINT",
+          "Name": "Sprint Race",
+          "Type": "Sprint",
+          "RequiredPosition": 3,
+          "Multiplier": 1.0
+        },
+        {
+          "ID": "RACE_RIVAL",
+          "Name": "Rival Challenge",
+          "Type": "1v1",
+          "RequiredPosition": 1,
+          "Multiplier": 1.5
+        },
+        {
+          "ID": "RACE_TOURNAMENT",
+          "Name": "Tournament Entry",
+          "Type": "MultiRace",
+          "RaceCount": 3,
+          "RequiredPoints": 20,
+          "Multiplier": 2.5
+        }
+      ]
+    },
+    "Drifting": {
+      "ID": "CONTRACT_DRIFT",
+      "Name": "Drift Contracts",
+      "Description": "Show off your sideways skills",
+      "Icon": "ICO_Contract_Drift",
+      "Color": "#00FFFF",
+      "BaseReward": { "Cash": 4000, "REP": 200 },
+      "Variants": [
+        {
+          "ID": "DRIFT_ZONE",
+          "Name": "Zone Score",
+          "TargetScore": 50000,
+          "Multiplier": 1.0
+        },
+        {
+          "ID": "DRIFT_TANDEM",
+          "Name": "Tandem Battle",
+          "Type": "Tandem",
+          "Multiplier": 1.5
+        },
+        {
+          "ID": "DRIFT_EXHIBITION",
+          "Name": "Drift Exhibition",
+          "TargetScore": 100000,
+          "Location": "Featured",
+          "Multiplier": 2.0
+        }
+      ]
+    },
+    "Pursuit": {
+      "ID": "CONTRACT_PURSUIT",
+      "Name": "Pursuit Contracts",
+      "Description": "Outrun the law",
+      "Icon": "ICO_Contract_Pursuit",
+      "Color": "#0066FF",
+      "BaseReward": { "Cash": 6000, "REP": 300 },
+      "Variants": [
+        {
+          "ID": "PURSUIT_ESCAPE",
+          "Name": "Clean Getaway",
+          "Type": "Escape",
+          "MaxTime": 300,
+          "Multiplier": 1.0
+        },
+        {
+          "ID": "PURSUIT_SURVIVE",
+          "Name": "Survival Run",
+          "Type": "Survive",
+          "Duration": 600,
+          "Multiplier": 1.5
+        },
+        {
+          "ID": "PURSUIT_DECOY",
+          "Name": "Decoy Driver",
+          "Type": "Decoy",
+          "DrawHeat": true,
+          "Duration": 300,
+          "Multiplier": 2.0
+        }
+      ]
+    },
+    "Photo": {
+      "ID": "CONTRACT_PHOTO",
+      "Name": "Photography Contracts",
+      "Description": "Capture specific moments",
+      "Icon": "ICO_Contract_Photo",
+      "Color": "#FF69B4",
+      "BaseReward": { "Cash": 2000, "REP": 100 },
+      "Variants": [
+        {
+          "ID": "PHOTO_LOCATION",
+          "Name": "Location Shot",
+          "Requirements": { "Location": true, "Quality": 70 },
+          "Multiplier": 1.0
+        },
+        {
+          "ID": "PHOTO_ACTION",
+          "Name": "Action Shot",
+          "Requirements": { "Speed": 100, "Drift": false },
+          "Multiplier": 1.5
+        },
+        {
+          "ID": "PHOTO_DRIFT",
+          "Name": "Drift Shot",
+          "Requirements": { "DriftAngle": 30, "Speed": 60 },
+          "Multiplier": 1.5
+        },
+        {
+          "ID": "PHOTO_RARE",
+          "Name": "Rare Vehicle Shot",
+          "Requirements": { "Vehicle": "Specific", "Quality": 80 },
+          "Multiplier": 2.0
+        }
+      ]
+    },
+    "Showcase": {
+      "ID": "CONTRACT_SHOWCASE",
+      "Name": "Showcase Events",
+      "Description": "Special high-profile events",
+      "Icon": "ICO_Contract_Showcase",
+      "Color": "#FFD700",
+      "BaseReward": { "Cash": 10000, "REP": 500 },
+      "Variants": [
+        {
+          "ID": "SHOWCASE_STUNT",
+          "Name": "Stunt Showcase",
+          "Tasks": ["Jump", "NearMiss", "Drift"],
+          "Multiplier": 1.5
+        },
+        {
+          "ID": "SHOWCASE_SPEED",
+          "Name": "Speed Showcase",
+          "Tasks": ["SpeedTrap", "TopSpeed", "Sprint"],
+          "Multiplier": 1.5
+        },
+        {
+          "ID": "SHOWCASE_MIXED",
+          "Name": "Mixed Challenge",
+          "Tasks": ["Race", "Drift", "Pursuit"],
+          "Multiplier": 2.0
+        }
+      ]
+    }
+  },
+
+  "ContractBoard": {
+    "AvailableContracts": 8,
+    "RefreshCost": 2500,
+    "FreeRefreshDaily": 1,
+    "Filtering": {
+      "ByType": true,
+      "ByDifficulty": true,
+      "ByReward": true
+    }
+  },
+
+  "ContractDifficulty": {
+    "Easy": {
+      "RewardMultiplier": 1.0,
+      "Requirements": "Low",
+      "UnlockLevel": 1
+    },
+    "Medium": {
+      "RewardMultiplier": 1.5,
+      "Requirements": "Medium",
+      "UnlockLevel": 10
+    },
+    "Hard": {
+      "RewardMultiplier": 2.0,
+      "Requirements": "High",
+      "UnlockLevel": 20
+    },
+    "Expert": {
+      "RewardMultiplier": 3.0,
+      "Requirements": "Very High",
+      "UnlockLevel": 30
+    }
+  },
+
+  "Sponsors": {
+    "Enabled": true,
+    "Sponsors": [
+      {
+        "ID": "SPONSOR_MIDNIGHT",
+        "Name": "Midnight Performance",
+        "ContractTypes": ["Racing", "Drifting"],
+        "BonusMultiplier": 1.1,
+        "UnlockCondition": "LEVEL_5"
+      },
+      {
+        "ID": "SPONSOR_GRIP",
+        "Name": "Grip Masters",
+        "ContractTypes": ["Racing"],
+        "BonusMultiplier": 1.15,
+        "UnlockCondition": "REP_TIER_STREET"
+      },
+      {
+        "ID": "SPONSOR_BOOST",
+        "Name": "Boost Brothers",
+        "ContractTypes": ["Racing", "Pursuit"],
+        "BonusMultiplier": 1.2,
+        "UnlockCondition": "REP_TIER_PRO"
+      },
+      {
+        "ID": "SPONSOR_ELITE",
+        "Name": "Elite Racing Co.",
+        "ContractTypes": ["All"],
+        "BonusMultiplier": 1.25,
+        "UnlockCondition": "REP_TIER_ELITE"
+      }
+    ]
+  },
+
+  "ChainContracts": {
+    "Enabled": true,
+    "BonusPerChain": 0.1,
+    "MaxChainBonus": 0.5,
+    "ResetOnFail": true
+  },
+
+  "FailureConsequences": {
+    "CashPenalty": false,
+    "REPPenalty": false,
+    "CooldownEnabled": true,
+    "CooldownMinutes": 30,
+    "RetryAllowed": true,
+    "RetryCost": 1000
+  }
+}

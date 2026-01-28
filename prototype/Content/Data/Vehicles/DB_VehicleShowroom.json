@@ -1,0 +1,245 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Showroom and Dealer Configuration",
+
+  "ShowroomSystem": {
+    "Enabled": true,
+    "RotatingStock": true,
+    "StockRefreshDays": 7,
+    "TestDriveEnabled": true,
+    "FinancingEnabled": true
+  },
+
+  "Dealers": [
+    {
+      "ID": "DEALER_UNDERGROUND",
+      "Name": "Underground Motors",
+      "Description": "Your main source for performance vehicles",
+      "Location": { "X": 1800, "Y": 600, "Z": 12 },
+      "Type": "Mixed",
+      "Specialty": null,
+      "Unlocked": true,
+      "Inventory": {
+        "Categories": ["JDM", "Muscle", "Euro", "Tuner"],
+        "PriceRange": { "Min": 15000, "Max": 150000 },
+        "ClassRange": ["D", "C", "B", "A"]
+      },
+      "Services": ["Buy", "Sell", "Trade", "Finance"],
+      "Discount": 0,
+      "Ambience": "Underground_Cool"
+    },
+    {
+      "ID": "DEALER_RISING_SUN",
+      "Name": "Rising Sun Imports",
+      "Description": "JDM specialist - the finest from Japan",
+      "Location": { "X": -2800, "Y": -1500, "Z": 8 },
+      "Type": "Specialty",
+      "Specialty": "JDM",
+      "UnlockCondition": "REP_TIER_STREET",
+      "Inventory": {
+        "Categories": ["JDM"],
+        "PriceRange": { "Min": 25000, "Max": 300000 },
+        "ClassRange": ["C", "B", "A", "S"]
+      },
+      "Services": ["Buy", "Trade"],
+      "Discount": 0.05,
+      "Ambience": "Japanese_Import"
+    },
+    {
+      "ID": "DEALER_AMERICAN_THUNDER",
+      "Name": "American Thunder",
+      "Description": "American muscle specialist",
+      "Location": { "X": 4200, "Y": 1800, "Z": 10 },
+      "Type": "Specialty",
+      "Specialty": "Muscle",
+      "UnlockCondition": "REP_TIER_STREET",
+      "Inventory": {
+        "Categories": ["Muscle", "Classic"],
+        "PriceRange": { "Min": 30000, "Max": 250000 },
+        "ClassRange": ["C", "B", "A", "S"]
+      },
+      "Services": ["Buy", "Sell", "Trade"],
+      "Discount": 0.05,
+      "Ambience": "American_Garage"
+    },
+    {
+      "ID": "DEALER_VELOCITY_EXOTICS",
+      "Name": "Velocity Exotics",
+      "Description": "High-end performance vehicles for the elite",
+      "Location": { "X": -800, "Y": 4500, "Z": 25 },
+      "Type": "Premium",
+      "Specialty": "Exotic",
+      "UnlockCondition": "REP_TIER_ELITE",
+      "Inventory": {
+        "Categories": ["Exotic", "Supercar", "Hypercar"],
+        "PriceRange": { "Min": 200000, "Max": 2000000 },
+        "ClassRange": ["A", "S", "S+"]
+      },
+      "Services": ["Buy"],
+      "Discount": 0,
+      "ExclusiveVehicles": true,
+      "Ambience": "Luxury_Showroom"
+    },
+    {
+      "ID": "DEALER_BUDGET_WHEELS",
+      "Name": "Budget Wheels",
+      "Description": "Affordable rides to get you started",
+      "Location": { "X": 500, "Y": -1200, "Z": 8 },
+      "Type": "Budget",
+      "Specialty": null,
+      "Unlocked": true,
+      "Inventory": {
+        "Categories": ["Economy", "Beater", "Project"],
+        "PriceRange": { "Min": 5000, "Max": 35000 },
+        "ClassRange": ["D", "C"]
+      },
+      "Services": ["Buy", "Sell"],
+      "Discount": 0,
+      "Ambience": "Used_Car_Lot"
+    },
+    {
+      "ID": "DEALER_EURO_PERFORMANCE",
+      "Name": "Euro Performance",
+      "Description": "European engineering excellence",
+      "Location": { "X": 2200, "Y": 3000, "Z": 15 },
+      "Type": "Specialty",
+      "Specialty": "Euro",
+      "UnlockCondition": "REP_TIER_PRO",
+      "Inventory": {
+        "Categories": ["Euro", "German", "Italian"],
+        "PriceRange": { "Min": 50000, "Max": 500000 },
+        "ClassRange": ["B", "A", "S", "S+"]
+      },
+      "Services": ["Buy", "Trade"],
+      "Discount": 0.05,
+      "Ambience": "European_Elegance"
+    }
+  ],
+
+  "RotatingStock": {
+    "RefreshDay": "Monday",
+    "FeaturedVehicle": {
+      "Enabled": true,
+      "Discount": 0.1,
+      "Duration": 7
+    },
+    "LimitedTimeVehicles": {
+      "Enabled": true,
+      "Frequency": "Monthly",
+      "ExclusivityPeriod": 30
+    }
+  },
+
+  "TestDrive": {
+    "Enabled": true,
+    "Duration": 300,
+    "Area": "TestTrack",
+    "Restrictions": {
+      "NoDamage": true,
+      "NoCustomization": true,
+      "BoundedArea": true
+    },
+    "FreeDrives": 3,
+    "AdditionalDriveCost": 500
+  },
+
+  "Financing": {
+    "Enabled": true,
+    "MinDownPayment": 0.2,
+    "MaxDownPayment": 1.0,
+    "InterestRate": 0.05,
+    "PaymentTerms": [4, 8, 12, 24],
+    "MissedPaymentPenalty": {
+      "Fee": 500,
+      "RepossessionAfter": 3
+    },
+    "EarlyPayoffBonus": 0.02
+  },
+
+  "TradeIn": {
+    "Enabled": true,
+    "ValuePercent": 0.6,
+    "ConditionModifiers": {
+      "Perfect": 1.0,
+      "Good": 0.9,
+      "Fair": 0.75,
+      "Poor": 0.5
+    },
+    "ModsValuePercent": 0.3
+  },
+
+  "PurchaseProcess": {
+    "Steps": [
+      "SelectVehicle",
+      "ChooseColor",
+      "SelectPayment",
+      "Confirm",
+      "Delivery"
+    ],
+    "ColorSelection": {
+      "Enabled": true,
+      "FreeColors": 5,
+      "PremiumColors": { "Available": true, "ExtraCost": true }
+    },
+    "DeliveryOptions": {
+      "Standard": { "Time": "Instant", "Cost": 0 },
+      "ShowroomPickup": { "Time": "Instant", "Cost": 0, "Cinematic": true }
+    }
+  },
+
+  "SellVehicle": {
+    "Enabled": true,
+    "BaseValuePercent": 0.5,
+    "RarityBonus": {
+      "Common": 0,
+      "Uncommon": 0.05,
+      "Rare": 0.1,
+      "Epic": 0.15,
+      "Legendary": 0.25
+    },
+    "DemandModifier": {
+      "Enabled": true,
+      "Range": { "Min": 0.9, "Max": 1.2 }
+    },
+    "QuickSell": {
+      "Enabled": true,
+      "Penalty": 0.1
+    }
+  },
+
+  "Auction": {
+    "Enabled": true,
+    "UnlockCondition": "LEVEL_20",
+    "Location": "AuctionHouse",
+    "Types": {
+      "BuyNow": { "Fee": 0.05 },
+      "Bid": { "Fee": 0.1, "MinBidIncrement": 0.05 }
+    },
+    "ListingDuration": [24, 48, 72],
+    "MaxActiveListings": 10,
+    "RareVehicles": {
+      "Enabled": true,
+      "Frequency": "Weekly",
+      "ExclusiveVehicles": true
+    }
+  },
+
+  "ShowroomDisplay": {
+    "CameraSettings": {
+      "AutoRotate": true,
+      "ManualControl": true,
+      "ZoomEnabled": true,
+      "InteriorView": true
+    },
+    "InfoDisplay": {
+      "Stats": true,
+      "History": true,
+      "Comparison": true,
+      "Reviews": true
+    },
+    "Lighting": {
+      "Presets": ["Showroom", "Outdoor", "Night", "Studio"],
+      "CustomEnabled": true
+    }
+  }
+}

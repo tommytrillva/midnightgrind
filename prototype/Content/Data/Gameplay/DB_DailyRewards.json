@@ -1,0 +1,135 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Daily Login and Reward System",
+
+  "DailyRewardSystem": {
+    "Enabled": true,
+    "ResetTime": "00:00",
+    "Timezone": "Local",
+    "StreakEnabled": true,
+    "MaxStreak": 30,
+    "StreakResetOnMiss": true,
+    "GracePeriodHours": 24
+  },
+
+  "DailyLoginRewards": {
+    "Week1": [
+      { "Day": 1, "Reward": { "Type": "Cash", "Amount": 2500 }, "Bonus": null },
+      { "Day": 2, "Reward": { "Type": "Cash", "Amount": 3000 }, "Bonus": null },
+      { "Day": 3, "Reward": { "Type": "Part", "ID": "PART_RANDOM_COMMON" }, "Bonus": null },
+      { "Day": 4, "Reward": { "Type": "Cash", "Amount": 4000 }, "Bonus": null },
+      { "Day": 5, "Reward": { "Type": "REP", "Amount": 500 }, "Bonus": null },
+      { "Day": 6, "Reward": { "Type": "Cash", "Amount": 5000 }, "Bonus": null },
+      { "Day": 7, "Reward": { "Type": "MysteryBox", "Tier": "Common" }, "Bonus": { "Type": "Cash", "Amount": 5000 } }
+    ],
+    "Week2": [
+      { "Day": 8, "Reward": { "Type": "Cash", "Amount": 5000 }, "Bonus": null },
+      { "Day": 9, "Reward": { "Type": "Cash", "Amount": 6000 }, "Bonus": null },
+      { "Day": 10, "Reward": { "Type": "Part", "ID": "PART_RANDOM_SPORT" }, "Bonus": null },
+      { "Day": 11, "Reward": { "Type": "Cash", "Amount": 7000 }, "Bonus": null },
+      { "Day": 12, "Reward": { "Type": "REP", "Amount": 1000 }, "Bonus": null },
+      { "Day": 13, "Reward": { "Type": "Cash", "Amount": 8000 }, "Bonus": null },
+      { "Day": 14, "Reward": { "Type": "MysteryBox", "Tier": "Sport" }, "Bonus": { "Type": "Cash", "Amount": 10000 } }
+    ],
+    "Week3": [
+      { "Day": 15, "Reward": { "Type": "Cash", "Amount": 8000 }, "Bonus": null },
+      { "Day": 16, "Reward": { "Type": "Cash", "Amount": 9000 }, "Bonus": null },
+      { "Day": 17, "Reward": { "Type": "Vinyl", "ID": "VINYL_RANDOM" }, "Bonus": null },
+      { "Day": 18, "Reward": { "Type": "Cash", "Amount": 10000 }, "Bonus": null },
+      { "Day": 19, "Reward": { "Type": "REP", "Amount": 1500 }, "Bonus": null },
+      { "Day": 20, "Reward": { "Type": "Cash", "Amount": 12000 }, "Bonus": null },
+      { "Day": 21, "Reward": { "Type": "MysteryBox", "Tier": "Race" }, "Bonus": { "Type": "Cash", "Amount": 15000 } }
+    ],
+    "Week4": [
+      { "Day": 22, "Reward": { "Type": "Cash", "Amount": 12000 }, "Bonus": null },
+      { "Day": 23, "Reward": { "Type": "Cash", "Amount": 14000 }, "Bonus": null },
+      { "Day": 24, "Reward": { "Type": "Part", "ID": "PART_RANDOM_RACE" }, "Bonus": null },
+      { "Day": 25, "Reward": { "Type": "Cash", "Amount": 16000 }, "Bonus": null },
+      { "Day": 26, "Reward": { "Type": "REP", "Amount": 2500 }, "Bonus": null },
+      { "Day": 27, "Reward": { "Type": "Cash", "Amount": 18000 }, "Bonus": null },
+      { "Day": 28, "Reward": { "Type": "MysteryBox", "Tier": "Premium" }, "Bonus": { "Type": "Cash", "Amount": 25000 } }
+    ],
+    "FinalDays": [
+      { "Day": 29, "Reward": { "Type": "Cash", "Amount": 25000 }, "Bonus": { "Type": "REP", "Amount": 1000 } },
+      { "Day": 30, "Reward": { "Type": "Vehicle", "ID": "VEH_DAILY_REWARD", "Name": "Loyalty Reward Vehicle" }, "Bonus": { "Type": "Cash", "Amount": 50000, "Title": "TITLE_LOYAL_RACER" } }
+    ]
+  },
+
+  "StreakBonuses": {
+    "3Days": { "CashBonus": 1.1, "REPBonus": 1.1 },
+    "7Days": { "CashBonus": 1.25, "REPBonus": 1.25 },
+    "14Days": { "CashBonus": 1.5, "REPBonus": 1.5 },
+    "21Days": { "CashBonus": 1.75, "REPBonus": 1.75 },
+    "30Days": { "CashBonus": 2.0, "REPBonus": 2.0 }
+  },
+
+  "FirstWinOfDay": {
+    "Enabled": true,
+    "Bonus": {
+      "Cash": 5000,
+      "REP": 500
+    },
+    "ResetTime": "00:00",
+    "ShowIndicator": true
+  },
+
+  "DailyObjectives": {
+    "Enabled": true,
+    "ObjectivesPerDay": 3,
+    "RefreshTime": "00:00",
+    "CompletionBonus": {
+      "AllThree": { "Cash": 5000, "REP": 250 }
+    },
+    "ObjectivePool": [
+      { "ID": "OBJ_WIN_RACE", "Description": "Win a race", "Reward": { "Cash": 2000, "REP": 100 } },
+      { "ID": "OBJ_COMPLETE_RACES", "Description": "Complete 3 races", "Reward": { "Cash": 1500, "REP": 75 } },
+      { "ID": "OBJ_DRIFT_SCORE", "Description": "Score 25,000 drift points", "Reward": { "Cash": 1500, "REP": 75 } },
+      { "ID": "OBJ_SPEED_TRAP", "Description": "Hit a speed trap over 150 MPH", "Reward": { "Cash": 1500, "REP": 75 } },
+      { "ID": "OBJ_ESCAPE_PURSUIT", "Description": "Escape a police pursuit", "Reward": { "Cash": 2500, "REP": 125 } },
+      { "ID": "OBJ_CAR_MEET", "Description": "Attend a car meet", "Reward": { "Cash": 1000, "REP": 50 } },
+      { "ID": "OBJ_PHOTO_MODE", "Description": "Take 5 photos", "Reward": { "Cash": 1000, "REP": 50 } },
+      { "ID": "OBJ_DISTANCE", "Description": "Drive 10 miles", "Reward": { "Cash": 1000, "REP": 50 } },
+      { "ID": "OBJ_NITRO_USE", "Description": "Use nitrous 20 times", "Reward": { "Cash": 1000, "REP": 50 } },
+      { "ID": "OBJ_NEAR_MISS", "Description": "Near miss 10 vehicles", "Reward": { "Cash": 1500, "REP": 75 } },
+      { "ID": "OBJ_CLEAN_RACE", "Description": "Complete a race without collisions", "Reward": { "Cash": 2000, "REP": 100 } },
+      { "ID": "OBJ_PERFECT_START", "Description": "Get 3 perfect race starts", "Reward": { "Cash": 1500, "REP": 75 } }
+    ]
+  },
+
+  "WheelSpin": {
+    "Enabled": true,
+    "FreeSpinDaily": true,
+    "AdditionalSpinCost": { "Currency": "Premium", "Amount": 50 },
+    "Prizes": [
+      { "ID": "SPIN_CASH_SMALL", "Name": "2,500 Cash", "Weight": 30, "Reward": { "Type": "Cash", "Amount": 2500 } },
+      { "ID": "SPIN_CASH_MEDIUM", "Name": "10,000 Cash", "Weight": 20, "Reward": { "Type": "Cash", "Amount": 10000 } },
+      { "ID": "SPIN_CASH_LARGE", "Name": "50,000 Cash", "Weight": 5, "Reward": { "Type": "Cash", "Amount": 50000 } },
+      { "ID": "SPIN_REP_SMALL", "Name": "500 REP", "Weight": 20, "Reward": { "Type": "REP", "Amount": 500 } },
+      { "ID": "SPIN_REP_LARGE", "Name": "2,500 REP", "Weight": 8, "Reward": { "Type": "REP", "Amount": 2500 } },
+      { "ID": "SPIN_PART", "Name": "Random Part", "Weight": 10, "Reward": { "Type": "Part", "ID": "PART_RANDOM_SPORT" } },
+      { "ID": "SPIN_VINYL", "Name": "Random Vinyl", "Weight": 5, "Reward": { "Type": "Vinyl", "ID": "VINYL_RANDOM" } },
+      { "ID": "SPIN_VEHICLE", "Name": "Random Vehicle", "Weight": 2, "Reward": { "Type": "Vehicle", "ID": "VEH_RANDOM_SPIN" } }
+    ]
+  },
+
+  "MissedDayRecovery": {
+    "Enabled": true,
+    "RecoveryWindow": 7,
+    "Cost": { "Currency": "Premium", "AmountPerDay": 50 },
+    "MaxRecoverable": 3
+  },
+
+  "NotificationSettings": {
+    "DailyRewardAvailable": true,
+    "StreakAtRisk": true,
+    "ObjectivesReminder": true,
+    "WheelSpinAvailable": true
+  },
+
+  "UIDisplay": {
+    "ShowOnMainMenu": true,
+    "ShowStreakCounter": true,
+    "ShowNextRewardPreview": true,
+    "CalendarView": true
+  }
+}
