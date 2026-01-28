@@ -1,25 +1,92 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-#pragma once
-
-#include "CoreMinimal.h"
-#include "TestFramework/MGTestFrameworkSubsystem.h"
-#include "MGSubsystemTests.generated.h"
-
-class UMGCurrencySubsystem;
-class UMGWeatherSubsystem;
-class UMGEconomySubsystem;
-class UMGVehicleDamageSystem;
-class UMGAIDriverProfile;
-class UMGSaveManagerSubsystem;
-class UMGSaveGame;
-
 /**
- * Subsystem Unit Tests
- * Provides actual test implementations for core subsystems
- * Total Tests: 55
+ * =============================================================================
+ * MGSubsystemTests.h - Comprehensive Subsystem Test Suite
+ * =============================================================================
  *
- * Test Categories:
+ * PURPOSE:
+ * This file contains the actual test implementations for all core game
+ * subsystems. While MGTestFrameworkSubsystem provides the infrastructure
+ * for running tests, THIS file contains the tests themselves - 60 individual
+ * tests covering currency, weather, vehicles, AI, physics, menu systems, and more.
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ *
+ * 1. TEST ORGANIZATION:
+ *    - Tests are grouped by the subsystem they verify (Currency, Weather, etc.)
+ *    - Each test function follows the pattern: Test<Category>_<WhatItTests>()
+ *    - Example: TestCurrency_EarnGrindCash() tests earning currency
+ *
+ * 2. TEST NAMING CONVENTION:
+ *    - Test prefix identifies it as a test function
+ *    - Category (Currency, Weather, etc.) indicates which system
+ *    - Specific behavior being tested (EarnGrindCash, SpendGrindCash)
+ *    - This makes it easy to find tests for specific functionality
+ *
+ * 3. TEST CATEGORIES IN THIS FILE:
+ *    - Currency (6 tests): Money earning, spending, multipliers, edge cases
+ *    - Weather (6 tests): Weather changes, road conditions, visibility
+ *    - Economy (3 tests): Transactions, purchases, history
+ *    - Vehicle (6 tests): Damage, repair, performance degradation
+ *    - AI (5 tests): Driving behavior, skills, personalities
+ *    - Performance (4 tests): Speed and memory benchmarks
+ *    - Save/Load (5 tests): Game saving and loading
+ *    - Physics (9 tests): Tire grip, handling, suspension
+ *    - Stress (4 tests): High load scenarios
+ *    - UI Data (5 tests): HUD and telemetry data
+ *    - Menu (5 tests): Menu states, settings, navigation
+ *    - Integration (2 tests): Cross-system interactions
+ *
+ * 4. FORWARD DECLARATIONS:
+ *    - The "class UMG..." lines at the top are forward declarations.
+ *    - They tell the compiler these classes exist without including headers.
+ *    - This speeds up compilation - full headers are only in the .cpp file.
+ *
+ * 5. HELPER FUNCTIONS:
+ *    - GetCurrencySubsystem(), GetWeatherSubsystem(): Fetch subsystems to test
+ *    - CreatePassResult(), CreateFailResult(): Build test result objects
+ *    - LogTestStart(), LogTestResult(): Logging for debugging
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ *
+ *    [Console Command: MG.RunAllTests]
+ *           |
+ *           v
+ *    [UMGSubsystemTests] -- Contains 55 test functions
+ *           |
+ *           +---> Gets subsystem references
+ *           +---> Calls subsystem functions
+ *           +---> Verifies expected results
+ *           +---> Returns Pass/Fail
+ *           |
+ *           v
+ *    [UMGTestFrameworkSubsystem] -- Collects results, generates report
+ *
+ * HOW TO ADD A NEW TEST:
+ * 1. Add a new UFUNCTION declaration in the appropriate category section
+ * 2. Implement the test in the .cpp file
+ * 3. Register the test in RegisterAllTests()
+ * 4. The test is now runnable via console or Blueprint
+ *
+ * HOW TO RUN TESTS:
+ * Option 1 - Console:
+ *   Press ~ and type "MG.RunAllTests" or "MG.RunCurrencyTests"
+ *
+ * Option 2 - Blueprint:
+ *   Get SubsystemTests subsystem, call RunAllTests() or specific category
+ *
+ * Option 3 - C++:
+ *   UMGSubsystemTests* Tests = GetGameInstance()->GetSubsystem<UMGSubsystemTests>();
+ *   Tests->RunAllTests();
+ *
+ * READING TEST RESULTS:
+ *   - Use MG.PrintTestReport to see results in the console
+ *   - Check FMGTestResult for individual test outcomes
+ *   - Green = Passed, Red = Failed (in log output)
+ *
+ * =============================================================================
+ * Test Categories Summary:
  * - Currency (6): Earning, spending, balance tracking, multipliers
  * - Weather (6): State changes, transitions, road conditions, visibility
  * - Economy (3): Shop purchases, transaction pipeline
@@ -27,13 +94,14 @@ class UMGSaveGame;
  * - AI (5): Driving states, skills, personality, strategies
  * - Performance (4): Tick time, memory, delegates, data access
  * - Save/Load (5): Save game creation, data structures, slot naming
- * - Physics (9): Tire grip, wet modifiers, weight transfer, handling modes, surface, geometry, differential, wear
- * - Stress (4): High object count, sustained operation, memory stability, rapid state changes
- * - UI Data (5): HUD data, race status, telemetry, HUD modes, data provider
+ * - Physics (9): Tire grip, wet modifiers, weight transfer, handling, etc.
+ * - Stress (4): High object count, sustained operation, memory stability
+ * - UI Data (5): HUD data, race status, telemetry, HUD modes
+ * - Menu (5): Settings defaults, menu states, settings categories, subsystem
  * - Integration (2): Cross-system verification
  *
- * Console Commands:
- * - MG.RunAllTests - Run all 55 tests
+ * Console Commands Quick Reference:
+ * - MG.RunAllTests - Run all 60 tests
  * - MG.RunCurrencyTests - Run 6 currency subsystem tests
  * - MG.RunWeatherTests - Run 6 weather subsystem tests
  * - MG.RunEconomyTests - Run 3 economy tests
@@ -44,8 +112,44 @@ class UMGSaveGame;
  * - MG.RunPhysicsTests - Run 9 physics tests
  * - MG.RunStressTests - Run 4 stress tests
  * - MG.RunUIDataTests - Run 5 UI data tests
+ * - MG.RunMenuTests - Run 5 menu system tests
  * - MG.RunSmokeTests - Run quick smoke tests
  * - MG.PrintTestReport - Print last test report
+ * =============================================================================
+ */
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "TestFramework/MGTestFrameworkSubsystem.h"
+#include "MGSubsystemTests.generated.h"
+
+/**
+ * Forward declarations for subsystems that will be tested.
+ * These classes are defined elsewhere - we only need pointers to them here.
+ * The actual #includes are in the .cpp file to speed up compilation.
+ */
+class UMGCurrencySubsystem;    // Handles player money (Grind Cash, Neon Credits)
+class UMGWeatherSubsystem;     // Manages weather and time of day
+class UMGEconomySubsystem;     // Handles purchases and transactions
+class UMGVehicleDamageSystem;  // Tracks vehicle damage and repair
+class UMGAIDriverProfile;      // AI racer personality and skills
+class UMGSaveManagerSubsystem; // Handles save/load operations
+class UMGSaveGame;             // The actual save data structure
+class UMGMenuSubsystem;        // Manages game menus and settings
+
+/**
+ * Subsystem Unit Tests
+ *
+ * This class contains 60 automated tests for verifying that all core game
+ * subsystems work correctly. Tests can be run individually, by category,
+ * or all at once.
+ *
+ * Each test function:
+ * - Sets up the test scenario
+ * - Calls the subsystem function being tested
+ * - Verifies the result matches expectations
+ * - Returns a Pass or Fail result with a message
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGSubsystemTests : public UGameInstanceSubsystem
@@ -328,6 +432,30 @@ public:
 	FMGTestResult TestUIData_DataProvider();
 
 	// ==========================================
+	// MENU TESTS
+	// ==========================================
+
+	/** Test game settings structure defaults */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Menu")
+	FMGTestResult TestMenu_SettingsDefaults();
+
+	/** Test menu state enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Menu")
+	FMGTestResult TestMenu_MenuStates();
+
+	/** Test settings category enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Menu")
+	FMGTestResult TestMenu_SettingsCategories();
+
+	/** Test menu subsystem functionality */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Menu")
+	FMGTestResult TestMenu_Subsystem();
+
+	/** Test settings value ranges */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Menu")
+	FMGTestResult TestMenu_SettingsRanges();
+
+	// ==========================================
 	// CONSOLE COMMANDS
 	// ==========================================
 
@@ -374,6 +502,10 @@ public:
 	/** Run UI data tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunUIDataTests();
+
+	/** Run menu tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunMenuTests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")

@@ -20,6 +20,7 @@
 #include "Vehicle/MGStatCalculator.h"
 #include "UI/MGHUDDataProvider.h"
 #include "UI/MGRaceHUDSubsystem.h"
+#include "UI/MGMenuSubsystem.h"
 
 void UMGSubsystemTests::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -516,7 +517,54 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 55);
+	// Menu Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Menu_SettingsDefaults"));
+		Test.TestName = FText::FromString(TEXT("Menu - Settings Defaults"));
+		Test.Description = FText::FromString(TEXT("Verify game settings default values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Menu")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Menu_MenuStates"));
+		Test.TestName = FText::FromString(TEXT("Menu - Menu States"));
+		Test.Description = FText::FromString(TEXT("Verify menu state enumeration values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Menu")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Menu_SettingsCategories"));
+		Test.TestName = FText::FromString(TEXT("Menu - Settings Categories"));
+		Test.Description = FText::FromString(TEXT("Verify settings category enumeration values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Menu")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Menu_Subsystem"));
+		Test.TestName = FText::FromString(TEXT("Menu - Subsystem"));
+		Test.Description = FText::FromString(TEXT("Verify menu subsystem functionality"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Menu")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Menu_SettingsRanges"));
+		Test.TestName = FText::FromString(TEXT("Menu - Settings Ranges"));
+		Test.Description = FText::FromString(TEXT("Verify settings value ranges are valid"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Menu")));
+		TestFramework->RegisterTest(Test);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 60);
 }
 
 // ==========================================
@@ -3877,6 +3925,395 @@ FMGTestResult UMGSubsystemTests::TestUIData_DataProvider()
 }
 
 // ==========================================
+// MENU TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestMenu_SettingsDefaults()
+{
+	LogTestStart(TEXT("TestMenu_SettingsDefaults"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Create default settings structure
+	FMGGameSettings Settings;
+
+	// Test Graphics defaults
+	if (Settings.FullscreenMode < 0 || Settings.FullscreenMode > 2)
+	{
+		Logs.Add(FString::Printf(TEXT("FullscreenMode out of range: %d (expected 0-2)"), Settings.FullscreenMode));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("FullscreenMode: %d"), Settings.FullscreenMode));
+	}
+
+	if (Settings.FrameRateLimit < 0)
+	{
+		Logs.Add(FString::Printf(TEXT("FrameRateLimit negative: %d"), Settings.FrameRateLimit));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("FrameRateLimit: %d"), Settings.FrameRateLimit));
+	}
+
+	if (Settings.GraphicsQuality < 0 || Settings.GraphicsQuality > 4)
+	{
+		Logs.Add(FString::Printf(TEXT("GraphicsQuality out of range: %d (expected 0-4)"), Settings.GraphicsQuality));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("GraphicsQuality: %d"), Settings.GraphicsQuality));
+	}
+
+	// Test Audio defaults (0.0-1.0 range)
+	if (Settings.MasterVolume < 0.0f || Settings.MasterVolume > 1.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("MasterVolume out of range: %.2f"), Settings.MasterVolume));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("MasterVolume: %.2f"), Settings.MasterVolume));
+	}
+
+	if (Settings.MusicVolume < 0.0f || Settings.MusicVolume > 1.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("MusicVolume out of range: %.2f"), Settings.MusicVolume));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("MusicVolume: %.2f"), Settings.MusicVolume));
+	}
+
+	// Test Controls defaults
+	if (Settings.SteeringSensitivity <= 0.0f || Settings.SteeringSensitivity > 5.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("SteeringSensitivity invalid: %.2f"), Settings.SteeringSensitivity));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("SteeringSensitivity: %.2f"), Settings.SteeringSensitivity));
+	}
+
+	// Test Accessibility defaults
+	if (Settings.HUDScale <= 0.0f || Settings.HUDScale > 3.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("HUDScale invalid: %.2f"), Settings.HUDScale));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("HUDScale: %.2f"), Settings.HUDScale));
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Menu_SettingsDefaults")),
+			TEXT("Settings defaults validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Menu_SettingsDefaults")),
+		TEXT("Settings defaults valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestMenu_MenuStates()
+{
+	LogTestStart(TEXT("TestMenu_MenuStates"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test EMGMenuState enum values
+	TSet<int32> UniqueValues;
+
+	// Check all expected enum values exist and are unique
+	int32 NoneVal = static_cast<int32>(EMGMenuState::None);
+	int32 MainMenuVal = static_cast<int32>(EMGMenuState::MainMenu);
+	int32 PausedVal = static_cast<int32>(EMGMenuState::Paused);
+	int32 SettingsVal = static_cast<int32>(EMGMenuState::Settings);
+	int32 LoadingVal = static_cast<int32>(EMGMenuState::Loading);
+	int32 InGameVal = static_cast<int32>(EMGMenuState::InGame);
+
+	UniqueValues.Add(NoneVal);
+	UniqueValues.Add(MainMenuVal);
+	UniqueValues.Add(PausedVal);
+	UniqueValues.Add(SettingsVal);
+	UniqueValues.Add(LoadingVal);
+	UniqueValues.Add(InGameVal);
+
+	if (UniqueValues.Num() != 6)
+	{
+		Logs.Add(FString::Printf(TEXT("Expected 6 unique menu states, got %d"), UniqueValues.Num()));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("All 6 menu states are unique"));
+	}
+
+	Logs.Add(FString::Printf(TEXT("None=%d, MainMenu=%d, Paused=%d, Settings=%d, Loading=%d, InGame=%d"),
+		NoneVal, MainMenuVal, PausedVal, SettingsVal, LoadingVal, InGameVal));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Menu_MenuStates")),
+			TEXT("Menu states validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Menu_MenuStates")),
+		TEXT("All 6 menu states valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestMenu_SettingsCategories()
+{
+	LogTestStart(TEXT("TestMenu_SettingsCategories"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test EMGSettingsCategory enum values
+	TSet<int32> UniqueValues;
+
+	int32 GraphicsVal = static_cast<int32>(EMGSettingsCategory::Graphics);
+	int32 AudioVal = static_cast<int32>(EMGSettingsCategory::Audio);
+	int32 ControlsVal = static_cast<int32>(EMGSettingsCategory::Controls);
+	int32 GameplayVal = static_cast<int32>(EMGSettingsCategory::Gameplay);
+	int32 AccessibilityVal = static_cast<int32>(EMGSettingsCategory::Accessibility);
+
+	UniqueValues.Add(GraphicsVal);
+	UniqueValues.Add(AudioVal);
+	UniqueValues.Add(ControlsVal);
+	UniqueValues.Add(GameplayVal);
+	UniqueValues.Add(AccessibilityVal);
+
+	if (UniqueValues.Num() != 5)
+	{
+		Logs.Add(FString::Printf(TEXT("Expected 5 unique settings categories, got %d"), UniqueValues.Num()));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("All 5 settings categories are unique"));
+	}
+
+	Logs.Add(FString::Printf(TEXT("Graphics=%d, Audio=%d, Controls=%d, Gameplay=%d, Accessibility=%d"),
+		GraphicsVal, AudioVal, ControlsVal, GameplayVal, AccessibilityVal));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Menu_SettingsCategories")),
+			TEXT("Settings categories validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Menu_SettingsCategories")),
+		TEXT("All 5 settings categories valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestMenu_Subsystem()
+{
+	LogTestStart(TEXT("TestMenu_Subsystem"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Menu_Subsystem")),
+			TEXT("GameInstance not found"),
+			{TEXT("Cannot access GameInstance")}
+		);
+	}
+
+	UMGMenuSubsystem* MenuSubsystem = GameInstance->GetSubsystem<UMGMenuSubsystem>();
+	if (!MenuSubsystem)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Menu_Subsystem")),
+			TEXT("Menu Subsystem not found"),
+			{TEXT("GetSubsystem<UMGMenuSubsystem> returned nullptr")}
+		);
+	}
+
+	Logs.Add(TEXT("Menu Subsystem found"));
+
+	// Test GetMenuState
+	EMGMenuState CurrentState = MenuSubsystem->GetMenuState();
+	Logs.Add(FString::Printf(TEXT("Current menu state: %d"), static_cast<int32>(CurrentState)));
+
+	// Test GetSettings
+	FMGGameSettings Settings = MenuSubsystem->GetSettings();
+	Logs.Add(FString::Printf(TEXT("Settings loaded - MasterVolume: %.2f"), Settings.MasterVolume));
+
+	// Test IsGamePaused
+	bool bIsPaused = MenuSubsystem->IsGamePaused();
+	Logs.Add(FString::Printf(TEXT("IsGamePaused: %s"), bIsPaused ? TEXT("true") : TEXT("false")));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Menu_Subsystem")),
+			TEXT("Menu subsystem issues found"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Menu_Subsystem")),
+		TEXT("Menu Subsystem functioning correctly")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestMenu_SettingsRanges()
+{
+	LogTestStart(TEXT("TestMenu_SettingsRanges"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	FMGGameSettings Settings;
+
+	// Test all volume settings are in 0-1 range
+	const float MinVolume = 0.0f;
+	const float MaxVolume = 1.0f;
+
+	struct FVolumeCheck
+	{
+		const TCHAR* Name;
+		float Value;
+	};
+
+	TArray<FVolumeCheck> VolumeChecks = {
+		{TEXT("MasterVolume"), Settings.MasterVolume},
+		{TEXT("MusicVolume"), Settings.MusicVolume},
+		{TEXT("SFXVolume"), Settings.SFXVolume},
+		{TEXT("EngineVolume"), Settings.EngineVolume},
+		{TEXT("VoiceChatVolume"), Settings.VoiceChatVolume}
+	};
+
+	for (const FVolumeCheck& Check : VolumeChecks)
+	{
+		if (Check.Value < MinVolume || Check.Value > MaxVolume)
+		{
+			Logs.Add(FString::Printf(TEXT("%s out of range: %.2f (expected 0-1)"), Check.Name, Check.Value));
+			bAllPassed = false;
+		}
+		else
+		{
+			Logs.Add(FString::Printf(TEXT("%s: %.2f OK"), Check.Name, Check.Value));
+		}
+	}
+
+	// Test quality settings are in valid range (0-4)
+	struct FQualityCheck
+	{
+		const TCHAR* Name;
+		int32 Value;
+	};
+
+	TArray<FQualityCheck> QualityChecks = {
+		{TEXT("TextureQuality"), Settings.TextureQuality},
+		{TEXT("ShadowQuality"), Settings.ShadowQuality},
+		{TEXT("AntiAliasingQuality"), Settings.AntiAliasingQuality},
+		{TEXT("PostProcessQuality"), Settings.PostProcessQuality},
+		{TEXT("EffectsQuality"), Settings.EffectsQuality}
+	};
+
+	for (const FQualityCheck& Check : QualityChecks)
+	{
+		if (Check.Value < 0 || Check.Value > 4)
+		{
+			Logs.Add(FString::Printf(TEXT("%s out of range: %d (expected 0-4)"), Check.Name, Check.Value));
+			bAllPassed = false;
+		}
+		else
+		{
+			Logs.Add(FString::Printf(TEXT("%s: %d OK"), Check.Name, Check.Value));
+		}
+	}
+
+	// Test motion blur intensity
+	if (Settings.MotionBlurIntensity < 0.0f || Settings.MotionBlurIntensity > 1.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("MotionBlurIntensity out of range: %.2f"), Settings.MotionBlurIntensity));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("MotionBlurIntensity: %.2f OK"), Settings.MotionBlurIntensity));
+	}
+
+	// Test vibration intensity
+	if (Settings.VibrationIntensity < 0.0f || Settings.VibrationIntensity > 1.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("VibrationIntensity out of range: %.2f"), Settings.VibrationIntensity));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("VibrationIntensity: %.2f OK"), Settings.VibrationIntensity));
+	}
+
+	// Test color blind mode
+	if (Settings.ColorBlindMode < 0 || Settings.ColorBlindMode > 3)
+	{
+		Logs.Add(FString::Printf(TEXT("ColorBlindMode out of range: %d (expected 0-3)"), Settings.ColorBlindMode));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("ColorBlindMode: %d OK"), Settings.ColorBlindMode));
+	}
+
+	// Test camera style
+	if (Settings.DefaultCamera < 0 || Settings.DefaultCamera > 3)
+	{
+		Logs.Add(FString::Printf(TEXT("DefaultCamera out of range: %d (expected 0-3)"), Settings.DefaultCamera));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("DefaultCamera: %d OK"), Settings.DefaultCamera));
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Menu_SettingsRanges")),
+			TEXT("Settings ranges validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Menu_SettingsRanges")),
+		TEXT("All settings ranges valid")
+	);
+}
+
+// ==========================================
 // CONSOLE COMMANDS
 // ==========================================
 
@@ -3965,6 +4402,13 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestUIData_TelemetryDefaults());
 	TestResults.Add(TestUIData_HUDModes());
 	TestResults.Add(TestUIData_DataProvider());
+
+	// Menu tests
+	TestResults.Add(TestMenu_SettingsDefaults());
+	TestResults.Add(TestMenu_MenuStates());
+	TestResults.Add(TestMenu_SettingsCategories());
+	TestResults.Add(TestMenu_Subsystem());
+	TestResults.Add(TestMenu_SettingsRanges());
 
 	// Count results
 	for (const FMGTestResult& Result : TestResults)
@@ -4243,6 +4687,33 @@ void UMGSubsystemTests::RunUIDataTests()
 	TestResults.Add(TestUIData_TelemetryDefaults());
 	TestResults.Add(TestUIData_HUDModes());
 	TestResults.Add(TestUIData_DataProvider());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
+void UMGSubsystemTests::RunMenuTests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING MENU TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestMenu_SettingsDefaults());
+	TestResults.Add(TestMenu_MenuStates());
+	TestResults.Add(TestMenu_SettingsCategories());
+	TestResults.Add(TestMenu_Subsystem());
+	TestResults.Add(TestMenu_SettingsRanges());
 
 	for (const FMGTestResult& Result : TestResults)
 	{
