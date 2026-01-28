@@ -1,0 +1,322 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Special, Rare, and Unique Vehicles",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "RaritySystem": true,
+    "LimitedEditions": true,
+    "SeasonalVehicles": true
+  },
+
+  "RarityTiers": {
+    "Common": {
+      "ID": "RARITY_COMMON",
+      "Color": "#808080",
+      "DropRate": 0.6,
+      "ValueMultiplier": 1.0
+    },
+    "Uncommon": {
+      "ID": "RARITY_UNCOMMON",
+      "Color": "#00AA00",
+      "DropRate": 0.25,
+      "ValueMultiplier": 1.5
+    },
+    "Rare": {
+      "ID": "RARITY_RARE",
+      "Color": "#0066FF",
+      "DropRate": 0.1,
+      "ValueMultiplier": 3.0
+    },
+    "Epic": {
+      "ID": "RARITY_EPIC",
+      "Color": "#AA00AA",
+      "DropRate": 0.04,
+      "ValueMultiplier": 7.0
+    },
+    "Legendary": {
+      "ID": "RARITY_LEGENDARY",
+      "Color": "#FF8C00",
+      "DropRate": 0.009,
+      "ValueMultiplier": 15.0
+    },
+    "Mythic": {
+      "ID": "RARITY_MYTHIC",
+      "Color": "#FF0000",
+      "DropRate": 0.001,
+      "ValueMultiplier": 50.0
+    }
+  },
+
+  "SpecialCategories": {
+    "BossVehicles": {
+      "Description": "Earned by defeating story bosses",
+      "Vehicles": {
+        "Boss_Chapter1": {
+          "Name": "Shadow's Supra",
+          "Rarity": "Epic",
+          "UnlockMethod": "DefeatShadow",
+          "Tradeable": false
+        },
+        "Boss_Chapter2": {
+          "Name": "Viper's R34",
+          "Rarity": "Epic",
+          "UnlockMethod": "DefeatViper",
+          "Tradeable": false
+        },
+        "Boss_Chapter3": {
+          "Name": "Phoenix's RX-7",
+          "Rarity": "Legendary",
+          "UnlockMethod": "DefeatPhoenix",
+          "Tradeable": false
+        },
+        "Boss_Final": {
+          "Name": "Midnight King's GT-R",
+          "Rarity": "Mythic",
+          "UnlockMethod": "DefeatFinalBoss",
+          "Tradeable": false,
+          "UniqueAbility": "MidnightAura"
+        }
+      }
+    },
+    "BarnFinds": {
+      "Description": "Discovered in hidden locations",
+      "Vehicles": {
+        "Barn_Mustang67": {
+          "Name": "1967 Mustang Fastback",
+          "Rarity": "Legendary",
+          "Location": "AbandonedFarm",
+          "Condition": "Restoration",
+          "RestorationCost": 150000
+        },
+        "Barn_240Z": {
+          "Name": "1972 Datsun 240Z",
+          "Rarity": "Epic",
+          "Location": "OldWarehouse",
+          "Condition": "Restoration",
+          "RestorationCost": 80000
+        },
+        "Barn_Countach": {
+          "Name": "1985 Countach LP5000",
+          "Rarity": "Mythic",
+          "Location": "SecretMansion",
+          "Condition": "Restoration",
+          "RestorationCost": 500000
+        },
+        "Barn_2000GT": {
+          "Name": "1967 Toyota 2000GT",
+          "Rarity": "Mythic",
+          "Location": "HiddenGarage",
+          "Condition": "Restoration",
+          "RestorationCost": 750000
+        }
+      }
+    },
+    "EventExclusives": {
+      "Description": "Limited-time event rewards",
+      "Vehicles": {
+        "Halloween_GhostCar": {
+          "Name": "Phantom Racer",
+          "Rarity": "Legendary",
+          "Event": "Halloween2026",
+          "Tradeable": false,
+          "SpecialEffect": "GhostTrail"
+        },
+        "Christmas_FrostRunner": {
+          "Name": "Frost Runner",
+          "Rarity": "Legendary",
+          "Event": "WinterEvent2026",
+          "Tradeable": false,
+          "SpecialEffect": "SnowTrail"
+        },
+        "Anniversary_GoldenLegend": {
+          "Name": "Golden Legend",
+          "Rarity": "Mythic",
+          "Event": "1YearAnniversary",
+          "Tradeable": false,
+          "SpecialEffect": "GoldenAura"
+        }
+      }
+    },
+    "PrestigeVehicles": {
+      "Description": "Earned through prestige system",
+      "Vehicles": {
+        "Prestige1_BronzeBeast": {
+          "Name": "Bronze Beast",
+          "Rarity": "Epic",
+          "Requirement": "Prestige1",
+          "Tradeable": false
+        },
+        "Prestige3_GoldenPhoenix": {
+          "Name": "Golden Phoenix",
+          "Rarity": "Legendary",
+          "Requirement": "Prestige3",
+          "Tradeable": false
+        },
+        "Prestige5_DiamondDemon": {
+          "Name": "Diamond Demon",
+          "Rarity": "Mythic",
+          "Requirement": "Prestige5",
+          "Tradeable": false,
+          "UniqueAbility": "DiamondShield"
+        }
+      }
+    },
+    "AchievementVehicles": {
+      "Description": "Earned through special achievements",
+      "Vehicles": {
+        "DriftKing_AE86": {
+          "Name": "Legendary AE86",
+          "Rarity": "Legendary",
+          "Requirement": "DriftMasterAchievement",
+          "UniquePaint": "DriftKingLivery"
+        },
+        "SpeedDemon_Venom": {
+          "Name": "Speed Demon",
+          "Rarity": "Legendary",
+          "Requirement": "TopSpeedRecord",
+          "UniqueEffect": "SpeedTrail"
+        },
+        "Completionist_DevCar": {
+          "Name": "Developer's Dream",
+          "Rarity": "Mythic",
+          "Requirement": "100%Completion",
+          "Tradeable": false
+        }
+      }
+    },
+    "PinkSlipSpecials": {
+      "Description": "High-stakes racing rewards",
+      "Vehicles": {
+        "PinkSlip_Champion": {
+          "Name": "Pink Slip King",
+          "Rarity": "Legendary",
+          "Requirement": "Win50PinkSlips",
+          "Tradeable": true
+        },
+        "Underground_Legend": {
+          "Name": "Underground Legend",
+          "Rarity": "Mythic",
+          "Requirement": "NeverLosePinkSlip100Races",
+          "Tradeable": false
+        }
+      }
+    }
+  },
+
+  "LimitedEditions": {
+    "GlobalLimit": {
+      "Enabled": true,
+      "Types": {
+        "Numbered": { "MaxCount": 1000, "ShowNumber": true },
+        "FirstDay": { "TimeLimit": "24Hours", "Badge": "DayOneOwner" }
+      }
+    },
+    "Vehicles": {
+      "LE_Founders": {
+        "Name": "Founder's Edition",
+        "Rarity": "Legendary",
+        "Limit": 10000,
+        "Requirement": "LaunchDayPurchase",
+        "Tradeable": true
+      },
+      "LE_Champion2026": {
+        "Name": "2026 Champion Edition",
+        "Rarity": "Legendary",
+        "Limit": 500,
+        "Requirement": "TournamentWinner2026",
+        "Tradeable": false
+      }
+    }
+  },
+
+  "SeasonalVehicles": {
+    "Spring": {
+      "Vehicles": ["SpringRunner", "BlossomRacer"],
+      "Availability": "March-May",
+      "ReturnPolicy": "Yearly"
+    },
+    "Summer": {
+      "Vehicles": ["SunsetCruiser", "BeachBlaster"],
+      "Availability": "June-August",
+      "ReturnPolicy": "Yearly"
+    },
+    "Fall": {
+      "Vehicles": ["HarvestHauler", "AutumnPhantom"],
+      "Availability": "September-November",
+      "ReturnPolicy": "Yearly"
+    },
+    "Winter": {
+      "Vehicles": ["WinterWarrior", "FrostBite"],
+      "Availability": "December-February",
+      "ReturnPolicy": "Yearly"
+    }
+  },
+
+  "UniqueAbilities": {
+    "Enabled": true,
+    "Types": {
+      "VisualEffects": {
+        "GhostTrail": { "Description": "Ethereal trailing effect" },
+        "GoldenAura": { "Description": "Golden light emission" },
+        "SnowTrail": { "Description": "Leaves snow particles" }
+      },
+      "GameplayEffects": {
+        "MidnightAura": { "Effect": "REPBonus", "Amount": 1.1 },
+        "DiamondShield": { "Effect": "ReducedDamage", "Amount": 0.9 }
+      }
+    }
+  },
+
+  "CollectorValue": {
+    "Tracking": {
+      "MarketValue": true,
+      "Appreciation": true,
+      "Demand": true
+    },
+    "Factors": {
+      "Rarity": 0.4,
+      "Age": 0.2,
+      "Availability": 0.2,
+      "Demand": 0.2
+    },
+    "Display": {
+      "CurrentValue": true,
+      "HistoricalValue": true,
+      "TrendIndicator": true
+    }
+  },
+
+  "Showcase": {
+    "SpecialGarage": {
+      "Enabled": true,
+      "DisplayMode": true,
+      "Lighting": "Premium",
+      "Pedestal": true
+    },
+    "ProfileDisplay": {
+      "FeaturedRare": true,
+      "RarityBadges": true,
+      "CollectionCount": true
+    }
+  },
+
+  "UI": {
+    "Showroom": {
+      "RarityFilter": true,
+      "CategoryFilter": true,
+      "AvailabilityStatus": true,
+      "UnlockRequirements": true
+    },
+    "Collection": {
+      "CompletionTracking": true,
+      "CategoryProgress": true,
+      "TotalValue": true
+    },
+    "RarityIndicator": {
+      "BorderGlow": true,
+      "ColorCoding": true,
+      "Icon": true
+    }
+  }
+}

@@ -1,0 +1,229 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Mentorship and New Player Guidance System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "OptIn": true,
+    "RewardBoth": true,
+    "MatchmakingBased": true
+  },
+
+  "MentorSystem": {
+    "Eligibility": {
+      "Mentor": {
+        "MinLevel": 40,
+        "MinPlaytime": { "Hours": 100 },
+        "MinWinRate": 0.4,
+        "GoodStanding": true,
+        "NoRecentBans": true,
+        "REPTier": "TIER_RESPECTED"
+      },
+      "Mentee": {
+        "MaxLevel": 15,
+        "NewPlayer": true,
+        "OptInRequired": true
+      }
+    },
+    "Matching": {
+      "Criteria": {
+        "Language": { "Priority": "High" },
+        "Region": { "Priority": "High" },
+        "PlayStyle": { "Priority": "Medium" },
+        "Schedule": { "Priority": "Medium" }
+      },
+      "Method": "Automatic",
+      "ManualRequest": true,
+      "MaxMentees": 3
+    }
+  },
+
+  "MentorshipProgram": {
+    "Phases": {
+      "Introduction": {
+        "Duration": "3Days",
+        "Goals": ["MeetMentor", "BasicTutorial", "FirstRace"],
+        "Completion": { "Automatic": true }
+      },
+      "Fundamentals": {
+        "Duration": "7Days",
+        "Goals": ["LearnControls", "BasicCustomization", "Win5Races"],
+        "MentorGuidance": true
+      },
+      "Development": {
+        "Duration": "14Days",
+        "Goals": ["JoinCrew", "CustomizeCar", "EarnREP"],
+        "IndependentPlay": true
+      },
+      "Graduation": {
+        "Trigger": "Level20",
+        "Celebration": true,
+        "BondMaintained": true
+      }
+    },
+    "Milestones": {
+      "FirstWin": { "BothReward": { "REP": 500 } },
+      "Level10": { "BothReward": { "REP": 1000 } },
+      "Graduation": { "BothReward": { "REP": 5000, "Badge": "MentorshipComplete" } }
+    }
+  },
+
+  "MentorTools": {
+    "Communication": {
+      "DirectMessage": true,
+      "VoiceChat": true,
+      "QuickTips": { "Presets": 20 },
+      "VideoShare": true
+    },
+    "Guidance": {
+      "SpectateMode": true,
+      "CoDriver": { "SameSession": true },
+      "LineGuide": { "ShowOptimalPath": true },
+      "TelemetryShare": true
+    },
+    "Tracking": {
+      "MenteeProgress": true,
+      "SessionHistory": true,
+      "AchievementTracker": true,
+      "SkillAssessment": true
+    },
+    "Resources": {
+      "TutorialLinks": true,
+      "TipLibrary": true,
+      "VideoGuides": true
+    }
+  },
+
+  "MenteeExperience": {
+    "Guidance": {
+      "MentorAvailability": { "ShowOnline": true },
+      "AskForHelp": { "QuickButton": true },
+      "FollowMentor": { "InFreeRoam": true },
+      "JoinMentor": { "InRace": true }
+    },
+    "Learning": {
+      "ContextualTips": true,
+      "SkillChallenges": true,
+      "ProgressTracking": true,
+      "FeedbackSystem": true
+    },
+    "Protection": {
+      "GuidedMatchmaking": true,
+      "ReducedPenalties": true,
+      "SafeEnvironment": true
+    }
+  },
+
+  "Rewards": {
+    "Mentor": {
+      "PerSession": { "REP": 100 },
+      "PerMilestone": { "REP": 500, "Cash": 5000 },
+      "PerGraduation": { "REP": 5000, "Cash": 25000 },
+      "Milestones": {
+        "FirstMentee": { "Badge": "Mentor" },
+        "5Graduates": { "Title": "Guide", "REP": 10000 },
+        "25Graduates": { "Title": "Master Mentor", "REP": 50000, "ExclusiveItem": true },
+        "100Graduates": { "Title": "Legend Guide", "REP": 200000, "Vehicle": "MentorExclusive" }
+      }
+    },
+    "Mentee": {
+      "JoiningProgram": { "Cash": 10000, "REP": 1000 },
+      "PerMilestone": { "Cash": 5000, "REP": 500 },
+      "Graduation": { "Cash": 50000, "REP": 5000, "Badge": "Graduate" }
+    },
+    "Bonus": {
+      "ActiveDuo": { "XPBoost": 1.25, "CashBoost": 1.15 },
+      "SessionTogether": { "BonusREP": 100 }
+    }
+  },
+
+  "MentorRating": {
+    "System": {
+      "Scale": 5,
+      "Categories": ["Helpfulness", "Knowledge", "Patience", "Communication"],
+      "MenteeRates": true
+    },
+    "Impact": {
+      "HighRating": { "PriorityMatching": true, "BonusRewards": 1.2 },
+      "LowRating": { "ReviewRequired": true, "PossibleRemoval": true }
+    },
+    "Recognition": {
+      "TopMentors": { "Leaderboard": true },
+      "MentorOfMonth": { "SpecialReward": true }
+    }
+  },
+
+  "SafetyFeatures": {
+    "Moderation": {
+      "ReportMentor": true,
+      "ReportMentee": true,
+      "StaffReview": true
+    },
+    "Boundaries": {
+      "NoRealMoneyDiscussion": true,
+      "NoPersonalInfoSharing": true,
+      "NoHarassment": true
+    },
+    "EndRelationship": {
+      "EitherParty": true,
+      "NoQuestions": true,
+      "Cooldown": { "Days": 7 }
+    }
+  },
+
+  "CommunityMentoring": {
+    "CrewMentorship": {
+      "Enabled": true,
+      "CrewMentorRole": true,
+      "NewMemberGuidance": true
+    },
+    "GroupSessions": {
+      "Enabled": true,
+      "MaxSize": 5,
+      "ScheduledEvents": true
+    },
+    "ContentCreators": {
+      "VerifiedMentors": true,
+      "StreamIntegration": true,
+      "SpecialBadge": true
+    }
+  },
+
+  "Analytics": {
+    "Tracking": {
+      "RetentionRate": true,
+      "MenteeProgression": true,
+      "MentorEffectiveness": true,
+      "MatchQuality": true
+    },
+    "Optimization": {
+      "MatchingAlgorithm": true,
+      "ProgramAdjustment": true
+    }
+  },
+
+  "UI": {
+    "MentorHub": {
+      "Dashboard": true,
+      "MenteeList": true,
+      "SessionScheduler": true,
+      "Resources": true
+    },
+    "MenteeHub": {
+      "MentorInfo": true,
+      "Progress": true,
+      "AskHelp": true,
+      "Schedule": true
+    },
+    "Matching": {
+      "BrowseMentors": true,
+      "FilterByStyle": true,
+      "SendRequest": true
+    },
+    "Notifications": {
+      "MentorOnline": true,
+      "SessionReminder": true,
+      "MilestoneAchieved": true
+    }
+  }
+}

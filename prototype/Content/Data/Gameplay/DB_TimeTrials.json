@@ -1,0 +1,299 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Time Trial System and Ghost Racing",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "GhostSystem": true,
+    "LeaderboardIntegration": true,
+    "PersonalBestTracking": true,
+    "SectorTiming": true
+  },
+
+  "TimeTrialModes": {
+    "Standard": {
+      "ID": "TT_STANDARD",
+      "Name": "Standard Time Trial",
+      "Description": "Beat the clock solo",
+      "Laps": 1,
+      "Traffic": false,
+      "Weather": "Clear",
+      "TimeOfDay": "Day"
+    },
+    "HotLap": {
+      "ID": "TT_HOTLAP",
+      "Name": "Hot Lap",
+      "Description": "Pure lap time challenge",
+      "Laps": "Unlimited",
+      "BestLapCounts": true,
+      "FlyingStart": true
+    },
+    "Sprint": {
+      "ID": "TT_SPRINT",
+      "Name": "Sprint Trial",
+      "Description": "Point-to-point time challenge",
+      "Checkpoints": true,
+      "NoLaps": true
+    },
+    "Endurance": {
+      "ID": "TT_ENDURANCE",
+      "Name": "Endurance Trial",
+      "Description": "Extended session consistency",
+      "Laps": { "Options": [5, 10, 20] },
+      "TotalTime": true,
+      "Consistency": true
+    },
+    "Drift": {
+      "ID": "TT_DRIFT",
+      "Name": "Drift Time Trial",
+      "Description": "Score and time combined",
+      "ScoreRequired": true,
+      "TimeLimit": true
+    },
+    "Rival": {
+      "ID": "TT_RIVAL",
+      "Name": "Rival Challenge",
+      "Description": "Beat a specific ghost",
+      "TargetGhost": true,
+      "Progressive": true
+    }
+  },
+
+  "GhostSystem": {
+    "Types": {
+      "PersonalBest": {
+        "ID": "GHOST_PB",
+        "Description": "Your fastest run",
+        "Color": "Blue",
+        "AlwaysAvailable": true
+      },
+      "FriendGhost": {
+        "ID": "GHOST_FRIEND",
+        "Description": "Friend's best time",
+        "Color": "Green",
+        "ShareEnabled": true
+      },
+      "LeaderboardGhost": {
+        "ID": "GHOST_LB",
+        "Description": "Top leaderboard time",
+        "Color": "Gold",
+        "Downloadable": true
+      },
+      "RivalGhost": {
+        "ID": "GHOST_RIVAL",
+        "Description": "Assigned rival time",
+        "Color": "Red",
+        "Progressive": true
+      },
+      "DeveloperGhost": {
+        "ID": "GHOST_DEV",
+        "Description": "Developer challenge time",
+        "Color": "Purple",
+        "SpecialReward": true
+      }
+    },
+    "Display": {
+      "Opacity": { "Min": 0, "Max": 100, "Default": 50 },
+      "MaxSimultaneous": 3,
+      "Collision": false,
+      "SoundEffects": false
+    },
+    "Recording": {
+      "AutoRecord": true,
+      "MaxSaved": 10,
+      "Quality": "Full",
+      "DataPoints": ["Position", "Speed", "Steering", "Inputs"]
+    },
+    "Sharing": {
+      "Enabled": true,
+      "Methods": ["Friends", "Crew", "Public"],
+      "Download": true,
+      "Leaderboard": true
+    }
+  },
+
+  "SectorTiming": {
+    "Enabled": true,
+    "Sectors": { "Auto": true, "Custom": true },
+    "Display": {
+      "SectorDelta": true,
+      "SectorBest": true,
+      "ColorCoding": {
+        "Faster": "#00FF00",
+        "Slower": "#FF0000",
+        "Even": "#FFFF00"
+      }
+    },
+    "SectorRecords": {
+      "Personal": true,
+      "Track": true,
+      "TheoreticalBest": true
+    }
+  },
+
+  "TargetTimes": {
+    "Medals": {
+      "Gold": {
+        "Percentage": 100,
+        "Reward": { "Cash": 5000, "REP": 500 }
+      },
+      "Silver": {
+        "Percentage": 103,
+        "Reward": { "Cash": 2500, "REP": 250 }
+      },
+      "Bronze": {
+        "Percentage": 107,
+        "Reward": { "Cash": 1000, "REP": 100 }
+      }
+    },
+    "Platinium": {
+      "Description": "Beat developer time",
+      "Reward": { "Cash": 10000, "REP": 1000, "Badge": "Platinum" }
+    },
+    "Dynamic": {
+      "Enabled": true,
+      "BasedOn": "LeaderboardAverage",
+      "Adjustment": "Weekly"
+    }
+  },
+
+  "Leaderboards": {
+    "Categories": {
+      "Global": { "AllPlayers": true },
+      "Regional": { "ByRegion": true },
+      "Friends": { "FriendsOnly": true },
+      "Crew": { "CrewOnly": true },
+      "Class": { "ByVehicleClass": true },
+      "Vehicle": { "BySpecificVehicle": true }
+    },
+    "Timeframes": {
+      "AllTime": true,
+      "Monthly": true,
+      "Weekly": true,
+      "Daily": true
+    },
+    "Verification": {
+      "AntiCheat": true,
+      "ReplayRequired": { "ForTop100": true },
+      "ManualReview": { "ForTop10": true }
+    },
+    "Display": {
+      "TopPlayers": 100,
+      "YourPosition": true,
+      "SurroundingPlayers": 5,
+      "DownloadGhost": true
+    }
+  },
+
+  "RivalSystem": {
+    "Assignment": {
+      "Automatic": true,
+      "BasedOn": "SimilarSkill",
+      "Refresh": "AfterBeaten"
+    },
+    "Progression": {
+      "Tiers": ["Rookie", "Amateur", "Pro", "Elite", "Legend"],
+      "ClimbMethod": "BeatRival",
+      "Rewards": { "PerTier": true }
+    },
+    "RivalInfo": {
+      "ShowName": true,
+      "ShowVehicle": true,
+      "ShowTime": true,
+      "DownloadGhost": true
+    }
+  },
+
+  "ConditionOptions": {
+    "Weather": {
+      "Clear": { "Default": true },
+      "Cloudy": { "Multiplier": 1.0 },
+      "Rain": { "Multiplier": 0.95, "SeparateLeaderboard": true },
+      "Storm": { "Multiplier": 0.9, "SeparateLeaderboard": true }
+    },
+    "TimeOfDay": {
+      "Day": { "Default": true },
+      "Dusk": { "Multiplier": 1.0 },
+      "Night": { "Multiplier": 0.98, "SeparateLeaderboard": true }
+    },
+    "Traffic": {
+      "None": { "Default": true },
+      "Light": { "Multiplier": 0.95, "SeparateLeaderboard": true },
+      "Medium": { "Multiplier": 0.9, "SeparateLeaderboard": true }
+    },
+    "VehicleRestrictions": {
+      "Open": { "AnyVehicle": true },
+      "ClassLocked": { "SpecificClass": true },
+      "VehicleLocked": { "SpecificVehicle": true }
+    }
+  },
+
+  "Statistics": {
+    "Tracking": {
+      "TotalAttempts": true,
+      "TotalTime": true,
+      "PersonalBests": { "PerTrack": true },
+      "Improvement": { "OverTime": true },
+      "Consistency": { "LapVariance": true }
+    },
+    "Analysis": {
+      "SectorBreakdown": true,
+      "SpeedGraph": true,
+      "LineComparison": true,
+      "ImprovementTips": true
+    },
+    "History": {
+      "RecentRuns": 50,
+      "BestRuns": { "PerTrack": 10 },
+      "Progression": { "Graph": true }
+    }
+  },
+
+  "Rewards": {
+    "FirstComplete": {
+      "PerTrack": { "Cash": 1000, "REP": 100 }
+    },
+    "Medals": {
+      "Bronze": { "REP": 100 },
+      "Silver": { "REP": 250 },
+      "Gold": { "REP": 500 },
+      "Platinum": { "REP": 1000 }
+    },
+    "Milestones": {
+      "AllGold": { "Reward": { "REP": 25000, "Title": "Gold Standard" } },
+      "AllPlatinum": { "Reward": { "REP": 100000, "Vehicle": "PlatinumReward" } }
+    },
+    "Leaderboard": {
+      "Top10": { "Weekly": { "Cash": 50000 } },
+      "Top100": { "Weekly": { "Cash": 10000 } }
+    }
+  },
+
+  "UI": {
+    "PreRace": {
+      "TrackPreview": true,
+      "BestTime": true,
+      "Medals": true,
+      "GhostSelect": true,
+      "ConditionSelect": true
+    },
+    "InRace": {
+      "CurrentTime": true,
+      "Delta": true,
+      "SectorTimes": true,
+      "MiniLeaderboard": true
+    },
+    "PostRace": {
+      "TimeBreakdown": true,
+      "Comparison": true,
+      "NewRecord": { "Celebration": true },
+      "Retry": true,
+      "SaveGhost": true
+    },
+    "HUD": {
+      "Position": "TopCenter",
+      "DeltaDisplay": { "Large": true },
+      "SectorIndicator": true
+    }
+  }
+}

@@ -397,7 +397,15 @@ FMGPurchaseResult UMGStoreSubsystem::ExecutePurchase(FName ItemID, EMGCurrencyTy
 	}
 
 	// Check currency
-	UMGCurrencySubsystem* Currency = GetGameInstance()->GetSubsystem<UMGCurrencySubsystem>();
+	UGameInstance* GI = GetGameInstance();
+	if (!GI)
+	{
+		Result.bSuccess = false;
+		Result.FailureReason = FText::FromString(TEXT("Game instance unavailable"));
+		return Result;
+	}
+
+	UMGCurrencySubsystem* Currency = GI->GetSubsystem<UMGCurrencySubsystem>();
 	if (!Currency)
 	{
 		Result.bSuccess = false;

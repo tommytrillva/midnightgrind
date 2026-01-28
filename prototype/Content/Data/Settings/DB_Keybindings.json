@@ -1,0 +1,262 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Keybindings and Input Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "FullyRemappable": true,
+    "MultipleBindings": 2,
+    "ConflictWarning": true,
+    "ProfileSystem": true
+  },
+
+  "InputDevices": {
+    "Keyboard": {
+      "ID": "INPUT_KB",
+      "Supported": true,
+      "DefaultProfile": "KeyboardDefault"
+    },
+    "Controller": {
+      "ID": "INPUT_CTRL",
+      "Supported": true,
+      "Types": ["Xbox", "PlayStation", "Generic"],
+      "DefaultProfile": "ControllerDefault"
+    },
+    "Wheel": {
+      "ID": "INPUT_WHEEL",
+      "Supported": true,
+      "ForceFeeback": true,
+      "DefaultProfile": "WheelDefault"
+    },
+    "Mouse": {
+      "ID": "INPUT_MOUSE",
+      "Supported": true,
+      "ForUI": true,
+      "ForCamera": true
+    }
+  },
+
+  "KeyboardDefaults": {
+    "Driving": {
+      "Accelerate": { "Primary": "W", "Secondary": "UpArrow" },
+      "Brake": { "Primary": "S", "Secondary": "DownArrow" },
+      "SteerLeft": { "Primary": "A", "Secondary": "LeftArrow" },
+      "SteerRight": { "Primary": "D", "Secondary": "RightArrow" },
+      "Handbrake": { "Primary": "Space", "Secondary": null },
+      "Nitro": { "Primary": "LeftShift", "Secondary": null },
+      "GearUp": { "Primary": "E", "Secondary": null },
+      "GearDown": { "Primary": "Q", "Secondary": null },
+      "Clutch": { "Primary": "LeftCtrl", "Secondary": null },
+      "Horn": { "Primary": "H", "Secondary": null },
+      "Lights": { "Primary": "L", "Secondary": null },
+      "LookBack": { "Primary": "C", "Secondary": null }
+    },
+    "Camera": {
+      "CycleCamera": { "Primary": "V", "Secondary": null },
+      "HoodCamera": { "Primary": "1", "Secondary": null },
+      "BumperCamera": { "Primary": "2", "Secondary": null },
+      "ChaseNear": { "Primary": "3", "Secondary": null },
+      "ChaseFar": { "Primary": "4", "Secondary": null },
+      "FreeLook": { "Primary": "MouseMiddle", "Secondary": null }
+    },
+    "Menu": {
+      "Pause": { "Primary": "Escape", "Secondary": null },
+      "Map": { "Primary": "M", "Secondary": "Tab" },
+      "Garage": { "Primary": "G", "Secondary": null },
+      "Inventory": { "Primary": "I", "Secondary": null },
+      "Quick Menu": { "Primary": "Z", "Secondary": null }
+    },
+    "Communication": {
+      "TextChat": { "Primary": "T", "Secondary": null },
+      "VoicePush": { "Primary": "F", "Secondary": null },
+      "QuickChat1": { "Primary": "F1", "Secondary": null },
+      "QuickChat2": { "Primary": "F2", "Secondary": null },
+      "QuickChat3": { "Primary": "F3", "Secondary": null },
+      "QuickChat4": { "Primary": "F4", "Secondary": null }
+    },
+    "Actions": {
+      "ResetVehicle": { "Primary": "R", "Secondary": null },
+      "PhotoMode": { "Primary": "P", "Secondary": null },
+      "Replay": { "Primary": "K", "Secondary": null },
+      "Emote": { "Primary": "B", "Secondary": null }
+    }
+  },
+
+  "ControllerDefaults": {
+    "Xbox": {
+      "Driving": {
+        "Accelerate": "RT",
+        "Brake": "LT",
+        "Steer": "LeftStick",
+        "Handbrake": "A",
+        "Nitro": "B",
+        "GearUp": "RB",
+        "GearDown": "LB",
+        "Horn": "DPadLeft",
+        "LookBack": "RightStickClick"
+      },
+      "Camera": {
+        "CycleCamera": "Back",
+        "FreeLook": "RightStick"
+      },
+      "Menu": {
+        "Pause": "Start",
+        "Map": "DPadUp",
+        "Confirm": "A",
+        "Cancel": "B"
+      }
+    },
+    "PlayStation": {
+      "Driving": {
+        "Accelerate": "R2",
+        "Brake": "L2",
+        "Steer": "LeftStick",
+        "Handbrake": "Cross",
+        "Nitro": "Circle",
+        "GearUp": "R1",
+        "GearDown": "L1",
+        "Horn": "DPadLeft",
+        "LookBack": "R3"
+      },
+      "Camera": {
+        "CycleCamera": "TouchPad",
+        "FreeLook": "RightStick"
+      },
+      "Menu": {
+        "Pause": "Options",
+        "Map": "DPadUp",
+        "Confirm": "Cross",
+        "Cancel": "Circle"
+      }
+    }
+  },
+
+  "WheelDefaults": {
+    "Driving": {
+      "Accelerate": "ThrottlePedal",
+      "Brake": "BrakePedal",
+      "Clutch": "ClutchPedal",
+      "Steer": "Wheel",
+      "GearUp": "RightPaddle",
+      "GearDown": "LeftPaddle",
+      "Handbrake": "Button1",
+      "Nitro": "Button2"
+    },
+    "WheelSettings": {
+      "Rotation": { "Options": [180, 270, 360, 540, 720, 900], "Default": 540 },
+      "Sensitivity": { "Min": 0.1, "Max": 2.0, "Default": 1.0 },
+      "Linearity": { "Min": 0, "Max": 100, "Default": 50 },
+      "DeadZone": { "Min": 0, "Max": 20, "Default": 5 }
+    },
+    "ForceFeedback": {
+      "Enabled": true,
+      "Strength": { "Min": 0, "Max": 100, "Default": 70 },
+      "Effects": {
+        "Collisions": { "Enabled": true, "Strength": 80 },
+        "RoadTexture": { "Enabled": true, "Strength": 50 },
+        "EngineTorque": { "Enabled": true, "Strength": 40 },
+        "Understeer": { "Enabled": true, "Strength": 60 },
+        "Curbs": { "Enabled": true, "Strength": 70 }
+      }
+    }
+  },
+
+  "BindingProfiles": {
+    "MaxProfiles": 5,
+    "DefaultProfiles": {
+      "Standard": { "Preset": "Default" },
+      "Racing": { "Optimized": "Competitive" },
+      "Casual": { "Optimized": "Simplified" },
+      "OneHanded": { "Accessibility": true }
+    },
+    "CustomProfiles": {
+      "Create": true,
+      "Rename": true,
+      "Delete": true,
+      "Import": true,
+      "Export": true
+    },
+    "QuickSwitch": {
+      "Enabled": true,
+      "Hotkey": "F12"
+    }
+  },
+
+  "AdvancedSettings": {
+    "SteeringSettings": {
+      "Sensitivity": { "Min": 0.1, "Max": 2.0, "Default": 1.0 },
+      "DeadZone": { "Min": 0, "Max": 30, "Default": 10 },
+      "Linearity": { "Min": 0, "Max": 100, "Default": 50 },
+      "CounterSteerAssist": { "Enabled": true, "Strength": 50 }
+    },
+    "ThrottleSettings": {
+      "Sensitivity": { "Min": 0.1, "Max": 2.0, "Default": 1.0 },
+      "DeadZone": { "Min": 0, "Max": 20, "Default": 5 }
+    },
+    "BrakeSettings": {
+      "Sensitivity": { "Min": 0.1, "Max": 2.0, "Default": 1.0 },
+      "DeadZone": { "Min": 0, "Max": 20, "Default": 5 }
+    },
+    "VibrationSettings": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100, "Default": 70 },
+      "Types": {
+        "Collision": true,
+        "Engine": true,
+        "Road": true,
+        "Nitro": true
+      }
+    }
+  },
+
+  "AccessibilityBindings": {
+    "HoldVsToggle": {
+      "Accelerate": { "Options": ["Hold", "Toggle"], "Default": "Hold" },
+      "Brake": { "Options": ["Hold", "Toggle"], "Default": "Hold" },
+      "Nitro": { "Options": ["Hold", "Toggle"], "Default": "Hold" },
+      "Handbrake": { "Options": ["Hold", "Toggle"], "Default": "Hold" }
+    },
+    "SimplifiedControls": {
+      "AutoAccelerate": { "Enabled": false },
+      "AutoBrake": { "Enabled": false },
+      "OneButtonDrift": { "Enabled": false }
+    },
+    "AlternativeInputs": {
+      "HeadTracking": { "Supported": true },
+      "EyeTracking": { "Supported": true },
+      "VoiceCommands": { "Supported": false }
+    }
+  },
+
+  "ConflictResolution": {
+    "Detection": {
+      "Enabled": true,
+      "ShowWarning": true,
+      "AllowConflicts": true
+    },
+    "Resolution": {
+      "AutoResolve": false,
+      "PromptUser": true,
+      "ContextAware": true
+    }
+  },
+
+  "UI": {
+    "BindingMenu": {
+      "CategoryTabs": true,
+      "SearchFunction": true,
+      "ResetToDefault": true,
+      "ProfileSelector": true
+    },
+    "BindingDisplay": {
+      "ShowCurrent": true,
+      "ShowConflicts": true,
+      "QuickRemap": true
+    },
+    "OnScreenPrompts": {
+      "ShowBindings": true,
+      "AdaptToInput": true,
+      "IconStyle": { "Options": ["Xbox", "PlayStation", "Keyboard"] }
+    }
+  }
+}
