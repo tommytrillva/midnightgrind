@@ -1,0 +1,354 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Steering Wheel Customization System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "WheelSwaps": true,
+    "QuickRelease": true,
+    "HubAdapters": true
+  },
+
+  "SteeringWheelTypes": {
+    "Stock": {
+      "ID": "WHEEL_STOCK",
+      "Description": "Factory steering wheel",
+      "Diameter": { "Inches": 15 },
+      "Material": "LeatherWrapped",
+      "Airbag": true,
+      "Controls": true,
+      "Default": true
+    },
+    "SportFlat": {
+      "ID": "WHEEL_SPORT_FLAT",
+      "Description": "Sport flat-bottom wheel",
+      "Diameter": { "Inches": 14 },
+      "Material": "Leather",
+      "FlatBottom": true,
+      "ThickGrip": true,
+      "Cost": 400
+    },
+    "DeepDish": {
+      "ID": "WHEEL_DEEP",
+      "Description": "Deep dish wheel",
+      "Diameter": { "Inches": 13.5 },
+      "Material": "Suede",
+      "Dish": { "Inches": 3 },
+      "Cost": 350
+    },
+    "Drift": {
+      "ID": "WHEEL_DRIFT",
+      "Description": "Drift-style wheel",
+      "Diameter": { "Inches": 13 },
+      "Material": "Suede",
+      "Dish": { "Inches": 2 },
+      "QuickTurn": true,
+      "Cost": 300
+    },
+    "Racing": {
+      "ID": "WHEEL_RACING",
+      "Description": "Racing steering wheel",
+      "Diameter": { "Inches": 12.5 },
+      "Material": "Alcantara",
+      "Buttons": true,
+      "Lightweight": true,
+      "Cost": 800
+    },
+    "FormulaStyle": {
+      "ID": "WHEEL_FORMULA",
+      "Description": "F1-style wheel",
+      "Diameter": { "Inches": 11 },
+      "Material": "CarbonAlcantara",
+      "Buttons": true,
+      "Display": true,
+      "Paddles": true,
+      "Cost": 2000
+    },
+    "Classic": {
+      "ID": "WHEEL_CLASSIC",
+      "Description": "Classic wood wheel",
+      "Diameter": { "Inches": 15 },
+      "Material": "Wood",
+      "Vintage": true,
+      "ChromeSpokes": true,
+      "Cost": 500
+    },
+    "GTStyle": {
+      "ID": "WHEEL_GT",
+      "Description": "GT racing wheel",
+      "Diameter": { "Inches": 13 },
+      "Material": "Leather",
+      "ThreeSpoke": true,
+      "Buttons": true,
+      "Cost": 600
+    }
+  },
+
+  "Materials": {
+    "Leather": {
+      "ID": "MAT_LEATHER",
+      "Description": "Genuine leather",
+      "Grip": "Good",
+      "Durability": "High",
+      "Feel": "Premium",
+      "Default": true
+    },
+    "Alcantara": {
+      "ID": "MAT_ALCANTARA",
+      "Description": "Alcantara suede",
+      "Grip": "Excellent",
+      "Durability": "Medium",
+      "Feel": "Racing",
+      "CostMultiplier": 1.3
+    },
+    "Suede": {
+      "ID": "MAT_SUEDE",
+      "Description": "Synthetic suede",
+      "Grip": "Very Good",
+      "Durability": "Medium",
+      "Feel": "Sporty",
+      "CostMultiplier": 1.0
+    },
+    "Perforated": {
+      "ID": "MAT_PERF",
+      "Description": "Perforated leather",
+      "Grip": "Good",
+      "Durability": "High",
+      "Feel": "Breathable",
+      "CostMultiplier": 1.2
+    },
+    "CarbonFiber": {
+      "ID": "MAT_CARBON",
+      "Description": "Carbon fiber spokes",
+      "Grip": "N/A",
+      "Durability": "Very High",
+      "Feel": "Premium",
+      "ForSpokes": true,
+      "CostMultiplier": 2.0
+    },
+    "Wood": {
+      "ID": "MAT_WOOD",
+      "Description": "Wood rim",
+      "Grip": "Moderate",
+      "Durability": "High",
+      "Feel": "Classic",
+      "CostMultiplier": 1.5
+    }
+  },
+
+  "QuickRelease": {
+    "Types": {
+      "None": {
+        "ID": "QR_NONE",
+        "Description": "No quick release",
+        "Default": true
+      },
+      "BallLock": {
+        "ID": "QR_BALL",
+        "Description": "Ball-lock quick release",
+        "Security": "Medium",
+        "ReleaseType": "Pull",
+        "Cost": 150
+      },
+      "SparesStyle": {
+        "ID": "QR_SPARES",
+        "Description": "Sparco-style release",
+        "Security": "High",
+        "ReleaseType": "Twist",
+        "Cost": 200
+      },
+      "NRGStyle": {
+        "ID": "QR_NRG",
+        "Description": "NRG-style release",
+        "Security": "Medium",
+        "ReleaseType": "Pull",
+        "TiltAdjust": true,
+        "Cost": 180
+      },
+      "WorksStyle": {
+        "ID": "QR_WORKS",
+        "Description": "Works-style release",
+        "Security": "Very High",
+        "ReleaseType": "Button",
+        "Cost": 300
+      }
+    },
+    "Benefits": {
+      "TheftDeterrent": true,
+      "EasierEntry": true,
+      "SpaceOptimization": true
+    }
+  },
+
+  "HubAdapter": {
+    "Required": true,
+    "Types": {
+      "Universal": {
+        "ID": "HUB_UNIVERSAL",
+        "Description": "Universal short hub",
+        "Length": "Short",
+        "Cost": 80
+      },
+      "Extended": {
+        "ID": "HUB_EXTENDED",
+        "Description": "Extended hub adapter",
+        "Length": "Long",
+        "Cost": 100
+      },
+      "Collapsible": {
+        "ID": "HUB_COLLAPSIBLE",
+        "Description": "Collapsible hub",
+        "Safety": true,
+        "Cost": 150
+      }
+    },
+    "VehicleSpecific": true
+  },
+
+  "WheelFeatures": {
+    "Buttons": {
+      "Types": {
+        "HornOnly": { "Default": true },
+        "Basic": { "Buttons": 2, "Cost": 100 },
+        "Racing": { "Buttons": 6, "Rotaries": 2, "Cost": 400 },
+        "Formula": { "Buttons": 12, "Rotaries": 4, "Display": true, "Cost": 1000 }
+      },
+      "Functions": {
+        "Horn": true,
+        "Radio": true,
+        "NOS": true,
+        "PitLimiter": true,
+        "TractionControl": true,
+        "DRS": true,
+        "DrinkSystem": true
+      }
+    },
+    "Display": {
+      "None": { "Default": true },
+      "Basic": {
+        "Size": "Small",
+        "Shows": ["RPM", "Gear", "Speed"],
+        "Cost": 500
+      },
+      "Advanced": {
+        "Size": "Large",
+        "Shows": ["RPM", "Gear", "Speed", "LapTime", "Temps", "Fuel"],
+        "Cost": 1500
+      }
+    },
+    "ShiftLights": {
+      "None": { "Default": true },
+      "Basic": {
+        "LEDs": 5,
+        "Color": "Red",
+        "Cost": 100
+      },
+      "RGB": {
+        "LEDs": 10,
+        "Color": "RGB",
+        "Customizable": true,
+        "Cost": 250
+      }
+    },
+    "Paddles": {
+      "None": { "Default": true },
+      "Magnetic": {
+        "Feel": "Click",
+        "Size": "Standard",
+        "Cost": 300
+      },
+      "Extended": {
+        "Feel": "Click",
+        "Size": "Large",
+        "Cost": 400
+      },
+      "CarbonExtended": {
+        "Feel": "Click",
+        "Size": "Large",
+        "Material": "CarbonFiber",
+        "Cost": 600
+      }
+    }
+  },
+
+  "Finishes": {
+    "Spokes": {
+      "Black": { "Default": true },
+      "Chrome": { "Cost": 50 },
+      "Brushed": { "Cost": 75 },
+      "CarbonFiber": { "Cost": 200 },
+      "Painted": { "Custom": true, "Cost": 100 }
+    },
+    "CenterCap": {
+      "Plain": { "Default": true },
+      "Logo": { "Custom": true, "Cost": 50 },
+      "HornButton": { "Design": true, "Cost": 30 }
+    },
+    "Stitching": {
+      "Matching": { "Default": true },
+      "Contrast": { "Colors": "Any", "Cost": 30 },
+      "DoubleStitch": { "Premium": true, "Cost": 50 }
+    },
+    "CenterStripe": {
+      "None": { "Default": true },
+      "Single": { "Colors": ["Red", "Yellow", "Blue", "Green"], "Cost": 20 },
+      "Double": { "Colors": "Matching", "Cost": 30 }
+    }
+  },
+
+  "Sizes": {
+    "Diameter": {
+      "Large": { "Inches": 15, "Comfort": "Best" },
+      "Medium": { "Inches": 14, "Comfort": "Good" },
+      "Sport": { "Inches": 13, "QuickRatio": true },
+      "Racing": { "Inches": 12, "QuickRatio": true },
+      "Formula": { "Inches": 11, "QuickestRatio": true }
+    },
+    "DishDepth": {
+      "Flat": { "Inches": 0 },
+      "Shallow": { "Inches": 1.5 },
+      "Medium": { "Inches": 2.5 },
+      "Deep": { "Inches": 3.5 }
+    },
+    "GripThickness": {
+      "Thin": { "MM": 30 },
+      "Standard": { "MM": 35 },
+      "Thick": { "MM": 40 }
+    }
+  },
+
+  "Brands": {
+    "Premium": ["Momo", "Nardi", "Sparco", "OMP", "Personal"],
+    "Racing": ["Works Bell", "Vertex", "Keys Racing"],
+    "Value": ["NRG", "Grip Royal", "Spec-D", "Luisi"]
+  },
+
+  "LegalConsiderations": {
+    "Airbag": {
+      "Removal": "NotRecommended",
+      "Insurance": "MayAffect"
+    },
+    "Size": {
+      "TooSmall": "MayBeIllegal",
+      "MinimumDiameter": { "Inches": 10 }
+    }
+  },
+
+  "UI": {
+    "WheelMenu": {
+      "TypeSelector": true,
+      "MaterialOptions": true,
+      "SizeOptions": true,
+      "FeatureOptions": true
+    },
+    "Preview": {
+      "3DView": true,
+      "CockpitView": true,
+      "RotatePreview": true
+    },
+    "Compatibility": {
+      "HubCheck": true,
+      "FeatureCheck": true
+    }
+  }
+}

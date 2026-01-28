@@ -1,0 +1,385 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Aftermarket Gauges and Pods Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "CustomGauges": true,
+    "GaugePods": true,
+    "DigitalDisplays": true
+  },
+
+  "GaugeTypes": {
+    "Tachometer": {
+      "ID": "GAUGE_TACH",
+      "Description": "Tachometer",
+      "Measures": "RPM",
+      "Range": { "Min": 0, "Max": 10000 },
+      "ShiftLight": { "Available": true },
+      "Essential": true,
+      "Cost": 150
+    },
+    "BoostPressure": {
+      "ID": "GAUGE_BOOST",
+      "Description": "Boost/vacuum gauge",
+      "Measures": "PSI",
+      "Range": { "Min": -30, "Max": 30 },
+      "ForTurbo": true,
+      "Cost": 120
+    },
+    "OilPressure": {
+      "ID": "GAUGE_OILP",
+      "Description": "Oil pressure gauge",
+      "Measures": "PSI",
+      "Range": { "Min": 0, "Max": 100 },
+      "Warning": { "Low": 15 },
+      "Cost": 100
+    },
+    "OilTemperature": {
+      "ID": "GAUGE_OILT",
+      "Description": "Oil temperature gauge",
+      "Measures": "Fahrenheit",
+      "Range": { "Min": 100, "Max": 300 },
+      "Warning": { "High": 260 },
+      "Cost": 100
+    },
+    "WaterTemperature": {
+      "ID": "GAUGE_WATER",
+      "Description": "Water temperature gauge",
+      "Measures": "Fahrenheit",
+      "Range": { "Min": 100, "Max": 280 },
+      "Warning": { "High": 230 },
+      "Cost": 100
+    },
+    "FuelPressure": {
+      "ID": "GAUGE_FUELP",
+      "Description": "Fuel pressure gauge",
+      "Measures": "PSI",
+      "Range": { "Min": 0, "Max": 100 },
+      "Warning": { "Low": 30 },
+      "Cost": 110
+    },
+    "AFR": {
+      "ID": "GAUGE_AFR",
+      "Description": "Air-fuel ratio gauge",
+      "Measures": "Lambda",
+      "Range": { "Min": 10, "Max": 18 },
+      "WideBand": true,
+      "Cost": 200
+    },
+    "EGT": {
+      "ID": "GAUGE_EGT",
+      "Description": "Exhaust gas temperature",
+      "Measures": "Fahrenheit",
+      "Range": { "Min": 200, "Max": 2000 },
+      "ForTurbo": true,
+      "Cost": 180
+    },
+    "Voltmeter": {
+      "ID": "GAUGE_VOLT",
+      "Description": "Battery voltage gauge",
+      "Measures": "Volts",
+      "Range": { "Min": 8, "Max": 18 },
+      "Warning": { "Low": 11, "High": 15 },
+      "Cost": 80
+    },
+    "TransmissionTemp": {
+      "ID": "GAUGE_TRANS",
+      "Description": "Transmission temperature",
+      "Measures": "Fahrenheit",
+      "Range": { "Min": 100, "Max": 300 },
+      "Warning": { "High": 250 },
+      "Cost": 100
+    },
+    "NitrousPressure": {
+      "ID": "GAUGE_NOS",
+      "Description": "Nitrous bottle pressure",
+      "Measures": "PSI",
+      "Range": { "Min": 0, "Max": 1500 },
+      "ForNOS": true,
+      "Cost": 120
+    }
+  },
+
+  "GaugeSizes": {
+    "52mm": {
+      "Diameter": 52,
+      "Unit": "MM",
+      "Common": true,
+      "Default": true
+    },
+    "60mm": {
+      "Diameter": 60,
+      "Unit": "MM",
+      "Large": true,
+      "CostMultiplier": 1.2
+    },
+    "80mm": {
+      "Diameter": 80,
+      "Unit": "MM",
+      "Tachometer": true,
+      "CostMultiplier": 1.5
+    }
+  },
+
+  "GaugeStyles": {
+    "Analog": {
+      "ID": "STYLE_ANALOG",
+      "Description": "Traditional analog gauge",
+      "Needle": true,
+      "Classic": true,
+      "Default": true
+    },
+    "Digital": {
+      "ID": "STYLE_DIGITAL",
+      "Description": "Digital readout",
+      "Display": "LED",
+      "Precise": true,
+      "CostMultiplier": 1.3
+    },
+    "AnalogDigital": {
+      "ID": "STYLE_COMBO",
+      "Description": "Analog with digital",
+      "Needle": true,
+      "Display": "LED",
+      "CostMultiplier": 1.5
+    },
+    "OLED": {
+      "ID": "STYLE_OLED",
+      "Description": "OLED display gauge",
+      "Display": "OLED",
+      "Customizable": true,
+      "CostMultiplier": 2.0
+    }
+  },
+
+  "GaugeFaces": {
+    "Black": {
+      "Background": "Black",
+      "Markings": "White",
+      "Default": true
+    },
+    "White": {
+      "Background": "White",
+      "Markings": "Black"
+    },
+    "Carbon": {
+      "Background": "CarbonPattern",
+      "Markings": "White",
+      "CostMultiplier": 1.2
+    },
+    "Blue": {
+      "Background": "Blue",
+      "Markings": "White"
+    },
+    "Racing": {
+      "Background": "Black",
+      "Markings": "Green",
+      "Redline": "Red"
+    }
+  },
+
+  "GaugeLighting": {
+    "Standard": {
+      "Color": "Amber",
+      "Default": true
+    },
+    "LED": {
+      "Colors": ["White", "Blue", "Red", "Green", "Amber"],
+      "Bright": true,
+      "Cost": 30
+    },
+    "RGB": {
+      "Colors": "Any",
+      "Customizable": true,
+      "Cost": 50
+    }
+  },
+
+  "PodTypes": {
+    "APillar": {
+      "ID": "POD_APILLAR",
+      "Description": "A-pillar gauge pod",
+      "Positions": [1, 2, 3],
+      "Location": "APillar",
+      "Visible": "Easy",
+      "Cost": 80
+    },
+    "DashTop": {
+      "ID": "POD_DASHTOP",
+      "Description": "Dash-top gauge pod",
+      "Positions": [1, 2, 3],
+      "Location": "Dashboard",
+      "Visible": "Central",
+      "Cost": 60
+    },
+    "SteeringColumn": {
+      "ID": "POD_COLUMN",
+      "Description": "Steering column pod",
+      "Positions": [1, 2],
+      "Location": "SteeringColumn",
+      "Visible": "Behind Wheel",
+      "Cost": 70
+    },
+    "VentPod": {
+      "ID": "POD_VENT",
+      "Description": "Vent-mount gauge pod",
+      "Positions": [1],
+      "Location": "Vent",
+      "Visible": "Integrated",
+      "Cost": 50
+    },
+    "CenterConsole": {
+      "ID": "POD_CONSOLE",
+      "Description": "Console gauge pod",
+      "Positions": [1, 2],
+      "Location": "Console",
+      "Visible": "Low",
+      "Cost": 60
+    },
+    "RoofMount": {
+      "ID": "POD_ROOF",
+      "Description": "Roof-mount pod",
+      "Positions": [3, 4, 5],
+      "Location": "Roof",
+      "Visible": "Top",
+      "Racing": true,
+      "Cost": 150
+    }
+  },
+
+  "PodMaterials": {
+    "ABS": {
+      "Description": "ABS plastic",
+      "Finish": "Paintable",
+      "Default": true
+    },
+    "Fiberglass": {
+      "Description": "Fiberglass pod",
+      "Finish": "Paintable",
+      "CostMultiplier": 1.3
+    },
+    "CarbonFiber": {
+      "Description": "Carbon fiber pod",
+      "Finish": "CarbonWeave",
+      "CostMultiplier": 2.5
+    }
+  },
+
+  "DigitalDisplays": {
+    "Standalone": {
+      "ID": "DISPLAY_STANDALONE",
+      "Description": "Standalone digital display",
+      "Size": { "Inches": 2.5 },
+      "Parameters": "Multiple",
+      "Programmable": true,
+      "Cost": 300
+    },
+    "MultiGauge": {
+      "ID": "DISPLAY_MULTI",
+      "Description": "Multi-function display",
+      "Size": { "Inches": 4 },
+      "Parameters": 8,
+      "TouchScreen": true,
+      "Cost": 500
+    },
+    "RacingDisplay": {
+      "ID": "DISPLAY_RACING",
+      "Description": "Racing data display",
+      "Size": { "Inches": 5 },
+      "Parameters": 16,
+      "LapTimer": true,
+      "DataLogging": true,
+      "Cost": 1000
+    },
+    "DashReplacement": {
+      "ID": "DISPLAY_DASH",
+      "Description": "Full digital dash",
+      "Size": { "Inches": 10 },
+      "Parameters": "All",
+      "CustomLayout": true,
+      "Cost": 2500
+    }
+  },
+
+  "SensorPackages": {
+    "Basic": {
+      "ID": "SENSOR_BASIC",
+      "Description": "Basic sensor kit",
+      "Includes": ["OilPressure", "OilTemp", "WaterTemp"],
+      "Cost": 200
+    },
+    "Turbo": {
+      "ID": "SENSOR_TURBO",
+      "Description": "Turbo sensor kit",
+      "Includes": ["Boost", "EGT", "AFR"],
+      "Cost": 400
+    },
+    "Complete": {
+      "ID": "SENSOR_COMPLETE",
+      "Description": "Complete sensor kit",
+      "Includes": "All",
+      "Cost": 800
+    }
+  },
+
+  "Warnings": {
+    "Visual": {
+      "LED": { "Color": "Red", "Flash": true },
+      "Display": { "Warning": true, "Color": "Red" }
+    },
+    "Audio": {
+      "Beep": { "Available": true },
+      "Voice": { "Available": true, "Premium": true }
+    },
+    "Thresholds": {
+      "Configurable": true,
+      "Presets": true
+    }
+  },
+
+  "Brands": {
+    "Premium": ["Defi", "Auto Meter", "Stack", "AEM"],
+    "Mid": ["Glowshift", "Prosport", "Isspro"],
+    "Value": ["OBD2", "Generic"]
+  },
+
+  "Installation": {
+    "Wiring": {
+      "Required": true,
+      "Harness": { "Available": true }
+    },
+    "Sensors": {
+      "Installation": "Required",
+      "Tapping": { "SomeModels": true }
+    },
+    "Calibration": {
+      "Required": true,
+      "Digital": "Easy",
+      "Analog": "Manual"
+    }
+  },
+
+  "UI": {
+    "GaugeMenu": {
+      "TypeSelector": true,
+      "StyleOptions": true,
+      "FaceOptions": true,
+      "LightingOptions": true
+    },
+    "PodMenu": {
+      "LocationSelector": true,
+      "SizeOptions": true,
+      "MaterialOptions": true
+    },
+    "Preview": {
+      "CockpitView": true,
+      "GaugeReadings": true,
+      "WarningTest": true
+    },
+    "Setup": {
+      "WarningThresholds": true,
+      "DisplayConfig": true
+    }
+  }
+}

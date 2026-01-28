@@ -1,0 +1,364 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Racing Pedals and Footrest Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "PedalSwaps": true,
+    "AdjustablePedals": true,
+    "DeadPedal": true
+  },
+
+  "PedalTypes": {
+    "Stock": {
+      "ID": "PEDAL_STOCK",
+      "Description": "Factory pedals",
+      "Material": "Rubber",
+      "Grip": "Standard",
+      "Default": true
+    },
+    "SportsAluminum": {
+      "ID": "PEDAL_SPORT_AL",
+      "Description": "Sport aluminum pedals",
+      "Material": "Aluminum",
+      "Grip": "Good",
+      "RubberInserts": true,
+      "Cost": 100
+    },
+    "RacingAluminum": {
+      "ID": "PEDAL_RACE_AL",
+      "Description": "Racing aluminum pedals",
+      "Material": "Aluminum",
+      "Grip": "Excellent",
+      "Drilled": true,
+      "Cost": 150
+    },
+    "BilletAluminum": {
+      "ID": "PEDAL_BILLET",
+      "Description": "Billet aluminum pedals",
+      "Material": "BilletAluminum",
+      "Grip": "Premium",
+      "Heavy": true,
+      "Cost": 250
+    },
+    "Titanium": {
+      "ID": "PEDAL_TITANIUM",
+      "Description": "Titanium racing pedals",
+      "Material": "Titanium",
+      "Grip": "Excellent",
+      "Lightweight": true,
+      "Cost": 500
+    },
+    "CarbonFiber": {
+      "ID": "PEDAL_CARBON",
+      "Description": "Carbon fiber pedals",
+      "Material": "CarbonFiber",
+      "Grip": "Good",
+      "Ultralight": true,
+      "Cost": 400
+    },
+    "HeelToe": {
+      "ID": "PEDAL_HEELTOE",
+      "Description": "Heel-toe optimized",
+      "Material": "Aluminum",
+      "Grip": "Excellent",
+      "ThrottleExtension": true,
+      "GasOffset": true,
+      "Cost": 200
+    },
+    "Rally": {
+      "ID": "PEDAL_RALLY",
+      "Description": "Rally-style pedals",
+      "Material": "Steel",
+      "Grip": "Maximum",
+      "LargeFootprint": true,
+      "Cost": 180
+    }
+  },
+
+  "PedalSurfaces": {
+    "Rubber": {
+      "ID": "SURF_RUBBER",
+      "Description": "Rubber surface",
+      "Grip": "Good",
+      "Wet": "Good",
+      "Default": true
+    },
+    "Textured": {
+      "ID": "SURF_TEXTURED",
+      "Description": "Textured aluminum",
+      "Grip": "Very Good",
+      "Wet": "Moderate"
+    },
+    "Drilled": {
+      "ID": "SURF_DRILLED",
+      "Description": "Drilled pattern",
+      "Grip": "Excellent",
+      "Wet": "Good",
+      "Weight": "Light"
+    },
+    "Knurled": {
+      "ID": "SURF_KNURLED",
+      "Description": "Knurled surface",
+      "Grip": "Maximum",
+      "Wet": "Excellent",
+      "Aggressive": true
+    },
+    "Honeycomb": {
+      "ID": "SURF_HONEYCOMB",
+      "Description": "Honeycomb pattern",
+      "Grip": "Very Good",
+      "Wet": "Good",
+      "Weight": "Light"
+    }
+  },
+
+  "PedalConfiguration": {
+    "Standard": {
+      "Description": "Standard 3-pedal layout",
+      "Pedals": ["Gas", "Brake", "Clutch"],
+      "ForManual": true
+    },
+    "Automatic": {
+      "Description": "2-pedal layout",
+      "Pedals": ["Gas", "Brake"],
+      "ForAutomatic": true
+    },
+    "LeftFootBrake": {
+      "Description": "Left-foot brake setup",
+      "Pedals": ["Gas", "Brake"],
+      "BrakePosition": "Left",
+      "ForRacing": true
+    }
+  },
+
+  "DeadPedal": {
+    "Types": {
+      "None": {
+        "ID": "DEAD_NONE",
+        "Description": "No dead pedal",
+        "Default": { "ForManual": true }
+      },
+      "Stock": {
+        "ID": "DEAD_STOCK",
+        "Description": "Factory dead pedal"
+      },
+      "Aluminum": {
+        "ID": "DEAD_ALUMINUM",
+        "Description": "Aluminum dead pedal",
+        "Material": "Aluminum",
+        "Matching": true,
+        "Cost": 50
+      },
+      "Extended": {
+        "ID": "DEAD_EXTENDED",
+        "Description": "Extended dead pedal",
+        "Material": "Aluminum",
+        "LargerFootprint": true,
+        "Cost": 75
+      }
+    }
+  },
+
+  "AdjustableFeatures": {
+    "HeightAdjust": {
+      "ID": "ADJ_HEIGHT",
+      "Description": "Pedal height adjustment",
+      "Range": { "Inches": 2 },
+      "Benefit": "Comfort",
+      "Cost": 100
+    },
+    "AngleAdjust": {
+      "ID": "ADJ_ANGLE",
+      "Description": "Pedal angle adjustment",
+      "Range": { "Degrees": 15 },
+      "Benefit": "Ergonomics",
+      "Cost": 100
+    },
+    "ReachAdjust": {
+      "ID": "ADJ_REACH",
+      "Description": "Pedal reach adjustment",
+      "Range": { "Inches": 3 },
+      "Benefit": "Fit",
+      "Cost": 150
+    },
+    "SpacingAdjust": {
+      "ID": "ADJ_SPACING",
+      "Description": "Pedal spacing adjustment",
+      "Benefit": "HeelToe",
+      "Cost": 75
+    }
+  },
+
+  "SpecialFeatures": {
+    "ThrottleExtension": {
+      "ID": "FEAT_THROTTLE_EXT",
+      "Description": "Throttle pedal extension",
+      "Purpose": "HeelToe",
+      "Extends": { "Side": true },
+      "Cost": 50
+    },
+    "BrakeBias": {
+      "ID": "FEAT_BRAKE_BIAS",
+      "Description": "Adjustable brake bias",
+      "Purpose": "RacingControl",
+      "Adjustment": { "FrontRear": true },
+      "Cost": 300
+    },
+    "QuickRelease": {
+      "ID": "FEAT_QUICK",
+      "Description": "Quick-release pedal box",
+      "Purpose": "EasyRemoval",
+      "ForRacing": true,
+      "Cost": 500
+    },
+    "LoadCell": {
+      "ID": "FEAT_LOADCELL",
+      "Description": "Load cell brake",
+      "Purpose": "PressureSensitive",
+      "Precision": "High",
+      "Cost": 400
+    }
+  },
+
+  "Materials": {
+    "Rubber": {
+      "Weight": 1.0,
+      "Durability": "High",
+      "Cost": 1.0
+    },
+    "Aluminum": {
+      "Weight": 0.7,
+      "Durability": "Very High",
+      "Cost": 1.5
+    },
+    "BilletAluminum": {
+      "Weight": 0.8,
+      "Durability": "Extreme",
+      "Cost": 2.5
+    },
+    "Titanium": {
+      "Weight": 0.5,
+      "Durability": "Extreme",
+      "Cost": 5.0
+    },
+    "CarbonFiber": {
+      "Weight": 0.4,
+      "Durability": "High",
+      "Cost": 4.0
+    },
+    "Steel": {
+      "Weight": 1.2,
+      "Durability": "Extreme",
+      "Cost": 1.8
+    }
+  },
+
+  "Finishes": {
+    "Anodized": {
+      "Colors": ["Black", "Silver", "Red", "Blue", "Gold", "Purple"],
+      "Durable": true
+    },
+    "Polished": {
+      "Shine": "High",
+      "Maintenance": "Required"
+    },
+    "Brushed": {
+      "Shine": "Subtle",
+      "Maintenance": "Low"
+    },
+    "CarbonWeave": {
+      "Pattern": "Visible",
+      "Premium": true
+    },
+    "Painted": {
+      "Colors": "Custom",
+      "Durability": "Moderate"
+    }
+  },
+
+  "Shapes": {
+    "Rectangular": {
+      "Classic": true,
+      "FootCoverage": "Standard"
+    },
+    "Curved": {
+      "Ergonomic": true,
+      "FootCoverage": "Contoured"
+    },
+    "Extended": {
+      "HeelToe": true,
+      "FootCoverage": "Wide"
+    },
+    "Racing": {
+      "Minimalist": true,
+      "FootCoverage": "Precise"
+    }
+  },
+
+  "Installation": {
+    "BoltOn": {
+      "Difficulty": "Easy",
+      "Reversible": true,
+      "Default": true
+    },
+    "Universal": {
+      "Difficulty": "Easy",
+      "Fits": "Most",
+      "Clamps": true
+    },
+    "Custom": {
+      "Difficulty": "Moderate",
+      "Drilling": { "MayBeRequired": true }
+    },
+    "PedalBox": {
+      "Difficulty": "Hard",
+      "FullReplacement": true,
+      "ForRacing": true
+    }
+  },
+
+  "Brands": {
+    "Premium": ["Tilton", "Wilwood", "AP Racing", "ISR"],
+    "Sport": ["Sparco", "OMP", "Momo", "Nismo"],
+    "Value": ["NRG", "Spec-D", "Generic"]
+  },
+
+  "PerformanceEffects": {
+    "HeelToe": {
+      "Optimized": { "ShiftFeel": "Improved" },
+      "ThrottleBlip": "Easier"
+    },
+    "Grip": {
+      "Improved": { "Control": "Better" },
+      "WetConditions": { "Safety": "Improved" }
+    },
+    "Weight": {
+      "Reduction": { "Minimal": true },
+      "RotatingMass": "N/A"
+    }
+  },
+
+  "UI": {
+    "PedalMenu": {
+      "TypeSelector": true,
+      "MaterialOptions": true,
+      "SurfaceOptions": true,
+      "FinishOptions": true
+    },
+    "Adjustments": {
+      "HeightSlider": true,
+      "AngleSlider": true,
+      "SpacingSlider": true
+    },
+    "Preview": {
+      "FootwellView": true,
+      "TopDownView": true,
+      "SizeComparison": true
+    },
+    "DeadPedal": {
+      "TypeSelector": true,
+      "MatchingOption": true
+    }
+  }
+}

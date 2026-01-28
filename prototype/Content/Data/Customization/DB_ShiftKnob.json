@@ -1,0 +1,375 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Shift Knob and Gear Lever Customization",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "KnobSwaps": true,
+    "ShifterSwaps": true,
+    "ShortThrow": true
+  },
+
+  "ShiftKnobTypes": {
+    "Stock": {
+      "ID": "KNOB_STOCK",
+      "Description": "Factory shift knob",
+      "Material": "Leather",
+      "Weight": "Standard",
+      "Default": true
+    },
+    "Round": {
+      "ID": "KNOB_ROUND",
+      "Description": "Classic round knob",
+      "Shape": "Sphere",
+      "Material": "Various",
+      "Weight": "Light",
+      "Cost": 50
+    },
+    "Teardrop": {
+      "ID": "KNOB_TEAR",
+      "Description": "Teardrop racing knob",
+      "Shape": "Teardrop",
+      "Material": "Aluminum",
+      "Weight": "Light",
+      "Cost": 75
+    },
+    "CylindricalShort": {
+      "ID": "KNOB_CYL_SHORT",
+      "Description": "Short cylinder knob",
+      "Shape": "Cylinder",
+      "Height": "Short",
+      "Weight": "Light",
+      "Cost": 60
+    },
+    "CylindricalTall": {
+      "ID": "KNOB_CYL_TALL",
+      "Description": "Tall cylinder knob",
+      "Shape": "Cylinder",
+      "Height": "Tall",
+      "Weight": "Heavy",
+      "Cost": 80
+    },
+    "WeightedRound": {
+      "ID": "KNOB_WEIGHTED",
+      "Description": "Weighted shift knob",
+      "Shape": "Sphere",
+      "Material": "Steel",
+      "Weight": { "Grams": 500 },
+      "ShiftFeel": "Improved",
+      "Cost": 100
+    },
+    "Pistol": {
+      "ID": "KNOB_PISTOL",
+      "Description": "Pistol grip knob",
+      "Shape": "Pistol",
+      "Ergonomic": true,
+      "Cost": 120
+    },
+    "DuraconType": {
+      "ID": "KNOB_DURACON",
+      "Description": "Duracon racing knob",
+      "Shape": "Sphere",
+      "Material": "Duracon",
+      "Weight": "Light",
+      "Racing": true,
+      "Cost": 150
+    },
+    "JDMStyle": {
+      "ID": "KNOB_JDM",
+      "Description": "JDM bubble knob",
+      "Shape": "Sphere",
+      "Material": "Resin",
+      "Transparent": true,
+      "Embedded": true,
+      "Cost": 80
+    },
+    "Custom": {
+      "ID": "KNOB_CUSTOM",
+      "Description": "Custom shift knob",
+      "Shape": "Various",
+      "Material": "Various",
+      "Design": "Custom",
+      "Cost": 200
+    }
+  },
+
+  "Materials": {
+    "Leather": {
+      "ID": "MAT_LEATHER",
+      "Description": "Leather wrapped",
+      "Feel": "Comfortable",
+      "Temperature": "Neutral",
+      "Default": true
+    },
+    "Aluminum": {
+      "ID": "MAT_ALUMINUM",
+      "Description": "Billet aluminum",
+      "Feel": "Solid",
+      "Temperature": "Hot/Cold",
+      "Anodized": true,
+      "Cost": 50
+    },
+    "Stainless": {
+      "ID": "MAT_STEEL",
+      "Description": "Stainless steel",
+      "Feel": "Heavy",
+      "Temperature": "Hot/Cold",
+      "Weight": "Heavy",
+      "Cost": 75
+    },
+    "Titanium": {
+      "ID": "MAT_TITANIUM",
+      "Description": "Titanium knob",
+      "Feel": "Light",
+      "Temperature": "Moderate",
+      "Premium": true,
+      "Cost": 200
+    },
+    "Duracon": {
+      "ID": "MAT_DURACON",
+      "Description": "Duracon delrin",
+      "Feel": "Smooth",
+      "Temperature": "Neutral",
+      "Racing": true,
+      "Cost": 100
+    },
+    "Wood": {
+      "ID": "MAT_WOOD",
+      "Description": "Wood knob",
+      "Feel": "Classic",
+      "Temperature": "Neutral",
+      "Types": ["Walnut", "Mahogany", "Oak"],
+      "Cost": 80
+    },
+    "CarbonFiber": {
+      "ID": "MAT_CARBON",
+      "Description": "Carbon fiber",
+      "Feel": "Premium",
+      "Temperature": "Neutral",
+      "Cost": 150
+    },
+    "Resin": {
+      "ID": "MAT_RESIN",
+      "Description": "Clear resin",
+      "Feel": "Smooth",
+      "Temperature": "Neutral",
+      "Transparent": true,
+      "Embedded": { "Available": true },
+      "Cost": 60
+    },
+    "Alcantara": {
+      "ID": "MAT_ALCANTARA",
+      "Description": "Alcantara wrapped",
+      "Feel": "Grippy",
+      "Temperature": "Neutral",
+      "Cost": 90
+    }
+  },
+
+  "ShifterTypes": {
+    "Stock": {
+      "ID": "SHIFTER_STOCK",
+      "Description": "Factory shifter",
+      "ThrowDistance": 1.0,
+      "Default": true
+    },
+    "ShortThrow": {
+      "ID": "SHIFTER_SHORT",
+      "Description": "Short-throw shifter",
+      "ThrowDistance": 0.6,
+      "Reduction": { "Percentage": 40 },
+      "Cost": 300
+    },
+    "AdjustableShort": {
+      "ID": "SHIFTER_ADJ",
+      "Description": "Adjustable short-throw",
+      "ThrowDistance": { "Range": [0.5, 0.8] },
+      "Adjustable": true,
+      "Cost": 500
+    },
+    "QuickShift": {
+      "ID": "SHIFTER_QUICK",
+      "Description": "Quick-shift kit",
+      "ThrowDistance": 0.5,
+      "Reduction": { "Percentage": 50 },
+      "Stiffer": true,
+      "Cost": 400
+    },
+    "Sequential": {
+      "ID": "SHIFTER_SEQ",
+      "Description": "Sequential shifter",
+      "Pattern": "Sequential",
+      "PushPull": true,
+      "Requires": "SequentialGearbox",
+      "Cost": 2000
+    },
+    "PaddleShift": {
+      "ID": "SHIFTER_PADDLE",
+      "Description": "Paddle shift conversion",
+      "Location": "SteeringWheel",
+      "Requires": "AutoOrDCT",
+      "Cost": 800
+    }
+  },
+
+  "ShiftBoot": {
+    "Types": {
+      "Stock": {
+        "ID": "BOOT_STOCK",
+        "Description": "Factory shift boot",
+        "Default": true
+      },
+      "Leather": {
+        "ID": "BOOT_LEATHER",
+        "Description": "Leather shift boot",
+        "Material": "Leather",
+        "Colors": ["Black", "Red", "Tan", "Custom"],
+        "Cost": 80
+      },
+      "Alcantara": {
+        "ID": "BOOT_ALCANTARA",
+        "Description": "Alcantara shift boot",
+        "Material": "Alcantara",
+        "Colors": ["Black", "Gray", "Red"],
+        "Cost": 120
+      },
+      "Carbon": {
+        "ID": "BOOT_CARBON",
+        "Description": "Carbon fiber surround",
+        "Material": "CarbonFiber",
+        "Rigid": true,
+        "Cost": 200
+      }
+    },
+    "Stitching": {
+      "Matching": { "Default": true },
+      "Contrast": { "Colors": "Any", "Cost": 20 }
+    }
+  },
+
+  "GatePatterns": {
+    "HPattern": {
+      "Description": "Standard H-pattern",
+      "Layout": {
+        "5Speed": "1-2-3-4-5-R",
+        "6Speed": "1-2-3-4-5-6-R"
+      },
+      "Default": true
+    },
+    "DogLeg": {
+      "Description": "Dog-leg first gear",
+      "Layout": "R-1-2-3-4-5",
+      "Racing": true
+    },
+    "Sequential": {
+      "Description": "Sequential push-pull",
+      "Layout": "+-",
+      "Requires": "SeqGearbox"
+    }
+  },
+
+  "HeightAdjustment": {
+    "ShifterExtension": {
+      "ID": "EXT_SHIFTER",
+      "Description": "Shifter extension",
+      "Adds": { "Inches": [1, 2, 3] },
+      "Cost": 30
+    },
+    "ThreadAdapter": {
+      "ID": "THREAD_ADAPTER",
+      "Description": "Thread pitch adapter",
+      "Converts": ["M10x1.25", "M10x1.5", "M12x1.25", "M8x1.25"],
+      "Cost": 15
+    }
+  },
+
+  "WeightEffect": {
+    "Light": {
+      "Weight": { "Grams": 100 },
+      "ShiftFeel": "Quick",
+      "Notchy": true
+    },
+    "Standard": {
+      "Weight": { "Grams": 200 },
+      "ShiftFeel": "Balanced"
+    },
+    "Heavy": {
+      "Weight": { "Grams": 400 },
+      "ShiftFeel": "Smooth",
+      "Momentum": true
+    },
+    "VeryHeavy": {
+      "Weight": { "Grams": 600 },
+      "ShiftFeel": "Very Smooth",
+      "Momentum": "Strong"
+    }
+  },
+
+  "Colors": {
+    "Solid": ["Black", "Silver", "Red", "Blue", "Gold", "Titanium", "White"],
+    "Anodized": ["Red", "Blue", "Purple", "Gold", "Green", "Orange"],
+    "Patterns": ["Carbon", "WoodGrain", "Marble"],
+    "Custom": { "PaintMatch": true, "Engraving": true }
+  },
+
+  "Embedded": {
+    "Flowers": {
+      "Types": ["Rose", "Daisy", "Sakura"],
+      "InResin": true,
+      "Cost": 50
+    },
+    "Patterns": {
+      "Types": ["Galaxy", "Glitter", "Glow"],
+      "InResin": true,
+      "Cost": 40
+    },
+    "ShiftPattern": {
+      "Engraved": true,
+      "Painted": true,
+      "Cost": 20
+    },
+    "Logo": {
+      "Custom": true,
+      "Laser": true,
+      "Cost": 30
+    }
+  },
+
+  "ThreadPitch": {
+    "Common": {
+      "M10x1.25": { "Use": "Japanese" },
+      "M10x1.5": { "Use": "European" },
+      "M12x1.25": { "Use": "Japanese" },
+      "M8x1.25": { "Use": "Various" }
+    },
+    "Adapter": {
+      "Available": true,
+      "Universal": true
+    }
+  },
+
+  "Brands": {
+    "Premium": ["Razo", "Nismo", "TRD", "Mugen", "Works Bell"],
+    "Aftermarket": ["Mishimoto", "Skunk2", "Blox", "NRG"],
+    "Value": ["Generic", "Custom"]
+  },
+
+  "UI": {
+    "KnobMenu": {
+      "ShapeSelector": true,
+      "MaterialOptions": true,
+      "ColorOptions": true,
+      "WeightInfo": true
+    },
+    "ShifterMenu": {
+      "TypeSelector": true,
+      "ThrowReduction": true,
+      "HeightAdjust": true
+    },
+    "Preview": {
+      "3DView": true,
+      "InteriorView": true,
+      "SizeComparison": true
+    }
+  }
+}
