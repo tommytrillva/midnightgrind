@@ -1,0 +1,270 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Tutorial and Onboarding System",
+
+  "TutorialSystem": {
+    "Enabled": true,
+    "SkipAllowed": true,
+    "ReplayAllowed": true,
+    "AdaptiveHints": true
+  },
+
+  "Onboarding": {
+    "FirstTimeFlow": [
+      {
+        "ID": "ONBOARD_INTRO",
+        "Name": "Welcome to Midnight City",
+        "Type": "Cinematic",
+        "Duration": 60,
+        "Skippable": true
+      },
+      {
+        "ID": "ONBOARD_CONTROLS",
+        "Name": "Basic Controls",
+        "Type": "Interactive",
+        "Topics": ["Accelerate", "Brake", "Steering", "Camera"],
+        "TrackLocation": "Tutorial_Track_01"
+      },
+      {
+        "ID": "ONBOARD_FIRST_RACE",
+        "Name": "Your First Race",
+        "Type": "GuidedRace",
+        "OpponentDifficulty": "Very Easy",
+        "Hints": true
+      },
+      {
+        "ID": "ONBOARD_GARAGE",
+        "Name": "Meet Your Garage",
+        "Type": "GuidedTour",
+        "Topics": ["VehicleSelect", "BasicCustomization", "Map"]
+      },
+      {
+        "ID": "ONBOARD_COMPLETE",
+        "Name": "Welcome Gift",
+        "Type": "Reward",
+        "Rewards": { "Cash": 10000, "Vehicle": "STARTER_CHOICE" }
+      }
+    ]
+  },
+
+  "CoreTutorials": {
+    "Driving": {
+      "ID": "TUT_DRIVING",
+      "Name": "Driving Basics",
+      "Lessons": [
+        {
+          "ID": "LESSON_ACCEL",
+          "Topic": "Acceleration",
+          "Description": "Press RT/R2 to accelerate",
+          "Trigger": "FirstBoot",
+          "Completion": "ReachSpeed_30"
+        },
+        {
+          "ID": "LESSON_BRAKE",
+          "Topic": "Braking",
+          "Description": "Press LT/L2 to brake",
+          "Trigger": "AfterAccel",
+          "Completion": "FullStop"
+        },
+        {
+          "ID": "LESSON_STEER",
+          "Topic": "Steering",
+          "Description": "Use left stick to steer",
+          "Trigger": "AfterBrake",
+          "Completion": "TurnComplete"
+        },
+        {
+          "ID": "LESSON_HANDBRAKE",
+          "Topic": "Handbrake",
+          "Description": "Press A/X for handbrake turns",
+          "Trigger": "Level_3",
+          "Completion": "HandbrakeTurn"
+        }
+      ]
+    },
+    "Nitrous": {
+      "ID": "TUT_NITROUS",
+      "Name": "Nitrous System",
+      "UnlockCondition": "FirstNitrousUnlock",
+      "Lessons": [
+        {
+          "ID": "LESSON_NOS_USE",
+          "Topic": "Using Nitrous",
+          "Description": "Press B/Circle to activate nitrous",
+          "Completion": "NitrousUsed"
+        },
+        {
+          "ID": "LESSON_NOS_REFILL",
+          "Topic": "Refilling Nitrous",
+          "Description": "Build nitrous by drifting and near misses",
+          "Completion": "NitrousFilled"
+        }
+      ]
+    },
+    "Drifting": {
+      "ID": "TUT_DRIFT",
+      "Name": "Drifting",
+      "UnlockCondition": "Level_5",
+      "Lessons": [
+        {
+          "ID": "LESSON_DRIFT_INIT",
+          "Topic": "Initiating a Drift",
+          "Description": "Tap handbrake while turning to start a drift",
+          "Completion": "DriftStarted"
+        },
+        {
+          "ID": "LESSON_DRIFT_SUSTAIN",
+          "Topic": "Sustaining a Drift",
+          "Description": "Counter-steer and modulate throttle to maintain drift",
+          "Completion": "DriftHeld_3sec"
+        },
+        {
+          "ID": "LESSON_DRIFT_CHAIN",
+          "Topic": "Drift Chaining",
+          "Description": "Link drifts together for higher scores",
+          "Completion": "DriftChain_3"
+        }
+      ]
+    },
+    "Racing": {
+      "ID": "TUT_RACING",
+      "Name": "Racing Mechanics",
+      "Lessons": [
+        {
+          "ID": "LESSON_SLIPSTREAM",
+          "Topic": "Slipstream",
+          "Description": "Draft behind opponents for a speed boost",
+          "Completion": "SlipstreamGained"
+        },
+        {
+          "ID": "LESSON_RACING_LINE",
+          "Topic": "Racing Line",
+          "Description": "Follow the optimal path through corners",
+          "Completion": "RacingLineFollowed"
+        },
+        {
+          "ID": "LESSON_OVERTAKE",
+          "Topic": "Overtaking",
+          "Description": "Time your moves to pass opponents",
+          "Completion": "OvertakeComplete"
+        }
+      ]
+    },
+    "Pursuit": {
+      "ID": "TUT_PURSUIT",
+      "Name": "Police Pursuit",
+      "UnlockCondition": "FirstPursuitTrigger",
+      "Lessons": [
+        {
+          "ID": "LESSON_HEAT",
+          "Topic": "Heat System",
+          "Description": "Heat level increases with illegal activity",
+          "Trigger": "HeatGained"
+        },
+        {
+          "ID": "LESSON_EVADE",
+          "Topic": "Evading Police",
+          "Description": "Break line of sight and stay hidden",
+          "Completion": "PursuitEvaded"
+        },
+        {
+          "ID": "LESSON_COOLDOWN",
+          "Topic": "Cooldown Spots",
+          "Description": "Hide in safe zones to lose heat faster",
+          "Completion": "CooldownUsed"
+        }
+      ]
+    }
+  },
+
+  "AdvancedTutorials": {
+    "Tuning": {
+      "ID": "TUT_TUNING",
+      "Name": "Vehicle Tuning",
+      "UnlockCondition": "FirstTuningAccess",
+      "Lessons": [
+        { "Topic": "Suspension", "Description": "Adjust ride height and stiffness" },
+        { "Topic": "Gear Ratios", "Description": "Tune acceleration vs top speed" },
+        { "Topic": "Alignment", "Description": "Camber and toe settings" },
+        { "Topic": "Aero", "Description": "Downforce vs drag tradeoffs" }
+      ]
+    },
+    "CustomizationAdvanced": {
+      "ID": "TUT_CUSTOM_ADV",
+      "Name": "Advanced Customization",
+      "UnlockCondition": "Level_15",
+      "Lessons": [
+        { "Topic": "Livery Editor", "Description": "Create complex designs with layers" },
+        { "Topic": "Wrap System", "Description": "Apply and share custom wraps" },
+        { "Topic": "Performance Balancing", "Description": "Upgrade strategies for different race types" }
+      ]
+    }
+  },
+
+  "ContextualHints": {
+    "Enabled": true,
+    "Frequency": "Adaptive",
+    "Categories": {
+      "Performance": {
+        "LowSpeed": "Try a higher gear ratio for more top speed",
+        "SpinOuts": "Reduce rear tire pressure or add rear downforce",
+        "Understeer": "Soften front suspension or reduce front downforce"
+      },
+      "Racing": {
+        "LosingRaces": "Consider upgrading your vehicle or lowering difficulty",
+        "MissedCheckpoints": "Follow the GPS line on your minimap",
+        "SlowCorners": "Brake before the corner, accelerate through it"
+      },
+      "Economy": {
+        "LowCash": "Complete contracts for quick cash",
+        "REPNeeded": "Win races and perform stunts for more REP"
+      }
+    },
+    "Cooldown": 300,
+    "MaxPerSession": 10
+  },
+
+  "HelpSystem": {
+    "InGameManual": {
+      "Enabled": true,
+      "Sections": [
+        "Controls",
+        "Racing",
+        "Drifting",
+        "Pursuits",
+        "Customization",
+        "Tuning",
+        "Online",
+        "Progression"
+      ]
+    },
+    "VideoTutorials": {
+      "Enabled": true,
+      "Topics": [
+        "GettingStarted",
+        "DriftingGuide",
+        "TuningGuide",
+        "MoneyMaking",
+        "OnlineRacing"
+      ]
+    },
+    "LoadingScreenTips": {
+      "Enabled": true,
+      "Categories": ["Gameplay", "Lore", "Tips", "Fun Facts"],
+      "RotationTime": 5
+    }
+  },
+
+  "NewFeatureCallouts": {
+    "Enabled": true,
+    "HighlightNew": true,
+    "BadgeDisplay": true,
+    "AutoDismiss": 10
+  },
+
+  "Achievements": {
+    "CompleteTutorial": { "ID": "ACH_TUT_COMPLETE", "REP": 100 },
+    "NeverSkipped": { "ID": "ACH_TUT_NO_SKIP", "REP": 250 },
+    "HelpOthers": { "ID": "ACH_TUT_SHARE", "REP": 500 }
+  }
+}

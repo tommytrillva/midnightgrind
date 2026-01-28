@@ -1,0 +1,239 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Garage Customization and Upgrades",
+
+  "GarageSystem": {
+    "Enabled": true,
+    "StarterGarage": "GARAGE_STARTER",
+    "MaxOwnedGarages": 5,
+    "VehicleCapacityTotal": 50
+  },
+
+  "GarageTypes": [
+    {
+      "ID": "GARAGE_STARTER",
+      "Name": "Starter Garage",
+      "Description": "Your first home base",
+      "Location": "Industrial",
+      "Price": 0,
+      "Capacity": 4,
+      "Features": ["BasicTools", "Storage"],
+      "Unlocked": true,
+      "Upgradeable": true
+    },
+    {
+      "ID": "GARAGE_UNDERGROUND",
+      "Name": "Underground Garage",
+      "Description": "Hidden beneath the city",
+      "Location": "Downtown",
+      "Price": 150000,
+      "Capacity": 8,
+      "Features": ["BasicTools", "Storage", "Dyno", "PaintBooth"],
+      "UnlockCondition": "LEVEL_10"
+    },
+    {
+      "ID": "GARAGE_WAREHOUSE",
+      "Name": "Converted Warehouse",
+      "Description": "Spacious industrial space",
+      "Location": "Docks",
+      "Price": 350000,
+      "Capacity": 15,
+      "Features": ["FullTools", "Storage", "Dyno", "PaintBooth", "Showroom"],
+      "UnlockCondition": "LEVEL_20"
+    },
+    {
+      "ID": "GARAGE_PENTHOUSE",
+      "Name": "Penthouse Garage",
+      "Description": "Luxury high-rise parking",
+      "Location": "HighRise",
+      "Price": 750000,
+      "Capacity": 10,
+      "Features": ["FullTools", "Storage", "Dyno", "PaintBooth", "Showroom", "Helipad"],
+      "UnlockCondition": "REP_TIER_ELITE"
+    },
+    {
+      "ID": "GARAGE_COMPOUND",
+      "Name": "Private Compound",
+      "Description": "The ultimate car enthusiast's dream",
+      "Location": "Outskirts",
+      "Price": 2000000,
+      "Capacity": 25,
+      "Features": ["FullTools", "Storage", "Dyno", "PaintBooth", "Showroom", "TestTrack", "Museum"],
+      "UnlockCondition": "REP_TIER_LEGEND"
+    }
+  ],
+
+  "GarageUpgrades": {
+    "Capacity": {
+      "Levels": [
+        { "Level": 1, "Slots": 4, "Price": 0 },
+        { "Level": 2, "Slots": 6, "Price": 50000 },
+        { "Level": 3, "Slots": 8, "Price": 100000 },
+        { "Level": 4, "Slots": 10, "Price": 200000 },
+        { "Level": 5, "Slots": 15, "Price": 500000 }
+      ]
+    },
+    "Tools": {
+      "Basic": { "Price": 0, "WorkSpeed": 1.0 },
+      "Standard": { "Price": 75000, "WorkSpeed": 1.25, "Features": ["BasicRepairs"] },
+      "Professional": { "Price": 200000, "WorkSpeed": 1.5, "Features": ["FullRepairs", "Mods"] },
+      "Elite": { "Price": 500000, "WorkSpeed": 2.0, "Features": ["FullRepairs", "Mods", "Fabrication"] }
+    },
+    "PaintBooth": {
+      "None": { "Price": 0 },
+      "Basic": { "Price": 100000, "Features": ["SolidColors", "Matte"] },
+      "Professional": { "Price": 250000, "Features": ["AllFinishes", "CustomMix"] },
+      "Master": { "Price": 600000, "Features": ["AllFinishes", "CustomMix", "Chameleon", "Chrome"] }
+    },
+    "Dyno": {
+      "None": { "Price": 0 },
+      "Basic": { "Price": 150000, "Features": ["PowerReadout"] },
+      "Advanced": { "Price": 400000, "Features": ["PowerReadout", "TorqueCurve", "DataLog"] }
+    }
+  },
+
+  "Decorations": {
+    "Enabled": true,
+    "MaxItems": 50,
+    "Categories": {
+      "Lighting": {
+        "Items": [
+          { "ID": "LIGHT_NEON_RED", "Name": "Red Neon Strip", "Price": 2500 },
+          { "ID": "LIGHT_NEON_BLUE", "Name": "Blue Neon Strip", "Price": 2500 },
+          { "ID": "LIGHT_NEON_GREEN", "Name": "Green Neon Strip", "Price": 2500 },
+          { "ID": "LIGHT_NEON_PURPLE", "Name": "Purple Neon Strip", "Price": 2500 },
+          { "ID": "LIGHT_SPOT", "Name": "Spotlight", "Price": 5000 },
+          { "ID": "LIGHT_INDUSTRIAL", "Name": "Industrial Light", "Price": 3000 },
+          { "ID": "LIGHT_LED_STRIP", "Name": "LED Light Strip", "Price": 4000 },
+          { "ID": "LIGHT_FLOOR", "Name": "Floor Uplights", "Price": 8000 }
+        ]
+      },
+      "Posters": {
+        "Items": [
+          { "ID": "POSTER_RACING", "Name": "Classic Racing Poster", "Price": 500, "Unlocked": true },
+          { "ID": "POSTER_JDM", "Name": "JDM Legend Poster", "Price": 750 },
+          { "ID": "POSTER_MUSCLE", "Name": "Muscle Car Poster", "Price": 750 },
+          { "ID": "POSTER_EXOTIC", "Name": "Exotic Car Poster", "Price": 1000 },
+          { "ID": "POSTER_MIDNIGHT", "Name": "Midnight Grind Poster", "Price": 0, "Unlocked": true },
+          { "ID": "POSTER_SPONSOR", "Name": "Sponsor Banner", "Price": 1500 }
+        ]
+      },
+      "Furniture": {
+        "Items": [
+          { "ID": "FURN_WORKBENCH", "Name": "Workbench", "Price": 5000 },
+          { "ID": "FURN_TOOLBOX", "Name": "Rolling Toolbox", "Price": 3000 },
+          { "ID": "FURN_COUCH", "Name": "Leather Couch", "Price": 8000 },
+          { "ID": "FURN_TV", "Name": "Flatscreen TV", "Price": 10000 },
+          { "ID": "FURN_FRIDGE", "Name": "Mini Fridge", "Price": 2000 },
+          { "ID": "FURN_ARCADE", "Name": "Arcade Cabinet", "Price": 15000 },
+          { "ID": "FURN_JUKEBOX", "Name": "Jukebox", "Price": 12000 }
+        ]
+      },
+      "Trophies": {
+        "Items": [
+          { "ID": "TROPHY_RACE_1ST", "Name": "1st Place Trophy", "UnlockCondition": "RACE_WIN_1" },
+          { "ID": "TROPHY_RACE_GOLD", "Name": "Gold Trophy Collection", "UnlockCondition": "RACE_WIN_50" },
+          { "ID": "TROPHY_DRIFT_KING", "Name": "Drift King Trophy", "UnlockCondition": "ACH_DRIFT_KING" },
+          { "ID": "TROPHY_CHAMPION", "Name": "Championship Trophy", "UnlockCondition": "ACH_CHAMPION" },
+          { "ID": "TROPHY_LEGEND", "Name": "Legend Trophy", "UnlockCondition": "REP_TIER_LEGEND" }
+        ],
+        "DisplayCase": { "Price": 25000, "MaxTrophies": 20 }
+      },
+      "Floor": {
+        "Items": [
+          { "ID": "FLOOR_CONCRETE", "Name": "Polished Concrete", "Price": 0, "Unlocked": true },
+          { "ID": "FLOOR_EPOXY_BLACK", "Name": "Black Epoxy", "Price": 15000 },
+          { "ID": "FLOOR_EPOXY_GREY", "Name": "Grey Epoxy", "Price": 15000 },
+          { "ID": "FLOOR_CHECKERED", "Name": "Checkered Tiles", "Price": 25000 },
+          { "ID": "FLOOR_WOOD", "Name": "Hardwood", "Price": 35000 }
+        ]
+      },
+      "Walls": {
+        "Items": [
+          { "ID": "WALL_BRICK", "Name": "Exposed Brick", "Price": 20000 },
+          { "ID": "WALL_INDUSTRIAL", "Name": "Industrial Metal", "Price": 15000 },
+          { "ID": "WALL_WOOD_PANEL", "Name": "Wood Panels", "Price": 25000 },
+          { "ID": "WALL_CARBON", "Name": "Carbon Fiber", "Price": 50000 },
+          { "ID": "WALL_GRAFFITI", "Name": "Graffiti Art", "Price": 30000 }
+        ]
+      },
+      "Memorabilia": {
+        "Items": [
+          { "ID": "MEMO_ENGINE", "Name": "Display Engine Block", "Price": 20000 },
+          { "ID": "MEMO_WHEEL_WALL", "Name": "Wheel Collection Wall", "Price": 15000 },
+          { "ID": "MEMO_NEON_SIGN", "Name": "Custom Neon Sign", "Price": 35000 },
+          { "ID": "MEMO_GAS_PUMP", "Name": "Vintage Gas Pump", "Price": 25000 },
+          { "ID": "MEMO_TIRE_STACK", "Name": "Tire Stack", "Price": 5000 }
+        ]
+      }
+    }
+  },
+
+  "GarageThemes": {
+    "Industrial": {
+      "ID": "THEME_INDUSTRIAL",
+      "Name": "Industrial",
+      "Description": "Raw warehouse aesthetic",
+      "Price": 0,
+      "Unlocked": true
+    },
+    "Japanese": {
+      "ID": "THEME_JAPANESE",
+      "Name": "JDM Workshop",
+      "Description": "Japanese tuning shop vibes",
+      "Price": 100000,
+      "UnlockCondition": "OWN_JDM_3"
+    },
+    "American": {
+      "ID": "THEME_AMERICAN",
+      "Name": "American Muscle",
+      "Description": "Classic American garage",
+      "Price": 100000,
+      "UnlockCondition": "OWN_MUSCLE_3"
+    },
+    "European": {
+      "ID": "THEME_EURO",
+      "Name": "Euro Performance",
+      "Description": "Clean European styling",
+      "Price": 150000,
+      "UnlockCondition": "OWN_EURO_3"
+    },
+    "Neon": {
+      "ID": "THEME_NEON",
+      "Name": "Neon Underground",
+      "Description": "Cyberpunk neon aesthetic",
+      "Price": 200000,
+      "UnlockCondition": "LEVEL_25"
+    },
+    "Luxury": {
+      "ID": "THEME_LUXURY",
+      "Name": "Luxury Showroom",
+      "Description": "High-end dealership feel",
+      "Price": 500000,
+      "UnlockCondition": "REP_TIER_ELITE"
+    }
+  },
+
+  "VehicleDisplay": {
+    "Turntable": {
+      "Enabled": true,
+      "Speed": { "Min": 0, "Max": 5, "Default": 1 },
+      "Direction": "Configurable"
+    },
+    "Spotlights": {
+      "Enabled": true,
+      "Count": 4,
+      "ColorCustomization": true
+    },
+    "CarLift": {
+      "Price": 50000,
+      "Features": ["UndercarView", "WheelInspection"]
+    }
+  },
+
+  "QuickAccess": {
+    "FavoriteVehicle": true,
+    "LastUsedVehicle": true,
+    "QuickSwap": { "Enabled": true, "MaxSlots": 5 }
+  }
+}

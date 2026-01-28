@@ -1,0 +1,403 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Driver Skill and Progression System",
+
+  "SkillSystem": {
+    "Enabled": true,
+    "SkillPointsPerLevel": 1,
+    "RespecAllowed": true,
+    "RespecCost": 50000
+  },
+
+  "SkillTrees": {
+    "Racing": {
+      "ID": "TREE_RACING",
+      "Name": "Racer",
+      "Description": "Master of circuit and sprint racing",
+      "Icon": "ICO_Tree_Racing",
+      "Color": "#FF6600",
+      "Skills": [
+        {
+          "ID": "SKILL_RACE_START",
+          "Name": "Quick Reflexes",
+          "Description": "Improved launch timing window",
+          "MaxRanks": 3,
+          "Effect": { "LaunchWindow": [0.05, 0.1, 0.15] },
+          "Tier": 1,
+          "Cost": 1
+        },
+        {
+          "ID": "SKILL_RACE_SLIPSTREAM",
+          "Name": "Draft Master",
+          "Description": "Increased slipstream bonus",
+          "MaxRanks": 3,
+          "Effect": { "SlipstreamBonus": [0.1, 0.2, 0.3] },
+          "Tier": 1,
+          "Cost": 1,
+          "Requires": []
+        },
+        {
+          "ID": "SKILL_RACE_CORNER",
+          "Name": "Apex Hunter",
+          "Description": "Better speed retention through corners",
+          "MaxRanks": 5,
+          "Effect": { "CornerSpeed": [0.02, 0.04, 0.06, 0.08, 0.1] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_RACE_START"]
+        },
+        {
+          "ID": "SKILL_RACE_BRAKE",
+          "Name": "Trail Braking",
+          "Description": "Improved braking into corners",
+          "MaxRanks": 3,
+          "Effect": { "TrailBrakeWindow": [0.05, 0.1, 0.15] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_RACE_SLIPSTREAM"]
+        },
+        {
+          "ID": "SKILL_RACE_OVERTAKE",
+          "Name": "Clean Passes",
+          "Description": "Bonus REP for clean overtakes",
+          "MaxRanks": 3,
+          "Effect": { "OvertakeREP": [0.25, 0.5, 1.0] },
+          "Tier": 3,
+          "Cost": 2,
+          "Requires": ["SKILL_RACE_CORNER", "SKILL_RACE_BRAKE"]
+        },
+        {
+          "ID": "SKILL_RACE_CONSISTENCY",
+          "Name": "Consistent Laps",
+          "Description": "Reduced AI catchup when leading",
+          "MaxRanks": 3,
+          "Effect": { "CatchupReduction": [0.1, 0.2, 0.3] },
+          "Tier": 3,
+          "Cost": 2,
+          "Requires": ["SKILL_RACE_CORNER"]
+        },
+        {
+          "ID": "SKILL_RACE_CHAMPION",
+          "Name": "Born Champion",
+          "Description": "Bonus cash and REP from race wins",
+          "MaxRanks": 1,
+          "Effect": { "WinBonus": 0.25 },
+          "Tier": 4,
+          "Cost": 3,
+          "Requires": ["SKILL_RACE_OVERTAKE", "SKILL_RACE_CONSISTENCY"]
+        }
+      ]
+    },
+    "Drifting": {
+      "ID": "TREE_DRIFT",
+      "Name": "Drifter",
+      "Description": "Sideways specialist",
+      "Icon": "ICO_Tree_Drift",
+      "Color": "#00FFFF",
+      "Skills": [
+        {
+          "ID": "SKILL_DRIFT_INITIATE",
+          "Name": "Quick Initiation",
+          "Description": "Easier to start drifts",
+          "MaxRanks": 3,
+          "Effect": { "DriftInitiation": [0.1, 0.2, 0.3] },
+          "Tier": 1,
+          "Cost": 1
+        },
+        {
+          "ID": "SKILL_DRIFT_ANGLE",
+          "Name": "Extreme Angles",
+          "Description": "Maintain higher drift angles",
+          "MaxRanks": 3,
+          "Effect": { "MaxDriftAngle": [5, 10, 15] },
+          "Tier": 1,
+          "Cost": 1
+        },
+        {
+          "ID": "SKILL_DRIFT_SUSTAIN",
+          "Name": "Extended Slides",
+          "Description": "Easier to sustain long drifts",
+          "MaxRanks": 5,
+          "Effect": { "DriftStability": [0.05, 0.1, 0.15, 0.2, 0.25] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_DRIFT_INITIATE"]
+        },
+        {
+          "ID": "SKILL_DRIFT_TRANSITION",
+          "Name": "Smooth Transitions",
+          "Description": "Faster direction changes during drift",
+          "MaxRanks": 3,
+          "Effect": { "TransitionSpeed": [0.1, 0.2, 0.3] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_DRIFT_ANGLE"]
+        },
+        {
+          "ID": "SKILL_DRIFT_CHAIN",
+          "Name": "Chain Master",
+          "Description": "Longer chain windows for combos",
+          "MaxRanks": 3,
+          "Effect": { "ChainWindow": [0.5, 1.0, 1.5] },
+          "Tier": 3,
+          "Cost": 2,
+          "Requires": ["SKILL_DRIFT_SUSTAIN", "SKILL_DRIFT_TRANSITION"]
+        },
+        {
+          "ID": "SKILL_DRIFT_SCORE",
+          "Name": "Style Points",
+          "Description": "Bonus drift score multiplier",
+          "MaxRanks": 5,
+          "Effect": { "DriftScoreMultiplier": [0.1, 0.2, 0.3, 0.4, 0.5] },
+          "Tier": 3,
+          "Cost": 2,
+          "Requires": ["SKILL_DRIFT_SUSTAIN"]
+        },
+        {
+          "ID": "SKILL_DRIFT_KING",
+          "Name": "Drift King",
+          "Description": "Ultimate drift score bonus",
+          "MaxRanks": 1,
+          "Effect": { "DriftMastery": true, "ScoreBonus": 0.5 },
+          "Tier": 4,
+          "Cost": 3,
+          "Requires": ["SKILL_DRIFT_CHAIN", "SKILL_DRIFT_SCORE"]
+        }
+      ]
+    },
+    "Pursuit": {
+      "ID": "TREE_PURSUIT",
+      "Name": "Outlaw",
+      "Description": "Expert in police evasion",
+      "Icon": "ICO_Tree_Pursuit",
+      "Color": "#0066FF",
+      "Skills": [
+        {
+          "ID": "SKILL_PURSUIT_COOLDOWN",
+          "Name": "Low Profile",
+          "Description": "Faster cooldown when hiding",
+          "MaxRanks": 3,
+          "Effect": { "CooldownSpeed": [0.1, 0.2, 0.3] },
+          "Tier": 1,
+          "Cost": 1
+        },
+        {
+          "ID": "SKILL_PURSUIT_RADAR",
+          "Name": "Police Scanner",
+          "Description": "See police on minimap from further",
+          "MaxRanks": 3,
+          "Effect": { "PoliceRange": [50, 100, 150] },
+          "Tier": 1,
+          "Cost": 1
+        },
+        {
+          "ID": "SKILL_PURSUIT_EVASION",
+          "Name": "Evasive Maneuvers",
+          "Description": "Better handling during pursuit",
+          "MaxRanks": 3,
+          "Effect": { "PursuitHandling": [0.05, 0.1, 0.15] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_PURSUIT_COOLDOWN"]
+        },
+        {
+          "ID": "SKILL_PURSUIT_SHORTCUTS",
+          "Name": "Shortcut Expert",
+          "Description": "Reveal hidden escape routes",
+          "MaxRanks": 3,
+          "Effect": { "ShortcutReveal": [1, 2, 3] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_PURSUIT_RADAR"]
+        },
+        {
+          "ID": "SKILL_PURSUIT_BOUNTY",
+          "Name": "Bounty Hunter",
+          "Description": "Increased bounty rewards",
+          "MaxRanks": 3,
+          "Effect": { "BountyMultiplier": [0.1, 0.25, 0.5] },
+          "Tier": 3,
+          "Cost": 2,
+          "Requires": ["SKILL_PURSUIT_EVASION"]
+        },
+        {
+          "ID": "SKILL_PURSUIT_TAKEDOWN",
+          "Name": "Takedown Artist",
+          "Description": "More effective ramming",
+          "MaxRanks": 3,
+          "Effect": { "RamDamage": [0.15, 0.3, 0.5] },
+          "Tier": 3,
+          "Cost": 2,
+          "Requires": ["SKILL_PURSUIT_SHORTCUTS"]
+        },
+        {
+          "ID": "SKILL_PURSUIT_GHOST",
+          "Name": "Ghost Protocol",
+          "Description": "Become untraceable for short periods",
+          "MaxRanks": 1,
+          "Effect": { "GhostMode": { "Duration": 10, "Cooldown": 300 } },
+          "Tier": 4,
+          "Cost": 3,
+          "Requires": ["SKILL_PURSUIT_BOUNTY", "SKILL_PURSUIT_TAKEDOWN"]
+        }
+      ]
+    },
+    "Mechanic": {
+      "ID": "TREE_MECHANIC",
+      "Name": "Mechanic",
+      "Description": "Vehicle performance specialist",
+      "Icon": "ICO_Tree_Mechanic",
+      "Color": "#FFCC00",
+      "Skills": [
+        {
+          "ID": "SKILL_MECH_DISCOUNT",
+          "Name": "Parts Discount",
+          "Description": "Reduced parts costs",
+          "MaxRanks": 5,
+          "Effect": { "PartsDiscount": [0.05, 0.1, 0.15, 0.2, 0.25] },
+          "Tier": 1,
+          "Cost": 1
+        },
+        {
+          "ID": "SKILL_MECH_NITRO",
+          "Name": "Nitrous Efficiency",
+          "Description": "Nitrous lasts longer",
+          "MaxRanks": 3,
+          "Effect": { "NitrousDuration": [0.1, 0.2, 0.3] },
+          "Tier": 1,
+          "Cost": 1
+        },
+        {
+          "ID": "SKILL_MECH_TUNING",
+          "Name": "Precision Tuning",
+          "Description": "Expanded tuning range",
+          "MaxRanks": 3,
+          "Effect": { "TuningRange": [0.05, 0.1, 0.15] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_MECH_DISCOUNT"]
+        },
+        {
+          "ID": "SKILL_MECH_DURABILITY",
+          "Name": "Built to Last",
+          "Description": "Reduced component wear",
+          "MaxRanks": 3,
+          "Effect": { "WearReduction": [0.1, 0.2, 0.3] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_MECH_NITRO"]
+        },
+        {
+          "ID": "SKILL_MECH_POWER",
+          "Name": "Power Extraction",
+          "Description": "Bonus power from upgrades",
+          "MaxRanks": 5,
+          "Effect": { "PowerBonus": [0.02, 0.04, 0.06, 0.08, 0.1] },
+          "Tier": 3,
+          "Cost": 2,
+          "Requires": ["SKILL_MECH_TUNING"]
+        },
+        {
+          "ID": "SKILL_MECH_MASTER",
+          "Name": "Master Mechanic",
+          "Description": "Ultimate vehicle performance",
+          "MaxRanks": 1,
+          "Effect": { "AllStats": 0.05, "UnlockEliteParts": true },
+          "Tier": 4,
+          "Cost": 3,
+          "Requires": ["SKILL_MECH_POWER", "SKILL_MECH_DURABILITY"]
+        }
+      ]
+    },
+    "Entrepreneur": {
+      "ID": "TREE_MONEY",
+      "Name": "Entrepreneur",
+      "Description": "Maximize earnings",
+      "Icon": "ICO_Tree_Money",
+      "Color": "#00FF00",
+      "Skills": [
+        {
+          "ID": "SKILL_MONEY_RACE",
+          "Name": "Race Winnings",
+          "Description": "Bonus cash from races",
+          "MaxRanks": 5,
+          "Effect": { "RaceCashBonus": [0.05, 0.1, 0.15, 0.2, 0.25] },
+          "Tier": 1,
+          "Cost": 1
+        },
+        {
+          "ID": "SKILL_MONEY_CONTRACTS",
+          "Name": "Contract Negotiator",
+          "Description": "Better contract payouts",
+          "MaxRanks": 3,
+          "Effect": { "ContractBonus": [0.1, 0.2, 0.3] },
+          "Tier": 1,
+          "Cost": 1
+        },
+        {
+          "ID": "SKILL_MONEY_RESALE",
+          "Name": "Smart Seller",
+          "Description": "Better vehicle resale values",
+          "MaxRanks": 3,
+          "Effect": { "ResaleBonus": [0.05, 0.1, 0.15] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_MONEY_RACE"]
+        },
+        {
+          "ID": "SKILL_MONEY_STUNTS",
+          "Name": "Stunt Performer",
+          "Description": "Bonus cash from stunts",
+          "MaxRanks": 3,
+          "Effect": { "StuntCashBonus": [0.15, 0.3, 0.5] },
+          "Tier": 2,
+          "Cost": 1,
+          "Requires": ["SKILL_MONEY_CONTRACTS"]
+        },
+        {
+          "ID": "SKILL_MONEY_MOGUL",
+          "Name": "Business Mogul",
+          "Description": "Passive income per day",
+          "MaxRanks": 5,
+          "Effect": { "PassiveIncome": [500, 1000, 2000, 4000, 8000] },
+          "Tier": 3,
+          "Cost": 2,
+          "Requires": ["SKILL_MONEY_RESALE", "SKILL_MONEY_STUNTS"]
+        },
+        {
+          "ID": "SKILL_MONEY_EMPIRE",
+          "Name": "Empire Builder",
+          "Description": "Ultimate cash bonuses",
+          "MaxRanks": 1,
+          "Effect": { "AllCashBonus": 0.25, "UnlockVIPDeals": true },
+          "Tier": 4,
+          "Cost": 3,
+          "Requires": ["SKILL_MONEY_MOGUL"]
+        }
+      ]
+    }
+  },
+
+  "SkillPointGain": {
+    "PerLevel": 1,
+    "BonusPoints": {
+      "Level10": 2,
+      "Level25": 3,
+      "Level50": 5
+    },
+    "MaxPoints": 75
+  },
+
+  "Prestige": {
+    "Enabled": true,
+    "RequiredLevel": 50,
+    "MaxPrestige": 10,
+    "PrestigeRewards": {
+      "1": { "Title": "Veteran", "BonusMultiplier": 1.05 },
+      "5": { "Title": "Elite", "BonusMultiplier": 1.15 },
+      "10": { "Title": "Legend", "BonusMultiplier": 1.25 }
+    },
+    "KeepOnPrestige": ["Vehicles", "Cash", "Cosmetics"],
+    "ResetOnPrestige": ["Level", "SkillPoints", "Unlocks"]
+  }
+}

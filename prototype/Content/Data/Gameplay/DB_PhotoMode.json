@@ -1,0 +1,209 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Photo Mode System",
+
+  "PhotoModeSystem": {
+    "Enabled": true,
+    "PausesDuringCapture": true,
+    "MaxResolution": { "Width": 7680, "Height": 4320 },
+    "OutputFormats": ["PNG", "JPEG"],
+    "MetadataEnabled": true
+  },
+
+  "CameraControls": {
+    "Movement": {
+      "Speed": { "Min": 0.1, "Max": 10.0, "Default": 1.0 },
+      "Smoothing": true,
+      "InvertY": { "Default": false, "Configurable": true }
+    },
+    "Range": {
+      "MaxDistance": 50.0,
+      "MinDistance": 1.0,
+      "HeightRange": { "Min": 0.2, "Max": 30.0 }
+    },
+    "FocalLength": {
+      "Min": 12,
+      "Max": 200,
+      "Default": 50,
+      "Presets": [
+        { "Name": "Ultra Wide", "Value": 12 },
+        { "Name": "Wide", "Value": 24 },
+        { "Name": "Standard", "Value": 50 },
+        { "Name": "Portrait", "Value": 85 },
+        { "Name": "Telephoto", "Value": 135 },
+        { "Name": "Super Telephoto", "Value": 200 }
+      ]
+    },
+    "Aperture": {
+      "Min": 1.4,
+      "Max": 22.0,
+      "Default": 5.6,
+      "AffectsDoF": true
+    },
+    "FocusDistance": {
+      "AutoFocus": true,
+      "ManualOverride": true,
+      "FocusPeaking": true
+    },
+    "Roll": {
+      "Min": -180,
+      "Max": 180,
+      "Default": 0
+    }
+  },
+
+  "DepthOfField": {
+    "Enabled": true,
+    "BokehShape": ["Circle", "Hexagon", "Octagon", "Blade"],
+    "BlurIntensity": { "Min": 0, "Max": 2.0, "Default": 1.0 },
+    "ForegroundBlur": true,
+    "BackgroundBlur": true
+  },
+
+  "Filters": {
+    "ColorGrading": {
+      "Presets": [
+        { "ID": "FILTER_NONE", "Name": "None", "Unlocked": true },
+        { "ID": "FILTER_CINEMATIC", "Name": "Cinematic", "Unlocked": true },
+        { "ID": "FILTER_VINTAGE", "Name": "Vintage", "UnlockCondition": "PHOTO_COUNT_10" },
+        { "ID": "FILTER_NOIR", "Name": "Film Noir", "UnlockCondition": "PHOTO_COUNT_25" },
+        { "ID": "FILTER_NEON", "Name": "Neon Nights", "UnlockCondition": "NIGHT_PHOTO_10" },
+        { "ID": "FILTER_SUNSET", "Name": "Golden Hour", "UnlockCondition": "SUNSET_PHOTO_5" },
+        { "ID": "FILTER_DRIFT", "Name": "Drift Blur", "UnlockCondition": "DRIFT_PHOTO_10" },
+        { "ID": "FILTER_RETRO", "Name": "Retro PS1", "UnlockCondition": "LEVEL_15" },
+        { "ID": "FILTER_POLAROID", "Name": "Polaroid", "UnlockCondition": "LEVEL_20" },
+        { "ID": "FILTER_CHROME", "Name": "Chrome", "UnlockCondition": "LEVEL_25" },
+        { "ID": "FILTER_SEPIA", "Name": "Sepia", "UnlockCondition": "PHOTO_COUNT_50" },
+        { "ID": "FILTER_THERMAL", "Name": "Thermal", "UnlockCondition": "CHEAT_CODE" }
+      ],
+      "CustomLUT": {
+        "Enabled": true,
+        "UnlockCondition": "LEVEL_30"
+      }
+    },
+    "Effects": {
+      "Vignette": { "Min": 0, "Max": 1.0, "Default": 0.2 },
+      "ChromaticAberration": { "Min": 0, "Max": 1.0, "Default": 0 },
+      "FilmGrain": { "Min": 0, "Max": 1.0, "Default": 0 },
+      "Bloom": { "Min": 0, "Max": 2.0, "Default": 1.0 },
+      "Sharpness": { "Min": 0, "Max": 2.0, "Default": 1.0 },
+      "Contrast": { "Min": 0.5, "Max": 1.5, "Default": 1.0 },
+      "Saturation": { "Min": 0, "Max": 2.0, "Default": 1.0 },
+      "Exposure": { "Min": -3.0, "Max": 3.0, "Default": 0 },
+      "Temperature": { "Min": -1.0, "Max": 1.0, "Default": 0 },
+      "Tint": { "Min": -1.0, "Max": 1.0, "Default": 0 }
+    },
+    "MotionBlur": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 2.0, "Default": 0 },
+      "Direction": "Movement"
+    }
+  },
+
+  "Overlays": {
+    "Frames": [
+      { "ID": "FRAME_NONE", "Name": "None", "Unlocked": true },
+      { "ID": "FRAME_SIMPLE", "Name": "Simple Border", "Unlocked": true },
+      { "ID": "FRAME_POLAROID", "Name": "Polaroid", "UnlockCondition": "LEVEL_10" },
+      { "ID": "FRAME_MAGAZINE", "Name": "Magazine Cover", "UnlockCondition": "FEATURED_PHOTO" },
+      { "ID": "FRAME_RACING", "Name": "Racing Poster", "UnlockCondition": "LEVEL_15" },
+      { "ID": "FRAME_WANTED", "Name": "Wanted Poster", "UnlockCondition": "HEAT_5_ESCAPE" },
+      { "ID": "FRAME_FILM", "Name": "Film Strip", "UnlockCondition": "LEVEL_20" }
+    ],
+    "Watermarks": {
+      "GameLogo": { "Enabled": true, "Optional": true },
+      "UserName": { "Enabled": true, "Optional": true },
+      "DateTime": { "Enabled": true, "Optional": true },
+      "VehicleInfo": { "Enabled": true, "Optional": true }
+    },
+    "Stickers": {
+      "Enabled": true,
+      "MaxStickers": 10,
+      "Categories": ["Logos", "Text", "Icons", "Seasonal"]
+    }
+  },
+
+  "Lighting": {
+    "TimeOfDayOverride": {
+      "Enabled": true,
+      "Presets": ["Dawn", "Morning", "Noon", "Afternoon", "Sunset", "Dusk", "Night", "Midnight"]
+    },
+    "WeatherOverride": {
+      "Enabled": true,
+      "Options": ["Clear", "Cloudy", "Rain", "Storm", "Fog"]
+    },
+    "SpotLights": {
+      "Enabled": true,
+      "MaxLights": 3,
+      "Color": true,
+      "Intensity": { "Min": 0, "Max": 10.0 },
+      "Size": { "Min": 0.5, "Max": 20.0 }
+    }
+  },
+
+  "VehicleControls": {
+    "HideDriver": true,
+    "ShowChassis": false,
+    "WheelAngle": { "Min": -45, "Max": 45 },
+    "SuspensionDrop": { "Min": 0, "Max": 0.5 },
+    "DoorsOpen": { "Front": true, "Rear": true },
+    "HoodOpen": true,
+    "TrunkOpen": true,
+    "LightsOverride": ["Off", "Parking", "Headlights", "HighBeam"],
+    "HazardsOn": true,
+    "NeonGlow": { "Override": true, "Intensity": { "Min": 0, "Max": 2.0 } }
+  },
+
+  "EnvironmentControls": {
+    "HideTraffic": true,
+    "HidePedestrians": true,
+    "HideOtherPlayers": true,
+    "HideUI": true,
+    "FreezeParticles": true
+  },
+
+  "Gallery": {
+    "MaxPhotos": 500,
+    "Storage": "Local",
+    "CloudBackup": {
+      "Enabled": true,
+      "MaxCloudPhotos": 100
+    },
+    "Organization": {
+      "ByDate": true,
+      "ByVehicle": true,
+      "ByLocation": true,
+      "Favorites": true,
+      "Tags": true
+    },
+    "Slideshow": {
+      "Enabled": true,
+      "Transitions": ["Fade", "Slide", "Zoom"],
+      "MusicEnabled": true
+    }
+  },
+
+  "Sharing": {
+    "Enabled": true,
+    "Platforms": ["InGame", "Twitter", "Discord"],
+    "InGameShowcase": {
+      "Submit": true,
+      "Vote": true,
+      "Featured": true,
+      "Contest": true
+    },
+    "Export": {
+      "Resolution": ["1080p", "4K", "8K"],
+      "Watermark": { "Optional": true, "Removable": true }
+    }
+  },
+
+  "Achievements": {
+    "PhotoCount": [10, 25, 50, 100, 250, 500],
+    "FeaturedPhotos": [1, 5, 10],
+    "LikesReceived": [10, 50, 100, 500, 1000],
+    "VehiclesPhotographed": [10, 25, 50],
+    "LocationsPhotographed": [10, 25, 50],
+    "SpecialConditions": ["RainPhoto", "NightPhoto", "DriftPhoto", "AirPhoto", "PursuitPhoto"]
+  }
+}

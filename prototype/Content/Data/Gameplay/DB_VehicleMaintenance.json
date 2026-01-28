@@ -1,0 +1,306 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Maintenance and Repair System",
+
+  "MaintenanceSystem": {
+    "Enabled": true,
+    "DamageEnabled": true,
+    "WearEnabled": true,
+    "VisualDamage": true,
+    "MechanicalDamage": true
+  },
+
+  "DamageSystem": {
+    "Visual": {
+      "Scratches": {
+        "Enabled": true,
+        "Threshold": 10,
+        "MaxSeverity": 5
+      },
+      "Dents": {
+        "Enabled": true,
+        "Threshold": 30,
+        "MaxSeverity": 5
+      },
+      "BrokenLights": {
+        "Enabled": true,
+        "Threshold": 50,
+        "AffectsVisibility": true
+      },
+      "CrackedWindshield": {
+        "Enabled": true,
+        "Threshold": 60,
+        "AffectsVisibility": true
+      },
+      "BodyDeformation": {
+        "Enabled": true,
+        "Threshold": 70,
+        "AffectsAero": true
+      },
+      "BrokenMirrors": {
+        "Enabled": true,
+        "Threshold": 40
+      },
+      "LooseParts": {
+        "Enabled": true,
+        "Threshold": 80,
+        "CanFallOff": true
+      }
+    },
+    "Mechanical": {
+      "Engine": {
+        "MaxHealth": 100,
+        "DamagePerImpact": 5,
+        "OverheatDamage": 0.5,
+        "Effects": {
+          "75": "ReducedPower_10",
+          "50": "ReducedPower_25",
+          "25": "ReducedPower_50",
+          "0": "EngineFailure"
+        }
+      },
+      "Transmission": {
+        "MaxHealth": 100,
+        "DamagePerMissShift": 2,
+        "DamagePerGrind": 1,
+        "Effects": {
+          "75": "SlowerShifts",
+          "50": "OccasionalGrind",
+          "25": "GearSkip",
+          "0": "TransmissionFailure"
+        }
+      },
+      "Suspension": {
+        "MaxHealth": 100,
+        "DamagePerImpact": 3,
+        "DamagePerJump": 1,
+        "Effects": {
+          "75": "ReducedHandling_10",
+          "50": "ReducedHandling_25",
+          "25": "Unpredictable",
+          "0": "SuspensionFailure"
+        }
+      },
+      "Tires": {
+        "MaxHealth": 100,
+        "WearRate": 0.01,
+        "BurnoutWear": 0.5,
+        "DriftWear": 0.1,
+        "Effects": {
+          "75": "ReducedGrip_10",
+          "50": "ReducedGrip_25",
+          "25": "ReducedGrip_50",
+          "0": "Blowout"
+        }
+      },
+      "Brakes": {
+        "MaxHealth": 100,
+        "WearRate": 0.02,
+        "HardBrakingWear": 0.1,
+        "Effects": {
+          "75": "LongerStops_10",
+          "50": "LongerStops_25",
+          "25": "BrakeFade",
+          "0": "BrakeFailure"
+        }
+      },
+      "Nitrous": {
+        "MaxHealth": 100,
+        "OveruseWear": 0.5,
+        "Effects": {
+          "50": "ReducedBoost",
+          "25": "Misfires",
+          "0": "NitrousFailure"
+        }
+      }
+    }
+  },
+
+  "WearSystem": {
+    "Enabled": true,
+    "GlobalWearRate": 1.0,
+    "WearFactors": {
+      "Distance": 0.001,
+      "RaceIntensity": 0.01,
+      "Collisions": 0.05,
+      "DirtRoads": 0.002,
+      "Rain": 0.001
+    },
+    "Components": {
+      "Engine Oil": {
+        "MaxDistance": 50000,
+        "WarningThreshold": 0.8,
+        "Effects": { "Worn": "EngineDamageIncrease" }
+      },
+      "Coolant": {
+        "MaxDistance": 75000,
+        "WarningThreshold": 0.7,
+        "Effects": { "Worn": "OverheatRisk" }
+      },
+      "Brake Fluid": {
+        "MaxDistance": 40000,
+        "WarningThreshold": 0.75,
+        "Effects": { "Worn": "BrakeFade" }
+      },
+      "Spark Plugs": {
+        "MaxDistance": 30000,
+        "WarningThreshold": 0.8,
+        "Effects": { "Worn": "PowerLoss" }
+      },
+      "Air Filter": {
+        "MaxDistance": 25000,
+        "WarningThreshold": 0.85,
+        "Effects": { "Worn": "ReducedThrottle" }
+      },
+      "Clutch": {
+        "MaxShifts": 50000,
+        "WarningThreshold": 0.75,
+        "Effects": { "Worn": "SlippingClutch" }
+      }
+    }
+  },
+
+  "RepairSystem": {
+    "Locations": {
+      "Garage": {
+        "Available": true,
+        "CostModifier": 0.5,
+        "TimeModifier": 2.0
+      },
+      "Shop": {
+        "Available": true,
+        "CostModifier": 1.0,
+        "TimeModifier": 1.0
+      },
+      "Roadside": {
+        "Available": true,
+        "CostModifier": 2.0,
+        "TimeModifier": 0.5,
+        "LimitedRepairs": true
+      }
+    },
+    "RepairTypes": {
+      "QuickFix": {
+        "Cost": 500,
+        "RestoresHealth": 50,
+        "VisualOnly": true
+      },
+      "StandardRepair": {
+        "CostPerPercent": 50,
+        "RestoresHealth": 100,
+        "RestoresVisual": true,
+        "RestoresMechanical": true
+      },
+      "FullRestoration": {
+        "CostMultiplier": 2.5,
+        "RestoresEverything": true,
+        "IncludesDetailing": true,
+        "MinTime": 300
+      }
+    },
+    "ComponentRepairs": {
+      "Engine": { "BaseCost": 5000, "TimeMinutes": 30 },
+      "Transmission": { "BaseCost": 4000, "TimeMinutes": 25 },
+      "Suspension": { "BaseCost": 2000, "TimeMinutes": 15 },
+      "Tires": { "BaseCost": 1000, "TimeMinutes": 5 },
+      "Brakes": { "BaseCost": 1500, "TimeMinutes": 10 },
+      "BodyPanels": { "BaseCost": 3000, "TimeMinutes": 20 },
+      "Windshield": { "BaseCost": 800, "TimeMinutes": 10 },
+      "Lights": { "BaseCost": 300, "TimeMinutes": 5 },
+      "Nitrous": { "BaseCost": 2000, "TimeMinutes": 15 }
+    }
+  },
+
+  "MaintenanceSchedule": {
+    "OilChange": {
+      "Interval": 50000,
+      "Cost": 200,
+      "Benefits": ["EngineHealth+10", "PowerRestored"]
+    },
+    "TireRotation": {
+      "Interval": 20000,
+      "Cost": 100,
+      "Benefits": ["EvenWear"]
+    },
+    "BrakeService": {
+      "Interval": 40000,
+      "Cost": 500,
+      "Benefits": ["BrakeHealth+20"]
+    },
+    "FullService": {
+      "Interval": 100000,
+      "Cost": 2500,
+      "Benefits": ["AllComponentsRestored", "PerformanceBoost"]
+    }
+  },
+
+  "Insurance": {
+    "Enabled": true,
+    "Plans": [
+      {
+        "ID": "INS_BASIC",
+        "Name": "Basic Coverage",
+        "MonthlyCost": 1000,
+        "RepairDiscount": 0.1,
+        "Deductible": 2000
+      },
+      {
+        "ID": "INS_STANDARD",
+        "Name": "Standard Coverage",
+        "MonthlyCost": 2500,
+        "RepairDiscount": 0.25,
+        "Deductible": 1000,
+        "TowingIncluded": true
+      },
+      {
+        "ID": "INS_PREMIUM",
+        "Name": "Premium Coverage",
+        "MonthlyCost": 5000,
+        "RepairDiscount": 0.5,
+        "Deductible": 0,
+        "TowingIncluded": true,
+        "ReplacementVehicle": true
+      }
+    ]
+  },
+
+  "ConditionRating": {
+    "Perfect": { "Min": 95, "Multiplier": 1.1 },
+    "Excellent": { "Min": 85, "Multiplier": 1.0 },
+    "Good": { "Min": 70, "Multiplier": 0.95 },
+    "Fair": { "Min": 50, "Multiplier": 0.85 },
+    "Poor": { "Min": 25, "Multiplier": 0.7 },
+    "Damaged": { "Min": 0, "Multiplier": 0.5 }
+  },
+
+  "Notifications": {
+    "WearWarning": true,
+    "DamageAlert": true,
+    "MaintenanceDue": true,
+    "ComponentFailure": true
+  },
+
+  "DifficultySettings": {
+    "Casual": {
+      "DamageMultiplier": 0.25,
+      "WearMultiplier": 0.1,
+      "RepairCostMultiplier": 0.5
+    },
+    "Normal": {
+      "DamageMultiplier": 0.5,
+      "WearMultiplier": 0.5,
+      "RepairCostMultiplier": 1.0
+    },
+    "Simulation": {
+      "DamageMultiplier": 1.0,
+      "WearMultiplier": 1.0,
+      "RepairCostMultiplier": 1.5
+    },
+    "Hardcore": {
+      "DamageMultiplier": 1.5,
+      "WearMultiplier": 1.5,
+      "RepairCostMultiplier": 2.0,
+      "PermanentDamage": true
+    }
+  }
+}

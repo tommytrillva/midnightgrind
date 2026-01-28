@@ -1,0 +1,241 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Advanced Livery Editor System",
+
+  "LiveryEditorSystem": {
+    "Enabled": true,
+    "MaxLayers": 1000,
+    "MaxShapesPerLayer": 500,
+    "UndoHistory": 100,
+    "AutoSave": true,
+    "AutoSaveInterval": 60
+  },
+
+  "Canvas": {
+    "Resolution": 4096,
+    "UVMapping": "PerPanel",
+    "Panels": [
+      "Hood", "Roof", "Trunk", "FrontBumper", "RearBumper",
+      "LeftDoor", "RightDoor", "LeftFender", "RightFender",
+      "LeftQuarter", "RightQuarter", "Mirrors", "Spoiler"
+    ],
+    "MirrorMode": {
+      "Enabled": true,
+      "LeftToRight": true,
+      "RightToLeft": true,
+      "FrontToBack": false
+    }
+  },
+
+  "Shapes": {
+    "Primitives": {
+      "Circle": { "Unlocked": true, "Scalable": true, "Stretchable": true },
+      "Square": { "Unlocked": true, "Scalable": true, "Stretchable": true },
+      "Rectangle": { "Unlocked": true, "Scalable": true, "Stretchable": true },
+      "Triangle": { "Unlocked": true, "Scalable": true, "Stretchable": true },
+      "Ellipse": { "Unlocked": true, "Scalable": true, "Stretchable": true },
+      "Pentagon": { "UnlockLevel": 5 },
+      "Hexagon": { "UnlockLevel": 5 },
+      "Octagon": { "UnlockLevel": 8 },
+      "Star4": { "UnlockLevel": 3 },
+      "Star5": { "UnlockLevel": 3 },
+      "Star6": { "UnlockLevel": 10 },
+      "Arrow": { "Unlocked": true },
+      "Chevron": { "UnlockLevel": 5 },
+      "Cross": { "UnlockLevel": 5 },
+      "Ring": { "UnlockLevel": 8 },
+      "Arc": { "UnlockLevel": 10 },
+      "Crescent": { "UnlockLevel": 12 }
+    },
+    "Lines": {
+      "Straight": { "Unlocked": true },
+      "Curved": { "UnlockLevel": 5 },
+      "Zigzag": { "UnlockLevel": 8 },
+      "Dashed": { "UnlockLevel": 5 },
+      "Dotted": { "UnlockLevel": 5 },
+      "Tapered": { "UnlockLevel": 10 }
+    },
+    "SpecialShapes": {
+      "Flame": { "UnlockLevel": 15 },
+      "Tribal": { "UnlockLevel": 18 },
+      "Lightning": { "UnlockLevel": 12 },
+      "Splatter": { "UnlockLevel": 20 },
+      "Camo": { "UnlockLevel": 15 },
+      "Carbon": { "UnlockLevel": 10 },
+      "Honeycomb": { "UnlockLevel": 12 },
+      "Checkered": { "UnlockLevel": 8 },
+      "Gradient": { "UnlockLevel": 10 }
+    }
+  },
+
+  "Text": {
+    "Enabled": true,
+    "MaxCharacters": 50,
+    "Fonts": [
+      { "ID": "FONT_SANS", "Name": "Sans", "Unlocked": true },
+      { "ID": "FONT_SERIF", "Name": "Serif", "Unlocked": true },
+      { "ID": "FONT_RACING", "Name": "Racing", "Unlocked": true },
+      { "ID": "FONT_SCRIPT", "Name": "Script", "UnlockLevel": 5 },
+      { "ID": "FONT_BLOCK", "Name": "Block", "UnlockLevel": 5 },
+      { "ID": "FONT_GRAFFITI", "Name": "Graffiti", "UnlockLevel": 10 },
+      { "ID": "FONT_DIGITAL", "Name": "Digital", "UnlockLevel": 8 },
+      { "ID": "FONT_JAPANESE", "Name": "Japanese", "UnlockLevel": 12 },
+      { "ID": "FONT_STENCIL", "Name": "Stencil", "UnlockLevel": 10 },
+      { "ID": "FONT_CHROME", "Name": "Chrome", "UnlockLevel": 15 },
+      { "ID": "FONT_NEON", "Name": "Neon", "UnlockLevel": 20 },
+      { "ID": "FONT_RETRO", "Name": "Retro", "UnlockLevel": 18 }
+    ],
+    "Styling": {
+      "Bold": true,
+      "Italic": true,
+      "Outline": true,
+      "Shadow": true,
+      "Curve": { "UnlockLevel": 10 }
+    },
+    "ProfanityFilter": true
+  },
+
+  "Colors": {
+    "Palette": {
+      "Basic": { "Count": 16, "Unlocked": true },
+      "Extended": { "Count": 64, "UnlockLevel": 5 },
+      "Full": { "Count": 256, "UnlockLevel": 10 },
+      "Custom": { "RGB": true, "HSV": true, "HEX": true, "UnlockLevel": 15 }
+    },
+    "SpecialColors": {
+      "Metallic": { "UnlockLevel": 10, "Variants": 20 },
+      "Pearlescent": { "UnlockLevel": 15, "Variants": 15 },
+      "Matte": { "UnlockLevel": 8, "Variants": 25 },
+      "Chrome": { "UnlockLevel": 25 },
+      "Chameleon": { "UnlockLevel": 30 },
+      "Holographic": { "UnlockLevel": 35 }
+    },
+    "Gradients": {
+      "Enabled": true,
+      "UnlockLevel": 12,
+      "Types": ["Linear", "Radial", "Angular"],
+      "MaxColors": 5
+    },
+    "Opacity": {
+      "Min": 0,
+      "Max": 100,
+      "Default": 100
+    }
+  },
+
+  "Transformations": {
+    "Move": { "Precision": 0.1, "SnapToGrid": true },
+    "Scale": { "Min": 0.01, "Max": 100.0, "Uniform": true, "NonUniform": true },
+    "Rotate": { "Min": 0, "Max": 360, "SnapAngles": [15, 30, 45, 90] },
+    "Skew": { "Min": -89, "Max": 89 },
+    "Flip": { "Horizontal": true, "Vertical": true },
+    "Warp": { "UnlockLevel": 20, "Types": ["Arc", "Bulge", "Wave", "Twist"] }
+  },
+
+  "LayerManagement": {
+    "Operations": {
+      "BringToFront": true,
+      "SendToBack": true,
+      "BringForward": true,
+      "SendBackward": true,
+      "Duplicate": true,
+      "Delete": true,
+      "Lock": true,
+      "Hide": true,
+      "Rename": true
+    },
+    "Groups": {
+      "Enabled": true,
+      "MaxNesting": 5,
+      "GroupLimit": 100
+    },
+    "Masks": {
+      "Enabled": true,
+      "UnlockLevel": 20,
+      "Types": ["Shape", "Gradient", "Text"]
+    },
+    "BlendModes": {
+      "Normal": true,
+      "Multiply": { "UnlockLevel": 15 },
+      "Screen": { "UnlockLevel": 15 },
+      "Overlay": { "UnlockLevel": 20 },
+      "Difference": { "UnlockLevel": 25 }
+    }
+  },
+
+  "Presets": {
+    "RacingStripes": [
+      { "ID": "PRESET_SINGLE_STRIPE", "Name": "Single Center Stripe" },
+      { "ID": "PRESET_DOUBLE_STRIPE", "Name": "Double Racing Stripes" },
+      { "ID": "PRESET_OFFSET_STRIPE", "Name": "Offset Stripes" },
+      { "ID": "PRESET_SIDE_STRIPE", "Name": "Side Stripes" }
+    ],
+    "Patterns": [
+      { "ID": "PRESET_CAMO", "Name": "Camouflage", "UnlockLevel": 15 },
+      { "ID": "PRESET_CARBON", "Name": "Carbon Fiber", "UnlockLevel": 10 },
+      { "ID": "PRESET_CHECKERED", "Name": "Checkered Flag" },
+      { "ID": "PRESET_FLAMES", "Name": "Classic Flames", "UnlockLevel": 12 },
+      { "ID": "PRESET_TRIBAL", "Name": "Tribal", "UnlockLevel": 15 }
+    ],
+    "Numbers": [
+      { "ID": "PRESET_RACE_NUM", "Name": "Racing Number" },
+      { "ID": "PRESET_DOOR_NUM", "Name": "Door Numbers" },
+      { "ID": "PRESET_HOOD_NUM", "Name": "Hood Number" }
+    ]
+  },
+
+  "Sharing": {
+    "Enabled": true,
+    "Upload": {
+      "MaxFileSize": 10,
+      "Compression": true,
+      "Tags": { "Max": 5, "Required": 1 }
+    },
+    "Download": {
+      "Free": true,
+      "Favorites": true,
+      "History": 100
+    },
+    "Showcase": {
+      "Featured": true,
+      "MostDownloaded": true,
+      "TopRated": true,
+      "Recent": true,
+      "Staff Picks": true
+    },
+    "Creator": {
+      "Profile": true,
+      "FollowSystem": true,
+      "Statistics": true,
+      "Donations": { "Enabled": true, "Currency": "InGame" }
+    }
+  },
+
+  "Templates": {
+    "SaveAsTemplate": true,
+    "MaxTemplates": 50,
+    "Categories": ["Racing", "Drift", "Show", "Replica", "Custom"]
+  },
+
+  "ExportImport": {
+    "ExportFormats": ["PNG", "JSON"],
+    "ImportFormats": ["JSON"],
+    "CrossVehicle": {
+      "Enabled": true,
+      "Scaling": "Auto",
+      "PanelMapping": true
+    }
+  },
+
+  "TutorialSystem": {
+    "Interactive": true,
+    "Topics": [
+      "BasicShapes",
+      "Layers",
+      "Colors",
+      "Text",
+      "AdvancedTechniques",
+      "Sharing"
+    ]
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Rival and Nemesis System",
+
+  "RivalSystem": {
+    "Enabled": true,
+    "MaxRivals": 10,
+    "MaxNemesis": 3,
+    "AutoMatchmaking": true
+  },
+
+  "RivalTypes": {
+    "Story": {
+      "ID": "RIVAL_STORY",
+      "Description": "Main story antagonists",
+      "Persistent": true,
+      "Defeatable": true,
+      "Rivals": [
+        {
+          "ID": "RIVAL_VINCE",
+          "Name": "Vince Torreto",
+          "Alias": "The Viper",
+          "Description": "Street racing veteran with a grudge",
+          "Crew": "Venom Crew",
+          "Vehicle": "VIPER_2006",
+          "VehicleColor": "#000000",
+          "Style": "Aggressive",
+          "Difficulty": "Medium",
+          "UnlockCondition": "STORY_CH1_COMPLETE",
+          "Rewards": { "Cash": 25000, "REP": 1000, "Part": "EXHAUST_VIPER" }
+        },
+        {
+          "ID": "RIVAL_MAYA_RACE",
+          "Name": "Maya Chen",
+          "Alias": "Ghost",
+          "Description": "Underground racing coordinator who races on the side",
+          "Crew": "Phantom Runners",
+          "Vehicle": "RX7_FD",
+          "VehicleColor": "#FF4444",
+          "Style": "Technical",
+          "Difficulty": "Hard",
+          "UnlockCondition": "STORY_CH2_COMPLETE",
+          "Rewards": { "Cash": 50000, "REP": 2000, "Vehicle": "RX7_FD_SPECIAL" }
+        },
+        {
+          "ID": "RIVAL_DRIFT_KING",
+          "Name": "Takeshi Yamamoto",
+          "Alias": "Drift King",
+          "Description": "Legendary drifter from Japan",
+          "Crew": "Rising Sun Elite",
+          "Vehicle": "SILVIA_S15",
+          "VehicleColor": "#FFFFFF",
+          "Style": "Drift",
+          "Difficulty": "Expert",
+          "UnlockCondition": "STORY_CH3_COMPLETE",
+          "Rewards": { "Cash": 100000, "REP": 5000, "Title": "Drift King Challenger" }
+        }
+      ]
+    },
+    "Crew": {
+      "ID": "RIVAL_CREW",
+      "Description": "Leaders of rival crews",
+      "Persistent": true,
+      "Rivals": [
+        {
+          "ID": "RIVAL_MUSCLE_KING",
+          "Name": "Big Tony",
+          "Alias": "Thunder",
+          "Crew": "American Thunder",
+          "Vehicle": "CHALLENGER_HELLCAT",
+          "Style": "PowerBased",
+          "UnlockCondition": "REP_TIER_STREET"
+        },
+        {
+          "ID": "RIVAL_EURO_BOSS",
+          "Name": "Klaus Weber",
+          "Alias": "The German",
+          "Crew": "Euro Elite",
+          "Vehicle": "M3_GTR",
+          "Style": "Precision",
+          "UnlockCondition": "REP_TIER_PRO"
+        },
+        {
+          "ID": "RIVAL_EXOTIC_QUEEN",
+          "Name": "Isabella Romano",
+          "Alias": "La Regina",
+          "Crew": "Velocity",
+          "Vehicle": "FERRARI_458",
+          "Style": "Exotic",
+          "UnlockCondition": "REP_TIER_ELITE"
+        }
+      ]
+    },
+    "Generated": {
+      "ID": "RIVAL_GENERATED",
+      "Description": "Dynamically generated rivals based on player stats",
+      "MatchingFactors": ["Level", "WinRate", "PreferredRaceType", "VehicleClass"],
+      "RefreshPeriod": 168,
+      "MaxGenerated": 5
+    },
+    "PlayerRival": {
+      "ID": "RIVAL_PLAYER",
+      "Description": "Other players marked as rivals",
+      "CrossPlatform": true,
+      "GhostRacing": true,
+      "Notifications": true
+    }
+  },
+
+  "RivalInteractions": {
+    "Challenge": {
+      "Types": ["Race", "Drift", "SpeedTrap", "TimeAttack"],
+      "Stakes": {
+        "Enabled": true,
+        "Options": ["Cash", "PinkSlip", "Bragging Rights"],
+        "MaxCashStake": 100000
+      }
+    },
+    "Encounter": {
+      "FreeRoam": true,
+      "FlashChallenge": true,
+      "TrashTalk": true
+    },
+    "Revenge": {
+      "Enabled": true,
+      "BonusREP": 1.5,
+      "Tracking": true
+    }
+  },
+
+  "NemesisSystem": {
+    "Enabled": true,
+    "FormationCriteria": {
+      "LossesAgainst": 3,
+      "ConsecutiveLosses": 2,
+      "IntenseRivalry": true
+    },
+    "NemesisFeatures": {
+      "EnhancedAI": true,
+      "PersonalTaunts": true,
+      "SpecialIntros": true,
+      "UniqueRewards": true
+    },
+    "Resolution": {
+      "VictoriesRequired": 5,
+      "FinalShowdown": true,
+      "ExclusiveReward": true
+    }
+  },
+
+  "LeaderboardRivals": {
+    "Enabled": true,
+    "Categories": {
+      "NearbyRank": {
+        "Above": 3,
+        "Below": 3,
+        "AutoChallenge": true
+      },
+      "FriendsLeaderboard": {
+        "Enabled": true,
+        "ChallengeRecords": true
+      },
+      "GlobalElite": {
+        "TopPercentile": 1,
+        "Aspirational": true
+      }
+    }
+  },
+
+  "RivalProgression": {
+    "Wins": {
+      "REPBonus": 1.25,
+      "CashBonus": 1.25,
+      "TitleProgress": true
+    },
+    "Milestones": {
+      "FirstRivalWin": { "REP": 500, "Title": "Rival Hunter" },
+      "10RivalWins": { "REP": 2000, "Cash": 25000 },
+      "DefeatAllStory": { "REP": 10000, "Title": "Rival Slayer", "Vehicle": "EXCLUSIVE_RIVAL" },
+      "DefeatNemesis": { "REP": 5000, "Badge": "NEMESIS_DEFEATED" }
+    }
+  },
+
+  "RivalAI": {
+    "Adaptation": {
+      "Enabled": true,
+      "LearnPlayerStyle": true,
+      "CounterStrategies": true
+    },
+    "Difficulty": {
+      "Dynamic": true,
+      "BaseOnPlayerSkill": true,
+      "NeverTooEasy": true
+    },
+    "Personality": {
+      "Aggressive": { "RammingChance": 0.3, "BlockingChance": 0.5 },
+      "Technical": { "OptimalLine": 0.9, "MistakeRate": 0.05 },
+      "Unpredictable": { "RandomMoves": true, "VariedTactics": true }
+    }
+  },
+
+  "Notifications": {
+    "RivalNearby": true,
+    "RivalOnline": true,
+    "RecordBroken": true,
+    "ChallengeReceived": true,
+    "NewRivalMatched": true
+  }
+}

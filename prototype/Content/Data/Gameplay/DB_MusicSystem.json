@@ -1,0 +1,241 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Music and Audio Player System",
+
+  "MusicSystem": {
+    "Enabled": true,
+    "DynamicMixing": true,
+    "ContextualMusic": true,
+    "RadioStations": true,
+    "CustomMusic": true
+  },
+
+  "RadioStations": {
+    "MidnightFM": {
+      "ID": "RADIO_MIDNIGHT",
+      "Name": "Midnight FM",
+      "Genre": "Electronic/Synthwave",
+      "Description": "The sound of the night",
+      "DJ": "DJ Nova",
+      "Icon": "ICO_Radio_Midnight",
+      "TrackCount": 30,
+      "Unlocked": true
+    },
+    "ThunderRoad": {
+      "ID": "RADIO_THUNDER",
+      "Name": "Thunder Road",
+      "Genre": "Rock/Metal",
+      "Description": "High octane rock anthems",
+      "DJ": "Rex Thunder",
+      "Icon": "ICO_Radio_Thunder",
+      "TrackCount": 25,
+      "Unlocked": true
+    },
+    "StreetBeats": {
+      "ID": "RADIO_STREET",
+      "Name": "Street Beats",
+      "Genre": "Hip-Hop/Trap",
+      "Description": "Underground hip-hop and trap",
+      "DJ": "MC Flow",
+      "Icon": "ICO_Radio_Street",
+      "TrackCount": 28,
+      "Unlocked": true
+    },
+    "NeonDreams": {
+      "ID": "RADIO_NEON",
+      "Name": "Neon Dreams",
+      "Genre": "EDM/House",
+      "Description": "Electronic dance music",
+      "DJ": "DJ Pulse",
+      "Icon": "ICO_Radio_Neon",
+      "TrackCount": 32,
+      "Unlocked": true
+    },
+    "TokyoDrift": {
+      "ID": "RADIO_TOKYO",
+      "Name": "Tokyo Drift",
+      "Genre": "J-Pop/J-Rock",
+      "Description": "Japanese imports",
+      "DJ": "Yuki",
+      "Icon": "ICO_Radio_Tokyo",
+      "TrackCount": 20,
+      "UnlockCondition": "OWN_JDM_3"
+    },
+    "ClassicCruise": {
+      "ID": "RADIO_CLASSIC",
+      "Name": "Classic Cruise",
+      "Genre": "Classic Rock",
+      "Description": "Timeless driving anthems",
+      "DJ": "Rockin' Ron",
+      "Icon": "ICO_Radio_Classic",
+      "TrackCount": 25,
+      "UnlockCondition": "OWN_CLASSIC_1"
+    },
+    "BassDropFM": {
+      "ID": "RADIO_BASS",
+      "Name": "Bass Drop FM",
+      "Genre": "Dubstep/Drum&Bass",
+      "Description": "Heavy bass and drops",
+      "DJ": "Bass Queen",
+      "Icon": "ICO_Radio_Bass",
+      "TrackCount": 22,
+      "UnlockCondition": "LEVEL_15"
+    },
+    "ChillZone": {
+      "ID": "RADIO_CHILL",
+      "Name": "Chill Zone",
+      "Genre": "Lo-Fi/Ambient",
+      "Description": "Relaxed cruising vibes",
+      "DJ": "Luna",
+      "Icon": "ICO_Radio_Chill",
+      "TrackCount": 20,
+      "Unlocked": true
+    }
+  },
+
+  "DynamicMusic": {
+    "Enabled": true,
+    "Contexts": {
+      "FreeRoam": {
+        "MusicType": "Radio",
+        "Intensity": "Low",
+        "TransitionSpeed": "Slow"
+      },
+      "Race": {
+        "MusicType": "RaceMusic",
+        "Intensity": "High",
+        "PositionBasedIntensity": true,
+        "FinalLapBuild": true
+      },
+      "Pursuit": {
+        "MusicType": "PursuitMusic",
+        "Intensity": "Dynamic",
+        "HeatLevelAffects": true,
+        "EscapeStinger": true
+      },
+      "Drift": {
+        "MusicType": "DriftMusic",
+        "Intensity": "Medium",
+        "ScoreBasedBuild": true
+      },
+      "Garage": {
+        "MusicType": "AmbientRadio",
+        "Intensity": "Low",
+        "Muffled": true
+      },
+      "Menu": {
+        "MusicType": "MenuTheme",
+        "Intensity": "Medium"
+      }
+    },
+    "Transitions": {
+      "CrossFade": true,
+      "Duration": 2.0,
+      "SmartTiming": true
+    }
+  },
+
+  "RaceMusic": {
+    "BuildUp": {
+      "PreRace": true,
+      "GridMusic": true,
+      "CountdownIntensity": true
+    },
+    "Racing": {
+      "BaseTrack": true,
+      "PositionLayers": {
+        "Leading": "HighIntensity",
+        "Middle": "MediumIntensity",
+        "Behind": "UrgentIntensity"
+      },
+      "OvertakeStingers": true,
+      "NearMissStingers": true
+    },
+    "FinalLap": {
+      "Enabled": true,
+      "IntensityBoost": 1.5,
+      "UniqueLayer": true
+    },
+    "Finish": {
+      "VictoryFanfare": true,
+      "DefeatMusic": true,
+      "PhotoFinishTension": true
+    }
+  },
+
+  "PursuitMusic": {
+    "Layers": {
+      "Heat1": { "Intensity": 0.4, "Tension": "Low" },
+      "Heat2": { "Intensity": 0.6, "Tension": "Medium" },
+      "Heat3": { "Intensity": 0.8, "Tension": "High" },
+      "Heat4": { "Intensity": 0.9, "Tension": "VeryHigh" },
+      "Heat5": { "Intensity": 1.0, "Tension": "Maximum" }
+    },
+    "Events": {
+      "Escape": "VictoryStinger",
+      "Busted": "DefeatStinger",
+      "NearEscape": "TensionBuild",
+      "PoliceRam": "ImpactHit"
+    }
+  },
+
+  "CustomMusic": {
+    "Enabled": true,
+    "MaxTracks": 100,
+    "Formats": ["MP3", "WAV", "FLAC", "OGG"],
+    "MaxFileSizeMB": 50,
+    "CustomStation": {
+      "Name": "My Playlist",
+      "Shuffle": true,
+      "Repeat": true
+    },
+    "SpotifyIntegration": {
+      "Enabled": false,
+      "Premium": true
+    }
+  },
+
+  "PlayerControls": {
+    "VolumeSliders": {
+      "Master": true,
+      "Music": true,
+      "Radio": true,
+      "DJ": true
+    },
+    "StationControls": {
+      "NextStation": true,
+      "PreviousStation": true,
+      "NextTrack": true,
+      "Favorite": true
+    },
+    "Display": {
+      "NowPlaying": true,
+      "TrackInfo": true,
+      "AlbumArt": true,
+      "Duration": true
+    }
+  },
+
+  "DJSystem": {
+    "Enabled": true,
+    "Chatter": {
+      "BetweenTracks": true,
+      "TimeAnnouncements": true,
+      "WeatherCommentary": true,
+      "EventCallouts": true
+    },
+    "Frequency": "Occasional",
+    "Skippable": true,
+    "VolumeControl": true
+  },
+
+  "SoundtrackUnlocks": {
+    "Enabled": true,
+    "Sources": {
+      "Progression": true,
+      "Achievements": true,
+      "SeasonPass": true,
+      "Store": true
+    }
+  }
+}

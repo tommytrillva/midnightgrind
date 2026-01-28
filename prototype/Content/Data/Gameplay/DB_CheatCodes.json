@@ -1,0 +1,227 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Cheat Codes and Secrets",
+
+  "CheatSystem": {
+    "Enabled": true,
+    "DisablesSaving": false,
+    "DisablesAchievements": true,
+    "DisablesLeaderboards": true,
+    "DisablesOnline": true,
+    "RequireStoryComplete": false
+  },
+
+  "CheatCodes": {
+    "Vehicles": {
+      "UNLOCKALLCARS": {
+        "ID": "CHEAT_ALL_CARS",
+        "Name": "Unlock All Vehicles",
+        "Code": "UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A",
+        "Effect": "UnlockAllVehicles",
+        "Persistent": false
+      },
+      "FREEGARAGE": {
+        "ID": "CHEAT_FREE_GARAGE",
+        "Name": "Free Garage",
+        "Code": "LEFT RIGHT LEFT RIGHT UP UP DOWN DOWN",
+        "Effect": "FreeVehiclePurchase",
+        "Persistent": false
+      }
+    },
+    "Money": {
+      "MAKEITRAIN": {
+        "ID": "CHEAT_MONEY",
+        "Name": "Make It Rain",
+        "Code": "R1 R2 L1 L2 UP DOWN UP DOWN",
+        "Effect": { "AddCash": 1000000 },
+        "Persistent": true,
+        "ReuseCooldown": 300
+      },
+      "BIGBALLER": {
+        "ID": "CHEAT_MAX_MONEY",
+        "Name": "Big Baller",
+        "Code": "L1 L1 R1 R1 UP UP DOWN DOWN LEFT RIGHT",
+        "Effect": { "SetCash": 99999999 },
+        "Persistent": true
+      }
+    },
+    "Gameplay": {
+      "GODMODE": {
+        "ID": "CHEAT_GODMODE",
+        "Name": "Invincible",
+        "Code": "UP DOWN LEFT RIGHT UP DOWN LEFT RIGHT",
+        "Effect": "NoDamage",
+        "Toggle": true
+      },
+      "INFINITENOS": {
+        "ID": "CHEAT_NITRO",
+        "Name": "Infinite Nitrous",
+        "Code": "L2 R2 L2 R2 UP UP",
+        "Effect": "InfiniteNitrous",
+        "Toggle": true
+      },
+      "GHOSTCAR": {
+        "ID": "CHEAT_GHOST",
+        "Name": "Ghost Mode",
+        "Code": "L1 R1 L1 R1 DOWN DOWN UP UP",
+        "Effect": "NoCollision",
+        "Toggle": true
+      },
+      "SLOWMO": {
+        "ID": "CHEAT_SLOWMO",
+        "Name": "Slow Motion",
+        "Code": "R2 L2 R2 L2 LEFT LEFT RIGHT RIGHT",
+        "Effect": { "TimeScale": 0.5 },
+        "Toggle": true
+      },
+      "SUPERSPEED": {
+        "ID": "CHEAT_SPEED",
+        "Name": "Super Speed",
+        "Code": "UP UP UP LEFT LEFT LEFT",
+        "Effect": { "SpeedMultiplier": 2.0 },
+        "Toggle": true
+      }
+    },
+    "Police": {
+      "COOLDOWN": {
+        "ID": "CHEAT_COOLDOWN",
+        "Name": "Clear Heat",
+        "Code": "LEFT LEFT RIGHT RIGHT L1 R1",
+        "Effect": "ClearHeat",
+        "Persistent": false
+      },
+      "COPFREE": {
+        "ID": "CHEAT_NO_COPS",
+        "Name": "Cops Disabled",
+        "Code": "L1 L2 R1 R2 L1 L2 R1 R2",
+        "Effect": "DisablePolice",
+        "Toggle": true
+      },
+      "MOSTWANTED": {
+        "ID": "CHEAT_MAX_HEAT",
+        "Name": "Maximum Heat",
+        "Code": "R1 R1 R1 L1 L1 L1 UP UP",
+        "Effect": { "SetHeat": 5 },
+        "Persistent": false
+      }
+    },
+    "Weather": {
+      "LETITRAIN": {
+        "ID": "CHEAT_RAIN",
+        "Name": "Toggle Rain",
+        "Code": "DOWN DOWN UP UP L2 R2",
+        "Effect": "ToggleRain",
+        "Toggle": true
+      },
+      "FOGGYNIGHT": {
+        "ID": "CHEAT_FOG",
+        "Name": "Dense Fog",
+        "Code": "L2 L2 R2 R2 DOWN DOWN",
+        "Effect": "ToggleFog",
+        "Toggle": true
+      },
+      "ALWAYSNIGHT": {
+        "ID": "CHEAT_NIGHT",
+        "Name": "Eternal Night",
+        "Code": "DOWN DOWN DOWN LEFT RIGHT LEFT RIGHT",
+        "Effect": "ForceNight",
+        "Toggle": true
+      }
+    },
+    "Fun": {
+      "MOONGRAVITY": {
+        "ID": "CHEAT_LOWGRAV",
+        "Name": "Low Gravity",
+        "Code": "L1 L2 R1 R2 UP UP UP",
+        "Effect": { "GravityMultiplier": 0.3 },
+        "Toggle": true,
+        "UnlocksModifier": "MOD_LOW_GRAV"
+      },
+      "TINYCARS": {
+        "ID": "CHEAT_TINY",
+        "Name": "Tiny Vehicles",
+        "Code": "DOWN DOWN DOWN R1 L1 R1 L1",
+        "Effect": { "VehicleScale": 0.25 },
+        "Toggle": true,
+        "UnlocksModifier": "MOD_TINY"
+      },
+      "BIGHEAD": {
+        "ID": "CHEAT_BIGHEAD",
+        "Name": "Big Head Mode",
+        "Code": "UP UP UP L1 R1 L1 R1",
+        "Effect": { "HeadScale": 3.0 },
+        "Toggle": true,
+        "UnlocksModifier": "MOD_BIGHEAD"
+      },
+      "RAGDOLL": {
+        "ID": "CHEAT_RAGDOLL",
+        "Name": "Ragdoll Physics",
+        "Code": "L2 R2 L2 R2 DOWN UP DOWN UP",
+        "Effect": "RagdollOnCrash",
+        "Toggle": true
+      },
+      "EXPLOSIVE": {
+        "ID": "CHEAT_EXPLOSIVE",
+        "Name": "Explosive Collisions",
+        "Code": "R1 R1 L1 L1 UP DOWN UP DOWN",
+        "Effect": "ExplosiveCrashes",
+        "Toggle": true
+      },
+      "TRAFFICCHAOS": {
+        "ID": "CHEAT_CHAOS",
+        "Name": "Traffic Chaos",
+        "Code": "LEFT RIGHT LEFT RIGHT UP DOWN UP DOWN",
+        "Effect": "CrazyTraffic",
+        "Toggle": true
+      }
+    },
+    "Visual": {
+      "PS1MODE": {
+        "ID": "CHEAT_PS1",
+        "Name": "PS1 Graphics",
+        "Code": "L1 L1 R1 R1 LEFT RIGHT UP DOWN",
+        "Effect": "EnablePS1Filter",
+        "Toggle": true
+      },
+      "NOIR": {
+        "ID": "CHEAT_NOIR",
+        "Name": "Film Noir",
+        "Code": "DOWN DOWN LEFT LEFT UP UP RIGHT RIGHT",
+        "Effect": "NoirFilter",
+        "Toggle": true
+      },
+      "THERMAL": {
+        "ID": "CHEAT_THERMAL",
+        "Name": "Thermal Vision",
+        "Code": "R2 R2 L2 L2 UP DOWN LEFT RIGHT",
+        "Effect": "ThermalFilter",
+        "Toggle": true
+      }
+    }
+  },
+
+  "SecretVehicles": {
+    "DEVCAR": {
+      "Code": "MIDNIGHT",
+      "Vehicle": "DEV_TEST_CAR",
+      "Description": "Developer test vehicle"
+    },
+    "ALIENSHIP": {
+      "Code": "ROSWELL",
+      "Vehicle": "UFO_HOVERCAR",
+      "Description": "Alien hover vehicle"
+    }
+  },
+
+  "CheatMenu": {
+    "Enabled": true,
+    "UnlockCondition": "STORY_COMPLETE",
+    "Categories": ["Vehicles", "Money", "Gameplay", "Police", "Weather", "Fun", "Visual"]
+  },
+
+  "ActiveCheatsDisplay": {
+    "Enabled": true,
+    "Position": "TopLeft",
+    "ShowWarning": true
+  }
+}

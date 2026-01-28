@@ -1,0 +1,233 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Classification System",
+
+  "ClassificationSystem": {
+    "Enabled": true,
+    "PrimarySystem": "PerformanceIndex",
+    "SecondarySystem": "Category"
+  },
+
+  "PerformanceIndex": {
+    "Description": "PI rating based on vehicle performance characteristics",
+    "Range": { "Min": 100, "Max": 999 },
+    "Classes": {
+      "D": {
+        "Name": "D Class",
+        "Range": { "Min": 100, "Max": 299 },
+        "Description": "Entry level vehicles",
+        "Color": "#808080",
+        "Icon": "ICO_Class_D"
+      },
+      "C": {
+        "Name": "C Class",
+        "Range": { "Min": 300, "Max": 449 },
+        "Description": "Street tuner vehicles",
+        "Color": "#00FF00",
+        "Icon": "ICO_Class_C"
+      },
+      "B": {
+        "Name": "B Class",
+        "Range": { "Min": 450, "Max": 599 },
+        "Description": "Sport performance vehicles",
+        "Color": "#00FFFF",
+        "Icon": "ICO_Class_B"
+      },
+      "A": {
+        "Name": "A Class",
+        "Range": { "Min": 600, "Max": 749 },
+        "Description": "High performance vehicles",
+        "Color": "#FFFF00",
+        "Icon": "ICO_Class_A"
+      },
+      "S": {
+        "Name": "S Class",
+        "Range": { "Min": 750, "Max": 899 },
+        "Description": "Super performance vehicles",
+        "Color": "#FF8800",
+        "Icon": "ICO_Class_S"
+      },
+      "S+": {
+        "Name": "S+ Class",
+        "Range": { "Min": 900, "Max": 999 },
+        "Description": "Hypercar performance",
+        "Color": "#FF0000",
+        "Icon": "ICO_Class_SP"
+      }
+    },
+    "Calculation": {
+      "Factors": {
+        "Power": { "Weight": 0.25 },
+        "Weight": { "Weight": 0.15 },
+        "Acceleration": { "Weight": 0.20 },
+        "TopSpeed": { "Weight": 0.15 },
+        "Handling": { "Weight": 0.15 },
+        "Braking": { "Weight": 0.10 }
+      },
+      "Normalization": "MinMax",
+      "UpdateOnMod": true
+    }
+  },
+
+  "VehicleCategories": {
+    "JDM": {
+      "ID": "CAT_JDM",
+      "Name": "JDM",
+      "FullName": "Japanese Domestic Market",
+      "Description": "Performance vehicles from Japan",
+      "Icon": "ICO_Cat_JDM",
+      "Color": "#FF4444",
+      "Characteristics": {
+        "TypicalDrivetrain": ["RWD", "AWD"],
+        "TypicalEngine": ["I4_Turbo", "I6_Turbo", "Rotary"],
+        "TypicalEra": "1990s-2000s"
+      }
+    },
+    "Muscle": {
+      "ID": "CAT_MUSCLE",
+      "Name": "Muscle",
+      "FullName": "American Muscle",
+      "Description": "High-powered American vehicles",
+      "Icon": "ICO_Cat_Muscle",
+      "Color": "#FF8800",
+      "Characteristics": {
+        "TypicalDrivetrain": ["RWD"],
+        "TypicalEngine": ["V8_American"],
+        "TypicalEra": "1960s-Present"
+      }
+    },
+    "Euro": {
+      "ID": "CAT_EURO",
+      "Name": "Euro",
+      "FullName": "European Performance",
+      "Description": "European sports and performance cars",
+      "Icon": "ICO_Cat_Euro",
+      "Color": "#0088FF",
+      "Characteristics": {
+        "TypicalDrivetrain": ["RWD", "AWD"],
+        "TypicalEngine": ["I6_Turbo", "V8_Euro", "V10"],
+        "TypicalEra": "2000s-Present"
+      }
+    },
+    "Exotic": {
+      "ID": "CAT_EXOTIC",
+      "Name": "Exotic",
+      "FullName": "Exotic Supercars",
+      "Description": "High-end exotic performance vehicles",
+      "Icon": "ICO_Cat_Exotic",
+      "Color": "#FFD700",
+      "Characteristics": {
+        "TypicalDrivetrain": ["RWD", "AWD", "MR"],
+        "TypicalEngine": ["V8_Euro", "V10", "V12"],
+        "TypicalEra": "2010s-Present"
+      }
+    },
+    "Hypercar": {
+      "ID": "CAT_HYPERCAR",
+      "Name": "Hypercar",
+      "FullName": "Hypercars",
+      "Description": "Ultimate performance machines",
+      "Icon": "ICO_Cat_Hypercar",
+      "Color": "#FF00FF",
+      "Characteristics": {
+        "TypicalDrivetrain": ["RWD", "AWD"],
+        "TypicalEngine": ["V8_TwinTurbo", "V12", "Hybrid"],
+        "TypicalEra": "2015s-Present"
+      }
+    },
+    "Classic": {
+      "ID": "CAT_CLASSIC",
+      "Name": "Classic",
+      "FullName": "Classic Cars",
+      "Description": "Vintage and classic automobiles",
+      "Icon": "ICO_Cat_Classic",
+      "Color": "#8B4513",
+      "Characteristics": {
+        "YearRange": { "Max": 1989 }
+      }
+    },
+    "Tuner": {
+      "ID": "CAT_TUNER",
+      "Name": "Tuner",
+      "FullName": "Tuner Cars",
+      "Description": "Vehicles designed for modification",
+      "Icon": "ICO_Cat_Tuner",
+      "Color": "#00FF88",
+      "Characteristics": {
+        "HighModPotential": true,
+        "AftermarketSupport": "Extensive"
+      }
+    },
+    "Compact": {
+      "ID": "CAT_COMPACT",
+      "Name": "Compact",
+      "FullName": "Hot Hatches & Compacts",
+      "Description": "Small but sporty vehicles",
+      "Icon": "ICO_Cat_Compact",
+      "Color": "#88FF00",
+      "Characteristics": {
+        "TypicalDrivetrain": ["FWD", "AWD"],
+        "TypicalEngine": ["I4_Turbo", "I4_NA"],
+        "Size": "Compact"
+      }
+    },
+    "Truck": {
+      "ID": "CAT_TRUCK",
+      "Name": "Truck",
+      "FullName": "Performance Trucks",
+      "Description": "High-performance pickup trucks",
+      "Icon": "ICO_Cat_Truck",
+      "Color": "#666666",
+      "Characteristics": {
+        "TypicalDrivetrain": ["RWD", "4WD"],
+        "TypicalEngine": ["V8_American", "V6_Turbo"],
+        "BodyStyle": "Pickup"
+      }
+    },
+    "SUV": {
+      "ID": "CAT_SUV",
+      "Name": "SUV",
+      "FullName": "Performance SUVs",
+      "Description": "Sport utility vehicles with performance",
+      "Icon": "ICO_Cat_SUV",
+      "Color": "#444488",
+      "Characteristics": {
+        "TypicalDrivetrain": ["AWD", "4WD"],
+        "BodyStyle": "SUV"
+      }
+    }
+  },
+
+  "BodyStyles": {
+    "Coupe": { "ID": "BODY_COUPE", "Doors": 2, "Roof": "Fixed" },
+    "Sedan": { "ID": "BODY_SEDAN", "Doors": 4, "Roof": "Fixed" },
+    "Hatchback": { "ID": "BODY_HATCH", "Doors": [3, 5], "Roof": "Fixed" },
+    "Convertible": { "ID": "BODY_CONV", "Doors": 2, "Roof": "Retractable" },
+    "Wagon": { "ID": "BODY_WAGON", "Doors": [4, 5], "Roof": "Fixed" },
+    "Pickup": { "ID": "BODY_PICKUP", "Doors": [2, 4], "Bed": true },
+    "SUV": { "ID": "BODY_SUV", "Doors": [3, 5], "GroundClearance": "High" }
+  },
+
+  "Drivetrains": {
+    "FWD": { "ID": "DRIVE_FWD", "Name": "Front-Wheel Drive", "Abbreviation": "FWD" },
+    "RWD": { "ID": "DRIVE_RWD", "Name": "Rear-Wheel Drive", "Abbreviation": "RWD" },
+    "AWD": { "ID": "DRIVE_AWD", "Name": "All-Wheel Drive", "Abbreviation": "AWD" },
+    "4WD": { "ID": "DRIVE_4WD", "Name": "Four-Wheel Drive", "Abbreviation": "4WD" }
+  },
+
+  "EngineLayouts": {
+    "FF": { "Name": "Front Engine, Front Drive" },
+    "FR": { "Name": "Front Engine, Rear Drive" },
+    "MR": { "Name": "Mid Engine, Rear Drive" },
+    "RR": { "Name": "Rear Engine, Rear Drive" },
+    "F4": { "Name": "Front Engine, All-Wheel Drive" }
+  },
+
+  "Rarity": {
+    "Common": { "Color": "#FFFFFF", "DropRate": 0.50 },
+    "Uncommon": { "Color": "#00FF00", "DropRate": 0.30 },
+    "Rare": { "Color": "#0088FF", "DropRate": 0.15 },
+    "Epic": { "Color": "#9900FF", "DropRate": 0.04 },
+    "Legendary": { "Color": "#FFD700", "DropRate": 0.01 }
+  }
+}

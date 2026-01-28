@@ -1,0 +1,213 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Replay and Video Capture System",
+
+  "ReplaySystem": {
+    "Enabled": true,
+    "AutoRecord": true,
+    "MaxReplayLength": 300,
+    "BufferSize": 600,
+    "SaveSlots": 20
+  },
+
+  "Recording": {
+    "Resolution": {
+      "Playback": "Native",
+      "Export": ["720p", "1080p", "4K"]
+    },
+    "FrameRate": {
+      "Recording": 60,
+      "Export": [30, 60]
+    },
+    "Quality": {
+      "Compression": "Medium",
+      "ExportQuality": ["Standard", "High", "Maximum"]
+    },
+    "DataCaptured": {
+      "VehiclePosition": true,
+      "VehiclePhysics": true,
+      "CameraAngles": true,
+      "Audio": true,
+      "Weather": true,
+      "TimeOfDay": true,
+      "OtherVehicles": true,
+      "Effects": true
+    }
+  },
+
+  "PlaybackControls": {
+    "Speed": {
+      "Options": [0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0],
+      "Default": 1.0
+    },
+    "Timeline": {
+      "Scrubbing": true,
+      "Markers": true,
+      "KeyFrames": true
+    },
+    "Actions": {
+      "Play": true,
+      "Pause": true,
+      "Rewind": true,
+      "FastForward": true,
+      "FrameStep": true,
+      "JumpToStart": true,
+      "JumpToEnd": true
+    }
+  },
+
+  "CameraSystem": {
+    "Modes": {
+      "Follow": {
+        "ID": "CAM_FOLLOW",
+        "Description": "Standard chase camera",
+        "DistanceControl": true,
+        "HeightControl": true,
+        "Smoothing": true
+      },
+      "Cockpit": {
+        "ID": "CAM_COCKPIT",
+        "Description": "First-person view",
+        "HeadMovement": true,
+        "MirrorView": true
+      },
+      "Hood": {
+        "ID": "CAM_HOOD",
+        "Description": "Hood-mounted camera",
+        "ShakeIntensity": "High"
+      },
+      "Bumper": {
+        "ID": "CAM_BUMPER",
+        "Description": "Low front bumper view",
+        "SpeedLines": true
+      },
+      "Free": {
+        "ID": "CAM_FREE",
+        "Description": "Fully controllable camera",
+        "MovementSpeed": { "Min": 1, "Max": 50 },
+        "RotationSpeed": { "Min": 1, "Max": 10 }
+      },
+      "Orbit": {
+        "ID": "CAM_ORBIT",
+        "Description": "Camera orbits the vehicle",
+        "AutoRotate": true,
+        "OrbitSpeed": { "Min": 0.1, "Max": 5.0 }
+      },
+      "Trackside": {
+        "ID": "CAM_TRACKSIDE",
+        "Description": "Fixed track-side positions",
+        "AutoSwitch": true,
+        "SwitchDistance": 100
+      },
+      "Helicopter": {
+        "ID": "CAM_HELI",
+        "Description": "Aerial tracking shot",
+        "Height": { "Min": 50, "Max": 500 },
+        "Tracking": true
+      },
+      "Drone": {
+        "ID": "CAM_DRONE",
+        "Description": "Drone-style free movement",
+        "Tilt": true,
+        "Banking": true
+      },
+      "Cinematic": {
+        "ID": "CAM_CINEMATIC",
+        "Description": "Auto-generated cinematic shots",
+        "ShotVariety": true,
+        "DynamicCuts": true
+      }
+    },
+    "Effects": {
+      "DepthOfField": { "Enabled": true, "Controllable": true },
+      "MotionBlur": { "Enabled": true, "Intensity": { "Min": 0, "Max": 2.0 } },
+      "FilmGrain": { "Enabled": true, "Intensity": { "Min": 0, "Max": 1.0 } },
+      "Vignette": { "Enabled": true, "Intensity": { "Min": 0, "Max": 1.0 } },
+      "ChromaticAberration": { "Enabled": true },
+      "LensFlare": { "Enabled": true }
+    },
+    "FocalLength": {
+      "Min": 16,
+      "Max": 200,
+      "Default": 50,
+      "Presets": ["Wide", "Normal", "Telephoto"]
+    }
+  },
+
+  "Editing": {
+    "Enabled": true,
+    "Features": {
+      "Trim": true,
+      "Split": true,
+      "Merge": true,
+      "AddMarkers": true,
+      "KeyframeCamera": true
+    },
+    "KeyframeSystem": {
+      "Enabled": true,
+      "Properties": ["Position", "Rotation", "FOV", "Focus", "Effects"],
+      "Interpolation": ["Linear", "EaseIn", "EaseOut", "EaseInOut", "Custom"]
+    },
+    "Transitions": {
+      "Cut": true,
+      "Fade": true,
+      "CrossDissolve": true,
+      "Wipe": true
+    }
+  },
+
+  "Export": {
+    "Formats": ["MP4", "MOV"],
+    "Codec": "H264",
+    "Settings": {
+      "Bitrate": ["10Mbps", "20Mbps", "50Mbps", "100Mbps"],
+      "AudioIncluded": true,
+      "EngineAudio": { "Separate": true, "Include": true },
+      "MusicAudio": { "Separate": true, "Include": false },
+      "Watermark": { "Enabled": true, "Removable": true }
+    },
+    "Presets": {
+      "QuickShare": { "Resolution": "1080p", "Bitrate": "20Mbps", "FrameRate": 30 },
+      "HighQuality": { "Resolution": "4K", "Bitrate": "50Mbps", "FrameRate": 60 },
+      "Maximum": { "Resolution": "4K", "Bitrate": "100Mbps", "FrameRate": 60 }
+    }
+  },
+
+  "Sharing": {
+    "Enabled": true,
+    "Platforms": ["YouTube", "Twitter", "Discord"],
+    "DirectUpload": true,
+    "InGameShowcase": true,
+    "MaxUploadSize": 500
+  },
+
+  "AutoHighlights": {
+    "Enabled": true,
+    "DetectedEvents": [
+      "PhotoFinish",
+      "BigOvertake",
+      "NearMiss",
+      "HighSpeedDrift",
+      "MassiveJump",
+      "PursuitEscape",
+      "Crash",
+      "PerfectCorner"
+    ],
+    "AutoClipLength": 15,
+    "MaxAutoClips": 10
+  },
+
+  "Storage": {
+    "Location": "Local",
+    "MaxStorageGB": 50,
+    "AutoDelete": {
+      "Enabled": true,
+      "AfterDays": 30,
+      "KeepFavorites": true
+    },
+    "CloudBackup": {
+      "Enabled": false,
+      "MaxCloudGB": 5
+    }
+  }
+}

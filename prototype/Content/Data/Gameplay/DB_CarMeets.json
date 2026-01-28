@@ -1,0 +1,242 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Car Meets and Social Events",
+
+  "CarMeetSystem": {
+    "Enabled": true,
+    "MaxParticipants": 30,
+    "HostRequirement": "LEVEL_10",
+    "JoinRequirement": "LEVEL_5"
+  },
+
+  "MeetLocations": [
+    {
+      "ID": "MEET_PARKING_LOT",
+      "Name": "Downtown Parking Lot",
+      "Description": "Classic meet spot under the city lights",
+      "Location": { "X": 1200, "Y": -800, "Z": 10 },
+      "Capacity": 30,
+      "Ambience": "Urban_Night",
+      "Features": ["OpenSpace", "GoodLighting", "FoodTrucks"],
+      "Unlocked": true
+    },
+    {
+      "ID": "MEET_DOCK_WAREHOUSE",
+      "Name": "Dock Warehouse",
+      "Description": "Industrial vibes by the water",
+      "Location": { "X": -2500, "Y": 1800, "Z": 5 },
+      "Capacity": 25,
+      "Ambience": "Industrial_Harbor",
+      "Features": ["Indoor", "Waterfront", "Container"],
+      "UnlockCondition": "LEVEL_15"
+    },
+    {
+      "ID": "MEET_MOUNTAIN_OVERLOOK",
+      "Name": "Mountain Overlook",
+      "Description": "Scenic views of the city below",
+      "Location": { "X": 4500, "Y": 3200, "Z": 450 },
+      "Capacity": 20,
+      "Ambience": "Mountain_Night",
+      "Features": ["Scenic", "PhotoSpot", "Secluded"],
+      "UnlockCondition": "LEVEL_20"
+    },
+    {
+      "ID": "MEET_BEACH",
+      "Name": "Beach Parking",
+      "Description": "Ocean breeze and sunset views",
+      "Location": { "X": -3800, "Y": -2500, "Z": 3 },
+      "Capacity": 25,
+      "Ambience": "Coastal_Evening",
+      "Features": ["Beachfront", "Sunset", "Bonfire"],
+      "UnlockCondition": "LEVEL_10"
+    },
+    {
+      "ID": "MEET_AIRPORT",
+      "Name": "Airport Runway",
+      "Description": "Vast open space for serious meets",
+      "Location": { "X": 6000, "Y": -4000, "Z": 8 },
+      "Capacity": 30,
+      "Ambience": "Industrial_Open",
+      "Features": ["Runway", "DragStrip", "Hangar"],
+      "UnlockCondition": "LEVEL_25"
+    },
+    {
+      "ID": "MEET_TEMPLE",
+      "Name": "Temple Gardens",
+      "Description": "Peaceful JDM gathering spot",
+      "Location": { "X": -1500, "Y": 4200, "Z": 25 },
+      "Capacity": 20,
+      "Ambience": "Japanese_Serene",
+      "Features": ["JDM", "Garden", "Traditional"],
+      "UnlockCondition": "OWN_JDM_5"
+    },
+    {
+      "ID": "MEET_CASINO",
+      "Name": "Casino Valet",
+      "Description": "High-roller showcase",
+      "Location": { "X": 800, "Y": 2800, "Z": 15 },
+      "Capacity": 15,
+      "Ambience": "Luxury_Night",
+      "Features": ["Luxury", "Exclusive", "Valet"],
+      "UnlockCondition": "REP_TIER_ELITE"
+    }
+  ],
+
+  "MeetTypes": {
+    "Casual": {
+      "ID": "MEET_TYPE_CASUAL",
+      "Name": "Casual Hangout",
+      "Description": "No theme, just vibes",
+      "Duration": { "Min": 30, "Max": 180 },
+      "Activities": ["Chat", "Photos", "Show"]
+    },
+    "Themed": {
+      "ID": "MEET_TYPE_THEMED",
+      "Name": "Themed Meet",
+      "Description": "Specific vehicle theme required",
+      "Themes": [
+        { "ID": "THEME_JDM", "Name": "JDM Only", "Filter": "Category:JDM" },
+        { "ID": "THEME_MUSCLE", "Name": "Muscle Only", "Filter": "Category:Muscle" },
+        { "ID": "THEME_EURO", "Name": "Euro Only", "Filter": "Category:Euro" },
+        { "ID": "THEME_CLASSIC", "Name": "Classics Only", "Filter": "Year:<1990" },
+        { "ID": "THEME_COLOR", "Name": "Color Match", "Filter": "Color:Specified" },
+        { "ID": "THEME_BRAND", "Name": "Brand Specific", "Filter": "Make:Specified" }
+      ]
+    },
+    "ShowAndShine": {
+      "ID": "MEET_TYPE_SHOW",
+      "Name": "Show & Shine",
+      "Description": "Compete for best in show",
+      "Duration": 60,
+      "Voting": true,
+      "Categories": ["BestPaint", "BestMods", "BestOverall", "MostOriginal"],
+      "Prizes": { "1st": 10000, "2nd": 5000, "3rd": 2500 }
+    },
+    "PhotoMeet": {
+      "ID": "MEET_TYPE_PHOTO",
+      "Name": "Photo Session",
+      "Description": "Collaborative photography event",
+      "Duration": 45,
+      "PhotoModeBonus": true,
+      "SharedAlbum": true
+    },
+    "CruiseStart": {
+      "ID": "MEET_TYPE_CRUISE",
+      "Name": "Cruise Meetup",
+      "Description": "Gather before a group cruise",
+      "Duration": 30,
+      "FollowsCruise": true,
+      "RouteSelection": true
+    }
+  },
+
+  "Cruises": {
+    "Enabled": true,
+    "MaxParticipants": 20,
+    "LeaderControls": {
+      "Speed": true,
+      "Route": true,
+      "Stops": true,
+      "Music": true
+    },
+    "Formation": {
+      "Enabled": true,
+      "Types": ["SingleFile", "Staggered", "Free"],
+      "Spacing": { "Min": 10, "Max": 50 }
+    },
+    "PredefinedRoutes": [
+      { "ID": "ROUTE_COASTAL", "Name": "Coastal Cruise", "Distance": 15000, "Duration": 20 },
+      { "ID": "ROUTE_MOUNTAIN", "Name": "Mountain Run", "Distance": 12000, "Duration": 25 },
+      { "ID": "ROUTE_DOWNTOWN", "Name": "Downtown Loop", "Distance": 8000, "Duration": 15 },
+      { "ID": "ROUTE_SCENIC", "Name": "Scenic Tour", "Distance": 20000, "Duration": 30 }
+    ],
+    "CustomRoute": {
+      "Enabled": true,
+      "MaxWaypoints": 10,
+      "SaveRoute": true
+    }
+  },
+
+  "MeetActivities": {
+    "PhotoBooth": {
+      "Enabled": true,
+      "GroupPhoto": true,
+      "MaxCars": 10,
+      "Presets": ["LineUp", "Circle", "Scattered", "Stacked"]
+    },
+    "Showcase": {
+      "Enabled": true,
+      "SpotlightDuration": 30,
+      "Queue": true,
+      "Reactions": true
+    },
+    "Voting": {
+      "Enabled": true,
+      "Categories": ["Paint", "Mods", "Style", "Sound"],
+      "AnonymousVoting": true
+    },
+    "Burnouts": {
+      "Enabled": true,
+      "DesignatedArea": true,
+      "SmokeColors": true
+    },
+    "Revving": {
+      "Enabled": true,
+      "SoundShowcase": true
+    }
+  },
+
+  "MeetRewards": {
+    "Attendance": {
+      "BaseREP": 50,
+      "TimeBonus": 10,
+      "MaxBonus": 150
+    },
+    "Hosting": {
+      "BaseREP": 100,
+      "PerParticipant": 5,
+      "SuccessfulMeet": 250
+    },
+    "ShowWinner": {
+      "REP": 500,
+      "Cash": 10000,
+      "Trophy": true
+    }
+  },
+
+  "MeetManagement": {
+    "Hosting": {
+      "Schedule": { "AdvanceHours": 24, "MaxScheduled": 3 },
+      "Privacy": ["Public", "FriendsOnly", "CrewOnly", "InviteOnly"],
+      "Moderation": {
+        "KickPlayer": true,
+        "BanPlayer": true,
+        "MutePlayer": true
+      }
+    },
+    "Chat": {
+      "VoiceChat": true,
+      "TextChat": true,
+      "Emotes": true,
+      "Reactions": true
+    },
+    "Spectator": {
+      "Enabled": true,
+      "DroneCamera": true,
+      "FreeCam": true
+    }
+  },
+
+  "WeeklyEvents": {
+    "Enabled": true,
+    "OfficialMeets": [
+      { "Day": "Friday", "Time": "20:00", "Type": "Casual", "Location": "MEET_PARKING_LOT" },
+      { "Day": "Saturday", "Time": "21:00", "Type": "ShowAndShine", "Location": "MEET_DOCK_WAREHOUSE" },
+      { "Day": "Sunday", "Time": "19:00", "Type": "CruiseStart", "Location": "MEET_BEACH" }
+    ],
+    "FeaturedTheme": {
+      "Duration": 7,
+      "SpecialRewards": true
+    }
+  }
+}

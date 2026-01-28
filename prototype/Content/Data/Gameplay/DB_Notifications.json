@@ -1,0 +1,283 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Notification and Alert System",
+
+  "NotificationSystem": {
+    "Enabled": true,
+    "MaxQueueSize": 10,
+    "DefaultDuration": 5,
+    "StackingBehavior": "Queue"
+  },
+
+  "NotificationTypes": {
+    "Achievement": {
+      "ID": "NOTIF_ACHIEVEMENT",
+      "Priority": "High",
+      "Duration": 8,
+      "Sound": "SFX_Achievement_Unlock",
+      "Position": "TopCenter",
+      "Animation": "SlideDown",
+      "Icon": true,
+      "Dismissible": true
+    },
+    "LevelUp": {
+      "ID": "NOTIF_LEVEL",
+      "Priority": "High",
+      "Duration": 6,
+      "Sound": "SFX_Level_Up",
+      "Position": "Center",
+      "Animation": "ScaleIn",
+      "FullScreen": false
+    },
+    "REPTierUp": {
+      "ID": "NOTIF_REP_TIER",
+      "Priority": "Critical",
+      "Duration": 10,
+      "Sound": "SFX_REP_Tier_Up",
+      "Position": "Center",
+      "Animation": "Dramatic",
+      "FullScreen": true
+    },
+    "UnlockVehicle": {
+      "ID": "NOTIF_UNLOCK_VEHICLE",
+      "Priority": "High",
+      "Duration": 8,
+      "Sound": "SFX_Vehicle_Unlock",
+      "Position": "TopCenter",
+      "Animation": "SlideDown",
+      "ShowVehiclePreview": true
+    },
+    "UnlockPart": {
+      "ID": "NOTIF_UNLOCK_PART",
+      "Priority": "Medium",
+      "Duration": 4,
+      "Sound": "SFX_Part_Unlock",
+      "Position": "TopRight",
+      "Animation": "SlideLeft"
+    },
+    "CashEarned": {
+      "ID": "NOTIF_CASH",
+      "Priority": "Low",
+      "Duration": 3,
+      "Sound": "SFX_Cash_Cha_Ching",
+      "Position": "TopRight",
+      "Animation": "Pop",
+      "Stackable": true
+    },
+    "REPEarned": {
+      "ID": "NOTIF_REP",
+      "Priority": "Low",
+      "Duration": 3,
+      "Sound": "SFX_REP_Gain",
+      "Position": "TopRight",
+      "Animation": "Pop",
+      "Stackable": true
+    },
+    "DailyReward": {
+      "ID": "NOTIF_DAILY",
+      "Priority": "Medium",
+      "Duration": 5,
+      "Sound": "SFX_Daily_Reward",
+      "Position": "Center",
+      "Animation": "ScaleIn"
+    },
+    "FriendOnline": {
+      "ID": "NOTIF_FRIEND",
+      "Priority": "Low",
+      "Duration": 4,
+      "Sound": "SFX_Friend_Online",
+      "Position": "BottomRight",
+      "Animation": "SlideUp"
+    },
+    "CrewInvite": {
+      "ID": "NOTIF_CREW_INVITE",
+      "Priority": "Medium",
+      "Duration": 10,
+      "Sound": "SFX_Invite",
+      "Position": "BottomRight",
+      "Animation": "SlideUp",
+      "ActionButtons": ["Accept", "Decline"]
+    },
+    "RaceInvite": {
+      "ID": "NOTIF_RACE_INVITE",
+      "Priority": "High",
+      "Duration": 15,
+      "Sound": "SFX_Race_Invite",
+      "Position": "Center",
+      "Animation": "ScaleIn",
+      "ActionButtons": ["Join", "Decline"]
+    },
+    "ChallengeComplete": {
+      "ID": "NOTIF_CHALLENGE",
+      "Priority": "Medium",
+      "Duration": 5,
+      "Sound": "SFX_Challenge_Complete",
+      "Position": "TopCenter",
+      "Animation": "SlideDown"
+    },
+    "SeasonPassTier": {
+      "ID": "NOTIF_SEASON_TIER",
+      "Priority": "Medium",
+      "Duration": 6,
+      "Sound": "SFX_Season_Tier",
+      "Position": "TopCenter",
+      "Animation": "SlideDown"
+    },
+    "BarnFindHint": {
+      "ID": "NOTIF_BARNFIND",
+      "Priority": "Medium",
+      "Duration": 8,
+      "Sound": "SFX_Mystery",
+      "Position": "TopCenter",
+      "Animation": "FadeIn"
+    },
+    "PoliceAlert": {
+      "ID": "NOTIF_POLICE",
+      "Priority": "Critical",
+      "Duration": 3,
+      "Sound": "SFX_Police_Siren",
+      "Position": "TopCenter",
+      "Animation": "Flash",
+      "Urgent": true
+    },
+    "MaintenanceWarning": {
+      "ID": "NOTIF_MAINTENANCE",
+      "Priority": "Low",
+      "Duration": 4,
+      "Sound": "SFX_Warning",
+      "Position": "TopRight",
+      "Animation": "SlideLeft"
+    },
+    "PhotoLiked": {
+      "ID": "NOTIF_PHOTO_LIKE",
+      "Priority": "Low",
+      "Duration": 3,
+      "Sound": "SFX_Like",
+      "Position": "BottomRight",
+      "Animation": "Pop",
+      "Stackable": true
+    },
+    "NewRecord": {
+      "ID": "NOTIF_RECORD",
+      "Priority": "High",
+      "Duration": 6,
+      "Sound": "SFX_New_Record",
+      "Position": "TopCenter",
+      "Animation": "Burst"
+    }
+  },
+
+  "InRaceNotifications": {
+    "PositionChange": {
+      "Up": { "Color": "#00FF00", "Sound": "SFX_Position_Up" },
+      "Down": { "Color": "#FF0000", "Sound": "SFX_Position_Down" }
+    },
+    "LapComplete": {
+      "Sound": "SFX_Lap_Complete",
+      "ShowTime": true,
+      "ShowDelta": true
+    },
+    "FinalLap": {
+      "Sound": "SFX_Final_Lap",
+      "VisualFlash": true
+    },
+    "Checkpoint": {
+      "Sound": "SFX_Checkpoint",
+      "ShowTimeBonus": true
+    },
+    "NearMiss": {
+      "Sound": "SFX_Near_Miss",
+      "ShowBonus": true,
+      "Position": "Center"
+    },
+    "DriftScore": {
+      "ShowRunningTotal": true,
+      "ShowMultiplier": true,
+      "Position": "TopRight"
+    },
+    "SpeedTrap": {
+      "Sound": "SFX_Speed_Trap",
+      "ShowSpeed": true,
+      "ShowRank": true
+    },
+    "Collision": {
+      "Sound": "SFX_Crash",
+      "ShowDamage": true
+    },
+    "Nitrous": {
+      "Ready": { "Sound": "SFX_Nitro_Ready", "Visual": true },
+      "Empty": { "Sound": "SFX_Nitro_Empty", "Visual": true }
+    }
+  },
+
+  "ToastMessages": {
+    "AutoSave": {
+      "Message": "Game saved",
+      "Duration": 2,
+      "Position": "BottomLeft"
+    },
+    "ScreenshotTaken": {
+      "Message": "Screenshot saved",
+      "Duration": 2,
+      "Position": "BottomLeft"
+    },
+    "ControllerConnected": {
+      "Message": "Controller connected",
+      "Duration": 3,
+      "Position": "BottomCenter"
+    },
+    "ControllerDisconnected": {
+      "Message": "Controller disconnected",
+      "Duration": 3,
+      "Position": "Center",
+      "Urgent": true
+    },
+    "NetworkError": {
+      "Message": "Connection lost",
+      "Duration": 5,
+      "Position": "TopCenter",
+      "Urgent": true
+    }
+  },
+
+  "NotificationSettings": {
+    "AllowDuringRace": {
+      "Achievement": false,
+      "LevelUp": false,
+      "CashEarned": true,
+      "PositionChange": true,
+      "PoliceAlert": true
+    },
+    "SoundEnabled": true,
+    "VibrationEnabled": true,
+    "ScreenFlashEnabled": true,
+    "FilterByPriority": {
+      "Enabled": true,
+      "MinPriority": "Low"
+    }
+  },
+
+  "NotificationHistory": {
+    "Enabled": true,
+    "MaxEntries": 100,
+    "Categories": ["Achievements", "Unlocks", "Social", "Rewards", "System"],
+    "Timestamps": true,
+    "MarkAsRead": true
+  },
+
+  "PushNotifications": {
+    "Enabled": true,
+    "Types": {
+      "DailyReward": true,
+      "FriendActivity": true,
+      "CrewEvents": true,
+      "LimitedTimeEvents": true,
+      "MaintenanceReminder": false
+    },
+    "QuietHours": {
+      "Enabled": true,
+      "Start": "22:00",
+      "End": "08:00"
+    }
+  }
+}

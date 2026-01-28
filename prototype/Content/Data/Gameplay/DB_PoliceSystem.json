@@ -1,0 +1,277 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Police and Pursuit System",
+
+  "PoliceSystem": {
+    "Enabled": true,
+    "ActiveInFreeRoam": true,
+    "ActiveInRaces": false,
+    "MaxHeatLevel": 5,
+    "BountySystem": true
+  },
+
+  "HeatLevels": {
+    "Level0": {
+      "Name": "Clean",
+      "Description": "No police attention",
+      "Units": 0,
+      "UnitTypes": [],
+      "Tactics": [],
+      "BountyMultiplier": 0
+    },
+    "Level1": {
+      "Name": "Noticed",
+      "Description": "Minor infraction detected",
+      "Units": 2,
+      "UnitTypes": ["Patrol"],
+      "Tactics": ["Follow", "LightPursuit"],
+      "BountyMultiplier": 1.0,
+      "TriggerSpeed": 80,
+      "DecayTime": 30
+    },
+    "Level2": {
+      "Name": "Wanted",
+      "Description": "Active pursuit initiated",
+      "Units": 4,
+      "UnitTypes": ["Patrol", "Interceptor"],
+      "Tactics": ["Pursue", "BoxIn", "RadioBackup"],
+      "BountyMultiplier": 1.5,
+      "DecayTime": 60,
+      "RoadblockChance": 0.1
+    },
+    "Level3": {
+      "Name": "Dangerous",
+      "Description": "Dangerous suspect",
+      "Units": 6,
+      "UnitTypes": ["Patrol", "Interceptor", "SUV"],
+      "Tactics": ["AggressivePursue", "BoxIn", "PIT", "Roadblock"],
+      "BountyMultiplier": 2.0,
+      "DecayTime": 120,
+      "RoadblockChance": 0.3,
+      "Helicopter": false
+    },
+    "Level4": {
+      "Name": "Felony",
+      "Description": "Felony pursuit",
+      "Units": 8,
+      "UnitTypes": ["Patrol", "Interceptor", "SUV", "Heavy"],
+      "Tactics": ["AllOut", "Ramming", "SpikeStrip", "Roadblock"],
+      "BountyMultiplier": 3.0,
+      "DecayTime": 180,
+      "RoadblockChance": 0.5,
+      "Helicopter": true
+    },
+    "Level5": {
+      "Name": "Most Wanted",
+      "Description": "Maximum response",
+      "Units": 12,
+      "UnitTypes": ["Interceptor", "SUV", "Heavy", "Rhino"],
+      "Tactics": ["AllOut", "Ramming", "SpikeStrip", "MultiRoadblock", "Helicopter"],
+      "BountyMultiplier": 5.0,
+      "DecayTime": 300,
+      "RoadblockChance": 0.8,
+      "Helicopter": true,
+      "CrossCounty": true
+    }
+  },
+
+  "PoliceVehicles": {
+    "Patrol": {
+      "ID": "POLICE_PATROL",
+      "Name": "Patrol Cruiser",
+      "TopSpeed": 140,
+      "Acceleration": "Medium",
+      "Durability": "Low",
+      "Aggression": 0.3,
+      "Skill": 0.4
+    },
+    "Interceptor": {
+      "ID": "POLICE_INTERCEPTOR",
+      "Name": "Police Interceptor",
+      "TopSpeed": 165,
+      "Acceleration": "High",
+      "Durability": "Medium",
+      "Aggression": 0.5,
+      "Skill": 0.6
+    },
+    "SUV": {
+      "ID": "POLICE_SUV",
+      "Name": "Police SUV",
+      "TopSpeed": 130,
+      "Acceleration": "Medium",
+      "Durability": "High",
+      "Aggression": 0.7,
+      "Skill": 0.5
+    },
+    "Heavy": {
+      "ID": "POLICE_HEAVY",
+      "Name": "Heavy Response",
+      "TopSpeed": 120,
+      "Acceleration": "Low",
+      "Durability": "Very High",
+      "Aggression": 0.9,
+      "Skill": 0.5
+    },
+    "Rhino": {
+      "ID": "POLICE_RHINO",
+      "Name": "Rhino Unit",
+      "TopSpeed": 100,
+      "Acceleration": "Very Low",
+      "Durability": "Extreme",
+      "Aggression": 1.0,
+      "Skill": 0.4,
+      "Purpose": "Roadblock"
+    },
+    "Helicopter": {
+      "ID": "POLICE_HELI",
+      "Name": "Police Helicopter",
+      "Speed": 180,
+      "TrackingRange": 500,
+      "Spotlight": true,
+      "CallsBackup": true
+    }
+  },
+
+  "Tactics": {
+    "Follow": {
+      "Description": "Keep visual on suspect",
+      "Aggression": 0.1,
+      "MaintainDistance": 50
+    },
+    "LightPursuit": {
+      "Description": "Chase without ramming",
+      "Aggression": 0.3,
+      "UseShortcuts": false
+    },
+    "Pursue": {
+      "Description": "Active chase",
+      "Aggression": 0.5,
+      "UseShortcuts": true
+    },
+    "AggressivePursue": {
+      "Description": "High-speed aggressive chase",
+      "Aggression": 0.7,
+      "UseShortcuts": true,
+      "AttemptPIT": true
+    },
+    "BoxIn": {
+      "Description": "Surround and slow target",
+      "RequiredUnits": 3,
+      "Formation": "Box"
+    },
+    "PIT": {
+      "Description": "Precision Immobilization Technique",
+      "MinHeatLevel": 3,
+      "SuccessChance": 0.4,
+      "DamageToPlayer": 15
+    },
+    "Ramming": {
+      "Description": "Direct contact to disable",
+      "MinHeatLevel": 4,
+      "DamageToPlayer": 20,
+      "DamageToPolice": 30
+    },
+    "Roadblock": {
+      "Description": "Setup ahead of suspect",
+      "SetupTime": 15,
+      "VehicleCount": { "Min": 2, "Max": 6 }
+    },
+    "SpikeStrip": {
+      "Description": "Deploy tire shredders",
+      "MinHeatLevel": 4,
+      "SetupTime": 10,
+      "EffectOnTires": "FlatInstant"
+    }
+  },
+
+  "EscapeMechanics": {
+    "LineOfSight": {
+      "BreakDuration": 8,
+      "CooldownStart": true
+    },
+    "Cooldown": {
+      "Level1": 30,
+      "Level2": 60,
+      "Level3": 90,
+      "Level4": 120,
+      "Level5": 180
+    },
+    "SafeZones": {
+      "Enabled": true,
+      "CooldownMultiplier": 2.0,
+      "Locations": "See DB_PointsOfInterest.json"
+    },
+    "Pursuit Breakers": {
+      "Enabled": true,
+      "Types": ["Donut Shop", "Gas Station", "Construction"],
+      "CooldownBonus": 5
+    }
+  },
+
+  "BountySystem": {
+    "Enabled": true,
+    "AccumulatesOverTime": true,
+    "DecaysOnEscape": false,
+    "Sources": {
+      "Speeding": 100,
+      "Collision": 250,
+      "PropertyDamage": 500,
+      "PoliceDamage": 1000,
+      "PoliceDisable": 2500,
+      "Evade": 5000
+    },
+    "Milestones": {
+      "10000": { "Title": "Petty Criminal", "REP": 100 },
+      "50000": { "Title": "Wanted", "REP": 500 },
+      "100000": { "Title": "Notorious", "REP": 1000 },
+      "500000": { "Title": "Public Enemy", "REP": 2500 },
+      "1000000": { "Title": "Most Wanted", "REP": 5000 }
+    }
+  },
+
+  "Consequences": {
+    "Busted": {
+      "CashFine": 0.1,
+      "MaxFine": 25000,
+      "BountyReset": true,
+      "VehicleImpound": false,
+      "RespawnLocation": "NearestGarage"
+    },
+    "Escape": {
+      "BountyKept": true,
+      "REPBonus": true,
+      "CashBonus": true
+    }
+  },
+
+  "HeatTriggers": {
+    "Speeding": { "Speed": 80, "HeatGain": 0.1 },
+    "HighSpeeding": { "Speed": 120, "HeatGain": 0.3 },
+    "Collision": { "HeatGain": 0.5 },
+    "PropertyDamage": { "HeatGain": 0.8 },
+    "WrongWay": { "HeatGain": 0.2 },
+    "NearMissPolice": { "HeatGain": 0.3 },
+    "HitPolice": { "HeatGain": 1.0 }
+  },
+
+  "DifficultyModifiers": {
+    "Easy": {
+      "PoliceSkill": 0.5,
+      "PoliceAggression": 0.5,
+      "CooldownMultiplier": 1.5,
+      "BountyMultiplier": 0.5
+    },
+    "Normal": {
+      "PoliceSkill": 1.0,
+      "PoliceAggression": 1.0,
+      "CooldownMultiplier": 1.0,
+      "BountyMultiplier": 1.0
+    },
+    "Hard": {
+      "PoliceSkill": 1.5,
+      "PoliceAggression": 1.5,
+      "CooldownMultiplier": 0.75,
+      "BountyMultiplier": 1.5
+    }
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Social Features and Community",
+
+  "SocialSystem": {
+    "Enabled": true,
+    "CrossPlatformPlay": true,
+    "CrossPlatformProgression": true,
+    "RequiresOnline": false
+  },
+
+  "FriendsSystem": {
+    "Enabled": true,
+    "MaxFriends": 500,
+    "Features": {
+      "AddFriend": true,
+      "RemoveFriend": true,
+      "BlockPlayer": true,
+      "MutePlayer": true
+    },
+    "PlatformIntegration": {
+      "Steam": true,
+      "PlayStation": true,
+      "Xbox": true,
+      "Epic": true
+    },
+    "InGameFriends": {
+      "Enabled": true,
+      "Separate": false
+    },
+    "FriendActivity": {
+      "ShowOnline": true,
+      "ShowInGame": true,
+      "ShowActivity": true,
+      "ShowVehicle": true
+    }
+  },
+
+  "Messaging": {
+    "Enabled": true,
+    "Types": {
+      "DirectMessage": {
+        "MaxLength": 500,
+        "MaxConversations": 50,
+        "History": 100
+      },
+      "QuickChat": {
+        "Enabled": true,
+        "InRace": true,
+        "Presets": [
+          "Nice race!",
+          "Good luck!",
+          "Well played!",
+          "Rematch?",
+          "GG",
+          "Let's cruise!",
+          "Follow me!",
+          "Wait up!"
+        ],
+        "CustomPresets": { "Enabled": true, "Max": 8 }
+      }
+    },
+    "VoiceChat": {
+      "Enabled": true,
+      "Channels": ["Party", "Crew", "Proximity"],
+      "ProximityRange": 100,
+      "MuteOptions": true,
+      "PushToTalk": { "Available": true, "Default": false }
+    },
+    "ContentFilter": {
+      "Enabled": true,
+      "ProfanityFilter": true,
+      "ReportSystem": true
+    }
+  },
+
+  "PartySystem": {
+    "Enabled": true,
+    "MaxSize": 8,
+    "Features": {
+      "InviteFriends": true,
+      "JoinFriends": true,
+      "PartyChat": true,
+      "PartyLeader": true
+    },
+    "Permissions": {
+      "LeaderCanKick": true,
+      "LeaderCanTransfer": true,
+      "MembersCanInvite": true
+    },
+    "Activities": {
+      "JoinRaceTogether": true,
+      "FreeroamTogether": true,
+      "PrivateSession": true
+    }
+  },
+
+  "RecentPlayers": {
+    "Enabled": true,
+    "MaxHistory": 50,
+    "ShowActivity": true,
+    "Actions": ["AddFriend", "SendMessage", "ViewProfile", "Block"]
+  },
+
+  "PlayerProfile": {
+    "Visibility": ["Public", "FriendsOnly", "Private"],
+    "DisplayInfo": {
+      "Username": true,
+      "Avatar": true,
+      "Level": true,
+      "REPTier": true,
+      "Crew": true,
+      "PlayTime": true,
+      "Badges": true,
+      "FeaturedVehicle": true
+    },
+    "Statistics": {
+      "RacesWon": true,
+      "TotalRaces": true,
+      "DriftScore": true,
+      "TopSpeed": true,
+      "PursuitEscapes": true,
+      "VehiclesOwned": true,
+      "Distance": true
+    },
+    "Customization": {
+      "Banner": true,
+      "Badge": true,
+      "Title": true,
+      "ShowcaseVehicle": true
+    }
+  },
+
+  "Gifting": {
+    "Enabled": true,
+    "GiftableItems": {
+      "Cash": { "Enabled": false },
+      "PremiumCurrency": { "Enabled": true },
+      "Cosmetics": { "Enabled": true },
+      "Vehicles": { "Enabled": false },
+      "SeasonPass": { "Enabled": true }
+    },
+    "Restrictions": {
+      "FriendshipDays": 7,
+      "DailyLimit": 5,
+      "ValueLimit": 5000
+    },
+    "Wrapping": {
+      "Enabled": true,
+      "Styles": ["Default", "Birthday", "Holiday", "Celebration"]
+    }
+  },
+
+  "ActivityFeed": {
+    "Enabled": true,
+    "Types": {
+      "FriendOnline": true,
+      "FriendAchievement": true,
+      "FriendPurchase": true,
+      "FriendRecord": true,
+      "CrewActivity": true
+    },
+    "MaxEntries": 50,
+    "Reactions": {
+      "Enabled": true,
+      "Types": ["Like", "Congrats", "Challenge"]
+    }
+  },
+
+  "Challenges": {
+    "FriendChallenges": {
+      "Enabled": true,
+      "Types": [
+        {
+          "ID": "CHALLENGE_RACE",
+          "Name": "Race Challenge",
+          "Description": "Challenge a friend to beat your time"
+        },
+        {
+          "ID": "CHALLENGE_DRIFT",
+          "Name": "Drift Challenge",
+          "Description": "Challenge a friend to beat your drift score"
+        },
+        {
+          "ID": "CHALLENGE_SPEED",
+          "Name": "Speed Challenge",
+          "Description": "Challenge a friend to beat your top speed"
+        }
+      ],
+      "Duration": 168,
+      "Stakes": {
+        "Enabled": true,
+        "MaxBet": 10000,
+        "Optional": true
+      }
+    },
+    "Rivals": {
+      "Enabled": true,
+      "MaxRivals": 10,
+      "AutoMatch": true,
+      "CompetitionAreas": ["LapTimes", "DriftScores", "SpeedTraps"]
+    }
+  },
+
+  "Spectating": {
+    "Enabled": true,
+    "WatchFriends": true,
+    "WatchLive": true,
+    "Cameras": ["Follow", "Free", "Cinematic", "TrackSide"],
+    "Commentary": {
+      "Enabled": true,
+      "VoiceEnabled": true
+    }
+  },
+
+  "Reporting": {
+    "Enabled": true,
+    "Categories": [
+      "Cheating",
+      "Harassment",
+      "Offensive Content",
+      "Griefing",
+      "Inappropriate Name"
+    ],
+    "EvidenceUpload": true,
+    "FeedbackProvided": true
+  },
+
+  "Privacy": {
+    "Settings": {
+      "ShowOnlineTo": ["Everyone", "Friends", "Nobody"],
+      "AllowJoinRequests": ["Everyone", "Friends", "Nobody"],
+      "AllowMessages": ["Everyone", "Friends", "Nobody"],
+      "ShowActivity": ["Everyone", "Friends", "Nobody"],
+      "ShowStatistics": ["Everyone", "Friends", "Nobody"]
+    },
+    "BlockedPlayers": {
+      "MaxBlocked": 200,
+      "HideCompletely": true
+    }
+  },
+
+  "Endorsements": {
+    "Enabled": true,
+    "Categories": ["GoodSport", "SkillfulDriver", "HelpfulPlayer", "CreativeDesigner"],
+    "MaxPerDay": 10,
+    "Rewards": {
+      "10": { "Title": "Appreciated" },
+      "50": { "Title": "Well Liked" },
+      "100": { "Title": "Community Favorite" }
+    }
+  }
+}

@@ -1,0 +1,500 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Achievements and Trophies",
+
+  "AchievementSystem": {
+    "Enabled": true,
+    "PlatformIntegration": ["Steam", "PlayStation", "Xbox"],
+    "TrackProgress": true,
+    "SecretAchievements": true
+  },
+
+  "Categories": {
+    "Story": {
+      "ID": "CAT_STORY",
+      "Name": "Story Progression",
+      "Icon": "ICO_Cat_Story",
+      "Achievements": [
+        {
+          "ID": "ACH_STORY_START",
+          "Name": "Fresh Meat",
+          "Description": "Complete the tutorial",
+          "Icon": "ICO_Ach_FreshMeat",
+          "Type": "Bronze",
+          "REP": 100,
+          "Cash": 1000
+        },
+        {
+          "ID": "ACH_STORY_CH1",
+          "Name": "Proving Ground",
+          "Description": "Complete Chapter 1",
+          "Icon": "ICO_Ach_Chapter1",
+          "Type": "Bronze",
+          "REP": 250,
+          "Cash": 5000
+        },
+        {
+          "ID": "ACH_STORY_CH2",
+          "Name": "Rising Star",
+          "Description": "Complete Chapter 2",
+          "Icon": "ICO_Ach_Chapter2",
+          "Type": "Silver",
+          "REP": 500,
+          "Cash": 10000
+        },
+        {
+          "ID": "ACH_STORY_CH3",
+          "Name": "Notorious",
+          "Description": "Complete Chapter 3",
+          "Icon": "ICO_Ach_Chapter3",
+          "Type": "Silver",
+          "REP": 750,
+          "Cash": 15000
+        },
+        {
+          "ID": "ACH_STORY_CH4",
+          "Name": "Untouchable",
+          "Description": "Complete Chapter 4",
+          "Icon": "ICO_Ach_Chapter4",
+          "Type": "Gold",
+          "REP": 1000,
+          "Cash": 25000
+        },
+        {
+          "ID": "ACH_STORY_CH5",
+          "Name": "Legend Born",
+          "Description": "Complete Chapter 5",
+          "Icon": "ICO_Ach_Chapter5",
+          "Type": "Gold",
+          "REP": 1500,
+          "Cash": 50000
+        },
+        {
+          "ID": "ACH_STORY_COMPLETE",
+          "Name": "Midnight Legend",
+          "Description": "Complete the main story",
+          "Icon": "ICO_Ach_Legend",
+          "Type": "Platinum",
+          "REP": 5000,
+          "Cash": 100000
+        }
+      ]
+    },
+    "Racing": {
+      "ID": "CAT_RACING",
+      "Name": "Racing",
+      "Icon": "ICO_Cat_Racing",
+      "Achievements": [
+        {
+          "ID": "ACH_RACE_FIRST",
+          "Name": "First Victory",
+          "Description": "Win your first race",
+          "Type": "Bronze",
+          "REP": 100
+        },
+        {
+          "ID": "ACH_RACE_10",
+          "Name": "Getting Started",
+          "Description": "Win 10 races",
+          "Type": "Bronze",
+          "REP": 250,
+          "Progress": { "Current": 0, "Target": 10 }
+        },
+        {
+          "ID": "ACH_RACE_50",
+          "Name": "Consistent Winner",
+          "Description": "Win 50 races",
+          "Type": "Silver",
+          "REP": 500,
+          "Progress": { "Current": 0, "Target": 50 }
+        },
+        {
+          "ID": "ACH_RACE_100",
+          "Name": "Race Master",
+          "Description": "Win 100 races",
+          "Type": "Gold",
+          "REP": 1000,
+          "Progress": { "Current": 0, "Target": 100 }
+        },
+        {
+          "ID": "ACH_RACE_PERFECT",
+          "Name": "Perfect Race",
+          "Description": "Win a race without hitting anything",
+          "Type": "Silver",
+          "REP": 500
+        },
+        {
+          "ID": "ACH_RACE_COMEBACK",
+          "Name": "Comeback King",
+          "Description": "Win from last place",
+          "Type": "Silver",
+          "REP": 500
+        },
+        {
+          "ID": "ACH_RACE_DOMINATE",
+          "Name": "Total Domination",
+          "Description": "Win by more than 10 seconds",
+          "Type": "Gold",
+          "REP": 750
+        },
+        {
+          "ID": "ACH_RACE_PHOTO_FINISH",
+          "Name": "Photo Finish",
+          "Description": "Win by less than 0.1 seconds",
+          "Type": "Gold",
+          "REP": 1000
+        }
+      ]
+    },
+    "Drifting": {
+      "ID": "CAT_DRIFT",
+      "Name": "Drifting",
+      "Icon": "ICO_Cat_Drift",
+      "Achievements": [
+        {
+          "ID": "ACH_DRIFT_FIRST",
+          "Name": "Sideways",
+          "Description": "Complete your first drift",
+          "Type": "Bronze",
+          "REP": 100
+        },
+        {
+          "ID": "ACH_DRIFT_SCORE_50K",
+          "Name": "Slide Artist",
+          "Description": "Score 50,000 points in a single drift",
+          "Type": "Silver",
+          "REP": 500
+        },
+        {
+          "ID": "ACH_DRIFT_SCORE_100K",
+          "Name": "Drift Pro",
+          "Description": "Score 100,000 points in a single drift",
+          "Type": "Gold",
+          "REP": 1000
+        },
+        {
+          "ID": "ACH_DRIFT_CHAIN_5",
+          "Name": "Chain Reaction",
+          "Description": "Chain 5 drifts together",
+          "Type": "Silver",
+          "REP": 400
+        },
+        {
+          "ID": "ACH_DRIFT_CHAIN_10",
+          "Name": "Endless Slide",
+          "Description": "Chain 10 drifts together",
+          "Type": "Gold",
+          "REP": 800
+        },
+        {
+          "ID": "ACH_DRIFT_TANDEM_WIN",
+          "Name": "Tandem Terror",
+          "Description": "Win a tandem drift battle",
+          "Type": "Silver",
+          "REP": 500
+        },
+        {
+          "ID": "ACH_DRIFT_KING",
+          "Name": "Drift King",
+          "Description": "Reach maximum drift REP tier",
+          "Type": "Platinum",
+          "REP": 2500
+        }
+      ]
+    },
+    "Pursuit": {
+      "ID": "CAT_PURSUIT",
+      "Name": "Pursuit",
+      "Icon": "ICO_Cat_Pursuit",
+      "Achievements": [
+        {
+          "ID": "ACH_PURSUIT_ESCAPE",
+          "Name": "Clean Getaway",
+          "Description": "Escape your first pursuit",
+          "Type": "Bronze",
+          "REP": 150
+        },
+        {
+          "ID": "ACH_PURSUIT_HEAT_3",
+          "Name": "Troublemaker",
+          "Description": "Escape at Heat Level 3",
+          "Type": "Silver",
+          "REP": 400
+        },
+        {
+          "ID": "ACH_PURSUIT_HEAT_5",
+          "Name": "Most Wanted",
+          "Description": "Escape at Heat Level 5",
+          "Type": "Gold",
+          "REP": 1000
+        },
+        {
+          "ID": "ACH_PURSUIT_SURVIVE_10",
+          "Name": "Slippery",
+          "Description": "Survive a 10-minute pursuit",
+          "Type": "Gold",
+          "REP": 800
+        },
+        {
+          "ID": "ACH_PURSUIT_TAKEDOWN_5",
+          "Name": "Road Rage",
+          "Description": "Take down 5 cop cars in one pursuit",
+          "Type": "Silver",
+          "REP": 500
+        },
+        {
+          "ID": "ACH_PURSUIT_BOUNTY_100K",
+          "Name": "High Value Target",
+          "Description": "Accumulate 100,000 bounty",
+          "Type": "Gold",
+          "REP": 1500,
+          "Progress": { "Current": 0, "Target": 100000 }
+        }
+      ]
+    },
+    "Vehicles": {
+      "ID": "CAT_VEHICLES",
+      "Name": "Collector",
+      "Icon": "ICO_Cat_Vehicles",
+      "Achievements": [
+        {
+          "ID": "ACH_VEH_FIRST",
+          "Name": "First Ride",
+          "Description": "Purchase your first vehicle",
+          "Type": "Bronze",
+          "REP": 100
+        },
+        {
+          "ID": "ACH_VEH_5",
+          "Name": "Small Collection",
+          "Description": "Own 5 vehicles",
+          "Type": "Bronze",
+          "REP": 250
+        },
+        {
+          "ID": "ACH_VEH_15",
+          "Name": "Growing Stable",
+          "Description": "Own 15 vehicles",
+          "Type": "Silver",
+          "REP": 500
+        },
+        {
+          "ID": "ACH_VEH_30",
+          "Name": "Serious Collector",
+          "Description": "Own 30 vehicles",
+          "Type": "Gold",
+          "REP": 1000
+        },
+        {
+          "ID": "ACH_VEH_ALL_JDM",
+          "Name": "JDM Complete",
+          "Description": "Own all JDM vehicles",
+          "Type": "Platinum",
+          "REP": 2000
+        },
+        {
+          "ID": "ACH_VEH_ALL_MUSCLE",
+          "Name": "American Thunder",
+          "Description": "Own all Muscle vehicles",
+          "Type": "Platinum",
+          "REP": 2000
+        },
+        {
+          "ID": "ACH_VEH_BARNFIND",
+          "Name": "Barn Hunter",
+          "Description": "Find your first barn find",
+          "Type": "Silver",
+          "REP": 500
+        },
+        {
+          "ID": "ACH_VEH_ALL_BARNFIND",
+          "Name": "Archaeologist",
+          "Description": "Find all barn finds",
+          "Type": "Platinum",
+          "REP": 3000
+        }
+      ]
+    },
+    "Customization": {
+      "ID": "CAT_CUSTOM",
+      "Name": "Customization",
+      "Icon": "ICO_Cat_Custom",
+      "Achievements": [
+        {
+          "ID": "ACH_CUSTOM_FIRST",
+          "Name": "Personal Touch",
+          "Description": "Customize a vehicle for the first time",
+          "Type": "Bronze",
+          "REP": 100
+        },
+        {
+          "ID": "ACH_CUSTOM_MAX",
+          "Name": "Fully Loaded",
+          "Description": "Max out all upgrades on a vehicle",
+          "Type": "Gold",
+          "REP": 1000
+        },
+        {
+          "ID": "ACH_CUSTOM_LIVERY",
+          "Name": "Artist",
+          "Description": "Create and save a custom livery",
+          "Type": "Bronze",
+          "REP": 150
+        },
+        {
+          "ID": "ACH_CUSTOM_SHARE",
+          "Name": "Sharing is Caring",
+          "Description": "Share a livery with the community",
+          "Type": "Silver",
+          "REP": 300
+        },
+        {
+          "ID": "ACH_CUSTOM_POPULAR",
+          "Name": "Popular Designer",
+          "Description": "Have a livery downloaded 100 times",
+          "Type": "Gold",
+          "REP": 1000
+        }
+      ]
+    },
+    "Speed": {
+      "ID": "CAT_SPEED",
+      "Name": "Speed",
+      "Icon": "ICO_Cat_Speed",
+      "Achievements": [
+        {
+          "ID": "ACH_SPEED_150",
+          "Name": "Speed Demon",
+          "Description": "Reach 150 MPH",
+          "Type": "Bronze",
+          "REP": 200
+        },
+        {
+          "ID": "ACH_SPEED_200",
+          "Name": "Breakneck",
+          "Description": "Reach 200 MPH",
+          "Type": "Silver",
+          "REP": 500
+        },
+        {
+          "ID": "ACH_SPEED_250",
+          "Name": "Terminal Velocity",
+          "Description": "Reach 250 MPH",
+          "Type": "Gold",
+          "REP": 1000
+        },
+        {
+          "ID": "ACH_SPEED_NEAR_MISS",
+          "Name": "Thread the Needle",
+          "Description": "Near miss at over 150 MPH",
+          "Type": "Silver",
+          "REP": 400
+        },
+        {
+          "ID": "ACH_SPEED_DISTANCE",
+          "Name": "Road Warrior",
+          "Description": "Drive 1000 miles total",
+          "Type": "Gold",
+          "REP": 1000,
+          "Progress": { "Current": 0, "Target": 1609344 }
+        }
+      ]
+    },
+    "Social": {
+      "ID": "CAT_SOCIAL",
+      "Name": "Social",
+      "Icon": "ICO_Cat_Social",
+      "Achievements": [
+        {
+          "ID": "ACH_SOCIAL_CREW_JOIN",
+          "Name": "Crew Member",
+          "Description": "Join a crew",
+          "Type": "Bronze",
+          "REP": 100
+        },
+        {
+          "ID": "ACH_SOCIAL_CREW_CREATE",
+          "Name": "Crew Leader",
+          "Description": "Create a crew",
+          "Type": "Silver",
+          "REP": 300
+        },
+        {
+          "ID": "ACH_SOCIAL_MULTIPLAYER",
+          "Name": "Social Racer",
+          "Description": "Complete 10 multiplayer races",
+          "Type": "Bronze",
+          "REP": 200
+        },
+        {
+          "ID": "ACH_SOCIAL_MEET",
+          "Name": "Meet and Greet",
+          "Description": "Attend a car meet",
+          "Type": "Bronze",
+          "REP": 150
+        },
+        {
+          "ID": "ACH_SOCIAL_PHOTO",
+          "Name": "Shutterbug",
+          "Description": "Take 50 photos",
+          "Type": "Silver",
+          "REP": 300,
+          "Progress": { "Current": 0, "Target": 50 }
+        }
+      ]
+    },
+    "Secret": {
+      "ID": "CAT_SECRET",
+      "Name": "Secret",
+      "Icon": "ICO_Cat_Secret",
+      "Achievements": [
+        {
+          "ID": "ACH_SECRET_DONUT",
+          "Name": "Donut Master",
+          "Description": "Do 10 consecutive donuts",
+          "Type": "Silver",
+          "REP": 500,
+          "Hidden": true
+        },
+        {
+          "ID": "ACH_SECRET_STUNT",
+          "Name": "Stuntman",
+          "Description": "Land a 500ft jump",
+          "Type": "Gold",
+          "REP": 1000,
+          "Hidden": true
+        },
+        {
+          "ID": "ACH_SECRET_REVERSE",
+          "Name": "Wrong Way",
+          "Description": "Complete a lap in reverse",
+          "Type": "Gold",
+          "REP": 1500,
+          "Hidden": true
+        },
+        {
+          "ID": "ACH_SECRET_MIDNIGHT",
+          "Name": "True Midnight",
+          "Description": "Win a race at exactly midnight",
+          "Type": "Silver",
+          "REP": 500,
+          "Hidden": true
+        }
+      ]
+    }
+  },
+
+  "Rewards": {
+    "Types": ["REP", "Cash", "Vehicle", "Part", "Cosmetic", "Title"],
+    "BonusForPlatinum": {
+      "REP": 5000,
+      "ExclusiveTitle": "Platinum Collector"
+    }
+  },
+
+  "Tracking": {
+    "RealTimeProgress": true,
+    "Notifications": true,
+    "SyncWithPlatform": true
+  }
+}

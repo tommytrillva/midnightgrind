@@ -1,0 +1,270 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Crew System and Management",
+
+  "CrewSystem": {
+    "Enabled": true,
+    "MaxCrewSize": 50,
+    "CreateRequirement": "LEVEL_10",
+    "JoinRequirement": "LEVEL_5"
+  },
+
+  "CrewCreation": {
+    "NameRules": {
+      "MinLength": 3,
+      "MaxLength": 20,
+      "AllowedCharacters": "AlphanumericAndSpaces",
+      "FilterProfanity": true
+    },
+    "Tag": {
+      "MinLength": 2,
+      "MaxLength": 5,
+      "AllowedCharacters": "Alphanumeric"
+    },
+    "Emblem": {
+      "Layers": 10,
+      "Shapes": ["Geometric", "Icons", "Letters", "Custom"],
+      "Colors": "Any"
+    },
+    "CreationCost": 25000
+  },
+
+  "CrewRanks": {
+    "Ranks": [
+      {
+        "ID": "RANK_LEADER",
+        "Name": "Leader",
+        "Permissions": ["All"],
+        "MaxPerCrew": 1
+      },
+      {
+        "ID": "RANK_OFFICER",
+        "Name": "Lieutenant",
+        "Permissions": ["Invite", "Kick", "Promote", "Events", "Bank"],
+        "MaxPerCrew": 5
+      },
+      {
+        "ID": "RANK_VETERAN",
+        "Name": "Veteran",
+        "Permissions": ["Invite", "Events"],
+        "RequiredDays": 30
+      },
+      {
+        "ID": "RANK_MEMBER",
+        "Name": "Member",
+        "Permissions": ["Participate"],
+        "RequiredDays": 7
+      },
+      {
+        "ID": "RANK_PROSPECT",
+        "Name": "Prospect",
+        "Permissions": ["Limited"],
+        "Default": true
+      }
+    ],
+    "CustomRanks": {
+      "Enabled": true,
+      "MaxCustomRanks": 3
+    }
+  },
+
+  "CrewProgression": {
+    "Levels": {
+      "Max": 50,
+      "XPPerLevel": 10000,
+      "Multiplier": 1.1
+    },
+    "XPSources": {
+      "RaceWin": 100,
+      "RaceParticipation": 25,
+      "DriftScore": 0.001,
+      "CrewChallenge": 500,
+      "DailyActive": 50,
+      "Milestone": 1000
+    },
+    "LevelRewards": {
+      "5": { "Unlock": "CrewGarage", "Cash": 50000 },
+      "10": { "Unlock": "CrewLivery", "Cash": 100000 },
+      "15": { "Unlock": "CrewHQ", "Cash": 150000 },
+      "20": { "Unlock": "CrewVehicle", "Cash": 200000 },
+      "25": { "Unlock": "CrewWars", "Cash": 250000 },
+      "30": { "Unlock": "CrewBanner", "Cash": 300000 },
+      "40": { "Unlock": "CrewExclusive", "Cash": 400000 },
+      "50": { "Unlock": "LegendStatus", "Cash": 1000000 }
+    }
+  },
+
+  "CrewBank": {
+    "Enabled": true,
+    "MaxBalance": 50000000,
+    "Contributions": {
+      "PercentageOfEarnings": 0.05,
+      "ManualDonation": true,
+      "MinDonation": 1000
+    },
+    "Withdrawals": {
+      "LeaderOnly": false,
+      "RequiredRank": "RANK_OFFICER",
+      "MaxWithdrawalPercent": 0.1,
+      "CooldownHours": 24
+    },
+    "Usage": {
+      "EventPrizes": true,
+      "GarageUpgrades": true,
+      "MemberBonuses": true
+    }
+  },
+
+  "CrewChallenges": {
+    "Daily": {
+      "Count": 3,
+      "RefreshTime": "00:00",
+      "Types": ["RaceWins", "DriftScore", "Distance", "NearMisses", "Takedowns"]
+    },
+    "Weekly": {
+      "Count": 1,
+      "RefreshDay": "Monday",
+      "Types": ["CumulativeRaces", "TotalDistance", "CollectiveScore"]
+    },
+    "Milestones": {
+      "TotalRaces": [100, 500, 1000, 5000, 10000],
+      "TotalDistance": [1000, 5000, 10000, 50000, 100000],
+      "TotalWins": [50, 250, 500, 2500, 5000]
+    }
+  },
+
+  "CrewWars": {
+    "Enabled": true,
+    "UnlockLevel": 25,
+    "Duration": 168,
+    "MatchmakingFactors": ["CrewLevel", "MemberCount", "WinRate"],
+    "Scoring": {
+      "RaceWin": 10,
+      "DriftZone": 5,
+      "Takedown": 3,
+      "Pursuit": 15
+    },
+    "Rewards": {
+      "Winner": { "CashMultiplier": 2.0, "XPBonus": 5000, "Trophy": true },
+      "Loser": { "CashMultiplier": 0.5, "XPBonus": 1000 }
+    },
+    "Seasons": {
+      "Duration": 28,
+      "Leaderboard": true,
+      "TopRewards": true
+    }
+  },
+
+  "CrewGarage": {
+    "Enabled": true,
+    "UnlockLevel": 5,
+    "SharedVehicles": {
+      "Enabled": true,
+      "MaxSlots": 5,
+      "UsageCooldown": 3600
+    },
+    "Customization": {
+      "Themes": ["Industrial", "Japanese", "American", "Euro", "Neon"],
+      "Decorations": true,
+      "Trophies": true
+    },
+    "Upgrades": {
+      "Capacity": [5, 10, 15, 20],
+      "Perks": ["DiscountRepairs", "FastDelivery", "BonusXP"]
+    }
+  },
+
+  "CrewHQ": {
+    "Enabled": true,
+    "UnlockLevel": 15,
+    "Location": "Purchasable",
+    "Features": {
+      "MeetingSpace": true,
+      "ShowroomFloor": true,
+      "TrophyRoom": true,
+      "MemberBoard": true,
+      "EventPlanning": true
+    },
+    "Locations": [
+      { "ID": "HQ_WAREHOUSE", "Name": "Industrial Warehouse", "Price": 500000 },
+      { "ID": "HQ_PENTHOUSE", "Name": "Downtown Penthouse", "Price": 1000000 },
+      { "ID": "HQ_GARAGE", "Name": "Multi-Level Garage", "Price": 750000 },
+      { "ID": "HQ_HANGAR", "Name": "Airport Hangar", "Price": 1500000 }
+    ]
+  },
+
+  "CrewEvents": {
+    "Types": [
+      {
+        "ID": "EVENT_CREW_RACE",
+        "Name": "Crew Race Night",
+        "MinParticipants": 4,
+        "MaxParticipants": 16,
+        "Duration": 120
+      },
+      {
+        "ID": "EVENT_CREW_CRUISE",
+        "Name": "Crew Cruise",
+        "MinParticipants": 2,
+        "MaxParticipants": 30,
+        "Duration": 60
+      },
+      {
+        "ID": "EVENT_CREW_DRIFT",
+        "Name": "Drift Comp",
+        "MinParticipants": 4,
+        "MaxParticipants": 12,
+        "Duration": 90
+      },
+      {
+        "ID": "EVENT_CREW_PHOTO",
+        "Name": "Photo Meet",
+        "MinParticipants": 2,
+        "MaxParticipants": 20,
+        "Duration": 60
+      }
+    ],
+    "Scheduling": {
+      "MaxScheduled": 5,
+      "AdvanceNotice": 168,
+      "Reminders": true
+    }
+  },
+
+  "CrewPerks": {
+    "Passive": [
+      { "Level": 1, "Perk": "REP_BONUS_5", "Description": "+5% REP when racing with crew" },
+      { "Level": 5, "Perk": "CASH_BONUS_5", "Description": "+5% Cash when racing with crew" },
+      { "Level": 10, "Perk": "XP_BONUS_10", "Description": "+10% XP in crew events" },
+      { "Level": 15, "Perk": "REPAIR_DISCOUNT", "Description": "10% repair discount" },
+      { "Level": 20, "Perk": "NITRO_BOOST", "Description": "Extended nitro in crew races" },
+      { "Level": 30, "Perk": "EXCLUSIVE_ACCESS", "Description": "Crew-only vehicles" }
+    ]
+  },
+
+  "CrewSearch": {
+    "Filters": {
+      "ByRegion": true,
+      "ByLevel": true,
+      "BySize": true,
+      "ByPlayStyle": ["Casual", "Competitive", "Mixed"],
+      "ByFocus": ["Racing", "Drifting", "Cruising", "Pursuit"]
+    },
+    "Visibility": ["Public", "Invite Only", "Private"]
+  },
+
+  "CrewManagement": {
+    "InactivityPolicy": {
+      "AutoKickDays": 30,
+      "Configurable": true
+    },
+    "Applications": {
+      "Enabled": true,
+      "Questions": { "Max": 3, "Optional": true }
+    },
+    "Announcements": {
+      "MaxPinned": 3,
+      "History": 20
+    }
+  }
+}

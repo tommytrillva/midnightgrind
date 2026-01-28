@@ -1,0 +1,202 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Live Events and Calendar System",
+
+  "EventCalendarSystem": {
+    "Enabled": true,
+    "TimezoneHandling": "UTC",
+    "LocalTimeDisplay": true,
+    "NotifyUpcoming": true
+  },
+
+  "EventTypes": {
+    "WeeklyChallenge": {
+      "ID": "EVENT_WEEKLY",
+      "Name": "Weekly Challenge",
+      "Duration": 168,
+      "ResetDay": "Monday",
+      "ResetTime": "00:00",
+      "Rewards": {
+        "Tier1": { "REP": 500, "Cash": 5000 },
+        "Tier2": { "REP": 1000, "Cash": 15000 },
+        "Tier3": { "REP": 2500, "Cash": 50000 }
+      }
+    },
+    "Weekend Event": {
+      "ID": "EVENT_WEEKEND",
+      "Name": "Weekend Event",
+      "StartDay": "Friday",
+      "StartTime": "18:00",
+      "EndDay": "Sunday",
+      "EndTime": "23:59",
+      "BonusMultiplier": 2.0
+    },
+    "DoubleRewards": {
+      "ID": "EVENT_DOUBLE",
+      "Name": "Double Rewards",
+      "Frequency": "Monthly",
+      "Duration": 72,
+      "Affects": ["Cash", "REP", "XP"]
+    },
+    "LimitedTimeMode": {
+      "ID": "EVENT_LTM",
+      "Name": "Limited Time Mode",
+      "Duration": 168,
+      "ExclusiveRewards": true
+    },
+    "SeasonalEvent": {
+      "ID": "EVENT_SEASONAL",
+      "Name": "Seasonal Event",
+      "Duration": 336,
+      "UniqueContent": true,
+      "ExclusiveRewards": true
+    },
+    "CommunityChallenge": {
+      "ID": "EVENT_COMMUNITY",
+      "Name": "Community Challenge",
+      "Duration": 168,
+      "CollectiveGoals": true,
+      "MilestoneRewards": true
+    }
+  },
+
+  "RecurringEvents": {
+    "Monday": [
+      { "Event": "WeeklyReset", "Time": "00:00" },
+      { "Event": "ContractRefresh", "Time": "00:00" }
+    ],
+    "Tuesday": [
+      { "Event": "TuesdayTimeTrials", "Time": "12:00", "Duration": 24 }
+    ],
+    "Wednesday": [
+      { "Event": "WednesdayWheelSpin", "Time": "12:00", "BonusSpins": 1 }
+    ],
+    "Thursday": [
+      { "Event": "ThrowbackThursday", "Time": "12:00", "Duration": 24, "ClassicCarsBonus": true }
+    ],
+    "Friday": [
+      { "Event": "WeekendKickoff", "Time": "18:00" },
+      { "Event": "FridayNightRacing", "Time": "20:00", "Duration": 6, "BonusREP": 1.5 }
+    ],
+    "Saturday": [
+      { "Event": "SaturdayShowdown", "Time": "14:00", "Duration": 8, "Tournament": true }
+    ],
+    "Sunday": [
+      { "Event": "SundayCruise", "Time": "16:00", "Duration": 4, "CruiseEvent": true }
+    ]
+  },
+
+  "SeasonalThemes": {
+    "Spring": {
+      "Months": [3, 4, 5],
+      "Theme": "CherryBlossom",
+      "ExclusiveItems": ["STICKER_SAKURA", "PAINT_BLOSSOM_PINK"],
+      "Weather": "MorningMist"
+    },
+    "Summer": {
+      "Months": [6, 7, 8],
+      "Theme": "BeachVibes",
+      "ExclusiveItems": ["STICKER_PALM", "PAINT_SUNSET_ORANGE"],
+      "Events": ["SummerShowdown"]
+    },
+    "Fall": {
+      "Months": [9, 10, 11],
+      "Theme": "AutumnDrive",
+      "ExclusiveItems": ["STICKER_LEAVES", "PAINT_AUTUMN_RED"],
+      "Weather": "FallingLeaves"
+    },
+    "Winter": {
+      "Months": [12, 1, 2],
+      "Theme": "WinterNights",
+      "ExclusiveItems": ["STICKER_SNOW", "PAINT_ICE_BLUE"],
+      "Events": ["HolidayEvent"]
+    }
+  },
+
+  "SpecialEvents": {
+    "Anniversary": {
+      "Date": "10-15",
+      "Duration": 168,
+      "Rewards": ["ExclusiveVehicle", "AnniversaryStickers", "BonusCash"],
+      "BonusMultiplier": 3.0
+    },
+    "Halloween": {
+      "StartDate": "10-25",
+      "EndDate": "11-01",
+      "Theme": "Spooky",
+      "ExclusiveContent": true,
+      "SpecialRaces": ["HauntedHighway", "MidnightTerror"]
+    },
+    "Christmas": {
+      "StartDate": "12-20",
+      "EndDate": "01-02",
+      "Theme": "Holiday",
+      "DailyGifts": true,
+      "ExclusiveContent": true
+    },
+    "NewYear": {
+      "Date": "01-01",
+      "Duration": 24,
+      "BonusMultiplier": 5.0,
+      "FireworksEnabled": true
+    },
+    "Valentine": {
+      "StartDate": "02-12",
+      "EndDate": "02-15",
+      "Theme": "Love",
+      "ExclusiveContent": true,
+      "CouplesChallenges": true
+    }
+  },
+
+  "CommunityGoals": {
+    "Enabled": true,
+    "Types": {
+      "CollectiveDistance": {
+        "Target": 10000000,
+        "Unit": "Miles",
+        "Milestones": [0.25, 0.5, 0.75, 1.0],
+        "MilestoneRewards": ["Cash", "REP", "Cosmetic", "Vehicle"]
+      },
+      "CollectiveRaces": {
+        "Target": 1000000,
+        "Milestones": [0.25, 0.5, 0.75, 1.0]
+      },
+      "CollectiveDriftScore": {
+        "Target": 1000000000,
+        "Milestones": [0.25, 0.5, 0.75, 1.0]
+      }
+    },
+    "Display": {
+      "GlobalProgress": true,
+      "IndividualContribution": true,
+      "Leaderboard": true
+    }
+  },
+
+  "LiveServices": {
+    "ContentDrops": {
+      "Frequency": "Monthly",
+      "Includes": ["NewVehicles", "NewParts", "NewEvents", "NewChallenges"]
+    },
+    "SeasonUpdates": {
+      "Frequency": "Quarterly",
+      "MajorContent": true,
+      "NewFeatures": true
+    }
+  },
+
+  "Notifications": {
+    "EventStart": { "Advance": 3600, "InGame": true, "Push": true },
+    "EventEnd": { "Advance": 3600, "InGame": true, "Push": false },
+    "RewardAvailable": { "InGame": true, "Push": true },
+    "MilestoneReached": { "InGame": true, "Push": true }
+  },
+
+  "Calendar UI": {
+    "ViewModes": ["Daily", "Weekly", "Monthly"],
+    "FilterByType": true,
+    "Reminders": true,
+    "ExportToCalendar": false
+  }
+}
