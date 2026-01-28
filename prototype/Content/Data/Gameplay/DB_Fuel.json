@@ -1,0 +1,262 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Fuel System and Consumption Management",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "ConsumptionSystem": true,
+    "FuelStrategy": true,
+    "AffectsWeight": true,
+    "RefuelingRequired": { "ForEndurance": true }
+  },
+
+  "FuelTypes": {
+    "Regular": {
+      "ID": "FUEL_REGULAR",
+      "Octane": 87,
+      "PowerModifier": 0.95,
+      "Cost": { "PerLiter": 1.5 },
+      "Available": true
+    },
+    "Premium": {
+      "ID": "FUEL_PREMIUM",
+      "Octane": 93,
+      "PowerModifier": 1.0,
+      "Cost": { "PerLiter": 2.0 },
+      "Default": true
+    },
+    "Racing": {
+      "ID": "FUEL_RACING",
+      "Octane": 100,
+      "PowerModifier": 1.05,
+      "Cost": { "PerLiter": 5.0 },
+      "ForPerformance": true
+    },
+    "E85": {
+      "ID": "FUEL_E85",
+      "Octane": 105,
+      "PowerModifier": 1.08,
+      "ConsumptionIncrease": 30,
+      "Cost": { "PerLiter": 2.5 },
+      "RequiresTune": true
+    },
+    "Diesel": {
+      "ID": "FUEL_DIESEL",
+      "PowerModifier": 0.9,
+      "TorqueModifier": 1.1,
+      "Efficiency": 1.3,
+      "Cost": { "PerLiter": 1.8 },
+      "ForDieselOnly": true
+    }
+  },
+
+  "FuelConsumption": {
+    "BaseConsumption": {
+      "PerKm": { "Liters": 0.15 },
+      "Idle": { "LitersPerMinute": 0.02 }
+    },
+    "Factors": {
+      "Throttle": {
+        "Full": { "Multiplier": 2.0 },
+        "Half": { "Multiplier": 1.0 },
+        "Light": { "Multiplier": 0.5 }
+      },
+      "RPM": {
+        "Redline": { "Multiplier": 1.5 },
+        "MidRange": { "Multiplier": 1.0 },
+        "LowRPM": { "Multiplier": 0.7 }
+      },
+      "Speed": {
+        "HighSpeed": { "AeroIncrease": true },
+        "LowSpeed": { "Minimal": true }
+      },
+      "Weight": {
+        "FullTank": { "Increase": 10 },
+        "EmptyTank": { "Decrease": 5 }
+      }
+    },
+    "Modes": {
+      "Eco": {
+        "Multiplier": 0.7,
+        "PowerReduction": 10
+      },
+      "Normal": {
+        "Multiplier": 1.0,
+        "Default": true
+      },
+      "Performance": {
+        "Multiplier": 1.3,
+        "PowerIncrease": 5
+      }
+    }
+  },
+
+  "FuelTank": {
+    "Capacity": {
+      "Small": { "Liters": 40, "ForCompact": true },
+      "Medium": { "Liters": 60, "Standard": true },
+      "Large": { "Liters": 80, "ForMuscleSupercar": true },
+      "Racing": { "Liters": 100, "ForEndurance": true }
+    },
+    "Upgrades": {
+      "Enabled": true,
+      "Sizes": ["+10L", "+20L", "+40L"],
+      "WeightPenalty": true
+    },
+    "StartingFuel": {
+      "FreeRoam": { "Percentage": 50 },
+      "Race": { "Configurable": true },
+      "Endurance": { "Strategy": true }
+    }
+  },
+
+  "WeightEffect": {
+    "FuelWeight": {
+      "PerLiter": { "Kg": 0.75 }
+    },
+    "PerformanceImpact": {
+      "Acceleration": { "AffectedBy": "TotalWeight" },
+      "Handling": { "AffectedBy": "WeightDistribution" },
+      "Braking": { "AffectedBy": "TotalWeight" }
+    },
+    "Strategy": {
+      "LightFuel": { "Faster": true, "RiskRunningOut": true },
+      "HeavyFuel": { "Slower": true, "LongerRange": true }
+    }
+  },
+
+  "Refueling": {
+    "Locations": {
+      "GasStation": {
+        "InFreeRoam": true,
+        "Cost": "FuelTypeCost",
+        "Time": "Instant"
+      },
+      "Garage": {
+        "Free": true,
+        "Unlimited": true
+      },
+      "PitLane": {
+        "InRace": true,
+        "Rate": { "LitersPerSecond": 10 },
+        "Strategy": true
+      }
+    },
+    "Process": {
+      "Animation": true,
+      "Nozzle": true,
+      "Counter": true
+    },
+    "Options": {
+      "FillUp": true,
+      "AddAmount": true,
+      "Splash": { "QuickAdd": 20 }
+    }
+  },
+
+  "FuelStrategy": {
+    "PreRace": {
+      "StartingFuel": { "Selectable": true },
+      "PitStopPlanning": true,
+      "FuelCalculator": true
+    },
+    "DuringRace": {
+      "FuelRemaining": { "Display": true },
+      "LapsRemaining": { "Estimate": true },
+      "PitWindowAlert": true
+    },
+    "Tactics": {
+      "UnderFuel": { "Risk": "RunningOut", "Benefit": "Speed" },
+      "OverFuel": { "Risk": "Slow", "Benefit": "Flexibility" },
+      "FuelSaving": { "LiftAndCoast": true, "EcoMode": true }
+    }
+  },
+
+  "EmptyTank": {
+    "Warning": {
+      "At25Percent": { "Indicator": true },
+      "At10Percent": { "Alarm": true },
+      "At5Percent": { "Critical": true }
+    },
+    "Effects": {
+      "Sputtering": { "At": 2 },
+      "PowerLoss": { "At": 1 },
+      "StallOut": { "At": 0 }
+    },
+    "Recovery": {
+      "WalkToStation": { "FreeRoam": true },
+      "DNF": { "InRace": true },
+      "CallRecovery": { "Cost": 500 }
+    }
+  },
+
+  "FuelGauge": {
+    "Display": {
+      "Analog": { "Needle": true },
+      "Digital": { "Percentage": true },
+      "Both": { "Default": true }
+    },
+    "Information": {
+      "CurrentLevel": true,
+      "LitersRemaining": true,
+      "RangeEstimate": { "Km": true },
+      "LapsRemaining": { "InRace": true }
+    },
+    "Warnings": {
+      "LowFuel": { "Light": true },
+      "Critical": { "Flashing": true }
+    }
+  },
+
+  "GameModes": {
+    "FreeRoam": {
+      "Enabled": true,
+      "Configurable": true,
+      "RefuelAtStations": true
+    },
+    "Race": {
+      "Enabled": { "Depends": true },
+      "Sprint": { "Usually": false },
+      "Long": { "Usually": true }
+    },
+    "Endurance": {
+      "Enabled": true,
+      "Mandatory": true,
+      "PitStops": true
+    },
+    "Casual": {
+      "Enabled": false,
+      "Optional": true
+    }
+  },
+
+  "Efficiency": {
+    "Tracking": {
+      "MPG": { "Display": true },
+      "LPer100Km": { "Display": true },
+      "Average": { "OverTime": true }
+    },
+    "EcoDriving": {
+      "Tips": true,
+      "Score": true,
+      "Rewards": { "ForEfficiency": true }
+    }
+  },
+
+  "UI": {
+    "FuelGauge": {
+      "Position": "Dashboard",
+      "Style": { "Options": ["Minimal", "Detailed", "Racing"] }
+    },
+    "RefuelMenu": {
+      "FuelTypeSelect": true,
+      "AmountSlider": true,
+      "CostDisplay": true
+    },
+    "StrategyDisplay": {
+      "FuelMap": true,
+      "ConsumptionRate": true,
+      "PitRecommendation": true
+    }
+  }
+}

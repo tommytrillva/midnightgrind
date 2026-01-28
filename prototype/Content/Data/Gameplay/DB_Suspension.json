@@ -1,0 +1,307 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Suspension System and Tuning Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "TuningAvailable": true,
+    "DynamicSuspension": true,
+    "AffectsHandling": true,
+    "VisualChanges": true
+  },
+
+  "SuspensionTypes": {
+    "Stock": {
+      "ID": "SUSP_STOCK",
+      "Description": "Factory suspension",
+      "Adjustability": "None",
+      "Performance": 1.0,
+      "Comfort": 1.0,
+      "Default": true
+    },
+    "Sport": {
+      "ID": "SUSP_SPORT",
+      "Description": "Stiffer springs, better control",
+      "Adjustability": "Basic",
+      "Performance": 1.2,
+      "Comfort": 0.8,
+      "LowerRideHeight": 20
+    },
+    "Race": {
+      "ID": "SUSP_RACE",
+      "Description": "Track-focused setup",
+      "Adjustability": "Full",
+      "Performance": 1.4,
+      "Comfort": 0.5,
+      "LowerRideHeight": 40
+    },
+    "Coilover": {
+      "ID": "SUSP_COILOVER",
+      "Description": "Adjustable coilovers",
+      "Adjustability": "Full",
+      "Performance": 1.5,
+      "Comfort": 0.6,
+      "HeightAdjust": { "Range": 50 }
+    },
+    "Air": {
+      "ID": "SUSP_AIR",
+      "Description": "Air suspension",
+      "Adjustability": "Dynamic",
+      "Performance": 1.2,
+      "Comfort": 0.9,
+      "HeightAdjust": { "Range": 100, "OnTheFly": true }
+    },
+    "Drift": {
+      "ID": "SUSP_DRIFT",
+      "Description": "Drift-optimized",
+      "Adjustability": "Full",
+      "Performance": 1.3,
+      "RearFlexibility": 1.5,
+      "AngleKit": true
+    },
+    "Offroad": {
+      "ID": "SUSP_OFFROAD",
+      "Description": "High travel suspension",
+      "Adjustability": "Basic",
+      "Performance": 0.9,
+      "Travel": 2.0,
+      "LiftHeight": 50
+    }
+  },
+
+  "TuningParameters": {
+    "RideHeight": {
+      "ID": "TUNE_HEIGHT",
+      "Range": { "Min": -50, "Max": 50 },
+      "Effects": {
+        "Lower": { "Handling": "Better", "Aero": "Improved", "Clearance": "Reduced" },
+        "Higher": { "Handling": "Worse", "Clearance": "Improved" }
+      },
+      "Unit": "mm"
+    },
+    "SpringRate": {
+      "ID": "TUNE_SPRINGS",
+      "Range": { "Min": -10, "Max": 10 },
+      "Effects": {
+        "Stiffer": { "Response": "Faster", "Grip": "Transfer Quicker" },
+        "Softer": { "Comfort": "Better", "Grip": "More Mechanical" }
+      },
+      "FrontRear": true
+    },
+    "DamperCompression": {
+      "ID": "TUNE_COMPRESSION",
+      "Range": { "Min": -10, "Max": 10 },
+      "Effects": {
+        "Stiffer": { "Control": "Better", "Bump": "Harsher" },
+        "Softer": { "Comfort": "Better", "Wallowing": "More" }
+      },
+      "FrontRear": true
+    },
+    "DamperRebound": {
+      "ID": "TUNE_REBOUND",
+      "Range": { "Min": -10, "Max": 10 },
+      "Effects": {
+        "Faster": { "Recovery": "Quick", "Bouncing": "Risk" },
+        "Slower": { "Stable": "More", "Sluggish": "Risk" }
+      },
+      "FrontRear": true
+    },
+    "AntiRollBar": {
+      "ID": "TUNE_ARB",
+      "Range": { "Min": -10, "Max": 10 },
+      "Effects": {
+        "Stiffer": { "BodyRoll": "Less", "Transfer": "Faster" },
+        "Softer": { "Grip": "More", "BodyRoll": "More" }
+      },
+      "FrontRear": true
+    },
+    "Camber": {
+      "ID": "TUNE_CAMBER",
+      "Range": { "Min": -5, "Max": 0 },
+      "Effects": {
+        "MoreNegative": { "Cornering": "Better", "Straight": "Worse" },
+        "LessNegative": { "Cornering": "Worse", "Straight": "Better" }
+      },
+      "FrontRear": true,
+      "Unit": "degrees"
+    },
+    "Toe": {
+      "ID": "TUNE_TOE",
+      "Range": { "Min": -2, "Max": 2 },
+      "Effects": {
+        "ToeIn": { "Stability": "More", "TurnIn": "Slower" },
+        "ToeOut": { "TurnIn": "Faster", "Stability": "Less" }
+      },
+      "FrontRear": true,
+      "Unit": "degrees"
+    },
+    "Caster": {
+      "ID": "TUNE_CASTER",
+      "Range": { "Min": 3, "Max": 8 },
+      "Effects": {
+        "More": { "Stability": "Better", "Steering": "Heavier" },
+        "Less": { "Stability": "Worse", "Steering": "Lighter" }
+      },
+      "Unit": "degrees"
+    }
+  },
+
+  "PresetTunes": {
+    "Comfort": {
+      "RideHeight": 0,
+      "Springs": -5,
+      "Dampers": -5,
+      "ARB": -5,
+      "Description": "Smooth ride for cruising"
+    },
+    "Balanced": {
+      "RideHeight": 0,
+      "Springs": 0,
+      "Dampers": 0,
+      "ARB": 0,
+      "Description": "All-around setup",
+      "Default": true
+    },
+    "Sport": {
+      "RideHeight": -20,
+      "Springs": 3,
+      "Dampers": 3,
+      "ARB": 3,
+      "Description": "Spirited driving"
+    },
+    "Track": {
+      "RideHeight": -40,
+      "Springs": 7,
+      "Dampers": 7,
+      "ARB": 7,
+      "Description": "Track day ready"
+    },
+    "Drift": {
+      "RideHeight": -20,
+      "SpringsFront": 5,
+      "SpringsRear": -3,
+      "Description": "Oversteer-biased for drifting"
+    }
+  },
+
+  "DynamicSuspension": {
+    "Adaptive": {
+      "Enabled": { "ForAirSuspension": true },
+      "Modes": {
+        "Comfort": { "SofterAll": true },
+        "Normal": { "Balanced": true },
+        "Sport": { "StifferAll": true },
+        "Track": { "StiffestAll": true }
+      }
+    },
+    "HeightAdjust": {
+      "OnTheFly": { "ForAirSuspension": true },
+      "Presets": {
+        "Parked": { "Height": "Lowest", "ShowOff": true },
+        "Driving": { "Height": "Normal", "Auto": true },
+        "Offroad": { "Height": "Raised", "Clearance": true }
+      }
+    },
+    "SpeedSensitive": {
+      "Enabled": true,
+      "LowerAtSpeed": true,
+      "StifferAtSpeed": true
+    }
+  },
+
+  "VisualEffects": {
+    "StanceChange": {
+      "Visible": true,
+      "RideHeightShows": true,
+      "CamberVisible": true
+    },
+    "Compression": {
+      "OnBump": true,
+      "OnBraking": true,
+      "OnAcceleration": true
+    },
+    "BodyRoll": {
+      "InCorners": true,
+      "Amount": { "AffectedByARB": true }
+    },
+    "WheelTravel": {
+      "Visible": true,
+      "OffRoad": { "Extended": true }
+    }
+  },
+
+  "HandlingEffects": {
+    "RideHeight": {
+      "CenterOfGravity": true,
+      "Aerodynamics": true,
+      "Scraping": { "IfTooLow": true }
+    },
+    "SpringRate": {
+      "WeightTransfer": true,
+      "TireLoad": true,
+      "MechanicalGrip": true
+    },
+    "Damping": {
+      "ControlResponse": true,
+      "BumpAbsorption": true,
+      "StabilityOverBumps": true
+    },
+    "Alignment": {
+      "TireWear": true,
+      "CorneringGrip": true,
+      "StraightLineStability": true
+    }
+  },
+
+  "SurfaceResponse": {
+    "Smooth": {
+      "StifferBetter": true,
+      "LowerBetter": true
+    },
+    "Bumpy": {
+      "SofterBetter": true,
+      "MoreTravelBetter": true
+    },
+    "Curbs": {
+      "DamageRisk": { "IfTooLow": true },
+      "Unsettling": { "IfTooStiff": true }
+    },
+    "Offroad": {
+      "HigherRequired": true,
+      "SofterBetter": true,
+      "TravelRequired": true
+    }
+  },
+
+  "Upgrades": {
+    "Levels": {
+      "Level1": { "Sport": true, "Cost": 5000 },
+      "Level2": { "Coilover": true, "Cost": 15000 },
+      "Level3": { "Race": true, "Cost": 30000 },
+      "Level4": { "ProRace": true, "Cost": 50000 }
+    },
+    "Special": {
+      "AirSuspension": { "Cost": 25000 },
+      "DriftKit": { "Cost": 20000 },
+      "OffroadLift": { "Cost": 15000 }
+    }
+  },
+
+  "UI": {
+    "TuningMenu": {
+      "Sliders": true,
+      "Presets": true,
+      "LivePreview": true,
+      "SaveSetup": true
+    },
+    "Visualization": {
+      "SuspensionDiagram": true,
+      "HeightIndicator": true,
+      "AlignmentDisplay": true
+    },
+    "QuickAdjust": {
+      "HeightButtons": { "ForAir": true },
+      "ModeSwitch": { "ForAdaptive": true }
+    }
+  }
+}

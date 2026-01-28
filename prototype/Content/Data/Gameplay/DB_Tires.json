@@ -1,0 +1,260 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Tire System, Compounds, and Temperature Management",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "TireWear": true,
+    "TireTemperature": true,
+    "TireCompounds": true,
+    "Punctures": true
+  },
+
+  "TireCompounds": {
+    "Soft": {
+      "ID": "TIRE_SOFT",
+      "Color": "#FF0000",
+      "Grip": 1.15,
+      "WearRate": 1.5,
+      "OptimalTemp": { "Min": 85, "Max": 100 },
+      "WarmupTime": "Fast",
+      "BestFor": ["Qualifying", "ShortRaces", "Sprint"]
+    },
+    "Medium": {
+      "ID": "TIRE_MEDIUM",
+      "Color": "#FFFF00",
+      "Grip": 1.0,
+      "WearRate": 1.0,
+      "OptimalTemp": { "Min": 80, "Max": 105 },
+      "WarmupTime": "Medium",
+      "BestFor": ["StandardRaces", "Balanced"],
+      "Default": true
+    },
+    "Hard": {
+      "ID": "TIRE_HARD",
+      "Color": "#FFFFFF",
+      "Grip": 0.9,
+      "WearRate": 0.6,
+      "OptimalTemp": { "Min": 90, "Max": 115 },
+      "WarmupTime": "Slow",
+      "BestFor": ["Endurance", "LongRaces", "Hot"]
+    },
+    "Wet": {
+      "ID": "TIRE_WET",
+      "Color": "#00FF00",
+      "Grip": { "Wet": 1.1, "Dry": 0.6 },
+      "WearRate": 1.2,
+      "OptimalTemp": { "Min": 60, "Max": 80 },
+      "WarmupTime": "Medium",
+      "BestFor": ["HeavyRain", "Standing Water"]
+    },
+    "Intermediate": {
+      "ID": "TIRE_INTER",
+      "Color": "#00AA00",
+      "Grip": { "Wet": 0.9, "Dry": 0.85 },
+      "WearRate": 1.0,
+      "OptimalTemp": { "Min": 70, "Max": 90 },
+      "WarmupTime": "Medium",
+      "BestFor": ["LightRain", "DryingTrack"]
+    },
+    "Drift": {
+      "ID": "TIRE_DRIFT",
+      "Color": "#FF00FF",
+      "Grip": 0.7,
+      "SlideGrip": 1.2,
+      "WearRate": 2.0,
+      "SmokeProduction": "High",
+      "BestFor": ["Drifting", "Burnouts"]
+    },
+    "Street": {
+      "ID": "TIRE_STREET",
+      "Color": "#888888",
+      "Grip": 0.85,
+      "WearRate": 0.4,
+      "AllWeather": true,
+      "BestFor": ["FreeRoam", "Casual"]
+    }
+  },
+
+  "TireTemperature": {
+    "Ranges": {
+      "Cold": { "Max": 60, "GripPenalty": 20, "Color": "#0088FF" },
+      "CoolOptimal": { "Range": [60, 80], "GripPenalty": 5, "Color": "#00FFFF" },
+      "Optimal": { "Range": [80, 100], "GripBonus": 0, "Color": "#00FF00" },
+      "WarmOptimal": { "Range": [100, 110], "GripPenalty": 5, "Color": "#FFFF00" },
+      "Hot": { "Range": [110, 130], "GripPenalty": 15, "Color": "#FF8800" },
+      "Overheating": { "Min": 130, "GripPenalty": 30, "Color": "#FF0000", "WearIncrease": 50 }
+    },
+    "Factors": {
+      "AmbientTemp": { "Affects": true },
+      "TrackTemp": { "Affects": true },
+      "DrivingStyle": { "Aggressive": "Hotter", "Smooth": "Cooler" },
+      "Speed": { "Higher": "Hotter" },
+      "Braking": { "Hard": "Hotter" }
+    },
+    "Zones": {
+      "Inner": true,
+      "Middle": true,
+      "Outer": true,
+      "BalanceAffects": "Handling"
+    }
+  },
+
+  "TireWear": {
+    "WearModel": {
+      "Distance": { "Factor": 0.1 },
+      "Aggression": { "Factor": 0.3 },
+      "Temperature": { "Factor": 0.2 },
+      "Surface": { "Factor": 0.1 },
+      "Weight": { "Factor": 0.1 }
+    },
+    "WearStages": {
+      "New": { "Range": [100, 80], "Performance": 100 },
+      "Good": { "Range": [80, 60], "Performance": 98 },
+      "Worn": { "Range": [60, 40], "Performance": 92 },
+      "Critical": { "Range": [40, 20], "Performance": 80 },
+      "Dangerous": { "Range": [20, 0], "Performance": 60, "PunctureRisk": true }
+    },
+    "VisualWear": {
+      "NewTexture": { "At": 100 },
+      "WornTexture": { "At": 50 },
+      "BaldTexture": { "At": 20 }
+    }
+  },
+
+  "TirePressure": {
+    "Enabled": true,
+    "Range": {
+      "Low": { "PSI": 25, "Effect": "MoreGrip", "WearIncrease": 20 },
+      "Optimal": { "PSI": 32, "Effect": "Balanced" },
+      "High": { "PSI": 38, "Effect": "LessGrip", "WearDecrease": 15 }
+    },
+    "Adjustment": {
+      "InGarage": true,
+      "InPit": true,
+      "Range": { "Min": 20, "Max": 45 }
+    },
+    "Dynamic": {
+      "TemperatureAffects": true,
+      "IncreasesWithHeat": true
+    }
+  },
+
+  "Punctures": {
+    "Enabled": true,
+    "Causes": {
+      "Debris": { "Chance": 0.001 },
+      "Collision": { "Chance": 0.01 },
+      "Curbs": { "Chance": 0.005 },
+      "WornTire": { "ChanceMultiplier": 5 }
+    },
+    "Types": {
+      "SlowPuncture": {
+        "PressureLoss": { "PerSecond": 0.5 },
+        "Continuable": true
+      },
+      "FastPuncture": {
+        "PressureLoss": { "PerSecond": 5 },
+        "LimitedDistance": true
+      },
+      "Blowout": {
+        "Immediate": true,
+        "VehicleControl": "Difficult",
+        "MustPit": true
+      }
+    },
+    "Effects": {
+      "Handling": { "Affected": true },
+      "Speed": { "Reduced": true },
+      "Damage": { "IfDriven": true }
+    }
+  },
+
+  "TireSmoke": {
+    "Enabled": true,
+    "Triggers": {
+      "Burnout": { "Intensity": "High" },
+      "Drift": { "Intensity": "Medium" },
+      "HardBraking": { "Intensity": "Low" },
+      "Launch": { "Intensity": "Medium" }
+    },
+    "Color": {
+      "Standard": "#CCCCCC",
+      "Colored": { "Available": true, "Customizable": true }
+    },
+    "Quality": {
+      "Low": { "Particles": 50 },
+      "Medium": { "Particles": 100 },
+      "High": { "Particles": 200 },
+      "Ultra": { "Particles": 400 }
+    }
+  },
+
+  "TireStrategy": {
+    "ForRaces": {
+      "MandatoryChange": { "Optional": true },
+      "CompoundChoice": true,
+      "PitStop": true
+    },
+    "Planning": {
+      "PreRace": true,
+      "DuringRace": true,
+      "AIAssist": true
+    },
+    "Factors": {
+      "RaceLength": true,
+      "Weather": true,
+      "TrackType": true,
+      "CompetitorStrategy": true
+    }
+  },
+
+  "TireMarks": {
+    "Enabled": true,
+    "Persistence": { "Seconds": 300 },
+    "Types": {
+      "Braking": { "Intensity": "Low" },
+      "Drift": { "Intensity": "High" },
+      "Burnout": { "Intensity": "VeryHigh" }
+    },
+    "Quality": {
+      "Affects": "Performance",
+      "Options": ["Low", "Medium", "High"]
+    }
+  },
+
+  "Customization": {
+    "TireLettering": {
+      "Enabled": true,
+      "Brands": 10,
+      "CustomText": false
+    },
+    "TireColor": {
+      "WallColor": { "Available": true },
+      "Options": ["Black", "White", "Red", "Blue"]
+    },
+    "SmokeColor": {
+      "Available": true,
+      "Colors": 20,
+      "Unlock": { "Method": "Purchase" }
+    }
+  },
+
+  "UI": {
+    "TireDisplay": {
+      "Temperature": { "PerTire": true },
+      "Wear": { "PerTire": true },
+      "Pressure": { "PerTire": true }
+    },
+    "Indicators": {
+      "OverheatingWarning": true,
+      "WearWarning": true,
+      "PunctureWarning": true
+    },
+    "Strategy": {
+      "CompoundSelector": true,
+      "WearPrediction": true,
+      "PitWindow": true
+    }
+  }
+}
