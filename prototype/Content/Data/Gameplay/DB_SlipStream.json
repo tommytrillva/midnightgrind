@@ -1,0 +1,251 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Slipstream and Drafting Physics System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "Physics": "Realistic",
+    "Configurable": true,
+    "AffectsAllVehicles": true
+  },
+
+  "SlipstreamMechanics": {
+    "DraftZone": {
+      "Length": { "Meters": 50, "MaxMeters": 100 },
+      "Width": { "Meters": 4 },
+      "Shape": "Cone",
+      "FallOff": "Gradual"
+    },
+    "SpeedBoost": {
+      "MaxBoost": { "Percentage": 8 },
+      "BuildUp": { "Seconds": 2 },
+      "Decay": { "Seconds": 1 }
+    },
+    "EffectiveRange": {
+      "Optimal": { "Meters": [10, 30] },
+      "Reduced": { "Meters": [30, 50] },
+      "Minimal": { "Meters": [50, 100] }
+    }
+  },
+
+  "DraftingTypes": {
+    "Standard": {
+      "ID": "DRAFT_STANDARD",
+      "Description": "Normal slipstream effect",
+      "SpeedBoost": 5,
+      "DragReduction": 15,
+      "Default": true
+    },
+    "Enhanced": {
+      "ID": "DRAFT_ENHANCED",
+      "Description": "Stronger arcade-style effect",
+      "SpeedBoost": 10,
+      "DragReduction": 25,
+      "ForArcade": true
+    },
+    "Realistic": {
+      "ID": "DRAFT_REALISTIC",
+      "Description": "True-to-life drafting",
+      "SpeedBoost": 3,
+      "DragReduction": 10,
+      "TemperatureEffect": true,
+      "ForSimulation": true
+    }
+  },
+
+  "VehicleFactors": {
+    "LeadVehicle": {
+      "DraftCreation": {
+        "Size": { "Matters": true },
+        "Speed": { "Matters": true },
+        "Aerodynamics": { "Matters": true }
+      },
+      "Disadvantage": {
+        "IncreasedDrag": { "When": "Followed", "Amount": 2 },
+        "TemperatureIncrease": { "Optional": true }
+      }
+    },
+    "FollowingVehicle": {
+      "Benefit": {
+        "DragReduction": true,
+        "SpeedBoost": true,
+        "FuelSaving": { "Percentage": 3 }
+      },
+      "Drawback": {
+        "ReducedCooling": true,
+        "TurbulenceInCorners": true
+      }
+    }
+  },
+
+  "ChainSlipstream": {
+    "Enabled": true,
+    "MultipleVehicles": {
+      "MaxChain": 5,
+      "DiminishingReturns": true,
+      "PackRacing": true
+    },
+    "BonusScaling": {
+      "SecondCar": { "Percentage": 100 },
+      "ThirdCar": { "Percentage": 80 },
+      "FourthCar": { "Percentage": 60 },
+      "FifthCar": { "Percentage": 40 }
+    }
+  },
+
+  "SlipstreamIndicator": {
+    "Visual": {
+      "Enabled": true,
+      "Type": "AirStream",
+      "Color": { "Default": "#00AAFF", "Strong": "#00FF00" },
+      "Animation": true
+    },
+    "HUD": {
+      "Enabled": true,
+      "Position": "BehindSpeedometer",
+      "ShowPercentage": true,
+      "FillMeter": true
+    },
+    "Audio": {
+      "Enabled": true,
+      "WindSound": true,
+      "IntensityBased": true
+    }
+  },
+
+  "PhysicsDetails": {
+    "AerodynamicDrag": {
+      "BaseReduction": { "Percentage": 15 },
+      "VelocityDependent": true,
+      "AngleDependent": true
+    },
+    "Turbulence": {
+      "Enabled": true,
+      "InCorners": true,
+      "Effect": "ReducedGrip",
+      "Intensity": "Low"
+    },
+    "DirtyAir": {
+      "Enabled": true,
+      "CloseBehind": { "Effect": "Reduced Downforce" },
+      "Range": { "Meters": 5 },
+      "Amount": { "Percentage": -5 }
+    },
+    "ThermalEffect": {
+      "Enabled": { "Simulation": true },
+      "EngineCooling": { "Reduced": true },
+      "TireTemperature": { "Increased": true }
+    }
+  },
+
+  "SlingshortEffect": {
+    "Enabled": true,
+    "Mechanics": {
+      "BuildUpTime": { "Seconds": 3 },
+      "MaxCharge": { "Percentage": 12 },
+      "ReleaseBoost": { "Duration": 2 }
+    },
+    "Activation": {
+      "PullOutToSide": true,
+      "TimingWindow": { "Seconds": 1 }
+    },
+    "Indicator": {
+      "ChargeLevel": true,
+      "OptimalTiming": true
+    }
+  },
+
+  "EnvironmentalFactors": {
+    "Wind": {
+      "Affects": true,
+      "Headwind": { "ReducesEffect": true },
+      "Tailwind": { "EnhancesEffect": true },
+      "Crosswind": { "OffsetsDraft": true }
+    },
+    "Altitude": {
+      "Affects": true,
+      "HighAltitude": { "ReducedEffect": true },
+      "LowAltitude": { "NormalEffect": true }
+    },
+    "Weather": {
+      "Rain": { "ReducedEffect": 20 },
+      "Fog": { "NoChange": true }
+    }
+  },
+
+  "VehicleClassEffects": {
+    "SuperCar": {
+      "DraftCreation": "Large",
+      "DraftBenefit": "High",
+      "AeroSensitive": true
+    },
+    "Muscle": {
+      "DraftCreation": "Large",
+      "DraftBenefit": "Medium",
+      "LessAeroSensitive": true
+    },
+    "JDM": {
+      "DraftCreation": "Medium",
+      "DraftBenefit": "Medium",
+      "Balanced": true
+    },
+    "Compact": {
+      "DraftCreation": "Small",
+      "DraftBenefit": "High",
+      "Nimble": true
+    }
+  },
+
+  "GameModes": {
+    "Standard": {
+      "Effect": "Normal",
+      "Configurable": true
+    },
+    "Draft": {
+      "Effect": "Enhanced",
+      "DraftCentric": true
+    },
+    "Simulation": {
+      "Effect": "Realistic",
+      "AllFactors": true
+    },
+    "Arcade": {
+      "Effect": "Strong",
+      "Simplified": true
+    }
+  },
+
+  "Settings": {
+    "Strength": {
+      "Options": ["Off", "Low", "Medium", "High", "Extreme"],
+      "Default": "Medium"
+    },
+    "Realism": {
+      "Options": ["Arcade", "Balanced", "Simulation"],
+      "Default": "Balanced"
+    },
+    "Indicators": {
+      "Visual": { "Default": true },
+      "Audio": { "Default": true },
+      "HUD": { "Default": true }
+    }
+  },
+
+  "UI": {
+    "DraftMeter": {
+      "Position": "BottomCenter",
+      "Style": ["Bar", "Circle", "Minimal"],
+      "ShowPercentage": true
+    },
+    "SlingshotIndicator": {
+      "Enabled": true,
+      "Position": "NearDraftMeter",
+      "ChargeAnimation": true
+    },
+    "Settings": {
+      "SliderControl": true,
+      "PresetButtons": true,
+      "Advanced": true
+    }
+  }
+}

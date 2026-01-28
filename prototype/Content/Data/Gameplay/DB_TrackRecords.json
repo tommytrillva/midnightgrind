@@ -1,0 +1,253 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Track Records and Leaderboard System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "RecordTypes": ["LapTime", "SectorTime", "TopSpeed", "DriftScore"],
+    "Verification": true,
+    "LeaderboardIntegration": true
+  },
+
+  "RecordCategories": {
+    "LapRecords": {
+      "ID": "RECORD_LAP",
+      "Description": "Fastest lap times",
+      "Categories": {
+        "Overall": { "AnyVehicle": true, "AnyCondition": true },
+        "ByClass": { "PerVehicleClass": true },
+        "ByVehicle": { "PerSpecificVehicle": true },
+        "ByCondition": { "Weather": true, "TimeOfDay": true }
+      },
+      "Precision": { "Milliseconds": true }
+    },
+    "SectorRecords": {
+      "ID": "RECORD_SECTOR",
+      "Description": "Fastest sector times",
+      "PerSector": true,
+      "TheoreticalBest": { "Calculate": true },
+      "Precision": { "Milliseconds": true }
+    },
+    "SpeedRecords": {
+      "ID": "RECORD_SPEED",
+      "Description": "Top speed achievements",
+      "Categories": {
+        "TopSpeed": { "OnTrack": true },
+        "SpeedTrap": { "AtLocation": true },
+        "AverageSpeed": { "PerLap": true }
+      },
+      "Precision": { "KMH": 1 }
+    },
+    "DriftRecords": {
+      "ID": "RECORD_DRIFT",
+      "Description": "Drift scoring records",
+      "Categories": {
+        "SingleDrift": { "HighScore": true },
+        "LapScore": { "TotalPoints": true },
+        "MaxAngle": { "Degrees": true },
+        "LongestDrift": { "Meters": true }
+      }
+    }
+  },
+
+  "RecordScopes": {
+    "Personal": {
+      "ID": "SCOPE_PERSONAL",
+      "Description": "Player's own records",
+      "Storage": "Local",
+      "History": { "Keep": 100 },
+      "Improvement": { "Track": true }
+    },
+    "Friends": {
+      "ID": "SCOPE_FRIENDS",
+      "Description": "Friends list records",
+      "Display": true,
+      "Challenge": true,
+      "Notification": { "WhenBroken": true }
+    },
+    "Crew": {
+      "ID": "SCOPE_CREW",
+      "Description": "Crew member records",
+      "Contribution": true,
+      "CrewBests": { "Aggregate": true }
+    },
+    "Regional": {
+      "ID": "SCOPE_REGIONAL",
+      "Description": "Region-based records",
+      "Regions": ["NA", "EU", "Asia", "OCE", "SA"],
+      "Filters": true
+    },
+    "Global": {
+      "ID": "SCOPE_GLOBAL",
+      "Description": "Worldwide records",
+      "AllPlayers": true,
+      "Verified": { "Top100": true }
+    }
+  },
+
+  "LeaderboardDisplay": {
+    "Views": {
+      "Top100": { "Default": true },
+      "AroundPlayer": { "Positions": 5 },
+      "Friends": { "FriendsOnly": true },
+      "Crew": { "CrewOnly": true }
+    },
+    "Information": {
+      "Position": true,
+      "PlayerName": true,
+      "Time": true,
+      "Vehicle": true,
+      "Date": true,
+      "Platform": { "Optional": true }
+    },
+    "Filters": {
+      "TimeFrame": ["AllTime", "ThisMonth", "ThisWeek", "Today"],
+      "VehicleClass": true,
+      "Platform": { "CrossPlay": true },
+      "Input": { "Controller": true, "Keyboard": true, "Wheel": true }
+    }
+  },
+
+  "Verification": {
+    "AntiCheat": {
+      "Enabled": true,
+      "ServerValidation": true,
+      "ReplayRequired": { "Top100": true },
+      "ManualReview": { "Top10": true }
+    },
+    "Validation": {
+      "TimePlausibility": true,
+      "SpeedChecks": true,
+      "TrackBoundaries": true,
+      "CutDetection": true
+    },
+    "Flags": {
+      "Verified": { "Badge": true },
+      "Pending": { "UnderReview": true },
+      "Rejected": { "Hidden": true }
+    }
+  },
+
+  "RecordConditions": {
+    "ValidConditions": {
+      "CleanLap": { "Required": true, "NoCuts": true },
+      "NoCollision": { "Optional": true, "Bonus": true },
+      "ControlsLegal": { "NoExploits": true }
+    },
+    "TrackConditions": {
+      "Weather": { "Tracked": true, "SeparateBoards": true },
+      "TimeOfDay": { "Tracked": true, "SeparateBoards": true },
+      "Traffic": { "MustBeOff": true }
+    },
+    "VehicleConditions": {
+      "Tuning": { "Tracked": true, "Categories": ["Stock", "Modified"] },
+      "Class": { "Tracked": true },
+      "Assists": { "Tracked": true, "SeparateCategory": true }
+    }
+  },
+
+  "GhostData": {
+    "Storage": {
+      "PersonalBest": { "Auto": true },
+      "Top10": { "Download": true },
+      "Friends": { "Download": true }
+    },
+    "Quality": {
+      "DataPoints": ["Position", "Speed", "Steering", "Throttle", "Brake"],
+      "Frequency": { "Hz": 60 }
+    },
+    "Sharing": {
+      "Upload": { "Optional": true },
+      "Download": true,
+      "Challenge": true
+    }
+  },
+
+  "Notifications": {
+    "PersonalRecords": {
+      "NewPB": { "Celebrate": true, "Sound": true },
+      "Improvement": { "ShowDelta": true }
+    },
+    "Leaderboard": {
+      "ClimbedRank": { "Notify": true },
+      "Top100": { "SpecialNotify": true },
+      "WorldRecord": { "Announcement": true }
+    },
+    "Friends": {
+      "FriendBeatYou": { "Notify": true },
+      "YouTiedFriend": { "Notify": true }
+    }
+  },
+
+  "Rewards": {
+    "PersonalBest": {
+      "FirstTime": { "REP": 100 },
+      "Improvement": { "REP": 50 }
+    },
+    "Leaderboard": {
+      "Top100": { "REP": 500, "Badge": "Top100" },
+      "Top10": { "REP": 2500, "Badge": "Top10", "Title": true },
+      "WorldRecord": { "REP": 10000, "Badge": "WorldRecord", "Title": true }
+    },
+    "Milestones": {
+      "AllTracksPB": { "REP": 5000 },
+      "AllTracksTop100": { "REP": 50000, "Vehicle": true }
+    }
+  },
+
+  "RecordHistory": {
+    "Personal": {
+      "AllAttempts": { "Store": 1000 },
+      "BestHistory": { "Store": 100 },
+      "ProgressGraph": true
+    },
+    "Track": {
+      "RecordProgression": true,
+      "FirstRecord": { "Tracked": true },
+      "RecordHolders": { "History": true }
+    }
+  },
+
+  "SocialFeatures": {
+    "Challenge": {
+      "ChallengeFriend": true,
+      "ChallengeCrew": true,
+      "OpenChallenge": true
+    },
+    "Share": {
+      "ShareRecord": true,
+      "ShareReplay": true,
+      "ShareGhost": true
+    },
+    "Compare": {
+      "SideBySide": true,
+      "SectorBreakdown": true,
+      "LineComparison": true
+    }
+  },
+
+  "UI": {
+    "LeaderboardScreen": {
+      "TrackSelector": true,
+      "CategoryTabs": true,
+      "FilterOptions": true,
+      "RefreshButton": true
+    },
+    "RecordDisplay": {
+      "CurrentRecord": true,
+      "PersonalBest": true,
+      "RankPosition": true,
+      "TargetTime": true
+    },
+    "InRace": {
+      "RecordDelta": true,
+      "SectorColors": true,
+      "NewRecordPopup": true
+    },
+    "PostRace": {
+      "RecordSummary": true,
+      "LeaderboardPosition": true,
+      "ImprovementStats": true
+    }
+  }
+}

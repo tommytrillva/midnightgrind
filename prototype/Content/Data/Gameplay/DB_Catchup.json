@@ -1,0 +1,221 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Catchup Mechanics and Competitive Balance System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultState": "Enabled",
+    "Configurable": true,
+    "AffectsMultiplayer": true,
+    "AffectsSinglePlayer": true
+  },
+
+  "CatchupTypes": {
+    "SpeedBoost": {
+      "ID": "CATCHUP_SPEED",
+      "Description": "Trailing vehicles get speed boost",
+      "Enabled": true,
+      "MaxBoost": { "Percentage": 5 },
+      "ActivationGap": { "Seconds": 3 }
+    },
+    "SlipstreamEnhanced": {
+      "ID": "CATCHUP_SLIPSTREAM",
+      "Description": "Increased drafting effect",
+      "Enabled": true,
+      "BonusMultiplier": 1.5,
+      "WhenBehind": true
+    },
+    "CorneringAssist": {
+      "ID": "CATCHUP_CORNERING",
+      "Description": "Better grip when behind",
+      "Enabled": true,
+      "GripBonus": { "Percentage": 3 },
+      "SubtleEffect": true
+    },
+    "AccelerationBoost": {
+      "ID": "CATCHUP_ACCEL",
+      "Description": "Faster acceleration for trailing cars",
+      "Enabled": true,
+      "BoostAmount": { "Percentage": 4 },
+      "OutOfCorners": true
+    }
+  },
+
+  "CatchupLevels": {
+    "Off": {
+      "ID": "LEVEL_OFF",
+      "Description": "No catchup assistance",
+      "Multiplier": 0,
+      "ForPurists": true
+    },
+    "Low": {
+      "ID": "LEVEL_LOW",
+      "Description": "Subtle assistance",
+      "Multiplier": 0.5,
+      "Noticeable": "Barely"
+    },
+    "Medium": {
+      "ID": "LEVEL_MEDIUM",
+      "Description": "Balanced assistance",
+      "Multiplier": 1.0,
+      "Default": true
+    },
+    "High": {
+      "ID": "LEVEL_HIGH",
+      "Description": "Strong assistance",
+      "Multiplier": 1.5,
+      "ForCasual": true
+    },
+    "Extreme": {
+      "ID": "LEVEL_EXTREME",
+      "Description": "Maximum assistance",
+      "Multiplier": 2.0,
+      "PartyMode": true
+    }
+  },
+
+  "ActivationCriteria": {
+    "Position": {
+      "MinPosition": 2,
+      "ScaleWithPosition": true,
+      "MoreBehind": { "StrongerEffect": true }
+    },
+    "Gap": {
+      "TimeGap": {
+        "Min": 2,
+        "Max": 30,
+        "ScaleLinear": true
+      },
+      "DistanceGap": {
+        "Min": 50,
+        "Max": 500,
+        "ScaleLinear": true
+      }
+    },
+    "Lap": {
+      "NotOnFirstLap": { "Optional": true },
+      "NotOnLastLap": { "Optional": true }
+    },
+    "Exclusions": {
+      "WhenInFirst": true,
+      "WhenGapTooSmall": true,
+      "WhenCrashed": true
+    }
+  },
+
+  "Scaling": {
+    "GapBased": {
+      "Enabled": true,
+      "Curve": "Logarithmic",
+      "MaxAt": { "Seconds": 15 },
+      "MinAt": { "Seconds": 2 }
+    },
+    "PositionBased": {
+      "Enabled": true,
+      "LastPlace": { "BonusMultiplier": 1.3 },
+      "MidPack": { "BonusMultiplier": 1.0 },
+      "SecondPlace": { "BonusMultiplier": 0.7 }
+    },
+    "LapBased": {
+      "Enabled": true,
+      "EarlyRace": { "Multiplier": 1.0 },
+      "MidRace": { "Multiplier": 1.1 },
+      "LateRace": { "Multiplier": 1.2 }
+    }
+  },
+
+  "BalanceMechanics": {
+    "LeaderSlowdown": {
+      "Enabled": false,
+      "Optional": true,
+      "Amount": { "Percentage": -2 },
+      "WhenGapLarge": { "Seconds": 10 }
+    },
+    "PackRacing": {
+      "Enabled": true,
+      "KeepTogether": { "Target": 5 },
+      "Method": "BalancedBoosts"
+    },
+    "CombackPotential": {
+      "Enabled": true,
+      "MaxGapRecovery": { "PerLap": 3 },
+      "Realistic": true
+    }
+  },
+
+  "ModeSpecific": {
+    "SinglePlayer": {
+      "DefaultLevel": "Medium",
+      "Configurable": true,
+      "StoryMode": { "Adaptive": true }
+    },
+    "Multiplayer": {
+      "DefaultLevel": "Low",
+      "HostConfigurable": true,
+      "Voted": { "Optional": true }
+    },
+    "Ranked": {
+      "DefaultLevel": "Off",
+      "Fixed": true,
+      "PureCompetition": true
+    },
+    "Casual": {
+      "DefaultLevel": "Medium",
+      "Adjustable": true
+    }
+  },
+
+  "VehicleBalance": {
+    "ClassBalance": {
+      "Enabled": true,
+      "WithinClass": true,
+      "CrossClass": false
+    },
+    "PerformanceNormalization": {
+      "Enabled": false,
+      "Optional": true,
+      "ForMixedLobbies": true
+    }
+  },
+
+  "Visibility": {
+    "Indicators": {
+      "ShowWhenActive": { "Default": false, "Configurable": true },
+      "SubtleEffect": true,
+      "DebugMode": { "ShowAll": true }
+    },
+    "Notifications": {
+      "CatchupEnabled": { "PreRace": true },
+      "SettingChanged": { "Notify": true }
+    }
+  },
+
+  "AntiExploit": {
+    "Prevention": {
+      "IntentionalSlowdown": { "Detect": true },
+      "WaitForBoost": { "Penalize": true },
+      "ConsistencyCheck": true
+    },
+    "Caps": {
+      "MaxBoost": { "Absolute": 10 },
+      "MaxDuration": { "Seconds": 30 },
+      "CooldownAfterOvertake": { "Seconds": 5 }
+    }
+  },
+
+  "UI": {
+    "Settings": {
+      "LevelSelector": true,
+      "DetailedOptions": { "Advanced": true },
+      "PresetButtons": true
+    },
+    "InRace": {
+      "BoostIndicator": { "Optional": true },
+      "EffectActive": { "Subtle": true }
+    },
+    "PreRace": {
+      "ShowSetting": true,
+      "VoteOption": { "Multiplayer": true }
+    }
+  }
+}

@@ -1,0 +1,329 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Racing Penalties and Rule Enforcement System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultMode": "Balanced",
+    "Configurable": true,
+    "AnnouncePenalties": true
+  },
+
+  "PenaltyModes": {
+    "Off": {
+      "ID": "PENALTY_OFF",
+      "Description": "No penalties",
+      "ForCasual": true,
+      "FullFreedom": true
+    },
+    "Lenient": {
+      "ID": "PENALTY_LENIENT",
+      "Description": "Light penalties",
+      "Severity": 0.5,
+      "Forgiveness": "High"
+    },
+    "Balanced": {
+      "ID": "PENALTY_BALANCED",
+      "Description": "Standard penalties",
+      "Severity": 1.0,
+      "Default": true
+    },
+    "Strict": {
+      "ID": "PENALTY_STRICT",
+      "Description": "Harsh penalties",
+      "Severity": 1.5,
+      "ForCompetitive": true
+    },
+    "Simulation": {
+      "ID": "PENALTY_SIMULATION",
+      "Description": "Realistic penalties",
+      "Severity": 2.0,
+      "FullRules": true
+    }
+  },
+
+  "TrackViolations": {
+    "TrackLimits": {
+      "ID": "VIOLATION_LIMITS",
+      "Description": "Exceeding track boundaries",
+      "Detection": {
+        "AllFourWheels": true,
+        "ThreeWheels": false,
+        "TwoWheels": false
+      },
+      "Tolerance": {
+        "Warnings": 3,
+        "AfterWarning": "TimePenalty"
+      },
+      "Penalties": {
+        "Warning": { "First": true },
+        "LapInvalid": { "ForTiming": true },
+        "TimePenalty": { "Seconds": 2, "AfterWarnings": true }
+      }
+    },
+    "Cutting": {
+      "ID": "VIOLATION_CUTTING",
+      "Description": "Cutting corners",
+      "Detection": {
+        "TimeGained": true,
+        "CheckpointMissed": true,
+        "ShortcutDetection": true
+      },
+      "Penalties": {
+        "TimeGainReturned": true,
+        "AdditionalPenalty": { "Seconds": 1 },
+        "LapInvalid": true
+      }
+    },
+    "Shortcut": {
+      "ID": "VIOLATION_SHORTCUT",
+      "Description": "Using shortcuts",
+      "Detection": {
+        "CheckpointSkipped": true,
+        "DistanceSaved": true
+      },
+      "Penalties": {
+        "Disqualification": { "Severe": true },
+        "PositionLoss": { "Moderate": true },
+        "TimePenalty": { "Seconds": 10 }
+      }
+    }
+  },
+
+  "ContactViolations": {
+    "Ramming": {
+      "ID": "VIOLATION_RAMMING",
+      "Description": "Intentional collision",
+      "Detection": {
+        "ImpactForce": { "Threshold": "High" },
+        "Trajectory": { "Analysis": true },
+        "Repetition": { "Tracked": true }
+      },
+      "Penalties": {
+        "Warning": { "First": true },
+        "TimePenalty": { "Seconds": 5 },
+        "Disqualification": { "Repeated": true }
+      }
+    },
+    "Blocking": {
+      "ID": "VIOLATION_BLOCKING",
+      "Description": "Illegal blocking",
+      "Detection": {
+        "MultipleMovements": true,
+        "LateMovement": true,
+        "ForcingOffTrack": true
+      },
+      "Penalties": {
+        "Warning": true,
+        "TimePenalty": { "Seconds": 3 },
+        "DriveThrough": { "Severe": true }
+      }
+    },
+    "PushingOff": {
+      "ID": "VIOLATION_PUSHING",
+      "Description": "Forcing car off track",
+      "Detection": {
+        "ContactToExit": true,
+        "NoRoomLeft": true
+      },
+      "Penalties": {
+        "Warning": true,
+        "PositionReturn": { "IfGained": true },
+        "TimePenalty": { "Seconds": 3 }
+      }
+    }
+  },
+
+  "StartViolations": {
+    "FalseStart": {
+      "ID": "VIOLATION_FALSESTART",
+      "Description": "Starting before signal",
+      "Detection": {
+        "Movement": { "BeforeGo": true },
+        "Threshold": { "Meters": 0.5 }
+      },
+      "Penalties": {
+        "DriveThrough": { "Standard": true },
+        "TimePenalty": { "Seconds": 5, "Alternative": true },
+        "Disqualification": { "Second": true }
+      }
+    },
+    "FormationViolation": {
+      "ID": "VIOLATION_FORMATION",
+      "Description": "Breaking formation",
+      "Detection": {
+        "Overtaking": true,
+        "BreakingOrder": true
+      },
+      "Penalties": {
+        "Warning": true,
+        "PositionReturn": true,
+        "TimePenalty": { "Seconds": 5 }
+      }
+    }
+  },
+
+  "PitViolations": {
+    "Speeding": {
+      "ID": "VIOLATION_PITSPEEDING",
+      "Description": "Exceeding pit speed limit",
+      "Detection": {
+        "SpeedLimit": 60,
+        "Tolerance": 2
+      },
+      "Penalties": {
+        "DriveThrough": true,
+        "StopGo": { "Severe": true },
+        "TimePenalty": { "Seconds": 10 }
+      }
+    },
+    "UnsafeRelease": {
+      "ID": "VIOLATION_UNSAFERELEASE",
+      "Description": "Dangerous pit exit",
+      "Detection": {
+        "CollisionRisk": true,
+        "CrossingLine": true
+      },
+      "Penalties": {
+        "Warning": true,
+        "DriveThrough": true,
+        "TimePenalty": { "Seconds": 5 }
+      }
+    }
+  },
+
+  "PenaltyTypes": {
+    "Warning": {
+      "ID": "PENALTY_WARNING",
+      "Effect": "None",
+      "Display": true,
+      "Accumulates": true
+    },
+    "TimePenalty": {
+      "ID": "PENALTY_TIME",
+      "Effect": "AddedToTime",
+      "Range": { "Seconds": [1, 30] },
+      "Application": "PostRace"
+    },
+    "DriveThrough": {
+      "ID": "PENALTY_DRIVETHROUGH",
+      "Effect": "MustPassPit",
+      "TimeEquivalent": { "Seconds": 15 },
+      "Window": { "Laps": 3 }
+    },
+    "StopAndGo": {
+      "ID": "PENALTY_STOPGO",
+      "Effect": "StopInPit",
+      "Duration": { "Seconds": 10 },
+      "Window": { "Laps": 3 }
+    },
+    "PositionDrop": {
+      "ID": "PENALTY_POSITION",
+      "Effect": "LosePositions",
+      "Range": { "Positions": [1, 5] },
+      "Application": "Immediate"
+    },
+    "LapInvalid": {
+      "ID": "PENALTY_LAPINVALID",
+      "Effect": "NoTimeRecord",
+      "ForQualifying": true,
+      "ForRecords": true
+    },
+    "Disqualification": {
+      "ID": "PENALTY_DQ",
+      "Effect": "RemovedFromRace",
+      "Severe": true,
+      "NoPoints": true
+    }
+  },
+
+  "PenaltySystem": {
+    "Warnings": {
+      "MaxPerRace": 3,
+      "AfterMax": "AutoPenalty"
+    },
+    "Accumulation": {
+      "Enabled": true,
+      "TrackedAcross": "Session",
+      "Escalation": true
+    },
+    "ServeWindow": {
+      "DriveThrough": { "Laps": 3 },
+      "StopGo": { "Laps": 3 },
+      "MissedPenalty": "TimeAdded"
+    },
+    "Appeals": {
+      "Enabled": false,
+      "PostRace": { "Optional": true }
+    }
+  },
+
+  "Detection": {
+    "Automatic": {
+      "Enabled": true,
+      "TrackLimits": true,
+      "Cutting": true,
+      "Speeding": true
+    },
+    "Contact": {
+      "ForceThreshold": true,
+      "IntentAnalysis": { "Basic": true },
+      "ContextAware": true
+    },
+    "Tolerance": {
+      "RacingIncident": true,
+      "FirstLap": { "Lenient": true },
+      "Weather": { "Lenient": true }
+    }
+  },
+
+  "Notifications": {
+    "InRace": {
+      "PenaltyAssigned": { "Popup": true, "Sound": true },
+      "Warning": { "Flash": true },
+      "PenaltyServed": { "Confirm": true }
+    },
+    "Display": {
+      "PenaltyIndicator": { "Position": "TopCenter" },
+      "ServeReminder": { "Countdown": true },
+      "TotalPenalties": { "Summary": true }
+    }
+  },
+
+  "ModeSettings": {
+    "SinglePlayer": {
+      "Default": "Lenient",
+      "Configurable": true
+    },
+    "Multiplayer": {
+      "Default": "Balanced",
+      "HostConfigurable": true
+    },
+    "Ranked": {
+      "Default": "Strict",
+      "Fixed": true
+    },
+    "Casual": {
+      "Default": "Off",
+      "Optional": true
+    }
+  },
+
+  "UI": {
+    "PenaltyPopup": {
+      "Reason": true,
+      "Type": true,
+      "ServeInstructions": true
+    },
+    "PenaltyList": {
+      "CurrentPenalties": true,
+      "History": true,
+      "TimeAdded": true
+    },
+    "Settings": {
+      "ModeSelector": true,
+      "CustomToggles": { "Advanced": true },
+      "Presets": true
+    }
+  }
+}
