@@ -1,0 +1,329 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Data Import, Export, and Backup Management",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "ExportEnabled": true,
+    "ImportEnabled": true,
+    "BackupEnabled": true,
+    "DataPortability": true
+  },
+
+  "ExportFeatures": {
+    "ProfileExport": {
+      "Enabled": true,
+      "Includes": {
+        "PlayerData": true,
+        "Statistics": true,
+        "Achievements": true,
+        "Progress": true
+      },
+      "Format": ["JSON", "Encrypted"],
+      "Destination": ["LocalFile", "Email"]
+    },
+    "VehicleExport": {
+      "Enabled": true,
+      "Includes": {
+        "VehicleList": true,
+        "Customization": true,
+        "TuningSetups": true,
+        "Liveries": true
+      },
+      "PerVehicle": true,
+      "AllVehicles": true,
+      "Format": ["JSON", "ShareCode"]
+    },
+    "ContentExport": {
+      "Liveries": {
+        "Enabled": true,
+        "Format": ["PNG", "Custom"],
+        "ShareCode": true,
+        "HighResolution": true
+      },
+      "Vinyls": {
+        "Enabled": true,
+        "Format": "Custom",
+        "ShareCode": true
+      },
+      "TuningSetups": {
+        "Enabled": true,
+        "Format": "JSON",
+        "ShareCode": true
+      },
+      "Photos": {
+        "Enabled": true,
+        "Format": ["JPEG", "PNG"],
+        "Bulk": true,
+        "WithMetadata": true
+      }
+    },
+    "StatisticsExport": {
+      "Enabled": true,
+      "Categories": {
+        "RaceHistory": true,
+        "LapTimes": true,
+        "DriftScores": true,
+        "CareerStats": true,
+        "OnlineStats": true
+      },
+      "Format": ["JSON", "CSV"],
+      "DateRange": true
+    },
+    "FullBackup": {
+      "Enabled": true,
+      "Includes": "Everything",
+      "Encrypted": true,
+      "Compressed": true,
+      "RestoreCompatible": true
+    }
+  },
+
+  "ImportFeatures": {
+    "ContentImport": {
+      "Liveries": {
+        "Enabled": true,
+        "FromShareCode": true,
+        "FromFile": true,
+        "Validation": true
+      },
+      "Vinyls": {
+        "Enabled": true,
+        "FromShareCode": true,
+        "FromFile": true,
+        "Validation": true
+      },
+      "TuningSetups": {
+        "Enabled": true,
+        "FromShareCode": true,
+        "FromFile": true,
+        "Validation": true
+      }
+    },
+    "BackupRestore": {
+      "Enabled": true,
+      "FullRestore": true,
+      "SelectiveRestore": true,
+      "VersionCheck": true,
+      "ConflictHandling": true
+    },
+    "CrossGameImport": {
+      "Enabled": false,
+      "FutureSupport": true,
+      "LegacyData": { "FromPreviousGames": true }
+    }
+  },
+
+  "ShareCodes": {
+    "Generation": {
+      "Enabled": true,
+      "Length": 12,
+      "Characters": "Alphanumeric",
+      "CaseSensitive": false,
+      "Expiration": { "Optional": true, "MaxDays": 365 }
+    },
+    "Types": {
+      "Livery": { "Prefix": "LVY" },
+      "Vinyl": { "Prefix": "VNL" },
+      "Tuning": { "Prefix": "TUN" },
+      "Vehicle": { "Prefix": "VEH" },
+      "Challenge": { "Prefix": "CHL" },
+      "Route": { "Prefix": "RTE" }
+    },
+    "Usage": {
+      "QRCode": true,
+      "DirectLink": true,
+      "InGameEntry": true,
+      "ClipboardCopy": true
+    },
+    "Tracking": {
+      "DownloadCount": true,
+      "RatingEnabled": true,
+      "CreatorCredit": true
+    }
+  },
+
+  "LocalBackup": {
+    "AutoBackup": {
+      "Enabled": true,
+      "Frequency": {
+        "Options": ["Daily", "Weekly", "BeforeMajorChange"],
+        "Default": "Daily"
+      },
+      "Time": { "Configurable": true },
+      "MaxBackups": 10
+    },
+    "ManualBackup": {
+      "Enabled": true,
+      "Location": { "Configurable": true },
+      "Naming": { "DateBased": true, "Custom": true },
+      "MaxManual": 20
+    },
+    "Storage": {
+      "DefaultLocation": "Documents/MidnightGrind/Backups",
+      "CustomLocation": true,
+      "ExternalDrive": true,
+      "NetworkLocation": { "Advanced": true }
+    },
+    "Compression": {
+      "Enabled": true,
+      "Level": { "Options": ["Fast", "Balanced", "Maximum"] },
+      "Format": "ZIP"
+    }
+  },
+
+  "DataValidation": {
+    "OnImport": {
+      "VersionCheck": true,
+      "IntegrityCheck": true,
+      "CompatibilityCheck": true,
+      "MalwareScanning": true
+    },
+    "OnExport": {
+      "IntegrityHash": true,
+      "VersionTag": true,
+      "Encryption": { "Optional": true }
+    },
+    "ErrorHandling": {
+      "InvalidData": { "Skip": true, "Report": true },
+      "CorruptedFile": { "Abort": true, "Notify": true },
+      "VersionMismatch": { "Warn": true, "AttemptConvert": true }
+    }
+  },
+
+  "PrivacyControls": {
+    "ExportOptions": {
+      "AnonymizeOption": true,
+      "RemovePersonalInfo": true,
+      "StripLocation": true
+    },
+    "ImportOptions": {
+      "SourceValidation": true,
+      "ContentScanning": true,
+      "SafeMode": true
+    },
+    "DataRetention": {
+      "UserControl": true,
+      "DeleteLocalData": true,
+      "DeleteCloudData": true,
+      "ExportBeforeDelete": true
+    }
+  },
+
+  "MigrationTools": {
+    "AccountMigration": {
+      "Enabled": true,
+      "FullTransfer": true,
+      "ToNewPlatform": true,
+      "Verification": "Required"
+    },
+    "VersionMigration": {
+      "AutoUpgrade": true,
+      "BackupFirst": true,
+      "Rollback": { "IfFailed": true }
+    },
+    "PlatformMigration": {
+      "Enabled": true,
+      "LinkedAccounts": "Required",
+      "OneTime": true,
+      "VerificationProcess": true
+    }
+  },
+
+  "DataAnalytics": {
+    "PersonalInsights": {
+      "PlaytimeStats": true,
+      "ProgressionGraph": true,
+      "SkillImprovement": true,
+      "FavoriteVehicles": true,
+      "RaceAnalysis": true
+    },
+    "Exports": {
+      "ForSpreadsheet": true,
+      "Visualizations": true,
+      "PDFReport": true
+    },
+    "History": {
+      "SessionHistory": { "Days": 365 },
+      "RaceHistory": { "Count": 1000 },
+      "AchievementTimeline": true
+    }
+  },
+
+  "BulkOperations": {
+    "Export": {
+      "MultipleItems": true,
+      "SelectAll": true,
+      "FilteredExport": true,
+      "ProgressIndicator": true
+    },
+    "Import": {
+      "MultipleFiles": true,
+      "BatchProcess": true,
+      "SkipDuplicates": true,
+      "OverwriteOption": true
+    },
+    "Cleanup": {
+      "BulkDelete": true,
+      "ConfirmRequired": true,
+      "RecoveryPeriod": { "Days": 7 }
+    }
+  },
+
+  "ScheduledTasks": {
+    "AutoBackup": {
+      "Enabled": true,
+      "Schedule": { "Configurable": true },
+      "Notification": true
+    },
+    "CloudSync": {
+      "Enabled": true,
+      "Interval": 300,
+      "SmartSync": true
+    },
+    "Cleanup": {
+      "OldBackups": { "AutoDelete": true, "Age": 90 },
+      "TempFiles": { "AutoClean": true },
+      "Cache": { "Manage": true }
+    }
+  },
+
+  "UI": {
+    "DataManager": {
+      "Dashboard": {
+        "StorageUsage": true,
+        "BackupStatus": true,
+        "SyncStatus": true,
+        "RecentActivity": true
+      },
+      "ExportWizard": {
+        "StepByStep": true,
+        "Preview": true,
+        "Options": true
+      },
+      "ImportWizard": {
+        "FileSelection": true,
+        "Validation": true,
+        "Preview": true,
+        "Confirmation": true
+      },
+      "BackupManager": {
+        "BackupList": true,
+        "Details": true,
+        "Restore": true,
+        "Delete": true
+      }
+    },
+    "QuickActions": {
+      "ExportAll": true,
+      "BackupNow": true,
+      "RestoreLatest": true
+    },
+    "Notifications": {
+      "BackupComplete": true,
+      "ImportSuccess": true,
+      "ExportReady": true,
+      "Errors": true
+    }
+  }
+}

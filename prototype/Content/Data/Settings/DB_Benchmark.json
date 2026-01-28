@@ -1,0 +1,307 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Performance Benchmark System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "AutoRunOnFirstLaunch": true,
+    "ScheduledRetest": { "AfterDriverUpdate": true, "AfterSettingsChange": false },
+    "ResultHistory": true
+  },
+
+  "BenchmarkModes": {
+    "Quick": {
+      "ID": "BENCH_QUICK",
+      "Name": "Quick Benchmark",
+      "Description": "Fast performance assessment",
+      "Duration": 60,
+      "Scenes": 2,
+      "Accuracy": "Moderate"
+    },
+    "Standard": {
+      "ID": "BENCH_STANDARD",
+      "Name": "Standard Benchmark",
+      "Description": "Comprehensive performance test",
+      "Duration": 180,
+      "Scenes": 4,
+      "Accuracy": "High",
+      "Default": true
+    },
+    "Extended": {
+      "ID": "BENCH_EXTENDED",
+      "Name": "Extended Benchmark",
+      "Description": "Thorough stress test",
+      "Duration": 300,
+      "Scenes": 6,
+      "Accuracy": "Maximum"
+    },
+    "Custom": {
+      "ID": "BENCH_CUSTOM",
+      "Name": "Custom Benchmark",
+      "Description": "User-defined parameters",
+      "Configurable": true
+    }
+  },
+
+  "BenchmarkScenes": {
+    "CityDriving": {
+      "ID": "SCENE_CITY",
+      "Name": "Downtown Rush",
+      "Description": "Dense urban environment",
+      "Focus": ["DrawCalls", "Shadows", "Reflections"],
+      "TrafficDensity": "High",
+      "Weather": "Clear",
+      "TimeOfDay": "Day"
+    },
+    "HighwayRace": {
+      "ID": "SCENE_HIGHWAY",
+      "Name": "Highway Sprint",
+      "Description": "High-speed highway racing",
+      "Focus": ["LOD", "MotionBlur", "Streaming"],
+      "TrafficDensity": "Medium",
+      "Weather": "Clear",
+      "TimeOfDay": "Sunset"
+    },
+    "NightRain": {
+      "ID": "SCENE_NIGHT_RAIN",
+      "Name": "Midnight Storm",
+      "Description": "Night racing in rain",
+      "Focus": ["Lighting", "Particles", "Reflections"],
+      "TrafficDensity": "Low",
+      "Weather": "Rain",
+      "TimeOfDay": "Night"
+    },
+    "MultiCar": {
+      "ID": "SCENE_MULTI",
+      "Name": "Grid Start",
+      "Description": "Multiple vehicles racing",
+      "Focus": ["CPU", "Physics", "AI"],
+      "VehicleCount": 16,
+      "Weather": "Clear",
+      "TimeOfDay": "Day"
+    },
+    "Drift": {
+      "ID": "SCENE_DRIFT",
+      "Name": "Drift Zone",
+      "Description": "Intense drifting with effects",
+      "Focus": ["Particles", "TireSmoke", "Physics"],
+      "Weather": "Clear",
+      "TimeOfDay": "Night"
+    },
+    "GarageShowroom": {
+      "ID": "SCENE_GARAGE",
+      "Name": "Garage View",
+      "Description": "High-detail vehicle rendering",
+      "Focus": ["Materials", "Lighting", "Reflections"],
+      "Static": true
+    }
+  },
+
+  "MetricsTracked": {
+    "FrameRate": {
+      "Average": true,
+      "Minimum": true,
+      "Maximum": true,
+      "P1": true,
+      "P99": true,
+      "Stability": true
+    },
+    "FrameTime": {
+      "Average": true,
+      "Consistency": true,
+      "Spikes": true
+    },
+    "GPU": {
+      "Utilization": true,
+      "Temperature": { "Available": true },
+      "VRAM": true,
+      "PowerDraw": { "Available": true }
+    },
+    "CPU": {
+      "Utilization": true,
+      "PerCore": { "Available": true },
+      "Temperature": { "Available": true }
+    },
+    "Memory": {
+      "Usage": true,
+      "PageFaults": true,
+      "Streaming": true
+    }
+  },
+
+  "ResultsPresentation": {
+    "Score": {
+      "Overall": { "Scale": 10000 },
+      "PerScene": true,
+      "Rating": { "Tiers": ["Low", "Medium", "High", "Ultra", "Extreme"] }
+    },
+    "Graphs": {
+      "FPSOverTime": true,
+      "FrameTimeGraph": true,
+      "UtilizationGraph": true
+    },
+    "Recommendations": {
+      "AutoSettings": true,
+      "OptimizationTips": true,
+      "BottleneckIdentification": true
+    },
+    "Comparison": {
+      "ToHistory": true,
+      "ToRecommended": true,
+      "ToTargetFPS": true
+    }
+  },
+
+  "AutoSettings": {
+    "Enabled": true,
+    "TargetFPS": {
+      "Options": [30, 60, 120, 144, 165, 240, "Unlimited"],
+      "Default": 60
+    },
+    "QualityPriority": {
+      "Options": ["Performance", "Balanced", "Quality"],
+      "Default": "Balanced"
+    },
+    "Adjustments": {
+      "Resolution": true,
+      "TextureQuality": true,
+      "ShadowQuality": true,
+      "Reflections": true,
+      "Effects": true,
+      "DrawDistance": true,
+      "AntiAliasing": true
+    },
+    "RecommendationTypes": {
+      "Conservative": { "Headroom": 20 },
+      "Aggressive": { "Headroom": 5 },
+      "Balanced": { "Headroom": 10, "Default": true }
+    }
+  },
+
+  "StressTest": {
+    "Enabled": true,
+    "Modes": {
+      "Stability": {
+        "Description": "Long-duration stability test",
+        "Duration": { "Options": [15, 30, 60], "Unit": "Minutes" },
+        "Focus": "Thermal"
+      },
+      "VRAM": {
+        "Description": "Video memory stress",
+        "MaxTextures": true,
+        "MaxResolution": true
+      },
+      "CPU": {
+        "Description": "Physics and AI stress",
+        "MaxVehicles": 32,
+        "MaxPhysics": true
+      }
+    },
+    "Monitoring": {
+      "TemperatureWarning": { "GPU": 90, "CPU": 95 },
+      "ThrottlingDetection": true,
+      "CrashLogging": true
+    }
+  },
+
+  "Presets": {
+    "QualityLevels": {
+      "Low": {
+        "Description": "Maximum performance",
+        "TargetHardware": "Integrated Graphics",
+        "TypicalFPS": "60+"
+      },
+      "Medium": {
+        "Description": "Balanced experience",
+        "TargetHardware": "Entry Gaming GPU",
+        "TypicalFPS": "60+"
+      },
+      "High": {
+        "Description": "Great visuals",
+        "TargetHardware": "Mid-range GPU",
+        "TypicalFPS": "60+"
+      },
+      "Ultra": {
+        "Description": "Premium quality",
+        "TargetHardware": "High-end GPU",
+        "TypicalFPS": "60+"
+      },
+      "Extreme": {
+        "Description": "Maximum quality",
+        "TargetHardware": "Enthusiast GPU",
+        "TypicalFPS": "60+"
+      }
+    }
+  },
+
+  "ResultsHistory": {
+    "Storage": {
+      "MaxResults": 50,
+      "AutoCleanup": { "OlderThan": "90Days" }
+    },
+    "Tracking": {
+      "Date": true,
+      "DriverVersion": true,
+      "GameVersion": true,
+      "Settings": true,
+      "Hardware": true
+    },
+    "Export": {
+      "ToFile": true,
+      "Format": ["JSON", "CSV"],
+      "ShareCode": true
+    }
+  },
+
+  "HardwareDetection": {
+    "Components": {
+      "GPU": { "Model": true, "VRAM": true, "Driver": true },
+      "CPU": { "Model": true, "Cores": true, "Frequency": true },
+      "RAM": { "Amount": true, "Speed": true },
+      "Storage": { "Type": true, "Speed": true },
+      "Display": { "Resolution": true, "RefreshRate": true, "HDR": true }
+    },
+    "DatabaseMatch": {
+      "Enabled": true,
+      "RecommendedSettings": true,
+      "SimilarHardware": true
+    }
+  },
+
+  "Comparison": {
+    "Online": {
+      "UploadResults": { "Optional": true },
+      "CompareToOthers": true,
+      "SimilarHardware": true,
+      "Leaderboard": true
+    },
+    "Categories": {
+      "ByGPU": true,
+      "ByCPU": true,
+      "ByPreset": true,
+      "ByResolution": true
+    }
+  },
+
+  "UI": {
+    "BenchmarkScreen": {
+      "Progress": true,
+      "LiveMetrics": true,
+      "Preview": true,
+      "Cancel": true
+    },
+    "ResultsScreen": {
+      "Summary": true,
+      "DetailedBreakdown": true,
+      "Graphs": true,
+      "Recommendations": true,
+      "Actions": ["ApplyRecommended", "RunAgain", "Export", "Compare"]
+    },
+    "Settings": {
+      "ModeSelection": true,
+      "SceneSelection": true,
+      "TargetFPSInput": true,
+      "AdvancedOptions": true
+    }
+  }
+}

@@ -1,0 +1,351 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Server Browser and Region Management",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "AutoRegionSelect": true,
+    "ServerBrowser": true,
+    "QuickMatch": true,
+    "MaxPing": 200
+  },
+
+  "Regions": {
+    "NorthAmerica": {
+      "ID": "REGION_NA",
+      "Subregions": {
+        "NAEast": {
+          "ID": "REGION_NA_EAST",
+          "Location": "Virginia",
+          "Capacity": "High"
+        },
+        "NAWest": {
+          "ID": "REGION_NA_WEST",
+          "Location": "Oregon",
+          "Capacity": "High"
+        },
+        "NACentral": {
+          "ID": "REGION_NA_CENTRAL",
+          "Location": "Texas",
+          "Capacity": "Medium"
+        }
+      }
+    },
+    "Europe": {
+      "ID": "REGION_EU",
+      "Subregions": {
+        "EUWest": {
+          "ID": "REGION_EU_WEST",
+          "Location": "Frankfurt",
+          "Capacity": "High"
+        },
+        "EUNorth": {
+          "ID": "REGION_EU_NORTH",
+          "Location": "Stockholm",
+          "Capacity": "Medium"
+        },
+        "EUSouth": {
+          "ID": "REGION_EU_SOUTH",
+          "Location": "Milan",
+          "Capacity": "Medium"
+        }
+      }
+    },
+    "Asia": {
+      "ID": "REGION_ASIA",
+      "Subregions": {
+        "AsiaEast": {
+          "ID": "REGION_ASIA_EAST",
+          "Location": "Tokyo",
+          "Capacity": "High"
+        },
+        "AsiaSoutheast": {
+          "ID": "REGION_ASIA_SE",
+          "Location": "Singapore",
+          "Capacity": "Medium"
+        },
+        "AsiaIndia": {
+          "ID": "REGION_ASIA_IN",
+          "Location": "Mumbai",
+          "Capacity": "Medium"
+        }
+      }
+    },
+    "Oceania": {
+      "ID": "REGION_OCE",
+      "Subregions": {
+        "Australia": {
+          "ID": "REGION_OCE_AU",
+          "Location": "Sydney",
+          "Capacity": "Medium"
+        }
+      }
+    },
+    "SouthAmerica": {
+      "ID": "REGION_SA",
+      "Subregions": {
+        "SAEast": {
+          "ID": "REGION_SA_EAST",
+          "Location": "SaoPaulo",
+          "Capacity": "Medium"
+        }
+      }
+    },
+    "MiddleEast": {
+      "ID": "REGION_ME",
+      "Subregions": {
+        "UAE": {
+          "ID": "REGION_ME_UAE",
+          "Location": "Dubai",
+          "Capacity": "Medium"
+        }
+      }
+    }
+  },
+
+  "ServerTypes": {
+    "Official": {
+      "ID": "SERVER_OFFICIAL",
+      "Description": "Developer-hosted servers",
+      "Moderated": true,
+      "AntiCheat": true,
+      "Features": "Full"
+    },
+    "Community": {
+      "ID": "SERVER_COMMUNITY",
+      "Description": "Player-hosted servers",
+      "CustomRules": true,
+      "Moderated": { "ByOwner": true },
+      "Features": "Configurable"
+    },
+    "Private": {
+      "ID": "SERVER_PRIVATE",
+      "Description": "Invite-only servers",
+      "Password": true,
+      "FriendsOnly": true,
+      "CrewOnly": true
+    },
+    "Ranked": {
+      "ID": "SERVER_RANKED",
+      "Description": "Competitive matchmaking",
+      "SkillBased": true,
+      "NoCustomRules": true,
+      "AntiCheat": "Strict"
+    }
+  },
+
+  "ServerBrowser": {
+    "Display": {
+      "ServerName": true,
+      "Map": true,
+      "Mode": true,
+      "Players": { "Current": true, "Max": true },
+      "Ping": true,
+      "Region": true,
+      "Type": true,
+      "Password": { "Icon": true }
+    },
+    "Filters": {
+      "Region": { "MultiSelect": true },
+      "Mode": { "MultiSelect": true },
+      "ServerType": { "MultiSelect": true },
+      "HasPlayers": { "MinPlayers": 1 },
+      "NotFull": true,
+      "NoPassword": true,
+      "MaxPing": { "Slider": true },
+      "FriendsPlaying": true
+    },
+    "Sorting": {
+      "ByPing": true,
+      "ByPlayers": true,
+      "ByName": true,
+      "ByMode": true
+    },
+    "Actions": {
+      "Refresh": true,
+      "AutoRefresh": { "Interval": 30 },
+      "Join": true,
+      "Favorite": true,
+      "ViewDetails": true
+    }
+  },
+
+  "QuickMatch": {
+    "Enabled": true,
+    "Settings": {
+      "PreferredRegion": { "Default": "Auto" },
+      "GameMode": { "Selectable": true },
+      "SkillBasedMatchmaking": { "Default": true },
+      "AllowBackfill": { "Default": true }
+    },
+    "Process": {
+      "SearchTimeout": 60,
+      "ExpandSearch": { "AfterSeconds": 30 },
+      "PingLimit": { "Initial": 100, "Expanded": 200 }
+    }
+  },
+
+  "RegionSelection": {
+    "Auto": {
+      "Enabled": true,
+      "Method": "LowestPing",
+      "TestAllRegions": true,
+      "UpdateInterval": "SessionStart"
+    },
+    "Manual": {
+      "Enabled": true,
+      "Override": true,
+      "RememberChoice": true
+    },
+    "Fallback": {
+      "Enabled": true,
+      "SecondaryRegion": true,
+      "MaxPingDifference": 50
+    }
+  },
+
+  "PingSystem": {
+    "Display": {
+      "Numeric": true,
+      "ColorCoded": {
+        "Excellent": { "Max": 30, "Color": "#00FF00" },
+        "Good": { "Max": 60, "Color": "#88FF00" },
+        "Moderate": { "Max": 100, "Color": "#FFFF00" },
+        "Poor": { "Max": 150, "Color": "#FF8800" },
+        "Bad": { "Min": 150, "Color": "#FF0000" }
+      },
+      "Bars": true
+    },
+    "Testing": {
+      "AutoTest": true,
+      "ManualTest": true,
+      "TestFrequency": "OnBrowserOpen"
+    },
+    "Warnings": {
+      "HighPing": { "Threshold": 150 },
+      "Unstable": { "Jitter": 50 },
+      "PacketLoss": { "Threshold": 5 }
+    }
+  },
+
+  "Favorites": {
+    "Enabled": true,
+    "MaxFavorites": 50,
+    "Features": {
+      "QuickJoin": true,
+      "NotifyWhenSpace": true,
+      "NotifyFriendsJoin": true,
+      "SortToTop": true
+    },
+    "History": {
+      "RecentServers": 20,
+      "AutoAddFrequent": false
+    }
+  },
+
+  "ServerDetails": {
+    "Information": {
+      "ServerName": true,
+      "Description": true,
+      "Rules": true,
+      "Map": true,
+      "Mode": true,
+      "Settings": true
+    },
+    "Players": {
+      "PlayerList": true,
+      "FriendsHighlighted": true,
+      "LevelShown": true
+    },
+    "Statistics": {
+      "Uptime": true,
+      "AveragePopulation": true,
+      "PeakPlayers": true
+    }
+  },
+
+  "PrivateServers": {
+    "Creation": {
+      "Enabled": true,
+      "MaxPlayers": { "Options": [4, 8, 12, 16] },
+      "Password": { "Optional": true },
+      "Duration": { "Max": "4Hours" }
+    },
+    "Settings": {
+      "GameMode": true,
+      "Map": true,
+      "Weather": true,
+      "TimeOfDay": true,
+      "Traffic": true,
+      "Collisions": true,
+      "CatchUp": true
+    },
+    "Invites": {
+      "InviteFriends": true,
+      "InviteCrew": true,
+      "ShareLink": true,
+      "QRCode": true
+    },
+    "Management": {
+      "KickPlayer": true,
+      "BanPlayer": true,
+      "TransferHost": true,
+      "ChangeSettings": true
+    }
+  },
+
+  "CommunityServers": {
+    "Hosting": {
+      "Requirements": { "Level": 30, "GoodStanding": true },
+      "ServerSlots": { "Free": 1, "VIP": 3 },
+      "Customization": "Full"
+    },
+    "Rules": {
+      "CustomGameRules": true,
+      "CustomBanList": true,
+      "Moderation": true,
+      "AdminSystem": true
+    },
+    "Verification": {
+      "VerifiedServers": true,
+      "Requirements": ["ActiveModeration", "MinPlayers", "Uptime"],
+      "Benefits": ["HigherVisibility", "Badge"]
+    }
+  },
+
+  "LoadBalancing": {
+    "Automatic": {
+      "Enabled": true,
+      "RedirectToEmpty": { "WhenFull": true },
+      "MergeServers": { "WhenLow": true }
+    },
+    "Capacity": {
+      "WarningThreshold": 80,
+      "QueueSystem": { "WhenFull": true }
+    }
+  },
+
+  "UI": {
+    "ServerBrowserLayout": {
+      "ListMode": true,
+      "GridMode": true,
+      "QuickFilters": true,
+      "SearchBar": true
+    },
+    "RegionSelector": {
+      "WorldMap": true,
+      "PingOverlay": true,
+      "QuickSelect": true
+    },
+    "QuickMatchUI": {
+      "EstimatedTime": true,
+      "PlayersSearching": true,
+      "CancelOption": true
+    },
+    "Notifications": {
+      "ServerFull": true,
+      "FriendJoined": true,
+      "FavoriteAvailable": true
+    }
+  }
+}

@@ -1,0 +1,296 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Cloud Save and Data Synchronization",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultEnabled": true,
+    "AutoSync": true,
+    "ConflictResolution": "Prompt",
+    "MaxSaveSlots": 5
+  },
+
+  "SyncedData": {
+    "Profile": {
+      "PlayerInfo": true,
+      "Level": true,
+      "REP": true,
+      "Statistics": true,
+      "Titles": true,
+      "Badges": true,
+      "Settings": { "Gameplay": true, "NotControls": true }
+    },
+    "Progress": {
+      "StoryProgress": true,
+      "Achievements": true,
+      "Challenges": true,
+      "Milestones": true,
+      "UnlockedContent": true
+    },
+    "Garage": {
+      "OwnedVehicles": true,
+      "VehicleCustomization": true,
+      "VehicleSettings": true,
+      "GarageProperties": true,
+      "FavoriteVehicles": true
+    },
+    "Inventory": {
+      "Parts": true,
+      "Currency": { "InGame": true, "Premium": "PlatformSpecific" },
+      "Consumables": true,
+      "Cosmetics": true
+    },
+    "Social": {
+      "Friends": true,
+      "CrewMembership": true,
+      "BlockList": true,
+      "RecentPlayers": true
+    },
+    "CustomContent": {
+      "Liveries": true,
+      "VinylDesigns": true,
+      "TuningSetups": true,
+      "PhotoGallery": { "Limited": true, "MaxSize": "500MB" }
+    }
+  },
+
+  "NotSynced": {
+    "LocalSettings": {
+      "ControlBindings": true,
+      "GraphicsSettings": true,
+      "AudioSettings": true,
+      "Reason": "DeviceSpecific"
+    },
+    "PlatformSpecific": {
+      "PlatformAchievements": true,
+      "PlatformPurchases": true,
+      "PlatformCurrency": true
+    },
+    "TemporaryData": {
+      "SessionStats": true,
+      "Cache": true,
+      "TempFiles": true
+    }
+  },
+
+  "SyncSettings": {
+    "Frequency": {
+      "AutoSync": {
+        "OnChange": { "Delay": 30 },
+        "Periodic": { "Interval": 300 },
+        "OnExit": true,
+        "OnSignificantEvent": true
+      },
+      "ManualSync": {
+        "Enabled": true,
+        "FromMenu": true
+      }
+    },
+    "Bandwidth": {
+      "LimitUpload": { "Optional": true, "MaxKbps": 1000 },
+      "BackgroundSync": { "LowerPriority": true },
+      "WifiOnly": { "ForMobile": true }
+    },
+    "Compression": {
+      "Enabled": true,
+      "Algorithm": "LZ4",
+      "SaveSpace": true
+    }
+  },
+
+  "StorageQuota": {
+    "Allocation": {
+      "BaseQuota": "1GB",
+      "VIPBonus": { "Amount": "5GB" },
+      "MaxQuota": "10GB"
+    },
+    "Usage": {
+      "ProfileData": { "Typical": "50MB" },
+      "VehicleData": { "PerVehicle": "5MB" },
+      "CustomContent": { "Variable": true },
+      "Screenshots": { "PerImage": "2MB" }
+    },
+    "Management": {
+      "ViewUsage": true,
+      "IdentifyLarge": true,
+      "CleanupSuggestions": true,
+      "WarningAt": 90
+    }
+  },
+
+  "ConflictHandling": {
+    "Detection": {
+      "Automatic": true,
+      "CompareTimestamps": true,
+      "CompareVersions": true
+    },
+    "Resolution": {
+      "Prompt": {
+        "ShowDifferences": true,
+        "PreviewBoth": true,
+        "UserChoice": true,
+        "Default": true
+      },
+      "Auto": {
+        "UseNewer": { "Optional": true },
+        "UseLocal": { "Optional": true },
+        "UseCloud": { "Optional": true }
+      },
+      "Merge": {
+        "WherePossible": true,
+        "KeepBoth": { "ForContent": true }
+      }
+    },
+    "Backup": {
+      "BeforeResolve": true,
+      "KeepConflicted": { "Duration": "30Days" }
+    }
+  },
+
+  "SaveSlots": {
+    "Management": {
+      "Create": true,
+      "Delete": true,
+      "Rename": true,
+      "Copy": true,
+      "MaxSlots": 5
+    },
+    "SlotInfo": {
+      "Name": true,
+      "LastPlayed": true,
+      "PlayTime": true,
+      "Level": true,
+      "StoryProgress": true,
+      "Thumbnail": true
+    },
+    "Protection": {
+      "ConfirmDelete": true,
+      "RecoveryPeriod": { "Days": 7 }
+    }
+  },
+
+  "BackupSystem": {
+    "Automatic": {
+      "Enabled": true,
+      "Frequency": "Daily",
+      "MaxBackups": 10,
+      "RetentionDays": 30
+    },
+    "Manual": {
+      "CreateBackup": true,
+      "NameBackup": true,
+      "MaxManual": 5
+    },
+    "Restore": {
+      "FromBackup": true,
+      "PreviewBeforeRestore": true,
+      "ConfirmRequired": true
+    },
+    "Export": {
+      "ToLocal": true,
+      "Format": "Encrypted",
+      "ImportBack": true
+    }
+  },
+
+  "Security": {
+    "Encryption": {
+      "InTransit": "TLS1.3",
+      "AtRest": "AES256",
+      "KeyManagement": "Secure"
+    },
+    "Authentication": {
+      "AccountRequired": true,
+      "TwoFactor": { "Recommended": true },
+      "SessionValidation": true
+    },
+    "Integrity": {
+      "Checksums": true,
+      "ValidationOnLoad": true,
+      "TamperDetection": true
+    },
+    "Privacy": {
+      "DataOwnership": "User",
+      "DeleteOnRequest": true,
+      "ExportOnRequest": true
+    }
+  },
+
+  "OfflineMode": {
+    "Support": {
+      "Enabled": true,
+      "LocalSaveFirst": true,
+      "QueueChanges": true
+    },
+    "Sync": {
+      "WhenOnline": true,
+      "AutoMerge": { "IfPossible": true },
+      "ConflictPrompt": { "IfNeeded": true }
+    },
+    "Limitations": {
+      "SomeFeatures": "Unavailable",
+      "OnlineValidation": { "Required": "Periodically" }
+    }
+  },
+
+  "CrossPlatform": {
+    "Enabled": true,
+    "LinkedAccounts": {
+      "Required": true,
+      "PrimaryPlatform": true
+    },
+    "SharedData": {
+      "AllSyncedData": true,
+      "ExceptPlatformSpecific": true
+    },
+    "Transfer": {
+      "OneWay": { "FromPrimary": true },
+      "TwoWay": { "WithLinkedAccount": true }
+    }
+  },
+
+  "Notifications": {
+    "SyncStatus": {
+      "InProgress": { "Icon": true },
+      "Complete": { "Brief": true },
+      "Failed": { "Alert": true }
+    },
+    "Conflicts": {
+      "Detected": { "Prompt": true },
+      "Resolved": { "Notify": true }
+    },
+    "Storage": {
+      "NearingLimit": { "Warning": true },
+      "AtLimit": { "Alert": true }
+    },
+    "Errors": {
+      "ConnectionIssue": { "Retry": true },
+      "DataCorruption": { "Recovery": true }
+    }
+  },
+
+  "UI": {
+    "CloudStatus": {
+      "SyncIcon": { "StatusBar": true },
+      "LastSynced": { "Display": true },
+      "QuickActions": true
+    },
+    "SaveManagement": {
+      "SlotSelector": true,
+      "SlotDetails": true,
+      "BackupAccess": true,
+      "StorageInfo": true
+    },
+    "Settings": {
+      "EnableDisable": true,
+      "SyncFrequency": true,
+      "ConflictBehavior": true,
+      "StorageManagement": true
+    },
+    "ConflictUI": {
+      "ComparisonView": true,
+      "ActionButtons": true,
+      "DetailedDiff": { "Optional": true }
+    }
+  }
+}
