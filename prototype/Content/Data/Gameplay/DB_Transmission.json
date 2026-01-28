@@ -1,0 +1,311 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Transmission System and Gearbox Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "GearTuning": true,
+    "TransmissionSwaps": true,
+    "ShiftAssist": true
+  },
+
+  "TransmissionTypes": {
+    "Manual": {
+      "ID": "TRANS_MANUAL",
+      "Description": "Traditional manual gearbox",
+      "Gears": { "Range": [4, 6] },
+      "ClutchRequired": true,
+      "Control": "Full",
+      "SkillLevel": "Expert"
+    },
+    "SequentialManual": {
+      "ID": "TRANS_SEQUENTIAL",
+      "Description": "Sequential shifting",
+      "Gears": { "Range": [5, 7] },
+      "ClutchRequired": false,
+      "ShiftSpeed": "Fast",
+      "SkillLevel": "Advanced"
+    },
+    "Automatic": {
+      "ID": "TRANS_AUTO",
+      "Description": "Automatic transmission",
+      "Gears": { "Range": [6, 10] },
+      "ClutchRequired": false,
+      "ManualOverride": true,
+      "SkillLevel": "Beginner"
+    },
+    "DCT": {
+      "ID": "TRANS_DCT",
+      "Description": "Dual clutch transmission",
+      "Gears": { "Range": [7, 8] },
+      "ClutchRequired": false,
+      "ShiftSpeed": "VeryFast",
+      "SkillLevel": "Intermediate"
+    },
+    "CVT": {
+      "ID": "TRANS_CVT",
+      "Description": "Continuously variable",
+      "Gears": "Infinite",
+      "ClutchRequired": false,
+      "Smooth": true,
+      "SkillLevel": "Beginner"
+    },
+    "DogBox": {
+      "ID": "TRANS_DOGBOX",
+      "Description": "Racing dog engagement",
+      "Gears": { "Range": [5, 6] },
+      "ClutchRequired": { "FirstGear": true },
+      "ShiftSpeed": "Instant",
+      "Aggressive": true,
+      "SkillLevel": "Expert"
+    }
+  },
+
+  "GearConfiguration": {
+    "RatioTuning": {
+      "Enabled": true,
+      "PerGear": {
+        "First": { "Range": [2.5, 4.0], "Default": 3.2 },
+        "Second": { "Range": [1.8, 2.8], "Default": 2.1 },
+        "Third": { "Range": [1.3, 2.0], "Default": 1.5 },
+        "Fourth": { "Range": [1.0, 1.5], "Default": 1.15 },
+        "Fifth": { "Range": [0.8, 1.2], "Default": 0.9 },
+        "Sixth": { "Range": [0.6, 1.0], "Default": 0.75 },
+        "Seventh": { "Range": [0.5, 0.8], "Default": 0.65 }
+      },
+      "Unit": "Ratio"
+    },
+    "FinalDrive": {
+      "Range": { "Min": 2.5, "Max": 5.0 },
+      "Default": 3.7,
+      "Effect": {
+        "Higher": { "Acceleration": "Better", "TopSpeed": "Lower" },
+        "Lower": { "Acceleration": "Worse", "TopSpeed": "Higher" }
+      }
+    }
+  },
+
+  "ShiftBehavior": {
+    "ShiftSpeed": {
+      "Manual": { "Ms": 200 },
+      "Sequential": { "Ms": 100 },
+      "DCT": { "Ms": 50 },
+      "DogBox": { "Ms": 30 },
+      "Automatic": { "Ms": 150 }
+    },
+    "RevMatch": {
+      "Enabled": true,
+      "Modes": {
+        "Off": { "Manual": true },
+        "Auto": { "BlipsThrottle": true },
+        "Assisted": { "HalfAuto": true }
+      }
+    },
+    "LaunchControl": {
+      "Enabled": true,
+      "OptimalRPM": { "PerVehicle": true },
+      "Activation": "HoldBrakeAndThrottle"
+    }
+  },
+
+  "Presets": {
+    "Stock": {
+      "Description": "Factory gear ratios",
+      "BalancedFor": "Economy"
+    },
+    "Street": {
+      "Description": "Optimized for street",
+      "Shorter": true,
+      "BetterAcceleration": true
+    },
+    "Track": {
+      "Description": "Track-optimized ratios",
+      "CloseRatio": true,
+      "PowerBand": true
+    },
+    "Drag": {
+      "Description": "Drag racing setup",
+      "VeryShort": true,
+      "MaxAcceleration": true
+    },
+    "TopSpeed": {
+      "Description": "Top speed setup",
+      "TallGears": true,
+      "MaxVelocity": true
+    },
+    "Drift": {
+      "Description": "Drift-friendly ratios",
+      "MidRange": true,
+      "Controllable": true
+    }
+  },
+
+  "TransmissionSwap": {
+    "Enabled": true,
+    "Conversions": {
+      "Auto_to_Manual": {
+        "Cost": 15000,
+        "Difficulty": "Major",
+        "WeightChange": -30,
+        "Control": "Improved"
+      },
+      "Manual_to_Sequential": {
+        "Cost": 25000,
+        "Difficulty": "Major",
+        "ShiftSpeed": "Improved"
+      },
+      "Any_to_DCT": {
+        "Cost": 40000,
+        "Difficulty": "Extreme",
+        "Performance": "Improved"
+      },
+      "Any_to_DogBox": {
+        "Cost": 35000,
+        "Difficulty": "Major",
+        "ForRacing": true
+      }
+    }
+  },
+
+  "ClutchSystem": {
+    "Types": {
+      "Stock": {
+        "Engagement": "Smooth",
+        "Strength": 1.0,
+        "Default": true
+      },
+      "Sport": {
+        "Engagement": "Quick",
+        "Strength": 1.3,
+        "Cost": 3000
+      },
+      "Racing": {
+        "Engagement": "Aggressive",
+        "Strength": 1.6,
+        "Cost": 8000
+      },
+      "MultiPlate": {
+        "Engagement": "Instant",
+        "Strength": 2.0,
+        "Cost": 15000
+      }
+    },
+    "Behavior": {
+      "SlipPoint": { "Adjustable": true },
+      "BitePoint": { "Adjustable": true },
+      "Weight": { "ByType": true }
+    }
+  },
+
+  "ShiftAssist": {
+    "Modes": {
+      "Off": {
+        "ID": "SHIFT_OFF",
+        "Description": "Full manual control",
+        "NoAssist": true
+      },
+      "Indicator": {
+        "ID": "SHIFT_INDICATOR",
+        "Description": "Shows optimal shift point",
+        "Visual": true,
+        "Audio": { "Optional": true }
+      },
+      "Suggested": {
+        "ID": "SHIFT_SUGGESTED",
+        "Description": "Suggests gear changes",
+        "Prompt": true,
+        "ManualAction": true
+      },
+      "Auto": {
+        "ID": "SHIFT_AUTO",
+        "Description": "Automatic shifting",
+        "FullAuto": true,
+        "ManualOverride": true
+      }
+    },
+    "Customization": {
+      "ShiftPoint": { "RPM": true },
+      "AggressiveMode": { "Optional": true }
+    }
+  },
+
+  "PerformanceEffects": {
+    "ShortGears": {
+      "Acceleration": "Better",
+      "TopSpeed": "Lower",
+      "Fuel": "Higher"
+    },
+    "TallGears": {
+      "Acceleration": "Worse",
+      "TopSpeed": "Higher",
+      "Fuel": "Lower"
+    },
+    "CloseRatio": {
+      "PowerBand": "Maintained",
+      "Shifts": "More"
+    },
+    "WideRatio": {
+      "Range": "Greater",
+      "Shifts": "Fewer"
+    }
+  },
+
+  "TelemetryDisplay": {
+    "CurrentGear": {
+      "Display": true,
+      "Position": "Speedometer"
+    },
+    "ShiftIndicator": {
+      "Display": true,
+      "Type": ["Light", "Bar", "LEDs"]
+    },
+    "GearGraph": {
+      "Display": { "Advanced": true },
+      "PowerVsRPM": true
+    },
+    "ClutchStatus": {
+      "Display": { "Manual": true },
+      "Pressure": true
+    }
+  },
+
+  "Upgrades": {
+    "ShortThrow": {
+      "Cost": 2000,
+      "Effect": "QuickerShifts",
+      "Feel": "Improved"
+    },
+    "CloserRatio": {
+      "Cost": 10000,
+      "Effect": "BetterPowerBand"
+    },
+    "StraightCut": {
+      "Cost": 15000,
+      "Effect": "Stronger",
+      "Noise": "Loud"
+    },
+    "LightweightFlywheel": {
+      "Cost": 3000,
+      "Effect": "FasterRevs",
+      "Weight": -8
+    }
+  },
+
+  "UI": {
+    "GearMenu": {
+      "TypeSelector": true,
+      "RatioSliders": true,
+      "FinalDriveSlider": true,
+      "PresetButtons": true
+    },
+    "Visualization": {
+      "GearChart": true,
+      "SpeedAtRPM": true,
+      "PowerBandOverlay": true
+    },
+    "QuickSettings": {
+      "ShiftAssistToggle": true,
+      "PresetQuickSwitch": true
+    }
+  }
+}

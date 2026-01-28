@@ -1,0 +1,320 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Weight Reduction and Lightweight Components",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "AffectsPerformance": true,
+    "AffectsHandling": true,
+    "VisualChanges": true
+  },
+
+  "WeightCategories": {
+    "Interior": {
+      "ID": "WEIGHT_INTERIOR",
+      "Components": {
+        "RearSeats": {
+          "RemovalWeight": 25,
+          "Cost": 0,
+          "Description": "Remove rear seats"
+        },
+        "Carpet": {
+          "RemovalWeight": 10,
+          "Cost": 0,
+          "Description": "Remove carpet and insulation"
+        },
+        "Soundproofing": {
+          "RemovalWeight": 15,
+          "Cost": 0,
+          "NoisePenalty": true,
+          "Description": "Remove sound deadening"
+        },
+        "AirConditioning": {
+          "RemovalWeight": 30,
+          "Cost": 500,
+          "ComfortPenalty": true,
+          "Description": "Remove A/C system"
+        },
+        "Stereo": {
+          "RemovalWeight": 8,
+          "Cost": 0,
+          "NoMusic": true,
+          "Description": "Remove audio system"
+        },
+        "PassengerSeat": {
+          "RemovalWeight": 20,
+          "Cost": 0,
+          "Description": "Remove passenger seat"
+        },
+        "DoorPanels": {
+          "RemovalWeight": 12,
+          "Cost": 0,
+          "Description": "Replace with lightweight panels"
+        }
+      }
+    },
+    "Exterior": {
+      "ID": "WEIGHT_EXTERIOR",
+      "Components": {
+        "CarbonHood": {
+          "WeightSaving": 15,
+          "Cost": 5000,
+          "Visual": true,
+          "Description": "Carbon fiber hood"
+        },
+        "CarbonTrunk": {
+          "WeightSaving": 12,
+          "Cost": 4000,
+          "Visual": true,
+          "Description": "Carbon fiber trunk"
+        },
+        "CarbonRoof": {
+          "WeightSaving": 20,
+          "Cost": 8000,
+          "Visual": true,
+          "LowersCG": true,
+          "Description": "Carbon fiber roof"
+        },
+        "CarbonFenders": {
+          "WeightSaving": 10,
+          "Cost": 6000,
+          "Visual": true,
+          "Description": "Carbon fiber fenders"
+        },
+        "CarbonDoors": {
+          "WeightSaving": 25,
+          "Cost": 12000,
+          "Visual": true,
+          "Description": "Carbon fiber doors"
+        },
+        "LexanWindows": {
+          "WeightSaving": 20,
+          "Cost": 3000,
+          "NotStreet": true,
+          "Description": "Lexan/polycarbonate windows"
+        },
+        "FiberglassBumpers": {
+          "WeightSaving": 15,
+          "Cost": 2000,
+          "LessDurable": true,
+          "Description": "Fiberglass bumpers"
+        }
+      }
+    },
+    "Chassis": {
+      "ID": "WEIGHT_CHASSIS",
+      "Components": {
+        "LightweightBattery": {
+          "WeightSaving": 10,
+          "Cost": 500,
+          "Description": "Lightweight racing battery"
+        },
+        "AluminumSubframe": {
+          "WeightSaving": 20,
+          "Cost": 5000,
+          "Description": "Aluminum subframe"
+        },
+        "TitaniumBolts": {
+          "WeightSaving": 5,
+          "Cost": 3000,
+          "Description": "Titanium hardware throughout"
+        },
+        "LightweightFlywheel": {
+          "WeightSaving": 8,
+          "Cost": 1500,
+          "FasterRevs": true,
+          "Description": "Lightweight flywheel"
+        }
+      }
+    },
+    "Wheels": {
+      "ID": "WEIGHT_WHEELS",
+      "Components": {
+        "ForgedWheels": {
+          "WeightSaving": 20,
+          "Cost": 8000,
+          "UnsprungWeight": true,
+          "Description": "Lightweight forged wheels"
+        },
+        "CarbonWheels": {
+          "WeightSaving": 30,
+          "Cost": 25000,
+          "UnsprungWeight": true,
+          "Premium": true,
+          "Description": "Carbon fiber wheels"
+        },
+        "LightweightLugNuts": {
+          "WeightSaving": 1,
+          "Cost": 200,
+          "Description": "Lightweight lug nuts"
+        }
+      }
+    },
+    "Brakes": {
+      "ID": "WEIGHT_BRAKES",
+      "Components": {
+        "CarbonCeramicBrakes": {
+          "WeightSaving": 15,
+          "Cost": 50000,
+          "UnsprungWeight": true,
+          "BetterBraking": true,
+          "Description": "Carbon ceramic brake system"
+        }
+      }
+    }
+  },
+
+  "WeightPackages": {
+    "Street": {
+      "ID": "PACKAGE_STREET",
+      "TotalSaving": 30,
+      "Cost": 5000,
+      "Includes": ["CarpetRemoval", "StereoRemoval", "LightweightBattery"],
+      "StreetLegal": true
+    },
+    "Sport": {
+      "ID": "PACKAGE_SPORT",
+      "TotalSaving": 80,
+      "Cost": 20000,
+      "Includes": ["Street", "CarbonHood", "RearSeatRemoval", "ForgedWheels"],
+      "StreetLegal": true
+    },
+    "Track": {
+      "ID": "PACKAGE_TRACK",
+      "TotalSaving": 150,
+      "Cost": 50000,
+      "Includes": ["Sport", "CarbonTrunk", "LexanWindows", "ACRemoval"],
+      "StreetLegal": false
+    },
+    "Race": {
+      "ID": "PACKAGE_RACE",
+      "TotalSaving": 250,
+      "Cost": 100000,
+      "Includes": ["Track", "CarbonDoors", "CarbonRoof", "StripInterior"],
+      "StreetLegal": false
+    },
+    "Ultimate": {
+      "ID": "PACKAGE_ULTIMATE",
+      "TotalSaving": 350,
+      "Cost": 200000,
+      "Includes": ["Race", "CarbonWheels", "CarbonCeramicBrakes", "TitaniumEverything"],
+      "StreetLegal": false
+    }
+  },
+
+  "PerformanceEffects": {
+    "Acceleration": {
+      "PerKgRemoved": { "Improvement": 0.01 },
+      "Formula": "PowerToWeight"
+    },
+    "Handling": {
+      "CorneringSpeed": { "Improvement": true },
+      "ResponsivenesS": { "Improvement": true },
+      "UnsprungWeight": { "ExtraBonus": true }
+    },
+    "Braking": {
+      "StoppingDistance": { "Improved": true },
+      "BrakeFade": { "Reduced": { "IfLighter": true } }
+    },
+    "TopSpeed": {
+      "Effect": "Minimal",
+      "Aerodynamics": "Unchanged"
+    }
+  },
+
+  "Tradeoffs": {
+    "Comfort": {
+      "NoAC": { "Temperature": "Affected" },
+      "NoSoundproofing": { "Noise": "Increased" },
+      "NoStereo": { "Entertainment": "None" }
+    },
+    "Durability": {
+      "Fiberglass": { "Damage": "Easier" },
+      "CarbonFiber": { "Repair": "Expensive" }
+    },
+    "Practicality": {
+      "NoRearSeats": { "Passengers": "Limited" },
+      "StrippedInterior": { "Daily": "Impractical" }
+    },
+    "Legality": {
+      "LexanWindows": { "NotStreetLegal": true },
+      "RollCage": { "PassengerSafety": true }
+    }
+  },
+
+  "UnsprungWeight": {
+    "Importance": "High",
+    "Components": ["Wheels", "Tires", "Brakes", "Suspension"],
+    "Effects": {
+      "Ride": { "Improved": true },
+      "Grip": { "Improved": true },
+      "Response": { "Improved": true }
+    },
+    "Multiplier": 1.5
+  },
+
+  "WeightDistribution": {
+    "Affected": true,
+    "FrontRearBalance": {
+      "CarbonHood": { "Moves": "Rearward" },
+      "RearSeatRemoval": { "Moves": "Forward" },
+      "BatteryRelocation": { "Configurable": true }
+    },
+    "TargetBalance": {
+      "Ideal": { "Front": 50, "Rear": 50 },
+      "Acceptable": { "Range": [48, 52] }
+    }
+  },
+
+  "VisualChanges": {
+    "CarbonParts": {
+      "Visible": true,
+      "Weave": "Exposed",
+      "Finish": ["Matte", "Gloss"]
+    },
+    "StrippedInterior": {
+      "Visible": true,
+      "BareMetal": true,
+      "RollCage": { "Optional": true }
+    },
+    "LexanWindows": {
+      "Visible": true,
+      "Tint": "Optional"
+    }
+  },
+
+  "Restrictions": {
+    "StoryMode": {
+      "SomeUnavailable": true
+    },
+    "OnlineRanked": {
+      "ClassLimited": true
+    },
+    "StreetRacing": {
+      "StreetLegalOnly": { "SomeModes": true }
+    }
+  },
+
+  "UI": {
+    "WeightManager": {
+      "TotalWeight": true,
+      "SavingsDisplay": true,
+      "DistributionBar": true
+    },
+    "ComponentList": {
+      "Categories": true,
+      "IndividualItems": true,
+      "CostBenefit": true
+    },
+    "Packages": {
+      "QuickSelect": true,
+      "Comparison": true,
+      "StreetLegalIndicator": true
+    },
+    "Performance": {
+      "BeforeAfter": true,
+      "PowerToWeight": true,
+      "ClassImpact": true
+    }
+  }
+}

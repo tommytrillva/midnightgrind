@@ -1,0 +1,258 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Drivetrain Configuration and Options",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DrivetrainSwaps": true,
+    "DifferentialTuning": true,
+    "AffectsHandling": true
+  },
+
+  "DrivetrainTypes": {
+    "FWD": {
+      "ID": "DRIVE_FWD",
+      "Name": "Front Wheel Drive",
+      "Description": "Power to front wheels",
+      "Characteristics": {
+        "Understeer": "Natural",
+        "Traction": "Good",
+        "Weight": "Light",
+        "Efficiency": "High"
+      },
+      "DriftAbility": "Low",
+      "Maintenance": "Low"
+    },
+    "RWD": {
+      "ID": "DRIVE_RWD",
+      "Name": "Rear Wheel Drive",
+      "Description": "Power to rear wheels",
+      "Characteristics": {
+        "Oversteer": "Natural",
+        "Balance": "Good",
+        "Weight": "Medium",
+        "Efficiency": "Medium"
+      },
+      "DriftAbility": "High",
+      "Maintenance": "Medium"
+    },
+    "AWD": {
+      "ID": "DRIVE_AWD",
+      "Name": "All Wheel Drive",
+      "Description": "Power to all wheels",
+      "Characteristics": {
+        "Traction": "Excellent",
+        "Stability": "High",
+        "Weight": "Heavy",
+        "Efficiency": "Low"
+      },
+      "DriftAbility": "Medium",
+      "Maintenance": "High"
+    },
+    "4WD": {
+      "ID": "DRIVE_4WD",
+      "Name": "Four Wheel Drive",
+      "Description": "Selectable 4x4 system",
+      "Characteristics": {
+        "OffRoad": "Excellent",
+        "Traction": "Maximum",
+        "Weight": "Heavy"
+      },
+      "Modes": ["2WD", "4H", "4L"],
+      "ForOffroad": true
+    }
+  },
+
+  "DrivetrainSwap": {
+    "Enabled": true,
+    "Conversions": {
+      "FWD_to_RWD": {
+        "Cost": 50000,
+        "Difficulty": "Major",
+        "WeightChange": 50,
+        "BalanceChange": "Improved"
+      },
+      "RWD_to_AWD": {
+        "Cost": 75000,
+        "Difficulty": "Major",
+        "WeightChange": 100,
+        "TractionChange": "Improved"
+      },
+      "FWD_to_AWD": {
+        "Cost": 80000,
+        "Difficulty": "Extreme",
+        "WeightChange": 120,
+        "TractionChange": "Improved"
+      },
+      "AWD_to_RWD": {
+        "Cost": 30000,
+        "Difficulty": "Moderate",
+        "WeightChange": -80,
+        "DriftChange": "Improved"
+      }
+    },
+    "Requirements": {
+      "GarageLevel": 3,
+      "REPLevel": 25
+    }
+  },
+
+  "Differential": {
+    "Types": {
+      "Open": {
+        "ID": "DIFF_OPEN",
+        "Description": "Standard open differential",
+        "Locking": 0,
+        "Stock": true
+      },
+      "LimitedSlip": {
+        "ID": "DIFF_LSD",
+        "Description": "Limited slip differential",
+        "Locking": { "Min": 20, "Max": 80 },
+        "Types": ["Clutch", "Viscous", "Torsen"]
+      },
+      "Locking": {
+        "ID": "DIFF_LOCKED",
+        "Description": "Fully locking differential",
+        "Locking": 100,
+        "ForDrift": true
+      },
+      "Electronic": {
+        "ID": "DIFF_ELECTRONIC",
+        "Description": "Electronically controlled",
+        "Locking": { "Variable": true },
+        "Adaptive": true
+      }
+    },
+    "Tuning": {
+      "Acceleration": {
+        "Range": { "Min": 0, "Max": 100 },
+        "Default": 50,
+        "Effect": "WheelLockupOnPower"
+      },
+      "Deceleration": {
+        "Range": { "Min": 0, "Max": 100 },
+        "Default": 30,
+        "Effect": "WheelLockupOnBraking"
+      }
+    }
+  },
+
+  "TransferCase": {
+    "ForAWD": true,
+    "PowerSplit": {
+      "Default": { "Front": 50, "Rear": 50 },
+      "Adjustable": true,
+      "Range": { "Front": [10, 70], "Rear": [30, 90] }
+    },
+    "Presets": {
+      "Balanced": { "Front": 50, "Rear": 50 },
+      "FrontBias": { "Front": 60, "Rear": 40 },
+      "RearBias": { "Front": 40, "Rear": 60 },
+      "DriftMode": { "Front": 20, "Rear": 80 }
+    },
+    "Active": {
+      "Enabled": { "ForElectronic": true },
+      "TorqueVectoring": true,
+      "AdaptiveDistribution": true
+    }
+  },
+
+  "Driveshaft": {
+    "Types": {
+      "Steel": { "Weight": "Heavy", "Strength": "High", "Stock": true },
+      "Aluminum": { "Weight": "Light", "Strength": "Medium" },
+      "CarbonFiber": { "Weight": "VeryLight", "Strength": "High", "Premium": true }
+    },
+    "Effects": {
+      "Weight": { "RotationalInertia": true },
+      "Strength": { "PowerLimit": true }
+    }
+  },
+
+  "Axles": {
+    "Front": {
+      "CVJoints": true,
+      "Angle": { "Affects": "SteeringLock" }
+    },
+    "Rear": {
+      "SolidAxle": { "ForOffroad": true },
+      "IndependentRear": { "Standard": true }
+    },
+    "Upgrades": {
+      "HeavyDuty": { "PowerHandling": 1.5 },
+      "Racing": { "Weight": -10, "Strength": 1.3 }
+    }
+  },
+
+  "HandlingEffects": {
+    "FWD": {
+      "Understeer": { "OnPower": true },
+      "TorqueSteer": { "HighPower": true },
+      "NoseHeavy": true,
+      "LiftOffOversteer": { "Possible": true }
+    },
+    "RWD": {
+      "Oversteer": { "OnPower": true },
+      "PowerSlide": { "Easy": true },
+      "Balanced": true,
+      "TractionLimited": { "LowGrip": true }
+    },
+    "AWD": {
+      "Neutral": { "Mostly": true },
+      "Understeer": { "Heavy": true },
+      "AllConditions": { "Best": true },
+      "FuelConsumption": { "Higher": true }
+    }
+  },
+
+  "DriftBehavior": {
+    "FWD": {
+      "Technique": "Scandinavian Flick",
+      "Handbrake": "Required",
+      "Difficulty": "Hard"
+    },
+    "RWD": {
+      "Technique": "PowerOversteer",
+      "Handbrake": "Optional",
+      "Difficulty": "Medium"
+    },
+    "AWD": {
+      "Technique": "RallyCross",
+      "Handbrake": "Helps",
+      "Difficulty": "Medium",
+      "RearBias": "Recommended"
+    }
+  },
+
+  "Upgrades": {
+    "Differential": {
+      "Level1": { "Type": "LSD_Clutch", "Cost": 8000 },
+      "Level2": { "Type": "LSD_Torsen", "Cost": 15000 },
+      "Level3": { "Type": "Racing_LSD", "Cost": 25000 },
+      "Level4": { "Type": "Electronic_Diff", "Cost": 40000 }
+    },
+    "Driveshaft": {
+      "Aluminum": { "Cost": 5000, "Weight": -15 },
+      "CarbonFiber": { "Cost": 15000, "Weight": -25 }
+    }
+  },
+
+  "UI": {
+    "DrivetrainDisplay": {
+      "TypeIndicator": true,
+      "PowerFlowDiagram": true,
+      "LiveDistribution": { "ForAWD": true }
+    },
+    "TuningMenu": {
+      "DiffSliders": true,
+      "TransferCaseSliders": { "ForAWD": true },
+      "PresetButtons": true
+    },
+    "SwapMenu": {
+      "ConversionOptions": true,
+      "CostDisplay": true,
+      "EffectPreview": true
+    }
+  }
+}
