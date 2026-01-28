@@ -1,5 +1,87 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGDefaultGameplayHUD.h - Full-Featured Racing HUD Implementation
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines the complete, production-ready racing HUD with all the
+ * visual elements a player sees during a race. Unlike the minimal Debug HUD,
+ * this includes a full digital speedometer, tachometer, nitrous gauge, drift
+ * scoring display, minimap integration, and animated visual feedback.
+ *
+ * This is what players actually see when playing the game - the polished,
+ * feature-complete dashboard interface.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * Class Inheritance:
+ *   This class inherits from UMGRaceHUDWidget (see MGRaceHUDWidget.h).
+ *   The base class defines the interface (what methods must exist), and this
+ *   class provides the actual implementation (how those methods work).
+ *
+ *   UMGRaceHUDWidget (Abstract Base)
+ *         |
+ *         v
+ *   UMGDefaultGameplayHUD (Concrete Implementation)
+ *
+ * _Implementation Suffix:
+ *   Methods ending in "_Implementation" are the C++ implementations of
+ *   BlueprintNativeEvent functions. This is Unreal's pattern for allowing
+ *   both C++ and Blueprint to override the same function.
+ *
+ * Widget Binding Types:
+ *   - BindWidget: REQUIRED - the Blueprint MUST have this widget or it crashes
+ *   - BindWidgetOptional: OPTIONAL - the Blueprint may or may not have this widget
+ *   Use Optional for features that might not appear in all HUD variations.
+ *
+ * UI Element Types Used:
+ *   - UTextBlock: Displays text (speed numbers, lap count, times)
+ *   - UProgressBar: Shows a value as a filled bar (RPM, nitrous amount)
+ *   - UImage: Displays textures/icons (shift light, nitrous glow)
+ *   - UBorder: Container with background color for visual grouping
+ *   - UCanvasPanel: Allows precise positioning of child widgets
+ *
+ * Color Configuration:
+ *   The UPROPERTY(EditDefaultsOnly) properties let designers adjust colors
+ *   in the editor without changing code. This is essential for iteration -
+ *   artists can tweak the look without programmer involvement.
+ *
+ * HOW IT FITS IN THE ARCHITECTURE:
+ * --------------------------------
+ *
+ *   [Vehicle Pawn] -----> [HUD Data Provider] -----> [DefaultGameplayHUD]
+ *        |                       |                           |
+ *        v                       v                           v
+ *   (Speed, RPM,           (Aggregates &              (Renders all
+ *    Gear, NOS)            Formats Data)              UI Elements)
+ *
+ * The HUD receives data from the HUD Data Provider subsystem, which
+ * aggregates information from the vehicle, race systems, and scoring systems.
+ *
+ * FEATURE BREAKDOWN:
+ * ------------------
+ * 1. SPEEDOMETER CLUSTER: Digital speed display with unit toggle (MPH/KPH)
+ * 2. TACHOMETER: Arc-style RPM display with redline warning animation
+ * 3. GEAR INDICATOR: Current gear with shift light when approaching redline
+ * 4. NITROUS GAUGE: Shows NOS remaining with activation glow effect
+ * 5. POSITION/LAP: Race standing (1st/8) and lap progress (2/3)
+ * 6. TIMING: Current lap time, best lap time, and gap to other racers
+ * 7. DRIFT DISPLAY: Score, multiplier, and combo chain during drifts
+ * 8. MINIMAP: Integrated track map showing racer positions
+ *
+ * VISUAL STYLE:
+ * -------------
+ * The HUD follows a "Y2K aesthetic" with neon colors (cyan, pink, yellow)
+ * reminiscent of early 2000s racing games. Color constants are configurable
+ * through the editor properties.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

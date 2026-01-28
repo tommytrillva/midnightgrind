@@ -1,18 +1,100 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehicleAudioComponent.h
+ * @brief Vehicle audio system for immersive engine, tire, and environmental sounds.
+ *
+ * @section Overview
+ * This component manages all audio aspects of a vehicle in MIDNIGHT GRIND, creating
+ * an immersive soundscape that responds dynamically to vehicle state. It handles
+ * multi-layer engine sounds, tire squeals, turbo whine, NOS effects, and collision audio.
+ *
+ * @section Architecture
+ * The audio system uses a layered approach where multiple sound sources blend together
+ * based on vehicle state:
+ *
+ * 1. **Engine Layers**: Multiple engine sounds crossfade based on RPM
+ *    - Idle layer (0-2000 RPM)
+ *    - Low RPM layer (1500-4000 RPM)
+ *    - Mid RPM layer (3500-6000 RPM)
+ *    - High RPM layer (5500+ RPM)
+ *
+ * 2. **Load Modulation**: Throttle position affects volume and pitch
+ *
+ * 3. **Forced Induction**: Turbo whine and blow-off sounds
+ *
+ * 4. **Tire Audio**: Surface-dependent skid and rolling sounds
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **AudioComponent**: An Unreal Engine component that plays sound in 3D space.
+ * We create multiple AudioComponents - one for each engine layer, tires, etc.
+ *
+ * **Crossfading**: Smoothly transitioning between sounds. For example, as RPM
+ * increases, the idle engine sound fades out while the high-RPM sound fades in.
+ *
+ * **Load Modulation**: Making sounds respond to throttle input. When you floor it,
+ * the engine sounds more strained/aggressive than when coasting.
+ *
+ * **Backfire**: The popping sound when unburnt fuel ignites in the exhaust. Occurs
+ * when you suddenly lift off the throttle at high RPM.
+ *
+ * @section Usage Example Usage
+ * @code
+ * // In your vehicle pawn's BeginPlay:
+ * AudioComponent = NewObject<UMGVehicleAudioComponent>(this);
+ * AudioComponent->RegisterComponent();
+ * AudioComponent->Initialize(this);
+ * AudioComponent->StartAudio();
+ *
+ * // When gear changes (connect to delegate or call directly):
+ * AudioComponent->OnGearChanged(OldGear, NewGear);
+ *
+ * // When NOS activates:
+ * AudioComponent->OnNOSStateChanged(true);
+ * @endcode
+ *
+ * @see AMGVehiclePawn The vehicle pawn that owns this component
+ * @see UMGVehicleMovementComponent Provides RPM, throttle, and speed data
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "MGVehicleAudioComponent.generated.h"
 
+// ============================================================================
+// FORWARD DECLARATIONS
+// ============================================================================
+
 class UAudioComponent;
 class USoundBase;
 class USoundCue;
 class AMGVehiclePawn;
 
+// ============================================================================
+// ENGINE SOUND LAYER CONFIGURATION
+// ============================================================================
+
 /**
- * Engine sound layer configuration
+ * @brief Engine sound layer configuration for RPM-based crossfading.
+ *
+ * Each layer represents a sound that plays within a specific RPM range.
+ * Multiple layers blend together to create a realistic engine sound that
+ * evolves as RPM changes.
+ *
+ * How it works:
+ * - Below FadeInRPM: Sound is silent
+ * - FadeInRPM to FullVolumeRPM: Sound fades in
+ * - FullVolumeRPM to FadeOutRPM: Sound plays at full volume
+ * - FadeOutRPM to SilentRPM: Sound fades out
+ * - Above SilentRPM: Sound is silent
+ *
+ * Example layer setup for a 4-cylinder engine:
+ * - Layer 1 (Idle): FadeIn=0, FullVol=800, FadeOut=2000, Silent=3000
+ * - Layer 2 (Low): FadeIn=1500, FullVol=3000, FadeOut=5000, Silent=6000
+ * - Layer 3 (High): FadeIn=4500, FullVol=6000, FadeOut=7500, Silent=8000
  */
 USTRUCT(BlueprintType)
 struct FMGEngineSoundLayer
@@ -56,8 +138,17 @@ struct FMGEngineSoundLayer
 	float LoadModulationStrength = 0.3f;
 };
 
+// ============================================================================
+// TIRE SOUND CONFIGURATION
+// ============================================================================
+
 /**
- * Tire sound configuration per surface type
+ * @brief Tire sound configuration per surface type.
+ *
+ * Different surfaces produce different tire sounds. Asphalt produces
+ * a sharp screech, gravel produces a crunchy rolling sound, etc.
+ * The GripFactor affects volume scaling based on how much grip the
+ * surface provides.
  */
 USTRUCT(BlueprintType)
 struct FMGTireSoundConfig
@@ -77,8 +168,23 @@ struct FMGTireSoundConfig
 	float GripFactor = 1.0f;
 };
 
+// ============================================================================
+// BACKFIRE CONFIGURATION
+// ============================================================================
+
 /**
- * Backfire configuration
+ * @brief Configuration for exhaust backfire/pop sounds.
+ *
+ * Backfires occur when unburnt fuel ignites in the exhaust system.
+ * This typically happens when you suddenly release the throttle at
+ * high RPM, causing fuel to enter the hot exhaust where it combusts.
+ *
+ * Common trigger conditions:
+ * - High RPM (above MinRPM)
+ * - Sudden throttle lift (throttle drops below ThrottleLiftThreshold)
+ * - Random chance (Probability) adds variation
+ *
+ * CooldownTime prevents machine-gun-like rapid backfires.
  */
 USTRUCT(BlueprintType)
 struct FMGBackfireConfig
@@ -106,18 +212,41 @@ struct FMGBackfireConfig
 	float Probability = 0.4f;
 };
 
+// ============================================================================
+// VEHICLE AUDIO COMPONENT CLASS
+// ============================================================================
+
 /**
- * Vehicle audio component - handles all vehicle sounds
+ * @class UMGVehicleAudioComponent
+ * @brief Main vehicle audio component handling all vehicle sounds.
  *
- * Features:
- * - Multi-layer engine sound with RPM crossfading
- * - Exhaust/backfire pops
- * - Tire sounds (skid, surface type)
- * - Transmission shift sounds
- * - Turbo/supercharger whine
- * - Wind noise
- * - NOS activation
- * - Collision/scrape sounds
+ * This component creates an immersive audio experience by managing multiple
+ * sound sources that respond to vehicle state in real-time.
+ *
+ * @section Features Features
+ * - **Multi-layer Engine Sound**: RPM-based crossfading between sound layers
+ * - **Exhaust/Backfire Pops**: Dynamic pops on throttle lift at high RPM
+ * - **Tire Sounds**: Surface-aware skid and rolling sounds
+ * - **Transmission**: Shift up/down, clutch, and gear grind sounds
+ * - **Forced Induction**: Turbo whine, blow-off valve, supercharger sounds
+ * - **Wind Noise**: Speed-dependent wind audio
+ * - **NOS System**: Activation, loop, and deactivation sounds
+ * - **Collision Audio**: Impact and scrape sounds
+ *
+ * @section UnrealMacros Unreal Engine Macro Explanations
+ *
+ * **UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))**
+ * - ClassGroup=(Custom): Groups this class under "Custom" in the editor
+ * - BlueprintSpawnableComponent: Allows spawning this component via Blueprint
+ *
+ * **UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "...")**
+ * - EditAnywhere: Can edit in both Blueprint and instance defaults
+ * - BlueprintReadWrite: Blueprint can read and modify this property
+ * - Category: Organizes properties in the Details panel
+ *
+ * **UFUNCTION(BlueprintCallable, Category = "...")**
+ * - BlueprintCallable: This function can be called from Blueprint graphs
+ * - Category: Groups the function in Blueprint's function list
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MIDNIGHTGRIND_API UMGVehicleAudioComponent : public UActorComponent

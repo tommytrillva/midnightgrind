@@ -1,5 +1,115 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGStreakSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the Streak and Combo system for Midnight Grind. While the
+ * Daily Login systems track daily play patterns, THIS system tracks IN-GAME
+ * performance streaks that happen during actual gameplay.
+ *
+ * Streaks and combos are a core part of arcade racing games - they reward
+ * skilled, consistent play with multipliers and bonuses. Think of classic
+ * games like Burnout, Need for Speed, or Tony Hawk where chaining moves
+ * together gives you higher scores.
+ *
+ * KEY CONCEPTS:
+ * -------------
+ * 1. STREAKS (EMGStreakType): Tracking consecutive achievements across races.
+ *    - Win Streak: Winning multiple races in a row
+ *    - Podium Streak: Finishing top 3 multiple times
+ *    - Perfect Streak: Completing races without crashes
+ *    - Daily Streak: Playing every day (different from daily LOGIN)
+ *    - Ranked Streak: Winning ranked matches consecutively
+ *
+ *    Streaks persist across multiple game sessions until broken.
+ *
+ * 2. COMBOS (EMGComboType): Short-term chains during a SINGLE race.
+ *    - Drift Combo: Chaining multiple drifts together
+ *    - Near Miss Combo: Narrowly avoiding obstacles repeatedly
+ *    - Slipstream Combo: Drafting behind opponents
+ *    - Takedown Combo: Knocking out multiple opponents quickly
+ *    - Mega Combo: Combining multiple combo types at once
+ *
+ *    Combos have a timer - keep performing actions or it expires!
+ *
+ * 3. STREAK TIERS (EMGStreakTier): Reward levels based on streak length.
+ *    None -> Bronze (3) -> Silver (5) -> Gold (10) -> Platinum (15)
+ *    -> Diamond (25) -> Champion (50) -> Legend (100)
+ *
+ *    Higher tiers give better multipliers and exclusive rewards.
+ *
+ * 4. STREAK STATUS (EMGStreakStatus):
+ *    - Inactive: Not currently tracking (no streak)
+ *    - Active: Streak is ongoing
+ *    - AtRisk: Streak might expire soon (time-based streaks)
+ *    - Frozen: Player used a token to pause the streak
+ *    - Broken: Streak was lost
+ *    - Completed: Reached maximum tier
+ *
+ * 5. FREEZE TOKENS: Players can "freeze" their streak to protect it.
+ *    If you know you can't play tomorrow, freeze your daily streak!
+ *    Limited tokens add strategic decision-making.
+ *
+ * 6. MULTIPLIERS: Both streaks and combos grant score/reward multipliers.
+ *    A 5x multiplier means your points are worth 5 times more!
+ *
+ * ARCHITECTURE:
+ * -------------
+ * UGameInstanceSubsystem - Singleton for entire game session.
+ *
+ * Key Data Structures:
+ * - FMGActiveStreak: Currently active streak with count, tier, multiplier
+ * - FMGStreakDefinition: How a streak type works (thresholds, multipliers)
+ * - FMGActiveCombo: In-progress combo during gameplay
+ * - FMGComboResult: Final result when combo ends
+ * - FMGStreakTierReward: Rewards for reaching streak tiers
+ * - FMGDailyStreakData: Daily play streak tracking
+ * - FMGStreakPlayerStats: Player's overall streak statistics
+ *
+ * TYPICAL GAMEPLAY FLOW:
+ * ----------------------
+ * Racing:
+ * 1. Player starts race
+ * 2. Player drifts -> StartCombo(DriftCombo)
+ * 3. Player keeps drifting -> AddComboHit() adds to combo
+ * 4. Combo timer ticking down -> ExtendComboTimer() on each hit
+ * 5. Timer runs out OR player crashes -> EndCombo() / DropCombo()
+ * 6. Final score calculated with combo multiplier
+ *
+ * Streaks (across races):
+ * 1. Player wins race -> IncrementStreak(Win)
+ * 2. Win 3 in a row -> OnStreakTierReached(Bronze)
+ * 3. Lose next race -> BreakStreak(Win) -> OnStreakBroken
+ *
+ * DELEGATES (Events):
+ * -------------------
+ * - OnStreakUpdated: Streak count changed
+ * - OnStreakTierReached: Hit a new tier (Bronze, Silver, etc.)
+ * - OnStreakBroken: Streak was lost
+ * - OnComboHit: Added to current combo
+ * - OnComboEnded: Combo finished (successfully)
+ * - OnMegaCombo: Player achieved a mega combo (impressive!)
+ * - OnStreakFrozen: Player used a freeze token
+ * - OnStreakAtRisk: Warning that streak might expire
+ *
+ * WHY SEPARATE FROM DAILY LOGIN?
+ * ------------------------------
+ * Daily Login tracks WHEN you play (engagement/retention).
+ * Streaks track HOW WELL you play (skill/performance).
+ *
+ * A player could have a 30-day login streak but 0 win streak.
+ * Another could have 10 wins in a row but only played 2 days.
+ *
+ * Both systems reward different player behaviors and work together
+ * to create a rich progression experience.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

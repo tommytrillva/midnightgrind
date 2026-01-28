@@ -1,5 +1,156 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGNewsSubsystem.h - In-Game News and Announcements System
+ *******************************************************************************
+ *
+ * OVERVIEW FOR NEW DEVELOPERS
+ * ===========================
+ * This file defines the News system - the in-game "newspaper" that keeps
+ * players informed about updates, events, and community content. Similar to
+ * the news feeds in Fortnite, Destiny, or League of Legends that show when
+ * you launch the game.
+ *
+ * WHY DO GAMES HAVE NEWS SYSTEMS?
+ * -------------------------------
+ * - Announce new content (maps, cars, features)
+ * - Promote limited-time events before they end
+ * - Share patch notes so players know what changed
+ * - Warn about upcoming maintenance to prevent frustration
+ * - Highlight community content (fan art, streamers)
+ * - Build excitement for upcoming features
+ *
+ * NEWS CATEGORIES (EMGNewsCategory)
+ * ---------------------------------
+ * Different types of news have different purposes:
+ *
+ * - PatchNotes: "Version 1.2 is here! Here's what changed..."
+ *   - Bug fixes, new features, balance changes
+ *   - Players want to know what's different
+ *
+ * - Event: "Double XP Weekend starts Friday!"
+ *   - Limited-time content and special occasions
+ *   - Creates urgency to play
+ *
+ * - Community: "Check out this amazing fan art!"
+ *   - Player spotlights, content creator features
+ *   - Builds community connection
+ *
+ * - Esports: "World Championship Finals this Saturday!"
+ *   - Tournament announcements and results
+ *   - For competitive players
+ *
+ * - Maintenance: "Servers down Tuesday 2-4 AM for updates"
+ *   - Scheduled downtime warnings
+ *   - Prevents player frustration
+ *
+ * - Feature: "New Photo Mode - Here's how to use it"
+ *   - New feature tutorials and guides
+ *   - Helps players discover features
+ *
+ * - Season: "Season 3 rewards revealed!"
+ *   - Battle pass and seasonal content
+ *   - Drives progression engagement
+ *
+ * PRIORITY LEVELS (EMGNewsPriority)
+ * ---------------------------------
+ * Not all news is equally important:
+ *
+ * - Low: Background content, only in news section
+ *   "Community art contest winners announced"
+ *
+ * - Normal: Shows notification badge, doesn't interrupt
+ *   "New map Neon District now available!"
+ *
+ * - High: Highlighted on main menu, hard to miss
+ *   "Double XP ends in 24 hours!"
+ *
+ * - Critical: INTERRUPTS gameplay, must acknowledge
+ *   "Server maintenance in 15 minutes - save your progress!"
+ *
+ * KEY DATA STRUCTURES
+ * -------------------
+ * 1. FMGNewsArticle: A single news item
+ *    - Title, summary, full content
+ *    - Category and priority
+ *    - Publish and expiry dates
+ *    - Optional image and action button
+ *    - Read/acknowledged status
+ *
+ * 2. FMGPatchNote: Structured patch notes
+ *    - Version number and release date
+ *    - Categorized lists: New Features, Improvements, Bug Fixes, etc.
+ *    - Makes patch notes readable and organized
+ *
+ * ARTICLE LIFECYCLE
+ * -----------------
+ * 1. Published on server with publish date
+ * 2. Client fetches during RefreshNews()
+ * 3. Appears in news list (sorted by date)
+ * 4. Player opens it -> MarkAsRead()
+ * 5. If critical -> must AcknowledgeArticle()
+ * 6. Eventually expires (ExpiryDate) and disappears
+ *
+ * READ TRACKING
+ * -------------
+ * The system tracks which articles you've read:
+ * - GetUnreadCount() for notification badges (the red "3" bubble)
+ * - GetUnreadArticles() to highlight new content
+ * - MarkAsRead() when player opens an article
+ * - MarkAllAsRead() for "clear all" button
+ *
+ * MAINTENANCE WARNINGS
+ * --------------------
+ * Special handling for maintenance notifications:
+ * - IsMaintenanceScheduled() checks if maintenance is coming
+ * - GetTimeUntilMaintenance() for countdown timers
+ * - Critical priority ensures players see it
+ *
+ * This prevents the frustrating experience of:
+ * "I was about to finish the race and the server kicked me!"
+ *
+ * HOW TO USE THIS SYSTEM (EXAMPLE)
+ * --------------------------------
+ * // Get the subsystem:
+ * UMGNewsSubsystem* News = GetGameInstance()->GetSubsystem<UMGNewsSubsystem>();
+ *
+ * // Check for unread news (for notification badge):
+ * int32 UnreadCount = News->GetUnreadCount();
+ * if (UnreadCount > 0)
+ * {
+ *     ShowNotificationBadge(UnreadCount);
+ * }
+ *
+ * // Get event news for the events page:
+ * TArray<FMGNewsArticle> Events = News->GetArticlesByCategory(EMGNewsCategory::Event);
+ *
+ * // Check for maintenance warning:
+ * if (News->IsMaintenanceScheduled())
+ * {
+ *     FTimespan TimeLeft = News->GetTimeUntilMaintenance();
+ *     if (TimeLeft.GetTotalMinutes() < 30)
+ *     {
+ *         ShowMaintenanceWarning(TimeLeft);
+ *     }
+ * }
+ *
+ * DELEGATES (EVENTS)
+ * ------------------
+ * Subscribe to these to react to news changes:
+ * - OnNewArticleReceived: New article fetched from server
+ * - OnCriticalNewsReceived: URGENT - show immediately!
+ * - OnNewsRefreshed: News list was updated from server
+ *
+ * SERVER COMMUNICATION
+ * --------------------
+ * News is fetched from a backend server:
+ * - RefreshNews() triggers a fetch
+ * - Automatic refresh on a timer (set during Initialize)
+ * - Cached locally so it's available offline
+ * - Read status saved locally and persists across sessions
+ *
+ ******************************************************************************/
+
 /**
  * @file MGNewsSubsystem.h
  * @brief News and Announcements Subsystem for Midnight Grind

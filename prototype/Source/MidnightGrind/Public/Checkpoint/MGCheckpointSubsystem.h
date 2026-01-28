@@ -1,5 +1,245 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGCheckpointSubsystem.h
+ * @brief Checkpoint System - Race Timing, Laps, Sectors, and Wrong Way Detection
+ * =============================================================================
+ *
+ * @section Overview
+ * This subsystem manages the checkpoint system for racing in Midnight Grind.
+ * Checkpoints are invisible (or visible) triggers placed around tracks that
+ * validate race progress, track timing, and detect wrong-way driving. This is
+ * the core system that makes racing "work" - without it, the game wouldn't know
+ * when you've completed a lap or crossed the finish line.
+ *
+ * @section WhyCheckpoints Why Checkpoints Matter
+ *
+ * Checkpoints serve multiple purposes:
+ * - LAP VALIDATION: Ensures player drove the whole track, not shortcuts
+ * - TIMING: Split times, sector times, lap times for competitive racing
+ * - PROGRESSION: Know when to count a lap, when to end the race
+ * - ANTI-CHEAT: Prevents skipping sections of the track
+ * - NAVIGATION: Wrong-way detection, next checkpoint guidance
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * 1. GAME INSTANCE SUBSYSTEM
+ *    Inherits from UGameInstanceSubsystem:
+ *    - One instance for entire game session
+ *    - Persists across level loads (keeps best times)
+ *    - Access via: GetGameInstance()->GetSubsystem<UMGCheckpointSubsystem>()
+ *
+ * 2. CHECKPOINT TYPES (EMGCheckpointType)
+ *    Different checkpoint functions:
+ *    - Standard: Regular checkpoint for progress tracking
+ *    - Start: Race starting line
+ *    - Finish: Race ending line (may be same as Start for circuits)
+ *    - Lap: Marks lap completion (usually same as Start/Finish)
+ *    - Split: Timing checkpoint for split times
+ *    - Secret: Hidden checkpoint for shortcuts
+ *    - Bonus: Optional checkpoint for extra points
+ *    - Mandatory: MUST be passed or lap is invalid
+ *    - Optional: Can be skipped without penalty
+ *    - TimeExtension: Adds time in time-attack modes
+ *
+ * 3. CHECKPOINT STATES (EMGCheckpointState)
+ *    Current status of each checkpoint:
+ *    - Inactive: Not part of current race
+ *    - Active: The next checkpoint to pass
+ *    - Upcoming: Soon to be active (for UI preview)
+ *    - Passed: Successfully crossed
+ *    - Missed: Skipped (may invalidate lap)
+ *    - Invalid: Crossed wrong way or in wrong order
+ *
+ * 4. CHECKPOINT SHAPES (EMGCheckpointShape)
+ *    Trigger volume geometry:
+ *    - Box: Rectangular trigger (most common)
+ *    - Sphere: Spherical trigger
+ *    - Plane: Thin plane to cross (precise timing)
+ *    - Cylinder: Cylindrical trigger
+ *    - Custom: Complex geometry
+ *
+ * 5. CHECKPOINT LAYOUT (FMGCheckpointLayout)
+ *    Complete checkpoint configuration for a track:
+ *    - Array of checkpoints in order
+ *    - Sector definitions (groups of checkpoints)
+ *    - Total laps for circuit races
+ *    - bIsCircuit: True for loops, false for point-to-point
+ *
+ * 6. SECTORS (FMGSectorDefinition)
+ *    Track divided into timed sections:
+ *    - Typically 3 sectors per lap (S1, S2, S3)
+ *    - Each sector has best/target times
+ *    - Sector colors for UI (green=personal best, purple=all-time best)
+ *
+ * 7. LAP DATA (FMGLapData)
+ *    Information about a completed lap:
+ *    - LapTime: Total time for the lap
+ *    - SectorTimes: Time for each sector
+ *    - Passages: Every checkpoint crossed
+ *    - bIsValid: True if all checkpoints hit
+ *    - bIsBestLap: True if new personal best
+ *
+ * 8. SPLIT TIMES & DELTA
+ *    Comparison timing:
+ *    - Split time: Time at each checkpoint
+ *    - Delta: Difference from best/target (+/- seconds)
+ *    - Green delta: Ahead of target
+ *    - Red delta: Behind target
+ *
+ * 9. DIRECTION VALIDATION
+ *    Checkpoints verify approach direction:
+ *    - RequiredDirection: Which way to cross
+ *    - DirectionTolerance: Allowed angle deviation
+ *    - Prevents driving backward through checkpoints
+ *
+ * 10. WRONG WAY DETECTION
+ *     System detects when player drives backward:
+ *     - Compares velocity to expected direction
+ *     - OnWrongWay delegate fires
+ *     - UI shows "WRONG WAY" warning
+ *
+ * 11. TIME EXTENSION MODE
+ *     For arcade-style time attack:
+ *     - Checkpoints add time when crossed
+ *     - TimeExtensionSeconds per checkpoint
+ *     - OnTimeExpired when clock runs out
+ *
+ * @section Usage Common Usage Patterns
+ *
+ * @code
+ * // Get the checkpoint subsystem
+ * UMGCheckpointSubsystem* Checkpoints =
+ *     GetGameInstance()->GetSubsystem<UMGCheckpointSubsystem>();
+ *
+ * // Load a track layout before starting race
+ * if (Checkpoints->LoadLayout("Downtown_Circuit_Main"))
+ * {
+ *     // Layout loaded, ready to race
+ * }
+ *
+ * // Start a race (3 laps, no time limit)
+ * Checkpoints->StartRace(3, 0.0f);
+ *
+ * // Start a time attack (1 lap, 90 second limit)
+ * Checkpoints->StartRace(1, 90.0f);
+ *
+ * // In vehicle Tick, update checkpoint detection
+ * Checkpoints->UpdateCheckpointDetection(
+ *     GetActorLocation(),
+ *     GetVelocity(),
+ *     DeltaTime
+ * );
+ *
+ * // Also update wrong way detection
+ * Checkpoints->UpdateWrongWayDetection(GetVelocity());
+ *
+ * // Get current race state for UI
+ * FMGActiveCheckpointState State = Checkpoints->GetActiveState();
+ * // Display: Lap State.CurrentLap, Time State.CurrentLapTime
+ *
+ * // Get timing delta (how far ahead/behind)
+ * float Delta = Checkpoints->GetCurrentDelta();
+ * FLinearColor DeltaColor = Checkpoints->GetDeltaColor(Delta);
+ * FText DeltaText = Checkpoints->FormatDelta(Delta);
+ * // Show "+0.352" in green or "-1.204" in red
+ *
+ * // Get next checkpoint for navigation arrow
+ * FVector NextLocation = Checkpoints->GetNextCheckpointLocation();
+ * float Distance = Checkpoints->GetDistanceToNextCheckpoint(PlayerLocation);
+ *
+ * // Listen for race events
+ * Checkpoints->OnCheckpointPassed.AddDynamic(this, &AMyRace::HandleCheckpoint);
+ * Checkpoints->OnLapCompleted.AddDynamic(this, &AMyRace::HandleLapComplete);
+ * Checkpoints->OnRaceFinished.AddDynamic(this, &AMyRace::HandleRaceFinish);
+ * Checkpoints->OnWrongWay.AddDynamic(this, &AMyRace::HandleWrongWay);
+ *
+ * void AMyRace::HandleCheckpoint(const FMGCheckpointPassage& Passage,
+ *                                 int32 Remaining, float Delta)
+ * {
+ *     // Show split time popup
+ *     ShowSplitTime(Passage.SplitTime, Delta);
+ *
+ *     // Award points if speed bonus earned
+ *     if (Passage.bWasSpeedBonus)
+ *     {
+ *         ShowSpeedBonus(Passage.PointsEarned);
+ *     }
+ * }
+ *
+ * void AMyRace::HandleLapComplete(const FMGLapData& LapData,
+ *                                  int32 LapsRemaining, bool bIsBest)
+ * {
+ *     if (bIsBest)
+ *     {
+ *         ShowNewBestLap(LapData.LapTime);
+ *     }
+ *     ShowLapTime(LapData.LapTime, LapsRemaining);
+ * }
+ *
+ * void AMyRace::HandleWrongWay(bool bIsWrongWay)
+ * {
+ *     if (bIsWrongWay)
+ *     {
+ *         ShowWrongWayWarning();
+ *     }
+ *     else
+ *     {
+ *         HideWrongWayWarning();
+ *     }
+ * }
+ *
+ * // Set target times for ghost comparison
+ * Checkpoints->SetTargetTimes(GhostSplitTimes, GhostLapTime);
+ *
+ * // End of session, save best times
+ * Checkpoints->SaveBestTimes("Downtown_Circuit_Main");
+ * @endcode
+ *
+ * @section Architecture Architecture Notes
+ *
+ * LAYOUT MANAGEMENT:
+ * - RegisterLayout() adds layouts to database
+ * - LoadLayout() activates a layout for racing
+ * - Layouts can be defined in data assets or code
+ * - Multiple layouts per track (full circuit, short circuit, etc.)
+ *
+ * DETECTION ALGORITHM:
+ * - UpdateCheckpointDetection() runs each frame
+ * - Checks if player is inside next checkpoint trigger
+ * - Validates direction if bRequiresDirection is true
+ * - Fires OnCheckpointPassed or OnCheckpointInvalid
+ *
+ * TIMING PRECISION:
+ * - Uses high-resolution game time
+ * - TickRace() updates all timing counters
+ * - Split times recorded at checkpoint passage
+ *
+ * STATE PERSISTENCE:
+ * - BestTimesRecords stores personal bests
+ * - SaveCheckpointData() / LoadCheckpointData()
+ * - Per-layout, per-vehicle times possible
+ *
+ * EVENTS/DELEGATES:
+ * - OnCheckpointPassed: Valid checkpoint crossed
+ * - OnCheckpointMissed: Required checkpoint skipped
+ * - OnCheckpointInvalid: Wrong direction or order
+ * - OnLapCompleted: Full lap finished
+ * - OnSectorCompleted: Sector time recorded
+ * - OnNewBestLap: New personal best lap
+ * - OnNewBestSector: New personal best sector
+ * - OnTimeExtension: Time added (arcade mode)
+ * - OnTimeExpired: Clock ran out
+ * - OnRaceFinished: All laps complete
+ * - OnWrongWay: Direction changed
+ * - OnApproachingCheckpoint: Near next checkpoint
+ *
+ * @see UMGRaceSubsystem - Overall race management
+ * @see UMGGhostSubsystem - Ghost replay for time comparison
+ * @see UMGLeaderboardSubsystem - Best times storage
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

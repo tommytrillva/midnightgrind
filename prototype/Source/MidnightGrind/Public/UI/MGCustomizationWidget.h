@@ -1,5 +1,95 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGCustomizationWidget.h
+ * @brief Main vehicle customization/garage UI widget for upgrading vehicles
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the central widget for the vehicle customization system -
+ * the "garage" where players browse, purchase, and install upgrade parts on
+ * their vehicles. It handles navigation between categories, part selection,
+ * stat preview, purchasing, and installation flows.
+ *
+ * The customization UI is a complex multi-state interface supporting:
+ * - Performance parts (engine, turbo, suspension, etc.)
+ * - Visual customization (paint, body kits, vinyls)
+ * - Fine-tuning (gear ratios, suspension settings, alignment)
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Menu States**: The UI operates as a state machine with states like
+ *   CategorySelect, PartSelect, PartDetails, TuningAdjust, etc. Each state
+ *   has different navigation behaviors and visible elements.
+ *
+ * - **Part Comparison**: When selecting a part, the UI shows before/after
+ *   stats so players can make informed decisions about upgrades.
+ *
+ * - **Performance Index (PI)**: A single number representing overall vehicle
+ *   capability. Parts affect PI, which determines racing class eligibility.
+ *
+ * - **Camera Presets**: The 3D garage camera moves to focus on relevant
+ *   vehicle areas (engine bay for engine parts, wheels for tire selection).
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [MGGarageSubsystem] <---- Provides vehicle/part data
+ *          |
+ *          v
+ *   [MGCustomizationWidget] (this file)
+ *          |
+ *          +-- State Machine (MainMenu -> CategorySelect -> PartSelect -> etc.)
+ *          |
+ *          +-- [MGPartListItemWidget] for each part
+ *          |
+ *          +-- [MGStatBarWidget] for stat comparisons
+ *          |
+ *          +-- [MGPerformanceIndexWidget] for PI display
+ *          |
+ *          v
+ *   [3D Garage Scene] <---- Camera control, vehicle preview
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Create and initialize the customization widget
+ * UMGCustomizationWidget* CustomWidget = CreateWidget<UMGCustomizationWidget>(
+ *     GetWorld(), CustomizationWidgetClass);
+ *
+ * // Initialize with the player's selected vehicle
+ * CustomWidget->InitializeWithVehicle(PlayerVehicleID);
+ *
+ * // Add to viewport
+ * CustomWidget->AddToViewport();
+ *
+ * // Handle events
+ * CustomWidget->OnPartPurchased.AddDynamic(this, &AMyController::HandlePartPurchased);
+ * CustomWidget->OnPartInstalled.AddDynamic(this, &AMyController::HandlePartInstalled);
+ *
+ * // Navigate programmatically (for gamepad/keyboard)
+ * CustomWidget->Navigate(EMGUINavigationDirection::Down);
+ * CustomWidget->ConfirmSelection();
+ * CustomWidget->NavigateBack();
+ * @endcode
+ *
+ * =============================================================================
+ * @section UnrealMacros Unreal Engine Macros Explained
+ *
+ * - UCLASS(Abstract, Blueprintable): This class cannot be instantiated directly
+ *   but can be subclassed in Blueprints to create the actual UI layout.
+ *
+ * - UPROPERTY(BlueprintAssignable): These delegates can be bound in Blueprint
+ *   event graphs using the "Bind Event" node.
+ *
+ * - UFUNCTION(BlueprintImplementableEvent): These are "hooks" that Blueprints
+ *   can override to add custom behavior (like animations, sounds).
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,16 +101,39 @@
 class UMGGarageSubsystem;
 class UMGPartDataAsset;
 
+// -----------------------------------------------------------------------------
+// Delegate Declarations
+// These events notify listeners about important state changes in the UI
+// -----------------------------------------------------------------------------
+
+/** Broadcast when player selects a category (Engine, Tires, Paint, etc.) */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCategorySelected, EMGCustomizationCategory, Category);
+
+/** Broadcast when player hovers over or selects a part for preview */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPartSelected, const FMGUIPartData&, PartData);
+
+/** Broadcast when player successfully purchases a part */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPartPurchased, const FMGUIPartData&, PartData);
+
+/** Broadcast when player installs a part on their vehicle */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPartInstalled, const FMGUIPartData&, PartData);
+
+/** Broadcast when the UI state machine transitions between states */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMenuStateChanged, EMGCustomizationMenuState, NewState);
+
+/** Broadcast when player backs out of customization entirely */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCustomizationCanceled);
+
+// =============================================================================
+// MGCustomizationWidget Class
+// =============================================================================
 
 /**
  * Base widget class for the vehicle customization interface
  * Provides core functionality for the garage/customization UI
+ *
+ * This is an abstract base class - create a Blueprint child class to define
+ * the actual visual layout using UMG Designer.
  */
 UCLASS(Abstract, Blueprintable)
 class MIDNIGHTGRIND_API UMGCustomizationWidget : public UUserWidget

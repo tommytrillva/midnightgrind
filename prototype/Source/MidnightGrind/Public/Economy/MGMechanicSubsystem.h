@@ -1,5 +1,160 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGMechanicSubsystem.h
+ * @brief Mechanic relationship and job management system for vehicle part installation and tuning.
+ *
+ * The Mechanic Subsystem manages all interactions with in-game mechanics who install,
+ * tune, and repair vehicle parts. Rather than instant part swaps, Midnight Grind features
+ * a realistic mechanic system where work takes time, costs money, and quality varies
+ * based on the mechanic's skill and your relationship with them.
+ *
+ * @section mech_concepts Key Concepts
+ *
+ * **Mechanics as Characters:**
+ * Mechanics are not just service points - they're characters with personalities,
+ * backstories, and specializations that affect gameplay:
+ * - Skill Tiers: Apprentice to Legend, affecting work quality and speed
+ * - Specializations: Engine, Suspension, Transmission, etc. - better at specific jobs
+ * - Personalities: Professional, Hustler, Perfectionist, etc. - affects pricing and behavior
+ *
+ * **The Job System:**
+ * All work is tracked as "jobs" with the following properties:
+ * - Estimated completion time (affected by mechanic speed and rush status)
+ * - Cost (affected by mechanic rates, part complexity, and your loyalty discount)
+ * - Quality outcome (Perfect, Good, Acceptable, Botched, Failed)
+ * - Quality modifier applied to the installed part's stats
+ *
+ * **Work Results:**
+ * Each job has a probabilistic outcome based on mechanic skill:
+ * - Perfect: Above expected quality, part gets a stat bonus
+ * - Good: Standard quality, part performs as specified
+ * - Acceptable: Slight imperfections, minor stat penalty
+ * - Botched: Mistakes made, noticeable performance reduction
+ * - Failed: Complete failure, part may be damaged or destroyed
+ *
+ * **Trust and Relationships:**
+ * Building trust with mechanics provides tangible benefits:
+ * - Loyalty discounts on labor (up to 15% at high trust)
+ * - Access to faster turnaround times
+ * - Better quality outcomes (reduced chance of botched work)
+ * - Special services unlocked (custom fabrication, black market referrals)
+ * - Tips about rare parts and deals
+ *
+ * @section mech_services Service Types
+ *
+ * Mechanics can perform various services:
+ * - Install: Basic part installation on a vehicle
+ * - Remove: Remove a part (often to transfer to another vehicle)
+ * - Tune: Fine-tune an installed part for better performance
+ * - Repair: Fix damaged parts instead of replacing them
+ * - Restore: Restore worn parts to full condition
+ * - Custom: Fabricate custom one-off parts (high trust required)
+ * - Rush: Any service done quickly for extra cost
+ *
+ * @section mech_usage Basic Usage Examples
+ *
+ * **Finding the Right Mechanic:**
+ * @code
+ * UMGMechanicSubsystem* MechanicSystem = GetGameInstance()->GetSubsystem<UMGMechanicSubsystem>();
+ *
+ * // Get all mechanics you have access to
+ * TArray<FMGMechanic> AvailableMechanics = MechanicSystem->GetAvailableMechanics();
+ *
+ * // Find mechanics who specialize in engine work
+ * TArray<FMGMechanic> EngineSpecialists = MechanicSystem->GetMechanicsBySpecialization(
+ *     EMGMechanicSpecialization::Engine
+ * );
+ *
+ * // Get the recommended mechanic for a specific job
+ * FName BestMechanic = MechanicSystem->GetRecommendedMechanic(
+ *     PartID,
+ *     EMGMechanicService::Install
+ * );
+ * @endcode
+ *
+ * **Starting a Job:**
+ * @code
+ * // Get an estimate first
+ * int32 Cost = MechanicSystem->GetJobEstimate(MechanicID, PartID, EMGMechanicService::Install, false);
+ * float Hours = MechanicSystem->GetJobDuration(MechanicID, PartID, EMGMechanicService::Install, false);
+ *
+ * // Check expected quality
+ * float ExpectedQuality = MechanicSystem->GetExpectedQuality(MechanicID, PartID, EMGMechanicService::Install);
+ *
+ * // Start the job
+ * FGuid JobID = MechanicSystem->StartJob(
+ *     MechanicID,
+ *     VehicleID,
+ *     PartID,
+ *     EMGMechanicService::Install,
+ *     false  // Not a rush job
+ * );
+ * @endcode
+ *
+ * **Tracking Active Jobs:**
+ * @code
+ * // Get all jobs in progress
+ * TArray<FMGMechanicJob> ActiveJobs = MechanicSystem->GetActiveJobs();
+ *
+ * for (const FMGMechanicJob& Job : ActiveJobs)
+ * {
+ *     // Check if job is ready
+ *     if (MechanicSystem->IsJobComplete(Job.JobID))
+ *     {
+ *         // Complete the job and get results
+ *         FMGMechanicJob CompletedJob = MechanicSystem->CompleteJob(Job.JobID);
+ *
+ *         // Handle the result
+ *         if (CompletedJob.Result == EMGWorkResult::Botched)
+ *         {
+ *             // Part has reduced performance
+ *             UE_LOG(LogTemp, Warning, TEXT("Job was botched! Quality modifier: %d"),
+ *                 CompletedJob.QualityModifier);
+ *         }
+ *     }
+ * }
+ * @endcode
+ *
+ * **Building Trust:**
+ * @code
+ * // Get your relationship with a mechanic
+ * FMGMechanicRelationship Relationship = MechanicSystem->GetMechanicRelationship(MechanicID);
+ *
+ * // Check trust level and loyalty discount
+ * int32 Trust = MechanicSystem->GetTrustLevel(MechanicID);
+ * float Discount = MechanicSystem->GetLoyaltyDiscount(MechanicID);
+ *
+ * // Set this mechanic as your preferred (for quick access)
+ * MechanicSystem->SetPreferredMechanic(MechanicID);
+ *
+ * // Check for unlocked special services
+ * TArray<FName> UnlockedServices = MechanicSystem->GetUnlockedServices(MechanicID);
+ * @endcode
+ *
+ * **Using Special Abilities:**
+ * @code
+ * // Check if mechanic has underground connections
+ * FMGMechanic Mechanic;
+ * if (MechanicSystem->GetMechanic(MechanicID, Mechanic) && Mechanic.bHasUndergroundConnections)
+ * {
+ *     // Request a black market referral
+ *     FName DealerID;
+ *     if (MechanicSystem->RequestBlackMarketReferral(MechanicID, DealerID))
+ *     {
+ *         // Got access to a new black market dealer!
+ *     }
+ *
+ *     // Get tips about rare parts
+ *     FText Tip = MechanicSystem->GetRarePartTip(MechanicID);
+ * }
+ * @endcode
+ *
+ * @see UMGGarageSubsystem For vehicle and part ownership
+ * @see UMGBlackMarketSubsystem For underground part acquisition
+ * @see UMGTransactionPipeline For payment processing
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

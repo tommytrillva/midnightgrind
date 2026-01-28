@@ -1,5 +1,105 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehicleMovementComponent.h
+ * @brief Advanced vehicle movement component with simulation-grade physics.
+ *
+ * @section Overview
+ * This is the core vehicle physics component for MIDNIGHT GRIND. It extends
+ * Unreal's Chaos Vehicle physics with extensive additional simulation systems
+ * for turbo, clutch, differential, tire pressure, weight transfer, and more.
+ *
+ * @section Architecture
+ * The component builds on ChaosWheeledVehicleMovementComponent and adds:
+ *
+ * **Engine Simulation**:
+ * - Torque curves from vehicle data
+ * - Turbo/supercharger simulation with spool and lag
+ * - Rev limiter and overrev protection
+ * - Temperature and wear effects
+ *
+ * **Drivetrain Simulation**:
+ * - Clutch with slip and wear modeling
+ * - Sequential and H-pattern gearbox modes
+ * - Limited-slip differential with multiple types (1-way, 1.5-way, 2-way, Torsen)
+ * - AWD torque split control
+ *
+ * **Tire Simulation**:
+ * - Pressure-based grip modeling
+ * - Temperature buildup and optimal range
+ * - Compound-specific characteristics
+ * - Blowout mechanics
+ *
+ * **Handling**:
+ * - Dynamic weight transfer (longitudinal and lateral)
+ * - Arcade, Balanced, and Simulation handling modes
+ * - Stability assists (configurable)
+ * - Drift mechanics with scoring
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Chaos Vehicle Physics**: Unreal Engine 5's vehicle physics system based
+ * on the Chaos physics engine. Provides base wheel simulation, suspension,
+ * and basic drivetrain. We extend it significantly.
+ *
+ * **Torque vs Horsepower**: Torque is rotational force (how hard the engine pushes).
+ * Horsepower is power (torque x RPM). High torque = strong acceleration at low RPM.
+ * High HP = high top speed potential.
+ *
+ * **Turbo Lag/Spool**: Turbochargers need exhaust gas to spin up (spool). There's
+ * a delay (lag) between pressing throttle and getting boost. This is simulated
+ * realistically based on turbo size and RPM.
+ *
+ * **Limited-Slip Differential (LSD)**: A differential that allows some wheel speed
+ * difference but limits it. When one wheel spins, the LSD transfers some torque
+ * to the gripping wheel. Different types behave differently:
+ * - 1-way: Only locks under acceleration
+ * - 1.5-way: Partial lock under deceleration
+ * - 2-way: Equal lock accel and decel
+ * - Torsen: Gear-based, speed-sensitive
+ *
+ * **Weight Transfer**: As you brake, weight shifts forward (more front grip).
+ * As you accelerate, weight shifts rearward. Cornering shifts weight to outside.
+ * This affects grip at each wheel.
+ *
+ * **Handling Modes**: Three physics "feels" from the same simulation:
+ * - Arcade: Maximum assists, forgiving, great for controllers
+ * - Balanced: Moderate assists, good for most players
+ * - Simulation: Minimal assists, realistic, best with wheel
+ *
+ * @section Usage Example Usage
+ * @code
+ * // Get the movement component from a vehicle pawn
+ * UMGVehicleMovementComponent* Movement = Vehicle->GetMGVehicleMovement();
+ *
+ * // Apply input
+ * Movement->SetThrottleInput(ThrottleValue);
+ * Movement->SetSteeringInput(SteeringValue);
+ * Movement->SetBrakeInput(BrakeValue);
+ * Movement->SetHandbrakeInput(bHandbrake);
+ *
+ * // Activate NOS
+ * Movement->ActivateNitrous();
+ *
+ * // Check state for HUD
+ * float RPM = Movement->GetEngineRPM();
+ * int32 Gear = Movement->GetCurrentGear();
+ * float Boost = Movement->GetCurrentBoostPSI();
+ * bool bDrifting = Movement->IsDrifting();
+ *
+ * // Configure handling mode
+ * Movement->SetHandlingMode(EMGPhysicsHandlingMode::Simulation);
+ *
+ * // Bind to events
+ * Movement->OnGearChanged.AddDynamic(this, &AMyClass::HandleGearChange);
+ * Movement->OnDriftScoreAwarded.AddDynamic(this, &AMyClass::HandleDriftScore);
+ * @endcode
+ *
+ * @see FMGVehicleData Vehicle configuration data applied to this component
+ * @see AMGVehiclePawn The pawn that owns this component
+ * @see EMGPhysicsHandlingMode Handling mode presets
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -10,6 +110,19 @@
 #include "RacingWheel/MGRacingWheelTypes.h"
 #include "MGVehicleMovementComponent.generated.h"
 
+// ============================================================================
+// DELEGATE DECLARATIONS
+// ============================================================================
+
+/**
+ * @brief Movement component event delegates.
+ *
+ * These delegates broadcast state changes for other systems to respond to.
+ * Used by audio, VFX, HUD, and scoring systems.
+ *
+ * **DECLARE_DYNAMIC_MULTICAST_DELEGATE_...**: Creates Blueprint-compatible events.
+ * The suffix indicates parameter count (OneParam, TwoParams, ThreeParams).
+ */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGearChanged, int32, NewGear);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNitrousStateChanged, bool, bActive);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBoostChanged, float, CurrentBoost, float, MaxBoost);

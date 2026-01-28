@@ -1,5 +1,139 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGRacingHUD.h
+ * @brief Main racing HUD widget displaying vehicle telemetry during gameplay
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the primary HUD widget displayed during racing gameplay.
+ * The HUD provides real-time vehicle telemetry and race information in a
+ * PS1/PS2 era aesthetic with bold, chunky, highly readable elements.
+ *
+ * The HUD displays:
+ * - Speedometer (digital, analog, bar, or minimal styles)
+ * - Tachometer with RPM gauge and shift indicator
+ * - Gear indicator with optimal shift point highlighting
+ * - Turbo/boost pressure gauge
+ * - Nitrous remaining bar
+ * - Lap counter and position display
+ * - Lap timer with best lap tracking
+ * - Drift score and multiplier
+ * - Weather conditions and grip level warnings
+ * - Minimap integration point
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Data-Driven Binding**: The HUD provides BlueprintPure getter functions
+ *   for all data. Blueprint UMG widgets bind to these functions for automatic
+ *   updates. This keeps C++ logic clean and gives designers layout control.
+ *
+ * - **Normalized Values**: Many values (RPM, boost, nitrous) are normalized to
+ *   0-1 range for easy binding to progress bars and gauge rotations. Raw values
+ *   are also available for text display.
+ *
+ * - **Zone Colors**: RPM uses a three-zone color system (green/yellow/red) that
+ *   changes based on current RPM vs redline. This provides instant visual
+ *   feedback for optimal shifting.
+ *
+ * - **Weather Integration**: The HUD displays current weather conditions and
+ *   warns players when conditions become hazardous (low grip, poor visibility).
+ *
+ * - **Event-Driven Animations**: Rather than polling for state changes, the HUD
+ *   exposes trigger functions (TriggerLapCompleteAnimation, etc.) that the race
+ *   manager calls. Blueprint implements the actual animations.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [AMGVehiclePawn] -----> [UMGRacingHUD]
+ *          |                     |
+ *   Vehicle State          Data Getters (BlueprintPure)
+ *          |                     |
+ *          v                     v
+ *   FMGVehicleRuntimeState  Blueprint Widget Bindings
+ *                                |
+ *                                +-- Speedometer
+ *                                +-- Tachometer
+ *                                +-- Boost/NOS gauges
+ *                                +-- Lap/Position display
+ *                                +-- Weather indicators
+ *
+ *   [Race Manager] ---> Trigger Functions ---> Animation Events
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Create HUD when race starts
+ * UMGRacingHUD* RaceHUD = CreateWidget<UMGRacingHUD>(GetWorld(), RaceHUDClass);
+ *
+ * // Link to player's vehicle
+ * RaceHUD->SetVehicle(PlayerVehicle);
+ *
+ * // Configure display options
+ * FMGHUDConfig Config;
+ * Config.SpeedometerStyle = EMGSpeedometerStyle::Digital;
+ * Config.bUseMPH = true;
+ * Config.bShowMinimap = true;
+ * Config.bShowDriftScore = true;
+ * RaceHUD->ApplyConfig(Config);
+ *
+ * // Add to viewport
+ * RaceHUD->AddToViewport();
+ *
+ * // In Blueprint, bind widgets to data:
+ * // SpeedText.Text = GetSpeedText()
+ * // RPMBar.Percent = GetRPMPercent()
+ * // GearText.Text = GetGearText()
+ * // GearText.ColorAndOpacity = GetGearColor()
+ *
+ * // Race manager triggers events:
+ * RaceHUD->ShowCountdown(3);  // "3"
+ * RaceHUD->ShowCountdown(2);  // "2"
+ * RaceHUD->ShowCountdown(1);  // "1"
+ * RaceHUD->ShowGoSignal();    // "GO!"
+ *
+ * // On lap complete:
+ * RaceHUD->TriggerLapCompleteAnimation(LapNumber, LapTime, bIsNewBest);
+ *
+ * // On checkpoint:
+ * RaceHUD->TriggerCheckpointAnimation(SplitTime, bAheadOfGhost);
+ *
+ * // On drift score banked:
+ * RaceHUD->TriggerDriftScorePopup(DriftScore);
+ * @endcode
+ *
+ * =============================================================================
+ * @section VisualDesign Visual Design Notes
+ *
+ * The HUD follows PS1/PS2 era racing game aesthetics:
+ * - Bold, high-contrast colors (cyan speed, green/yellow/red RPM zones)
+ * - Chunky progress bars and large readable numbers
+ * - Hot pink shift indicator for immediate visibility
+ * - Magenta nitrous, orange drift colors for thematic consistency
+ * - Weather indicators use green/yellow/orange/red danger progression
+ *
+ * =============================================================================
+ * @section UnrealMacros Unreal Engine Macros Explained
+ *
+ * - UFUNCTION(BlueprintPure): Functions that calculate and return values without
+ *   side effects. These can be called from Blueprint property bindings for
+ *   automatic UI updates every frame.
+ *
+ * - UFUNCTION(BlueprintCallable): Functions that perform actions and may have
+ *   side effects. Called explicitly from Blueprint event graphs.
+ *
+ * - UFUNCTION(BlueprintImplementableEvent): Hook functions that Blueprint
+ *   subclasses can override to add custom behavior (animations, sounds).
+ *
+ * - TWeakObjectPtr: A "weak" reference that automatically becomes null if the
+ *   referenced object is destroyed. Prevents crashes from dangling pointers.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

@@ -1,8 +1,90 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MGReplayBufferSubsystem.h
-// Midnight Grind - Replay Buffer and Race Recording System
-// Provides real-time replay recording, instant replay, and cinematic playback
+/**
+ * =============================================================================
+ * MGReplayBufferSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * This file defines the Replay Buffer Subsystem for Midnight Grind. It provides
+ * a comprehensive replay recording and playback system, including instant replay,
+ * cinematic camera controls, and video export functionality.
+ *
+ * KEY CONCEPTS FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * 1. REPLAY BUFFER vs. REPLAY RECORDING:
+ *    - BUFFER: Continuously records the last N seconds (circular buffer).
+ *      When it fills up, old frames are overwritten. Used for instant replay.
+ *    - RECORDING: A complete saved replay from start to finish (like a race
+ *      recording). Can be saved to disk and loaded later.
+ *
+ * 2. FRAME-BASED RECORDING:
+ *    - The replay system captures "snapshots" of the game state every frame.
+ *    - Each FMGReplayFrame stores: vehicle positions, velocities, inputs,
+ *      camera position, and timing information.
+ *    - Keyframes (every N frames) store complete data; intermediate frames
+ *      may use delta compression to save memory.
+ *
+ * 3. VEHICLE SNAPSHOTS (FMGVehicleSnapshot):
+ *    - Complete state of a vehicle at a moment in time.
+ *    - Includes: Transform (position/rotation), velocity, throttle, brake,
+ *      steering, gear, RPM, drift state, nitro, and wheel data.
+ *    - This allows perfect recreation of vehicle physics during playback.
+ *
+ * 4. INTERPOLATION:
+ *    - When playing back, the system interpolates between recorded frames
+ *      to create smooth motion even if recording framerate differs from
+ *      playback framerate.
+ *    - LerpSnapshot() blends two vehicle states together for smooth transitions.
+ *
+ * 5. REPLAY EVENTS:
+ *    - Significant moments are marked with FMGReplayEvent (overtakes, crashes,
+ *      lap completions, etc.).
+ *    - Events have an "importance score" to identify the most exciting moments.
+ *    - Used for highlight reels and "jump to event" navigation.
+ *
+ * 6. CAMERA MODES:
+ *    - Multiple ways to view the replay: FollowCar, Cinematic, TrackSide,
+ *      Helicopter, FreeCam, etc.
+ *    - Director mode auto-switches cameras for broadcast-style viewing.
+ *    - Photo mode lets players freeze time and position the camera freely.
+ *
+ * 7. CAMERA KEYFRAMES:
+ *    - For cinematic sequences, users can place camera keyframes.
+ *    - The system interpolates between keyframes for smooth camera movements.
+ *    - Includes FOV, depth of field, and post-processing effects.
+ *
+ * 8. CIRCULAR BUFFER:
+ *    - The replay buffer is circular - when full, oldest frames are discarded.
+ *    - Controlled by MaxBufferDurationSeconds and MaxBufferSizeBytes.
+ *    - Efficient for instant replay (always have last N seconds available).
+ *
+ * 9. EXPORT:
+ *    - Replays can be exported to various formats: Video (MP4), GIF, Image
+ *      Sequence, or native Replay File format.
+ *    - Export settings control resolution, framerate, bitrate, and more.
+ *
+ * 10. INSTANT REPLAY:
+ *     - Quick playback of recent action (like sports broadcasts).
+ *     - TriggerInstantReplay() pauses game and shows last N seconds.
+ *     - Often triggered after exciting moments (finish line, big crash).
+ *
+ * MEMORY CONSIDERATIONS:
+ * - Replay buffers can consume significant memory (hundreds of MB).
+ * - Compression reduces memory but increases CPU usage.
+ * - The system monitors buffer size and trims when necessary.
+ *
+ * TYPICAL WORKFLOW:
+ * 1. Recording starts automatically when race begins
+ * 2. Each tick, RecordFrame() captures current state
+ * 3. Events are detected and marked (overtakes, laps, etc.)
+ * 4. Race ends, recording is saved (or discarded)
+ * 5. Player enters replay viewer, chooses camera mode
+ * 6. Player can create clips, add camera keyframes
+ * 7. Export to video file for sharing
+ *
+ * =============================================================================
+ */
 
 #pragma once
 

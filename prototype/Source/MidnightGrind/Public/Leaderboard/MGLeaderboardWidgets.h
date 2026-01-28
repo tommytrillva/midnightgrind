@@ -1,5 +1,197 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGLeaderboardWidgets.h
+ * @brief UI Widgets for Leaderboard Display and Interaction
+ *
+ * @section overview_lw Overview
+ * This file defines the UI widgets used to display leaderboards, track records,
+ * player rankings, and ghost racing features. These widgets work with the
+ * UMGLeaderboardSubsystem to fetch and display competitive data.
+ *
+ * @section concepts_lw Key Concepts for Beginners
+ *
+ * ### Widget Architecture
+ * Leaderboard UI is built from several specialized widgets that work together:
+ *
+ * 1. **UMGLeaderboardScreenWidget**: The main container/screen that holds everything
+ * 2. **UMGLeaderboardEntryWidget**: A single row showing one player's rank/time
+ * 3. **UMGLeaderboardFilterWidget**: Buttons to filter by type/scope
+ * 4. **UMGTrackSelectorWidget**: Dropdown to choose which track's records to view
+ * 5. **UMGPlayerRankWidget**: Shows the local player's rank summary
+ * 6. **UMGGhostActionWidget**: Buttons to race against or watch a ghost
+ * 7. **UMGPostRaceLeaderboardWidget**: Shows results after finishing a race
+ *
+ * ### Abstract Widget Classes
+ * All widgets here are marked "Abstract" - you cannot use them directly.
+ * Instead, create a Blueprint class that inherits from them:
+ * 1. In UE Editor, right-click -> Blueprint Class
+ * 2. Search for the widget class (e.g., "MGLeaderboardEntryWidget")
+ * 3. Design the visual layout in UMG Designer
+ * 4. Bind UI elements to the exposed properties
+ *
+ * ### Data Flow
+ * @code
+ * [LeaderboardSubsystem] --query--> [Backend Server]
+ *                       <--results--
+ *                                 |
+ *                                 v
+ * [LeaderboardScreenWidget] --populates--> [EntryWidgets]
+ *                          --updates--> [PlayerRankWidget]
+ *                          --enables--> [GhostActionWidget]
+ * @endcode
+ *
+ * ### Leaderboard Types (EMGLeaderboardType)
+ * Different ways to rank players:
+ * - **LapTime**: Fastest single lap
+ * - **RaceTime**: Fastest complete race
+ * - **DriftScore**: Highest drift points
+ * - **TopSpeed**: Maximum speed achieved
+ *
+ * ### Leaderboard Scopes (EMGLeaderboardScope)
+ * Who to compare against:
+ * - **Global**: All players worldwide
+ * - **Friends**: Only your friends list
+ * - **Region**: Players in your geographic region
+ * - **Club**: Your racing club/crew members
+ *
+ * @section widgets_lw Widget Classes
+ *
+ * ### UMGLeaderboardEntryWidget
+ * Displays a single leaderboard row with:
+ * - Rank position (1st, 2nd, 3rd, etc.)
+ * - Player name and avatar
+ * - Score/time value
+ * - Optional: Vehicle used, date achieved
+ *
+ * **Key Methods:**
+ * - `SetEntryData()`: Populate with leaderboard data
+ * - `SetSelected()`: Highlight when user clicks on it
+ * - `UpdateDisplay()`: Override in Blueprint to update visuals
+ *
+ * ### UMGLeaderboardFilterWidget
+ * Filter controls for leaderboard queries:
+ * - Type buttons (Lap Time, Race Time, Drift Score)
+ * - Scope buttons (Global, Friends, Region)
+ *
+ * **Key Methods:**
+ * - `SetFilters()`: Set current filter values
+ * - `OnFilterChanged`: Delegate fired when user changes filters
+ *
+ * ### UMGPlayerRankWidget
+ * Summary of the local player's standing:
+ * - Current rank (e.g., "#1,234 of 50,000")
+ * - Percentile (e.g., "Top 3%")
+ * - Personal best time/score
+ *
+ * **Key Methods:**
+ * - `SetPlayerData()`: Set rank and score info
+ * - `SetPersonalBest()`: Show personal best data
+ *
+ * ### UMGTrackSelectorWidget
+ * Track selection dropdown/list:
+ * - Shows available tracks
+ * - Fires event when selection changes
+ *
+ * **Key Methods:**
+ * - `SetAvailableTracks()`: Populate track list
+ * - `SelectTrack()`: Programmatically select a track
+ * - `OnTrackSelected`: Delegate fired on selection
+ *
+ * ### UMGGhostActionWidget
+ * Ghost racing action buttons:
+ * - "Race Against Ghost" - Start time trial with ghost
+ * - "Watch Replay" - Spectate the ghost run
+ *
+ * **Key Methods:**
+ * - `SetGhostData()`: Set which ghost this relates to
+ * - `OnRaceGhostRequested`: Delegate for race button
+ * - `OnWatchGhostRequested`: Delegate for watch button
+ *
+ * ### UMGLeaderboardScreenWidget
+ * The main leaderboard screen containing all other widgets:
+ * - Filter widget at top
+ * - Track selector
+ * - Scrollable list of entry widgets
+ * - Player rank summary
+ * - Loading indicator
+ *
+ * **Key Methods:**
+ * - `ShowLeaderboard()`: Load and display a leaderboard
+ * - `RefreshLeaderboard()`: Reload current leaderboard
+ * - `SelectEntry()`: Select a specific entry
+ * - `NavigateToPlayer()`: Scroll to local player's position
+ *
+ * ### UMGPostRaceLeaderboardWidget
+ * Shown after finishing a race:
+ * - Player's finishing time
+ * - New rank position
+ * - Comparison to nearby entries
+ * - Personal best celebration (if applicable)
+ *
+ * **Key Methods:**
+ * - `ShowComparison()`: Display post-race comparison
+ * - `SetSubmissionResult()`: Show score submission result
+ *
+ * @section usage_lw Usage Example
+ *
+ * @code
+ * // Creating the leaderboard screen (typically in your menu Blueprint)
+ * void UMyMenuWidget::ShowLeaderboards()
+ * {
+ *     // Create the widget (assumes you have a Blueprint child class)
+ *     UMGLeaderboardScreenWidget* Screen = CreateWidget<UMGLeaderboardScreenWidget>(
+ *         GetOwningPlayer(),
+ *         LeaderboardScreenClass
+ *     );
+ *
+ *     // Add to viewport
+ *     Screen->AddToViewport();
+ *
+ *     // Show leaderboard for a specific track
+ *     Screen->ShowLeaderboard(FName("Track_Downtown"), EMGLeaderboardType::LapTime);
+ * }
+ *
+ * // Handling filter changes in your Blueprint
+ * void UMyLeaderboardScreen::HandleFilterChanged(EMGLeaderboardType Type, EMGLeaderboardScope Scope)
+ * {
+ *     // Refresh with new filters
+ *     CurrentType = Type;
+ *     CurrentScope = Scope;
+ *     RefreshLeaderboard();
+ * }
+ *
+ * // Handling ghost race request
+ * void UMyLeaderboardScreen::HandleRaceGhost(const FString& GhostID)
+ * {
+ *     // Load the track with this ghost
+ *     UMGLeaderboardSubsystem* LB = GetGameInstance()->GetSubsystem<UMGLeaderboardSubsystem>();
+ *     // ... start time trial with ghost
+ * }
+ * @endcode
+ *
+ * @section styling_lw Styling Tips
+ *
+ * **Entry Widget Styling:**
+ * - Top 3 ranks often have special colors (gold, silver, bronze)
+ * - Local player's entry should be highlighted
+ * - Selected entry should have distinct border/background
+ *
+ * **Loading States:**
+ * - Show loading spinner while fetching data
+ * - Disable interaction during load
+ * - Show error message if fetch fails
+ *
+ * **Responsive Design:**
+ * - Consider both mouse and gamepad navigation
+ * - Entry widgets should be focusable for gamepad
+ * - Provide keyboard shortcuts (R for refresh, etc.)
+ *
+ * @see UMGLeaderboardSubsystem For the backend data fetching
+ * @see FMGLeaderboardEntry For the data structure displayed in entries
+ * @see FMGPersonalBest For personal best record data
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

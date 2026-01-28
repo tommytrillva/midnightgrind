@@ -1,5 +1,167 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGReplaySubsystem.h
+ * @brief Central Replay System - Recording, playback, ghost racing, and storage
+ *
+ * @section overview Overview
+ * The Replay Subsystem is the central hub for all replay-related functionality
+ * in Midnight Grind. It manages recording race data, playing back replays,
+ * spawning ghost racers for time attack mode, and persisting replays to storage.
+ *
+ * As a World Subsystem, it is automatically created for each game world and
+ * provides a single point of access for replay features throughout the game.
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * **What is a World Subsystem?**
+ * World Subsystems are Unreal Engine's way of providing singleton-like services
+ * that exist for the lifetime of a game world. Unlike traditional singletons,
+ * they are properly managed by the engine - created when the world loads and
+ * destroyed when it unloads. Access them via GetWorld()->GetSubsystem<T>().
+ *
+ * **Replay Data Structure**
+ * Replay data is organized hierarchically:
+ * - FMGReplayData: Contains metadata (track, vehicle, times) and an array of frames
+ * - FMGReplayFrame: A single snapshot of vehicle state at a point in time
+ * - Frames include position, rotation, velocity, inputs, gear, RPM, etc.
+ *
+ * **Ghost Racers**
+ * Ghosts are visual replays that race alongside the player. They read from
+ * FMGReplayData and interpolate between frames to show smooth movement.
+ * Multiple ghosts can be active simultaneously (personal best, friend, world record).
+ *
+ * **Replay States:**
+ * - Idle: No recording or playback active
+ * - Recording: Actively capturing frames from a target actor
+ * - Playing: Playing back a replay (full replay viewer mode)
+ * - Paused: Playback is temporarily stopped
+ *
+ * **Playback Modes:**
+ * - Normal: Real-time playback at 1x speed
+ * - SlowMotion: Reduced speed for detailed analysis
+ * - FastForward: Accelerated playback to skip sections
+ * - FrameByFrame: Step through individual frames
+ *
+ * **Delta Time Calculation**
+ * The subsystem calculates time differences between player and ghost based on
+ * track distance (not elapsed time). This ensures accurate deltas even when
+ * the player takes different racing lines.
+ *
+ * @section usage Usage Examples
+ *
+ * **Accessing the Replay Subsystem:**
+ * @code
+ * // From any Actor or Component
+ * UMGReplaySubsystem* ReplaySubsystem = GetWorld()->GetSubsystem<UMGReplaySubsystem>();
+ *
+ * // From a Widget (need to get world from player controller)
+ * UWorld* World = GetOwningPlayer()->GetWorld();
+ * UMGReplaySubsystem* ReplaySubsystem = World->GetSubsystem<UMGReplaySubsystem>();
+ * @endcode
+ *
+ * **Recording a Race:**
+ * @code
+ * // Start recording when race begins
+ * AActor* PlayerVehicle = GetPlayerVehicle();
+ * ReplaySubsystem->StartRecording(PlayerVehicle, FName("Track_Tokyo"), FName("Vehicle_R34"));
+ *
+ * // ... race happens ...
+ *
+ * // Stop recording when race ends
+ * FMGReplayData ReplayData = ReplaySubsystem->StopRecording();
+ *
+ * // Save if it's a personal best
+ * if (ReplayData.BestLapTime < CurrentPersonalBest)
+ * {
+ *     ReplaySubsystem->SaveReplay(ReplayData, true); // Upload to server
+ * }
+ * @endcode
+ *
+ * **Spawning Ghost Racers:**
+ * @code
+ * // Spawn personal best ghost
+ * AMGGhostRacerActor* PBGhost = ReplaySubsystem->SpawnPersonalBestGhost(FName("Track_Tokyo"));
+ *
+ * // Spawn custom ghost with specific settings
+ * FMGGhostConfig Config;
+ * Config.ReplayData = FriendReplayData;
+ * Config.Transparency = 0.6f;
+ * Config.GhostColor = FLinearColor::Blue;
+ * Config.bShowDelta = true;
+ * AMGGhostRacerActor* FriendGhost = ReplaySubsystem->SpawnGhost(Config);
+ *
+ * // Get delta time during race
+ * float Delta = ReplaySubsystem->GetDeltaToGhost(PBGhost, PlayerDistanceTraveled);
+ * // Delta < 0 means player is ahead
+ * @endcode
+ *
+ * **Full Replay Playback:**
+ * @code
+ * // Load and play a saved replay
+ * FMGReplayData Replay = ReplaySubsystem->LoadReplay(SavedReplayID);
+ * ReplaySubsystem->StartPlayback(Replay);
+ *
+ * // Control playback
+ * ReplaySubsystem->SetPlaybackSpeed(2.0f);  // 2x speed
+ * ReplaySubsystem->SeekToTime(30.0f);       // Jump to 30 seconds
+ * ReplaySubsystem->PausePlayback();
+ *
+ * // Frame-by-frame analysis
+ * ReplaySubsystem->SetPlaybackMode(EMGReplayPlaybackMode::FrameByFrame);
+ * ReplaySubsystem->SeekByFrames(1);  // Advance one frame
+ *
+ * // Get current frame data for UI
+ * FMGReplayFrame Frame = ReplaySubsystem->GetCurrentPlaybackFrame();
+ * DisplaySpeed(Frame.SpeedKPH);
+ * DisplayInputs(Frame.ThrottleInput, Frame.BrakeInput, Frame.SteeringInput);
+ * @endcode
+ *
+ * **Managing Saved Replays:**
+ * @code
+ * // Get all replays for a track
+ * TArray<FMGReplayData> Replays = ReplaySubsystem->GetSavedReplays(FName("Track_Tokyo"));
+ *
+ * // Sort by lap time
+ * Replays.Sort([](const FMGReplayData& A, const FMGReplayData& B) {
+ *     return A.BestLapTime < B.BestLapTime;
+ * });
+ *
+ * // Delete old replays if over limit
+ * while (Replays.Num() > MaxReplaysPerTrack)
+ * {
+ *     ReplaySubsystem->DeleteReplay(Replays.Pop().ReplayID);
+ * }
+ * @endcode
+ *
+ * **Listening to Replay Events:**
+ * @code
+ * // Bind to events
+ * ReplaySubsystem->OnReplayStateChanged.AddDynamic(this, &AMyClass::HandleStateChange);
+ * ReplaySubsystem->OnGhostSpawned.AddDynamic(this, &AMyClass::HandleGhostSpawned);
+ * ReplaySubsystem->OnPlaybackProgress.AddDynamic(this, &AMyClass::HandleProgress);
+ *
+ * void AMyClass::HandleProgress(float CurrentTime, float TotalTime)
+ * {
+ *     float Progress = CurrentTime / TotalTime;
+ *     UpdateProgressBar(Progress);
+ * }
+ * @endcode
+ *
+ * @section bestpractices Best Practices
+ * - Access the subsystem once and cache the pointer for frequent use
+ * - Always check IsRecording() before StartRecording() to avoid double-recording
+ * - Clean up ghosts with DespawnAllGhosts() when leaving a race
+ * - Use OnPlaybackComplete to detect replay end and return to menu
+ * - Compress replays before uploading to reduce bandwidth
+ * - Limit concurrent ghosts to 3-5 for performance
+ *
+ * @see AMGGhostRacerActor
+ * @see UMGReplayRecordingComponent
+ * @see FMGReplayData
+ * @see FMGReplayFrame
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

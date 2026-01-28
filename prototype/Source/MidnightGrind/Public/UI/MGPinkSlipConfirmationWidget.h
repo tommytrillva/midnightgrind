@@ -1,5 +1,79 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGPinkSlipConfirmationWidget.h
+ * @brief Triple-confirmation dialog for high-stakes pink slip races
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the base widget class for pink slip race confirmations.
+ * Pink slip races are winner-takes-all wagers where the loser permanently
+ * loses their vehicle. Due to the severe consequences, this widget implements
+ * a mandatory triple-confirmation process with increasingly stern warnings.
+ *
+ * The widget is designed to be extended in Blueprint for visual presentation
+ * while this base class handles all confirmation logic and flow.
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Triple Confirmation**: Three separate "Are you sure?" dialogs must be
+ *   acknowledged before a pink slip race can begin. This prevents accidental
+ *   wagers and ensures the player understands the stakes.
+ *
+ * - **Escalating Warnings**: Each confirmation step shows progressively more
+ *   urgent warnings. The final confirmation requires extra acknowledgment.
+ *
+ * - **Blueprint Extension**: The C++ base handles logic; Blueprint subclasses
+ *   implement the visual design and animations.
+ *
+ * - **Permanent Consequences**: If the player loses, the vehicle is permanently
+ *   transferred to the opponent. There is no undo or buyback.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [Pink Slip Challenge] ---> [UMGPinkSlipSubsystem]
+ *                                      |
+ *                                      v
+ *                              [UMGPinkSlipConfirmationWidget]
+ *                                      |
+ *                                      +-- Step 1: "You will wager your vehicle"
+ *                                      |
+ *                                      +-- Step 2: "If you lose, it's gone forever"
+ *                                      |
+ *                                      +-- Step 3: "FINAL WARNING - No undo!"
+ *                                      |
+ *                                      v
+ *                              [Race Begins or Cancel]
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // This widget is typically shown by the PinkSlipSubsystem, not directly
+ * // Blueprint designers should extend this class and implement visuals
+ *
+ * // In Blueprint, bind to confirmation data:
+ * // - GetConfirmationData() returns current FMGPinkSlipConfirmationData
+ * // - IsFinalConfirmation() returns true on step 3
+ * // - GetFormattedTotalValue() returns formatted currency string
+ * // - GetStepText() returns "1 of 3", "2 of 3", etc.
+ *
+ * // When player clicks confirm button:
+ * OnConfirmClicked(); // Base class handles progression to next step
+ *
+ * // When player clicks cancel button:
+ * OnCancelClicked(); // Base class handles cleanup
+ *
+ * // Blueprint event for updating visuals:
+ * UFUNCTION(BlueprintImplementableEvent)
+ * void OnConfirmationDataSet(); // Override to update UI elements
+ * @endcode
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

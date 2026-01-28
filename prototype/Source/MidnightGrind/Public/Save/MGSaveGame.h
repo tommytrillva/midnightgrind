@@ -1,5 +1,97 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGSaveGame.h
+ * @brief Core save game data structure for Midnight Grind
+ *
+ * This file defines the primary save game class and all associated data structures
+ * that store player progress, statistics, and achievements. When a player saves their
+ * game, all data flows through this class.
+ *
+ * @section Overview
+ *
+ * The save system in Midnight Grind uses Unreal Engine's USaveGame serialization
+ * framework. UMGSaveGame serves as the central data container that aggregates
+ * information from multiple game subsystems into a single serializable object.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **1. USaveGame Base Class**
+ * Unreal Engine provides USaveGame as a base class for save data. Any UPROPERTY
+ * marked with the "SaveGame" specifier will be automatically serialized when the
+ * game saves. This file contains many SaveGame-marked properties.
+ *
+ * **2. Data Structures (USTRUCT)**
+ * Save data is organized into logical groups using USTRUCT:
+ * - FMGHeatLevelSaveData: Police pursuit statistics
+ * - FMGShortcutSaveData: Discovered shortcuts and time saved
+ * - FMGTakedownSaveData: Vehicle takedown achievements
+ * - FMGVehicleClassSaveData: Performance class progression
+ * - FMGLicenseSaveData: Racing license achievements
+ * - FMGNearMissSaveData: Close-call driving statistics
+ * - FMGStuntSaveData: Stunts and tricks performed
+ *
+ * **3. Save Metadata**
+ * Every save includes metadata like timestamps and version numbers to handle
+ * save file migration when the game updates.
+ *
+ * **4. Save Slots**
+ * Players can have multiple save files (slots). Each slot has a unique name
+ * and stores independent progression.
+ *
+ * @section Usage Usage Example
+ *
+ * @code
+ * // Creating a new save game object
+ * UMGSaveGame* NewSave = Cast<UMGSaveGame>(
+ *     UGameplayStatics::CreateSaveGameObject(UMGSaveGame::StaticClass())
+ * );
+ *
+ * // Populate with player data
+ * NewSave->PlayerLevel = 25;
+ * NewSave->PlayerCash = 150000;
+ * NewSave->TotalRacesWon = 47;
+ *
+ * // Save to disk
+ * UGameplayStatics::SaveGameToSlot(NewSave, TEXT("Slot1"), 0);
+ *
+ * // Loading a save
+ * UMGSaveGame* LoadedSave = Cast<UMGSaveGame>(
+ *     UGameplayStatics::LoadGameFromSlot(TEXT("Slot1"), 0)
+ * );
+ * if (LoadedSave)
+ * {
+ *     int32 PlayerLevel = LoadedSave->PlayerLevel;
+ *     // Restore game state from loaded data...
+ * }
+ * @endcode
+ *
+ * @section DataFlow Data Flow
+ *
+ * @code
+ * [Game Subsystems] --> [UMGSaveManagerSubsystem] --> [UMGSaveGame] --> [Disk]
+ *
+ * On Save:
+ *   HeatLevelSubsystem   ---> HeatLevelData
+ *   ShortcutSubsystem    ---> ShortcutData
+ *   TakedownSubsystem    ---> TakedownData
+ *   PlayerProgression    ---> PlayerLevel, PlayerXP, etc.
+ *   GarageSubsystem      ---> UnlockedVehicles
+ *
+ * On Load:
+ *   [Disk] --> [UMGSaveGame] --> [Distribute to Subsystems]
+ * @endcode
+ *
+ * @section Integration Integration Points
+ *
+ * - **UMGSaveManagerSubsystem**: Orchestrates save/load operations using this class
+ * - **UMGCloudSaveSubsystem**: Syncs save data to cloud storage
+ * - **Individual Subsystems**: Each contributes its data during GatherSubsystemData()
+ *
+ * @see UMGSaveManagerSubsystem for save/load orchestration
+ * @see UMGCloudSaveSubsystem for cloud synchronization
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

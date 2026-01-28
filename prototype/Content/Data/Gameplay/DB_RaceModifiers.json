@@ -1,0 +1,245 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Race Modifiers and Mutators",
+
+  "ModifierSystem": {
+    "Enabled": true,
+    "StackingAllowed": true,
+    "MaxModifiers": 5,
+    "RewardMultiplier": true
+  },
+
+  "PositiveModifiers": {
+    "DoubleRewards": {
+      "ID": "MOD_DOUBLE_REWARDS",
+      "Name": "Double Down",
+      "Description": "Double cash and REP rewards",
+      "Icon": "ICO_Mod_Double",
+      "Effect": { "CashMultiplier": 2.0, "REPMultiplier": 2.0 },
+      "Rarity": "Rare",
+      "Source": ["DailyReward", "WheelSpin", "Achievement"]
+    },
+    "XPBoost": {
+      "ID": "MOD_XP_BOOST",
+      "Name": "XP Surge",
+      "Description": "50% more season XP",
+      "Icon": "ICO_Mod_XP",
+      "Effect": { "SeasonXPMultiplier": 1.5 },
+      "Rarity": "Common",
+      "Source": ["SeasonPass", "Store"]
+    },
+    "NitroRecharge": {
+      "ID": "MOD_NITRO_FAST",
+      "Name": "Quick Charge",
+      "Description": "Nitrous recharges 50% faster",
+      "Icon": "ICO_Mod_Nitro",
+      "Effect": { "NitrousRechargeRate": 1.5 },
+      "Rarity": "Common",
+      "AppliesTo": ["Race", "FreeRoam"]
+    },
+    "ExtendedNitro": {
+      "ID": "MOD_NITRO_LONG",
+      "Name": "Extended Burn",
+      "Description": "Nitrous lasts 25% longer",
+      "Icon": "ICO_Mod_Nitro_Long",
+      "Effect": { "NitrousDuration": 1.25 },
+      "Rarity": "Uncommon",
+      "AppliesTo": ["Race", "FreeRoam"]
+    },
+    "GhostStart": {
+      "ID": "MOD_GHOST_START",
+      "Name": "Clean Start",
+      "Description": "No collision for first 10 seconds",
+      "Icon": "ICO_Mod_Ghost",
+      "Effect": { "NoCollisionDuration": 10 },
+      "Rarity": "Uncommon",
+      "AppliesTo": ["Race"]
+    },
+    "CatchUpBoost": {
+      "ID": "MOD_CATCHUP",
+      "Name": "Rubber Band",
+      "Description": "Speed boost when falling behind",
+      "Icon": "ICO_Mod_Catchup",
+      "Effect": { "CatchUpStrength": 1.5 },
+      "Rarity": "Common",
+      "AppliesTo": ["Race"]
+    }
+  },
+
+  "ChallengeModifiers": {
+    "NoNitrous": {
+      "ID": "MOD_NO_NOS",
+      "Name": "Pure Skill",
+      "Description": "Nitrous disabled",
+      "Icon": "ICO_Mod_NoNos",
+      "Effect": { "NitrousEnabled": false },
+      "RewardBonus": 1.25,
+      "Difficulty": "Medium"
+    },
+    "NoRewind": {
+      "ID": "MOD_NO_REWIND",
+      "Name": "No Second Chances",
+      "Description": "Rewind disabled",
+      "Icon": "ICO_Mod_NoRewind",
+      "Effect": { "RewindEnabled": false },
+      "RewardBonus": 1.15,
+      "Difficulty": "Medium"
+    },
+    "NoAssists": {
+      "ID": "MOD_NO_ASSISTS",
+      "Name": "Manual Everything",
+      "Description": "All driving assists disabled",
+      "Icon": "ICO_Mod_NoAssists",
+      "Effect": { "AssistsEnabled": false },
+      "RewardBonus": 1.5,
+      "Difficulty": "Hard"
+    },
+    "OneShot": {
+      "ID": "MOD_ONE_SHOT",
+      "Name": "Glass Cannon",
+      "Description": "One crash ends the race",
+      "Icon": "ICO_Mod_OneShot",
+      "Effect": { "InstantFailOnCrash": true },
+      "RewardBonus": 2.0,
+      "Difficulty": "Expert"
+    },
+    "FirstPerson": {
+      "ID": "MOD_FP_ONLY",
+      "Name": "Cockpit View",
+      "Description": "First-person camera only",
+      "Icon": "ICO_Mod_FP",
+      "Effect": { "CameraRestriction": "Cockpit" },
+      "RewardBonus": 1.2,
+      "Difficulty": "Medium"
+    },
+    "MirrorMode": {
+      "ID": "MOD_MIRROR",
+      "Name": "Mirror Mode",
+      "Description": "Track is mirrored",
+      "Icon": "ICO_Mod_Mirror",
+      "Effect": { "TrackMirrored": true },
+      "RewardBonus": 1.1,
+      "Difficulty": "Easy"
+    },
+    "NightRace": {
+      "ID": "MOD_NIGHT",
+      "Name": "Midnight Run",
+      "Description": "Race takes place at night",
+      "Icon": "ICO_Mod_Night",
+      "Effect": { "TimeOfDay": "Night" },
+      "RewardBonus": 1.1,
+      "Difficulty": "Easy"
+    },
+    "RainRace": {
+      "ID": "MOD_RAIN",
+      "Name": "Wet Conditions",
+      "Description": "Race in the rain",
+      "Icon": "ICO_Mod_Rain",
+      "Effect": { "Weather": "Rain" },
+      "RewardBonus": 1.25,
+      "Difficulty": "Medium"
+    },
+    "IncreasedTraffic": {
+      "ID": "MOD_TRAFFIC",
+      "Name": "Rush Hour",
+      "Description": "Double traffic density",
+      "Icon": "ICO_Mod_Traffic",
+      "Effect": { "TrafficMultiplier": 2.0 },
+      "RewardBonus": 1.3,
+      "Difficulty": "Hard",
+      "AppliesTo": ["Sprint", "FreeRoam"]
+    },
+    "TougherAI": {
+      "ID": "MOD_HARD_AI",
+      "Name": "Elite Opposition",
+      "Description": "AI difficulty increased",
+      "Icon": "ICO_Mod_HardAI",
+      "Effect": { "AIDifficultyBoost": 2 },
+      "RewardBonus": 1.35,
+      "Difficulty": "Hard"
+    }
+  },
+
+  "FunModifiers": {
+    "LowGravity": {
+      "ID": "MOD_LOW_GRAV",
+      "Name": "Moon Mode",
+      "Description": "Reduced gravity for big air",
+      "Icon": "ICO_Mod_Moon",
+      "Effect": { "GravityMultiplier": 0.5 },
+      "RewardBonus": 0,
+      "Category": "Fun",
+      "OnlineAllowed": false
+    },
+    "TinyCars": {
+      "ID": "MOD_TINY",
+      "Name": "Micro Machines",
+      "Description": "All cars are tiny",
+      "Icon": "ICO_Mod_Tiny",
+      "Effect": { "VehicleScale": 0.25 },
+      "RewardBonus": 0,
+      "Category": "Fun",
+      "OnlineAllowed": false
+    },
+    "BigHead": {
+      "ID": "MOD_BIGHEAD",
+      "Name": "Big Head Mode",
+      "Description": "Driver heads are huge",
+      "Icon": "ICO_Mod_BigHead",
+      "Effect": { "DriverHeadScale": 3.0 },
+      "RewardBonus": 0,
+      "Category": "Fun",
+      "OnlineAllowed": false
+    },
+    "SlowMotion": {
+      "ID": "MOD_SLOWMO",
+      "Name": "Bullet Time",
+      "Description": "Everything moves at half speed",
+      "Icon": "ICO_Mod_SlowMo",
+      "Effect": { "TimeScale": 0.5 },
+      "RewardBonus": 0,
+      "Category": "Fun",
+      "OnlineAllowed": false
+    },
+    "Chaos": {
+      "ID": "MOD_CHAOS",
+      "Name": "Total Chaos",
+      "Description": "Random events throughout the race",
+      "Icon": "ICO_Mod_Chaos",
+      "Effect": { "RandomEvents": true },
+      "RewardBonus": 0,
+      "Category": "Fun",
+      "OnlineAllowed": true
+    }
+  },
+
+  "ModifierPacks": {
+    "Hardcore": {
+      "ID": "PACK_HARDCORE",
+      "Name": "Hardcore Pack",
+      "Modifiers": ["MOD_NO_ASSISTS", "MOD_NO_REWIND", "MOD_HARD_AI"],
+      "CombinedBonus": 2.0
+    },
+    "Immersion": {
+      "ID": "PACK_IMMERSION",
+      "Name": "Immersion Pack",
+      "Modifiers": ["MOD_FP_ONLY", "MOD_NIGHT", "MOD_RAIN"],
+      "CombinedBonus": 1.5
+    },
+    "Chaos": {
+      "ID": "PACK_CHAOS",
+      "Name": "Chaos Pack",
+      "Modifiers": ["MOD_TRAFFIC", "MOD_RAIN", "MOD_NIGHT"],
+      "CombinedBonus": 1.7
+    }
+  },
+
+  "UnlockRequirements": {
+    "MOD_NO_ASSISTS": "LEVEL_15",
+    "MOD_ONE_SHOT": "LEVEL_25",
+    "MOD_HARD_AI": "LEVEL_20",
+    "MOD_LOW_GRAV": "CHEAT_CODE",
+    "MOD_TINY": "CHEAT_CODE",
+    "MOD_BIGHEAD": "CHEAT_CODE"
+  }
+}

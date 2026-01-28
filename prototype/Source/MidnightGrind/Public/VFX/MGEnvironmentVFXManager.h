@@ -1,5 +1,141 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGEnvironmentVFXManager.h
+ * @brief Manages atmospheric and environmental visual effects for the game world
+ *
+ * @section Overview
+ * AMGEnvironmentVFXManager is an Actor that controls all environmental visual effects
+ * including weather systems, time-of-day lighting, zone-based ambient particles, and
+ * city atmosphere. It creates a living, breathing urban environment that responds to
+ * game state and enhances immersion.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Weather System**
+ * The weather system simulates different atmospheric conditions that affect both
+ * visuals and gameplay:
+ * - Clear: No precipitation, normal visibility
+ * - Overcast: Cloudy skies, diffused lighting
+ * - LightRain/HeavyRain: Varying rain intensity with wet surfaces
+ * - Storm: Heavy rain plus lightning and wind debris
+ * - Fog: Reduced visibility with volumetric fog effects
+ * - Heat: Heat shimmer distortion effects
+ *
+ * Weather transitions happen smoothly over time using interpolation between
+ * configurations (FMGWeatherConfig structs).
+ *
+ * **Time of Day**
+ * The manager tracks a 24-hour clock that affects lighting and ambient particles:
+ * - Dawn/Dusk: Golden hour lighting with warm tones
+ * - Day (Morning/Noon/Afternoon): Bright, high-contrast lighting
+ * - Night (Sunset/Dusk/Night/Midnight): Dark with artificial lighting emphasis
+ *
+ * Time can progress in real-time or be accelerated/paused for gameplay purposes.
+ *
+ * **Environment Zones**
+ * Different areas of the city have unique ambient particle systems:
+ * - Downtown: Neon glow, dense atmosphere, light bloom
+ * - Industrial: Steam vents, smoke, sparks from machinery
+ * - Waterfront: Sea spray, birds, coastal fog
+ * - Residential: Quieter, falling leaves, fireflies at night
+ * - Highway: Wind particles, minimal ambient effects
+ * - Tunnel/Underground: Dust, enclosed atmosphere
+ *
+ * **Niagara Integration**
+ * All particle effects use Unreal's Niagara system. The manager spawns and controls
+ * UNiagaraComponent instances for each active effect, managing their lifecycle and
+ * parameters based on current conditions.
+ *
+ * @section Architecture
+ * The manager is a world-placed Actor that:
+ * 1. Maintains current weather, time, and zone state
+ * 2. Updates active Niagara components each tick based on state
+ * 3. Manages smooth transitions between states using interpolation
+ * 4. Broadcasts events when significant changes occur (weather change, zone entry)
+ * 5. Synchronizes with post-processing for screen-space effects
+ *
+ * Place one instance of this actor in each level. It can be accessed via:
+ * - Direct reference (level Blueprint)
+ * - Finding by class: GetWorld()->SpawnActor or FindActorOfClass
+ *
+ * @section UsageExamples Usage Examples
+ *
+ * **Setting Up Weather in Level Blueprint:**
+ * @code
+ * // Get reference to the environment manager in the level
+ * AMGEnvironmentVFXManager* EnvManager = Cast<AMGEnvironmentVFXManager>(
+ *     UGameplayStatics::GetActorOfClass(GetWorld(), AMGEnvironmentVFXManager::StaticClass()));
+ *
+ * // Start a rainy night race
+ * EnvManager->SetTimeOfDay(22.0f);  // 10 PM
+ * EnvManager->TransitionToWeather(EMGWeatherType::HeavyRain, 5.0f);  // 5 second transition
+ * @endcode
+ *
+ * **Responding to Weather Changes:**
+ * @code
+ * // In your game mode or vehicle class
+ * void AMyGameMode::BeginPlay()
+ * {
+ *     Super::BeginPlay();
+ *
+ *     // Find and bind to environment manager
+ *     EnvManager = Cast<AMGEnvironmentVFXManager>(
+ *         UGameplayStatics::GetActorOfClass(GetWorld(), AMGEnvironmentVFXManager::StaticClass()));
+ *
+ *     if (EnvManager)
+ *     {
+ *         EnvManager->OnWeatherChanged.AddDynamic(this, &AMyGameMode::HandleWeatherChange);
+ *     }
+ * }
+ *
+ * void AMyGameMode::HandleWeatherChange(EMGWeatherType NewWeather)
+ * {
+ *     // Adjust vehicle handling for wet conditions
+ *     if (NewWeather == EMGWeatherType::HeavyRain || NewWeather == EMGWeatherType::Storm)
+ *     {
+ *         NotifyAllVehicles_WetConditions(true);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Zone-Based Ambient Effects:**
+ * @code
+ * // When player enters a new area (via trigger volume or track section)
+ * void ATrackSection::OnVehicleEnter(AActor* Vehicle)
+ * {
+ *     if (Vehicle->IsA<APlayerVehicle>())
+ *     {
+ *         AMGEnvironmentVFXManager* EnvManager = GetEnvManager();
+ *         EnvManager->EnterZone(ZoneType);  // e.g., EMGEnvironmentZone::Industrial
+ *     }
+ * }
+ * @endcode
+ *
+ * **Triggering Atmospheric Events:**
+ * @code
+ * // Manual lightning strike for dramatic moment
+ * void ATriggerVolume::OnDramaticMoment()
+ * {
+ *     EnvManager->TriggerLightning();
+ *
+ *     // Spawn steam vent for cinematic effect
+ *     EnvManager->SpawnSteamVent(GetActorLocation(), 1.5f);
+ * }
+ * @endcode
+ *
+ * **Blueprint Usage:**
+ * 1. Place AMGEnvironmentVFXManager in your level
+ * 2. Configure default weather/time in the Details panel
+ * 3. Assign Niagara systems for each weather type
+ * 4. Call "Transition To Weather" or "Set Time Of Day" from gameplay events
+ * 5. Bind to OnWeatherChanged/OnZoneChanged events for gameplay responses
+ *
+ * @see UMGVFXSubsystem For global VFX spawning and pooling
+ * @see UMGWeatherVFXPresetData For configuring weather VFX presets
+ * @see UMGZoneVFXPresetData For configuring zone-specific effects
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

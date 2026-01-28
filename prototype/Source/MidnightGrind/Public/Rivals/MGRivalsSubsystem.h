@@ -4,6 +4,45 @@
  * @file MGRivalsSubsystem.h
  * @brief Dynamic rivalry system that turns real players into meaningful opponents
  *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ==========================
+ * This file defines the Rivals system, which tracks relationships between you and
+ * other players you race against. Unlike static leaderboards, this system creates
+ * personal, evolving rivalries that make multiplayer feel more meaningful.
+ *
+ * Think of it like the nemesis system in Shadow of Mordor, but for racing - players
+ * you frequently compete with become recognized rivals with their own history.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * --------------------------
+ *
+ * 1. WHAT IS A GAMEINSTANCE SUBSYSTEM?
+ *    - This class inherits from UGameInstanceSubsystem, meaning it persists across
+ *      level loads and exists for the entire game session.
+ *    - Access it from anywhere: GetGameInstance()->GetSubsystem<UMGRivalsSubsystem>()
+ *    - It automatically initializes when the game starts and cleans up when it ends.
+ *
+ * 2. WHAT ARE THESE MACROS (UENUM, USTRUCT, UCLASS)?
+ *    - UENUM: Defines an enumeration that Unreal's reflection system knows about.
+ *    - USTRUCT: Defines a data structure (like a class but simpler, no inheritance).
+ *    - UCLASS: Defines a full Unreal class with all engine integration.
+ *    - GENERATED_BODY(): Required macro that generates boilerplate code.
+ *
+ * 3. WHAT ARE DELEGATES?
+ *    - Delegates are Unreal's event system - they notify listeners when something happens.
+ *    - DECLARE_DYNAMIC_MULTICAST_DELEGATE declares a delegate type.
+ *    - "Dynamic" = works with Blueprints, "Multicast" = multiple listeners allowed.
+ *    - Example: OnNewRivalDiscovered fires when you race someone new enough times.
+ *
+ * 4. WHAT DO THE UPROPERTY SPECIFIERS MEAN?
+ *    - EditAnywhere: Editable in the editor's details panel.
+ *    - BlueprintReadWrite: Readable and writable from Blueprint visual scripts.
+ *    - BlueprintPure: Function has no side effects (doesn't change state).
+ *    - BlueprintCallable: Function can be called from Blueprints.
+ *    - BlueprintAssignable: Delegate can be bound to in Blueprints.
+ *
+ * RIVALRY SYSTEM OVERVIEW:
+ * -----------------------
  * The Rivals System creates persistent, narrative-driven relationships with other
  * players you encounter in races. Unlike static NPC rivals, these are real players
  * whose repeated encounters build into genuine rivalries over time.
@@ -36,7 +75,18 @@
  * When a rival joins your crew (or vice versa), the rivalry can transform into
  * an alliance, turning a former opponent into a teammate.
  *
+ * DATA FLOW EXAMPLE:
+ * -----------------
+ * 1. After a race, OnRaceWithPlayer() is called for each opponent
+ * 2. System finds or creates an FMGRival entry for that player
+ * 3. FMGRivalRecord is updated with win/loss and encounter data
+ * 4. CalculateRivalryScore() determines new intensity level
+ * 5. If intensity changed, OnRivalryIntensified fires
+ * 6. If this is a new rival (reached Acquaintance), OnNewRivalDiscovered fires
+ * 7. UI can show notifications like "New Rival: xXSpeedDemonXx"
+ *
  * @see UMGSocialSubsystem For crew membership that affects rivalries
+ * @see UMGSocialHubSubsystem For social spaces where rivals might meet
  */
 
 #pragma once

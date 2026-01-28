@@ -1,12 +1,217 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-#pragma once
-
-#include "CoreMinimal.h"
-#include "Subsystems/GameInstanceSubsystem.h"
-#include "MGGameModeSubsystem.generated.h"
+/**
+ * @file MGGameModeSubsystem.h
+ * @brief Race Type Configuration and Game Mode Rule Management System
+ * @author Midnight Grind Team
+ * @date 2024
+ *
+ * @section overview_sec Overview
+ * This subsystem manages all race types and rule configurations in Midnight Grind.
+ * It defines what kinds of races exist (circuit, drift, drag, etc.) and what
+ * rules apply to each (lap count, traffic, collisions, nitro, etc.).
+ *
+ * @note This is NOT Unreal's AGameMode class (which handles spawning and game flow).
+ * This subsystem specifically handles race TYPE configuration and rules.
+ *
+ * @section quickstart_sec Quick Start Example
+ * @code
+ * // Get the subsystem
+ * UMGGameModeSubsystem* GameMode = GetGameInstance()->GetSubsystem<UMGGameModeSubsystem>();
+ *
+ * // Set up a drift race
+ * GameMode->SetGameMode(EMGGameModeType::Drift);
+ * GameMode->SetTrafficMode(EMGTrafficMode::None);
+ * GameMode->SetCollisionsEnabled(false);  // Ghost mode for drift
+ *
+ * // Set up a standard circuit race
+ * GameMode->SetGameMode(EMGGameModeType::CircuitRace);
+ * GameMode->SetLapCount(5);
+ * GameMode->SetNitroEnabled(true);
+ * GameMode->SetCatchUpMode(EMGCatchUpMode::Subtle);
+ *
+ * // Get current configuration
+ * FMGGameModeRules Rules = GameMode->GetCurrentRules();
+ * UE_LOG(LogGame, Log, TEXT("Laps: %d, Traffic: %d"), Rules.LapCount, (int32)Rules.Traffic);
+ *
+ * // Use playlists for quickplay
+ * TArray<FMGPlaylistEntry> Featured = GameMode->GetFeaturedPlaylists();
+ * GameMode->SelectPlaylist(Featured[0].PlaylistID);
+ * @endcode
+ *
+ * @section concepts_sec Key Concepts for Beginners
+ *
+ * @subsection modes_subsec Game Mode Types (EMGGameModeType)
+ * | Mode Type     | Description                                        |
+ * |---------------|----------------------------------------------------|
+ * | CircuitRace   | Traditional lap-based racing around a track        |
+ * | SprintRace    | Point A to Point B, no laps                        |
+ * | Drift         | Score points by drifting, position doesn't matter  |
+ * | TimeAttack    | Race against the clock, not other players          |
+ * | Elimination   | Last place gets eliminated each lap                |
+ * | KingOfTheHill | Earn points by leading the race                    |
+ * | Tag           | One player is "it", earn points while tagged       |
+ * | Cops          | Pursuit mode - evade or chase                      |
+ * | Drag          | Quarter-mile straight-line speed runs              |
+ * | Touge         | Japanese mountain pass battles                     |
+ * | Custom        | Player-created rule combinations                   |
+ *
+ * @subsection rules_subsec Game Mode Rules (FMGGameModeRules)
+ * Rules are the configurable settings for each race:
+ * - **LapCount**: Number of laps (0 for point-to-point races)
+ * - **MaxRacers**: Maximum players allowed in the race
+ * - **Traffic**: None/Light/Normal/Heavy AI traffic on roads
+ * - **CatchUp**: Rubber-banding intensity to keep races close
+ * - **bAllowNitro**: Can players use NOS boost?
+ * - **bAllowCollisions**: Can cars physically interact?
+ * - **bGhostMode**: Cars pass through each other
+ * - **PerformanceCapPI**: Maximum vehicle performance index allowed
+ *
+ * @subsection playlist_subsec Playlists (FMGPlaylistEntry)
+ * Curated combinations of modes and tracks for matchmaking:
+ * - Quickplay uses playlists to find appropriate matches
+ * - Can be ranked (competitive) or casual
+ * - Featured playlists rotate based on events (see EventCalendar)
+ * - RuleOverrides customize rules per playlist
+ *
+ * @section modespecific_sec Mode-Specific Features
+ *
+ * @subsection elim_subsec Elimination Mode
+ * @code
+ * // During race, update elimination timer
+ * GameMode->UpdateEliminationTimer(DeltaTime);
+ *
+ * // When someone is eliminated
+ * GameMode->EliminatePlayer(PlayerID);
+ *
+ * // Check elimination state
+ * FMGEliminationState State = GameMode->GetEliminationState();
+ * if (State.TimeUntilElimination < 10.0f)
+ * {
+ *     ShowEliminationWarning(State.PlayerInLastPlace);
+ * }
+ * @endcode
+ *
+ * @subsection drift_subsec Drift Mode
+ * @code
+ * // Update drift score during gameplay
+ * GameMode->UpdateDriftScore(PlayerID, DriftAngle, Speed, DeltaTime);
+ *
+ * // When drift ends (straightened out or crashed)
+ * GameMode->EndDriftCombo(PlayerID);
+ *
+ * // Get current scoring
+ * FMGDriftScoring Score = GameMode->GetDriftScore(PlayerID);
+ * ShowCombo(Score.CurrentCombo, Score.ComboMultiplier);
+ * @endcode
+ *
+ * @section events_subsec Delegates/Events
+ * - **OnGameModeChanged**: Fires when mode type changes
+ * - **OnRulesChanged**: Fires when any rule is modified
+ * - **OnPlayerEliminated**: Fires when a player is eliminated
+ * - **OnDriftScoreUpdate**: Fires when drift score changes
+ *
+ * @section related_sec Related Files
+ * - MGGameModeSubsystem.cpp: Implementation
+ * - MGEventCalendarSubsystem.h: Featured playlist rotation
+ * - MGMatchmakingSubsystem.h: Uses playlists for online matching
+ *
+ * @see EMGGameModeType, EMGTrafficMode, EMGCatchUpMode
+ * @see FMGGameModeRules, FMGPlaylistEntry, FMGEliminationState, FMGDriftScoring
+ */
 
 /**
+ * ============================================================================
+ * MGGameModeSubsystem.h
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file manages all race types and rule configurations in Midnight Grind.
+ * It defines what kinds of races exist (circuit, drift, drag, etc.) and what
+ * rules apply to each (laps, traffic, collisions, etc.).
+ *
+ * NOTE: This is NOT the same as Unreal's AGameMode class. That handles
+ * spawning and game flow. This subsystem handles race TYPE configuration.
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. GAME MODE TYPES (EMGGameModeType)
+ *    The core race types available in the game:
+ *    - CircuitRace: Traditional lap-based racing around a track
+ *    - SprintRace: Point A to Point B, no laps
+ *    - Drift: Score points by drifting, not by position
+ *    - TimeAttack: Race against the clock, not other players
+ *    - Elimination: Last place gets eliminated each lap
+ *    - KingOfTheHill: Earn points by leading the race
+ *    - Tag: One player is "it", earn points while "it"
+ *    - Cops: Pursuit mode - evade or chase
+ *    - Drag: Quarter-mile straight-line speed runs
+ *    - Touge: Japanese mountain pass battles
+ *    - Custom: Player-created rule combinations
+ *
+ * 2. GAME MODE RULES (FMGGameModeRules)
+ *    Rules are the "settings" for a race. Key options include:
+ *    - LapCount: How many laps (0 for point-to-point)
+ *    - MaxRacers: Maximum players in the race
+ *    - Traffic: None/Light/Normal/Heavy - AI cars on road
+ *    - CatchUp: Rubber-banding to keep races close
+ *    - bAllowNitro: Can players use NOS boost?
+ *    - bAllowCollisions: Can cars hit each other?
+ *    - bGhostMode: Cars pass through each other
+ *    - PerformanceCapPI: Maximum car performance allowed
+ *
+ * 3. PLAYLISTS (FMGPlaylistEntry)
+ *    Playlists are curated combinations of modes and tracks:
+ *    - Quickplay uses playlists to find matches
+ *    - Can be ranked or casual
+ *    - Featured playlists rotate (see EventCalendar)
+ *    - RuleOverrides customize rules per playlist
+ *
+ * 4. MODE-SPECIFIC STATE
+ *    Some modes need extra tracking:
+ *    - FMGEliminationState: Who's been eliminated, countdown timer
+ *    - FMGDriftScoring: Current combo, multiplier, total score
+ *    These are accessed via GetEliminationState() / GetDriftScore()
+ *
+ * 5. CUSTOM MODES
+ *    Players can create their own modes:
+ *    - CreateCustomMode() saves a new mode configuration
+ *    - Custom modes can be shared with friends
+ *    - GetCustomModes() returns player-created modes
+ *
+ * COMMON USE CASES:
+ *
+ * For Race Setup:
+ * - SetGameMode(EMGGameModeType::Drift) to change race type
+ * - SetLapCount(5) to configure laps
+ * - SetTrafficMode(EMGTrafficMode::Heavy) for challenge
+ * - GetCurrentRules() to read active configuration
+ *
+ * For Lobby UI:
+ * - GetAvailableModes() to populate mode selector
+ * - GetPlaylists() for quickplay playlist list
+ * - GetFeaturedPlaylists() for highlighted playlists
+ *
+ * For In-Race:
+ * - Elimination: Call UpdateEliminationTimer(), EliminatePlayer()
+ * - Drift: Call UpdateDriftScore(), EndDriftCombo()
+ * - Subscribe to OnPlayerEliminated for elimination announcements
+ * - Subscribe to OnDriftScoreUpdate for score popups
+ *
+ * For Rule Modification:
+ * - SetRules() applies complete rule set
+ * - Individual setters (SetLapCount, SetNitroEnabled, etc.) for tweaks
+ * - ResetToDefaultRules() restores mode's default settings
+ *
+ * DELEGATES:
+ * - OnGameModeChanged: Fires when mode type changes
+ * - OnRulesChanged: Fires when any rule is modified
+ * - OnPlayerEliminated: Fires when a player is eliminated
+ * - OnDriftScoreUpdate: Fires when drift score changes
+ *
+ * ============================================================================
+ *
  * Game Mode System - Race Type Management
  * - Multiple race types with unique rules
  * - Dynamic rule modification
@@ -14,6 +219,12 @@
  * - Playlist management for quickplay
  * - Tournament mode integration
  */
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Subsystems/GameInstanceSubsystem.h"
+#include "MGGameModeSubsystem.generated.h"
 
 UENUM(BlueprintType)
 enum class EMGGameModeType : uint8

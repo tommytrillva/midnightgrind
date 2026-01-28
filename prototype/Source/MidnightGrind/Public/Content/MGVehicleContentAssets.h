@@ -1,6 +1,59 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * ============================================================================
+ * MGVehicleContentAssets.h
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file defines the "blueprints" for all vehicles in the Midnight Grind
+ * racing game. Think of it as a template that describes everything about a
+ * car - from how it looks and sounds to how it handles and accelerates.
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. DATA ASSETS
+ *    In Unreal Engine, a "Data Asset" is a container for storing game data
+ *    that can be edited in the Unreal Editor without writing code. This file
+ *    defines two main data asset types:
+ *    - UMGVehicleDataAsset: Contains all data for a single vehicle
+ *    - UMGVehicleCollectionAsset: Groups vehicles together (like "JDM Cars")
+ *
+ * 2. STRUCTS (USTRUCT)
+ *    Structs are custom data types that bundle related variables together.
+ *    For example, FMGEngineSpec groups all engine-related properties like
+ *    horsepower, torque, and RPM. The "F" prefix is an Unreal convention
+ *    for struct names.
+ *
+ * 3. ENUMS (UENUM)
+ *    Enums define a fixed set of named options. For example, EMGVehicleClass
+ *    lets you pick from D_Class, C_Class, B_Class, etc. The "E" prefix is
+ *    the Unreal convention for enum names.
+ *
+ * 4. UPROPERTY MACRO
+ *    The UPROPERTY() macro tells Unreal Engine about each variable, enabling:
+ *    - EditAnywhere: Can be edited in the Unreal Editor
+ *    - BlueprintReadOnly/ReadWrite: Can be accessed from Blueprint visual scripts
+ *    - Category: Organizes properties into groups in the editor
+ *
+ * HOW THIS FILE IS USED:
+ * - Designers create vehicle data assets in the Content Browser
+ * - The game loads these assets to spawn and configure vehicles
+ * - Physics systems read engine/transmission/handling specs
+ * - UI systems read stats and identity info for displays
+ * - Customization systems use paint options and slots
+ *
+ * WORKFLOW FOR ADDING A NEW VEHICLE:
+ * 1. Create a new UMGVehicleDataAsset in Content Browser
+ * 2. Fill in identity (name, manufacturer, class)
+ * 3. Assign visual assets (mesh, materials, thumbnail)
+ * 4. Configure engine, transmission, and handling specs
+ * 5. Set up NOS, audio, and VFX references
+ * 6. Define unlock requirements for progression
+ *
+ * ============================================================================
+ *
  * @file MGVehicleContentAssets.h
  * @brief Vehicle configuration data assets for Midnight Grind racing game.
  *

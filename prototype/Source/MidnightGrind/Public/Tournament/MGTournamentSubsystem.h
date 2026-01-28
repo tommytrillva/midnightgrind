@@ -1,5 +1,99 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGTournamentSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the Tournament Subsystem for Midnight Grind, which manages
+ * all aspects of competitive bracket-based tournaments in the game. Think of it
+ * as the backbone for organizing racing competitions where players compete in
+ * structured elimination or point-based formats.
+ *
+ * WHAT IS A TOURNAMENT?
+ * ---------------------
+ * A tournament is an organized competitive event where multiple players (or teams)
+ * compete through a series of matches to determine a winner. Unlike casual racing,
+ * tournaments have:
+ *   - Fixed schedules (registration period, check-in, start times)
+ *   - Bracket structures (who plays whom and in what order)
+ *   - Elimination rules (lose and you're out, or accumulate points)
+ *   - Prize pools (rewards for top placements)
+ *
+ * KEY CONCEPTS AND TERMINOLOGY:
+ * -----------------------------
+ *
+ * 1. TOURNAMENT FORMATS (EMGTournamentFormat):
+ *    - Single Elimination: Lose once and you're out. Fast and dramatic.
+ *    - Double Elimination: Must lose twice to be eliminated. Has winners/losers brackets.
+ *    - Round Robin: Everyone plays everyone. Best record wins.
+ *    - Swiss System: Pairs players with similar records each round.
+ *    - Group Stage: Divide into groups, top finishers advance to knockouts.
+ *
+ * 2. TOURNAMENT STATES (EMGTournamentState):
+ *    - Announced: Tournament is visible but registration hasn't opened
+ *    - Registration: Players can sign up
+ *    - CheckIn: Registered players confirm they're ready to play
+ *    - InProgress: Matches are being played
+ *    - Finals: Final match(es) are happening
+ *    - Completed/Cancelled: Tournament has ended
+ *
+ * 3. BRACKETS:
+ *    A visual representation of the tournament structure showing all matches
+ *    and how winners advance. In double elimination, there are:
+ *    - Winners Bracket: Where everyone starts
+ *    - Losers Bracket: Where you go after your first loss
+ *    - Grand Finals: Winner of winners vs winner of losers
+ *
+ * 4. SEEDING:
+ *    Assigning positions to players based on skill rating so top players
+ *    don't face each other in early rounds.
+ *
+ * 5. PARTICIPANT:
+ *    Can be a solo player, a team, or a crew depending on tournament type.
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ * - This is a UGameInstanceSubsystem, meaning it persists across level loads
+ *   and exists for the entire game session.
+ * - It works with UMGOnlineSubsystem for network/backend communication.
+ * - Tournaments generate matches that use the core racing systems.
+ * - Results feed into the Skill Rating system (UMGSkillRatingSubsystem).
+ * - Works alongside the Esports Subsystem for professional/broadcast features.
+ *
+ * TYPICAL WORKFLOW:
+ * -----------------
+ * 1. Browse available tournaments (GetAvailableTournaments)
+ * 2. Check requirements and register (CanRegisterForTournament, RegisterForTournament)
+ * 3. Wait for check-in window and check in (CheckInForTournament)
+ * 4. Receive match notifications (OnMatchReady delegate)
+ * 5. Play matches and report results (GetCurrentMatch, ReportMatchResult)
+ * 6. Advance through bracket or get eliminated
+ * 7. Receive prizes if placed well (OnTournamentCompleted delegate)
+ *
+ * DELEGATES (Event Notifications):
+ * --------------------------------
+ * - OnTournamentStateChanged: Fires when tournament moves to new state
+ * - OnTournamentRegistration: Fires when registration succeeds/fails
+ * - OnMatchReady: Fires when your next match is ready to start
+ * - OnMatchCompleted: Fires when any match finishes
+ * - OnTournamentCompleted: Fires when tournament ends with final standings
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ---------------------------
+ * - USTRUCT: A data container (like a C struct with Unreal reflection support)
+ * - UENUM: An enumeration type exposed to Blueprints
+ * - UPROPERTY: Member variable that Unreal tracks (for serialization, GC, Blueprints)
+ * - UFUNCTION: Function exposed to Unreal reflection system
+ * - BlueprintPure: Function with no side effects, callable from Blueprints
+ * - BlueprintCallable: Function that may have side effects, callable from Blueprints
+ * - GameInstanceSubsystem: A singleton that lives as long as the game instance
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,8 +102,32 @@
 
 class UMGOnlineSubsystem;
 
+//=============================================================================
+// ENUMS - Tournament Configuration Types
+//=============================================================================
+
 /**
  * Tournament Format Types
+ *
+ * Determines the structure of competition and how players advance or are eliminated.
+ * Each format has different characteristics:
+ *
+ * - SingleElimination: Quick, high-stakes. One loss = out.
+ *   Common for smaller tournaments or when time is limited.
+ *   Example: 16 players = 4 rounds (16 -> 8 -> 4 -> 2 -> 1)
+ *
+ * - DoubleElimination: More forgiving. Two losses = out.
+ *   Creates Winners Bracket (undefeated) and Losers Bracket (one loss).
+ *   Grand Finals: Winners champ vs Losers champ.
+ *
+ * - RoundRobin: Everyone plays everyone. Best record wins.
+ *   Fair but time-consuming. Best for small groups (4-8 players).
+ *
+ * - Swiss: Smart pairing system. Players with similar records face each other.
+ *   Efficient for large player counts. Common in chess tournaments.
+ *
+ * - GroupStage: Divide into groups (round robin within), top finishers
+ *   advance to knockout rounds. Used in World Cup, etc.
  */
 UENUM(BlueprintType)
 enum class EMGTournamentFormat : uint8
@@ -23,6 +141,22 @@ enum class EMGTournamentFormat : uint8
 
 /**
  * Tournament State
+ *
+ * Represents the lifecycle of a tournament from announcement to completion.
+ * Tournaments progress through these states in order (with some exceptions).
+ *
+ * State Flow:
+ * Announced -> Registration -> CheckIn -> InProgress <-> Intermission -> Finals -> Completed
+ *                                                                               \-> Cancelled
+ *
+ * - Announced: Tournament visible but can't register yet. Used for hype/marketing.
+ * - Registration: Players can sign up. Usually opens days before the event.
+ * - CheckIn: Registered players confirm attendance. Reduces no-shows.
+ * - InProgress: Active matches being played.
+ * - Intermission: Break between rounds (for broadcasts, player rest).
+ * - Finals: The championship match(es). Grand Finals, etc.
+ * - Completed: Tournament finished. Results finalized, prizes distributed.
+ * - Cancelled: Tournament will not occur. Refunds issued if applicable.
  */
 UENUM(BlueprintType)
 enum class EMGTournamentState : uint8
@@ -39,6 +173,19 @@ enum class EMGTournamentState : uint8
 
 /**
  * Match State
+ *
+ * Represents the lifecycle of an individual match within a tournament.
+ * A match is a single competitive encounter between two participants.
+ *
+ * - Pending: Match exists but participants not yet determined
+ *   (waiting for earlier round results).
+ * - ReadyToStart: Both participants known and ready. Match can begin.
+ * - InProgress: Match is actively being played.
+ * - Completed: Match finished with a winner determined normally.
+ * - Disputed: Result is contested. Requires admin intervention.
+ * - Forfeited: A participant didn't show up or gave up.
+ * - Bye: Only one participant. They advance automatically.
+ *   (Happens in brackets with non-power-of-2 participant counts)
  */
 UENUM(BlueprintType)
 enum class EMGMatchState : uint8
@@ -54,6 +201,14 @@ enum class EMGMatchState : uint8
 
 /**
  * Tournament Entry Type
+ *
+ * Defines what kind of participants can enter the tournament.
+ *
+ * - Solo: Individual players compete. Most common type.
+ * - Team: Pre-formed teams compete. TeamSize in tournament data specifies members.
+ *   Example: 2v2 relay racing.
+ * - Crew: Crew-based competition. Players must be in a crew to enter.
+ *   Represents the crew in inter-crew rivalries.
  */
 UENUM(BlueprintType)
 enum class EMGTournamentEntryType : uint8
@@ -65,6 +220,17 @@ enum class EMGTournamentEntryType : uint8
 
 /**
  * Tournament Tier (determines prize pools and prestige)
+ *
+ * Higher tiers = bigger prizes, more prestige, tougher competition.
+ * Championship Points from higher tiers count more toward rankings.
+ *
+ * Tier Hierarchy (lowest to highest):
+ * - Community: Player-organized events. Small prizes, casual.
+ * - Weekly: Regular scheduled events. Modest rewards.
+ * - Monthly: End-of-month championship. Good rewards.
+ * - Seasonal: Every 3 months. Significant rewards and prestige.
+ * - Major: Big competitive events. Large prize pools.
+ * - Championship: The ultimate events. Massive rewards, exclusive titles.
  */
 UENUM(BlueprintType)
 enum class EMGTournamentTier : uint8
@@ -79,6 +245,20 @@ enum class EMGTournamentTier : uint8
 
 /**
  * Bracket Side (for double elimination)
+ *
+ * In double elimination, there are two parallel brackets:
+ *
+ * - Winners: Where everyone starts. You stay here until your first loss.
+ *   Winning here is ideal - shorter path to championship.
+ *
+ * - Losers: Where you go after losing in Winners bracket.
+ *   You get a second chance but have a longer road to the finals.
+ *   Lose here = eliminated from tournament.
+ *
+ * - GrandFinals: The championship match.
+ *   Winners bracket champion vs Losers bracket champion.
+ *   Note: Losers champ may need to beat Winners champ twice
+ *   (since Winners champ hasn't lost yet) - called "bracket reset".
  */
 UENUM(BlueprintType)
 enum class EMGBracketSide : uint8
@@ -88,8 +268,20 @@ enum class EMGBracketSide : uint8
 	GrandFinals	UMETA(DisplayName = "Grand Finals")
 };
 
+//=============================================================================
+// STRUCTS - Tournament Data Containers
+//=============================================================================
+
 /**
  * Tournament Participant (player or team)
+ *
+ * Represents a single entry in the tournament. This could be:
+ * - A solo player
+ * - A team of players
+ * - A crew representation
+ *
+ * Contains all the data needed to identify, track, and display a participant
+ * throughout the tournament lifecycle.
  */
 USTRUCT(BlueprintType)
 struct FMGTournamentParticipant
@@ -147,6 +339,17 @@ struct FMGTournamentParticipant
 
 /**
  * Tournament Match
+ *
+ * Represents a single scheduled encounter between two participants.
+ * Tracks the state, participants, results, and bracket position of the match.
+ *
+ * Key fields:
+ * - MatchID: Unique identifier for this match
+ * - Round/MatchNumber: Position in the bracket (for display)
+ * - BracketSide: Winners, Losers, or Grand Finals
+ * - Participant1ID/Participant2ID: Who is competing
+ * - BestOf: Number of games in series (e.g., BestOf=3 means first to 2 wins)
+ * - NextMatchWinnerID/NextMatchLoserID: Where participants go after this match
  */
 USTRUCT(BlueprintType)
 struct FMGTournamentMatch
@@ -232,6 +435,17 @@ struct FMGTournamentMatch
 
 /**
  * Tournament Bracket Round
+ *
+ * Groups matches that occur at the same stage of the tournament.
+ * Used for bracket visualization and to determine when to advance.
+ *
+ * Example rounds in a 16-player single elimination:
+ * - Round 1 (8 matches): "Round of 16"
+ * - Round 2 (4 matches): "Quarterfinals"
+ * - Round 3 (2 matches): "Semifinals"
+ * - Round 4 (1 match): "Finals"
+ *
+ * The RoundName field contains a display-friendly name like "Quarterfinals".
  */
 USTRUCT(BlueprintType)
 struct FMGBracketRound
@@ -261,6 +475,16 @@ struct FMGBracketRound
 
 /**
  * Tournament Group (for group stage)
+ *
+ * In GroupStage format, participants are divided into groups (like World Cup).
+ * Within each group, everyone plays everyone (round robin).
+ * Top finishers from each group advance to knockout rounds.
+ *
+ * Example with 16 players:
+ * - 4 groups of 4 players each (Group A, B, C, D)
+ * - Each group plays round robin (6 matches per group)
+ * - Top 2 from each group advance to knockout (8 players)
+ * - Quarterfinals -> Semifinals -> Finals
  */
 USTRUCT(BlueprintType)
 struct FMGTournamentGroup
@@ -290,6 +514,18 @@ struct FMGTournamentGroup
 
 /**
  * Tournament Prize
+ *
+ * Defines rewards given to participants based on their final placement.
+ * Tournaments can have multiple prize entries for different placements.
+ *
+ * Reward types:
+ * - CashReward: In-game currency
+ * - XPReward: Experience points for progression
+ * - ReputationReward: Street reputation (affects unlock availability)
+ * - ChampionshipPoints: Points toward seasonal rankings
+ * - ItemRewards: Specific items (parts, cosmetics)
+ * - TitleReward: Display title (e.g., "Weekly Champion")
+ * - VehicleReward: Exclusive vehicle unlock
  */
 USTRUCT(BlueprintType)
 struct FMGTournamentPrize
@@ -331,6 +567,17 @@ struct FMGTournamentPrize
 
 /**
  * Tournament Entry Requirements
+ *
+ * Defines who is eligible to enter a tournament. Acts as a gatekeeper
+ * to ensure fair competition and appropriate skill levels.
+ *
+ * Examples of restrictions:
+ * - Level 20-50 only (keeps veterans from stomping newbies)
+ * - Gold rank or higher (competitive events)
+ * - Muscle cars only (themed tournaments)
+ * - Entry fee of 5000 credits (prize pool contribution)
+ * - Crew members only (crew events)
+ * - North America region only (latency concerns)
  */
 USTRUCT(BlueprintType)
 struct FMGTournamentRequirements
@@ -376,6 +623,18 @@ struct FMGTournamentRequirements
 
 /**
  * Tournament Schedule
+ *
+ * Contains all timing information for a tournament. Used to:
+ * - Notify players when to register, check in, and play
+ * - Automatically transition tournament states
+ * - Display countdown timers in UI
+ *
+ * Timeline Example:
+ * Day 1: Registration opens
+ * Day 3: Registration closes
+ * Day 4 (6:00 PM): Check-in opens
+ * Day 4 (6:30 PM): Check-in closes, tournament starts
+ * Day 4 (10:00 PM): Estimated end (depends on match lengths)
  */
 USTRUCT(BlueprintType)
 struct FMGTournamentSchedule
@@ -417,6 +676,21 @@ struct FMGTournamentSchedule
 
 /**
  * Tournament Data
+ *
+ * The main data structure containing ALL information about a tournament.
+ * This is the primary container passed around and stored for tournaments.
+ *
+ * Think of this as the "tournament document" - everything you need to know
+ * is in here: settings, schedule, participants, matches, brackets, etc.
+ *
+ * Key sections:
+ * - Identity: ID, name, description
+ * - Classification: Tier, format, entry type, state
+ * - Timing: Schedule struct
+ * - Rules: Requirements, max/min participants, team size
+ * - Rewards: Prize pool and prize distribution
+ * - Progression: Tracks, rounds, matches, brackets
+ * - Metadata: Featured status, streaming, organizer
  */
 USTRUCT(BlueprintType)
 struct FMGTournamentData
@@ -530,6 +804,17 @@ struct FMGTournamentData
 
 /**
  * Player Tournament Stats
+ *
+ * Aggregated statistics tracking a player's tournament history.
+ * Used for profile displays, achievements, and bragging rights.
+ *
+ * Tracked metrics:
+ * - Participation: Total tournaments entered
+ * - Success: Wins, top 3 finishes, match record
+ * - Streaks: Current and best winning streaks
+ * - Earnings: Total prize money won
+ * - Rankings: Championship points accumulated
+ * - Achievements: Best placement in each tier
  */
 USTRUCT(BlueprintType)
 struct FMGPlayerTournamentStats
@@ -577,16 +862,57 @@ struct FMGPlayerTournamentStats
 	TMap<EMGTournamentTier, int32> BestPlacementByTier;
 };
 
-// Delegates
+//=============================================================================
+// DELEGATES - Event Notifications
+//=============================================================================
+/**
+ * Delegates allow other systems to subscribe to tournament events.
+ * In Blueprints, these appear as bindable events you can hook into.
+ *
+ * DECLARE_DYNAMIC_MULTICAST_DELEGATE:
+ * - "Dynamic": Works with Blueprints
+ * - "Multicast": Multiple listeners can subscribe
+ * - "Delegate": Function pointer wrapper
+ * - OneParam/TwoParams: Number of parameters passed to listeners
+ */
+
+/** Fired when a tournament changes state (registration opened, started, etc.) */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTournamentStateChanged, const FMGTournamentData&, Tournament);
+
+/** Fired when a registration attempt completes (success or failure) */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTournamentRegistration, const FString&, TournamentID, bool, bSuccess);
+
+/** Fired when a match is ready to start and waiting for players */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchReady, const FMGTournamentMatch&, Match);
+
+/** Fired when a match finishes (with results) */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchCompleted, const FMGTournamentMatch&, Match);
+
+/** Fired when a tournament concludes with final standings and prizes distributed */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTournamentCompleted, const FString&, TournamentID, const TArray<FMGTournamentParticipant>&, FinalStandings);
+
+//=============================================================================
+// SUBSYSTEM CLASS
+//=============================================================================
 
 /**
  * Tournament Subsystem
- * Manages bracket-based competitive tournaments
+ *
+ * The main subsystem that manages all tournament functionality.
+ * Inherits from UGameInstanceSubsystem, meaning:
+ * - One instance exists per game instance
+ * - Persists across level loads (unlike per-level actors)
+ * - Accessed via: GetGameInstance()->GetSubsystem<UMGTournamentSubsystem>()
+ *
+ * Responsibilities:
+ * - Tournament creation, browsing, and lifecycle management
+ * - Player registration and check-in
+ * - Match scheduling and result tracking
+ * - Bracket generation and advancement
+ * - Prize distribution
+ * - Statistics tracking
+ *
+ * @see UGameInstanceSubsystem for subsystem lifecycle details
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGTournamentSubsystem : public UGameInstanceSubsystem
@@ -594,7 +920,16 @@ class MIDNIGHTGRIND_API UMGTournamentSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	/**
+	 * Called when the subsystem is created (game starts).
+	 * Sets up initial state, timers, and mock data for testing.
+	 */
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	/**
+	 * Called when the subsystem is destroyed (game ends).
+	 * Cleans up timers and any pending operations.
+	 */
 	virtual void Deinitialize() override;
 
 	// ==========================================

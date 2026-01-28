@@ -1,5 +1,216 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGPlayerMarketSubsystem.h
+ * @brief Player-to-player marketplace and auction house for trading vehicles and parts.
+ *
+ * The Player Market Subsystem powers the in-game auction house and direct trading system,
+ * allowing players to buy and sell vehicles, parts, and cosmetics to each other. This
+ * creates a dynamic player-driven economy where rare finds and well-built vehicles can
+ * be monetized, and budget-conscious players can find deals.
+ *
+ * @section pm_concepts Key Concepts
+ *
+ * **Listing Types:**
+ * The marketplace supports three types of listings:
+ * - Auction: Traditional bidding with optional buy-now price and reserve
+ * - Buy Now: Fixed price listings for immediate purchase
+ * - Classified: Contact-seller listings for negotiated trades
+ *
+ * **Item Types:**
+ * Players can list various item types:
+ * - Vehicles: Complete cars with full modification history
+ * - Parts: Performance and functional components
+ * - Cosmetics: Body kits, spoilers, mirrors, etc.
+ * - Liveries/Wraps: Custom paint schemes and decals
+ *
+ * **Auction Mechanics:**
+ * The auction system includes several features to ensure fair bidding:
+ * - Reserve price: Minimum price the seller will accept
+ * - Snipe protection: Bids in the last 60 seconds extend the auction
+ * - Auto-bidding: Set a maximum bid and the system bids incrementally
+ * - Bid history: Full transparency on all bids placed
+ *
+ * **Market Fees:**
+ * A 5% market fee is charged on successful sales. This fee:
+ * - Is deducted from the seller's payout
+ * - Helps maintain economic balance
+ * - Discourages market manipulation
+ *
+ * @section pm_trade Direct Trading
+ *
+ * Players can also trade directly with each other:
+ * - Propose trades with items + cash on both sides
+ * - Counter-offers create new trade proposals
+ * - Both parties must confirm before trade executes
+ * - Trades expire after 24 hours if not accepted
+ *
+ * @section pm_security Fraud Prevention
+ *
+ * The marketplace includes fraud detection to protect players:
+ * - Suspicious transaction patterns are flagged
+ * - Price manipulation is detected and prevented
+ * - Minimum/maximum pricing based on item value
+ * - Pink slip vehicles are locked for 7 days before resale
+ *
+ * @section pm_usage Basic Usage Examples
+ *
+ * **Creating an Auction Listing:**
+ * @code
+ * UMGPlayerMarketSubsystem* Market = GetGameInstance()->GetSubsystem<UMGPlayerMarketSubsystem>();
+ *
+ * FGuid ListingID;
+ * bool bSuccess = Market->CreateAuctionListing(
+ *     PlayerID,           // Seller's player ID
+ *     VehicleGUID,        // Item being sold
+ *     EMGMarketItemType::Vehicle,
+ *     50000,              // Starting price
+ *     75000,              // Buy now price (optional, 0 = disabled)
+ *     45000,              // Reserve price (optional, 0 = no reserve)
+ *     24.0f,              // Duration in hours
+ *     ListingID           // Output: created listing ID
+ * );
+ *
+ * if (bSuccess)
+ * {
+ *     // Listing created successfully
+ *     UE_LOG(LogTemp, Log, TEXT("Created auction listing: %s"), *ListingID.ToString());
+ * }
+ * @endcode
+ *
+ * **Browsing and Searching:**
+ * @code
+ * // Search with filters
+ * FMGMarketSearchFilter Filter;
+ * Filter.ItemType = EMGMarketItemType::Vehicle;
+ * Filter.Manufacturer = TEXT("Nissan");
+ * Filter.PriceMin = 20000;
+ * Filter.PriceMax = 100000;
+ * Filter.PIMin = 500.0f;
+ * Filter.bBuyNowOnly = true;
+ * Filter.SortBy = TEXT("Price");
+ * Filter.bSortAscending = true;
+ *
+ * TArray<FMGMarketListing> Results = Market->SearchListings(Filter, 50);
+ *
+ * // Get featured/trending listings
+ * TArray<FMGMarketListing> Featured = Market->GetFeaturedListings(10);
+ *
+ * // Get auctions ending soon
+ * TArray<FMGMarketListing> EndingSoon = Market->GetEndingSoonListings(20);
+ * @endcode
+ *
+ * **Bidding on Auctions:**
+ * @code
+ * // Check minimum bid increment
+ * FMGMarketListing Listing;
+ * if (Market->GetListing(ListingID, Listing))
+ * {
+ *     int64 MinBid = Listing.CurrentBid + Market->GetMinimumBidIncrement(Listing.CurrentBid);
+ *
+ *     // Place a bid
+ *     bool bBidSuccess = Market->PlaceBid(
+ *         PlayerID,
+ *         ListingID,
+ *         MinBid + 5000,  // Bid amount
+ *         true,           // Enable auto-bid
+ *         MinBid + 15000  // Max auto-bid amount
+ *     );
+ *
+ *     // Or use Buy Now
+ *     if (Listing.BuyNowPrice > 0)
+ *     {
+ *         Market->ExecuteBuyNow(PlayerID, ListingID);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Managing Watchlist:**
+ * @code
+ * // Add to watchlist
+ * Market->AddToWatchlist(PlayerID, ListingID);
+ *
+ * // Get watched listings
+ * TArray<FMGMarketListing> Watched = Market->GetWatchlist(PlayerID);
+ *
+ * // Remove from watchlist
+ * Market->RemoveFromWatchlist(PlayerID, ListingID);
+ * @endcode
+ *
+ * **Direct Trading:**
+ * @code
+ * // Create a trade offer
+ * TArray<FGuid> MyItems = { VehicleGUID };
+ * TArray<FGuid> TheirItems = { PartGUID1, PartGUID2 };
+ * FGuid TradeID;
+ *
+ * Market->CreateTradeOffer(
+ *     MyPlayerID,
+ *     TheirPlayerID,
+ *     MyItems,    // Items I'm offering
+ *     5000,       // Cash I'm adding
+ *     TheirItems, // Items I want
+ *     0,          // Cash I want from them
+ *     TEXT("Interested in trading my Skyline for your turbo setup?"),
+ *     TradeID
+ * );
+ *
+ * // Check pending trades
+ * TArray<FMGTradeOffer> PendingTrades = Market->GetPendingTrades(MyPlayerID);
+ *
+ * // Accept or reject trades
+ * Market->AcceptTradeOffer(MyPlayerID, IncomingTradeID);
+ * Market->RejectTradeOffer(MyPlayerID, IncomingTradeID);
+ *
+ * // Counter-offer
+ * TArray<FGuid> CounterItems = { DifferentPartGUID };
+ * FGuid CounterTradeID;
+ * Market->CreateCounterOffer(MyPlayerID, OriginalTradeID, CounterItems, 2000, CounterTradeID);
+ * @endcode
+ *
+ * **Pricing Guidance:**
+ * @code
+ * // Get estimated market value
+ * int64 EstimatedValue = Market->GetEstimatedMarketValue(VehicleGUID);
+ *
+ * // Check price history for similar items
+ * TArray<FMGMarketTransaction> History = Market->GetPriceHistory(
+ *     TEXT("NISSAN_SKYLINE_R34"),  // Model ID
+ *     30                           // Days back
+ * );
+ *
+ * // Get allowed price range
+ * int64 MinPrice = Market->GetMinimumListingPrice(ItemGUID, EMGMarketItemType::Vehicle);
+ * int64 MaxPrice = Market->GetMaximumListingPrice(ItemGUID, EMGMarketItemType::Vehicle);
+ *
+ * // Calculate expected earnings after fees
+ * int64 Fee = Market->CalculateMarketFee(SalePrice);
+ * int64 Payout = SalePrice - Fee;
+ * @endcode
+ *
+ * **Listening to Events:**
+ * @code
+ * // Subscribe to marketplace events
+ * Market->OnBidPlaced.AddDynamic(this, &UMyWidget::HandleBidPlaced);
+ * Market->OnOutbid.AddDynamic(this, &UMyWidget::HandleOutbid);
+ * Market->OnListingSold.AddDynamic(this, &UMyWidget::HandleSale);
+ * Market->OnTradeOfferReceived.AddDynamic(this, &UMyWidget::HandleTradeOffer);
+ *
+ * void UMyWidget::HandleOutbid(const FMGBidInfo& NewHighBid)
+ * {
+ *     // Notify player they've been outbid
+ *     ShowNotification(FText::Format(
+ *         LOCTEXT("Outbid", "You've been outbid! New high bid: {0}"),
+ *         FText::AsNumber(NewHighBid.BidAmount)
+ *     ));
+ * }
+ * @endcode
+ *
+ * @see UMGEconomySubsystem For credit balance management
+ * @see UMGGarageSubsystem For vehicle ownership
+ * @see UMGInventorySubsystem For item ownership
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

@@ -1,5 +1,88 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * ============================================================================
+ * MGPinkSlipTypes.h - Pink Slip Types, Constants & Utilities
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This header file contains shared types, enumerations, constants, and utility
+ * functions used throughout the Pink Slip racing system. It's separate from
+ * MGPinkSlipSubsystem.h to avoid circular dependencies and provide a clean
+ * set of common types that multiple files can include.
+ *
+ * KEY CONTENTS:
+ *
+ * 1. EMGPinkSlipResult - Race outcome enumeration:
+ *    - Pending: Race still in progress
+ *    - ChallengerWon: Player who initiated the race won
+ *    - DefenderWon: Player who was challenged won
+ *    - Voided: Technical failure, both keep cars (EXTREMELY RARE)
+ *    - ChallengerDisconnected: Challenger rage-quit, defender wins
+ *    - DefenderDisconnected: Defender rage-quit, challenger wins
+ *
+ * 2. EMGPinkSlipVoidReason - Why a race might be voided:
+ *    - Voiding is EXTREMELY RARE and only for true technical failures
+ *    - Player-caused issues (disconnect) result in LOSS, not void
+ *    - ServerCrash: Server died during race
+ *    - MutualDisconnect: Both players lost connection simultaneously
+ *    - AdminIntervention: Cheating detected
+ *    - CriticalBug: Game bug affected outcome
+ *
+ * 3. UMGPinkSlipHelpers - Blueprint Function Library:
+ *    - Static utility functions callable from Blueprints
+ *    - HasWinner(): Does the result have a definitive winner?
+ *    - WasDisconnect(): Did someone disconnect?
+ *    - GetWinnerIndex(): 0 for challenger, 1 for defender
+ *    - GetLoserIndex(): Opposite of winner
+ *    - AllowsRetry(): ALWAYS returns false (no retries in pink slip!)
+ *    - GetResultMessage(): Human-readable outcome text
+ *
+ * 4. MGPinkSlipConstants Namespace - System configuration:
+ *    - MinVehiclesToParticipate: Must own 2+ vehicles (can't lose your only car)
+ *    - MinREPTier: Minimum reputation tier (3 = RESPECTED)
+ *    - MinPlayerLevel: Minimum level (20)
+ *    - MaxPIDifference: Maximum Performance Index gap (50)
+ *    - CooldownHours: Cooldown after loss (24)
+ *    - TradeLockDays: Won vehicle trade lock (7)
+ *    - RequiredConfirmations: Triple confirm (3)
+ *    - DisconnectGracePeriod: Seconds before disconnect = loss (30)
+ *    - PhotoFinishThreshold: Seconds for "photo finish" display (0.5)
+ *    - RematchWindowSeconds: Time to offer rematch (120)
+ *    - MaxWitnesses: Maximum spectators (50)
+ *    - REPTierThresholds: Array of REP amounts for each tier
+ *
+ * UNDERSTANDING BLUEPRINT FUNCTION LIBRARY:
+ * - UMGPinkSlipHelpers inherits from UBlueprintFunctionLibrary
+ * - All functions are static (no instance needed)
+ * - Can be called from any Blueprint without a reference
+ * - Appear in Blueprint as free functions in "Pink Slip" category
+ *
+ * NSLOCTEXT MACRO:
+ * - Used for localized text (translation support)
+ * - NSLOCTEXT("Namespace", "Key", "English Text")
+ * - Localization system can replace with translated versions
+ * - Always use for player-visible strings
+ *
+ * constexpr KEYWORD:
+ * - Compile-time constant values
+ * - No runtime overhead
+ * - Used in MGPinkSlipConstants namespace
+ * - Can be used in array sizes, switch cases, etc.
+ *
+ * DESIGN NOTES:
+ * - AllowsRetry() ALWAYS returns false by design
+ * - This is documented in the function to prevent "fixing" it
+ * - The permanence of loss is a core design pillar
+ *
+ * RELATED FILES:
+ * - MGPinkSlipSubsystem.h (main subsystem using these types)
+ * - MGPinkSlipHandler.h (race-time handler using these types)
+ *
+ * ============================================================================
+ */
+
 #pragma once
 
 /**

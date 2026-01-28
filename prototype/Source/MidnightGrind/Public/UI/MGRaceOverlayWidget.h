@@ -1,10 +1,149 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGRaceOverlayWidget.h - Abstract Base Class for Race Overlay Displays
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines the interface for race overlay systems - the temporary,
+ * event-driven displays that appear over the regular HUD for important moments.
+ * Like MGRaceHUDWidget, this is an abstract base class that defines WHAT an
+ * overlay must do, not HOW it does it visually.
+ *
+ * OVERLAY RESPONSIBILITIES:
+ * -------------------------
+ * 1. COUNTDOWN: "3... 2... 1... GO!" sequence at race start
+ * 2. NOTIFICATIONS: Position changes, lap completions, bonuses
+ * 3. WARNINGS: Wrong way indicator
+ * 4. FINISH: Race completion screen with final position and time
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * Abstract Base Pattern:
+ *   Same pattern as MGRaceHUDWidget - defines the interface, child classes
+ *   provide the implementation. This allows different visual styles for
+ *   overlays while keeping the game code consistent.
+ *
+ * Notification System (FMGNotificationData):
+ *   A flexible struct that can represent many notification types:
+ *   - Type: What kind of event (position gain, best lap, near miss, etc.)
+ *   - Priority: How important (Low, Medium, High, Critical)
+ *   - MainText/SubText: What to display
+ *   - Color: Visual emphasis
+ *   - Duration: How long to show
+ *   - Icon/Sound: Optional visual and audio feedback
+ *
+ *   This single struct handles all notification types rather than having
+ *   separate functions for each type - a flexible, extensible design.
+ *
+ * EMGNotificationType Enum:
+ *   Categorizes notifications so implementations can apply appropriate
+ *   styling automatically. For example:
+ *   - PositionGain: Green color, upward arrow icon
+ *   - PositionLoss: Red color, downward arrow icon
+ *   - BestLap: Purple color, trophy icon
+ *
+ *   The overlay can use the type to decide visuals even if the caller
+ *   doesn't specify explicit colors.
+ *
+ * EMGNotificationPriority Enum:
+ *   Determines how notifications compete for screen space:
+ *   - Low: Displayed if room available
+ *   - Medium: Queued if at capacity
+ *   - High: Bumps low priority notifications
+ *   - Critical: Always displayed immediately (like "WRONG WAY")
+ *
+ * Countdown State (FMGCountdownState):
+ *   Bundles all countdown-related data:
+ *   - bActive: Is countdown currently running
+ *   - CurrentValue: Current number (3, 2, 1, or 0 for GO)
+ *   - Timer: Time accumulator for interval tracking
+ *   - IntervalTime: Seconds between countdown ticks
+ *
+ * Event Delegates:
+ *   The overlay broadcasts events that other systems can listen to:
+ *   - OnCountdownTick: Fired each countdown number (for sound effects)
+ *   - OnCountdownComplete: Fired when GO appears (for race start)
+ *   - OnNotificationShown/Hidden: For analytics or sound systems
+ *
+ * BlueprintNativeEvent Pattern:
+ *   Protected methods like OnCountdownValueChanged are BlueprintNativeEvent,
+ *   allowing Blueprints to override the visual implementation while C++
+ *   handles the timing logic. The public StartCountdown() handles state,
+ *   while OnCountdownValueChanged() handles display.
+ *
+ * HOW IT FITS IN THE ARCHITECTURE:
+ * --------------------------------
+ *
+ *                   [UMGRaceOverlayWidget]  (Abstract - this file)
+ *                           ^
+ *                           |
+ *        +------------------+------------------+
+ *        |                                     |
+ *   [MGDefaultRaceOverlay]              [Blueprint Overlay]
+ *   (C++ implementation)                (Designer-created)
+ *
+ *   External Systems                Overlay Widget
+ *   +----------------+            +----------------+
+ *   | Race Manager   |--Start---->|                |
+ *   |                |  Race      | StartCountdown |
+ *   +----------------+            |                |
+ *                                 |                |
+ *   +----------------+            |                |
+ *   | Position Mgr   |--Changed-->|                |
+ *   |                |            |ShowPositionChange|
+ *   +----------------+            +----------------+
+ *
+ * INTERFACE CONTRACT:
+ * -------------------
+ * Child classes must implement these protected BlueprintNativeEvent methods:
+ *
+ * COUNTDOWN:
+ *   - OnCountdownValueChanged(int32): Display countdown number (3, 2, 1)
+ *   - OnCountdownGo(): Display "GO!" with appropriate fanfare
+ *
+ * NOTIFICATIONS:
+ *   - DisplayNotification(FMGNotificationData): Create and show notification
+ *   - RemoveNotification(int32 ID): Hide and clean up notification
+ *
+ * WARNINGS:
+ *   - UpdateWrongWayDisplay(bool): Show/hide wrong way warning
+ *
+ * FINISH:
+ *   - DisplayRaceFinish(Position, Time, bNewRecord): Show finish screen
+ *
+ * CONFIGURATION:
+ * --------------
+ * The base class provides configurable properties for:
+ *
+ * BEHAVIOR:
+ *   - MaxVisibleNotifications: How many can show at once (default: 3)
+ *
+ * SOUNDS:
+ *   - PositionGainSound/PositionLossSound: Audio feedback for standing changes
+ *   - BestLapSound/FinalLapSound: Lap milestone sounds
+ *   - CountdownTickSound/CountdownGoSound: Countdown audio
+ *
+ * COLORS:
+ *   - PositionGainColor/PositionLossColor: Standing change colors
+ *   - BestLapColor/FinalLapColor: Lap milestone colors
+ *   - NearMissColor/DriftScoreColor: Bonus popup colors
+ *   - WrongWayColor: Warning text color
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "MGRaceOverlayWidget.generated.h"
+
+// Forward declaration
+struct FMGHUDNotification;
 
 /**
  * Notification priority
@@ -127,6 +266,7 @@ class MIDNIGHTGRIND_API UMGRaceOverlayWidget : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	// ==========================================
@@ -373,4 +513,23 @@ protected:
 
 	/** Get ordinal suffix (1st, 2nd, 3rd, etc.) */
 	FText GetOrdinalSuffix(int32 Number) const;
+
+	// ==========================================
+	// HUD SUBSYSTEM INTEGRATION
+	// ==========================================
+
+	/** Called when HUD subsystem adds a notification */
+	UFUNCTION()
+	void OnHUDNotificationAdded(const FMGHUDNotification& HUDNotification);
+
+	/** Called when HUD subsystem removes a notification */
+	UFUNCTION()
+	void OnHUDNotificationRemoved(int32 NotificationID);
+
+	/** Called when HUD subsystem clears all notifications */
+	UFUNCTION()
+	void OnHUDNotificationsCleared();
+
+	/** Convert HUD notification to overlay notification */
+	FMGNotificationData ConvertHUDNotification(const FMGHUDNotification& HUDNotification) const;
 };

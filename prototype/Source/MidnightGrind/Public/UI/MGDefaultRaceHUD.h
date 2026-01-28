@@ -1,5 +1,89 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGDefaultRaceHUD.h - Programmatically-Created Race HUD
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines a race HUD that creates all its UI elements entirely in C++
+ * code, without requiring any Blueprint or UMG Designer setup. It's designed
+ * for immediate testing - just add this widget and you have a working HUD.
+ *
+ * While MGDefaultGameplayHUD expects a Blueprint with pre-placed widgets,
+ * this class builds everything from scratch at runtime using CreateWidget().
+ *
+ * WHY BUILD UI IN C++?
+ * --------------------
+ * 1. TESTING: Get a working HUD instantly without artist involvement
+ * 2. ITERATION: Faster compile-test cycle than Blueprint changes
+ * 3. CONSISTENCY: Guarantees the HUD works even with no content setup
+ * 4. REFERENCE: Shows exactly how to create UI programmatically
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * Programmatic UI Creation:
+ *   Instead of placing widgets in the UMG Designer, this class calls
+ *   NewObject<UTextBlock>() and similar functions to create widgets at runtime.
+ *   The CreateUIElements() method builds the entire HUD structure in code.
+ *
+ * Canvas Positioning:
+ *   UCanvasPanel uses "anchors" and "offsets" to position child widgets.
+ *   - Anchors: Where the widget attaches (0,0 = top-left, 1,1 = bottom-right)
+ *   - Offsets: Pixel distance from the anchor point
+ *
+ *   Example: Bottom-right speedometer
+ *     Anchor = (1.0, 1.0)  // Attached to bottom-right corner
+ *     Offset = (-200, -100)  // 200px left, 100px up from corner
+ *
+ * BindWidgetOptional:
+ *   All widgets use BindWidgetOptional because they might not exist in a
+ *   Blueprint version. The code checks for null before using them.
+ *
+ * FSlateColor vs FLinearColor:
+ *   - FLinearColor: Raw RGBA color values (0.0 to 1.0 per channel)
+ *   - FSlateColor: Wrapper that can reference color from a style or be literal
+ *   Use FSlateColor for widget properties, FLinearColor for calculations.
+ *
+ * FTimerHandle:
+ *   Used to schedule delayed actions. Here it clears status messages after
+ *   a timeout. Always store handles to cancel timers when the widget is destroyed.
+ *
+ * HOW IT FITS IN THE ARCHITECTURE:
+ * --------------------------------
+ *
+ *   [MGRaceHUDWidget] (Abstract Interface)
+ *          ^
+ *          |
+ *   [MGDefaultRaceHUD] (C++ Implementation)
+ *          |
+ *          v
+ *   (Creates widgets programmatically on NativeConstruct)
+ *
+ * This follows the same interface as other HUD implementations, so game
+ * systems don't need to know whether the HUD was built in Blueprint or C++.
+ *
+ * LAYOUT STRUCTURE:
+ * -----------------
+ *
+ *   +----------------------------------------+
+ *   | Position: 1st/8    Lap: 2/3            |  <-- Top bar (race info)
+ *   | Current: 1:23.456  Best: 1:21.789      |
+ *   |                                        |
+ *   |           [STATUS MESSAGE]             |  <-- Center (temporary messages)
+ *   |                                        |
+ *   |           Drift Score: 5000            |
+ *   |                                        |
+ *   |                    [RPM ========]  6   |  <-- Bottom-right cluster
+ *   |                    [NOS ====    ]      |
+ *   |                         156 MPH        |
+ *   +----------------------------------------+
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

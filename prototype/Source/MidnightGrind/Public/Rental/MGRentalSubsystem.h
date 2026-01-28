@@ -1,5 +1,182 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRentalSubsystem.h
+ * @brief Vehicle and Item Rental System for "try before you buy" gameplay
+ *
+ * @section Overview
+ * This file defines the Rental Subsystem for Midnight Grind, which allows
+ * players to temporarily rent vehicles, parts, body kits, and other items
+ * instead of purchasing them outright. This is a "try before you buy" system
+ * that helps players make informed purchasing decisions.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * @subsection RentVsPurchase 1. Rental vs Purchase
+ *   - RENT: Pay less, use item for limited time (1 hour to 7 days)
+ *   - PURCHASE: Pay full price, own item permanently
+ *   - Rental costs can be credited toward purchase price
+ *
+ * @subsection DurationOptions 2. Rental Duration Options (EMGRentalDuration)
+ *   - OneHour: Quick test drive
+ *   - ThreeHours: Extended session
+ *   - OneDay: Full 24-hour access
+ *   - ThreeDays: Weekend rental
+ *   - OneWeek: Extended trial
+ *   - Unlimited: Free trial (usually time-limited promotional)
+ *
+ * @subsection StatusLifecycle 3. Rental Status Lifecycle (EMGRentalStatus)
+ * @code
+ *    Available -> Active -> Expiring -> Expired
+ *                       -> Purchased (if player buys during rental)
+ * @endcode
+ *
+ * @subsection FreeTrials 4. Free Trials
+ *   - Players can try items for free (limited time, e.g., 15 minutes)
+ *   - FreeTrialsUsedThisMonth tracks monthly trial usage
+ *   - Each item can only have one free trial per player
+ *   - Encourages players to experience content before committing
+ *
+ * @subsection RentalCategories 5. Rental Categories (EMGRentalCategory)
+ *   - Vehicle: Cars, motorcycles, etc.
+ *   - Track: Race tracks (if DLC-based)
+ *   - BodyKit: Visual modifications
+ *   - PerformancePart: Engine, suspension, etc.
+ *   - Cosmetic: Paints, decals, etc.
+ *   - Bundle: Package deals
+ *   - PremiumFeature: Special game features
+ *
+ * @subsection PurchaseCredit 6. Purchase Credit System
+ *   - Money spent on rentals counts toward purchase
+ *   - PurchasePriceCredit tracks accumulated credit
+ *   - GetPurchasePriceWithCredit() calculates remaining cost
+ *   - Encourages players to eventually buy items they enjoy
+ *
+ * @subsection RentalPasses 7. Rental Passes (Subscription Model)
+ *   - FMGRentalPass: Monthly subscription plans
+ *   - Include X rentals per month
+ *   - Discount on purchases
+ *   - May include unlimited trials
+ *   - Good for players who like variety
+ *
+ * @section CodeExamples Code Examples
+ *
+ * @subsection GettingSubsystem Getting the Subsystem
+ * @code
+ * UMGRentalSubsystem* Rentals = GetGameInstance()->GetSubsystem<UMGRentalSubsystem>();
+ * @endcode
+ *
+ * @subsection RentingVehicle Renting a Vehicle
+ * @code
+ * // Rent a vehicle for 24 hours
+ * FName VehicleId = FName("SportsCar_Skyline");
+ * if (Rentals->RentItem(VehicleId, EMGRentalDuration::OneDay))
+ * {
+ *     // Rental successful! Vehicle is now available in garage.
+ *     ShowNotification("Vehicle rented for 24 hours!");
+ * }
+ * @endcode
+ *
+ * @subsection FreeTrialExample Starting a Free Trial
+ * @code
+ * // Check if free trial is available
+ * FName ItemId = FName("BodyKit_WideBody");
+ * if (Rentals->CanUseFreeTrial(ItemId))
+ * {
+ *     // Start the free trial (usually 15 minutes)
+ *     Rentals->StartFreeTrial(ItemId);
+ *     ShowNotification("Free trial started! 15 minutes remaining.");
+ * }
+ * else
+ * {
+ *     ShowMessage("You've already used your free trial for this item.");
+ * }
+ * @endcode
+ *
+ * @subsection CheckingRentals Checking Active Rentals
+ * @code
+ * // Get all active rentals
+ * TArray<FMGActiveRental> ActiveRentals = Rentals->GetActiveRentals();
+ *
+ * for (const FMGActiveRental& Rental : ActiveRentals)
+ * {
+ *     FTimespan TimeRemaining = Rental.GetTimeRemaining();
+ *
+ *     if (Rental.IsExpiringSoon())
+ *     {
+ *         // Show expiration warning (< 30 minutes left)
+ *         ShowExpirationWarning(Rental.ItemName, TimeRemaining);
+ *     }
+ * }
+ * @endcode
+ *
+ * @subsection ExtendingRental Extending a Rental
+ * @code
+ * // Extend an existing rental
+ * FString RentalId = "rental_12345";
+ * if (Rentals->ExtendRental(RentalId, EMGRentalDuration::ThreeHours))
+ * {
+ *     ShowNotification("Rental extended by 3 hours!");
+ * }
+ * @endcode
+ *
+ * @subsection PurchasingRented Purchasing a Rented Item
+ * @code
+ * // Convert rental to purchase (with credit applied)
+ * FString RentalId = "rental_12345";
+ * int32 RemainingPrice = Rentals->GetPurchasePriceWithCredit(RentalId);
+ *
+ * ShowPurchaseDialog(
+ *     FText::Format("Purchase for {0} credits? (Rental credit applied!)", RemainingPrice)
+ * );
+ *
+ * if (PlayerConfirmed)
+ * {
+ *     Rentals->PurchaseRentedItem(RentalId);
+ *     ShowNotification("Item purchased! Now yours permanently.");
+ * }
+ * @endcode
+ *
+ * @subsection EventListening Listening for Events
+ * @code
+ * // Bind to rental events
+ * Rentals->OnRentalExpiring.AddDynamic(this, &AMyClass::HandleRentalExpiring);
+ * Rentals->OnRentalExpired.AddDynamic(this, &AMyClass::HandleRentalExpired);
+ *
+ * void AMyClass::HandleRentalExpiring(const FMGActiveRental& Rental)
+ * {
+ *     ShowExpirationWarning(Rental);
+ * }
+ *
+ * void AMyClass::HandleRentalExpired(const FMGActiveRental& Rental)
+ * {
+ *     RemoveVehicleFromGarage(Rental.ItemId);
+ *     ShowMessage("Rental expired: " + Rental.ItemName.ToString());
+ * }
+ * @endcode
+ *
+ * @section BusinessModel Business Model Notes
+ *   - Rentals are player-friendly (low commitment)
+ *   - Encourages experimentation with different vehicles
+ *   - Credit system rewards loyal renters
+ *   - Passes provide predictable revenue stream
+ *
+ * @section Events Delegate Events
+ *   - OnRentalStarted: New rental activated
+ *   - OnRentalExpiring: Rental about to end (time to extend!)
+ *   - OnRentalExpired: Rental ended
+ *   - OnRentalExtended: Player extended rental duration
+ *   - OnRentalPurchased: Player bought rented item
+ *   - OnTrialStarted: Free trial began
+ *   - OnRentalPassActivated: Subscription activated
+ *
+ * @see MGGarageSubsystem.h Vehicle management
+ * @see MGInventorySubsystem.h Item management
+ * @see MGStoreSubsystem.h Purchasing
+ *
+ * @author Midnight Grind Team
+ */
+
 // MidnightGrind - Arcade Street Racing Game
 // Rental Subsystem - Vehicle rentals, trial periods, and temporary unlocks
 

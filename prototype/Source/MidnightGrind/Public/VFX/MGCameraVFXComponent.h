@@ -1,5 +1,121 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGCameraVFXComponent.h
+ * @brief Camera visual effects component for racing immersion
+ *
+ * @section Overview
+ * UMGCameraVFXComponent manages all camera-based visual effects that enhance the
+ * racing experience. This includes dynamic field of view changes, post-processing
+ * effects, camera shake, and screen effects that respond to gameplay events.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Field of View (FOV)**
+ * FOV determines how wide the camera's view is, measured in degrees. A higher FOV
+ * creates a "fish-eye" effect that conveys speed. This component dynamically
+ * increases FOV as the vehicle goes faster, making high-speed driving feel more
+ * intense. The base FOV (typically 90 degrees) expands up to MaxFOVIncrease at
+ * maximum speed.
+ *
+ * **Post-Processing Effects**
+ * Post-processing modifies the rendered image after the 3D scene is drawn:
+ * - Motion Blur: Blurs fast-moving objects to simulate real camera behavior
+ * - Chromatic Aberration: Separates color channels at screen edges (RGB fringing)
+ * - Vignette: Darkens the screen corners to focus attention on the center
+ * - Radial Blur: Creates "speed lines" emanating from a central point
+ *
+ * **Camera Shake**
+ * Controlled camera movement that simulates impacts, terrain rumble, or high-speed
+ * vibration. Different presets (Light, Medium, Heavy) suit different events like
+ * collisions, near misses, or NOS activation. Continuous shake can simulate
+ * constant high-speed vibration.
+ *
+ * **Drift Camera Effects**
+ * When the player drifts, the camera can roll (tilt) and offset to emphasize the
+ * sideways motion. This makes drifting feel more dynamic and cinematic.
+ *
+ * @section Architecture
+ * The component attaches to any actor (typically the player's vehicle or camera
+ * actor) and works by:
+ * 1. Receiving updates about vehicle state (speed, drift angle, impacts)
+ * 2. Interpolating effect intensities smoothly to avoid jarring transitions
+ * 3. Applying effects to the camera and post-process settings each frame
+ *
+ * This component communicates with the vehicle physics system and can be controlled
+ * by Blueprint or C++ game logic.
+ *
+ * @section UsageExamples Usage Examples
+ *
+ * **Basic Setup in C++:**
+ * @code
+ * // In your vehicle class header
+ * UPROPERTY(VisibleAnywhere)
+ * UMGCameraVFXComponent* CameraVFX;
+ *
+ * // In constructor
+ * CameraVFX = CreateDefaultSubobject<UMGCameraVFXComponent>(TEXT("CameraVFX"));
+ *
+ * // In Tick, update speed effects based on vehicle speed
+ * float SpeedKPH = GetVehicleSpeedKPH();
+ * CameraVFX->UpdateSpeedEffects(SpeedKPH);
+ * @endcode
+ *
+ * **Triggering Camera Shake on Collision:**
+ * @code
+ * void AMyVehicle::OnCollision(float ImpactForce)
+ * {
+ *     // Scale shake intensity by impact force
+ *     if (ImpactForce > 5000.0f)
+ *         CameraVFX->TriggerShake(EMGCameraShakeType::Heavy);
+ *     else if (ImpactForce > 2000.0f)
+ *         CameraVFX->TriggerShake(EMGCameraShakeType::Medium);
+ *     else
+ *         CameraVFX->TriggerShake(EMGCameraShakeType::Light);
+ *
+ *     // Also trigger impact flash
+ *     CameraVFX->TriggerImpactFlashPreset(ImpactForce);
+ * }
+ * @endcode
+ *
+ * **Drift Camera Effects:**
+ * @code
+ * // Called from vehicle physics update
+ * void AMyVehicle::UpdateDriftVisuals(float DeltaTime)
+ * {
+ *     float DriftAngle = CalculateDriftAngle(); // Degrees
+ *     float DriftIntensity = FMath::Clamp(FMath::Abs(DriftAngle) / 45.0f, 0.0f, 1.0f);
+ *
+ *     CameraVFX->UpdateDriftEffects(DriftAngle, DriftIntensity);
+ * }
+ * @endcode
+ *
+ * **Slow Motion for Dramatic Moments:**
+ * @code
+ * // Near miss reward
+ * void AMyVehicle::OnNearMiss()
+ * {
+ *     CameraVFX->StartSlowMotion(0.3f, 0.1f);  // 30% time scale, 0.1s transition
+ *     CameraVFX->TriggerShake(EMGCameraShakeType::NearMiss);
+ *
+ *     // Schedule return to normal speed
+ *     GetWorld()->GetTimerManager().SetTimer(SlowMoTimer, [this]()
+ *     {
+ *         CameraVFX->EndSlowMotion(0.2f);
+ *     }, 0.5f, false);
+ * }
+ * @endcode
+ *
+ * **Blueprint Usage:**
+ * In Blueprint, drag off the CameraVFX component reference and call:
+ * - "Update Speed Effects" node with your vehicle's current speed
+ * - "Trigger Shake" node with the appropriate shake type enum
+ * - "Set Speed Effect Config" to customize thresholds and intensities
+ *
+ * @see UMGVFXSubsystem For global VFX management
+ * @see UMGVehicleVFXComponent For vehicle-specific particle effects
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

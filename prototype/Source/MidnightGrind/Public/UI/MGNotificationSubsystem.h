@@ -1,5 +1,221 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGNotificationSubsystem.h
+ * @brief Extended notification subsystem with specialized notification types
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines an extended notification subsystem that provides specialized
+ * notifications for common game events. While MGNotificationManager handles basic
+ * notification queuing, this subsystem adds:
+ *
+ * - Achievement unlock celebrations with rarity display
+ * - Level up announcements with unlocked rewards
+ * - Race result summaries with stats breakdown
+ * - Challenge completion with reward showcase
+ * - Currency gain/loss notifications
+ *
+ * The system also manages notification history for later review and provides
+ * filtering/grouping capabilities for the notification center UI.
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Specialized Notification Types**: Each game event type (achievement,
+ *   level up, race result) has a dedicated struct with all relevant data.
+ *
+ * - **Display Styles (EMGNotificationStyle)**: Notifications can appear as:
+ *   - Toast: Small corner popup for quick, non-intrusive messages
+ *   - Banner: Horizontal strip at screen top/bottom for moderate importance
+ *   - Popup: Center-screen popup for rewards and confirmations
+ *   - FullScreen: Dramatic announcements (level up, race results)
+ *   - Minimal: Ultra-simple text-only display for subtle feedback
+ *
+ * - **Priority System (EMGNotificationPriority)**: Controls display order:
+ *   - Low: Informational, can be suppressed
+ *   - Normal: Standard notifications
+ *   - High: Important events, shown promptly
+ *   - Critical: Must-see (race finish, unlock), interrupts queue
+ *   - System: Errors and warnings
+ *
+ * - **Reward Display (FMGRewardDisplayData)**: Standardizes how rewards are
+ *   shown, with icon, name, quantity, rarity color, and currency type.
+ *
+ * - **History Tracking (FMGNotificationHistoryEntry)**: All shown notifications
+ *   are stored in history with timestamps, interaction data, and action taken
+ *   for later review in the notification center.
+ *
+ * - **Do Not Disturb Mode**: When enabled, only Critical and System priority
+ *   notifications will be shown. Useful during intense gameplay.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [Game Events]
+ *        |
+ *        +-- Achievement Unlocked ---> ShowAchievementNotification()
+ *        |
+ *        +-- Player Leveled Up ------> ShowLevelUpNotification()
+ *        |
+ *        +-- Race Finished ----------> ShowRaceResultNotification()
+ *        |
+ *        +-- Challenge Complete -----> ShowChallengeCompleteNotification()
+ *        |
+ *        +-- Currency Earned --------> ShowCurrencyNotification()
+ *        |
+ *        v
+ *   [MGNotificationSubsystem]
+ *        |
+ *        +-- ShouldShowNotification() --> Check DND, priority filter
+ *        |
+ *        +-- SortQueue() --> Priority-based ordering
+ *        |
+ *        +-- ShowNotification() --> Display via widget
+ *        |
+ *        +-- AddToHistory() --> Store for review
+ *        |
+ *        v
+ *   [Notification Widgets] (Toast, Banner, Popup, FullScreen)
+ *        |
+ *        +-- OnNotificationShown delegate
+ *        +-- OnNotificationDismissed delegate
+ *        +-- OnNotificationAction delegate (for button clicks)
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Get the notification subsystem
+ * UMGNotificationSubsystem* NotifSys = GetGameInstance()->GetSubsystem<UMGNotificationSubsystem>();
+ *
+ * // === ACHIEVEMENT NOTIFICATION ===
+ * FMGAchievementNotification Achievement;
+ * Achievement.AchievementID = TEXT("ACH_SPEED_DEMON");
+ * Achievement.Name = FText::FromString("Speed Demon");
+ * Achievement.Description = FText::FromString("Reach 200 MPH");
+ * Achievement.Points = 50;
+ * Achievement.RarityPercent = 5.0f; // Only 5% of players have this
+ * Achievement.bIsSecret = false;
+ * NotifSys->ShowAchievementNotification(Achievement);
+ *
+ * // === LEVEL UP NOTIFICATION ===
+ * FMGLevelUpNotification LevelUp;
+ * LevelUp.NewLevel = 15;
+ * LevelUp.LevelTitle = FText::FromString("Street Legend");
+ *
+ * // Add unlocked rewards
+ * FMGRewardDisplayData VehicleReward;
+ * VehicleReward.RewardName = FText::FromString("1999 Nissan Skyline R34");
+ * VehicleReward.Icon = VehicleIcon;
+ * VehicleReward.RarityColor = FLinearColor(1.0f, 0.5f, 0.0f); // Rare orange
+ * LevelUp.UnlockedRewards.Add(VehicleReward);
+ *
+ * LevelUp.UnlockedFeatures.Add(FText::FromString("Online Racing"));
+ * LevelUp.UnlockedFeatures.Add(FText::FromString("Custom Liveries"));
+ * NotifSys->ShowLevelUpNotification(LevelUp);
+ *
+ * // === RACE RESULT NOTIFICATION ===
+ * FMGRaceResultNotification RaceResult;
+ * RaceResult.Position = 1;
+ * RaceResult.TotalRacers = 8;
+ * RaceResult.FinishTime = 185.5f;
+ * RaceResult.BestLapTime = 45.2f;
+ * RaceResult.bIsPersonalBest = true;
+ * RaceResult.bIsTrackRecord = false;
+ * RaceResult.CashEarned = 10000;
+ * RaceResult.XPEarned = 500;
+ * RaceResult.ReputationEarned = 100;
+ * NotifSys->ShowRaceResultNotification(RaceResult);
+ *
+ * // === SIMPLE NOTIFICATIONS ===
+ * // Queue a simple notification
+ * FGuid NotifID = NotifSys->QueueSimpleNotification(
+ *     FText::FromString("Connection Restored"),
+ *     FText::FromString("You are back online."),
+ *     EMGNotificationType::Info
+ * );
+ *
+ * // Show currency change
+ * NotifSys->ShowCurrencyNotification(TEXT("Cash"), 5000, true);  // Gained $5000
+ * NotifSys->ShowCurrencyNotification(TEXT("Cash"), -1000, false); // Lost $1000
+ *
+ * // Show error/warning
+ * NotifSys->ShowErrorNotification(
+ *     FText::FromString("Save Failed"),
+ *     FText::FromString("Unable to save progress. Please try again.")
+ * );
+ *
+ * // === NOTIFICATION QUEUE MANAGEMENT ===
+ * // Cancel a queued notification
+ * NotifSys->CancelNotification(NotifID);
+ *
+ * // Dismiss current notification
+ * NotifSys->DismissCurrentNotification();
+ *
+ * // Check queue status
+ * int32 QueueSize = NotifSys->GetQueueSize();
+ * bool bShowing = NotifSys->IsShowingNotification();
+ * FMGNotificationData Current = NotifSys->GetCurrentNotification();
+ *
+ * // === HISTORY AND FILTERING ===
+ * // Query notification history
+ * TArray<FMGNotificationHistoryEntry> History = NotifSys->GetNotificationHistory();
+ * int32 Unread = NotifSys->GetUnreadCount();
+ *
+ * // Filter history by type
+ * TArray<FMGNotificationHistoryEntry> Achievements =
+ *     NotifSys->GetHistoryByType(EMGNotificationType::Success);
+ *
+ * // Filter by category
+ * TArray<FMGNotificationHistoryEntry> RaceNotifs =
+ *     NotifSys->GetHistoryByCategory(TEXT("Race"));
+ *
+ * // Mark notifications as read
+ * NotifSys->MarkNotificationRead(SomeNotificationID);
+ * NotifSys->MarkAllAsRead();
+ *
+ * // === SETTINGS ===
+ * // Enable/disable notifications
+ * NotifSys->SetNotificationsEnabled(true);
+ * NotifSys->SetSoundsEnabled(true);
+ *
+ * // Enable Do Not Disturb mode
+ * NotifSys->SetDoNotDisturb(true);  // Only Critical/System show
+ *
+ * // Filter by minimum priority
+ * NotifSys->SetMinimumPriority(EMGNotificationPriority::High);
+ *
+ * // === EVENT SUBSCRIPTIONS ===
+ * // Subscribe to notification events
+ * NotifSys->OnNotificationQueued.AddDynamic(this, &UMyClass::HandleQueued);
+ * NotifSys->OnNotificationShown.AddDynamic(this, &UMyClass::HandleShown);
+ * NotifSys->OnNotificationDismissed.AddDynamic(this, &UMyClass::HandleDismissed);
+ * NotifSys->OnNotificationAction.AddDynamic(this, &UMyClass::HandleAction);
+ * NotifSys->OnAchievementUnlocked.AddDynamic(this, &UMyClass::HandleAchievement);
+ * NotifSys->OnLevelUp.AddDynamic(this, &UMyClass::HandleLevelUp);
+ * @endcode
+ *
+ * =============================================================================
+ * @section Difference Difference from MGNotificationManager
+ *
+ * This subsystem (MGNotificationSubsystem) and MGNotificationManager serve
+ * different purposes:
+ *
+ * | Feature              | MGNotificationManager    | MGNotificationSubsystem      |
+ * |----------------------|--------------------------|------------------------------|
+ * | Purpose              | Basic queue & display    | Specialized game events      |
+ * | Notification Types   | Generic FMGNotification  | Achievement, LevelUp, Race   |
+ * | Data Richness        | Title + Body + Icon      | Full event data with rewards |
+ * | History              | Basic                    | Rich with filtering          |
+ * | Best For             | Simple toasts/alerts     | Game milestone celebrations  |
+ *
+ * Use MGNotificationManager for simple feedback messages.
+ * Use MGNotificationSubsystem for milestone events that deserve rich displays.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,8 +225,13 @@
 class UMGNotificationWidget;
 class USoundBase;
 
+// =============================================================================
+// Enums and Structs
+// =============================================================================
+
 /**
  * Notification priority
+ * Determines display order and whether notification can be suppressed
  */
 UENUM(BlueprintType)
 enum class EMGNotificationPriority : uint8

@@ -1,11 +1,39 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 #include "UI/MGRaceOverlayWidget.h"
+#include "UI/MGRaceHUDSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
 void UMGRaceOverlayWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	// Subscribe to HUD Subsystem notification events if available
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			HUDSubsystem->OnNotificationAdded.AddDynamic(this, &UMGRaceOverlayWidget::OnHUDNotificationAdded);
+			HUDSubsystem->OnNotificationRemoved.AddDynamic(this, &UMGRaceOverlayWidget::OnHUDNotificationRemoved);
+			HUDSubsystem->OnAllNotificationsCleared.AddDynamic(this, &UMGRaceOverlayWidget::OnHUDNotificationsCleared);
+		}
+	}
+}
+
+void UMGRaceOverlayWidget::NativeDestruct()
+{
+	// Unsubscribe from HUD Subsystem events
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			HUDSubsystem->OnNotificationAdded.RemoveDynamic(this, &UMGRaceOverlayWidget::OnHUDNotificationAdded);
+			HUDSubsystem->OnNotificationRemoved.RemoveDynamic(this, &UMGRaceOverlayWidget::OnHUDNotificationRemoved);
+			HUDSubsystem->OnAllNotificationsCleared.RemoveDynamic(this, &UMGRaceOverlayWidget::OnHUDNotificationsCleared);
+		}
+	}
+
+	Super::NativeDestruct();
 }
 
 void UMGRaceOverlayWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -477,4 +505,131 @@ FText UMGRaceOverlayWidget::GetOrdinalSuffix(int32 Number) const
 	default:
 		return NSLOCTEXT("RaceOverlay", "OrdinalTh", "th");
 	}
+}
+
+// ==========================================
+// HUD SUBSYSTEM INTEGRATION
+// ==========================================
+
+void UMGRaceOverlayWidget::OnHUDNotificationAdded(const FMGHUDNotification& HUDNotification)
+{
+	// Convert HUD notification to overlay notification format and display
+	FMGNotificationData OverlayData = ConvertHUDNotification(HUDNotification);
+	ShowNotification(OverlayData);
+}
+
+void UMGRaceOverlayWidget::OnHUDNotificationRemoved(int32 NotificationID)
+{
+	// Note: The overlay manages its own notification lifetimes,
+	// so we don't necessarily need to force remove here unless
+	// the HUD subsystem explicitly dismisses a notification early
+	HideNotification(NotificationID);
+}
+
+void UMGRaceOverlayWidget::OnHUDNotificationsCleared()
+{
+	ClearAllNotifications();
+}
+
+FMGNotificationData UMGRaceOverlayWidget::ConvertHUDNotification(const FMGHUDNotification& HUDNotification) const
+{
+	FMGNotificationData OverlayData;
+
+	// Map fields
+	OverlayData.MainText = HUDNotification.Message;
+	OverlayData.Color = HUDNotification.Color;
+	OverlayData.Duration = HUDNotification.Duration;
+	OverlayData.NotificationID = HUDNotification.NotificationID;
+	OverlayData.QueuedTime = HUDNotification.CreationTime;
+
+	// Map priority - HUD uses EMGHUDNotificationPriority, overlay uses EMGNotificationPriority
+	switch (HUDNotification.Priority)
+	{
+	case EMGHUDNotificationPriority::Low:
+		OverlayData.Priority = EMGNotificationPriority::Low;
+		break;
+	case EMGHUDNotificationPriority::Normal:
+		OverlayData.Priority = EMGNotificationPriority::Medium;
+		break;
+	case EMGHUDNotificationPriority::High:
+		OverlayData.Priority = EMGNotificationPriority::High;
+		break;
+	case EMGHUDNotificationPriority::Critical:
+		OverlayData.Priority = EMGNotificationPriority::Critical;
+		break;
+	}
+
+	// Determine notification type based on category
+	FName Category = HUDNotification.Category;
+	if (Category == FName("PositionChange"))
+	{
+		// Check color to determine gain vs loss
+		if (HUDNotification.Color.G > HUDNotification.Color.R)
+		{
+			OverlayData.Type = EMGNotificationType::PositionGain;
+		}
+		else
+		{
+			OverlayData.Type = EMGNotificationType::PositionLoss;
+		}
+	}
+	else if (Category == FName("LapComplete"))
+	{
+		// Check for final lap or best lap by examining the message
+		FString MessageStr = HUDNotification.Message.ToString().ToUpper();
+		if (MessageStr.Contains(TEXT("FINAL")))
+		{
+			OverlayData.Type = EMGNotificationType::FinalLap;
+		}
+		else if (MessageStr.Contains(TEXT("BEST")))
+		{
+			OverlayData.Type = EMGNotificationType::BestLap;
+		}
+		else
+		{
+			OverlayData.Type = EMGNotificationType::LapComplete;
+		}
+	}
+	else if (Category == FName("Countdown"))
+	{
+		FString MessageStr = HUDNotification.Message.ToString().ToUpper();
+		if (MessageStr.Contains(TEXT("GO")))
+		{
+			OverlayData.Type = EMGNotificationType::RaceStart;
+		}
+		else
+		{
+			OverlayData.Type = EMGNotificationType::Countdown;
+		}
+	}
+	else if (Category == FName("WrongWay"))
+	{
+		OverlayData.Type = EMGNotificationType::WrongWay;
+	}
+	else if (Category == FName("RaceFinish") || Category == FName("RaceResult"))
+	{
+		OverlayData.Type = EMGNotificationType::RaceFinish;
+	}
+	else if (Category == FName("Bonus"))
+	{
+		FString MessageStr = HUDNotification.Message.ToString().ToUpper();
+		if (MessageStr.Contains(TEXT("NEAR MISS")))
+		{
+			OverlayData.Type = EMGNotificationType::NearMiss;
+		}
+		else
+		{
+			OverlayData.Type = EMGNotificationType::Generic;
+		}
+	}
+	else if (Category == FName("DriftScore"))
+	{
+		OverlayData.Type = EMGNotificationType::DriftBonus;
+	}
+	else
+	{
+		OverlayData.Type = EMGNotificationType::Generic;
+	}
+
+	return OverlayData;
 }

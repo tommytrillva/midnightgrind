@@ -1,5 +1,126 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGVehicleSelectWidget.h
+ * @brief Carousel-style vehicle selection UI for pre-race setup
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the vehicle selection widget displayed before races, allowing
+ * players to browse their garage and select which vehicle to race with. The widget
+ * presents vehicles in a carousel format with 3D previews and detailed stat
+ * comparisons.
+ *
+ * The selection interface supports:
+ * - Horizontal carousel navigation with animated transitions
+ * - Performance stat bars (speed, acceleration, handling, braking, drift)
+ * - Filtering by class tier, ownership status, and vehicle type
+ * - Sorting by performance index, name, manufacturer, or price
+ * - Class restrictions for ranked/competitive races
+ * - Quick access to customization from selection screen
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Performance Index (PI)**: A single number (100-999) representing overall
+ *   vehicle capability. Higher PI means better performance. PI determines which
+ *   class tier a vehicle belongs to.
+ *
+ * - **Class Tiers**: Vehicles are grouped into classes (S, A, B, C, D) based on
+ *   their PI. Ranked races often restrict which classes can participate to ensure
+ *   fair competition.
+ *
+ * - **Stat Ratings**: Each stat (speed, acceleration, etc.) is normalized to 0-1
+ *   for easy comparison. These are derived from the vehicle's actual physics
+ *   parameters but simplified for player comprehension.
+ *
+ * - **Carousel Animation**: The selection uses smooth interpolation when switching
+ *   vehicles, creating a polished "spinning through options" feel common in
+ *   racing game UIs.
+ *
+ * - **Ownership States**: Vehicles can be owned (ready to race), available for
+ *   purchase, or locked behind progression requirements.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [Race Setup Flow]
+ *          |
+ *          v
+ *   [MGVehicleSelectWidget] <-- Vehicle data from garage subsystem
+ *          |
+ *          +-- FMGVehiclePreviewData (struct per vehicle)
+ *          |       |
+ *          |       +-- Stats, ownership, unlock requirements
+ *          |
+ *          +-- Filtering/Sorting Logic
+ *          |
+ *          +-- Carousel Animation System
+ *          |
+ *          v
+ *   [OnVehicleConfirmed] --> Race starts with selected vehicle
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Create and configure the vehicle select widget
+ * UMGVehicleSelectWidget* SelectWidget = CreateWidget<UMGVehicleSelectWidget>(
+ *     GetWorld(), VehicleSelectClass);
+ *
+ * // Get available vehicles from garage system
+ * TArray<FMGVehiclePreviewData> Vehicles = GarageSubsystem->GetOwnedVehicles();
+ *
+ * // Initialize the widget
+ * SelectWidget->Initialize(Vehicles);
+ *
+ * // For ranked races, set class restriction
+ * SelectWidget->SetClassRestriction("A");  // Only A-class vehicles
+ *
+ * // Pre-select player's last used vehicle
+ * SelectWidget->SetInitialSelection(LastUsedVehicleID);
+ *
+ * // Listen for selection events
+ * SelectWidget->OnVehicleConfirmed.AddDynamic(this, &AMyController::OnVehicleChosen);
+ * SelectWidget->OnCancelled.AddDynamic(this, &AMyController::OnSelectionCancelled);
+ *
+ * // Display the widget
+ * SelectWidget->AddToViewport();
+ *
+ * // Navigation (typically bound to gamepad/keyboard)
+ * SelectWidget->SelectNext();      // Move to next vehicle
+ * SelectWidget->SelectPrevious();  // Move to previous vehicle
+ * SelectWidget->ConfirmSelection(); // Confirm and start race
+ *
+ * // Filtering
+ * SelectWidget->SetFilter(EMGVehicleFilter::ClassA); // Show only A-class
+ * SelectWidget->SetSortMode(EMGVehicleSort::PerformanceIndex); // Sort by PI
+ * @endcode
+ *
+ * =============================================================================
+ * @section VisualDesign Visual Design Notes
+ *
+ * The widget follows the game's Y2K neon aesthetic with:
+ * - Cyan/pink neon accent colors for stats and highlights
+ * - Class tier colors: S=Hot Pink, A=Orange, B=Yellow, C=Green, D=Light Blue
+ * - Bold, chunky stat bars reminiscent of PS1/PS2 racing games
+ * - Animated transitions with smooth easing
+ *
+ * =============================================================================
+ * @section UnrealMacros Unreal Engine Macros Explained
+ *
+ * - USTRUCT(BlueprintType): FMGVehiclePreviewData can be used in Blueprints for
+ *   UI binding, making it easy to display vehicle info in UMG widgets.
+ *
+ * - DECLARE_DYNAMIC_MULTICAST_DELEGATE: Events that can be bound in both C++
+ *   and Blueprints. Use AddDynamic() in C++ or "Bind Event" nodes in Blueprint.
+ *
+ * - UPROPERTY(BlueprintAssignable): These delegates appear in Blueprint event
+ *   graphs and can trigger Blueprint logic when the event fires.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

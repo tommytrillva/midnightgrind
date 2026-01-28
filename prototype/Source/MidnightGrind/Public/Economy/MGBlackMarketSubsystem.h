@@ -1,5 +1,142 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGBlackMarketSubsystem.h
+ * @brief Underground parts market with risk/reward mechanics for acquiring rare performance parts.
+ *
+ * The Black Market is an alternative commerce system that offers rare and exclusive
+ * performance parts not available through legitimate shops. Access is gated by player
+ * reputation, heat level, and trust with individual dealers, creating a risk/reward
+ * dynamic that rewards players who engage with the underground racing scene.
+ *
+ * @section bm_concepts Key Concepts
+ *
+ * **Access Tiers:**
+ * The black market is organized into four access tiers, each requiring different
+ * levels of criminal reputation to unlock:
+ * - Street Level: Basic underground access for players who have earned some heat
+ * - Underground: Serious contraband requiring established reputation in the scene
+ * - Shadow Network: Elite connections with high heat requirements
+ * - Phantom Circle: Legendary dealers accessible only to pink slip winners
+ *
+ * **Dealers:**
+ * Each dealer is a unique character with their own personality, specialization,
+ * and pricing model. Dealers have:
+ * - Specializations (Turbo, Engine, Suspension, etc.) - better stock in their area
+ * - Personalities (Professional, Shady, Elite, Wildcard) - affects prices and reliability
+ * - Operating hours - some dealers only work late night
+ * - Trust levels - built over successful transactions for better deals
+ *
+ * **Part Rarity:**
+ * Black market parts come in five rarity tiers with increasing stat bonuses:
+ * - Common (available everywhere)
+ * - Uncommon (slightly rarer)
+ * - Rare (specialty shops only, +5% stats)
+ * - Epic (black market only, +10% stats)
+ * - Legendary (one of a kind, +15% stats)
+ *
+ * **Risk Mechanics:**
+ * Purchasing from the black market carries inherent risks:
+ * - Counterfeit parts: The part may be fake, providing no performance benefit
+ * - Police stings: Getting caught increases your heat level significantly
+ * - Hot items: Some parts are traced and carry extra heat if caught with them
+ *
+ * @section bm_trust Trust System
+ *
+ * Building trust with dealers provides significant benefits:
+ * - Lower prices (up to 20% discount at max trust)
+ * - Access to rarer inventory
+ * - Reduced risk of bad deals
+ * - Tips about incoming rare parts
+ * - Underground racing opportunities
+ *
+ * Trust is earned through successful transactions and lost through:
+ * - Canceling deals
+ * - Reporting dealers to police
+ * - Long periods of inactivity
+ *
+ * @section bm_usage Basic Usage Examples
+ *
+ * **Checking Black Market Access:**
+ * @code
+ * UMGBlackMarketSubsystem* BlackMarket = GetGameInstance()->GetSubsystem<UMGBlackMarketSubsystem>();
+ *
+ * // Check current access tier
+ * EMGBlackMarketTier CurrentTier = BlackMarket->GetAccessTier();
+ *
+ * // Check if you can access a specific tier
+ * if (BlackMarket->CanAccessTier(EMGBlackMarketTier::Shadow))
+ * {
+ *     // Player has Shadow Network access
+ * }
+ *
+ * // Get tier requirements
+ * int32 MinHeat, MinRep, MinPinkSlipWins;
+ * BlackMarket->GetTierRequirements(EMGBlackMarketTier::Phantom, MinHeat, MinRep, MinPinkSlipWins);
+ * @endcode
+ *
+ * **Browsing Dealer Inventory:**
+ * @code
+ * // Get all available dealers at your tier
+ * TArray<FMGBlackMarketDealer> Dealers = BlackMarket->GetAvailableDealers();
+ *
+ * for (const FMGBlackMarketDealer& Dealer : Dealers)
+ * {
+ *     // Check if dealer is currently available (time-based)
+ *     if (Dealer.bIsAvailable)
+ *     {
+ *         // Get their current inventory
+ *         TArray<FMGBlackMarketItem> Inventory = BlackMarket->GetDealerInventory(Dealer.DealerID);
+ *
+ *         // Check trust level for pricing info
+ *         int32 Trust = BlackMarket->GetDealerTrust(Dealer.DealerID);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Making a Purchase:**
+ * @code
+ * // Check the risk before purchasing
+ * float Risk = BlackMarket->GetPurchaseRisk(DealerID, PartVariantID);
+ * int32 PotentialHeat = BlackMarket->GetPotentialHeat(Item);
+ *
+ * // Attempt the purchase
+ * EMGBlackMarketResult Result = BlackMarket->PurchaseItem(DealerID, PartVariantID);
+ *
+ * switch (Result)
+ * {
+ *     case EMGBlackMarketResult::Success:
+ *         // Part added to inventory, trust increased
+ *         break;
+ *     case EMGBlackMarketResult::Counterfeit:
+ *         // Got a fake part! Money lost, no benefit
+ *         break;
+ *     case EMGBlackMarketResult::PoliceSting:
+ *         // Caught by police! Heat increased, possible fine
+ *         break;
+ * }
+ * @endcode
+ *
+ * **Tracking Rare Parts:**
+ * @code
+ * // Get all rare parts you've discovered (seen in shops or owned by opponents)
+ * TArray<FMGRarePart> Discovered = BlackMarket->GetDiscoveredRareParts();
+ *
+ * // Get parts you actually own
+ * TArray<FMGRarePart> Owned = BlackMarket->GetOwnedRareParts();
+ *
+ * // Check if you own a specific legendary part
+ * if (BlackMarket->OwnsRarePart(TEXT("legendary_t88_titanium")))
+ * {
+ *     // Player has the legendary titanium T88 turbo
+ * }
+ * @endcode
+ *
+ * @see UMGEconomySubsystem For credit balance management
+ * @see UMGMechanicSubsystem For part installation services
+ * @see UMGProgressionSubsystem For heat and reputation tracking
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

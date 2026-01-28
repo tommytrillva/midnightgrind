@@ -1,5 +1,176 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRaceHistorySubsystem.h
+ * @brief Race History Subsystem - Tracks and persists all race results and player statistics
+ *
+ * This subsystem maintains a comprehensive history of all races completed by the player,
+ * providing detailed statistics, personal bests, and performance analytics. It persists
+ * across game sessions and serves as the foundation for leaderboards, achievements, and
+ * progression tracking.
+ *
+ * ============================================================================
+ * KEY CONCEPTS FOR BEGINNERS
+ * ============================================================================
+ *
+ * WHAT DOES THIS SUBSYSTEM DO?
+ * Every time you finish a race, the Race History Subsystem:
+ * 1. Records all the details (position, time, vehicle, etc.)
+ * 2. Updates your lifetime statistics
+ * 3. Checks for new personal bests
+ * 4. Updates win/podium streaks
+ * 5. Saves everything to disk
+ *
+ * WHY IS THIS IMPORTANT?
+ * - Shows your progress over time
+ * - Tracks personal bests for each track
+ * - Maintains statistics for achievements
+ * - Provides data for in-game "career" screens
+ * - Enables comparing performance across vehicles
+ *
+ * DATA STRUCTURES:
+ * @see FMGRaceResult - Individual race record (one entry per race)
+ * @see FMGTrackStats - Aggregate stats for a specific track
+ * @see FMGVehicleRaceStats - Aggregate stats for a specific vehicle
+ * @see FMGLifetimeStats - Overall career statistics
+ *
+ * ============================================================================
+ * RACE RESULT DATA (FMGRaceResult)
+ * ============================================================================
+ *
+ * Each race result captures:
+ *
+ * IDENTIFICATION:
+ * - RaceId: Unique identifier for this race
+ * - TrackId/TrackName: Which track was raced
+ * - RaceType: Sprint, Circuit, Drift, etc.
+ * - Timestamp: When the race occurred
+ *
+ * RESULTS:
+ * - Position: Final finishing position (1 = first)
+ * - TotalRacers: How many competitors
+ * - RaceTime: Total completion time
+ * - BestLapTime: Fastest lap (circuit races)
+ * - LapTimes: Array of all lap times
+ * - bWasCleanRace: No collisions/penalties
+ * - bDNF: Did Not Finish
+ *
+ * PERFORMANCE:
+ * - AverageSpeedKPH: Average speed maintained
+ * - TopSpeedKPH: Maximum speed reached
+ * - DistanceM: Total distance driven
+ * - DefeatedRivals: List of beaten opponents
+ *
+ * VEHICLE:
+ * - VehicleId/VehicleName: What car was used
+ * - PerformanceIndex: PI at time of race
+ *
+ * REWARDS:
+ * - CashEarned: GrindCash won
+ * - ReputationEarned: Rep points gained
+ * - XPEarned: Experience earned
+ *
+ * ============================================================================
+ * LIFETIME STATISTICS (FMGLifetimeStats)
+ * ============================================================================
+ *
+ * Aggregate career statistics include:
+ *
+ * RACE COUNTS:
+ * - TotalRaces, TotalWins, TotalPodiums, TotalDNFs
+ * - CleanRaces: Races without collisions
+ *
+ * STREAKS:
+ * - CurrentWinStreak, BestWinStreak
+ * - CurrentPodiumStreak, BestPodiumStreak
+ *
+ * TOTALS:
+ * - TotalDistanceKM: Kilometers driven
+ * - TotalRaceTimeHours: Time spent racing
+ * - HighestTopSpeedKPH: Speed record
+ *
+ * EARNINGS:
+ * - TotalCashEarned, TotalReputationEarned, TotalXPEarned
+ *
+ * ONLINE:
+ * - OnlineRaces, OnlineWins
+ *
+ * CALCULATED RATIOS:
+ * - GetWinRate(): Wins / Total races
+ * - GetPodiumRate(): Podiums / Total races
+ * - GetCleanRaceRate(): Clean races / Total races
+ *
+ * ============================================================================
+ * USAGE EXAMPLE
+ * ============================================================================
+ *
+ * @code
+ * // Get the race history subsystem
+ * UMGRaceHistorySubsystem* History = GetGameInstance()->GetSubsystem<UMGRaceHistorySubsystem>();
+ *
+ * // Record a race result (usually done automatically by RaceFlowSubsystem)
+ * FMGRaceResult Result;
+ * Result.TrackId = "Tokyo_Highway";
+ * Result.TrackName = FText::FromString("Tokyo Highway");
+ * Result.Position = 1;
+ * Result.TotalRacers = 8;
+ * Result.RaceTime = 245.5f;
+ * Result.BestLapTime = 78.2f;
+ * Result.VehicleId = FName("Nissan_GTR");
+ * Result.CashEarned = 15000;
+ * History->RecordRaceResult(Result);
+ *
+ * // Query statistics
+ * FMGLifetimeStats Stats = History->GetLifetimeStats();
+ * UE_LOG(LogTemp, Log, TEXT("Win Rate: %.1f%%"), Stats.GetWinRate() * 100.0f);
+ *
+ * // Get personal best for a track
+ * float BestTime = History->GetPersonalBestTime("Tokyo_Highway");
+ *
+ * // Get recent results
+ * TArray<FMGRaceResult> RecentRaces = History->GetRecentResults(10);
+ *
+ * // Get stats for a specific vehicle
+ * FMGVehicleRaceStats GTRStats = History->GetVehicleStats(FName("Nissan_GTR"));
+ * UE_LOG(LogTemp, Log, TEXT("GTR Wins: %d"), GTRStats.Wins);
+ * @endcode
+ *
+ * ============================================================================
+ * EVENTS
+ * ============================================================================
+ *
+ * Subscribe to events for real-time updates:
+ *
+ * @code
+ * // React to new race results
+ * History->OnRaceResultRecorded.AddDynamic(this, &UMyWidget::HandleNewResult);
+ *
+ * // Show celebration for new personal bests
+ * History->OnNewPersonalBest.AddDynamic(this, &UMyWidget::ShowPersonalBestAnimation);
+ *
+ * // Update win streak display
+ * History->OnWinStreakUpdated.AddDynamic(this, &UMyWidget::UpdateStreakUI);
+ * @endcode
+ *
+ * ============================================================================
+ * PERSISTENCE
+ * ============================================================================
+ *
+ * Race history is automatically saved to disk:
+ * - SaveHistory(): Manually trigger a save
+ * - LoadHistory(): Load from disk (called automatically on startup)
+ * - ClearHistory(): Delete all history (with confirmation!)
+ *
+ * History is stored in the game's save directory as a JSON file.
+ * Maximum entries are limited (default 500) to prevent unbounded growth.
+ * Oldest entries are removed when the limit is exceeded.
+ *
+ * @note For online profiles, history is synced with the server via MGOnlineProfile
+ *
+ * @see UMGRaceFlowSubsystem for automatic result recording
+ * @see UMGOnlineProfileSubsystem for cloud synchronization
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

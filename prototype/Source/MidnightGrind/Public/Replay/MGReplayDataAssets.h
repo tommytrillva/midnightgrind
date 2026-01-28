@@ -1,5 +1,107 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGReplayDataAssets.h
+ * @brief Data Assets for configuring replay system visuals and behavior
+ *
+ * @section overview Overview
+ * This file contains Unreal Engine Data Assets that store configuration settings
+ * for the replay and ghost racing systems. Data Assets are designer-friendly
+ * configuration objects that can be created and edited in the Unreal Editor
+ * without requiring code changes.
+ *
+ * The file includes:
+ * - UMGGhostSettingsAsset: Visual presets and behavior settings for ghost racers
+ * - UMGReplaySettingsAsset: Recording and playback configuration
+ * - UMGReplayCameraAsset: Camera presets for replay viewing
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * **What are Data Assets?**
+ * Data Assets are Unreal Engine objects that store configurable data separately
+ * from code. They allow designers to tweak values (colors, speeds, limits) in
+ * the Editor without programmer involvement. Changes to Data Assets don't require
+ * recompilation, making iteration faster.
+ *
+ * **Ghost Visual Presets**
+ * Different ghost types (personal best, friend, world record) use distinct visual
+ * styles to help players identify them at a glance. Presets define colors,
+ * transparency, glow effects, and particle trails for each ghost type.
+ *
+ * **Recording Settings**
+ * Replay recording captures vehicle state at a fixed frame rate (e.g., 30 FPS).
+ * Higher frame rates produce smoother replays but larger file sizes. Settings
+ * control recording duration limits, compression, and auto-save behavior.
+ *
+ * **Camera Presets**
+ * Replay viewers can switch between camera angles (chase cam, hood cam, cockpit).
+ * Each preset defines camera offset, field of view, motion blur, and lag settings.
+ * The "Director" mode can automatically cut between cameras for cinematic replays.
+ *
+ * @section usage Usage Examples
+ *
+ * **Creating Ghost Settings in Editor:**
+ * 1. Right-click in Content Browser
+ * 2. Select Miscellaneous -> Data Asset
+ * 3. Choose MGGhostSettingsAsset
+ * 4. Configure visual presets for each ghost type
+ *
+ * **Loading and Using Ghost Settings:**
+ * @code
+ * // Load the ghost settings asset
+ * UMGGhostSettingsAsset* GhostSettings = LoadObject<UMGGhostSettingsAsset>(
+ *     nullptr, TEXT("/Game/Data/GhostSettings"));
+ *
+ * // Get the preset for a world record ghost
+ * FMGGhostVisualPreset Preset = GhostSettings->GetPresetForType(EMGGhostType::WorldRecord);
+ *
+ * // Apply preset to a ghost actor
+ * Ghost->SetGhostColor(Preset.GhostColor);
+ * Ghost->SetTransparency(Preset.Transparency);
+ * @endcode
+ *
+ * **Configuring Replay Recording:**
+ * @code
+ * // Access replay settings
+ * UMGReplaySettingsAsset* ReplaySettings = GetReplaySettings();
+ *
+ * // Check recording constraints
+ * float MaxDuration = ReplaySettings->MaxRecordingDuration;
+ * float TargetFPS = ReplaySettings->RecordingFPS;
+ *
+ * // Configure compression
+ * if (ReplaySettings->bEnableCompression)
+ * {
+ *     int32 Level = ReplaySettings->CompressionLevel;
+ *     // Apply compression with specified level
+ * }
+ * @endcode
+ *
+ * **Using Camera Presets:**
+ * @code
+ * // Load camera settings asset
+ * UMGReplayCameraAsset* CameraSettings = GetCameraSettings();
+ *
+ * // Get the chase camera preset
+ * FMGReplayCameraPreset ChasePreset = CameraSettings->GetPreset(FName("Chase"));
+ *
+ * // Apply to replay camera
+ * ReplayCamera->SetRelativeLocation(ChasePreset.Offset);
+ * ReplayCamera->FieldOfView = ChasePreset.FOV;
+ * @endcode
+ *
+ * @section bestpractices Best Practices
+ * - Create separate Data Assets for different game modes (arcade vs simulation)
+ * - Use distinct colors for each ghost type for quick visual identification
+ * - Keep recording FPS at 30 for good balance of quality and file size
+ * - Test camera presets in-game before finalizing
+ * - Document any project-specific preset conventions
+ *
+ * @see AMGGhostRacerActor
+ * @see UMGReplaySubsystem
+ * @see EMGGhostType
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

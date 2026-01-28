@@ -1,5 +1,195 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGWagerSubsystem.h
+ * @brief Race Wagering and Betting System - Manages All Player-vs-Player Stakes
+ *
+ * @section overview Overview for New Developers
+ *
+ * This file defines the Wager Subsystem, which manages all betting/wagering
+ * between players in Midnight Grind. This includes casual currency bets,
+ * item wagers, and the high-stakes pink slip races (vehicle wagers).
+ *
+ * Think of this as the "betting layer" that sits on top of the racing system.
+ * A race can exist without a wager, but a wager requires a race to resolve it.
+ *
+ * @section concepts Key Concepts
+ *
+ * 1. WAGER TYPES (EMGWagerType):
+ *    - Currency: Bet in-game money
+ *    - Vehicle: Pink slip races (see MGPinkSlipSubsystem.h)
+ *    - Part: Bet performance parts
+ *    - Cosmetic: Bet cosmetic items
+ *    - Experience: Bet XP points
+ *    - Mixed: Combination of above
+ *
+ * 2. WAGER STATE MACHINE (EMGWagerState):
+ *    Proposed -> Accepted -> Active (racing) -> Completed
+ *                                            -> Cancelled
+ *             -> Declined
+ *             -> Expired (timeout)
+ *             -> Disputed (contested result)
+ *
+ * 3. WAGER OUTCOME (EMGWagerOutcome):
+ *    - Pending: Race not yet finished
+ *    - WonByInitiator: Person who proposed the wager won
+ *    - WonByOpponent: Person who accepted the wager won
+ *    - Draw: Rare, both keep stakes
+ *    - Voided: Technical issue, both keep stakes
+ *
+ * 4. WAGER STAKE (FMGWagerStake):
+ *    What you're putting on the line:
+ *    - CurrencyAmount: In-game money
+ *    - VehicleID/Name: For pink slips
+ *    - PartID/Name: Performance parts
+ *    - CosmeticID/Name: Visual items
+ *    - ExperienceAmount: XP points
+ *    - EstimatedValue: Total value for matching
+ *    - StakeIcon: Visual representation
+ *
+ * 5. WAGER PARTICIPANTS (FMGWagerParticipant):
+ *    - PlayerID/Name: Who's wagering
+ *    - Stake: What they're betting
+ *    - bAccepted: Have they agreed?
+ *    - bStakeLocked: Is stake secured?
+ *    - FinalPosition/Time: Race results
+ *
+ * 6. WAGER CONDITIONS (FMGWagerConditions):
+ *    The "rules" of the race:
+ *    - TrackID: Where to race
+ *    - LapCount: Number of laps
+ *    - GameModeID: Race type
+ *    - bAllowCatchUp: Rubber-banding on/off
+ *    - bAllowCollisions: Contact allowed?
+ *    - bNightRace: Time of day
+ *    - WeatherCondition: Rain, dry, etc.
+ *    - Vehicle restrictions (class, max PI)
+ *
+ * 7. STAKE MATCHING:
+ *    - bRequireStakeMatch: Must stakes be similar value?
+ *    - StakeMatchTolerance: How much difference allowed (0.2 = 20%)
+ *    - Prevents unfair wagers (betting $100 vs $10,000)
+ *
+ * 8. STAKE LOCKING:
+ *    - When wager is active, stakes are "locked"
+ *    - Locked items can't be sold, traded, or used elsewhere
+ *    - Prevents "double-spending" exploits
+ *    - Unlocked when wager resolves
+ *
+ * 9. PINK SLIP SPECIAL HANDLING:
+ *    - bIsPinkSlip flag marks vehicle wagers
+ *    - Extra validation (level requirements, etc.)
+ *    - Integrates with MGPinkSlipSubsystem for transfers
+ *    - Higher stakes = more safeguards
+ *
+ * 10. CONFIGURATION (FMGWagerConfig):
+ *     - MinCurrencyWager: Minimum bet (100)
+ *     - MaxCurrencyWager: Maximum bet (1,000,000)
+ *     - WagerExpirationHours: How long before unaccepted wager expires (24)
+ *     - HouseFeePercent: Optional tax on winnings (0%)
+ *     - MinLevelForPinkSlips: Level requirement for pink slips (20)
+ *     - MaxActiveWagers: Concurrent wager limit (5)
+ *
+ * @section flow Typical Wager Flow
+ *
+ * 1. Player A calls ProposeWager() with stake and conditions
+ * 2. Player B receives OnWagerProposed delegate
+ * 3. Player B calls AcceptWager() with their stake
+ * 4. Both stakes are locked
+ * 5. OnWagerAccepted fires, race can begin
+ * 6. Race starts via StartWagerRace()
+ * 7. Race completes, ReportRaceResult() called
+ * 8. ProcessWagerCompletion() transfers stakes
+ * 9. OnWagerCompleted fires
+ * 10. Stakes unlocked, history recorded
+ *
+ * DELEGATES (Events):
+ * - OnWagerProposed: New wager offer received
+ * - OnWagerAccepted: Wager accepted, ready to race
+ * - OnWagerDeclined: Wager was declined
+ * - OnWagerStarted: Race is beginning
+ * - OnWagerCompleted: Wager resolved, stakes transferred
+ * - OnWagerCancelled: Wager was cancelled
+ * - OnStakeTransferred: Stake changed hands
+ *
+ * @section network Network Integration
+ * - ReceiveWagerProposal(): Handle incoming wager from network
+ * - ReceiveWagerAcceptance(): Handle acceptance from network
+ * - ReceiveWagerDecline(): Handle decline from network
+ * - ReceiveWagerResult(): Handle result from server
+ * - Server is authoritative for online races
+ *
+ * @section persistence Persistence
+ * - WagerHistory saved via SaveWagerData()
+ * - Statistics (TotalWon, TotalLost, etc.) persisted
+ * - Active wagers survive disconnects (within timeout)
+ *
+ * @section usage Usage Example
+ *
+ * @code
+ * // Get the wager subsystem
+ * UMGWagerSubsystem* WagerSystem = GetGameInstance()->GetSubsystem<UMGWagerSubsystem>();
+ *
+ * // Example 1: Propose a currency wager
+ * FMGWagerConditions Conditions;
+ * Conditions.TrackID = FName("DOWNTOWN_SPRINT");
+ * Conditions.LapCount = 3;
+ * Conditions.bAllowCollisions = true;
+ *
+ * FGuid WagerID = WagerSystem->ProposeCurrencyWager(
+ *     FName("OpponentPlayerID"),
+ *     50000,  // 50,000 credits
+ *     Conditions
+ * );
+ *
+ * // Example 2: Propose a pink slip race
+ * FGuid PinkSlipID = WagerSystem->ProposePinkSlipRace(
+ *     FName("OpponentPlayerID"),
+ *     FName("MY_SKYLINE_R34"),  // My vehicle on the line
+ *     Conditions
+ * );
+ *
+ * // Example 3: Accept an incoming wager
+ * FMGWagerStake MyStake;
+ * MyStake.StakeType = EMGWagerType::Currency;
+ * MyStake.CurrencyAmount = 50000;
+ * WagerSystem->AcceptWager(IncomingWagerID, MyStake);
+ *
+ * // Example 4: Listen for wager events (in BeginPlay)
+ * WagerSystem->OnWagerCompleted.AddDynamic(this, &AMyClass::HandleWagerComplete);
+ *
+ * void AMyClass::HandleWagerComplete(const FMGWager& Wager, bool bWon)
+ * {
+ *     if (bWon)
+ *     {
+ *         // Celebrate - we won!
+ *         UE_LOG(LogTemp, Log, TEXT("Won the wager!"));
+ *     }
+ *     else
+ *     {
+ *         // Handle loss
+ *         UE_LOG(LogTemp, Warning, TEXT("Lost the wager..."));
+ *     }
+ * }
+ *
+ * // Example 5: Check wager history
+ * TArray<FMGWagerHistory> History = WagerSystem->GetWagerHistory(10);
+ * int32 TotalWon = WagerSystem->GetTotalWagersWon();
+ * int64 CurrencyWon = WagerSystem->GetTotalCurrencyWon();
+ * @endcode
+ *
+ * @section related Related Files
+ * - MGWagerSubsystem.cpp (implementation)
+ * - MGPinkSlipSubsystem.h (vehicle-specific pink slip logic)
+ * - MGRaceSubsystem.h (race execution)
+ * - MGInventorySubsystem.h (item management for stakes)
+ * - MGGarageSubsystem.h (vehicle management)
+ *
+ * @see EMGWagerType for supported wager types
+ * @see EMGWagerState for the wager state machine
+ * @see FMGWager for the complete wager data structure
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

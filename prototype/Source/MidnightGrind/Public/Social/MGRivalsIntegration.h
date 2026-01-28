@@ -1,5 +1,218 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRivalsIntegration.h
+ * @brief Rivals System Integration with Career, Matchmaking, and Narrative
+ *
+ * @section overview Overview
+ * This file defines the Rivals Integration Manager, which connects the rivalry
+ * tracking system to other game systems: career progression, matchmaking,
+ * and narrative/story events. While MGRivalSubsystem tracks the raw rivalry data,
+ * this subsystem makes rivalries meaningful by integrating them into gameplay.
+ *
+ * @section beginners Key Concepts for Beginners
+ *
+ * @subsection purpose Why Integration Matters
+ * Raw rivalry data (wins, losses, streaks) is useful but doesn't create
+ * memorable experiences by itself. Integration makes rivalries feel alive:
+ * - Rivals appear in your races (matchmaking integration)
+ * - Story missions feature your nemesis (career integration)
+ * - Characters react to rivalry events (narrative integration)
+ * - Special rewards unlock from rivalry milestones (progression)
+ *
+ * @subsection intensity Rivalry Intensity (EMGRivalryIntensity)
+ * A simplified progression of how serious a rivalry has become:
+ * - Acquaintance: Casual competitor, just met
+ * - Competitor: Regular opponent, starting to remember them
+ * - Rival: Real competition, racing is personal now
+ * - Nemesis: Intense hatred/respect, major storylines
+ * - ArchNemesis: Ultimate rival, legendary status
+ *
+ * Intensity is determined by Rivalry Points, accumulated through encounters.
+ *
+ * @subsection events Rivalry Events (EMGRivalryEvent)
+ * Specific memorable moments that affect rivalry intensity:
+ * - FirstMeet: Initial encounter
+ * - Victory/Defeat: Win or loss against rival
+ * - PhotoFinish: Within 0.5 seconds - dramatic!
+ * - Domination: Won by 10+ seconds - humiliating
+ * - PinkSlipVictory/Loss: Won or lost a vehicle
+ * - WinStreak/LossStreak: Consecutive results
+ * - StreakBreaker: Ended rival's win streak
+ * - LastSecondPass/Loss: Passed or got passed at finish
+ * - MutualDestruction: Both crashed out (creates grudge)
+ *
+ * @subsection points Rivalry Points
+ * Events award rivalry points that determine intensity:
+ * - Normal victory: +10 points
+ * - Photo finish: +25 points (dramatic)
+ * - Domination: +15 points
+ * - Pink slip win: +50 points (high stakes)
+ * - Streak breaker: +20 points
+ * - Last second pass: +30 points
+ *
+ * Thresholds: Competitor=100, Rival=300, Nemesis=600, ArchNemesis=1000
+ *
+ * @section data_structures Key Data Structures
+ *
+ * @subsection encounter FMGRivalEncounter
+ * Records a single race encounter with a rival:
+ * - Where it happened (TrackID)
+ * - What happened (EventType)
+ * - Positions and time gap
+ * - Points earned/lost
+ *
+ * @subsection profile FMGRivalProfile
+ * Complete profile of a rival:
+ * - Identity (ID, name, crew)
+ * - Stats (wins, losses, streak)
+ * - Personality (catchphrase, preferred races)
+ * - History (encounter count, last seen)
+ *
+ * @subsection milestone FMGRivalryMilestone
+ * Achievements for rivalry progress:
+ * - "Beat [Rival] 5 times in a row"
+ * - "Win a pink slip from your nemesis"
+ * - Rewards credits, reputation, and unlocks
+ *
+ * @section integration_areas Integration Areas
+ *
+ * @subsection matchmaking Matchmaking Integration
+ * @code
+ * // When setting up a race, consider including rivals
+ * TArray<FName> RivalsToInclude = RivalsIntegration->GetRivalsForMatchmaking(2);
+ *
+ * // The system prioritizes:
+ * // 1. Current nemesis (if available)
+ * // 2. High-intensity rivals
+ * // 3. Players with active callouts
+ * // 4. Recent opponents
+ *
+ * // Check if a specific rival should be forced into the race
+ * if (RivalsIntegration->ShouldIncludeRivalInRace(NemesisID))
+ * {
+ *     // Nemesis is due for a showdown - add them!
+ *     AddParticipant(NemesisID);
+ * }
+ * @endcode
+ *
+ * @subsection career Career Integration
+ * @code
+ * // Get the best rival to feature in a career event
+ * FName SuggestedRival = RivalsIntegration->GetSuggestedRivalForEvent(EventID);
+ *
+ * // The system considers:
+ * // - Event difficulty vs rival skill
+ * // - Narrative arc (building towards confrontation)
+ * // - Time since last encounter
+ * // - Whether milestone would complete
+ * @endcode
+ *
+ * @subsection narrative Narrative Integration
+ * @code
+ * // Check for pending story moments
+ * TArray<FName> PendingNarratives = RivalsIntegration->GetPendingRivalryNarratives();
+ * // Returns: ["NemesisBossRace", "RevengeOpportunity", "FinalShowdown"]
+ *
+ * // Get the current story state for a rivalry
+ * FString StoryState = RivalsIntegration->GetRivalryStoryState(RivalID);
+ * // Returns: "BuildingTension" / "ReadyForShowdown" / "PostVictory"
+ *
+ * // Trigger a taunt (rival sends you a message)
+ * RivalsIntegration->TriggerRivalTaunt(RivalID, EMGRivalryEvent::Victory);
+ * // Generates contextual trash talk based on recent events
+ * @endcode
+ *
+ * @section usage Usage Examples
+ *
+ * @subsection processing_results Processing Race Results
+ * @code
+ * // After a race ends, process results for rivalry updates
+ * void ARaceGameMode::OnRaceComplete()
+ * {
+ *     UMGRivalsIntegration* Rivals = GetGameInstance()->GetSubsystem<UMGRivalsIntegration>();
+ *
+ *     // ProcessRaceResults automatically:
+ *     // 1. Detects rivalries (repeated encounters)
+ *     // 2. Creates new rivals if criteria met
+ *     // 3. Records encounters
+ *     // 4. Awards rivalry points
+ *     // 5. Updates intensity levels
+ *     // 6. Checks milestones
+ *     // 7. Triggers narrative events
+ *     Rivals->ProcessRaceResults(RaceResults);
+ * }
+ * @endcode
+ *
+ * @subsection recording_events Recording Specific Events
+ * @code
+ * // Record a specific notable moment
+ * Rivals->RecordRivalryEvent(
+ *     RivalID,
+ *     EMGRivalryEvent::LastSecondPass,
+ *     0.1f  // Time gap (positive = we're ahead)
+ * );
+ *
+ * // Record a pink slip victory
+ * Rivals->RecordRivalryEvent(RivalID, EMGRivalryEvent::PinkSlipVictory);
+ * @endcode
+ *
+ * @subsection querying_rivals Querying Rival Data
+ * @code
+ * // Get all known rivals
+ * TArray<FMGRivalProfile> AllRivals = Rivals->GetAllRivals();
+ *
+ * // Get rivals at specific intensity
+ * TArray<FMGRivalProfile> Nemeses = Rivals->GetRivalsByIntensity(EMGRivalryIntensity::Nemesis);
+ *
+ * // Get your top 5 rivals
+ * TArray<FMGRivalProfile> TopRivals = Rivals->GetTopRivals(5);
+ *
+ * // Get encounter history
+ * TArray<FMGRivalEncounter> History = Rivals->GetEncounterHistory(RivalID, 10);
+ *
+ * // Get THE nemesis (highest intensity rival)
+ * FMGRivalProfile Nemesis = Rivals->GetNemesis();
+ * @endcode
+ *
+ * @subsection milestones Working with Milestones
+ * @code
+ * // Get available milestones to work toward
+ * TArray<FMGRivalryMilestone> Available = Rivals->GetAvailableMilestones();
+ *
+ * // Get completed milestones
+ * TArray<FMGRivalryMilestone> Completed = Rivals->GetCompletedMilestones();
+ *
+ * // Manually check milestones (usually automatic)
+ * Rivals->CheckMilestones(RivalID);
+ * @endcode
+ *
+ * @section events Events/Delegates
+ * - OnRivalryIntensityChanged: Rival leveled up (Competitor -> Rival)
+ * - OnRivalEncounter: Any encounter processed
+ * - OnRivalryMilestoneComplete: Achievement unlocked
+ * - OnNewRivalDiscovered: First time encountering this rival
+ * - OnRivalTaunt: Rival sent a taunt message
+ *
+ * @section taunts Dynamic Taunts
+ * The system generates contextual taunts based on:
+ * - Recent race results
+ * - Current streak
+ * - Rivalry intensity
+ * - Rival's personality/catchphrase
+ *
+ * @code
+ * // System might generate:
+ * // After your loss: "Better luck next time, slowpoke!"
+ * // After their loss streak: "You're getting predictable..."
+ * // Before nemesis race: "This ends tonight."
+ * @endcode
+ *
+ * @see MGRivalSubsystem.h For raw rivalry data tracking
+ * @see MGCareerSubsystem.h For career mode integration
+ * @see MGProgressionSubsystem.h For rewards and unlocks
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

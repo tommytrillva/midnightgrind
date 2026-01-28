@@ -1,8 +1,340 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MGNetworkDiagnosticsSubsystem.h
-// Midnight Grind - Network Diagnostics and Connection Quality System
-// Provides real-time network monitoring, latency tracking, and connection health analysis
+/**
+ * @file MGNetworkDiagnosticsSubsystem.h
+ * @brief Network Diagnostics - Connection quality monitoring and troubleshooting tools
+ * @author Midnight Grind Team
+ * @version 1.0
+ *
+ * @section overview Overview
+ * ============================================================================
+ * MGNetworkDiagnosticsSubsystem.h
+ * Midnight Grind - Network Diagnostics and Connection Quality System
+ * ============================================================================
+ *
+ * This subsystem monitors network connection quality for multiplayer racing.
+ * It tracks latency (ping), packet loss, jitter, and bandwidth to ensure
+ * smooth online gameplay. Think of it as a "network health monitor."
+ *
+ * @section importance Why This Matters for a Racing Game
+ * Racing games are extremely sensitive to network quality:
+ * - 50ms of lag can mean the difference between winning and losing
+ * - Packet loss causes "rubber-banding" (cars jumping around)
+ * - Jitter (inconsistent ping) makes car positions unpredictable
+ * - Poor connections ruin the competitive experience
+ *
+ * This subsystem helps by:
+ * - Warning players when their connection is degraded
+ * - Auto-switching to better server regions
+ * - Providing diagnostic tools to troubleshoot issues
+ * - Enabling matchmaking to pair players with similar ping
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection quality 1. Connection Quality (EMGConnectionQuality)
+ * Overall rating from Excellent to Disconnected based on all metrics.
+ * - Excellent: <30ms ping, <0% packet loss - perfect for competitive
+ * - Good: <60ms ping, <1% packet loss - normal play
+ * - Fair: <100ms ping, <3% packet loss - playable but noticeable
+ * - Poor: <150ms ping, <5% packet loss - frustrating experience
+ * - Critical: High lag/loss - consider disconnecting
+ * - Disconnected: No connection to server
+ *
+ * @subsection latency 2. Latency/Ping (FMGLatencyStats)
+ * Round-trip time for packets to reach server and return.
+ * - CurrentLatencyMs: Most recent ping measurement
+ * - AverageLatencyMs: Rolling average over sample period
+ * - JitterMs: Variation in ping (high jitter = inconsistent)
+ * - Percentile95Ms: 95% of pings are below this value
+ *
+ * For a racing game:
+ * - <30ms = Excellent (competitive-ready)
+ * - 30-60ms = Good (normal play)
+ * - 60-100ms = Fair (noticeable but playable)
+ * - >100ms = Poor (frustrating for precision racing)
+ *
+ * @subsection packetloss 3. Packet Loss (FMGPacketLossStats)
+ * Percentage of packets that never arrive.
+ * - Even 1-2% loss is noticeable in racing games
+ * - "Burst loss" (multiple consecutive lost packets) is especially bad
+ *
+ * @subsection nat 4. NAT Type (EMGNATType)
+ * Network Address Translation configuration affects connectivity:
+ * - Open: Can connect to anyone
+ * - Moderate: May have issues with Strict NAT players
+ * - Strict: Can only connect to Open NAT players
+ * - Symmetric/DoubleNAT: Serious connectivity problems
+ *
+ * @subsection regions 5. Server Regions (EMGNetworkRegion)
+ * Geographic server locations (NA East, Europe West, Asia Pacific, etc.)
+ * Players should connect to the nearest region for lowest ping.
+ *
+ * @section diagnostics Diagnostic Tests
+ * - Ping: Measure latency to server
+ * - Bandwidth: Test upload/download speed
+ * - PacketLoss: Check for dropped packets
+ * - TraceRoute: Map network path to server (find where lag originates)
+ * - NATType: Detect NAT configuration
+ * - PortCheck: Verify required ports are accessible
+ * - ServerHealth: Check if server is online and responsive
+ * - FullDiagnostic: Run all tests and generate report
+ *
+ * @section usage Usage Examples
+ *
+ * @code
+ * // Get the subsystem
+ * UMGNetworkDiagnosticsSubsystem* NetDiag = GetGameInstance()->GetSubsystem<UMGNetworkDiagnosticsSubsystem>();
+ *
+ * // === STARTING MONITORING ===
+ * // Start monitoring (call once when entering online mode)
+ * NetDiag->StartMonitoring();
+ *
+ * // Check if monitoring is active
+ * bool bMonitoring = NetDiag->IsMonitoring();
+ *
+ * // === CONNECTION QUALITY ===
+ * // Check current connection quality
+ * EMGConnectionQuality Quality = NetDiag->GetConnectionQuality();
+ * if (Quality <= EMGConnectionQuality::Poor)
+ * {
+ *     ShowNetworkWarningUI();
+ * }
+ *
+ * // Get current ping for HUD display
+ * float Ping = NetDiag->GetCurrentLatency();
+ * PingText->SetText(FString::Printf(TEXT("%dms"), FMath::RoundToInt(Ping)));
+ *
+ * // Color-code the ping display
+ * FLinearColor PingColor = NetDiag->GetConnectionQualityColor();
+ *
+ * // Get detailed connection health
+ * FMGConnectionHealth Health = NetDiag->GetConnectionHealth();
+ * float QualityScore = Health.QualityScore;      // 0-100
+ * float StabilityScore = Health.StabilityScore;  // 0-100
+ *
+ * // === LATENCY MONITORING ===
+ * // Get detailed latency statistics
+ * FMGLatencyStats LatencyStats = NetDiag->GetLatencyStats();
+ * float AvgPing = LatencyStats.AverageLatencyMs;
+ * float Jitter = LatencyStats.JitterMs;
+ * float Worst = LatencyStats.Percentile99Ms;
+ *
+ * // Get latency history for graphing
+ * TArray<FMGLatencySample> History = NetDiag->GetLatencyHistory();
+ *
+ * // === DIAGNOSTICS ===
+ * // Run diagnostics when player reports issues
+ * NetDiag->RunFullDiagnostic();
+ * // Results broadcast via OnFullDiagnosticComplete delegate
+ *
+ * // Run a specific test
+ * NetDiag->RunDiagnosticTest(EMGDiagnosticTest::NATType);
+ *
+ * // Check NAT type
+ * EMGNATType NAT = NetDiag->GetNATType();
+ * if (NAT == EMGNATType::Strict || NAT == EMGNATType::DoubleNAT)
+ * {
+ *     ShowNATWarningUI();
+ * }
+ *
+ * // === SERVER SELECTION ===
+ * // Find the best server to connect to
+ * NetDiag->PingAllServers();
+ * FMGServerEndpoint BestServer = NetDiag->GetBestServer();
+ *
+ * // Get servers in a specific region
+ * TArray<FMGServerEndpoint> EUServers = NetDiag->GetServersByRegion(EMGNetworkRegion::EuropeWest);
+ *
+ * // Auto-switch to optimal region if current is poor
+ * NetDiag->SwitchToOptimalRegion();
+ *
+ * // Set preferred region manually
+ * NetDiag->SetPreferredRegion(EMGNetworkRegion::NAEast);
+ *
+ * // === ISSUE DETECTION ===
+ * // Check for active issues
+ * TArray<EMGNetworkIssue> Issues = NetDiag->GetActiveIssues();
+ * bool bHighLatency = NetDiag->HasActiveIssue(EMGNetworkIssue::HighLatency);
+ *
+ * // Get recommendations for an issue
+ * FString Recommendations = NetDiag->GetRecommendationsForIssue(EMGNetworkIssue::PacketLoss);
+ *
+ * // === REPORTING ===
+ * // Generate a network report for support
+ * FString Report = NetDiag->GenerateNetworkReport();
+ *
+ * // Copy diagnostic info to clipboard
+ * NetDiag->CopyDiagnosticToClipboard();
+ *
+ * // Export full report to file
+ * NetDiag->ExportDiagnosticReport("C:/NetworkDiagnostic.txt");
+ *
+ * // === EVENT LISTENERS ===
+ * NetDiag->OnConnectionLost.AddDynamic(this, &UMyClass::HandleConnectionLost);
+ * NetDiag->OnConnectionRestored.AddDynamic(this, &UMyClass::HandleReconnected);
+ * NetDiag->OnConnectionQualityChanged.AddDynamic(this, &UMyClass::HandleQualityChange);
+ * NetDiag->OnLatencyUpdated.AddDynamic(this, &UMyClass::HandlePingUpdate);
+ * NetDiag->OnNetworkIssueDetected.AddDynamic(this, &UMyClass::HandleIssue);
+ * @endcode
+ *
+ * @section configuration Configuration
+ * Use FMGNetworkConfig to customize behavior:
+ * - PreferredRegion: Force specific server region
+ * - bAutoReconnect: Automatically retry on disconnect
+ * - MaxReconnectAttempts: How many times to retry
+ * - bAutoSwitchRegion: Auto-switch if current region has high ping
+ * - PingSampleInterval: How often to measure ping (default 1 second)
+ * - QualityThresholds: Customize ping/loss thresholds for quality levels
+ *
+ * @section delegates Available Delegates
+ * - OnConnectionQualityChanged: Quality level changed (update UI)
+ * - OnNetworkIssueDetected: New problem found (show warning)
+ * - OnNetworkIssueResolved: Problem went away
+ * - OnLatencyUpdated: New ping measurement (update HUD)
+ * - OnPacketLossUpdated: Packet loss percentage changed
+ * - OnConnectionLost: Disconnected from server
+ * - OnConnectionRestored: Reconnected after disconnect
+ * - OnRegionSwitched: Switched to different server region
+ * - OnDiagnosticComplete: Single test finished
+ * - OnFullDiagnosticComplete: All tests finished with report
+ * - OnBandwidthTestComplete: Bandwidth test finished
+ *
+ * @see UMGMultiplayerSubsystem Uses this for matchmaking decisions
+ * @see UMGRaceNetworkSubsystem Vehicle position replication
+ * ============================================================================
+ */
+
+/**
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This subsystem monitors network connection quality for multiplayer racing.
+ * It tracks latency (ping), packet loss, jitter, and bandwidth to ensure
+ * smooth online gameplay. Think of it as a "network health monitor."
+ *
+ * WHY THIS MATTERS FOR A RACING GAME:
+ * ------------------------------------
+ * Racing games are extremely sensitive to network quality:
+ * - 50ms of lag can mean the difference between winning and losing
+ * - Packet loss causes "rubber-banding" (cars jumping around)
+ * - Jitter (inconsistent ping) makes car positions unpredictable
+ * - Poor connections ruin the competitive experience
+ *
+ * This subsystem helps by:
+ * - Warning players when their connection is degraded
+ * - Auto-switching to better server regions
+ * - Providing diagnostic tools to troubleshoot issues
+ * - Enabling matchmaking to pair players with similar ping
+ *
+ * KEY CONCEPTS:
+ * -------------
+ * 1. CONNECTION QUALITY (EMGConnectionQuality)
+ *    Overall rating from Excellent to Disconnected based on all metrics.
+ *    - Excellent: <30ms ping, <0% packet loss - perfect for competitive
+ *    - Good: <60ms ping, <1% packet loss - normal play
+ *    - Fair: <100ms ping, <3% packet loss - playable but noticeable
+ *    - Poor: <150ms ping, <5% packet loss - frustrating experience
+ *    - Critical: High lag/loss - consider disconnecting
+ *    - Disconnected: No connection to server
+ *
+ * 2. LATENCY/PING (FMGLatencyStats)
+ *    Round-trip time for packets to reach server and return.
+ *    - CurrentLatencyMs: Most recent ping measurement
+ *    - AverageLatencyMs: Rolling average over sample period
+ *    - JitterMs: Variation in ping (high jitter = inconsistent)
+ *    - Percentile95Ms: 95% of pings are below this value
+ *
+ * 3. PACKET LOSS (FMGPacketLossStats)
+ *    Percentage of packets that never arrive.
+ *    - Even 1-2% loss is noticeable in racing games
+ *    - "Burst loss" (multiple consecutive lost packets) is especially bad
+ *
+ * 4. NAT TYPE (EMGNATType)
+ *    Network Address Translation configuration affects connectivity:
+ *    - Open: Can connect to anyone
+ *    - Moderate: May have issues with Strict NAT players
+ *    - Strict: Can only connect to Open NAT players
+ *    - Symmetric/DoubleNAT: Serious connectivity problems
+ *
+ * 5. SERVER REGIONS (EMGNetworkRegion)
+ *    Geographic server locations (NA East, Europe West, Asia Pacific, etc.)
+ *    Players should connect to the nearest region for lowest ping.
+ *
+ * HOW TO USE THIS SUBSYSTEM:
+ * --------------------------
+ * @code
+ * // Get the subsystem
+ * UMGNetworkDiagnosticsSubsystem* NetDiag = GetGameInstance()->GetSubsystem<UMGNetworkDiagnosticsSubsystem>();
+ *
+ * // Start monitoring (call once when entering online mode)
+ * NetDiag->StartMonitoring();
+ *
+ * // Check current connection quality
+ * EMGConnectionQuality Quality = NetDiag->GetConnectionQuality();
+ * if (Quality <= EMGConnectionQuality::Poor)
+ * {
+ *     ShowNetworkWarningUI();
+ * }
+ *
+ * // Get current ping for HUD display
+ * float Ping = NetDiag->GetCurrentLatency();
+ * PingText->SetText(FString::Printf(TEXT("%dms"), FMath::RoundToInt(Ping)));
+ *
+ * // Color-code the ping display
+ * FLinearColor PingColor = NetDiag->GetConnectionQualityColor();
+ *
+ * // Run diagnostics when player reports issues
+ * NetDiag->RunFullDiagnostic();
+ * // Results broadcast via OnFullDiagnosticComplete delegate
+ *
+ * // Find the best server to connect to
+ * NetDiag->PingAllServers();
+ * FMGServerEndpoint BestServer = NetDiag->GetBestServer();
+ *
+ * // Auto-switch to optimal region if current is poor
+ * NetDiag->SwitchToOptimalRegion();
+ *
+ * // Listen for connection events
+ * NetDiag->OnConnectionLost.AddDynamic(this, &MyClass::HandleConnectionLost);
+ * NetDiag->OnConnectionRestored.AddDynamic(this, &MyClass::HandleReconnected);
+ * NetDiag->OnConnectionQualityChanged.AddDynamic(this, &MyClass::HandleQualityChange);
+ * @endcode
+ *
+ * DIAGNOSTIC TESTS:
+ * -----------------
+ * - Ping: Measure latency to server
+ * - Bandwidth: Test upload/download speed
+ * - PacketLoss: Check for dropped packets
+ * - TraceRoute: Map network path to server (find where lag originates)
+ * - NATType: Detect NAT configuration
+ * - PortCheck: Verify required ports are accessible
+ * - ServerHealth: Check if server is online and responsive
+ * - FullDiagnostic: Run all tests and generate report
+ *
+ * EVENTS TO LISTEN FOR:
+ * ---------------------
+ * - OnConnectionQualityChanged: Quality level changed (update UI)
+ * - OnNetworkIssueDetected: New problem found (show warning)
+ * - OnNetworkIssueResolved: Problem went away
+ * - OnLatencyUpdated: New ping measurement (update HUD)
+ * - OnConnectionLost: Disconnected from server
+ * - OnConnectionRestored: Reconnected after disconnect
+ * - OnRegionSwitched: Switched to different server region
+ * - OnDiagnosticComplete: Single test finished
+ * - OnFullDiagnosticComplete: All tests finished with report
+ *
+ * CONFIGURATION:
+ * --------------
+ * Use FMGNetworkConfig to customize behavior:
+ * - PreferredRegion: Force specific server region
+ * - bAutoReconnect: Automatically retry on disconnect
+ * - MaxReconnectAttempts: How many times to retry
+ * - bAutoSwitchRegion: Auto-switch if current region has high ping
+ * - PingSampleInterval: How often to measure ping (default 1 second)
+ * - QualityThresholds: Customize ping/loss thresholds for quality levels
+ *
+ * @see UMGMultiplayerSubsystem - Uses this for matchmaking decisions
+ * @see UMGRaceNetworkSubsystem - Vehicle position replication
+ */
 
 #pragma once
 
@@ -112,39 +444,66 @@ struct FMGLatencySample
     FString ServerEndpoint;
 };
 
-// Latency statistics
+/**
+ * Latency statistics - Comprehensive ping/latency metrics
+ *
+ * Latency (ping) is the round-trip time for data to travel from
+ * the player's machine to the game server and back.
+ *
+ * WHY THESE METRICS MATTER:
+ * - CurrentLatencyMs: What the player feels right now
+ * - AverageLatencyMs: Overall connection quality
+ * - Jitter: Consistency - high jitter = "laggy" feeling even with low average
+ * - Percentile95/99: "Worst case" latency spikes
+ *
+ * For a racing game:
+ * - <30ms = Excellent (competitive-ready)
+ * - 30-60ms = Good (normal play)
+ * - 60-100ms = Fair (noticeable but playable)
+ * - >100ms = Poor (frustrating for precision racing)
+ */
 USTRUCT(BlueprintType)
 struct FMGLatencyStats
 {
     GENERATED_BODY()
 
+    /** Most recent ping measurement in milliseconds */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float CurrentLatencyMs = 0.0f;
 
+    /** Rolling average of recent ping samples */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float AverageLatencyMs = 0.0f;
 
+    /** Lowest ping recorded in sample period */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float MinLatencyMs = 0.0f;
 
+    /** Highest ping recorded in sample period (spike detection) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float MaxLatencyMs = 0.0f;
 
+    /** Variation in ping over time (lower = more consistent connection) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float JitterMs = 0.0f;
 
+    /** Statistical standard deviation of ping samples */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float StandardDeviation = 0.0f;
 
+    /** 95% of pings are below this value (helps identify occasional spikes) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float Percentile95Ms = 0.0f;
 
+    /** 99% of pings are below this value (worst-case scenario) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float Percentile99Ms = 0.0f;
 
+    /** How many ping samples these stats are based on */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 SampleCount = 0;
 
+    /** Time period over which samples were collected (seconds) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float SamplePeriodSeconds = 0.0f;
 };
@@ -334,45 +693,70 @@ struct FMGDiagnosticResult
     TArray<EMGNetworkIssue> DetectedIssues;
 };
 
-// Connection health snapshot
+/**
+ * Connection health snapshot - Complete picture of network status
+ *
+ * This is the "dashboard" of network health - a single struct containing
+ * all the information needed to assess if the player can have a good
+ * online experience.
+ *
+ * QUALITY VS STABILITY:
+ * - QualityScore: How good the connection is right now (0-100)
+ * - StabilityScore: How consistent the connection has been (0-100)
+ *
+ * A player might have high quality (low ping) but low stability (frequent spikes),
+ * or vice versa. Both matter for racing games.
+ */
 USTRUCT(BlueprintType)
 struct FMGConnectionHealth
 {
     GENERATED_BODY()
 
+    /** Overall connection quality rating (Excellent to Disconnected) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     EMGConnectionQuality OverallQuality = EMGConnectionQuality::Disconnected;
 
+    /** Detailed latency/ping statistics */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FMGLatencyStats LatencyStats;
 
+    /** Detailed packet loss statistics */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FMGPacketLossStats PacketLossStats;
 
+    /** Bandwidth (upload/download speed) statistics */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FMGBandwidthStats BandwidthStats;
 
+    /** NAT type affecting peer-to-peer connectivity */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     EMGNATType NATType = EMGNATType::Unknown;
 
+    /** Is currently connected to game servers? */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     bool bIsConnected = false;
 
+    /** How long the current connection has been active (seconds) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float ConnectionUptime = 0.0f;
 
+    /** Number of times we've had to reconnect this session */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 ReconnectAttempts = 0;
 
+    /** When connection was last established */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FDateTime LastConnectedTime;
 
+    /** Currently detected network problems */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<EMGNetworkIssue> ActiveIssues;
 
+    /** Overall quality score from 0 (terrible) to 100 (perfect) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float QualityScore = 0.0f;
 
+    /** Connection stability score from 0 (constant problems) to 100 (rock solid) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float StabilityScore = 0.0f;
 };

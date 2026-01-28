@@ -1,0 +1,330 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - World Props and Environmental Objects",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DestructibleProps": true,
+    "InteractiveProps": true,
+    "DynamicProps": true
+  },
+
+  "RoadsideProps": {
+    "TrafficControl": {
+      "TrafficLights": {
+        "ID": "PROP_TLIGHT",
+        "Destructible": true,
+        "Functional": true,
+        "DamageOnHit": { "Vehicle": 100 }
+      },
+      "StopSigns": {
+        "ID": "PROP_STOP",
+        "Destructible": true,
+        "KnockOver": true,
+        "DamageOnHit": { "Vehicle": 25 }
+      },
+      "StreetSigns": {
+        "ID": "PROP_SIGN",
+        "Destructible": true,
+        "KnockOver": true,
+        "DamageOnHit": { "Vehicle": 15 }
+      },
+      "SpeedLimitSigns": {
+        "ID": "PROP_SPEED",
+        "Destructible": true,
+        "Info": true
+      }
+    },
+    "Barriers": {
+      "Guardrails": {
+        "ID": "PROP_GUARD",
+        "Destructible": false,
+        "Deformable": true,
+        "DamageOnHit": { "Vehicle": 200 }
+      },
+      "ConcreteBarrier": {
+        "ID": "PROP_CONCRETE",
+        "Destructible": false,
+        "Solid": true,
+        "DamageOnHit": { "Vehicle": 500 }
+      },
+      "WaterBarrels": {
+        "ID": "PROP_BARREL",
+        "Destructible": true,
+        "Absorbing": true,
+        "DamageOnHit": { "Vehicle": 50 }
+      },
+      "Cones": {
+        "ID": "PROP_CONE",
+        "Destructible": true,
+        "Light": true,
+        "DamageOnHit": { "Vehicle": 0 }
+      }
+    },
+    "Lighting": {
+      "StreetLamps": {
+        "ID": "PROP_LAMP",
+        "Destructible": true,
+        "Functional": true,
+        "DamageOnHit": { "Vehicle": 150 }
+      },
+      "Bollards": {
+        "ID": "PROP_BOLLARD",
+        "Destructible": false,
+        "Solid": true,
+        "DamageOnHit": { "Vehicle": 300 }
+      }
+    },
+    "Utilities": {
+      "FireHydrant": {
+        "ID": "PROP_HYDRANT",
+        "Destructible": true,
+        "WaterSpray": true,
+        "DamageOnHit": { "Vehicle": 75 }
+      },
+      "Mailbox": {
+        "ID": "PROP_MAIL",
+        "Destructible": true,
+        "Light": true,
+        "DamageOnHit": { "Vehicle": 10 }
+      },
+      "TrashCan": {
+        "ID": "PROP_TRASH",
+        "Destructible": true,
+        "Light": true,
+        "DamageOnHit": { "Vehicle": 5 }
+      },
+      "PhoneBooth": {
+        "ID": "PROP_PHONE",
+        "Destructible": true,
+        "DamageOnHit": { "Vehicle": 50 }
+      }
+    }
+  },
+
+  "ParkingProps": {
+    "ParkingMeters": {
+      "ID": "PROP_METER",
+      "Destructible": true,
+      "DamageOnHit": { "Vehicle": 25 }
+    },
+    "ParkingBollards": {
+      "ID": "PROP_PARKBOLL",
+      "Destructible": false,
+      "Solid": true
+    },
+    "ParkingGates": {
+      "ID": "PROP_GATE",
+      "Destructible": true,
+      "Breakable": true
+    },
+    "WheelStops": {
+      "ID": "PROP_WHEEL",
+      "Destructible": false,
+      "DriveOver": true
+    }
+  },
+
+  "UrbanProps": {
+    "Benches": {
+      "ID": "PROP_BENCH",
+      "Destructible": true,
+      "DamageOnHit": { "Vehicle": 30 }
+    },
+    "Tables": {
+      "ID": "PROP_TABLE",
+      "Destructible": true,
+      "Chairs": { "Included": true }
+    },
+    "Planters": {
+      "ID": "PROP_PLANTER",
+      "Destructible": true,
+      "Heavy": true,
+      "DamageOnHit": { "Vehicle": 100 }
+    },
+    "Fountains": {
+      "ID": "PROP_FOUNTAIN",
+      "Destructible": false,
+      "Solid": true,
+      "Water": true
+    },
+    "Statues": {
+      "ID": "PROP_STATUE",
+      "Destructible": false,
+      "Solid": true
+    },
+    "Newsstands": {
+      "ID": "PROP_NEWS",
+      "Destructible": true,
+      "DamageOnHit": { "Vehicle": 40 }
+    },
+    "VendingMachines": {
+      "ID": "PROP_VEND",
+      "Destructible": true,
+      "DamageOnHit": { "Vehicle": 75 }
+    }
+  },
+
+  "ConstructionProps": {
+    "Scaffolding": {
+      "ID": "PROP_SCAFFOLD",
+      "Destructible": true,
+      "Collapse": true
+    },
+    "ConstructionBarriers": {
+      "ID": "PROP_CONBAR",
+      "Destructible": true,
+      "Light": true
+    },
+    "Dumpsters": {
+      "ID": "PROP_DUMP",
+      "Destructible": false,
+      "Heavy": true,
+      "Moveable": true
+    },
+    "Pallets": {
+      "ID": "PROP_PALLET",
+      "Destructible": true,
+      "Scatter": true
+    },
+    "PortableToilets": {
+      "ID": "PROP_TOILET",
+      "Destructible": true,
+      "KnockOver": true
+    }
+  },
+
+  "VehicleProps": {
+    "ParkedCars": {
+      "ID": "PROP_PARKED",
+      "Destructible": false,
+      "Damageable": true,
+      "Alarm": true
+    },
+    "Motorcycles": {
+      "ID": "PROP_MOTO",
+      "Destructible": true,
+      "KnockOver": true
+    },
+    "Bicycles": {
+      "ID": "PROP_BIKE",
+      "Destructible": true,
+      "Light": true
+    },
+    "ShoppingCarts": {
+      "ID": "PROP_CART",
+      "Destructible": true,
+      "Rolling": true
+    }
+  },
+
+  "NatureProps": {
+    "Trees": {
+      "SmallTree": {
+        "ID": "PROP_TREE_S",
+        "Destructible": true,
+        "DamageOnHit": { "Vehicle": 200 }
+      },
+      "LargeTree": {
+        "ID": "PROP_TREE_L",
+        "Destructible": false,
+        "Solid": true,
+        "DamageOnHit": { "Vehicle": 1000 }
+      }
+    },
+    "Bushes": {
+      "ID": "PROP_BUSH",
+      "Destructible": true,
+      "DriveThrough": true,
+      "DamageOnHit": { "Vehicle": 5 }
+    },
+    "Fences": {
+      "WoodFence": {
+        "ID": "PROP_FENCE_W",
+        "Destructible": true,
+        "DamageOnHit": { "Vehicle": 25 }
+      },
+      "ChainLink": {
+        "ID": "PROP_FENCE_C",
+        "Destructible": true,
+        "DamageOnHit": { "Vehicle": 50 }
+      },
+      "MetalFence": {
+        "ID": "PROP_FENCE_M",
+        "Destructible": false,
+        "Solid": true
+      }
+    }
+  },
+
+  "InteractiveProps": {
+    "GasPumps": {
+      "ID": "PROP_PUMP",
+      "Interactive": true,
+      "Destructible": true,
+      "Explosive": true
+    },
+    "ATMs": {
+      "ID": "PROP_ATM",
+      "Interactive": false,
+      "Solid": true
+    },
+    "PayPhones": {
+      "ID": "PROP_PAY",
+      "Interactive": false,
+      "Destructible": true
+    }
+  },
+
+  "DestructionEffects": {
+    "Physical": {
+      "KnockOver": true,
+      "Scatter": true,
+      "Collapse": true,
+      "Deform": true
+    },
+    "Visual": {
+      "Sparks": true,
+      "Debris": true,
+      "Dust": true,
+      "Glass": true
+    },
+    "Audio": {
+      "Impact": true,
+      "Breaking": true,
+      "Metal": true,
+      "Wood": true
+    },
+    "Consequences": {
+      "VehicleDamage": true,
+      "PoliceAttention": { "ForMajor": true },
+      "RepairCost": true
+    }
+  },
+
+  "SpawnSettings": {
+    "Density": {
+      "Urban": "High",
+      "Suburban": "Medium",
+      "Rural": "Low",
+      "Highway": "Minimal"
+    },
+    "LOD": {
+      "Near": { "Full": true },
+      "Medium": { "Simplified": true },
+      "Far": { "Billboard": true }
+    },
+    "Pooling": {
+      "Enabled": true,
+      "RespawnTime": { "Seconds": 60 }
+    }
+  },
+
+  "UI": {
+    "Settings": {
+      "PropDensity": true,
+      "DestructionLevel": true,
+      "PhysicsQuality": true
+    }
+  }
+}

@@ -1,5 +1,88 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGMenuSubsystem.h
+ * @brief Central management for game menus, settings, and navigation
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the menu subsystem that manages all game menus and settings.
+ * As a GameInstanceSubsystem, it persists across level loads and provides:
+ *
+ * - Menu state machine (Main Menu, Paused, Settings, Loading, In-Game)
+ * - Complete game settings with persistence
+ * - Loading screen control with progress updates
+ * - Navigation between game states (garage, race, main menu)
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **GameInstanceSubsystem**: Persists for the entire application lifetime.
+ *   Menu state and settings survive level transitions.
+ *
+ * - **FMGGameSettings**: Comprehensive settings struct covering graphics, audio,
+ *   controls, gameplay, and accessibility. Saved to disk automatically.
+ *
+ * - **Menu State Machine**: EMGMenuState tracks current menu visibility.
+ *   State changes broadcast via OnMenuStateChanged delegate.
+ *
+ * - **Physics Handling Mode**: Gameplay settings include physics preset
+ *   (Arcade/Balanced/Simulation) that affects vehicle handling feel.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [Game Boot] ---> [UMGMenuSubsystem]
+ *                           |
+ *                           +-- LoadSettings() from disk
+ *                           +-- ShowMainMenu()
+ *                           |
+ *   [In-Game] <------------+
+ *       |                   |
+ *       +-- TogglePauseMenu() --> EMGMenuState::Paused
+ *       |                              |
+ *       |                              +-- ShowSettings()
+ *       |                              +-- ResumeGame()
+ *       |                              +-- ReturnToMainMenu()
+ *       |
+ *       +-- ShowLoadingScreen() --> EMGMenuState::Loading
+ *                                        +-- UpdateLoadingProgress()
+ *                                        +-- HideLoadingScreen()
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Get the menu subsystem
+ * UMGMenuSubsystem* MenuSub = GetGameInstance()->GetSubsystem<UMGMenuSubsystem>();
+ *
+ * // Check and modify game settings
+ * FMGGameSettings Settings = MenuSub->GetSettings();
+ * Settings.MasterVolume = 0.8f;
+ * Settings.PhysicsHandlingMode = EMGPhysicsHandlingMode::Arcade;
+ * MenuSub->ApplyAndSaveSettings(Settings);
+ *
+ * // Toggle pause during gameplay
+ * MenuSub->TogglePauseMenu();
+ *
+ * // Show loading screen during level load
+ * MenuSub->ShowLoadingScreen(FText::FromString("Loading Downtown Circuit..."));
+ * // ... load level ...
+ * MenuSub->UpdateLoadingProgress(0.5f); // 50%
+ * // ... finish loading ...
+ * MenuSub->HideLoadingScreen();
+ *
+ * // Navigate between game states
+ * MenuSub->StartQuickRace();          // Jump into a race
+ * MenuSub->ReturnToMainMenu();        // Back to main menu
+ *
+ * // Listen for state changes
+ * MenuSub->OnMenuStateChanged.AddDynamic(this, &UMyWidget::HandleMenuStateChange);
+ * @endcode
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

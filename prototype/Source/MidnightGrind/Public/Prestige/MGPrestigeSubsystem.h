@@ -1,5 +1,134 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGPrestigeSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the Prestige system for Midnight Grind. Prestige is an
+ * "endgame" progression system that lets max-level players reset their progress
+ * in exchange for permanent bonuses and exclusive rewards.
+ *
+ * The concept comes from Call of Duty's Prestige mode: once you reach max level,
+ * you can "prestige" to reset your level to 1, but keep some rewards and unlock
+ * exclusive content that only prestiged players can access.
+ *
+ * WHY PRESTIGE?
+ * -------------
+ * - Extends gameplay: Players have something to work toward after hitting max level
+ * - Shows dedication: Prestige ranks display player commitment
+ * - Rewards loyalty: Exclusive items only for those who prestige
+ * - Creates variety: Replaying progression with bonuses feels fresh
+ *
+ * KEY CONCEPTS:
+ * -------------
+ * 1. PRESTIGE RANKS (EMGPrestigeRank): How many times player has reset.
+ *    None -> Prestige I -> II -> III -> ... -> X
+ *    -> Master -> Grand Master -> Legend
+ *
+ *    Higher ranks = more prestige, better multipliers, exclusive rewards.
+ *
+ * 2. PRESTIGE CATEGORIES (EMGPrestigeCategory): Different progression tracks.
+ *    - Overall: Your main account prestige
+ *    - Racing: Racing-specific progression
+ *    - Drifting: Drift-specific progression
+ *    - Tuning: Vehicle customization progression
+ *    - Collection: Collector progression
+ *
+ *    You can prestige in different categories independently!
+ *
+ * 3. RESET TYPES (EMGPrestigeResetType): What gets reset when you prestige.
+ *    - Soft Reset: Only level resets, keep most unlocks
+ *    - Hard Reset: Level and some unlocks reset
+ *    - Seasonal Reset: End-of-season prestige with special rules
+ *    - Full Reset: Everything resets (rarely used)
+ *
+ * 4. PRESTIGE TOKENS: Special currency earned from prestiging.
+ *    Used to buy exclusive items from the Prestige Token Shop.
+ *    Higher prestige ranks give more tokens.
+ *
+ * 5. PERMANENT UNLOCKS: Some rewards survive prestige resets.
+ *    Even after resetting, you keep these exclusive items.
+ *    This is the main incentive - cool stuff that never goes away!
+ *
+ * 6. MULTIPLIERS: Prestige grants permanent bonuses.
+ *    Prestige I might give 1.1x XP multiplier.
+ *    Prestige X might give 2.0x XP multiplier.
+ *    Makes re-leveling faster and more rewarding.
+ *
+ * 7. PRESTIGE MILESTONES: Special achievements for prestige players.
+ *    "Reach Prestige V", "Earn 1 million XP total across all prestiges"
+ *
+ * ARCHITECTURE:
+ * -------------
+ * UGameInstanceSubsystem - Singleton for entire game session.
+ *
+ * Key Data Structures:
+ * - FMGPlayerPrestige: Player's current prestige state
+ * - FMGCategoryPrestige: Prestige data for a specific category
+ * - FMGPrestigeRankDefinition: How each rank works (requirements, bonuses)
+ * - FMGPrestigeReward: Items unlocked through prestige
+ * - FMGPrestigeResetResult: What happens when you prestige
+ * - FMGPrestigeMilestone: Special prestige-specific achievements
+ * - FMGPrestigeLeaderboardEntry: Ranking among prestige players
+ * - FMGPrestigeTokenShopItem: Items purchasable with prestige tokens
+ * - FMGPrestigePlayerStats: Lifetime prestige statistics
+ *
+ * THE PRESTIGE DECISION:
+ * ----------------------
+ * When player reaches max level (100), they can choose to prestige:
+ *
+ * BEFORE PRESTIGE:
+ * - Level 100
+ * - Has unlocked many items through normal play
+ * - Can't progress further
+ *
+ * AFTER PRESTIGE:
+ * - Level 1 again
+ * - Loses some unlocks (depends on reset type)
+ * - GAINS: Prestige rank, prestige tokens, permanent unlocks, XP multiplier
+ * - Can now work toward next prestige rank
+ *
+ * TYPICAL WORKFLOW:
+ * -----------------
+ * 1. Player reaches max level -> CanPrestige() returns true
+ * 2. UI shows "Prestige Available!" with preview: GetPrestigePreview()
+ * 3. Player reviews what they'll gain/lose
+ * 4. Player confirms -> PerformPrestige()
+ * 5. System returns FMGPrestigeResetResult with all changes
+ * 6. Player starts fresh at level 1 with bonuses
+ * 7. XP now earns faster due to multiplier: AddExperience()
+ * 8. Player can buy exclusive items: PurchaseShopItem()
+ *
+ * DELEGATES (Events):
+ * -------------------
+ * - OnPrestigeRankUp: Player advanced to a new prestige rank
+ * - OnPrestigeLevelUp: Player gained a level (post-prestige)
+ * - OnPrestigeReset: Prestige was performed
+ * - OnPrestigeRewardUnlocked: New reward became available
+ * - OnPrestigeTokensChanged: Token balance changed
+ * - OnPrestigeMilestoneAchieved: Hit a prestige-specific milestone
+ * - OnPrestigeEligible: Player CAN now prestige (reached max level)
+ * - OnCategoryPrestigeUp: Prestiged in a specific category
+ * - OnPrestigeExperienceGained: XP was earned (with multiplier)
+ *
+ * RELATIONSHIP TO OTHER SYSTEMS:
+ * ------------------------------
+ * - Level/XP System: Prestige resets level, applies multipliers
+ * - Milestone System: Prestige unlocks special milestones
+ * - Inventory/Unlocks: Some items persist, some don't
+ * - Leaderboards: Prestige has its own leaderboard
+ * - Daily Login: Login streaks may survive prestige (design choice)
+ *
+ * Prestige is the "long-term commitment" layer - it's for players who
+ * love the game and want to demonstrate their dedication while
+ * earning exclusive rewards unavailable to casual players.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

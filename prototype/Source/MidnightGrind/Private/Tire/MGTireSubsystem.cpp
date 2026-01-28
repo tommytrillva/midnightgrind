@@ -3,6 +3,7 @@
 #include "Tire/MGTireSubsystem.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Track/MGTrackSubsystem.h"
 
 void UMGTireSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -930,6 +931,89 @@ float UMGTireSubsystem::GetSurfaceGripMultiplier(EMGTrackSurface Surface, EMGTir
 		default:
 			return 1.0f;
 	}
+}
+
+// ============================================================================
+// SURFACE INTEGRATION (Iteration 95)
+// ============================================================================
+
+float UMGTireSubsystem::CalculateGripAtPosition(FName VehicleID, EMGTirePosition Position, FVector WorldPosition) const
+{
+	// Get tire state and compound
+	FMGTireState TireState = GetTireState(VehicleID, Position);
+	FMGTireCompoundData Compound = GetCompoundData(TireState.CompoundType);
+
+	// Calculate base grip from temperature and wear
+	float BaseGrip = CalculateGrip(TireState, Compound);
+
+	// Get surface type at position and apply modifier
+	EMGTrackSurface SurfaceType = GetSurfaceTypeAtPosition(WorldPosition);
+	float SurfaceModifier = GetSurfaceGripMultiplier(SurfaceType, TireState.CompoundType);
+
+	return BaseGrip * SurfaceModifier;
+}
+
+EMGTrackSurface UMGTireSubsystem::GetSurfaceTypeAtPosition(FVector WorldPosition) const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return EMGTrackSurface::Asphalt;
+	}
+
+	// Get track subsystem for surface detection
+	if (UMGTrackSubsystem* TrackSubsystem = World->GetSubsystem<UMGTrackSubsystem>())
+	{
+		// Use track subsystem's surface detection (implemented in Iteration 94)
+		// Convert from track surface enum to tire surface enum (they should match)
+		::EMGTrackSurface TrackSurface = TrackSubsystem->GetSurfaceAtPosition(WorldPosition);
+
+		// Map track surface to tire surface (assuming compatible enums)
+		switch (TrackSurface)
+		{
+			case ::EMGTrackSurface::Asphalt:
+				return EMGTrackSurface::Asphalt;
+			case ::EMGTrackSurface::Concrete:
+				return EMGTrackSurface::Concrete;
+			case ::EMGTrackSurface::Dirt:
+				return EMGTrackSurface::Dirt;
+			case ::EMGTrackSurface::Gravel:
+				return EMGTrackSurface::Gravel;
+			case ::EMGTrackSurface::Grass:
+				return EMGTrackSurface::Grass;
+			case ::EMGTrackSurface::Water:
+				return EMGTrackSurface::Puddle;
+			case ::EMGTrackSurface::Ice:
+				return EMGTrackSurface::Ice;
+			case ::EMGTrackSurface::Metal:
+				return EMGTrackSurface::Concrete; // Similar grip to concrete
+			case ::EMGTrackSurface::Cobblestone:
+				return EMGTrackSurface::Concrete; // Similar grip
+			default:
+				return EMGTrackSurface::Asphalt;
+		}
+	}
+
+	return EMGTrackSurface::Asphalt;
+}
+
+void UMGTireSubsystem::UpdateSurfaceGrip(FName VehicleID, FVector FLPosition, FVector FRPosition, FVector RLPosition, FVector RRPosition)
+{
+	FMGVehicleTireSet* TireSet = VehicleTires.Find(VehicleID);
+	if (!TireSet)
+	{
+		return;
+	}
+
+	// Update each tire's grip based on its surface
+	TireSet->FrontLeft.CurrentGrip = CalculateGripAtPosition(VehicleID, EMGTirePosition::FrontLeft, FLPosition);
+	TireSet->FrontRight.CurrentGrip = CalculateGripAtPosition(VehicleID, EMGTirePosition::FrontRight, FRPosition);
+	TireSet->RearLeft.CurrentGrip = CalculateGripAtPosition(VehicleID, EMGTirePosition::RearLeft, RLPosition);
+	TireSet->RearRight.CurrentGrip = CalculateGripAtPosition(VehicleID, EMGTirePosition::RearRight, RRPosition);
+
+	// Update average grip
+	TireSet->AverageGrip = (TireSet->FrontLeft.CurrentGrip + TireSet->FrontRight.CurrentGrip +
+	                        TireSet->RearLeft.CurrentGrip + TireSet->RearRight.CurrentGrip) / 4.0f;
 }
 
 FMGTireTemperatureZone UMGTireSubsystem::GetTireTemperatureZones(FName VehicleID, EMGTirePosition Position) const

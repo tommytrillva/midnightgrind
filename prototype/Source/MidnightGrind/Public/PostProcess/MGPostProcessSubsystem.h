@@ -1,8 +1,184 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MGPostProcessSubsystem.h
-// Midnight Grind - Y2K Visual Effects and Post-Processing System
-// Provides retro PS1/PS2 visual effects with modern post-processing capabilities
+/**
+ * @file MGPostProcessSubsystem.h
+ * @brief Y2K Visual Effects and Post-Processing System for Midnight Grind
+ *
+ * This file defines the Post Process Subsystem, the central hub for all visual
+ * effects in Midnight Grind. It provides a comprehensive suite of retro PS1/PS2
+ * aesthetics combined with modern post-processing capabilities for the game's
+ * distinctive Y2K/vaporwave visual style.
+ *
+ * @section Overview
+ *
+ * The Post Process Subsystem manages all screen-space visual effects including:
+ * - Retro CRT and VHS simulation
+ * - Color grading and LUT application
+ * - Speed-based effects (blur, FOV changes)
+ * - Racing-specific effects (nitro, drift, collision feedback)
+ * - Time-of-day lighting adaptation
+ * - Temporary effects (screen flash, shake, glitch)
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **1. Post-Processing Pipeline**
+ *
+ * Post-processing effects are applied AFTER the 3D scene is rendered:
+ * @code
+ * [3D Scene Render] -> [Post-Process Chain] -> [Final Image]
+ *                           |
+ *                           +-- Bloom
+ *                           +-- Color Grading
+ *                           +-- Motion Blur
+ *                           +-- CRT Effects
+ *                           +-- Film Grain
+ *                           +-- Vignette
+ * @endcode
+ *
+ * **2. Visual Style Presets (EMGVisualStyle)**
+ *
+ * Pre-configured visual styles for different aesthetics:
+ * - Modern: Clean contemporary look
+ * - PS2Authentic: Realistic PS2-era visuals
+ * - PS1Retro: Heavy pixelation and vertex wobble
+ * - Y2KNeon: Bright neons, high bloom, cyberpunk feel
+ * - CRTArcade: Arcade cabinet monitor simulation
+ * - VHSNostalgia: VHS tape artifacts and tracking lines
+ * - Cyberpunk: Futuristic with glitch effects
+ * - NightCity: Optimized for night racing with neon
+ * - SunsetDrive: Warm colors for sunset scenes
+ * - Custom: User-defined combination
+ *
+ * **3. Effect Categories**
+ *
+ * Effects are organized into logical groups:
+ * - **Bloom**: Glow on bright areas (headlights, neon signs)
+ * - **Motion Blur**: Blur based on camera/object movement
+ * - **Chromatic Aberration**: Color fringing at screen edges
+ * - **Film Grain**: Adds noise texture like old film
+ * - **Vignette**: Darkens corners of the screen
+ * - **CRT**: Scanlines, curvature, phosphor glow
+ * - **VHS**: Color bleed, static, tracking lines
+ * - **Glitch**: Digital corruption effects
+ * - **Pixelation**: Resolution reduction for retro look
+ *
+ * **4. Racing-Specific Effects**
+ *
+ * Dynamic effects that respond to gameplay:
+ * - Speed Effects: Radial blur, FOV increase at high speed
+ * - Nitro Effects: Blue tint, bloom boost, pulsing
+ * - Drift Effects: Directional blur based on drift angle
+ * - Collision Effects: Screen flash, shake on impact
+ *
+ * **5. Profiles and Persistence**
+ *
+ * Settings are organized into FMGPostProcessProfile structs:
+ * - Profiles can be saved/loaded by name
+ * - Players can create custom profiles
+ * - Profiles are serializable for settings persistence
+ *
+ * @section Usage Usage Example
+ *
+ * @code
+ * // Get the subsystem
+ * UMGPostProcessSubsystem* PostFX = GetGameInstance()->GetSubsystem<UMGPostProcessSubsystem>();
+ *
+ * // Apply a visual style preset
+ * PostFX->SetVisualStyle(EMGVisualStyle::Y2KNeon);
+ *
+ * // Or customize individual effects
+ * FMGBloomSettings BloomSettings;
+ * BloomSettings.Intensity = 2.0f;
+ * BloomSettings.Threshold = 0.6f;
+ * BloomSettings.Tint = FLinearColor(1.0f, 0.8f, 1.0f);  // Pink tint
+ * PostFX->SetBloomSettings(BloomSettings);
+ *
+ * // Enable CRT effects
+ * PostFX->EnableCRTEffect(true);
+ * PostFX->SetCRTSettings(MyCRTSettings);
+ *
+ * // During gameplay - update speed effects
+ * void AMyVehicle::Tick(float DeltaTime)
+ * {
+ *     float CurrentSpeed = GetVelocity().Size();
+ *     PostFX->UpdateSpeedEffect(CurrentSpeed);
+ * }
+ *
+ * // Nitro activation
+ * void AMyVehicle::ActivateNitro()
+ * {
+ *     PostFX->ActivateNitroEffect(true);
+ *     // Visual effect pulses automatically
+ * }
+ *
+ * // On collision
+ * void AMyVehicle::OnHit(float ImpactForce)
+ * {
+ *     PostFX->TriggerCollisionEffect(ImpactForce);
+ *     // Automatically handles flash and shake
+ * }
+ *
+ * // Temporary effects
+ * PostFX->FlashScreen(FLinearColor::Red, 0.1f);  // Red flash for damage
+ * PostFX->ShakeScreen(0.5f, 0.3f);               // Camera shake
+ * PostFX->TriggerGlitch(0.5f, 1.0f);             // Glitch on EMP hit
+ *
+ * // Save player's custom profile
+ * PostFX->SaveProfileAs(TEXT("MyCustomLook"));
+ *
+ * // Load it later
+ * PostFX->ApplyProfileByName(TEXT("MyCustomLook"));
+ * @endcode
+ *
+ * @section EffectSettings Effect Settings Structures
+ *
+ * Each effect has its own settings struct for fine-tuned control:
+ *
+ * | Struct                        | Purpose                                    |
+ * |-------------------------------|--------------------------------------------|
+ * | FMGBloomSettings              | Glow intensity, threshold, size, tint      |
+ * | FMGMotionBlurSettings         | Blur amount, speed threshold               |
+ * | FMGChromaticAberrationSettings| Color channel offset                       |
+ * | FMGFilmGrainSettings          | Grain intensity and animation              |
+ * | FMGVignetteSettings           | Corner darkening intensity and color       |
+ * | FMGCRTSettings                | Curvature, scanlines, phosphor glow        |
+ * | FMGVHSSettings                | Color bleed, static, tracking lines        |
+ * | FMGGlitchSettings             | Block glitch, color shift intensity        |
+ * | FMGColorGradingSettings       | Temperature, saturation, contrast, LUT     |
+ * | FMGSpeedEffectSettings        | Radial blur, FOV at speed                  |
+ * | FMGNitroEffectSettings        | Nitro visual feedback                      |
+ * | FMGPixelationSettings         | Resolution reduction mode                  |
+ *
+ * @section TimeOfDay Time of Day System
+ *
+ * The subsystem adapts color grading based on time of day:
+ * - Dawn: Soft warm colors, low contrast
+ * - Morning: Bright, neutral colors
+ * - Noon: High contrast, saturated
+ * - Afternoon: Warm tones
+ * - Sunset: Orange/pink tones, high bloom
+ * - Dusk: Purple tones, increasing darkness
+ * - Night: High contrast, enhanced neon glow
+ * - Midnight: Deep blues, maximum neon effect
+ *
+ * @code
+ * PostFX->SetTimeOfDay(EMGTimeOfDay::Midnight);
+ *
+ * // Or blend between times for transitions
+ * PostFX->SetTimeOfDayBlend(EMGTimeOfDay::Sunset, EMGTimeOfDay::Dusk, 0.5f);
+ * @endcode
+ *
+ * @section Events Delegate Events
+ *
+ * Subscribe to these for UI updates:
+ * - OnVisualStyleChanged: When preset changes
+ * - OnProfileChanged: When any setting changes
+ * - OnEffectTriggered: When temporary effect fires
+ * - OnSpeedEffectIntensityChanged: For HUD speed visualization
+ *
+ * @see UMGRetroRenderingComponent for geometry-level retro effects
+ * @see EMGVisualStyle for available visual presets
+ */
 
 #pragma once
 

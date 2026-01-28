@@ -1,5 +1,66 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGReferralSubsystem.h - Player Referral and Invitation System
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This header defines the Referral Subsystem - an "invite a friend" feature that
+ * rewards players for bringing new racers into Midnight Grind. Think of it like
+ * a rewards program: when you share your special code with friends and they join,
+ * BOTH of you get prizes!
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. SUBSYSTEMS (UGameInstanceSubsystem):
+ *    - A subsystem is a "manager" class that Unreal Engine automatically creates
+ *    - UGameInstanceSubsystem exists for the entire game session (persists between levels)
+ *    - You access it via: GameInstance->GetSubsystem<UMGReferralSubsystem>()
+ *    - No need to spawn or manage its lifetime - Unreal handles that!
+ *
+ * 2. REFERRAL CODES:
+ *    - Each player gets a unique code they can share (like "RACER123")
+ *    - New players enter this code when they start playing
+ *    - The system tracks who referred whom and awards bonuses
+ *
+ * 3. MILESTONES & TIERS:
+ *    - As the new player progresses (completes tutorial, wins races, etc.),
+ *      BOTH players unlock more rewards
+ *    - The more friends you successfully refer, the higher your "tier" (Bronze->Silver->Gold, etc.)
+ *    - Higher tiers give access to exclusive cosmetics and bonuses
+ *
+ * 4. BLUEPRINT MACROS:
+ *    - UFUNCTION(BlueprintCallable) = Can be called from Blueprints (visual scripting)
+ *    - UFUNCTION(BlueprintPure) = Like above, but doesn't modify anything (getter)
+ *    - UPROPERTY(BlueprintReadWrite) = Variable accessible from Blueprints
+ *    - UPROPERTY(BlueprintAssignable) = Event/delegate that Blueprints can listen to
+ *
+ * 5. DELEGATES (FOn...):
+ *    - These are "events" that broadcast when something happens
+ *    - Example: OnReferralComplete fires when a referred player finishes all milestones
+ *    - Other systems (like UI) can "subscribe" to these events to react accordingly
+ *
+ * HOW TO USE THIS SYSTEM:
+ * -----------------------
+ * 1. Get a player's referral code: GetReferralLink() or GetMyReferralCode()
+ * 2. New player applies a code: ApplyReferralCode("FRIEND123")
+ * 3. Check for rewards: GetPendingRewards()
+ * 4. Collect rewards: ClaimAllRewards()
+ * 5. Listen for events: Bind to OnReferralRewardAvailable delegate
+ *
+ * FILE STRUCTURE:
+ * ---------------
+ * - Enums (EMG...): Define fixed sets of options (status types, reward types, tiers)
+ * - Structs (FMG...): Data containers holding related information
+ * - Delegates: Event declarations for the observer pattern
+ * - Class: The actual subsystem with all the functions
+ *
+ ******************************************************************************/
+
 /**
  * @file MGReferralSubsystem.h
  * @brief Player referral and invitation system for Midnight Grind

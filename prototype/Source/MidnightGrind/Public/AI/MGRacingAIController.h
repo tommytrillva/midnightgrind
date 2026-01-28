@@ -1,5 +1,146 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRacingAIController.h
+ * @brief Racing AI Controller - Core AI Opponent Brain for Midnight Grind
+ *
+ * @section overview Overview
+ * This file defines the Racing AI Controller, which is the primary "brain" that
+ * controls AI opponent vehicles during races. Each AI car in a race has its own
+ * instance of this controller, which makes decisions about steering, throttle,
+ * braking, and tactical maneuvers every frame.
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection ai_controller What is an AI Controller?
+ * In Unreal Engine, an AIController is what "possesses" (controls) a Pawn:
+ * - PlayerController = Human player controls the pawn via input
+ * - AIController = Computer controls the pawn via code/logic
+ * When you see an AI car racing, this controller is making all the decisions.
+ *
+ * @subsection difficulty AI Difficulty System
+ * Difficulty affects HOW WELL the AI drives, not physics advantages:
+ * - Rookie: Slow reactions, makes mistakes, doesn't use full throttle
+ * - Amateur: Below-average skill, occasional mistakes
+ * - Professional: Average racer, balanced driving
+ * - Expert: Skilled racer, aggressive overtakes
+ * - Master: Near-perfect driving, minimal mistakes
+ * - Legend: Perfect racing lines, maximum safe speeds
+ *
+ * @subsection personality AI Personalities
+ * Each AI has a personality that affects their racing style:
+ * - Balanced: Safe, consistent, predictable
+ * - Aggressive: Takes risks, blocks, late braking
+ * - Defensive: Protects position, avoids contact
+ * - Showoff: Prioritizes style (drifts even when not optimal)
+ * - Calculated: Optimal lines, efficient driving
+ * - Wildcard: Unpredictable behavior
+ *
+ * @subsection state_machine AI State Machine
+ * The AI switches between states based on the race situation:
+ * - Waiting: Before race starts
+ * - Racing: Normal driving behavior
+ * - CatchingUp: Behind the pack, driving harder
+ * - Defending: Protecting position from overtakers
+ * - Overtaking: Attempting to pass another racer
+ * - Recovering: Getting back on track after incident
+ * - Finished: Race complete
+ *
+ * @subsection rubber_banding Rubber Banding (Catch-up Mechanics)
+ * To keep races competitive, AI speed can be adjusted based on position:
+ * - AI behind the player gets slight speed boost (catch-up)
+ * - AI far ahead may slow down slightly
+ * This is configurable and can be disabled for "pure" racing.
+ *
+ * @section usage Usage Examples
+ *
+ * @subsection basic_setup Basic Setup
+ * @code
+ * // Spawn an AI vehicle with a controller
+ * AMGVehiclePawn* AIVehicle = GetWorld()->SpawnActor<AMGVehiclePawn>(VehicleClass, SpawnTransform);
+ * AMGRacingAIController* AIController = GetWorld()->SpawnActor<AMGRacingAIController>();
+ *
+ * // Configure the AI
+ * AIController->SetDifficulty(EMGAIDifficulty::Professional);
+ * AIController->SetRacingLine(TrackRacingLineSpline);
+ *
+ * // Possess the vehicle
+ * AIController->Possess(AIVehicle);
+ * @endcode
+ *
+ * @subsection custom_profile Custom Driver Profile
+ * @code
+ * FMGAIDriverProfile Profile;
+ * Profile.DriverName = FText::FromString("Max Velocity");
+ * Profile.Difficulty = EMGAIDifficulty::Expert;
+ * Profile.Personality = EMGAIPersonality::Aggressive;
+ * Profile.SkillRating = 0.85f;
+ * Profile.OvertakeAggression = 0.9f;
+ * Profile.NOSAggression = 0.7f;
+ *
+ * AIController->SetDriverProfile(Profile);
+ * @endcode
+ *
+ * @subsection race_control Race Control
+ * @code
+ * // Set race position info for rubber-banding
+ * AIController->SetRacePosition(Position, TotalRacers);
+ * AIController->SetDistanceToLeader(DistanceInCm);
+ *
+ * // Start racing
+ * AIController->StartRacing();
+ *
+ * // Query AI state
+ * EMGAIState CurrentState = AIController->GetAIState();
+ * float Throttle = AIController->GetThrottleOutput();
+ * bool WantsNOS = AIController->ShouldUseNOS();
+ * @endcode
+ *
+ * @subsection events Listening to Events
+ * @code
+ * // Subscribe to state changes
+ * AIController->OnAIStateChanged.AddDynamic(this, &UMyClass::HandleStateChanged);
+ *
+ * void UMyClass::HandleStateChanged(EMGAIState NewState)
+ * {
+ *     if (NewState == EMGAIState::Overtaking)
+ *     {
+ *         // Play overtake attempt sound
+ *     }
+ * }
+ * @endcode
+ *
+ * @section architecture Architecture
+ * @verbatim
+ *   [AMGRacingAIController] - This class
+ *          |
+ *          +---> [FMGAIDriverProfile] - Personality & skill configuration
+ *          |
+ *          +---> [Racing Line Spline] - Path to follow
+ *          |
+ *          +---> [FMGAISteeringTarget] - Current navigation target
+ *          |
+ *          v
+ *   [AMGVehiclePawn] - The controlled vehicle
+ *          |
+ *          +---> Receives throttle, brake, steering inputs
+ *          +---> Receives NOS activation requests
+ * @endverbatim
+ *
+ * @section override Blueprint Extension
+ * This class is BlueprintType and Blueprintable, allowing:
+ * - Creating Blueprint subclasses with custom behavior
+ * - Overriding CalculateSteering, CalculateThrottle, etc. in Blueprints
+ * - Adding visual debugging in editor
+ *
+ * @see FMGAIDriverProfile - Driver configuration struct
+ * @see FMGRubberBandingConfig - Catch-up mechanics configuration
+ * @see EMGAIDifficulty - Difficulty presets
+ * @see EMGAIPersonality - Personality types
+ *
+ * Midnight Grind - Y2K Arcade Street Racing
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

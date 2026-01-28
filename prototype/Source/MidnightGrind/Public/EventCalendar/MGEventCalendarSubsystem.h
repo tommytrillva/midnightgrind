@@ -1,5 +1,100 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * ============================================================================
+ * MGEventCalendarSubsystem.h
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file implements the Event Calendar system - a centralized scheduler
+ * for all time-based game events, playlists, and seasonal content. Think of
+ * it like a TV guide for the game that knows what's happening and when.
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. SCHEDULED EVENTS (FMGScheduledEvent)
+ *    Events are time-limited activities with start/end times:
+ *    - DoubleXP/DoubleCredits: Bonus reward weekends
+ *    - SpecialRace: Limited-time race events
+ *    - CommunityChallenge: Goals the whole player base works toward
+ *    - SeasonLaunch/SeasonEnd: Season milestones
+ *    - Tournament: Competitive events
+ *    - ContentDrop: New content releases
+ *    - FlashSale: Limited-time shop discounts
+ *
+ * 2. EVENT LIFECYCLE (EMGEventState)
+ *    Events progress through states automatically:
+ *    Scheduled -> Upcoming -> Active -> Ending -> Completed
+ *
+ *    The subsystem's timer checks states and fires delegates when
+ *    events transition (OnEventStarted, OnEventEnding, OnEventCompleted).
+ *
+ * 3. PLAYLIST ROTATION (FMGPlaylistEntry)
+ *    Playlists are curated game mode selections that rotate on a schedule:
+ *    - Daily: Changes every 24 hours
+ *    - Weekly: Featured playlist of the week
+ *    - Seasonal: Tied to the current season theme
+ *    - Permanent: Always available
+ *
+ *    Example: "Drift Weekend" playlist with bonus XP, available Fri-Sun
+ *
+ * 4. SEASONS (FMGSeasonInfo)
+ *    Seasons are multi-week content periods with themes:
+ *    - Has a name and theme (e.g., "Season 3: Underground")
+ *    - Defines the battle pass level cap
+ *    - Affects available playlists and events
+ *    - GetSeasonTimeRemaining() shows countdown to end
+ *
+ * 5. REMINDERS (FMGEventReminder)
+ *    Players can set reminders for upcoming events:
+ *    - SetEventReminder("EVENT_ID", FTimespan::FromHours(1))
+ *    - OnEventReminder delegate fires at the reminder time
+ *    - UI can show push notification or in-game alert
+ *
+ * 6. BONUS MULTIPLIERS
+ *    Multiple events can stack bonuses:
+ *    - GetActiveXPMultiplier() returns combined XP bonus
+ *    - GetActiveCurrencyMultiplier() returns combined credit bonus
+ *    - These should be applied to race rewards
+ *
+ * COMMON USE CASES:
+ *
+ * For UI Developers:
+ * - GetActiveEvents() for the "What's Happening Now" screen
+ * - GetUpcomingEvents() for the calendar view
+ * - GetFeaturedPlaylists() for the main menu playlist selector
+ * - GetCurrentSeason() for season pass screen header
+ * - GetCalendarMonth() for a monthly calendar widget
+ *
+ * For Backend/Live Ops:
+ * - ForceRefreshFromServer() to pull latest event data
+ * - Events can be added server-side and pushed to clients
+ * - Recurring events (bIsRecurring) auto-create future instances
+ *
+ * For Reward Systems:
+ * - Check GetActiveXPMultiplier() before awarding XP
+ * - Check GetActiveCurrencyMultiplier() before awarding credits
+ * - Event rewards (FMGEventReward) grant items/currency
+ *
+ * DATA STRUCTURES:
+ * - FMGScheduledEvent: Complete event definition with times and rewards
+ * - FMGPlaylistEntry: A rotatable playlist with game modes and tracks
+ * - FMGSeasonInfo: Season metadata and timing
+ * - FMGCalendarDay: All events and playlists for one day
+ * - FMGEventReward: Currency, XP multipliers, or exclusive items
+ * - FMGEventReminder: Player-set notification for an event
+ *
+ * TIMER ARCHITECTURE:
+ * The subsystem uses CalendarTickHandle to periodically:
+ * - Check if events need state transitions
+ * - Fire reminder notifications
+ * - Rotate playlists at scheduled times
+ * - Update the "ending soon" warning state
+ *
+ * ============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

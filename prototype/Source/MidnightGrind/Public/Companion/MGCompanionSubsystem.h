@@ -1,5 +1,78 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGCompanionSubsystem.h - Companion Character Management System
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This header defines the Companion Subsystem - a system for managing collectible
+ * mascots, pets, and companion characters that accompany players during races.
+ * Think of it like Pokemon or Tamagotchi for your car! Companions can sit on your
+ * dashboard, ride in the passenger seat, or float nearby while you race.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. COMPANION TYPES:
+ *    - Mascot: Fun characters representing the game or teams
+ *    - Pet: Animals that keep you company (cats, dogs, etc.)
+ *    - Robot: Mechanical buddies with tech aesthetics
+ *    - Spirit: Ethereal/magical companions
+ *    - Hologram: Futuristic projected characters
+ *    - Crew: Human crew members from your racing team
+ *
+ * 2. RARITY SYSTEM:
+ *    - Common -> Uncommon -> Rare -> Epic -> Legendary -> Mythic
+ *    - Rarer companions are harder to get but have better abilities/looks
+ *    - This is a standard gacha/loot box rarity pattern used in many games
+ *
+ * 3. LEVELING & AFFECTION:
+ *    - Companions gain XP when you race with them equipped
+ *    - Higher levels unlock new abilities and customization options
+ *    - Affection is like friendship - interact with companions to increase it
+ *    - High affection might unlock special dialogue or bonuses
+ *
+ * 4. MOOD SYSTEM:
+ *    - Companions have emotional states: Happy, Excited, Neutral, Tired, Sad, Angry, Sleeping
+ *    - Mood changes based on gameplay (winning makes them happy, losing might make them sad)
+ *    - Mood affects their animations and dialogue
+ *
+ * 5. ABILITIES:
+ *    - Companions can provide gameplay bonuses (XP boost, drift bonus, etc.)
+ *    - Passive abilities: Always active when companion is equipped
+ *    - Active abilities: Player triggers them, has a cooldown timer
+ *
+ * 6. TMap AND TArray:
+ *    - TArray<T>: A dynamic list (like std::vector) - holds multiple items
+ *    - TMap<K,V>: A dictionary/hashtable - maps keys to values
+ *    - Example: TMap<FName, FMGCompanion> maps companion IDs to companion data
+ *
+ * 7. FName vs FString vs FText:
+ *    - FName: Immutable identifier, fast comparison (for IDs)
+ *    - FString: Mutable string for general text manipulation
+ *    - FText: Localized text for UI display (supports translations)
+ *
+ * HOW TO USE THIS SYSTEM:
+ * -----------------------
+ * 1. Get owned companions: GetOwnedCompanions()
+ * 2. Equip a companion: SetActiveCompanion(CompanionId)
+ * 3. Interact with companion: InteractWithCompanion(Id, "Pet")
+ * 4. Customize appearance: SetCompanionSkin(), SetCompanionAccessory()
+ * 5. Use abilities in race: UseCompanionAbility(CompanionId, AbilityId)
+ * 6. Listen for level ups: Bind to OnCompanionLevelUp delegate
+ *
+ * ARCHITECTURE NOTES:
+ * -------------------
+ * - AllCompanions: Master list of all companions in the game (even unowned)
+ * - OwnedCompanionIds: List of companions this player has unlocked
+ * - ActiveCompanionId: The currently equipped companion
+ * - The subsystem "ticks" periodically to update moods and cooldowns
+ *
+ ******************************************************************************/
+
 // MidnightGrind - Arcade Street Racing Game
 // Companion Subsystem - Mascots, pets, and companion characters
 

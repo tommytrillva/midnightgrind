@@ -1,8 +1,126 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MGStreamIntegrationSubsystem.h
-// Stream Integration System - Twitch/YouTube integration, viewer interactions
-// Midnight Grind - Y2K Arcade Street Racing
+/**
+ * =============================================================================
+ * MGStreamIntegrationSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * This file defines the Stream Integration Subsystem for Midnight Grind. It
+ * provides deep integration with streaming platforms like Twitch and YouTube,
+ * allowing viewers to interact with the game in real-time through chat commands,
+ * channel points, polls, and predictions.
+ *
+ * KEY CONCEPTS FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * 1. WHAT IS STREAM INTEGRATION?
+ *    - Streamers broadcast their gameplay to platforms like Twitch/YouTube.
+ *    - This system lets VIEWERS affect the game while watching.
+ *    - Example: Chat votes on next track, subscribers spawn power-ups.
+ *    - Creates an interactive experience between streamer and audience.
+ *
+ * 2. STREAMING PLATFORMS (EStreamPlatform):
+ *    - Twitch: Most popular for gaming, has Channel Points, Bits, Predictions.
+ *    - YouTube: YouTube Live with Super Chat and memberships.
+ *    - Kick, Facebook, TikTok: Alternative platforms with varying features.
+ *    - Each platform has different APIs and capabilities.
+ *
+ * 3. AUTHENTICATION (FStreamCredentials):
+ *    - OAuth tokens authenticate the game with streaming platforms.
+ *    - ClientId identifies the game as an authorized application.
+ *    - AccessToken grants permission to read chat, viewer info, etc.
+ *    - RefreshToken gets new AccessTokens when they expire.
+ *    - TokenExpiry tracks when re-authentication is needed.
+ *
+ * 4. CHAT SYSTEM:
+ *    - FChatMessage represents a message from a viewer.
+ *    - FViewerInfo contains viewer details: name, badges, sub status, etc.
+ *    - Chat commands start with "!" (like "!boost" or "!vote 1").
+ *    - Commands can trigger game effects if enabled.
+ *
+ * 5. VIEWER INTERACTIONS (EViewerInteractionType):
+ *    - ChatCommand: Viewer types a command in chat.
+ *    - ChannelPoints: Viewer spends Twitch channel points.
+ *    - Bits: Viewer sends Twitch bits (cheering).
+ *    - Subscription: New or gifted subscription.
+ *    - Raid: Another streamer raids the channel.
+ *    - Each interaction can trigger game effects.
+ *
+ * 6. GAME EFFECTS (EGameEffect):
+ *    - SpawnObstacle: Drop traffic cones, oil slicks on track.
+ *    - SpeedBoost/SlowDown: Affect player's speed temporarily.
+ *    - ChangeWeather: Trigger rain, fog, or clear skies.
+ *    - NitroRefill: Give player free nitro boost.
+ *    - VisualEffect/SoundEffect: Cosmetic effects on stream.
+ *    - These make the stream interactive and entertaining.
+ *
+ * 7. GAME EFFECT CONFIG (FGameEffectConfig):
+ *    - Each effect has: cost (points/bits), cooldown, duration, intensity.
+ *    - Can require subscriber or moderator status.
+ *    - Cooldowns prevent spam (Global, PerUser, or PerEffect).
+ *    - Effects can be enabled/disabled by the streamer.
+ *
+ * 8. POLLS (FStreamPoll):
+ *    - Viewers vote on choices (next track, weather, etc.).
+ *    - Time-limited voting period (e.g., 60 seconds).
+ *    - Can use channel points for weighted voting.
+ *    - Winner is applied to the game automatically.
+ *
+ * 9. PREDICTIONS (FStreamPrediction):
+ *    - Viewers bet channel points on outcomes (who will win?).
+ *    - Prediction window for placing bets, then locked.
+ *    - After race, winning outcome is resolved.
+ *    - Winners get points back with multiplier.
+ *
+ * 10. ALERTS (FStreamAlert):
+ *     - Visual notifications for follows, subs, raids, donations.
+ *     - Queued and displayed one at a time.
+ *     - Can trigger game effects (fireworks on sub, etc.).
+ *
+ * 11. COOLDOWN SYSTEM:
+ *     - Prevents effect spam that could ruin gameplay.
+ *     - GlobalCooldowns: Shared across all viewers.
+ *     - UserCooldowns: Per-viewer, per-effect tracking.
+ *     - MaxEffectsPerMinute: Rate limiting for balance.
+ *
+ * 12. MODERATION:
+ *     - BlockedWords: Profanity filter for chat.
+ *     - SubOnlyMode: Only subscribers can trigger effects.
+ *     - TimeoutUser/BanUser: Chat moderation tools.
+ *     - FilterProfanity: Auto-filter inappropriate chat.
+ *
+ * STATISTICS (FStreamIntegrationStats):
+ * - Tracks engagement: interactions, messages, effects, bits, points.
+ * - Records peak/average viewers for stream analytics.
+ * - EffectUsageCounts shows most popular viewer interactions.
+ * - TopInteractors identifies most engaged community members.
+ *
+ * DELEGATES (Events):
+ * - OnStreamConnected/Disconnected: Platform connection state.
+ * - OnChatMessageReceived: New chat message arrived.
+ * - OnViewerInteraction: Viewer triggered an interaction.
+ * - OnGameEffectTriggered: Effect is being applied to game.
+ * - OnPollStarted/Ended: Poll lifecycle events.
+ * - OnStreamAlertReceived: New alert to display.
+ *
+ * WORKFLOW EXAMPLE:
+ * 1. Streamer starts broadcast, calls ConnectToStream() with Twitch auth
+ * 2. OnStreamConnected fires, UI shows "Connected to Twitch"
+ * 3. Viewer types "!boost" in chat
+ * 4. OnChatMessageReceived fires, ProcessChatCommand() runs
+ * 5. System checks: Is effect enabled? Is viewer on cooldown? Sub-only?
+ * 6. If valid, TriggerEffect() called, OnGameEffectTriggered fires
+ * 7. Game gives player a speed boost, chat sees "Boost triggered by ViewerX!"
+ * 8. Cooldown starts, preventing immediate reuse
+ *
+ * SECURITY NOTE:
+ * - Never expose OAuth tokens in UI or logs.
+ * - Validate all viewer inputs (prevent injection).
+ * - Rate limit aggressively to prevent abuse.
+ * - Test effects to ensure they don't break gameplay.
+ *
+ * =============================================================================
+ */
 
 #pragma once
 

@@ -1,5 +1,154 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGSeasonWidgets.h
+ * Season UI Widgets - Visual Components for Season Pass and Events
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file contains all the UI widget classes used to display season pass
+ * progression, live events, and challenge information to players. These widgets
+ * connect to UMGSeasonSubsystem to show real-time data and handle user
+ * interactions like claiming rewards and joining events.
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
+ *
+ * 1. UNREAL UI SYSTEM (UMG - Unreal Motion Graphics)
+ *    - UUserWidget: Base class for all UI elements in Unreal
+ *    - Blueprintable widgets: C++ defines structure, Blueprint handles visuals
+ *    - Widget binding: Connect C++ variables to UI elements via BindWidget
+ *    - NativeConstruct/Destruct: Called when widget is created/destroyed
+ *
+ * 2. ABSTRACT CLASSES
+ *    All widgets here are "Abstract" meaning they MUST be subclassed in
+ *    Blueprint to be used. This allows designers to customize appearance
+ *    while programmers define behavior. Example:
+ *    - C++ defines: "UMGSeasonRewardWidget has RewardData and UpdateDisplay()"
+ *    - Blueprint implements: "UpdateDisplay sets icon, text, shows/hides elements"
+ *
+ * 3. BLUEPRINT NATIVE EVENTS
+ *    Functions marked "BlueprintNativeEvent" have:
+ *    - C++ implementation (the _Implementation suffix version)
+ *    - Blueprint can override to add custom behavior
+ *    - Example: UpdateDisplay() is called from C++, but visuals set in Blueprint
+ *
+ * WIDGET CLASSES EXPLAINED:
+ * -------------------------
+ *
+ * UMGSeasonRewardWidget
+ * ---------------------
+ * Displays a single reward item in the season pass grid.
+ * - Shows icon, name, rarity color
+ * - Shows locked/unlocked/claimed states
+ * - Has "Claim" button for available rewards
+ * - Fires OnClaimed delegate when player collects reward
+ *
+ * UMGSeasonProgressWidget
+ * -----------------------
+ * Shows the player's current tier progress bar.
+ * - Displays current tier number
+ * - Shows XP progress toward next tier
+ * - Animates when XP is gained
+ * - Shows tier-up celebration when leveling
+ * - Auto-updates by listening to subsystem delegates
+ *
+ * UMGSeasonPassWidget
+ * -------------------
+ * The main season pass overview screen.
+ * - Displays all 100 tiers in a scrollable grid
+ * - Shows free track and premium track rewards
+ * - Highlights current tier position
+ * - Has "Claim All" button for convenience
+ * - Shows premium upgrade purchase option
+ *
+ * UMGEventObjectiveWidget
+ * -----------------------
+ * Shows a single objective within an event.
+ * - Displays description (e.g., "Win 5 races")
+ * - Shows progress bar (3/5 completed)
+ * - Checkmark when completed
+ *
+ * UMGEventCardWidget
+ * ------------------
+ * A clickable card representing one live event.
+ * - Shows event name, icon, time remaining
+ * - Displays completion percentage
+ * - Click to open event details
+ * - Fires OnSelected delegate when clicked
+ *
+ * UMGEventDetailWidget
+ * --------------------
+ * Full-screen event details view.
+ * - Shows event description and theme
+ * - Lists all objectives with progress
+ * - Displays available rewards
+ * - Has "Join Event" button to start participating
+ *
+ * UMGEventsHubWidget
+ * ------------------
+ * Main events browser with tabs.
+ * - Active tab: Currently running events
+ * - Upcoming tab: Events starting soon
+ * - Completed tab: Past events (for history)
+ * - Creates event cards dynamically
+ * - Opens detail widget when card is selected
+ *
+ * UMGChallengesWidget
+ * -------------------
+ * Shows daily and weekly challenge lists.
+ * - Displays countdown timers until reset
+ * - Groups challenges by daily/weekly
+ * - Updates progress in real-time
+ * - Ticks every frame to update timers
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ *
+ *     +------------------+
+ *     | UMGSeasonSubsystem|  (Data source)
+ *     +------------------+
+ *              |
+ *              | Delegates & Data
+ *              v
+ *     +------------------+
+ *     | UI Widgets       |  <-- This file
+ *     | (Season/Events)  |
+ *     +------------------+
+ *              |
+ *              | User input
+ *              v
+ *     +------------------+
+ *     | Player Actions   |
+ *     | (Claim, Join)    |
+ *     +------------------+
+ *
+ * TYPICAL USAGE FLOW (Season Pass Screen):
+ * ----------------------------------------
+ * 1. UMGSeasonPassWidget::NativeConstruct() called when menu opens
+ * 2. Widget gets UMGSeasonSubsystem reference from GameInstance
+ * 3. Widget subscribes to OnSeasonChanged, OnTierUp delegates
+ * 4. UpdateDisplay() creates reward widgets for each tier
+ * 5. Player scrolls to current tier (ScrollToCurrentTier())
+ * 6. Player clicks reward -> OnRewardClaimed fires
+ * 7. Widget calls subsystem->ClaimTierReward()
+ * 8. Widget refreshes to show claimed state
+ *
+ * IMPORTANT PATTERNS:
+ * -------------------
+ * - Always get subsystem reference in NativeConstruct(), clear in NativeDestruct()
+ * - Bind to delegates in Construct, unbind in Destruct (prevent crashes)
+ * - Use UPROPERTY() on all widget references to prevent garbage collection
+ * - BlueprintReadOnly properties are set in C++, displayed in Blueprint
+ * - EditDefaultsOnly properties are set in Blueprint defaults (like widget classes)
+ *
+ * @see UMGSeasonSubsystem - The data source for all these widgets
+ * @see UUserWidget - Unreal's base UI widget class
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

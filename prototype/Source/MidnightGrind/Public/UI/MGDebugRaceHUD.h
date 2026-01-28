@@ -1,6 +1,71 @@
 // Copyright Midnight Grind. All Rights Reserved.
 // Stage 54: Debug Race HUD - MVP Minimal Display
 
+/**
+ * =============================================================================
+ * MGDebugRaceHUD.h - Debug/Fallback Racing HUD
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines a minimal, developer-friendly HUD (Heads-Up Display) that
+ * shows essential racing information during gameplay. Think of it as a simple
+ * dashboard overlay that displays speed, position, lap count, and timing.
+ *
+ * WHY IT EXISTS:
+ * --------------
+ * In game development, you often need a working UI before artists create the
+ * final polished version. This "debug" HUD serves two purposes:
+ * 1. Provides immediate visual feedback during development and testing
+ * 2. Acts as a fallback when no Blueprint-based HUD is configured
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * UUserWidget:
+ *   This class inherits from UUserWidget, which is Unreal's base class for
+ *   creating UI elements. UUserWidget handles rendering, input, and lifecycle
+ *   for on-screen interfaces.
+ *
+ * BindWidget Meta Tag:
+ *   The `meta = (BindWidget)` property specifier tells Unreal that this C++
+ *   variable should be automatically connected to a widget with the same name
+ *   in the Blueprint/UMG Designer. This is how code talks to visual elements.
+ *
+ * TObjectPtr and TWeakObjectPtr:
+ *   - TObjectPtr<T>: A smart pointer that holds a reference to an Unreal object
+ *   - TWeakObjectPtr<T>: A "weak" reference that won't prevent garbage collection
+ *   Use weak pointers for references to objects you don't "own"
+ *
+ * NativeConstruct / NativeTick:
+ *   - NativeConstruct(): Called once when the widget is created (like a constructor)
+ *   - NativeTick(): Called every frame to update the display (like Update() in Unity)
+ *
+ * UFUNCTION Macros:
+ *   - BlueprintCallable: Can be called from Blueprint visual scripting
+ *   - Category: Groups functions in the Blueprint editor for organization
+ *
+ * HOW IT FITS IN THE ARCHITECTURE:
+ * --------------------------------
+ *
+ *   [Game Mode] --> [Race HUD Subsystem] --> [MGDebugRaceHUD]
+ *                          |                        |
+ *                          v                        v
+ *                   (Provides Data)          (Displays Data)
+ *
+ * The HUD Subsystem gathers race data (speed, position, lap times) and sends
+ * it to this widget for display. This separation keeps data logic separate
+ * from presentation logic (a pattern called MVC or Model-View-Controller).
+ *
+ * TYPICAL USAGE:
+ * --------------
+ * This HUD is automatically created when racing starts if no custom HUD is set.
+ * Game systems call methods like SetSpeed() and SetPosition() each frame to
+ * update what the player sees.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

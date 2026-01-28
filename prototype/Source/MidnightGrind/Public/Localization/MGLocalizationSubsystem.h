@@ -1,5 +1,173 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGLocalizationSubsystem.h - Localization and Internationalization Subsystem
+ *******************************************************************************
+ *
+ * WHAT THIS FILE DOES:
+ * ====================
+ * This file defines the Localization Subsystem - a central manager responsible
+ * for making the game playable in multiple languages and regions worldwide.
+ * "Localization" (often abbreviated "L10N") is the process of adapting a game
+ * for different languages and cultures. "Internationalization" (I18N) is the
+ * underlying architecture that makes localization possible.
+ *
+ * This subsystem handles two main responsibilities:
+ * 1. LANGUAGE: Translating text and audio into different languages
+ * 2. REGIONAL FORMATTING: Displaying numbers, dates, units appropriately for
+ *    different regions (e.g., "1,000 mph" in USA vs "1.609 km/h" in Europe)
+ *
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * =================================
+ *
+ * 1. STRING TABLES AND STRING IDs
+ *    - We NEVER hardcode player-visible text in C++ or Blueprints
+ *    - Instead, each string has a unique ID like "UI.MainMenu.PlayButton"
+ *    - The actual text for each language is stored in separate "string tables"
+ *    - To display text: GetLocalizedString(FName("UI.MainMenu.PlayButton"))
+ *    - This returns "Play" in English, "Jouer" in French, "Spielen" in German
+ *
+ * 2. FTEXT VS FSTRING
+ *    - FText is Unreal's localization-aware string type - USE THIS for UI
+ *    - FString is a raw string - use for internal logic, file paths, etc.
+ *    - Never use FString for anything the player will see!
+ *    - FText can be marked for translation, FString cannot
+ *
+ * 3. RIGHT-TO-LEFT (RTL) LANGUAGES
+ *    - Some languages like Arabic and Hebrew read right-to-left
+ *    - When RTL is active, the entire UI layout mirrors horizontally
+ *    - Back buttons move to the right, text aligns differently, etc.
+ *    - The bRightToLeftUI setting handles this automatically
+ *
+ * 4. GAME INSTANCE SUBSYSTEM PATTERN
+ *    - Same as MGAccessibilitySubsystem - one instance for entire game
+ *    - Persists across level loads
+ *    - Access via: GetGameInstance()->GetSubsystem<UMGLocalizationSubsystem>()
+ *
+ * 5. DELEGATES FOR CHANGE NOTIFICATION
+ *    - OnLanguageChanged fires when the player switches languages
+ *    - All UI widgets should listen to this and refresh their text
+ *    - OnRegionChanged fires when formatting preferences change
+ *
+ * 6. METRIC VS IMPERIAL UNITS
+ *    - This is a racing game, so speed and distance are shown constantly
+ *    - USA uses miles/mph, most of the world uses kilometers/km/h
+ *    - FormatSpeed() and FormatDistance() handle this automatically
+ *
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ========================================
+ *
+ *    +-------------------+
+ *    |   Game Instance   |
+ *    +--------+----------+
+ *             |
+ *    +--------v----------+
+ *    | Localization      |<---- Player changes language in Settings Menu
+ *    | Subsystem         |
+ *    +--------+----------+
+ *             |
+ *             | Provides localized strings to:
+ *             |
+ *    +--------v--------------------------------------------------+
+ *    |                                                           |
+ *    |  +-------------+  +-------------+  +------------------+   |
+ *    |  | Main Menu   |  | HUD/UI      |  | Dialogue System  |   |
+ *    |  | Widgets     |  | Widgets     |  | (Subtitles)      |   |
+ *    |  +-------------+  +-------------+  +------------------+   |
+ *    |                                                           |
+ *    |  +-------------+  +-------------+  +------------------+   |
+ *    |  | Race        |  | Garage/     |  | Notification     |   |
+ *    |  | Results     |  | Store UI    |  | Popups           |   |
+ *    |  +-------------+  +-------------+  +------------------+   |
+ *    |                                                           |
+ *    +-----------------------------------------------------------+
+ *
+ * DATA FLOW FOR DISPLAYING LOCALIZED TEXT:
+ *
+ *    String Tables (Data Assets)
+ *    +---------------------------+
+ *    | ID: "UI.Race.Lap"         |
+ *    | EN: "Lap"                 |
+ *    | FR: "Tour"                |
+ *    | DE: "Runde"               |
+ *    | JP: "Lap" (in Japanese)   |
+ *    +---------------------------+
+ *             |
+ *             v
+ *    +---------------------------+
+ *    | Localization Subsystem    |
+ *    | - Stores current language |
+ *    | - Looks up string by ID   |
+ *    +---------------------------+
+ *             |
+ *             v
+ *    +---------------------------+
+ *    | HUD Widget calls:         |
+ *    | GetLocalizedString("...")  |
+ *    | Returns "Runde" (if DE)   |
+ *    +---------------------------+
+ *
+ *
+ * COMMON TASKS FOR NEW DEVELOPERS:
+ * =================================
+ *
+ * Displaying localized text in a Widget Blueprint:
+ *   1. Get reference to LocalizationSubsystem
+ *   2. Call GetLocalizedString with your string ID
+ *   3. Set the returned FText to your Text widget
+ *   4. Bind to OnLanguageChanged to refresh when language changes
+ *
+ * Adding a new localizable string:
+ *   1. Add entry to the string table data asset for each supported language
+ *   2. Use a hierarchical ID: "Category.Subcategory.StringName"
+ *   3. Call GetLocalizedString("Category.Subcategory.StringName")
+ *
+ * Using format strings with variables:
+ *   // String table: "Race.Position" = "You finished in {0} place!"
+ *   TArray<FText> Args;
+ *   Args.Add(FText::FromString("1st"));
+ *   FText Result = Localization->FormatLocalizedString("Race.Position", Args);
+ *   // Result: "You finished in 1st place!"
+ *
+ * Displaying formatted speed:
+ *   float SpeedMetersPerSec = 44.7f;  // ~100 mph
+ *   FText SpeedText = Localization->FormatSpeed(SpeedMetersPerSec);
+ *   // Returns "100 mph" (USA) or "161 km/h" (Europe) based on settings
+ *
+ * Reading current language:
+ *   EMGLanguage CurrentLang = Localization->GetCurrentLanguage();
+ *   if (CurrentLang == EMGLanguage::Japanese)
+ *   {
+ *       // Use Japanese-specific font or layout adjustments
+ *   }
+ *
+ *
+ * SUPPORTED LANGUAGES:
+ * ====================
+ * - English (US) - Default
+ * - Spanish, French, German, Italian, Portuguese (Brazilian)
+ * - Japanese, Korean, Chinese (Simplified & Traditional)
+ * - Russian, Polish, Turkish
+ * - Arabic (Right-to-Left support)
+ *
+ *
+ * IMPORTANT NOTES:
+ * =================
+ * - ALWAYS use FText for player-visible strings
+ * - NEVER hardcode strings - always use string IDs
+ * - Test UI layouts with German (longest translations) and Chinese (different fonts)
+ * - Arabic requires special RTL testing
+ * - Speed/distance formatting should always go through this subsystem
+ *
+ *
+ * @see FMGLocalizationSettings - The data structure holding all settings
+ * @see UMGAccessibilitySubsystem - For text size and subtitle settings
+ * @see Unreal's FText documentation for more on localization best practices
+ *
+ ******************************************************************************/
+
 /**
  * @file MGLocalizationSubsystem.h
  * @brief Localization and Internationalization Subsystem for Midnight Grind

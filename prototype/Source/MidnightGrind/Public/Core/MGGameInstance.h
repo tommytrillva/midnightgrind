@@ -1,55 +1,114 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGGameInstance.h
- * @brief Game Instance - Central manager for game-wide state and subsystem orchestration
+ * =============================================================================
+ * MGGameInstance.h - The Root of the Game
+ * =============================================================================
  *
- * The MGGameInstance is the root manager for Midnight Grind, responsible for
- * initializing platform services (Steam, Epic, consoles), managing player profiles,
- * coordinating subsystems, and handling network connectivity state.
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * The Game Instance is the ROOT MANAGER for Midnight Grind. It's the first
+ * game-specific class created when the game starts, and it lives until the
+ * game exits. Think of it as the "brain" that coordinates everything.
  *
- * @section Overview
- * The Game Instance lives for the entire duration of the application and is the
- * first game-specific class initialized during startup. It serves as the central
- * hub for accessing game-wide functionality and subsystems.
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
  *
- * @section Responsibilities
- * - Platform Detection: Identifies which platform (Steam, Epic, PlayStation, Xbox, Switch)
- * - Steam/Platform Integration: Initializes Steam API, handles login callbacks
- * - Subsystem Orchestration: Initializes and coordinates all game subsystems
- * - Player Profile: Manages local player identity, level, crew membership
- * - Network State: Tracks online/offline status with automatic reconnection
- * - Save/Load: Coordinates saving and loading across all subsystems
+ * 1. GAME INSTANCE (UGameInstance):
+ *    - THE top-level game class - there's only ONE for the entire game
+ *    - Created before anything else, destroyed last
+ *    - Survives level transitions (unlike World, Actors, etc.)
+ *    - Where you put "global" game logic and state
  *
- * @section Subsystems Available Subsystems
- * Access subsystems through convenience getters or generic GetSubsystem<T>():
- * - UMGGameStateSubsystem: Game flow state machine
- * - UMGSessionSubsystem: Multiplayer session management
- * - UMGAccountLinkSubsystem: Cross-platform account linking
- * - UMGProgressionSubsystem: Player progression and unlocks
- * - UMGCurrencySubsystem: In-game currency management
- * - UMGVehicleManagerSubsystem: Vehicle collection and customization
- * - UMGInputRemapSubsystem: Input remapping
- * - UMGAccessibilitySubsystem: Accessibility features
- * - UMGCloudSaveSubsystem: Cloud save synchronization
- * - UMGAnalyticsSubsystem: Analytics and telemetry
- * - UMGAntiCheatSubsystem: Anti-cheat validation
- * - UMGAudioMixSubsystem: Audio mixing
- * - UMGLocalizationSubsystem: Localization
+ *    LIFECYCLE:
+ *    Game Launch -> Init() -> StartGameInstance() -> OnStart() -> [Game Running] -> Shutdown()
  *
- * @section Usage
- * Access the game instance from anywhere:
+ * 2. SUBSYSTEM PATTERN:
+ *    Instead of putting everything in GameInstance, we use Subsystems:
+ *    - Each subsystem handles one area (save/load, sessions, input, etc.)
+ *    - GameInstance creates and owns all subsystems
+ *    - Access via: GameInstance->GetSubsystem<UMySubsystem>()
+ *
+ *    This keeps code organized and maintainable.
+ *
+ * 3. PLATFORM SERVICES:
+ *    The game can run on different platforms (Steam, Epic, PlayStation, etc.)
+ *    GameInstance detects the platform and initializes the right services.
+ *
+ *    Steam provides: friends list, achievements, matchmaking, cloud saves
+ *    Epic provides: similar features via Epic Online Services
+ *    Consoles: PSN, Xbox Live, Nintendo Online
+ *
+ * 4. NETWORK STATE:
+ *    Tracks whether we're connected to online services:
+ *    - Offline: No online features
+ *    - Connecting: Establishing connection
+ *    - Online: Full online features available
+ *    - Reconnecting: Lost connection, trying to restore
+ *    - Maintenance: Servers are down
+ *
+ * 5. PLAYER PROFILE:
+ *    The local player's identity (name, level, crew) loaded from
+ *    platform services and/or our backend.
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ * -----------------------------------------
+ *
+ *   [UMGGameInstance] <-- This file (THE ROOT)
+ *         |
+ *         +-- Platform Detection (Steam, Epic, Console)
+ *         |
+ *         +-- Network State (Online, Offline, Reconnecting)
+ *         |
+ *         +-- Player Profile (Name, Level, Crew)
+ *         |
+ *         +-- Subsystems (auto-created, accessed via GetSubsystem<T>)
+ *                |
+ *                +-- [UMGGameStateSubsystem] - Game flow
+ *                +-- [UMGSaveSubsystem] - Save/Load
+ *                +-- [UMGSessionSubsystem] - Multiplayer
+ *                +-- [UMGCurrencySubsystem] - In-game money
+ *                +-- [UMGProgressionSubsystem] - XP/Levels
+ *                +-- [UMGVehicleManagerSubsystem] - Garage
+ *                +-- [UMGInputRemapSubsystem] - Controls
+ *                +-- [UMGAccessibilitySubsystem] - Accessibility
+ *                +-- [UMGCloudSaveSubsystem] - Cloud sync
+ *                +-- [UMGAnalyticsSubsystem] - Telemetry
+ *                +-- [UMGAntiCheatSubsystem] - Anti-cheat
+ *                +-- [UMGAudioMixSubsystem] - Audio
+ *                +-- [UMGLocalizationSubsystem] - Languages
+ *
+ * HOW TO ACCESS THE GAME INSTANCE:
+ * --------------------------------
+ * From almost anywhere in game code, you can get the GameInstance:
+ *
  * @code
- * UMGGameInstance* GameInstance = Cast<UMGGameInstance>(GetGameInstance());
- * if (GameInstance && GameInstance->IsOnline())
- * {
- *     FString PlayerName = GameInstance->GetDisplayName();
- *     UMGSessionSubsystem* Sessions = GameInstance->GetSessionSubsystem();
- * }
+ * // From any Actor
+ * UMGGameInstance* GI = Cast<UMGGameInstance>(GetGameInstance());
+ *
+ * // From a UObject with access to World
+ * UMGGameInstance* GI = Cast<UMGGameInstance>(GetWorld()->GetGameInstance());
+ *
+ * // Then access subsystems:
+ * UMGSaveSubsystem* Save = GI->GetSubsystem<UMGSaveSubsystem>();
+ *
+ * // Or use convenience getters:
+ * UMGSessionSubsystem* Sessions = GI->GetSessionSubsystem();
  * @endcode
+ *
+ * INITIALIZATION ORDER:
+ * ---------------------
+ * 1. Init() - Very early, engine not fully ready
+ * 2. DetectPlatform() - Figure out where we're running
+ * 3. InitializeSteam() - Set up Steam API if on Steam
+ * 4. InitializeSubsystems() - Create all game subsystems
+ * 5. LoadPlayerProfile() - Get player identity
+ * 6. OnSubsystemsReady broadcast - Safe to use everything now
  *
  * @see UMGGameStateSubsystem For game flow control
  * @see UMGSessionSubsystem For multiplayer session management
+ * @see UMGSaveSubsystem For save/load functionality
+ * =============================================================================
  */
 
 #pragma once

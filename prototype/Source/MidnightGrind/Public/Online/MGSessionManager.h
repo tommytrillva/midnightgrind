@@ -1,5 +1,222 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGSessionManager.h
+ * @brief Session Manager - Multiplayer matchmaking, lobbies, and session lifecycle
+ *
+ * This subsystem handles all aspects of multiplayer racing: finding opponents,
+ * creating lobbies, managing player state, and coordinating race starts. It
+ * provides the social infrastructure that connects players for competitive racing.
+ *
+ * ============================================================================
+ * KEY CONCEPTS FOR BEGINNERS
+ * ============================================================================
+ *
+ * WHAT IS A SESSION?
+ * A session represents a group of players who will race together. It tracks:
+ * - Who's in the group
+ * - What track/settings are selected
+ * - Who's ready to race
+ * - When the countdown should start
+ *
+ * SESSION TYPES:
+ * @see EMGSessionType for different multiplayer modes:
+ * - QuickMatch: Fast matchmaking, any available race
+ * - Ranked: Competitive with skill-based matching
+ * - Private: Invite-only with friends
+ * - Crew: Racing with your crew/team
+ * - Tournament: Organized competitive events
+ *
+ * MATCHMAKING:
+ * The process of finding suitable opponents. The system considers:
+ * - Skill rating (avoid mismatches)
+ * - Ping/latency (smooth gameplay)
+ * - Preferences (track, race type, vehicle class)
+ * - Wait time (expands search over time)
+ *
+ * LOBBY:
+ * The waiting room before a race starts where players:
+ * - Select their vehicle
+ * - Mark themselves as ready
+ * - Chat (if implemented)
+ * - Wait for countdown
+ *
+ * ============================================================================
+ * SESSION STATE MACHINE
+ * ============================================================================
+ *
+ * @verbatim
+ *   +------+     StartMatchmaking()     +----------+
+ *   | Idle |--------------------------->| Searching|
+ *   +------+                            +----------+
+ *      |                                     |
+ *      | CreateSession()                     | Match found
+ *      v                                     v
+ *   +----------+     Session found     +---------+
+ *   | Creating |---------------------->| Joining |
+ *   +----------+                       +---------+
+ *                                           |
+ *                                           v
+ *                                      +---------+     All ready     +----------+
+ *                                      | InLobby |------------------>| Loading  |
+ *                                      +---------+                   +----------+
+ *                                           |                             |
+ *                                           | LeaveSession()              v
+ *                                           v                        +---------+
+ *                                      +--------------+              | InRace  |
+ *                                      | Disconnecting|              +---------+
+ *                                      +--------------+                   |
+ *                                           |                             | Race ends
+ *                                           v                             v
+ *                                      +------+                      +---------+
+ *                                      | Idle |<---------------------| PostRace|
+ *                                      +------+                      +---------+
+ * @endverbatim
+ *
+ * ============================================================================
+ * MATCHMAKING FLOW
+ * ============================================================================
+ *
+ * 1. CONFIGURE PREFERENCES:
+ * @code
+ * FMGMatchmakingPrefs Prefs;
+ * Prefs.SessionType = EMGSessionType::Ranked;
+ * Prefs.RaceType = FName("Circuit");
+ * Prefs.VehicleClass = FName("S_Class");
+ * Prefs.MaxPing = 100;
+ * @endcode
+ *
+ * 2. START SEARCHING:
+ * @code
+ * SessionManager->StartMatchmaking(Prefs);
+ * // System searches for matching sessions
+ * // UI shows "Searching..." with elapsed time
+ * @endcode
+ *
+ * 3. HANDLE RESULTS:
+ * - If match found: OnSessionJoined fires, player enters lobby
+ * - If no match: System creates new session, waits for others
+ * - After timeout: Search expands (relaxes constraints)
+ *
+ * ============================================================================
+ * LOBBY MANAGEMENT
+ * ============================================================================
+ *
+ * Once in a lobby, players interact through these functions:
+ *
+ * ALL PLAYERS:
+ * @code
+ * SessionManager->SetSelectedVehicle(VehicleID, PerformanceIndex);
+ * SessionManager->SetReady(true);
+ * SessionManager->LeaveSession();
+ * @endcode
+ *
+ * HOST ONLY:
+ * @code
+ * SessionManager->ChangeTrack(NewTrackID);
+ * SessionManager->ChangeLapCount(5);
+ * SessionManager->KickPlayer(PlayerID);
+ * SessionManager->StartCountdown();  // When all ready
+ * SessionManager->CancelCountdown();
+ * @endcode
+ *
+ * ============================================================================
+ * USAGE EXAMPLES
+ * ============================================================================
+ *
+ * QUICK MATCH:
+ * @code
+ * UMGSessionManager* Sessions = GetGameInstance()->GetSubsystem<UMGSessionManager>();
+ *
+ * // Subscribe to events
+ * Sessions->OnSessionStateChanged.AddDynamic(this, &UMyWidget::HandleStateChange);
+ * Sessions->OnSessionJoined.AddDynamic(this, &UMyWidget::EnterLobby);
+ * Sessions->OnRaceStarting.AddDynamic(this, &UMyWidget::LoadRaceLevel);
+ *
+ * // Start quick match
+ * FMGMatchmakingPrefs Prefs;
+ * Prefs.SessionType = EMGSessionType::QuickMatch;
+ * Sessions->StartMatchmaking(Prefs);
+ * @endcode
+ *
+ * PRIVATE LOBBY:
+ * @code
+ * // Host creates lobby
+ * Sessions->CreatePrivateLobby(8);  // Max 8 players
+ *
+ * // After creation, get lobby ID to share
+ * FString LobbyCode = Sessions->GetCurrentSession().SessionID;
+ *
+ * // Friends join with the code
+ * Sessions->JoinSession(LobbyCode);
+ *
+ * // Host configures race
+ * Sessions->ChangeTrack(FName("Tokyo_Highway"));
+ * Sessions->ChangeLapCount(3);
+ *
+ * // When everyone ready, host starts
+ * if (Sessions->AreAllPlayersReady())
+ * {
+ *     Sessions->StartCountdown();
+ * }
+ * @endcode
+ *
+ * LOBBY UI UPDATES:
+ * @code
+ * void ULobbyWidget::SetupBindings()
+ * {
+ *     auto* Sessions = GetGameInstance()->GetSubsystem<UMGSessionManager>();
+ *
+ *     Sessions->OnPlayerJoined.AddDynamic(this, &ULobbyWidget::AddPlayerCard);
+ *     Sessions->OnPlayerLeft.AddDynamic(this, &ULobbyWidget::RemovePlayerCard);
+ *     Sessions->OnPlayerReady.AddDynamic(this, &ULobbyWidget::UpdatePlayerReady);
+ *     Sessions->OnSessionUpdated.AddDynamic(this, &ULobbyWidget::RefreshSessionInfo);
+ *     Sessions->OnCountdownStarted.AddDynamic(this, &ULobbyWidget::ShowCountdown);
+ * }
+ *
+ * void ULobbyWidget::RefreshPlayerList()
+ * {
+ *     const FMGSessionInfo& Session = Sessions->GetCurrentSession();
+ *     for (const FMGSessionPlayer& Player : Session.Players)
+ *     {
+ *         CreatePlayerCard(Player.DisplayName, Player.SelectedVehicle,
+ *                         Player.VehiclePI, Player.bReady, Player.bIsHost);
+ *     }
+ * }
+ * @endcode
+ *
+ * ============================================================================
+ * HOST MIGRATION
+ * ============================================================================
+ *
+ * If the host disconnects, the session doesn't end:
+ * 1. System detects host departure
+ * 2. HandleHostMigration() selects new host (lowest ping, longest in session)
+ * 3. New host gains control of lobby settings
+ * 4. OnSessionUpdated fires to notify all clients
+ *
+ * ============================================================================
+ * SESSION DATA STRUCTURES
+ * ============================================================================
+ *
+ * @see FMGMatchmakingPrefs - What kind of match you're looking for
+ * @see FMGSessionPlayer - Info about a player in the session
+ * @see FMGSessionInfo - Complete session state
+ * @see FMGSessionSearchResult - A potential session to join
+ *
+ * ============================================================================
+ * INTEGRATION WITH OTHER SYSTEMS
+ * ============================================================================
+ *
+ * The Session Manager integrates with:
+ * - UMGOnlineProfileSubsystem: Player identity and stats
+ * - UMGRaceFlowSubsystem: Starting races from lobby
+ * - Online Services: Platform matchmaking APIs
+ *
+ * @see UMGOnlineProfileSubsystem for player profiles
+ * @see UMGRaceFlowSubsystem for race lifecycle
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

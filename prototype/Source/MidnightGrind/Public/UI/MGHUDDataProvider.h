@@ -1,5 +1,122 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGHUDDataProvider.h - Central Data Hub for All HUD Elements
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines a subsystem that collects data from various game systems
+ * (vehicle, race, scoring, police) and provides it in a clean, organized format
+ * for HUD widgets to display. It's the "data layer" between game logic and UI.
+ *
+ * Instead of each HUD widget directly accessing the vehicle, race manager,
+ * and scoring system, they all get their data from this single provider.
+ * This is a crucial architectural pattern called "separation of concerns."
+ *
+ * WHY USE A DATA PROVIDER?
+ * ------------------------
+ * 1. DECOUPLING: HUD widgets don't need to know where data comes from
+ * 2. CACHING: Data is gathered once per frame, not once per widget
+ * 3. FORMATTING: Provides both raw values and formatted display strings
+ * 4. EVENTS: Broadcasts changes (position gained, lap completed) to listeners
+ * 5. THROTTLING: Updates at a configurable rate to save performance
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * Game Instance Subsystem:
+ *   UGameInstanceSubsystem lives for the entire game session (not just one level).
+ *   It's created automatically and accessible via GetGameInstance()->GetSubsystem().
+ *   Perfect for data that persists across level transitions.
+ *
+ * USTRUCT Data Containers:
+ *   FMGRaceHUDData and FMGMinimapData are structs that bundle related values.
+ *   Using structs instead of individual variables:
+ *   - Groups related data logically
+ *   - Makes function signatures cleaner (pass one struct vs 20 parameters)
+ *   - Enables Blueprint binding with BlueprintReadOnly
+ *
+ * Delegates (Events):
+ *   DECLARE_DYNAMIC_MULTICAST_DELEGATE creates an event that multiple objects
+ *   can subscribe to. When something happens (like position change), the
+ *   provider broadcasts the event, and all subscribers are notified.
+ *
+ *   Example usage:
+ *     // In HUD widget:
+ *     DataProvider->OnPositionChanged.AddDynamic(this, &UMyHUD::HandlePositionChange);
+ *
+ *     // In data provider (when position changes):
+ *     OnPositionChanged.Broadcast(OldPosition, NewPosition);
+ *
+ * BlueprintPure Functions:
+ *   Functions marked BlueprintPure have no side effects and can be called
+ *   from Blueprint without an execution pin. They're "getters" that just
+ *   return data. Perfect for data access functions.
+ *
+ * TWeakObjectPtr:
+ *   A weak reference to the player vehicle. If the vehicle is destroyed,
+ *   this pointer automatically becomes null instead of dangling.
+ *   Always check IsValid() before using weak pointers.
+ *
+ * HOW IT FITS IN THE ARCHITECTURE:
+ * --------------------------------
+ *
+ *   +----------------+    +---------------+    +-------------+
+ *   | Vehicle Pawn   |--->|               |--->| Race HUD    |
+ *   +----------------+    |               |    +-------------+
+ *                         |  HUD Data     |
+ *   +----------------+    |  Provider     |    +-------------+
+ *   | Race Manager   |--->|               |--->| Minimap     |
+ *   +----------------+    |               |    +-------------+
+ *                         |               |
+ *   +----------------+    |               |    +-------------+
+ *   | Scoring System |--->|               |--->| Overlay     |
+ *   +----------------+    +---------------+    +-------------+
+ *
+ * Multiple data sources feed into the provider, and multiple UI elements
+ * consume its output. This "hub and spoke" pattern simplifies both sides.
+ *
+ * DATA CATEGORIES:
+ * ----------------
+ *
+ * VEHICLE DATA:
+ *   - Speed (KPH/MPH), Gear, RPM (current & max)
+ *   - NOS amount and activation state
+ *   - Damage, tire wear, engine temperature
+ *
+ * RACE DATA:
+ *   - Position (1st/8), Lap (2/3)
+ *   - Lap times (current, best, total)
+ *   - Gap to leader and next position
+ *   - Race progress percentage
+ *
+ * SCORING DATA:
+ *   - Drift score, multiplier, combo count
+ *   - Current drift angle
+ *   - Total accumulated score
+ *
+ * MINIMAP DATA:
+ *   - Player position and rotation
+ *   - Other racer positions
+ *   - Checkpoint locations
+ *   - Police positions (if in pursuit)
+ *
+ * COUNTDOWN DATA:
+ *   - Countdown active state
+ *   - Current countdown value
+ *   - "GO!" display state
+ *
+ * PERFORMANCE CONSIDERATION:
+ * --------------------------
+ * The provider uses a timer to update data at a configurable rate (default 30Hz).
+ * This is usually enough for smooth visuals while saving CPU compared to
+ * updating every single frame (which could be 120+ times per second).
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

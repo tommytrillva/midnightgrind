@@ -1,5 +1,102 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGTrackSpline.h
+ * @brief Track layout definition using splines for racing line, boundaries, and queries.
+ *
+ * This file defines the AMGTrackSpline class and related types for representing
+ * the physical layout of a race track. The track spline is the core data structure
+ * for position tracking, AI pathfinding, respawn calculations, and boundary detection.
+ *
+ * @section spline_concepts Key Concepts
+ *
+ * SPLINE: A mathematical curve that passes smoothly through a series of control
+ * points. USplineComponent in Unreal Engine provides powerful tools for defining
+ * and querying 3D paths. Think of it like a flexible wire that can be bent to
+ * follow any path.
+ *
+ * RACING LINE: The optimal path around the track. This spline defines the "center"
+ * of the track and is used for distance calculations and AI navigation.
+ *
+ * INNER/OUTER BOUNDARIES: Two additional splines that define the edges of the
+ * driveable track surface. Vehicles crossing these boundaries are considered
+ * "off-track" and may receive penalties.
+ *
+ * TRACK SEGMENTS: The track can be divided into segments with different properties
+ * (surface type, width, hazards). This allows for varied track surfaces like
+ * transitions from asphalt to gravel.
+ *
+ * DISTANCE ALONG TRACK: A key measurement - how far along the racing line a
+ * position is. Used for lap progress, position tracking, and respawn placement.
+ *
+ * @section spline_surface Track Surface Types
+ *
+ * Different surface types affect vehicle physics:
+ * - Asphalt: Standard road surface with maximum grip
+ * - Concrete: Slightly less grip than asphalt
+ * - Gravel: Loose surface, reduced grip, vehicles may slide
+ * - Dirt: Packed earth, good for controlled drifting
+ * - Grass: Very low grip, usually off-track penalty
+ * - Sand: Extremely low grip, slows vehicles significantly
+ * - Snow/Ice: Minimal grip, requires careful throttle control
+ * - Wet: Reduced grip compared to dry conditions
+ *
+ * @section spline_architecture Architecture
+ *
+ * The track spline system provides:
+ * 1. A racing line spline for distance/position queries
+ * 2. Inner and outer boundary splines for off-track detection
+ * 3. Per-segment track properties (surface, width, hazards)
+ * 4. AI pathfinding helpers (look-ahead points, curvature, speed suggestions)
+ * 5. Respawn system integration (safe return points after crashes)
+ *
+ * @section spline_usage Usage Examples
+ *
+ * @code
+ * // Get the track spline actor (placed in level or found via subsystem)
+ * AMGTrackSpline* TrackSpline = FindTrackSpline();
+ *
+ * // Calculate how far along the track a vehicle is
+ * float Distance = TrackSpline->GetClosestDistanceOnTrack(VehicleLocation);
+ *
+ * // Check if vehicle is on track
+ * if (!TrackSpline->IsPositionOnTrack(VehicleLocation))
+ * {
+ *     ApplyOffTrackPenalty();
+ * }
+ *
+ * // Get AI look-ahead point (for steering toward)
+ * float CurrentDist = TrackSpline->GetClosestDistanceOnTrack(AILocation);
+ * FVector TargetPoint = TrackSpline->GetLookAheadPoint(CurrentDist, 5000.0f);
+ *
+ * // Get suggested speed based on upcoming curvature
+ * float SuggestedSpeed = TrackSpline->GetSuggestedSpeedAtDistance(CurrentDist);
+ *
+ * // Get respawn transform after a crash
+ * FTransform RespawnTransform = TrackSpline->GetNearestRespawnTransform(CrashLocation);
+ * @endcode
+ *
+ * @section spline_editor Editor Setup
+ *
+ * To set up a track spline:
+ * 1. Place AMGTrackSpline actor in the level
+ * 2. Edit the RacingLineSpline by selecting spline points and adjusting
+ * 3. Add spline points (Alt+click on spline) to define the track path
+ * 4. Configure bClosedLoop = true for circuit tracks
+ * 5. Set DefaultTrackWidth for the overall track width
+ * 6. Add TrackSegments for areas with different surfaces/properties
+ *
+ * @section spline_related Related Systems
+ * - UMGTrackSubsystem: Higher-level track management that uses track spline
+ * - AMGTrackBoundaryActor: Separate boundary definition (alternative approach)
+ * - AI Controller: Queries track spline for pathfinding
+ * - Respawn System: Uses spline for safe respawn positions
+ *
+ * @see EMGTrackSurface
+ * @see FMGTrackSegment
+ * @see USplineComponent
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

@@ -1,7 +1,108 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MidnightGrind - Arcade Street Racing Game
-// Voice Chat Subsystem - Voice communication for multiplayer
+/*******************************************************************************
+ * MGVoiceChatSubsystem.h - Voice Communication System
+ *******************************************************************************
+ *
+ * OVERVIEW FOR NEW DEVELOPERS
+ * ===========================
+ * This file defines the Voice Chat system - allowing players to talk to each
+ * other using their microphones during multiplayer sessions. Similar to voice
+ * chat in games like Fortnite, Call of Duty, or Discord.
+ *
+ * WHAT THIS SYSTEM DOES
+ * ---------------------
+ * - Captures audio from the player's microphone
+ * - Transmits voice data to other players over the network
+ * - Plays received voice audio from other players' speakers
+ * - Manages who can hear whom (channels, teams, proximity)
+ * - Provides mute/deafen controls for privacy
+ *
+ * KEY CONCEPTS IN THIS FILE
+ * -------------------------
+ * 1. VOICE CHANNELS: Different "rooms" for voice communication
+ *    - Global: Everyone in the match can hear each other
+ *    - Team: Only teammates can hear each other
+ *    - Party: Your pre-made group (friends you queued with)
+ *    - Proximity: Only players physically near you in-game
+ *    - Private: Direct communication with one specific player
+ *    - Spectator: Observers watching the match
+ *
+ * 2. TRANSMISSION MODES: How voice is activated
+ *    - PushToTalk: Hold a button to transmit (most common in competitive)
+ *    - OpenMic: Always transmitting (like being on a phone call)
+ *    - VoiceActivated: Automatically transmits when you speak loud enough
+ *    - Disabled: No voice chat at all
+ *
+ * 3. MUTE vs DEAFEN:
+ *    - Mute: Others cannot hear YOU (your mic is off)
+ *    - Deafen: YOU cannot hear OTHERS (their audio is off for you)
+ *
+ * 4. SPATIAL AUDIO: Makes voices sound like they come from where the player
+ *    is in the game world (left/right, near/far). Creates immersion.
+ *
+ * 5. AUDIO PROCESSING: Features that improve voice quality
+ *    - Noise Suppression: Removes background noise (fans, keyboards)
+ *    - Echo Cancellation: Prevents feedback loops
+ *    - Auto Gain Control: Normalizes volume levels
+ *
+ * IMPORTANT STRUCTS IN THIS FILE
+ * ------------------------------
+ * - FMGVoiceParticipant: Represents one person in voice chat
+ * - FMGVoiceSettings: User's voice chat preferences
+ * - FMGVoiceChannelInfo: Information about a voice channel
+ * - FMGMuteEntry: Record of a muted player
+ * - FMGAudioDevice: Represents a microphone or speaker
+ *
+ * DELEGATES (EVENTS) IN THIS FILE
+ * -------------------------------
+ * Delegates are Unreal's way of handling events. Other code can "subscribe"
+ * to these events to be notified when something happens:
+ * - OnVoiceChannelJoined: When you join a voice channel
+ * - OnParticipantSpeakingChanged: When someone starts/stops talking
+ * - OnLocalMuteChanged: When your mute status changes
+ * etc.
+ *
+ * HOW TO USE THIS SYSTEM (EXAMPLE)
+ * --------------------------------
+ * // Get the subsystem:
+ * UMGVoiceChatSubsystem* Voice = GetGameInstance()->GetSubsystem<UMGVoiceChatSubsystem>();
+ *
+ * // Join team voice chat:
+ * Voice->JoinChannel(EMGVoiceChannel::Team);
+ *
+ * // Start transmitting (push-to-talk):
+ * Voice->StartTransmitting();
+ *
+ * // Mute an annoying player:
+ * Voice->MuteParticipant(AnnoyingPlayerID, true, EMGMuteReason::Manual);
+ *
+ * // Check who's currently talking:
+ * TArray<FMGVoiceParticipant> Speakers = Voice->GetSpeakingParticipants();
+ *
+ * PROXIMITY VOICE EXPLAINED
+ * -------------------------
+ * Proximity voice makes voice chat distance-based:
+ * - ProximityRadius: Maximum distance to hear someone at all
+ * - ProximityFalloffStart: Distance where volume starts decreasing
+ *
+ * Example: If radius is 5000 and falloff is 2500:
+ * - 0-2500 units away: Full volume
+ * - 2500-5000 units away: Volume fades out linearly
+ * - Beyond 5000 units: Cannot hear at all
+ *
+ * AUDIO DEVICES
+ * -------------
+ * Players may have multiple microphones and speakers (headset, webcam mic,
+ * external speakers, etc.). This system lets them choose which to use.
+ *
+ * TESTING FEATURES
+ * ----------------
+ * The microphone test functions let players verify their setup:
+ * - StartMicrophoneTest(): Begin recording/playback test
+ * - GetMicrophoneTestLevel(): Shows current input level (visual feedback)
+ *
+ ******************************************************************************/
 
 #pragma once
 

@@ -1,5 +1,145 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGPinkSlipHandler.h
+ * @brief Pink Slip Handler - High-stakes vehicle title racing.
+ *
+ * Pink Slip racing is the ultimate high-stakes format where both drivers wager
+ * their vehicles. The winner takes the loser's car permanently - it's transferred
+ * to their garage while the loser walks away with nothing. This handler manages
+ * all the verification, security, and transfer systems required for such races.
+ *
+ * @section overview_pinkslip Overview
+ * Named after the pink-colored vehicle title documents, Pink Slip racing has
+ * been a staple of street racing culture since the 1950s. In Midnight Grind,
+ * this mode provides genuine risk and reward - you can win rare, fully-upgraded
+ * vehicles from opponents, but you can also lose your own prized car forever.
+ *
+ * @section concepts_pinkslip Key Concepts for Beginners
+ *
+ * 1. **Vehicle Wagering**: Each participant puts their car on the line. If you
+ *    lose, your vehicle is permanently transferred to the winner's garage.
+ *    This is NOT reversible without winning it back in another pink slip race.
+ *
+ * 2. **Triple Confirmation**: Due to the permanent consequences, the system
+ *    requires multiple explicit confirmations before the race can begin.
+ *    Both parties must confirm they understand the stakes three times.
+ *
+ * 3. **Verification System**: Before racing, participants are verified:
+ *    - PI (Performance Index) matching: Cars must be within MaxPIDifference
+ *    - REP Tier requirement: Must have sufficient reputation
+ *    - Not player's only vehicle: Can't wager your last car
+ *    - No trade lock: Vehicle must be tradeable
+ *    - No disconnect penalty: Clean connection history required
+ *
+ * 4. **Anti-Quit Protection**: Disconnecting during a pink slip race counts
+ *    as a loss. The DisconnectGracePeriod gives a short window to reconnect,
+ *    but intentional disconnection forfeits the vehicle.
+ *
+ * 5. **Inner Race Handler**: Pink Slip is a "wrapper" race type. The actual
+ *    racing (Circuit, Sprint, Drag, etc.) is handled by an inner handler
+ *    while this handler manages the stakes and transfer.
+ *
+ * @section flow_pinkslip Race Flow
+ *
+ * @code
+ * [WaitingConfirmation]  <-- Both parties select vehicles, confirm 3x
+ *         |
+ *    Triple Confirm
+ *         |
+ *    [Verification]  <-- System verifies PI, REP, ownership
+ *         |
+ *     Both Pass
+ *         |
+ *      [Racing]  <-- Inner handler runs the actual race
+ *         |
+ *    Winner Determined
+ *         |
+ * [ProcessingTransfer]  <-- Vehicle transferred, cooldown applied
+ *         |
+ *     [Complete]
+ * @endcode
+ *
+ * @section transfer_pinkslip Vehicle Transfer
+ *
+ * When a pink slip race completes:
+ * 1. Winner receives the loser's vehicle in their garage
+ * 2. Loser's vehicle is removed from their garage
+ * 3. Won vehicle has a trade lock (WonVehicleTradeLockDays) to prevent
+ *    quick exploitation
+ * 4. Loser enters a cooldown period (LossCooldownHours) before they
+ *    can enter another pink slip race
+ * 5. Transfer is recorded in FMGPinkSlipTransfer for history
+ *
+ * @section witness_pinkslip Witness System
+ *
+ * Pink slip races can have spectators (witnesses) who watch the race.
+ * This serves multiple purposes:
+ * - Social proof of legitimate racing
+ * - Community engagement
+ * - Potential for social features (commenting, etc.)
+ * - Limited to MaxWitnesses to prevent performance issues
+ *
+ * @section dramatic_pinkslip Dramatic Moments
+ *
+ * The handler broadcasts EMGPinkSlipMoment events for cinematic presentation:
+ * - ChallengeIssued: Initial challenge
+ * - PointOfNoReturn: Both confirmed, can't back out
+ * - KeysOnTheTable: Race about to start
+ * - PhotoFinish: Race within 0.5 seconds (extreme tension)
+ * - KeysChange: Winner receives keys
+ * - WalkOfShame: Loser walks away
+ *
+ * @section rematch_pinkslip Rematch System
+ *
+ * After a race, the loser can request a rematch within RematchWindowSeconds.
+ * If accepted, a new pink slip race begins with the same participants.
+ * The loser would need to wager a different vehicle (since they lost the
+ * previous one).
+ *
+ * @section example_pinkslip Usage Example
+ *
+ * @code
+ * // Setting up a pink slip race:
+ * UMGPinkSlipHandler* Handler = NewObject<UMGPinkSlipHandler>();
+ *
+ * // Set the inner race type (what they'll actually race)
+ * UMGCircuitRaceHandler* InnerHandler = NewObject<UMGCircuitRaceHandler>();
+ * Handler->SetInnerRaceHandler(InnerHandler);
+ *
+ * // Set up participants
+ * Handler->SetChallenger(ChallengerPlayerID, ChallengerVehicleGUID);
+ * Handler->SetDefender(DefenderPlayerID, DefenderVehicleGUID);
+ *
+ * // Verify both can participate
+ * if (Handler->VerifyBoth())
+ * {
+ *     // Wait for confirmations (UI handles this)
+ *     // After triple confirmation, race begins
+ * }
+ *
+ * // Handle events
+ * Handler->OnStateChanged.AddDynamic(this, &UMyClass::OnPinkSlipStateChange);
+ * Handler->OnDramaticMoment.AddDynamic(this, &UMyClass::PlayDramaticCutscene);
+ * Handler->OnTransferComplete.AddDynamic(this, &UMyClass::ShowTransferResults);
+ * @endcode
+ *
+ * @section security_pinkslip Security Considerations
+ *
+ * Pink slip racing requires careful security to prevent exploitation:
+ * - Server-authoritative verification (can't fake PI/REP)
+ * - Transfer only after race fully completes
+ * - Disconnect detection and grace period
+ * - Rate limiting via cooldowns
+ * - Trade locks prevent quick flipping
+ * - Account standing checks
+ *
+ * @see UMGRaceTypeHandler Base class for all race type handlers
+ * @see FMGPinkSlipTransfer Transfer record structure
+ * @see EMGPinkSlipVerification Verification failure reasons
+ * @see PRD Section 4.3 For design requirements
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

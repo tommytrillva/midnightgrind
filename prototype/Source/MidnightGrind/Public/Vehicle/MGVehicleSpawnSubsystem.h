@@ -1,19 +1,99 @@
 // Copyright Midnight Grind. All Rights Reserved.
 // Stage 52: Vehicle Spawn Subsystem - MVP Vehicle Spawning
 
+/**
+ * @file MGVehicleSpawnSubsystem.h
+ * @brief World subsystem for spawning and managing race vehicles.
+ *
+ * @section Overview
+ * This subsystem handles all vehicle spawning at race start, including player
+ * vehicles and AI opponents. It finds spawn points in the level, creates vehicle
+ * actors, assigns controllers, and registers vehicles with the race game mode.
+ *
+ * @section Architecture
+ * As a World Subsystem, this system exists once per level and is automatically
+ * created/destroyed with the world. This makes it ideal for per-race vehicle
+ * management.
+ *
+ * Spawning Flow:
+ * 1. Race mode calls SpawnRaceVehicles() with player and AI configurations
+ * 2. Subsystem finds all AMGSpawnPointActor instances in level
+ * 3. Vehicles spawn at grid positions (1 = pole position)
+ * 4. Player vehicle is possessed, AI vehicles get AI controllers
+ * 5. All vehicles register with the race game mode
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **World Subsystem**: A special UE5 class that exists per-world (level).
+ * Unlike Game Instance subsystems that persist across levels, World Subsystems
+ * are created when a level loads and destroyed when it unloads. Perfect for
+ * level-specific systems like race vehicle management.
+ *
+ * **Grid Position**: Starting position on the race grid. Position 1 is "pole
+ * position" (front of grid), higher numbers are further back. Spawn points
+ * in the level are tagged with their grid positions.
+ *
+ * **Possession**: When a controller "possesses" a pawn, it takes control.
+ * The player controller possesses the player's vehicle, AI controllers
+ * possess AI vehicles. This is how input gets routed to the right pawn.
+ *
+ * **Spawn Point Actor**: A level-placed actor marking where vehicles spawn.
+ * Contains grid position, forward direction, and any spawn-specific settings.
+ *
+ * @section Usage Example Usage
+ * @code
+ * // In your race game mode BeginPlay:
+ * UMGVehicleSpawnSubsystem* SpawnSystem = GetWorld()->GetSubsystem<UMGVehicleSpawnSubsystem>();
+ *
+ * // Create AI opponent requests
+ * TArray<FMGVehicleSpawnRequest> AIVehicles;
+ * FMGVehicleSpawnRequest AI1;
+ * AI1.VehicleID = "Silvia_S15";
+ * AI1.GridPosition = 2;
+ * AI1.bIsAI = true;
+ * AI1.AISkill = 0.7f;
+ * AI1.DisplayName = "Rival 1";
+ * AIVehicles.Add(AI1);
+ *
+ * // Spawn all vehicles
+ * SpawnSystem->SpawnRaceVehicles("Supra_MK4", AIVehicles);
+ *
+ * // Possess player vehicle
+ * SpawnSystem->PossessPlayerVehicle(GetWorld()->GetFirstPlayerController());
+ * @endcode
+ *
+ * @see AMGSpawnPointActor Level-placed spawn point markers
+ * @see AMGRacingAIController AI controller for opponent vehicles
+ * @see AMGRaceGameMode Game mode that orchestrates race flow
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "MGVehicleSpawnSubsystem.generated.h"
 
+// ============================================================================
+// FORWARD DECLARATIONS
+// ============================================================================
+
 class AMGVehiclePawn;
 class AMGSpawnPointActor;
 class APlayerController;
 class AMGRacingAIController;
 
+// ============================================================================
+// SPAWN REQUEST STRUCTURE
+// ============================================================================
+
 /**
- * Vehicle spawn request
+ * @brief Request structure for spawning a single vehicle.
+ *
+ * Contains all information needed to spawn and configure a vehicle,
+ * including identity, grid position, controller type, and AI settings.
+ *
+ * **USTRUCT(BlueprintType)** exposes this to Blueprint for easy use
+ * in race setup UI and game mode configuration.
  */
 USTRUCT(BlueprintType)
 struct FMGVehicleSpawnRequest
@@ -74,16 +154,41 @@ struct FMGSpawnedVehicle
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnVehicleSpawned, AMGVehiclePawn*, Vehicle, bool, bIsPlayer);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllVehiclesSpawned);
 
+// ============================================================================
+// VEHICLE SPAWN SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Vehicle Spawn Subsystem
+ * @class UMGVehicleSpawnSubsystem
+ * @brief World subsystem managing vehicle spawning and lifecycle.
  *
- * Handles spawning vehicles at race start:
- * - Finds spawn points in level
- * - Spawns player and AI vehicles
- * - Registers vehicles with race game mode
- * - Possesses player vehicle
+ * This subsystem is the central authority for spawning race vehicles.
+ * It coordinates with spawn points, vehicle classes, and controllers to
+ * create a properly configured starting grid.
  *
- * This is a WorldSubsystem - it exists per-level.
+ * @section Features Features
+ * - **Spawn Point Discovery**: Finds all spawn points in the current level
+ * - **Grid Positioning**: Places vehicles at correct starting positions
+ * - **Vehicle Instantiation**: Creates vehicle actors from class references
+ * - **Controller Assignment**: Possesses vehicles with player/AI controllers
+ * - **Game Mode Integration**: Registers all vehicles with the race manager
+ *
+ * @section UnrealMacros Unreal Engine Macro Explanations
+ *
+ * **UCLASS()** with inheritance from UWorldSubsystem:
+ * - Automatically created when a world (level) is created
+ * - One instance per world, accessible via GetWorld()->GetSubsystem<T>()
+ * - Destroyed when the world is torn down (level unloaded)
+ *
+ * **virtual void Initialize(FSubsystemCollectionBase& Collection) override**
+ * - Called when the subsystem is created
+ * - Use for initial setup, finding references, binding delegates
+ *
+ * **virtual bool ShouldCreateSubsystem(UObject* Outer) const override**
+ * - Return false to prevent creation in certain contexts (e.g., editor-only)
+ *
+ * **TSubclassOf<T>**: A template type holding a class reference.
+ * Used to specify which Blueprint class to spawn for vehicles.
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGVehicleSpawnSubsystem : public UWorldSubsystem

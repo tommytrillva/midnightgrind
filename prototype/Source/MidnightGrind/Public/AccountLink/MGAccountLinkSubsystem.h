@@ -1,31 +1,87 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGAccountLinkSubsystem.h
- * @brief Cross-Platform Account Linking and Identity Management Subsystem
+ * ============================================================================
+ * MGAccountLinkSubsystem.h
+ * Cross-Platform Account Linking and Identity Management Subsystem
+ * ============================================================================
  *
- * This subsystem manages player identity across multiple gaming platforms,
- * enabling cross-progression, account linking, and unified player profiles
- * for Midnight Grind.
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file defines the Account Link Subsystem, which is responsible for managing
+ * player identity across multiple gaming platforms. In modern games, players often
+ * own the game on multiple platforms (e.g., Steam and PlayStation), and this system
+ * allows them to link those accounts together into one unified identity.
  *
- * Key Features:
- * - Platform account linking (Steam, Epic, PlayStation, Xbox, Nintendo, Mobile)
- * - Unified player identity with cross-platform progression
- * - Account merging with intelligent conflict resolution
- * - Session token management with automatic refresh
- * - Cross-play toggle for platform preference
+ * WHAT IS A SUBSYSTEM?
+ * --------------------
+ * In Unreal Engine, a "Subsystem" is a way to organize game-wide functionality.
+ * This particular class inherits from UGameInstanceSubsystem, which means:
+ *   - It is automatically created when the game starts
+ *   - It persists across level changes (unlike Actors that get destroyed)
+ *   - There is exactly one instance per game session
+ *   - You access it via: GameInstance->GetSubsystem<UMGAccountLinkSubsystem>()
  *
- * Usage Example:
+ * KEY CONCEPTS:
+ * -------------
+ * 1. UNIFIED ACCOUNT: A single account in our backend that represents the player,
+ *    regardless of which platform they log in from.
+ *
+ * 2. LINKED ACCOUNTS: Platform-specific accounts (Steam, Epic, PSN, etc.) that
+ *    are connected to the unified account. A player can have multiple linked
+ *    accounts but one unified identity.
+ *
+ * 3. AUTHENTICATION TOKENS: Secure credentials (like temporary passwords) that
+ *    prove the player's identity. These expire and need refreshing.
+ *
+ * 4. ACCOUNT MERGING: When a player has progress on two separate accounts and
+ *    wants to combine them into one. This requires resolving conflicts when
+ *    both accounts have different values for the same data.
+ *
+ * ARCHITECTURE NOTES:
+ * -------------------
+ * - UENUM: Creates an enumeration that can be used in both C++ and Blueprints
+ * - USTRUCT: Creates a data structure usable in C++ and Blueprints
+ * - UFUNCTION: Exposes a function to Blueprints and/or the reflection system
+ * - UPROPERTY: Exposes a variable to Blueprints and/or serialization
+ * - BlueprintCallable: Function can be called from Blueprint graphs
+ * - BlueprintPure: Function has no side effects, can be used as a getter
+ * - BlueprintAssignable: Delegate/event that Blueprints can bind to
+ *
+ * SECURITY CONSIDERATIONS:
+ * ------------------------
+ * This subsystem handles sensitive authentication data. All tokens should be:
+ *   - Stored securely (never in plain text save files)
+ *   - Transmitted only over encrypted connections (HTTPS)
+ *   - Automatically refreshed before expiration
+ *   - Cleared on logout
+ *
+ * USAGE EXAMPLE:
+ * --------------
  * @code
+ * // Get the subsystem from anywhere in your game
  * UMGAccountLinkSubsystem* AccountLink = GameInstance->GetSubsystem<UMGAccountLinkSubsystem>();
+ *
+ * // Login with the current platform
  * AccountLink->LoginWithPlatform(EMGPlatformType::Steam);
+ *
+ * // Listen for when account linking completes
  * AccountLink->OnAccountLinked.AddDynamic(this, &MyClass::HandleAccountLinked);
+ *
+ * // Check if logged in
+ * if (AccountLink->IsLoggedIn())
+ * {
+ *     FString DisplayName = AccountLink->GetDisplayName();
+ * }
  * @endcode
  *
- * @note This subsystem handles sensitive authentication data. All tokens are
- *       stored securely and transmitted over encrypted connections only.
+ * RELATED FILES:
+ * --------------
+ * - MGCrossProgressionSubsystem.h: Syncs save data across platforms
+ * - MGCrossPlaySubsystem.h: Enables multiplayer with players on other platforms
+ * - MGPlatformIntegrationSubsystem.h: Platform-specific features (achievements, etc.)
  *
- * @see UMGProgressionSubsystem for cross-platform save synchronization
+ * ============================================================================
  */
 
 #pragma once

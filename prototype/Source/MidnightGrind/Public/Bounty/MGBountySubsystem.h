@@ -1,5 +1,234 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * @file MGBountySubsystem.h
+ * @brief Bounty Hunt System - High-Value Target Missions and Rewards
+ *
+ * @section overview Overview
+ * This subsystem implements a bounty hunting system inspired by games like
+ * Red Dead Redemption and Need for Speed: Most Wanted's Blacklist. Players
+ * can accept bounties on specific targets (AI racers, bosses, rivals) and
+ * earn significant rewards by defeating them in races or takedowns.
+ *
+ * @section key_concepts Key Concepts for Beginners
+ *
+ * 1. WHAT IS A BOUNTY?
+ *    A bounty is a contract to defeat a specific target for rewards:
+ *    - "Take down the Street King in a 1v1 race" - $50,000 reward
+ *    - "Wreck 5 police vehicles in one pursuit" - $10,000 reward
+ *    - "Beat the Touge Master on Akina" - Unlock his car
+ *
+ *    Think of bounties as mini-story missions with valuable rewards.
+ *
+ * 2. BOUNTY TYPES (EMGBountyType):
+ *    - RaceWin: Beat a target racer in a race
+ *    - Takedown: Wreck a specific vehicle/driver
+ *    - PolicePursuit: Escape or wreck police
+ *    - StreetLegend: Defeat a famous street racer
+ *    - BossChallenge: Story boss fights
+ *    - RivalRevenge: Personal rival challenges
+ *    - CommunityTarget: Server-wide collaborative bounties
+ *    - Weekly: Rotating weekly challenges
+ *    - Special: Limited-time event bounties
+ *
+ * 3. BOUNTY FLOW:
+ *    @code
+ *    Bounty Board (GetAvailableBounties)
+ *           |
+ *           v
+ *    AcceptBounty() --> Status: Accepted
+ *           |
+ *           v
+ *    Complete Objectives (CompleteObjective)
+ *           |
+ *           +--> All Required Done? --> CompleteBounty()
+ *           |           |                     |
+ *           |           v                     v
+ *           |    Calculate Rewards     Apply to Player
+ *           |                               |
+ *           v                               v
+ *    Failed/Expired? --> FailBounty()  OnBountyCompleted fires
+ *    @endcode
+ *
+ * 4. BOUNTY BOARD SYSTEM:
+ *    Players have a personal bounty board:
+ *    - AvailableBountyIds: Bounties you can accept
+ *    - ActiveBountyIds: Bounties you've accepted (max 3 default)
+ *    - RefreshesRemaining: Manual refresh count per day
+ *    - RefreshBountyBoard() rotates available bounties
+ *
+ * 5. OBJECTIVES:
+ *    Bounties have required and optional objectives:
+ *    @code
+ *    Bounty: "Take Down the Midnight Racer"
+ *    Required:
+ *      - [X] Win a race against Midnight Racer
+ *      - [X] Finish with 5+ second lead
+ *    Optional (bonus rewards):
+ *      - [X] Never get taken down
+ *      - [ ] Complete in under 3 minutes
+ *    @endcode
+ *    - CompleteObjective() marks objectives done
+ *    - BonusMultiplierPerOptional (default 0.25 = +25% per optional)
+ *
+ * 6. DIFFICULTY LEVELS (EMGBountyDifficulty):
+ *    Affects AI skill and reward multiplier:
+ *    - Easy: Beginner-friendly, 0.75x rewards
+ *    - Medium: Standard, 1.0x rewards
+ *    - Hard: Challenging, 1.5x rewards
+ *    - Expert: Very difficult, 2.0x rewards
+ *    - Legendary: Elite players only, 3.0x rewards
+ *    - Impossible: Bragging rights, 5.0x rewards
+ *
+ * 7. BOUNTY TARGETS (FMGBountyTarget):
+ *    Named characters you hunt:
+ *    - TargetId: Unique identifier
+ *    - DisplayName, Title: "Shadow" - "The Midnight Ghost"
+ *    - Biography: Backstory and lore
+ *    - VehicleId: What they drive
+ *    - SkillLevel: AI difficulty (0-100)
+ *    - HomeDistrict: Where they hang out
+ *
+ * 8. REWARDS SYSTEM:
+ *    Bounties offer multiple reward types:
+ *    - RewardCurrency: In-game cash
+ *    - RewardExperience: XP for leveling
+ *    - RewardReputation: Street cred with crews
+ *    - SpecialRewardId: Unique items (cars, parts, cosmetics)
+ *
+ * 9. TIME LIMITS AND EXPIRATION:
+ *    - TimeLimit: Must complete within X seconds (0 = no limit)
+ *    - ExpirationHours: Bounty disappears after X hours
+ *    - OnBountyExpiring fires when time is running low
+ *
+ * 10. STREAKS AND STATS:
+ *     Track your bounty hunting career:
+ *     - CurrentStreak: Consecutive completions without failure
+ *     - BestStreak: All-time record
+ *     - TotalBountiesCompleted: Lifetime count
+ *     - FastestBountyTime: Speed run record
+ *
+ * 11. COMMUNITY BOUNTIES:
+ *     Server-wide cooperative bounties:
+ *     - All players contribute to TotalCompletions
+ *     - MilestoneThresholds unlock bonus rewards
+ *     - Everyone gets rewards when TargetCompletions reached
+ *     - Limited-time collaborative events
+ *
+ * @section usage_examples Code Examples
+ *
+ * @code
+ * // Get the bounty subsystem
+ * UMGBountySubsystem* Bounty = GetGameInstance()->GetSubsystem<UMGBountySubsystem>();
+ *
+ * // Load saved bounty data
+ * Bounty->LoadBountyData();
+ *
+ * // Get available bounties for the player
+ * FString PlayerId = TEXT("Player_12345");
+ * TArray<FMGBountyDefinition> Available = Bounty->GetAvailableBounties(PlayerId);
+ *
+ * // Display bounty board in UI
+ * for (const FMGBountyDefinition& Def : Available)
+ * {
+ *     ShowBountyCard(
+ *         Def.DisplayName,
+ *         Def.Description,
+ *         Def.Difficulty,
+ *         Def.RewardCurrency,
+ *         Def.TargetName
+ *     );
+ * }
+ *
+ * // Accept a bounty
+ * if (Bounty->CanAcceptBounty(PlayerId, TEXT("BOUNTY_MidnightRacer")))
+ * {
+ *     Bounty->AcceptBounty(PlayerId, TEXT("BOUNTY_MidnightRacer"));
+ * }
+ *
+ * // Get active bounties for HUD
+ * TArray<FMGActiveBounty> Active = Bounty->GetActiveBounties(PlayerId);
+ * for (const FMGActiveBounty& ABounty : Active)
+ * {
+ *     float Progress = Bounty->GetBountyProgress(PlayerId, ABounty.BountyId);
+ *     UpdateBountyTracker(ABounty.BountyId, Progress, ABounty.TimeRemaining);
+ * }
+ *
+ * // When player completes an objective
+ * void OnRaceFinished(bool bWon, const FString& OpponentId)
+ * {
+ *     if (bWon)
+ *     {
+ *         // Check if any active bounty has this target
+ *         for (const FMGActiveBounty& ABounty : Active)
+ *         {
+ *             FMGBountyDefinition Def = Bounty->GetBountyDefinition(ABounty.BountyId);
+ *             if (Def.TargetId == OpponentId)
+ *             {
+ *                 Bounty->CompleteObjective(PlayerId, ABounty.BountyId, TEXT("WinRace"));
+ *
+ *                 // Check if all required objectives are done
+ *                 if (Bounty->AreAllRequiredObjectivesComplete(PlayerId, ABounty.BountyId))
+ *                 {
+ *                     FMGBountyCompletionResult Result = Bounty->CompleteBounty(PlayerId, ABounty.BountyId);
+ *                     ShowBountyCompleteUI(Result);
+ *                 }
+ *             }
+ *         }
+ *     }
+ * }
+ *
+ * // Refresh bounty board (costs currency)
+ * FMGPlayerBountyBoard Board = Bounty->GetBountyBoard(PlayerId);
+ * if (Board.RefreshesRemaining > 0)
+ * {
+ *     Bounty->RefreshBountyBoard(PlayerId);
+ * }
+ *
+ * // Get player stats
+ * FMGBountyPlayerStats Stats = Bounty->GetPlayerStats(PlayerId);
+ * UE_LOG(LogGame, Log, TEXT("Completed: %d, Streak: %d, Best: %d"),
+ *        Stats.TotalBountiesCompleted, Stats.CurrentStreak, Stats.BestStreak);
+ *
+ * // Check community bounty progress
+ * TArray<FMGCommunityBounty> Community = Bounty->GetActiveCommunityBounties();
+ * for (const FMGCommunityBounty& CBounty : Community)
+ * {
+ *     float CommunityProgress = (float)CBounty.TotalCompletions / CBounty.TargetCompletions;
+ *     ShowCommunityProgress(CBounty.DisplayName, CommunityProgress);
+ * }
+ *
+ * // Listen for events
+ * Bounty->OnBountyAccepted.AddDynamic(this, &MyClass::HandleBountyAccepted);
+ * Bounty->OnBountyCompleted.AddDynamic(this, &MyClass::HandleBountyCompleted);
+ * Bounty->OnBountyFailed.AddDynamic(this, &MyClass::HandleBountyFailed);
+ * Bounty->OnBountyObjectiveCompleted.AddDynamic(this, &MyClass::HandleObjectiveComplete);
+ * Bounty->OnBountyExpiring.AddDynamic(this, &MyClass::HandleBountyExpiring);
+ * Bounty->OnBountyStreakUpdated.AddDynamic(this, &MyClass::HandleStreakUpdate);
+ * Bounty->OnCommunityBountyMilestone.AddDynamic(this, &MyClass::HandleMilestone);
+ *
+ * // Save progress
+ * Bounty->SaveBountyData();
+ * @endcode
+ *
+ * @section events_reference Events Reference
+ * - OnBountyAccepted: Player accepted a bounty
+ * - OnBountyCompleted: Bounty finished successfully (includes rewards)
+ * - OnBountyFailed: Bounty failed (time, death, etc.)
+ * - OnBountyAbandoned: Player gave up on bounty
+ * - OnBountyObjectiveCompleted: Individual objective completed
+ * - OnBountyProgress: Progress percentage changed
+ * - OnBountyBoardRefreshed: New bounties available
+ * - OnBountyExpiring: Warning that time is running out
+ * - OnCommunityBountyProgress: Community completion count updated
+ * - OnCommunityBountyMilestone: Community milestone reached
+ * - OnBountyStreakUpdated: Player streak changed
+ *
+ * @see UMGReputationSubsystem - Reputation rewards integration
+ * @see UMGProgressionSubsystem - XP and leveling
+ * @see UMGTakedownSubsystem - Takedown-based bounty objectives
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

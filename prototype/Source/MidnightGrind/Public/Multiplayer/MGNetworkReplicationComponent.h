@@ -1,5 +1,109 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGNetworkReplicationComponent.h
+ * @brief Network Replication Component for Vehicle State Synchronization
+ *
+ * @section overview_nrc Overview
+ * This component handles the network synchronization of vehicle state in multiplayer
+ * races. It ensures that all players see other vehicles in the correct positions
+ * with smooth movement, despite network latency and packet loss.
+ *
+ * @section concepts_nrc Key Concepts for Beginners
+ *
+ * ### What is Network Replication?
+ * In multiplayer games, each player's computer runs its own simulation. Network
+ * replication is how we keep all these simulations in sync. When you see another
+ * player's car on your screen, your computer is receiving "snapshots" of their
+ * car's state and reconstructing their movement locally.
+ *
+ * ### The Challenge
+ * Network data arrives with delays (latency) and sometimes out of order or not
+ * at all (packet loss). If we simply teleported cars to their latest known position,
+ * movement would look jerky and unnatural. This component solves these problems.
+ *
+ * ### Snapshot-Based Replication
+ * Instead of sending every tiny movement, we send periodic "snapshots" containing:
+ * - Position and rotation
+ * - Velocity (linear and angular)
+ * - Input states (throttle, brake, steering)
+ * - Vehicle states (gear, drifting, NOS active)
+ *
+ * ### Interpolation
+ * To make movement smooth, we don't show the LATEST data immediately. Instead,
+ * we render vehicles slightly "in the past" and smoothly interpolate between
+ * received snapshots. This is controlled by InterpolationDelay.
+ *
+ * ### Interpolation Modes (EMGNetInterpolationMode)
+ * - **Linear**: Simple straight-line interpolation between points. Fast but can
+ *   look robotic on curves.
+ * - **Hermite**: Uses velocity data to create smooth curves. Better for racing
+ *   games where vehicles follow curved paths.
+ * - **Predictive**: Extrapolates future positions when data is late. Risky but
+ *   reduces perceived latency.
+ *
+ * ### Server Reconciliation
+ * The server is the "source of truth." When our local prediction differs too much
+ * from server data (PositionErrorThreshold, RotationErrorThreshold), we "snap"
+ * back to the correct state. This prevents cheating and fixes desync issues.
+ *
+ * @section usage_nrc Usage
+ *
+ * This component is typically added to vehicle actors automatically by the
+ * multiplayer system. You generally don't need to create it manually.
+ *
+ * @code
+ * // The component is usually already attached to your vehicle
+ * UMGNetworkReplicationComponent* NetComp = Vehicle->FindComponentByClass<UMGNetworkReplicationComponent>();
+ *
+ * // Check network quality
+ * float Latency = NetComp->GetCurrentLatency();
+ * float PacketLoss = NetComp->GetPacketLoss();
+ *
+ * // For local vehicles, send snapshots (usually done automatically)
+ * if (NetComp->IsLocallyControlled())
+ * {
+ *     FMGNetworkSnapshot Snapshot;
+ *     Snapshot.Position = GetActorLocation();
+ *     Snapshot.Rotation = GetActorRotation();
+ *     Snapshot.Velocity = GetVelocity();
+ *     Snapshot.ThrottleInput = CurrentThrottle;
+ *     // ... fill other fields
+ *     NetComp->SendSnapshot(Snapshot);
+ * }
+ *
+ * // For remote vehicles, get interpolated state for rendering
+ * FVector SmoothPosition = NetComp->GetInterpolatedPosition();
+ * FRotator SmoothRotation = NetComp->GetInterpolatedRotation();
+ * @endcode
+ *
+ * @section config_nrc Configuration
+ *
+ * Key settings to tune:
+ * - **SendRate**: How often to send updates (30 Hz is typical)
+ * - **InterpolationDelay**: How far "in the past" to render (100ms is common)
+ * - **PositionErrorThreshold**: How far off before forcing reconciliation
+ * - **MaxExtrapolationTime**: How long to predict before giving up
+ *
+ * @section troubleshooting_nrc Common Issues
+ *
+ * **Vehicles are "stuttering":**
+ * - Increase InterpolationDelay
+ * - Check for packet loss
+ * - Try Hermite interpolation mode
+ *
+ * **Vehicles are "behind" their actual position:**
+ * - Decrease InterpolationDelay (but may cause stuttering)
+ * - Enable Predictive mode (but may cause rubber-banding)
+ *
+ * **Vehicles "snap" to new positions:**
+ * - Increase PositionErrorThreshold
+ * - Check server tickrate
+ *
+ * @see UMGMultiplayerSubsystem For session and lobby management
+ * @see FMGNetworkSnapshot For the replicated state structure
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

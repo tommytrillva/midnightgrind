@@ -1,5 +1,167 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRaceRewardsProcessor.h
+ * @brief Race completion rewards calculation and distribution system
+ *
+ * This file defines the Race Rewards Processor, a world subsystem that handles
+ * all reward calculations and distribution when a race ends. It serves as the
+ * bridge between the racing game mode and the player progression system.
+ *
+ * @section Overview
+ *
+ * When a race finishes, multiple rewards need to be calculated and granted:
+ * - Experience Points (XP) with detailed breakdown
+ * - In-game currency (Credits)
+ * - Crew reputation
+ * - Content unlocks (vehicles, parts, tracks)
+ * - Record tracking (personal bests, track records)
+ *
+ * The Race Rewards Processor handles all of this in a structured, event-driven way.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **1. World Subsystem**
+ *
+ * This class inherits from UWorldSubsystem, meaning:
+ * - One instance exists per game world
+ * - It's automatically created when a level loads
+ * - It's destroyed when the level is unloaded
+ * - Access it via: GetWorld()->GetSubsystem<UMGRaceRewardsProcessor>()
+ *
+ * **2. Performance Tracking**
+ *
+ * Throughout a race, the processor tracks player performance metrics:
+ * - Overtakes made and received
+ * - Drift scores accumulated
+ * - Near misses with traffic/opponents
+ * - Collisions (affects "clean race" bonus)
+ * - Maximum speed achieved
+ *
+ * These metrics feed into the XP calculation.
+ *
+ * **3. XP Breakdown (FMGXPBreakdown)**
+ *
+ * XP isn't just a single number - it's broken down into categories:
+ * - BaseXP: Everyone gets this for finishing
+ * - PositionXP: Bonus for placement (1st gets most)
+ * - BestLapXP: Bonus for setting the fastest lap
+ * - CleanRaceXP: Bonus for no collisions
+ * - OvertakeXP: Bonus per overtake
+ * - DriftXP: Bonus based on drift score
+ * - NearMissXP: Bonus for close passes
+ * - RankedBonusXP: Multiplier for ranked races
+ *
+ * This breakdown is shown to players post-race for satisfaction and transparency.
+ *
+ * **4. Two-Phase Rewards**
+ *
+ * Rewards are processed in two phases:
+ * - **Calculate**: Compute all rewards without applying them (for UI preview)
+ * - **Grant**: Actually apply the rewards to player progression
+ *
+ * This allows the UI to show a rewards screen before committing changes.
+ *
+ * **5. Event-Driven Architecture**
+ *
+ * The processor broadcasts delegates at key moments:
+ * - OnRaceRewardsCalculated: After calculation, before granting
+ * - OnRaceRewardsGranted: After rewards are applied
+ * - OnNewUnlockFromRace: For each new unlock (sequential animations)
+ *
+ * @section Usage Usage Example
+ *
+ * @code
+ * // Get the processor
+ * UMGRaceRewardsProcessor* RewardsProcessor =
+ *     GetWorld()->GetSubsystem<UMGRaceRewardsProcessor>();
+ *
+ * // Start tracking at race begin
+ * RewardsProcessor->BeginRaceTracking(StartingGridPosition);
+ *
+ * // Record events during the race
+ * void AMyRacerPawn::OnOvertake()
+ * {
+ *     RewardsProcessor->RecordOvertake();
+ * }
+ *
+ * void AMyRacerPawn::OnDriftScoreAwarded(float Score)
+ * {
+ *     RewardsProcessor->RecordDriftScore(Score);
+ * }
+ *
+ * // At race end, process rewards
+ * void ARaceGameMode::OnRaceFinished(const FMGFinalRaceResult& Result)
+ * {
+ *     // Option 1: Calculate and grant in one step
+ *     FMGRaceRewards Rewards = RewardsProcessor->ProcessRaceEnd(
+ *         Result, EMGCrew::Midnight, bIsRankedRace);
+ *
+ *     // Option 2: Calculate first, then grant (for UI preview)
+ *     FMGRaceRewards Rewards = RewardsProcessor->CalculateRewards(
+ *         Result, EMGCrew::Midnight, bIsRankedRace);
+ *
+ *     // Show rewards screen...
+ *
+ *     // Then grant when player dismisses screen
+ *     RewardsProcessor->GrantRewards(Rewards);
+ * }
+ *
+ * // Bind to unlock events for sequential reveal animation
+ * RewardsProcessor->OnNewUnlockFromRace.AddDynamic(
+ *     this, &URewardsUI::ShowUnlockAnimation);
+ * @endcode
+ *
+ * @section DataFlow Data Flow
+ *
+ * @code
+ * [Race Gameplay]
+ *     |
+ *     v
+ * [Performance Tracking] --> RecordOvertake(), RecordDriftScore(), etc.
+ *     |
+ *     v
+ * [Race End Event] --> FMGFinalRaceResult
+ *     |
+ *     v
+ * [CalculateRewards()] --> FMGRaceRewards with FMGXPBreakdown
+ *     |
+ *     +-- BaseXP calculation
+ *     +-- Position bonus
+ *     +-- Best lap check
+ *     +-- Clean race check
+ *     +-- Skill bonuses (drift, near miss, overtake)
+ *     +-- Ranked multiplier
+ *     |
+ *     v
+ * [GrantRewards()] --> UMGPlayerProgression
+ *     |
+ *     +-- AddXP()
+ *     +-- AddCredits()
+ *     +-- AddCrewReputation()
+ *     +-- CheckAndGrantNewUnlocks()
+ *     |
+ *     v
+ * [Broadcast Events]
+ *     +-- OnRaceRewardsGranted
+ *     +-- OnNewUnlockFromRace (for each unlock)
+ * @endcode
+ *
+ * @section Configuration Configuration
+ *
+ * XP values are configurable via class properties:
+ * - BaseFinishXP: XP for just finishing (default: 100)
+ * - XPPerPosition: XP multiplied by position difference (default: 50)
+ * - BestLapXP: Bonus for fastest lap (default: 150)
+ * - CleanRaceXP: Bonus for no collisions (default: 200)
+ * - XPPerOvertake: Per overtake bonus (default: 25)
+ * - RankedXPMultiplier: Multiplier for ranked races (default: 1.5x)
+ *
+ * @see UMGPlayerProgression for the progression system that receives rewards
+ * @see AMGRaceGameMode for race result generation
+ * @see FMGFinalRaceResult for race result data structure
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

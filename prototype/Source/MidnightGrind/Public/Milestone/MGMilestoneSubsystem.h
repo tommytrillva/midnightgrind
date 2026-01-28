@@ -1,5 +1,126 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGMilestoneSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the Achievement/Milestone system for Midnight Grind.
+ * Milestones are long-term goals that track player accomplishments throughout
+ * their entire career in the game. Think of them like Xbox Achievements,
+ * PlayStation Trophies, or Steam Achievements - but integrated into gameplay.
+ *
+ * Unlike streaks (consecutive actions) or daily rewards (login-based),
+ * milestones track CUMULATIVE progress over a player's entire history.
+ * "Win 1000 races" doesn't need to be consecutive - it can take months!
+ *
+ * KEY CONCEPTS:
+ * -------------
+ * 1. MILESTONES: Long-term goals with requirements and rewards.
+ *    Examples: "Win 100 races", "Own 50 vehicles", "Drive 10,000 miles"
+ *
+ * 2. CATEGORIES (EMGMilestoneCategory): Groupings for organization.
+ *    - Racing: Race wins, podiums, lap times
+ *    - Drifting: Drift scores, longest drifts
+ *    - Combat: Takedowns, near misses
+ *    - Collection: Vehicles owned, parts collected
+ *    - Social: Multiplayer activities
+ *    - Career: Overall progression
+ *    - Secret: Hidden until discovered (surprise achievements!)
+ *    - Seasonal: Limited-time achievements
+ *
+ * 3. RARITY (EMGMilestoneRarity): How difficult/rare the achievement is.
+ *    Common -> Uncommon -> Rare -> Epic -> Legendary -> Mythic
+ *    Rarer milestones give more points and better rewards.
+ *
+ * 4. TRACKING TYPES (EMGMilestoneTrackingType): How progress is measured.
+ *    - Counter: Simple count (win 100 races)
+ *    - Cumulative: Add up over time (earn 1 million coins total)
+ *    - Maximum: Track the highest value (reach 200 mph top speed)
+ *    - Minimum: Track the lowest value (complete race in under 1 minute)
+ *    - Boolean: Yes/no (unlock a legendary vehicle)
+ *    - Sequence: Do things in order (complete tutorial steps)
+ *    - Timed: Complete within time limit (win 3 races in one session)
+ *    - Compound: Multiple requirements combined
+ *
+ * 5. STATS (EMGStatType): The actual things being tracked.
+ *    RacesWon, TotalDistance, DriftScore, NitroUsed, TopSpeed, etc.
+ *    Stats are the "raw data" that milestones check against.
+ *
+ * 6. MILESTONE CHAINS: Sequences of related milestones.
+ *    Example: "Win 10 races" -> "Win 100 races" -> "Win 1000 races"
+ *    Completing one unlocks the next in the chain.
+ *
+ * 7. SECRET MILESTONES: Hidden achievements the player doesn't know about.
+ *    Creates "surprise and delight" moments when discovered.
+ *    Example: Hidden milestone for finding an easter egg location.
+ *
+ * 8. SEASONAL MILESTONES: Limited-time achievements during special seasons.
+ *    "Win 50 races during Summer Event 2024"
+ *    Creates urgency and special content for events.
+ *
+ * ARCHITECTURE:
+ * -------------
+ * UGameInstanceSubsystem - Singleton for entire game session.
+ *
+ * Key Data Structures:
+ * - FMGMilestoneDefinition: Complete definition of a milestone
+ * - FMGMilestoneRequirement: A single condition that must be met
+ * - FMGMilestoneReward: What you get for completing it
+ * - FMGMilestoneProgress: Player's current progress on a milestone
+ * - FMGPlayerStats: All tracked statistics for the player
+ * - FMGMilestoneChain: A series of related milestones
+ * - FMGMilestoneNotification: UI notification data
+ * - FMGSeasonMilestones: Seasonal achievement sets
+ *
+ * STATUS FLOW:
+ * ------------
+ * Locked -> Revealed/Hidden -> InProgress -> Completed -> Claimed
+ *
+ * - Locked: Prerequisites not met (need to complete an earlier milestone first)
+ * - Hidden: Secret milestone, not yet discovered
+ * - Revealed: Player can see it but hasn't started
+ * - InProgress: Player has made some progress
+ * - Completed: All requirements met, reward available
+ * - Claimed: Reward has been collected
+ *
+ * TYPICAL WORKFLOW:
+ * -----------------
+ * 1. Game registers all milestone definitions on startup
+ * 2. Player stats load from save data
+ * 3. During gameplay, stats update: IncrementStat(RacesWon, 1)
+ * 4. System automatically checks which milestones that stat affects
+ * 5. Progress updates: OnMilestoneProgressUpdated broadcasts
+ * 6. When requirement met: CheckMilestoneCompletion() marks complete
+ * 7. UI shows notification: "Achievement Unlocked: Speed Demon!"
+ * 8. Player claims reward from menu: ClaimMilestoneRewards()
+ *
+ * DELEGATES (Events):
+ * -------------------
+ * - OnMilestoneProgressUpdated: Progress changed on a milestone
+ * - OnMilestoneCompleted: Milestone requirements fully met
+ * - OnMilestoneRewardsClaimed: Player collected their rewards
+ * - OnMilestoneUnlocked: Milestone became available (prerequisites met)
+ * - OnSecretMilestoneDiscovered: Hidden milestone was revealed
+ * - OnChainProgressUpdated/Completed: Milestone chain progression
+ * - OnStatUpdated: A tracked statistic changed value
+ * - OnSeasonStarted/Ended: Seasonal content began/ended
+ *
+ * RELATIONSHIP TO OTHER SYSTEMS:
+ * ------------------------------
+ * - Stats feed into milestones (race wins -> "Win X races" milestone)
+ * - Streaks can trigger milestones ("Achieve a 10-win streak")
+ * - Daily rewards integrate (milestones for login streaks)
+ * - Prestige resets may affect milestone availability
+ *
+ * This is the "meta progression" layer that ties everything together
+ * and gives players long-term goals to work toward.
+ *
+ * =============================================================================
+ */
+
 // MidnightGrind - Arcade Street Racing Game
 // Milestone Subsystem - Achievement tracking, career progression, and unlock systems
 

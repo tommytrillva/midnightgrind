@@ -1,5 +1,90 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGQuickChatSubsystem.h - Quick Chat and Ping Communication System
+ *******************************************************************************
+ *
+ * OVERVIEW FOR NEW DEVELOPERS
+ * ===========================
+ * This file defines the Quick Chat system - a way for players to communicate
+ * quickly during races without typing. Think of it like the quick chat in
+ * Rocket League or Apex Legends where you can say "Nice shot!" or "I need help!"
+ * with just a button press.
+ *
+ * WHAT IS A SUBSYSTEM?
+ * --------------------
+ * In Unreal Engine, a "Subsystem" is a special class that:
+ * - Is automatically created and managed by the engine
+ * - Lives for a specific lifetime (in this case, the GameInstance lifetime)
+ * - Can be accessed from anywhere using GetSubsystem<>()
+ * - Is a great place for game-wide systems that don't need to be Actors
+ *
+ * This is a "GameInstanceSubsystem" which means it persists across level loads
+ * and exists for the entire time the game is running.
+ *
+ * KEY CONCEPTS IN THIS FILE
+ * -------------------------
+ * 1. QUICK CHAT MESSAGES: Pre-defined phrases players can send quickly
+ *    - Organized into categories (Greetings, Racing, Taunts, etc.)
+ *    - Some are unlocked by default, others earned through gameplay
+ *    - Can have voice lines that play when sent
+ *
+ * 2. CHAT WHEEL: A radial menu (like a pizza) where players assign their
+ *    favorite messages to slots for quick access during races
+ *
+ * 3. PINGS: Visual markers placed in the 3D world to communicate locations
+ *    - "Enemy here!", "Go this way!", "Danger ahead!"
+ *    - Appear as icons floating in the game world
+ *
+ * 4. VISIBILITY: Who sees your messages
+ *    - All: Everyone in the match
+ *    - TeamOnly: Just your teammates
+ *    - NearbyOnly: Players close to you
+ *    - Private: Specific player only
+ *
+ * 5. COOLDOWNS: Timers that prevent spam (can't send messages too fast)
+ *
+ * IMPORTANT UNREAL ENGINE CONCEPTS USED
+ * -------------------------------------
+ * - UENUM: Defines an enumeration that Blueprint can use
+ * - USTRUCT: Defines a data structure that Blueprint can use
+ * - UCLASS: Defines a class that Unreal's reflection system knows about
+ * - UPROPERTY: Makes a variable visible to Unreal (for serialization, Blueprint, etc.)
+ * - UFUNCTION: Makes a function callable from Blueprint or replicable over network
+ * - BlueprintCallable: Function can be called from Blueprint graphs
+ * - BlueprintPure: Function has no side effects, just returns data
+ * - BlueprintAssignable: Delegate that Blueprint can bind to
+ *
+ * HOW TO USE THIS SYSTEM (EXAMPLE)
+ * --------------------------------
+ * // Get the subsystem from anywhere in code:
+ * UMGQuickChatSubsystem* Chat = GetGameInstance()->GetSubsystem<UMGQuickChatSubsystem>();
+ *
+ * // Send a message:
+ * if (Chat->CanSendMessage())  // Check cooldown first
+ * {
+ *     Chat->SendQuickChat(TEXT("Greeting_Hello"), EMGQuickChatVisibility::All);
+ * }
+ *
+ * // Create a ping at a location:
+ * FVector TargetLocation = GetAimLocation();  // wherever player is pointing
+ * Chat->CreatePing(TargetLocation, EMGPingType::Warning);
+ *
+ * FILE ORGANIZATION
+ * -----------------
+ * 1. Enumerations (EMG...) - Define types/categories
+ * 2. Structs (FMG...) - Define data containers
+ * 3. Delegates - Define event signatures for notifications
+ * 4. Main Class (UMGQuickChatSubsystem) - The actual subsystem
+ *
+ * RELATED FILES
+ * -------------
+ * - MGQuickChatSubsystem.cpp: Implementation of all the functions
+ * - MGEmoteSubsystem.h: For visual expressions (dances, celebrations)
+ * - MGVoiceChatSubsystem.h: For actual voice communication
+ *
+ ******************************************************************************/
+
 /**
  * @file MGQuickChatSubsystem.h
  * @brief Quick Chat and Ping Communication Subsystem for Midnight Grind

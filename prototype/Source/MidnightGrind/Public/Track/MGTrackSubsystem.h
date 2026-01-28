@@ -1,5 +1,135 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGTrackSubsystem.h
+ * @brief Central track management subsystem for race timing, positions, and progress.
+ *
+ * This file defines UMGTrackSubsystem, the core system responsible for managing all
+ * track-related data during a race. It handles checkpoint validation, lap counting,
+ * sector timing, race positions, wrong-way detection, and track records.
+ *
+ * @section subsystem_concepts Key Concepts
+ *
+ * WORLD SUBSYSTEM: A UWorldSubsystem is an Unreal Engine singleton that exists
+ * once per game world. It is automatically created when the world loads and
+ * destroyed when the world unloads. Access it via GetWorld()->GetSubsystem<UMGTrackSubsystem>().
+ *
+ * CHECKPOINT VALIDATION: Racers must pass checkpoints in the correct order.
+ * Skipping a checkpoint (taking a shortcut that bypasses it) invalidates the lap.
+ * The subsystem tracks which checkpoint each racer should pass next.
+ *
+ * LAP TIMING: The subsystem records when racers cross each checkpoint and the
+ * finish line. Lap times are calculated as the time between consecutive finish
+ * line crossings (after passing all checkpoints).
+ *
+ * SECTOR TIMING: Tracks are divided into sectors (typically 3). The subsystem
+ * records sector times for detailed performance analysis. Personal best sectors
+ * are tracked independently of lap times.
+ *
+ * RACE POSITION: The subsystem calculates each racer's position based on:
+ * - Number of laps completed
+ * - Number of checkpoints passed
+ * - Distance traveled within current segment
+ *
+ * @section subsystem_architecture Architecture
+ *
+ * The subsystem is the central hub for track-related information:
+ *
+ * +------------------+
+ * | Track Subsystem  |<----+---- Checkpoint Actors (register & trigger)
+ * |                  |     |
+ * | - Checkpoints[]  |<----+---- Racing Line Actor (distance queries)
+ * | - RacerProgress[]|     |
+ * | - TrackConfig    |<----+---- Race Game Mode (init, start/stop)
+ * | - RaceTime       |     |
+ * +------------------+-----+---- Vehicle Pawns (position updates)
+ *         |
+ *         v
+ *   Events: OnCheckpointPassed, OnLapCompleted, OnPositionChanged, etc.
+ *
+ * @section subsystem_usage Usage Examples
+ *
+ * @code
+ * // Accessing the subsystem
+ * UMGTrackSubsystem* TrackSub = GetWorld()->GetSubsystem<UMGTrackSubsystem>();
+ *
+ * // Initialize track from data asset
+ * TrackSub->InitializeTrack(MyTrackDataAsset);
+ *
+ * // Register racers at race start
+ * for (int32 i = 0; i < NumRacers; ++i)
+ * {
+ *     TrackSub->RegisterRacer(i, RacerActors[i]);
+ * }
+ *
+ * // Start the race timer
+ * TrackSub->StartRaceTimer();
+ *
+ * // Query race positions during the race
+ * int32 PlayerPosition = TrackSub->GetRacerPosition(PlayerRacerID);
+ * float GapToLeader = TrackSub->GetGapToRacer(PlayerRacerID, 0); // Gap to first place
+ *
+ * // Get detailed progress for HUD display
+ * FMGRacerProgress Progress;
+ * if (TrackSub->GetRacerProgress(PlayerRacerID, Progress))
+ * {
+ *     DisplayLap(Progress.CurrentLap);
+ *     DisplaySectorTimes(Progress.CurrentSectorTimes);
+ *     if (Progress.bWrongWay)
+ *     {
+ *         ShowWrongWayWarning();
+ *     }
+ * }
+ *
+ * // Listen to track events
+ * TrackSub->OnLapCompleted.AddDynamic(this, &AMyClass::HandleLapCompleted);
+ * TrackSub->OnPositionChanged.AddDynamic(this, &AMyClass::HandlePositionChanged);
+ *
+ * void AMyClass::HandleLapCompleted(int32 RacerID, int32 LapNumber, float LapTime)
+ * {
+ *     if (RacerID == PlayerRacerID)
+ *     {
+ *         DisplayLapTime(LapTime);
+ *         if (LapNumber == TotalLaps)
+ *         {
+ *             // Player finished the race
+ *         }
+ *     }
+ * }
+ * @endcode
+ *
+ * @section subsystem_wrongway Wrong Way Detection
+ *
+ * The subsystem detects when racers are driving the wrong way:
+ * - Compares vehicle velocity direction to track direction
+ * - Broadcasts OnWrongWayChanged when status changes
+ * - UI can display "WRONG WAY" warnings
+ *
+ * @section subsystem_records Track Records
+ *
+ * The subsystem tracks the best lap time on the track:
+ * - Compares each completed lap to the current record
+ * - Broadcasts OnNewTrackRecord when a record is broken
+ * - Records persist via the track data asset
+ *
+ * @section subsystem_structs Key Data Structures
+ *
+ * FMGCheckpointData: Information about a checkpoint (position, width, sector info)
+ * FMGRacerProgress: Complete progress data for a racer (lap, checkpoints, times)
+ * FMGTrackConfig: Track configuration (name, length, number of sectors)
+ *
+ * @section subsystem_related Related Systems
+ * - AMGCheckpointActor: Triggers checkpoint crossing events
+ * - Race Game Mode: Initializes subsystem and manages race state
+ * - Race HUD: Displays timing and position information
+ * - AI Controller: May query track data for navigation
+ *
+ * @see UWorldSubsystem
+ * @see FMGCheckpointData
+ * @see FMGRacerProgress
+ * @see FMGTrackConfig
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

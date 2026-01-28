@@ -1,9 +1,61 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGTirePressureTypes.h
+ * @brief Tire pressure simulation types for realistic tire behavior.
+ *
+ * @section Overview
+ * This file defines all types related to tire pressure simulation in MIDNIGHT GRIND.
+ * Tire pressure is a critical factor affecting grip, wear, fuel economy, and blowout risk.
+ *
+ * @section Architecture
+ * The tire pressure system integrates with:
+ * - UMGVehicleMovementComponent: Applies pressure effects to grip
+ * - UMGVehicleWearSubsystem: Tracks pressure over time
+ * - UMGVehicleDamageSystem: Causes pressure loss from impacts
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Tire Pressure Effects**:
+ * - Lower pressure = larger contact patch = more grip but faster wear
+ * - Higher pressure = smaller contact patch = less grip but better economy
+ * - Temperature increases pressure (ideal gas law)
+ * - Optimal pressure varies by tire compound
+ *
+ * **Pressure Loss Causes**:
+ * - Natural: All tires slowly lose pressure over time
+ * - Damage: Impacts, punctures, and cuts cause faster loss
+ * - Blowout: Catastrophic failure with instant pressure loss
+ *
+ * **Pressure Units**: The system uses PSI (pounds per square inch),
+ * the standard unit for tire pressure in the US. Typical car tires
+ * run 30-35 PSI cold, increasing 2-4 PSI when hot.
+ *
+ * @section Usage Example Usage
+ * @code
+ * // Check for pressure warnings
+ * FMGTirePressureState PressureState = Movement->GetTirePressureState(WheelIndex);
+ * if (PressureState.CurrentPressurePSI < PressureState.CriticalLowPressurePSI)
+ * {
+ *     ShowWarning("Low tire pressure!");
+ * }
+ *
+ * // Cause pressure loss from damage
+ * Movement->ApplyPressureLoss(WheelIndex, EMGPressureLossCause::ModerateLeakDamage);
+ * @endcode
+ *
+ * @see UMGVehicleMovementComponent Where pressure affects physics
+ * @see FMGTirePressureConfig Tunable pressure parameters
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "MGTirePressureTypes.generated.h"
+
+// ============================================================================
+// FORWARD DECLARATIONS
+// ============================================================================
 
 // Forward declarations
 enum class EMGTireCompound : uint8;

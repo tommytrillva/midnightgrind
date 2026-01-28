@@ -1,4 +1,200 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Midnight Grind. All Rights Reserved.
+
+/**
+ * @file MGInstantReplaySubsystem.h
+ * @brief Instant Replay System for Capturing and Playback of Race Moments
+ *
+ * @section overview_ir Overview
+ * The Instant Replay Subsystem provides a complete replay system for capturing
+ * exciting moments during races, playing them back with cinematic camera angles,
+ * generating highlight reels, and sharing clips with other players. Think of it
+ * like the "Game DVR" feature on consoles, but built specifically for racing.
+ *
+ * @section concepts_ir Key Concepts for Beginners
+ *
+ * ### What is Instant Replay?
+ * During gameplay, the system constantly records a "buffer" of the last N seconds
+ * (typically 30 seconds). When something exciting happens - a crash, a near miss,
+ * a perfect drift - you can trigger an instant replay to watch it again from
+ * different camera angles, in slow motion, etc.
+ *
+ * ### Circular Buffer Recording
+ * The replay buffer works like a circular tape recorder:
+ * - It's always recording
+ * - When it fills up, it overwrites the oldest data
+ * - You only keep the most recent X seconds
+ * - Memory usage stays constant
+ *
+ * This means you can ALWAYS replay the last 30 seconds, without having to
+ * explicitly start recording.
+ *
+ * ### Replay Moments (FMGReplayMoment)
+ * A "moment" is a timestamped event worth highlighting:
+ * - Takedowns (crashing opponents)
+ * - Near misses (close calls)
+ * - Drift combos (high score drifts)
+ * - Big air (jumps)
+ * - Photo finishes
+ * - Overtakes
+ *
+ * The system automatically captures moments when these events occur, scoring
+ * them by "importance" to help generate highlight reels.
+ *
+ * ### Trigger Types (EMGReplayTriggerType)
+ * What caused a moment to be captured:
+ * - **Takedown**: You wrecked another car
+ * - **NearMiss**: Nearly hit something at high speed
+ * - **DriftCombo**: Executed a sick drift
+ * - **BigAir**: Got serious airtime
+ * - **PhotoFinish**: Won/lost by milliseconds
+ * - **Crash**: Spectacular crash
+ * - **Overtake**: Passed another racer
+ * - **PoliceTakedown**: Took out a cop car
+ * - **PursuitEscape**: Escaped from police
+ * - **RaceFinish**: Crossed the finish line
+ * - **Manual**: Player pressed replay button
+ * - **Highlight**: Auto-detected as interesting
+ *
+ * ### Camera Types (EMGReplayCameraType)
+ * Different viewpoints for replay playback:
+ * - **Chase**: Behind the car (default gameplay view)
+ * - **Bumper**: Front bumper view
+ * - **Hood**: Hood-mounted camera
+ * - **Cinematic**: Dramatic angles, follows action
+ * - **Orbital**: Circles around the action
+ * - **TrackSide**: Static cameras along the track
+ * - **Helicopter**: Aerial view
+ * - **Dramatic**: Extreme angles for impact moments
+ * - **SlowMotion**: Auto-triggers slow-mo at key moments
+ * - **Director**: AI-selected best angles
+ * - **Free**: User-controlled camera
+ *
+ * ### Director Sequences (FMGDirectorSequence)
+ * The "Director" feature automatically creates a cinematic edit:
+ * - Selects the best moments
+ * - Chooses appropriate camera angles
+ * - Times cuts to the action
+ * - Adds slow motion at dramatic moments
+ *
+ * ### Highlight Reels
+ * Automatically generated "best of" compilations:
+ * - Configurable duration and moment count
+ * - Filters by moment type (crashes, drifts, etc.)
+ * - Auto-selects best camera angles
+ * - Smooth transitions between shots
+ *
+ * @section usage_ir Usage Examples
+ *
+ * @code
+ * // Get the subsystem
+ * UMGInstantReplaySubsystem* Replay = GetGameInstance()->GetSubsystem<UMGInstantReplaySubsystem>();
+ *
+ * // Start recording when race begins
+ * Replay->StartRecording(RaceSessionId, EMGReplayQuality::High);
+ *
+ * // Capture moments during gameplay (called by game events)
+ * void OnTakedown(const FString& PlayerId, FVector Location, float Speed)
+ * {
+ *     Replay->CaptureAutoMoment(
+ *         EMGReplayTriggerType::Takedown,
+ *         PlayerId,
+ *         Location,
+ *         Speed,
+ *         1000  // Score value
+ *     );
+ * }
+ *
+ * // Trigger instant replay when player presses button
+ * void OnReplayButtonPressed()
+ * {
+ *     Replay->TriggerInstantReplay(5.0f, EMGReplayCameraType::Cinematic);
+ * }
+ *
+ * // Generate highlight reel after race
+ * void OnRaceComplete()
+ * {
+ *     FMGHighlightReelConfig Config;
+ *     Config.MaxDuration = 60.0f;
+ *     Config.MaxMoments = 10;
+ *     Config.bIncludeTakedowns = true;
+ *     Config.bIncludeDrifts = true;
+ *
+ *     FMGDirectorSequence Highlights = Replay->GenerateHighlightReel(Config);
+ *     Replay->PlayHighlightReel(Highlights);
+ * }
+ *
+ * // Control playback
+ * Replay->SetPlaybackSpeed(0.5f);  // Half speed
+ * Replay->SetCamera(EMGReplayCameraType::Helicopter);
+ * Replay->EnableSlowMotion(0.25f);  // Quarter speed
+ *
+ * // Save a replay for later
+ * FString ReplayId = Replay->SaveReplay(FText::FromString("Epic Takedown Compilation"));
+ *
+ * // Share a clip
+ * FString ShareUrl = Replay->ExportReplayClip(ReplayId, 10.0f, 20.0f);  // 10 second clip
+ * @endcode
+ *
+ * @section events_ir Events to Listen For
+ *
+ * - **OnReplayMomentCaptured**: A new moment was recorded (update UI)
+ * - **OnReplayStarted**: Replay playback began
+ * - **OnReplayStopped**: Replay playback ended
+ * - **OnReplayTimeUpdated**: Current playback time changed (for timeline UI)
+ * - **OnCameraChanged**: Camera angle switched
+ * - **OnReplaySaved**: Replay was saved to disk
+ * - **OnHighlightReelGenerated**: Auto-highlights are ready
+ * - **OnReplayShared**: Replay was shared (got URL)
+ * - **OnSlowMotionTriggered**: Slow motion activated
+ * - **OnReplayBookmarked**: User bookmarked a timestamp
+ *
+ * @section quality_ir Quality Settings
+ *
+ * **EMGReplayQuality levels:**
+ * - **Low**: Minimal data, small files, lower fidelity
+ * - **Medium**: Balanced quality and size
+ * - **High**: Good quality, recommended for most uses
+ * - **Ultra**: Maximum quality, large files
+ * - **Cinematic**: Highest quality for content creation
+ *
+ * Quality affects:
+ * - Recording frequency (snapshots per second)
+ * - Data precision (position accuracy)
+ * - File size when saved
+ * - Memory usage during recording
+ *
+ * @section ui_ir UI Integration
+ *
+ * **During Recording:**
+ * - Show recording indicator
+ * - Display moment count
+ * - Show recent moment notifications ("Nice Drift!")
+ *
+ * **During Playback:**
+ * - Timeline scrubber with moment markers
+ * - Camera selection buttons
+ * - Speed controls (0.25x, 0.5x, 1x, 2x)
+ * - Slow motion toggle
+ * - Bookmark button
+ *
+ * **In Replay Browser:**
+ * - Thumbnail previews
+ * - Duration and date info
+ * - View/like counts
+ * - Share and delete options
+ *
+ * @section performance_ir Performance Considerations
+ *
+ * - Buffer duration affects memory usage (longer = more RAM)
+ * - Higher quality = more CPU during recording
+ * - Many concurrent moments = larger buffer size
+ * - Consider reducing quality on lower-end hardware
+ *
+ * @see FMGReplayMoment For individual moment data structure
+ * @see FMGReplayBuffer For buffer state information
+ * @see FMGSavedReplay For saved replay metadata
+ * @see FMGHighlightReelConfig For highlight generation settings
+ */
 
 #pragma once
 

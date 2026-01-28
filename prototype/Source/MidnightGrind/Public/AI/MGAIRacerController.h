@@ -1,5 +1,171 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGAIRacerController.h
+ * @brief Advanced AI Racer Controller with Tactical Decision-Making
+ *
+ * @section overview Overview
+ * This file defines the Advanced AI Racer Controller, an enhanced AI system that
+ * provides sophisticated racing behavior with personality-driven tactics, skill-based
+ * catch-up mechanics (NOT rubber-banding), and fair competition that follows the
+ * same physics rules as the player.
+ *
+ * This controller is designed around GDD Pillar 5: "Unified Challenge" - AI opponents
+ * use the exact same physics as players. They compete through smarter decisions,
+ * not physics advantages.
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection driving_states Driving States
+ * The AI operates in different behavioral states based on the race situation:
+ * - Waiting: At start line, waiting for green light
+ * - Racing: Normal driving, following optimal racing line
+ * - Overtaking: Actively attempting to pass another vehicle
+ * - Defending: Protecting position without dirty driving
+ * - Recovering: Getting back on track after collision/off-track
+ * - Caution: Slowing for hazard (traffic, incident)
+ * - PushingHard: Skill-based catch-up (taking more risks)
+ * - ManagingLead: Conservative driving when ahead
+ * - Drafting: Using slipstream aerodynamic advantage
+ * - Finished: Race complete
+ *
+ * @subsection skill_vs_rubber Skill-Based Catch-Up vs Rubber Banding
+ * Traditional "rubber banding" gives AI speed boosts - this feels unfair!
+ * Skill-based catch-up means AI DRIVES DIFFERENTLY based on position:
+ * - When behind: Takes more risks (later braking, tighter lines)
+ * - When ahead: Drives conservatively (manages lead, avoids risks)
+ * The AI never gets physics advantages - just smarter/riskier decisions.
+ *
+ * @subsection perception AI Perception
+ * The AI "sees" nearby vehicles and tracks:
+ * - Distance and angle to each vehicle
+ * - Whether they're ahead or behind on track
+ * - Speed differences for closing rates
+ * - Slipstream opportunities
+ * - Time to collision calculations
+ *
+ * @subsection racing_line Racing Line Following
+ * Each point on the racing line contains:
+ * - World position and direction
+ * - Target speed (based on corner tightness)
+ * - Track width for avoidance calculations
+ * - Zone flags (apex, braking, acceleration)
+ * - Curvature for steering calculations
+ * - Grip level (affected by surface/weather)
+ *
+ * @subsection pid_steering PID Steering
+ * The AI uses PID (Proportional-Integral-Derivative) control for smooth steering:
+ * - Proportional: How far off the line? Steer proportionally.
+ * - Integral: Been off-line for a while? Increase correction.
+ * - Derivative: Rapidly getting worse? Apply quick correction.
+ * This creates smooth, human-like steering instead of jerky robot movements.
+ *
+ * @subsection tactics Tactical Decision Making
+ * The AI makes strategic choices about:
+ * - WHEN to overtake (waiting for good opportunity vs. forcing)
+ * - HOW to overtake (late braking, better exit, around outside)
+ * - WHEN to defend (covering racing line, protecting inside)
+ * - Risk level (based on personality, race position, lap count)
+ *
+ * @section usage Usage Examples
+ *
+ * @subsection controller_setup Controller Setup
+ * @code
+ * // Get or spawn the controller
+ * AMGAIRacerController* AIController = Cast<AMGAIRacerController>(Vehicle->GetController());
+ *
+ * // Configure driver profile
+ * AIController->SetDriverProfile(DriverProfileAsset);
+ *
+ * // Set difficulty (affects decision quality, not physics)
+ * AIController->SetDifficultyMultiplier(1.0f);  // Normal
+ *
+ * // Enable skill-based catch-up (NOT rubber banding!)
+ * AIController->SetSkillBasedCatchUpEnabled(true);
+ *
+ * // Provide the racing line
+ * AIController->SetRacingLine(RacingLinePoints);
+ * @endcode
+ *
+ * @subsection querying_state Querying AI State
+ * @code
+ * // What is the AI doing?
+ * EMGAIDrivingState State = AIController->GetDrivingState();
+ *
+ * // Get steering outputs
+ * FMGAISteeringOutput Output = AIController->GetSteeringOutput();
+ * float Steering = Output.Steering;    // -1 to 1
+ * float Throttle = Output.Throttle;    // 0 to 1
+ * float Brake = Output.Brake;          // 0 to 1
+ * bool WantsNOS = Output.bNOS;
+ *
+ * // Get nearby vehicles the AI sees
+ * TArray<FMGAIVehiclePerception> NearbyVehicles = AIController->GetPerceivedVehicles();
+ *
+ * // Get tactical information
+ * FMGAITacticalData Tactics = AIController->GetTacticalData();
+ * bool InSlipstream = Tactics.bInSlipstream;
+ * EMGOvertakeStrategy Strategy = Tactics.OvertakeStrategy;
+ * @endcode
+ *
+ * @subsection race_updates Race Position Updates
+ * @code
+ * // Update race position for tactical decisions
+ * AIController->UpdateRacePosition(
+ *     CurrentPosition,    // 1 = first place
+ *     TotalRacers,        // Total racers in race
+ *     GapToLeader,        // Seconds behind leader
+ *     GapToAhead          // Seconds behind vehicle ahead
+ * );
+ * @endcode
+ *
+ * @subsection events AI Events
+ * @code
+ * // Subscribe to state changes
+ * AIController->OnDrivingStateChanged.AddDynamic(this, &UMyClass::OnAIStateChanged);
+ *
+ * // Subscribe to successful overtakes
+ * AIController->OnOvertakeComplete.AddDynamic(this, &UMyClass::OnAIOvertook);
+ *
+ * void UMyClass::OnAIOvertook(AActor* OvertakenVehicle, EMGOvertakeStrategy Strategy)
+ * {
+ *     // Play overtake celebration, update positions, etc.
+ * }
+ * @endcode
+ *
+ * @section architecture Architecture
+ * @verbatim
+ *   [AMGAIRacerController] - This class
+ *          |
+ *          +---> [UMGAIDriverProfile] - Personality & skill data asset
+ *          |
+ *          +---> [FMGAIRacingLinePoint[]] - Path to follow
+ *          |
+ *          +---> [FMGAIVehiclePerception[]] - Nearby vehicle awareness
+ *          |
+ *          +---> [FMGAITacticalData] - Current tactical decisions
+ *          |
+ *          +---> [State Machine] - Racing/Overtaking/Defending/etc.
+ *          |
+ *          v
+ *   [Vehicle Pawn] - Receives steering outputs
+ * @endverbatim
+ *
+ * @section design Design Philosophy
+ * Per GDD Pillar 5 (Unified Challenge):
+ * - AI uses the SAME physics as players
+ * - No speed boosts or grip advantages
+ * - Difficulty through decision quality, not cheats
+ * - Fair competition that rewards player skill
+ *
+ * @see UMGAIDriverProfile - Driver personality data asset
+ * @see FMGAIRacingLinePoint - Racing line data structure
+ * @see FMGAISteeringOutput - Steering/throttle/brake outputs
+ * @see FMGAITacticalData - Tactical decision information
+ *
+ * Midnight Grind - Y2K Arcade Street Racing
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

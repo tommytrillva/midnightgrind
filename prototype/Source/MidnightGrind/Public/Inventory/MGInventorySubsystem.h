@@ -1,42 +1,118 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGInventorySubsystem.h
- * @brief Comprehensive inventory management system for items and vehicles.
+ * =============================================================================
+ * MGInventorySubsystem.h - Player Inventory and Garage Management
+ * =============================================================================
  *
- * This subsystem manages all player-owned items and vehicles including:
- * - General items (cosmetics, consumables, blueprints, crates)
- * - Vehicle garage with detailed per-vehicle statistics
- * - Equipment slots for customizing vehicles
- * - Crate opening with configurable drop tables
- * - Crafting system with recipes
- * - Item selling for currency
+ * OVERVIEW:
+ * ---------
+ * This is one of the most important subsystems in the game. It manages
+ * EVERYTHING the player owns: vehicles, parts, cosmetics, consumables,
+ * crates, and more. Think of it as the player's "bank" for all items.
  *
- * @section storage Storage Model
- * Items use a dual-key system:
- * - **ItemID (FName)**: The item template/definition (e.g., "spoiler_gt_wing")
- * - **ItemInstanceID (FGuid)**: Unique ID for each owned copy of an item
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
  *
- * This allows players to own multiple copies of stackable items while
- * maintaining individual state for each equipped/customized item.
+ * 1. ITEMS VS. VEHICLES:
+ *    Vehicles are stored separately from items because they have unique
+ *    properties (stats, customization state, race history). Items are
+ *    everything else: parts, cosmetics, consumables, etc.
  *
- * @section usage Basic Usage Example
- * @code
+ * 2. INSTANCE IDs (FGuid):
+ *    Each owned item/vehicle has a unique GUID (globally unique identifier).
+ *    This allows a player to own multiple copies of the same item, each
+ *    with its own state (equipped to different vehicles, different wear, etc.)
+ *
+ *    Example: Player owns 3 "GT Wing Spoiler" items:
+ *    - Instance A: Equipped to their Supra
+ *    - Instance B: Equipped to their 350Z
+ *    - Instance C: In inventory, not yet used
+ *
+ * 3. ITEM DEFINITIONS (FName) VS. INSTANCES (FGuid):
+ *    - ItemID (FName): The TYPE of item ("SPOILER_GT_WING")
+ *      Points to the catalog definition with base properties.
+ *    - ItemInstanceID (FGuid): A SPECIFIC copy the player owns
+ *      Has individual state (equipped, locked, favorite, etc.)
+ *
+ * 4. STACKING:
+ *    Consumable items can stack (e.g., 10x Repair Kits in one slot).
+ *    Non-stackable items (cosmetics, performance parts) each take a slot.
+ *    MaxStack property controls this per item type.
+ *
+ * 5. EQUIPMENT SLOTS:
+ *    Vehicles have named equipment slots (e.g., "Turbo", "Spoiler", "Wheels").
+ *    Items are equipped TO slots on specific vehicles. This creates the
+ *    connection between an owned item and where it's installed.
+ *
+ * 6. EVENTS/DELEGATES:
+ *    The inventory broadcasts events when things change (OnItemAdded,
+ *    OnVehicleRemoved, etc.). UI and other systems bind to these to
+ *    stay updated without constant polling.
+ *
+ * ARCHITECTURE OVERVIEW:
+ * ----------------------
+ *
+ *    [Shop/Race Rewards] ----> AddItem()/AddVehicle()
+ *                                    |
+ *                                    v
+ *                         [MGInventorySubsystem]
+ *                          /    |    |    \
+ *                         /     |    |     \
+ *    [Items Array]  [Vehicles]  [Crates]  [Recipes]
+ *         |              |          |          |
+ *         v              v          v          v
+ *    Equipment to    Garage UI   Crate     Crafting
+ *    vehicles        Stats       Opening   System
+ *
+ * COMMON OPERATIONS:
+ * ------------------
+ *
+ * // Get the subsystem
  * UMGInventorySubsystem* Inv = GetGameInstance()->GetSubsystem<UMGInventorySubsystem>();
  *
- * // Check if player has a specific item
- * if (Inv->HasItem(TEXT("turbo_stage2")))
- * {
- *     // Equip to current vehicle
- *     Inv->EquipItemToVehicle(CurrentVehicleID, ItemID, TEXT("Turbo"));
- * }
+ * // Check if player has enough of an item (for crafting, etc.)
+ * if (Inv->HasItem("SCRAP_METAL", 5)) { ... }
  *
- * // Browse garage
- * TArray<FMGVehicleInventoryEntry> AllCars = Inv->GetAllVehicles();
- * @endcode
+ * // Add rewards after a race
+ * Inv->AddItem(WonItem, 1);
+ * Inv->AddVehicle(WonVehicle);
  *
- * @see UMGShopSubsystem For purchasing new items
- * @see UMGCurrencySubsystem For selling items for currency
+ * // Equip a part to a vehicle
+ * Inv->EquipItemToVehicle(VehicleGuid, PartGuid, "Turbo");
+ *
+ * // Open a loot crate
+ * TArray<FMGInventoryItem> Rewards = Inv->OpenCrate("MIDNIGHT_CRATE");
+ *
+ * // Sell unwanted items
+ * Inv->SellItem(ItemGuid, Quantity);
+ *
+ * FILE SECTIONS:
+ * --------------
+ * 1. Enumerations: Item types, rarities, sources, sort methods
+ * 2. Item Struct: Complete data for owned items
+ * 3. Vehicle Struct: Complete data for owned vehicles
+ * 4. Filter Struct: Query parameters for inventory browsing
+ * 5. Crate/Crafting Structs: Loot box and crafting definitions
+ * 6. Statistics Struct: Aggregate inventory stats
+ * 7. Delegates: Events for inventory changes
+ * 8. Subsystem Class: Main API for inventory operations
+ *
+ * RELATED SYSTEMS:
+ * ----------------
+ * - MGCatalogTypes: Definitions for items/vehicles (what CAN exist)
+ * - MGVehicleCatalogSubsystem: Vehicle master data
+ * - MGPartsCatalogSubsystem: Part master data
+ * - MGShopSubsystem: Purchasing flow (calls AddItem/AddVehicle)
+ * - MGCurrencySubsystem: Currency for purchases/sales
+ *
+ * PERSISTENCE:
+ * ------------
+ * The inventory is saved to persistent storage (SaveInventory/LoadInventory).
+ * This happens automatically and on game save. The save format preserves
+ * all item/vehicle state including GUIDs.
+ *
+ * =============================================================================
  */
 
 #pragma once

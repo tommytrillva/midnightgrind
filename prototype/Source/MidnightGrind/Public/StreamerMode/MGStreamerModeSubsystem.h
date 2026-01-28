@@ -1,20 +1,124 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGStreamerModeSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * This file defines the Streamer Mode Subsystem for Midnight Grind. It provides
+ * a streamlined interface for content creators (streamers) to manage privacy
+ * settings, viewer interactions, and stream-friendly features. This is a
+ * lighter-weight alternative to MGStreamIntegrationSubsystem, focused on
+ * streamer convenience rather than deep platform integration.
+ *
+ * KEY CONCEPTS FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * 1. WHAT IS "STREAMER MODE"?
+ *    - A special game mode designed for people broadcasting their gameplay.
+ *    - Hides personal information (player names, crew tags, online status).
+ *    - Enables viewer interaction features (polls, commands).
+ *    - Optimizes UI for stream viewers (readable text, clean overlays).
+ *
+ * 2. WHY HIDE INFORMATION?
+ *    - Streamers play with real usernames visible to thousands.
+ *    - Other players might not want their names on stream.
+ *    - Privacy protection prevents harassment (stream sniping, etc.).
+ *    - bHidePlayerNames, bHideCrewName, bHideOnlineStatus control this.
+ *
+ * 3. STREAMER SETTINGS (FMGStreamerSettings):
+ *    - bStreamerModeEnabled: Master toggle for all streamer features.
+ *    - bShowViewerOverlay: Display stream-specific UI elements.
+ *    - bAllowViewerInteractions: Let chat affect the game.
+ *    - InteractionCooldownSeconds: Prevents spam (default 30s between effects).
+ *    - bSubOnlyInteractions: Restrict interactions to subscribers.
+ *    - CustomStreamerName: Override displayed name on stream.
+ *
+ * 4. VIEWER INTERACTIONS (EMGViewerInteractionType):
+ *    - VoteNextTrack: Chat votes on which track to race next.
+ *    - VoteWeather: Chat chooses weather conditions.
+ *    - TriggerEvent: Spawn random events during race.
+ *    - SpawnObstacle: Drop obstacles on the track.
+ *    - BoostPlayer/SlowPlayer: Affect the streamer's speed.
+ *    - ChangeMusic: Let chat pick the soundtrack.
+ *    - CustomMessage: Display viewer messages on screen.
+ *
+ * 5. VIEWER POLLS (FMGViewerPoll):
+ *    - Time-limited voting where chat chooses from options.
+ *    - Each viewer can vote once (tracked in VotedViewers set).
+ *    - WinningOptionIndex determined when poll ends.
+ *    - Used for track selection, weather, and custom choices.
+ *
+ * 6. PLATFORM CONNECTION:
+ *    - Simplified connection to Twitch, YouTube, Kick.
+ *    - ConnectToPlatform() with auth token establishes link.
+ *    - IsConnectedToPlatform() checks connection status.
+ *    - Less complex than MGStreamIntegrationSubsystem (no channel points, etc.).
+ *
+ * 7. CHAT COMMANDS:
+ *    - ProcessViewerCommand() handles incoming chat commands.
+ *    - Commands typically start with "!" (e.g., "!vote 1").
+ *    - bIsSubscriber flag enables sub-only commands.
+ *    - Commands trigger interactions via TriggerInteraction().
+ *
+ * 8. COOLDOWNS:
+ *    - CanTriggerInteraction() checks if cooldown has elapsed.
+ *    - GetInteractionCooldownRemaining() shows time until next interaction.
+ *    - LastInteractionTime tracks when last interaction occurred.
+ *    - Prevents chat from overwhelming the game with effects.
+ *
+ * 9. CHAOS MODE:
+ *    - AllowChaosMode() enables a period of rapid viewer interactions.
+ *    - Cooldowns are reduced or removed during chaos mode.
+ *    - bChaosModeActive flag tracks current state.
+ *    - Fun for special stream events but can be overwhelming.
+ *
+ * 10. STREAM STATS (FMGStreamStats):
+ *     - CurrentViewers: Live viewer count (updated via UpdateViewerCount).
+ *     - TotalInteractions: How many viewer effects triggered.
+ *     - TotalVotes: Participation in polls.
+ *     - StreamDuration: How long the stream has been live.
+ *     - RacesCompleted: Races finished during this stream.
+ *
+ * DELEGATES (Events):
+ * - OnViewerInteraction: Viewer triggered an interaction.
+ * - OnPollStarted: New poll is now active.
+ * - OnPollEnded: Poll finished with WinningIndex.
+ * - OnStreamConnected: Successfully connected to platform.
+ * - OnStreamDisconnected: Lost connection to platform.
+ *
+ * DIFFERENCE FROM MGStreamIntegrationSubsystem:
+ * - StreamerMode is SIMPLER: basic polls, interactions, privacy.
+ * - StreamIntegration is DEEPER: channel points, predictions, alerts, full chat.
+ * - StreamerMode is for casual streamers who want quick setup.
+ * - StreamIntegration is for professional streamers wanting full control.
+ * - Both can coexist; StreamerMode can use StreamIntegration under the hood.
+ *
+ * WORKFLOW EXAMPLE:
+ * 1. Streamer opens settings, enables Streamer Mode
+ * 2. Configures: hide player names, allow interactions, 30s cooldown
+ * 3. Connects to Twitch via ConnectToPlatform()
+ * 4. OnStreamConnected fires, UI shows "Live on Twitch"
+ * 5. Before race, StartTrackVote() creates poll for track selection
+ * 6. Chat votes via "!vote 1", "!vote 2", etc.
+ * 7. Poll ends, OnPollEnded fires with winning track
+ * 8. Race starts on viewer-chosen track
+ * 9. During race, subscriber types "!boost"
+ * 10. System checks cooldown, triggers BoostPlayer interaction
+ * 11. Streamer gets speed boost, chat sees "Boost from ViewerName!"
+ *
+ * SETTINGS PERSISTENCE:
+ * - LoadSettings()/SaveSettings() store preferences between sessions.
+ * - Streamers don't need to reconfigure each time they play.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MGStreamerModeSubsystem.generated.h"
-
-/**
- * Streamer Mode System - For Content Creators
- * - Twitch/YouTube integration
- * - Viewer interaction features
- * - Stream-safe options (hide personal info)
- * - Chat voting on races
- * - Subscriber perks (race as ghost, etc.)
- * - Clip-friendly UI modes
- */
 
 UENUM(BlueprintType)
 enum class EMGStreamPlatform : uint8

@@ -1,5 +1,215 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGPartySubsystem.h
+ * @brief Multiplayer Party System for Group Play and Matchmaking
+ *
+ * @section overview Overview
+ * This subsystem manages multiplayer parties - groups of players who want to
+ * play together. It handles party creation, invites, voice chat, ready states,
+ * and matchmaking queue integration. Think of it like Discord's party system
+ * or any modern multiplayer game's squad/fireteam feature.
+ *
+ * @section key_concepts Key Concepts for Beginners
+ *
+ * 1. WHAT IS A PARTY?
+ *    A party is a group of players (1-8) who:
+ *    - Can chat via voice together
+ *    - Queue for matches together
+ *    - Stay together between races
+ *    - Share game mode preferences
+ *
+ *    Example: You and 3 friends form a party to race as a team
+ *
+ * 2. PARTY LIFECYCLE:
+ *    @code
+ *    CreateParty() --> State: Forming
+ *          |
+ *          v
+ *    InvitePlayer() / AcceptInvite()
+ *          |
+ *          v
+ *    All Members Ready --> State: Ready
+ *          |
+ *          v
+ *    StartQueue() --> State: InQueue
+ *          |
+ *          v
+ *    Match Found --> State: InMatch
+ *          |
+ *          v
+ *    Match Ends --> State: PostMatch --> State: Ready (loop)
+ *          |
+ *          v
+ *    DisbandParty() or LeaveParty() --> State: None
+ *    @endcode
+ *
+ * 3. PARTY ROLES (EMGPartyRole):
+ *    - Member: Regular participant, can ready up and vote
+ *    - Moderator: Can kick members, approve join requests
+ *    - Leader: Full control - change settings, start queue, disband
+ *
+ * 4. PARTY PRIVACY (EMGPartyPrivacy):
+ *    - Open: Anyone can join directly
+ *    - FriendsOnly: Only friends can join/see the party
+ *    - InviteOnly: Must be invited by a member
+ *    - Closed: No new members allowed
+ *
+ * 5. INVITE SYSTEM:
+ *    Party invites flow:
+ *    @code
+ *    Leader calls InvitePlayer("Player2")
+ *          |
+ *          v
+ *    Server sends FMGPartyInvite to Player2
+ *          |
+ *          v
+ *    Player2's OnPartyInviteReceived fires
+ *          |
+ *          v
+ *    Player2 calls AcceptInvite() or DeclineInvite()
+ *          |
+ *          v
+ *    OnPartyMemberJoined fires for everyone
+ *    @endcode
+ *
+ * 6. READY SYSTEM:
+ *    Before queuing, all members must be ready:
+ *    - SetReady(true) marks you as ready
+ *    - AreAllMembersReady() checks if queue can start
+ *    - OnPartyReady fires when everyone is ready
+ *    - Leader can then call StartQueue()
+ *
+ * 7. VOICE CHAT INTEGRATION:
+ *    Party includes voice communication:
+ *    - JoinVoiceChannel() connects to party voice
+ *    - SetMuted(true) mutes your microphone
+ *    - SetDeafened(true) mutes all incoming audio
+ *    - SetMemberVolume() adjusts individual member volume
+ *    - GetSpeakingMembers() shows who's currently talking
+ *
+ * 8. PARTY SETTINGS (FMGPartySettings):
+ *    Configurable by the party leader:
+ *    - Privacy: Who can join
+ *    - MaxSize: Maximum party members (1-8)
+ *    - bAutoReady: Auto-ready when joining
+ *    - bRequireReadyToQueue: Must all be ready to queue
+ *    - PreferredGameMode: What mode to queue for
+ *    - PreferredRegion: Server region preference
+ *    - bEnableVoiceChat: Voice chat on/off
+ *    - bPushToTalk: PTT vs open mic
+ *
+ * 9. PARTY MEMBER DATA (FMGPartyMember):
+ *    Information about each party member:
+ *    - PlayerID, DisplayName: Identity
+ *    - Role: Member/Moderator/Leader
+ *    - bIsReady: Ready state
+ *    - SelectedVehicleID: Their chosen car
+ *    - RankTier, RankPoints: Competitive rank
+ *    - VoiceState: Voice chat status
+ *    - bIsSpeaking: Currently talking
+ *
+ * 10. JOIN REQUESTS:
+ *     For non-open parties, players can request to join:
+ *     - RequestToJoin() sends a request
+ *     - OnJoinRequestReceived fires for leader/mods
+ *     - ApproveJoinRequest() or DenyJoinRequest()
+ *
+ * @section usage_examples Code Examples
+ *
+ * @code
+ * // Get the party subsystem
+ * UMGPartySubsystem* Party = GetGameInstance()->GetSubsystem<UMGPartySubsystem>();
+ *
+ * // Set up local player info (call after login)
+ * Party->SetLocalPlayerInfo(
+ *     FName("Player_12345"),
+ *     TEXT("SpeedDemon"),
+ *     42  // Level
+ * );
+ *
+ * // Create a new party
+ * FMGPartySettings Settings;
+ * Settings.Privacy = EMGPartyPrivacy::FriendsOnly;
+ * Settings.MaxSize = 4;
+ * Settings.bEnableVoiceChat = true;
+ * Settings.PreferredGameMode = FName("CircuitRace");
+ *
+ * FGuid PartyID = Party->CreateParty(Settings);
+ *
+ * // Invite a friend
+ * FGuid InviteID = Party->InvitePlayer(
+ *     FName("Friend_67890"),
+ *     FText::FromString(TEXT("Join my party for some races!"))
+ * );
+ *
+ * // Check pending invites you've received
+ * TArray<FMGPartyInvite> Invites = Party->GetPendingInvites();
+ * for (const FMGPartyInvite& Invite : Invites)
+ * {
+ *     ShowInviteNotification(Invite.SenderName, Invite.PartyMemberCount);
+ * }
+ *
+ * // Accept an invite
+ * Party->AcceptInvite(Invites[0].InviteID);
+ *
+ * // Join voice chat
+ * Party->JoinVoiceChannel();
+ *
+ * // Set ready state
+ * Party->SetSelectedVehicle(FName("Nissan_Skyline_R34"));
+ * Party->SetReady(true);
+ *
+ * // Check if everyone is ready
+ * if (Party->IsPartyLeader() && Party->AreAllMembersReady())
+ * {
+ *     // Start matchmaking
+ *     Party->StartQueue(FName("CircuitRace"));
+ * }
+ *
+ * // Get party members for UI
+ * TArray<FMGPartyMember> Members = Party->GetPartyMembers();
+ * for (const FMGPartyMember& Member : Members)
+ * {
+ *     UpdatePartySlotUI(Member.DisplayName, Member.bIsReady, Member.Role);
+ * }
+ *
+ * // Listen for party events
+ * Party->OnPartyInviteReceived.AddDynamic(this, &MyClass::HandleInviteReceived);
+ * Party->OnPartyMemberJoined.AddDynamic(this, &MyClass::HandleMemberJoined);
+ * Party->OnPartyMemberLeft.AddDynamic(this, &MyClass::HandleMemberLeft);
+ * Party->OnPartyStateChanged.AddDynamic(this, &MyClass::HandleStateChanged);
+ * Party->OnPartyReady.AddDynamic(this, &MyClass::HandlePartyReady);
+ * Party->OnVoiceStateChanged.AddDynamic(this, &MyClass::HandleVoiceChanged);
+ *
+ * // Leave the party
+ * Party->LeaveParty();
+ *
+ * // Or if you're the leader, disband it
+ * Party->DisbandParty();
+ * @endcode
+ *
+ * @section events_reference Events Reference
+ * - OnPartyCreated: You created a new party
+ * - OnPartyDisbanded: Party was disbanded
+ * - OnPartyJoined: You joined a party
+ * - OnPartyLeft: You left a party
+ * - OnPartyMemberJoined: Someone joined your party
+ * - OnPartyMemberLeft: Someone left your party
+ * - OnPartyMemberUpdated: Member data changed (ready state, vehicle, etc.)
+ * - OnPartyLeaderChanged: New party leader assigned
+ * - OnPartyInviteReceived: You received a party invite
+ * - OnPartyInviteResponse: Someone responded to your invite
+ * - OnJoinRequestReceived: Someone wants to join (leaders/mods)
+ * - OnPartyStateChanged: Party state machine transition
+ * - OnVoiceStateChanged: Voice chat status changed
+ * - OnPartyReady: All members are ready
+ *
+ * @see UMGMatchmakingSubsystem - Handles the actual matchmaking queue
+ * @see UMGFriendsSubsystem - Friend list for inviting
+ * @see UMGVoiceChatSubsystem - Voice chat implementation
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

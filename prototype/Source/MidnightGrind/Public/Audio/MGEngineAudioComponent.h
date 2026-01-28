@@ -1,5 +1,140 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGEngineAudioComponent.h
+ * @brief Realistic engine audio system with multi-layer sound mixing and RPM-based synthesis
+ *
+ * =============================================================================
+ * OVERVIEW
+ * =============================================================================
+ *
+ * The Engine Audio Component produces realistic vehicle engine sounds based on
+ * RPM, throttle position, and load. It supports multi-layer sound mixing where
+ * different audio samples crossfade based on engine state, creating seamless
+ * transitions from idle to redline.
+ *
+ * =============================================================================
+ * @section concepts KEY CONCEPTS FOR BEGINNERS
+ * =============================================================================
+ *
+ * 1. MULTI-LAYER SOUND MIXING:
+ *    - Real engine recordings are split into "layers" (Idle, Low, Mid, High, Redline).
+ *    - Each layer plays simultaneously but at different volumes.
+ *    - As RPM increases, lower layers fade out and higher layers fade in.
+ *    - This creates smooth transitions without jarring pitch jumps.
+ *
+ * 2. RPM-BASED PITCH SHIFTING:
+ *    - Each layer's pitch is adjusted based on current RPM.
+ *    - RPMToPitchCurve defines how pitch scales with RPM.
+ *    - Pitch multipliers keep sounds realistic across the RPM range.
+ *
+ * 3. THROTTLE RESPONSE:
+ *    - bThrottleResponse: Whether a layer responds to throttle input.
+ *    - On-throttle: Engine under load, fuller sound.
+ *    - Off-throttle (decel): Engine braking sound, exhaust pops.
+ *    - bOnThrottle is true when throttle exceeds ThrottleOnThreshold.
+ *
+ * 4. ENGINE SOUND LAYERS (EMGEngineSoundLayer):
+ *    - Idle: Engine at rest, low RPM loop.
+ *    - Low/Mid/High: Different RPM ranges of the powerband.
+ *    - Redline: At or near rev limiter, aggressive sound.
+ *    - Decel: Off-throttle engine braking sound.
+ *    - ExhaustPops: Random backfires on deceleration.
+ *    - Turbo/Supercharger: Forced induction sounds.
+ *    - Transmission: Gear whine at high RPM.
+ *
+ * 5. ENGINE AUDIO PRESET (FMGEngineAudioPreset):
+ *    - Complete configuration for an engine type.
+ *    - Defines IdleRPM, RedlineRPM, LimiterRPM.
+ *    - Contains all layers and their configurations.
+ *    - Includes turbo/supercharger flags.
+ *    - ExhaustPopProbability controls decel crackles.
+ *
+ * 6. NORMALIZED OUTPUT VALUES:
+ *    - FMGEngineAudioParams provides 0-1 normalized values for audio middleware.
+ *    - RPMNormalized: 0 = idle, 1 = redline.
+ *    - LoadNormalized: 0 = coasting, 1 = full throttle under load.
+ *    - BoostNormalized: 0 = no boost, 1 = max turbo pressure.
+ *    - Useful for Wwise, FMOD, or MetaSounds integration.
+ *
+ * 7. ENGINE DAMAGE AUDIO:
+ *    - SetEngineDamageLevel() affects sound quality.
+ *    - Damaged engines misfire and knock.
+ *    - IsMisfiring()/IsKnocking() indicate current damage effects.
+ *    - OnEngineMisfire delegate fires for visual effects sync.
+ *
+ * 8. SPECIAL EFFECTS:
+ *    - TriggerBackfire(): Exhaust pop sound effect.
+ *    - TriggerBlowOffValve(): Turbo dump sound (psshh).
+ *    - ShouldPlayBOV()/ShouldPlayBackfire(): Check triggers for external audio.
+ *
+ * 9. PROCEDURAL FALLBACK:
+ *    - If bUseProceduralFallback is true and no assets are assigned,
+ *      the system generates basic engine tones procedurally.
+ *    - Not as realistic but useful for prototyping.
+ *
+ * =============================================================================
+ * @section usage USAGE EXAMPLE
+ * =============================================================================
+ *
+ * @code
+ * // Get the component from your vehicle
+ * UMGEngineAudioComponent* EngineAudio = Vehicle->FindComponentByClass<UMGEngineAudioComponent>();
+ *
+ * // Setup a preset (usually done in editor or data asset)
+ * FMGEngineAudioPreset V8Preset;
+ * V8Preset.PresetName = FName("V8_Muscle");
+ * V8Preset.IdleRPM = 750.0f;
+ * V8Preset.RedlineRPM = 6500.0f;
+ * V8Preset.LimiterRPM = 6800.0f;
+ * V8Preset.ExhaustPopProbability = 0.4f;
+ * // Add layers...
+ * EngineAudio->SetPreset(V8Preset);
+ *
+ * // Every tick from your vehicle physics:
+ * EngineAudio->SetEngineState(CurrentRPM, ThrottleInput, EngineLoad, CurrentGear);
+ *
+ * // Or set individual values:
+ * EngineAudio->SetRPM(CurrentRPM);
+ * EngineAudio->SetThrottle(ThrottleInput);
+ * EngineAudio->SetLoad(EngineLoad);
+ * EngineAudio->SetGear(CurrentGear);
+ *
+ * // On gear change (for shift sounds):
+ * EngineAudio->OnGearChange(OldGear, NewGear);
+ *
+ * // For turbo vehicles:
+ * EngineAudio->SetBoost(TurboBoostPressure);
+ * if (ThrottleClosed && BoostWasHigh)
+ * {
+ *     EngineAudio->TriggerBlowOffValve();
+ * }
+ *
+ * // Get normalized params for external audio middleware:
+ * FMGEngineAudioParams Params = EngineAudio->GetAudioParams();
+ * // Send Params to Wwise/FMOD/MetaSounds...
+ * @endcode
+ *
+ * =============================================================================
+ * @section integration AUDIO MIDDLEWARE INTEGRATION
+ * =============================================================================
+ *
+ * For professional audio integration with Wwise or FMOD:
+ *
+ * 1. Use GetAudioParams() to get all normalized values in one struct.
+ * 2. Map these to RTPC (Real-Time Parameter Controls):
+ *    - RPMNormalized -> "Engine_RPM"
+ *    - LoadNormalized -> "Engine_Load"
+ *    - BoostNormalized -> "Turbo_Boost"
+ *    - ThrottleNormalized -> "Throttle_Position"
+ * 3. Use ShouldPlayBOV()/ShouldPlayBackfire() to trigger one-shot events.
+ * 4. Subscribe to OnRevLimiter and OnExhaustPop for event-driven sounds.
+ *
+ * @see UMGVehicleSFXComponent for non-engine vehicle sounds
+ * @see FMGEngineAudioPreset for complete engine configuration
+ * @see FMGEngineAudioParams for audio middleware output
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

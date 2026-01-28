@@ -1,5 +1,288 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGSocialShareSubsystem.h
+ * @brief Social Sharing System - Screenshot capture, video recording, and social media integration
+ * @author Midnight Grind Team
+ * @version 1.0
+ *
+ * @section overview Overview
+ * ============================================================================
+ * MGSocialShareSubsystem.h
+ * Midnight Grind - Social Sharing and Media Capture System
+ * ============================================================================
+ *
+ * This subsystem handles screenshot capture, video clip recording, and sharing
+ * content to social media platforms. This is the primary interface for players
+ * to share their gaming moments with the world.
+ *
+ * @section features Key Features
+ * - Screenshot capture (with/without UI, photo mode)
+ * - Video clip recording (instant replay, live recording)
+ * - Social media integration (Twitter, YouTube, Discord, etc.)
+ * - Quick share options (clipboard, system share dialog)
+ * - Content library management
+ * - Custom watermarks
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection content 1. Shareable Content (FMGShareableContent)
+ * Any content that can be shared: screenshots, video clips, achievements.
+ * - Each piece of content has a unique ID, file path, thumbnail, metadata.
+ * - Stored in a "content library" for later access.
+ *
+ * @subsection contenttypes 2. Content Types (EMGShareContentType)
+ * - Screenshot: Single image capture of gameplay.
+ * - VideoClip: Short recorded video (up to MaxClipDurationSeconds).
+ * - PhotoModeImage: High-quality image from photo mode with filters.
+ * - ReplayHighlight: Clip from replay system.
+ * - Achievement/Milestone: Auto-generated content for accomplishments.
+ * - RaceResult: Shareable race finish card.
+ * - Livery/VehicleShowcase: Custom car designs.
+ *
+ * @subsection linking 3. Platform Linking
+ * - Players connect their social accounts (Twitter, YouTube, etc.).
+ * - LinkedPlatforms stores which accounts are connected.
+ * - LinkPlatform() initiates OAuth flow for authentication.
+ * - Platform-specific APIs handle actual posting.
+ *
+ * @subsection requests 4. Share Requests (FMGShareRequest)
+ * - When sharing, a request is created and processed asynchronously.
+ * - Can target multiple platforms simultaneously.
+ * - Tracks upload progress and completion status.
+ * - PostURLs map stores the resulting URL for each platform.
+ *
+ * @subsection recording 5. Video Recording
+ * - StartClipRecording() begins capturing gameplay video.
+ * - Recording has configurable quality (720p to 4K) and duration limits.
+ * - SaveLastNSeconds() captures the immediate past (instant replay style).
+ * - Includes options for game audio, voice chat, and microphone.
+ *
+ * @subsection screenshots 6. Screenshot Capture
+ * - CaptureScreenshot() takes an immediate screenshot.
+ * - CaptureScreenshotWithUI() option to include or exclude UI elements.
+ * - CapturePhotoModeImage() for high-quality artistic shots with filters.
+ *
+ * @subsection quickshare 7. Quick Share
+ * - QuickShareToClipboard(): Copy content for pasting elsewhere.
+ * - QuickShareToSystemDialog(): Opens OS-native share sheet (mobile-style).
+ * - Faster than full social media posting.
+ *
+ * @subsection watermarks 8. Watermarks
+ * - Automatic game branding on shared content.
+ * - CustomWatermark allows personalized overlay.
+ * - Configurable via ShareSettings.
+ *
+ * @subsection quality 9. Video Quality (EMGVideoQuality)
+ * - Low: 720p 30fps - Small files, fast upload.
+ * - Medium: 1080p 30fps - Balanced quality and size.
+ * - High: 1080p 60fps - Smooth, good quality.
+ * - Ultra: 4K 60fps - Maximum quality, large files.
+ *
+ * @section usage Usage Examples
+ *
+ * @code
+ * // Get the subsystem
+ * UMGSocialShareSubsystem* Social = GetGameInstance()->GetSubsystem<UMGSocialShareSubsystem>();
+ *
+ * // === SCREENSHOTS ===
+ * // Take a screenshot
+ * Social->CaptureScreenshot();
+ *
+ * // Take a screenshot without UI elements
+ * Social->CaptureScreenshotWithUI(false);
+ *
+ * // Take a photo mode image with a filter
+ * Social->CapturePhotoModeImage("Cinematic");
+ *
+ * // Get recent screenshots for gallery
+ * TArray<FMGShareableContent> Screenshots = Social->GetRecentScreenshots(10);
+ *
+ * // === VIDEO RECORDING ===
+ * // Start recording a clip (60 seconds max, high quality)
+ * Social->StartClipRecording(60.0f, EMGVideoQuality::High);
+ *
+ * // Stop recording when done
+ * Social->StopClipRecording();
+ *
+ * // Or save the last 30 seconds of gameplay (instant replay)
+ * Social->SaveLastNSeconds(30.0f);
+ *
+ * // Check if currently recording
+ * if (Social->IsRecording())
+ * {
+ *     FMGClipRecording CurrentRec = Social->GetCurrentRecording();
+ *     float Duration = CurrentRec.CurrentDuration;
+ * }
+ *
+ * // === SHARING ===
+ * // Share content to multiple platforms
+ * TArray<EMGSharePlatform> Platforms;
+ * Platforms.Add(EMGSharePlatform::Twitter);
+ * Platforms.Add(EMGSharePlatform::Discord);
+ *
+ * FMGShareableContent MyContent = Screenshots[0];
+ * FString RequestId = Social->ShareContent(MyContent, Platforms, "Just won an epic race!");
+ *
+ * // Quick share to clipboard
+ * Social->QuickShareToClipboard(MyContent);
+ *
+ * // Quick share using system dialog (iOS/Android style)
+ * Social->QuickShareToSystemDialog(MyContent);
+ *
+ * // === PLATFORM LINKING ===
+ * // Link social media accounts
+ * Social->LinkPlatform(EMGSharePlatform::Twitter);
+ *
+ * // Check which platforms are linked
+ * TArray<EMGSharePlatform> Linked = Social->GetLinkedPlatforms();
+ * bool bTwitterLinked = Social->IsPlatformLinked(EMGSharePlatform::Twitter);
+ *
+ * // === CONTENT MANAGEMENT ===
+ * // Get all saved content
+ * TArray<FMGShareableContent> AllContent = Social->GetAllContent();
+ *
+ * // Get content by type
+ * TArray<FMGShareableContent> Clips = Social->GetContentByType(EMGShareContentType::VideoClip);
+ *
+ * // Check storage usage
+ * int64 StorageUsed = Social->GetTotalStorageUsed();
+ *
+ * // Clean up old content (older than 30 days)
+ * Social->CleanupOldContent(30);
+ *
+ * // === EVENT LISTENERS ===
+ * Social->OnScreenshotCaptured.AddDynamic(this, &UMyClass::HandleScreenshot);
+ * Social->OnClipRecorded.AddDynamic(this, &UMyClass::HandleClipReady);
+ * Social->OnShareCompleted.AddDynamic(this, &UMyClass::HandleShareSuccess);
+ * Social->OnShareFailed.AddDynamic(this, &UMyClass::HandleShareError);
+ * @endcode
+ *
+ * @section workflow Typical Workflow Example
+ * 1. Player wins race, sees "Share Victory?" prompt
+ * 2. Player taps screenshot button -> CaptureScreenshot()
+ * 3. OnScreenshotCaptured fires, UI shows preview
+ * 4. Player adds message, selects Twitter + Discord
+ * 5. ShareContent() called -> FMGShareRequest created
+ * 6. OnShareProgressUpdated fires as upload proceeds
+ * 7. OnShareCompleted fires with tweet URL and Discord link
+ * 8. UI shows "Shared successfully!" with links
+ *
+ * @section storage Storage Management
+ * - Content is stored locally in ContentLibrary.
+ * - GetTotalStorageUsed() returns current disk usage.
+ * - CleanupOldContent() removes content older than N days.
+ * - Important for managing device storage on consoles/mobile.
+ *
+ * @section delegates Available Delegates
+ * - OnScreenshotCaptured: Screenshot ready for use/preview.
+ * - OnClipRecorded: Video recording finished processing.
+ * - OnShareRequestCreated: New share request created.
+ * - OnShareProgressUpdated: Upload progress changed (for progress bars).
+ * - OnShareCompleted: Successfully posted with URLs.
+ * - OnShareFailed: Error occurred during sharing.
+ * - OnClipRecordingStarted: Video recording began.
+ * - OnClipRecordingStopped: Recording stopped with content.
+ * - OnPlatformLinked/Unlinked: Account connection state changed.
+ *
+ * @see UMGPhotoModeSubsystem For advanced photo mode features
+ * @see UMGReplaySubsystem For replay recording and playback
+ * ============================================================================
+ */
+
+/**
+ * OVERVIEW:
+ * This file defines the Social Share Subsystem for Midnight Grind. It handles
+ * screenshot capture, video clip recording, and sharing content to social media
+ * platforms. This is the primary interface for players to share their gaming
+ * moments with the world.
+ *
+ * KEY CONCEPTS FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * 1. SHAREABLE CONTENT (FMGShareableContent):
+ *    - Any content that can be shared: screenshots, video clips, achievements.
+ *    - Each piece of content has a unique ID, file path, thumbnail, metadata.
+ *    - Stored in a "content library" for later access.
+ *
+ * 2. CONTENT TYPES (EMGShareContentType):
+ *    - Screenshot: Single image capture of gameplay.
+ *    - VideoClip: Short recorded video (up to MaxClipDurationSeconds).
+ *    - PhotoModeImage: High-quality image from photo mode with filters.
+ *    - ReplayHighlight: Clip from replay system.
+ *    - Achievement/Milestone: Auto-generated content for accomplishments.
+ *    - RaceResult: Shareable race finish card.
+ *    - Livery/VehicleShowcase: Custom car designs.
+ *
+ * 3. PLATFORM LINKING:
+ *    - Players connect their social accounts (Twitter, YouTube, etc.).
+ *    - LinkedPlatforms stores which accounts are connected.
+ *    - LinkPlatform() initiates OAuth flow for authentication.
+ *    - Platform-specific APIs handle actual posting.
+ *
+ * 4. SHARE REQUESTS (FMGShareRequest):
+ *    - When sharing, a request is created and processed asynchronously.
+ *    - Can target multiple platforms simultaneously.
+ *    - Tracks upload progress and completion status.
+ *    - PostURLs map stores the resulting URL for each platform.
+ *
+ * 5. VIDEO RECORDING:
+ *    - StartClipRecording() begins capturing gameplay video.
+ *    - Recording has configurable quality (720p to 4K) and duration limits.
+ *    - SaveLastNSeconds() captures the immediate past (instant replay style).
+ *    - Includes options for game audio, voice chat, and microphone.
+ *
+ * 6. SCREENSHOT CAPTURE:
+ *    - CaptureScreenshot() takes an immediate screenshot.
+ *    - CaptureScreenshotWithUI() option to include or exclude UI elements.
+ *    - CapturePhotoModeImage() for high-quality artistic shots with filters.
+ *
+ * 7. QUICK SHARE:
+ *    - QuickShareToClipboard(): Copy content for pasting elsewhere.
+ *    - QuickShareToSystemDialog(): Opens OS-native share sheet (mobile-style).
+ *    - Faster than full social media posting.
+ *
+ * 8. WATERMARKS:
+ *    - Automatic game branding on shared content.
+ *    - CustomWatermark allows personalized overlay.
+ *    - Configurable via ShareSettings.
+ *
+ * 9. SOCIAL STATS (FMGSocialStats):
+ *    - Tracks sharing activity: total shares, by platform, by content type.
+ *    - Useful for analytics and player engagement features.
+ *
+ * 10. VIDEO QUALITY (EMGVideoQuality):
+ *     - Low: 720p 30fps - Small files, fast upload.
+ *     - Medium: 1080p 30fps - Balanced quality and size.
+ *     - High: 1080p 60fps - Smooth, good quality.
+ *     - Ultra: 4K 60fps - Maximum quality, large files.
+ *
+ * DELEGATES (Events):
+ * - OnScreenshotCaptured: Screenshot ready for use/preview.
+ * - OnClipRecorded: Video recording finished processing.
+ * - OnShareProgressUpdated: Upload progress changed (for progress bars).
+ * - OnShareCompleted: Successfully posted with URLs.
+ * - OnShareFailed: Error occurred during sharing.
+ * - OnPlatformLinked/Unlinked: Account connection state changed.
+ *
+ * STORAGE MANAGEMENT:
+ * - Content is stored locally in ContentLibrary.
+ * - GetTotalStorageUsed() returns current disk usage.
+ * - CleanupOldContent() removes content older than N days.
+ * - Important for managing device storage on consoles/mobile.
+ *
+ * WORKFLOW EXAMPLE:
+ * 1. Player wins race, sees "Share Victory?" prompt
+ * 2. Player taps screenshot button -> CaptureScreenshot()
+ * 3. OnScreenshotCaptured fires, UI shows preview
+ * 4. Player adds message, selects Twitter + Discord
+ * 5. ShareContent() called -> FMGShareRequest created
+ * 6. OnShareProgressUpdated fires as upload proceeds
+ * 7. OnShareCompleted fires with tweet URL and Discord link
+ * 8. UI shows "Shared successfully!" with links
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

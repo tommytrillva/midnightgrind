@@ -1,4 +1,177 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Midnight Grind. All Rights Reserved.
+
+/**
+ * @file MGShortcutSubsystem.h
+ * @brief Secret Routes, Alternate Paths, and Discovery System for racing gameplay
+ *
+ * @section Overview
+ * This subsystem manages hidden shortcuts and alternate routes throughout the
+ * game world. Think of it like the shortcut system in games like Burnout or
+ * Need for Speed - secret alleys, rooftop jumps, breakable fences that reveal
+ * faster paths during races.
+ *
+ * @section WhyShortcuts Why Shortcuts Matter
+ * Shortcuts add depth to racing gameplay:
+ *   - Reward exploration and track knowledge
+ *   - Create risk/reward decisions during races
+ *   - Allow skilled players to gain advantages
+ *   - Encourage replayability to discover all secrets
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * @subsection ShortcutTypes 1. Shortcut Types (EMGShortcutType)
+ *   - Alley: Narrow street passage
+ *   - Tunnel: Underground or covered passage
+ *   - JumpRamp: Aerial shortcut over obstacles
+ *   - Rooftop: Path across building roofs
+ *   - Underground: Parking garage or subway route
+ *   - Breakable: Requires smashing through obstacle (fence, gate, etc.)
+ *   - Hidden: Not visible until discovered
+ *   - Risky: High-speed path with danger of crashing
+ *   - Technical: Requires precise driving skill
+ *   - Secret: Special unmarked shortcuts with bonus rewards
+ *
+ * @subsection DiscoveryStates 2. Discovery States (EMGShortcutState)
+ *   - Unknown: Player hasn't found it yet (no map marker)
+ *   - Hinted: Player has received a hint about its existence
+ *   - Discovered: Player has found the entry point
+ *   - Used: Player has successfully used the shortcut
+ *   - Mastered: Player has used it enough times (unlocks bonus)
+ *
+ * @subsection EntryExit 3. Entry/Exit Points (FMGShortcutEntry/FMGShortcutExit)
+ * Entry: Where the shortcut begins
+ *   - Has required approach angle (can't enter from wrong direction)
+ *   - May have speed requirements (too fast = overshoot, too slow = can't make jump)
+ *   - May require breaking through an obstacle first
+ *
+ * Exit: Where the shortcut ends
+ *   - May be a jump that launches you back onto the track
+ *   - Has a boost multiplier for dramatic exits
+ *
+ * @subsection Waypoints 4. Waypoints (FMGShortcutWaypoint)
+ * Checkpoints inside the shortcut path. Missing waypoints can:
+ *   - Fail the shortcut attempt (went wrong way)
+ *   - Reduce the time saved bonus
+ *   - Track player progress through complex shortcuts
+ *
+ * @subsection Breakables 5. Breakable Obstacles (FMGBreakableObstacle)
+ * Objects that can be destroyed to access shortcuts:
+ *   - Minimum speed required to break through
+ *   - Respawn after a timer (so AI can use them too)
+ *   - Track how many times player has broken each one
+ *
+ * @section CodeExamples Code Examples
+ *
+ * @subsection BasicUsage Basic Usage
+ * @code
+ * // Get the subsystem
+ * UMGShortcutSubsystem* Shortcuts = GetGameInstance()->GetSubsystem<UMGShortcutSubsystem>();
+ *
+ * // Start tracking shortcuts for a race session
+ * Shortcuts->StartSession();
+ *
+ * // Check if player is near a shortcut entry
+ * FString NearbyShortcut;
+ * if (Shortcuts->IsNearShortcutEntry(PlayerLocation, NearbyShortcut))
+ * {
+ *     // Show "Shortcut Ahead" UI indicator
+ * }
+ *
+ * // When player enters a shortcut trigger
+ * if (Shortcuts->TryEnterShortcut(ShortcutId, PlayerLocation, PlayerVelocity))
+ * {
+ *     // Player successfully entered! Start tracking their progress.
+ * }
+ *
+ * // Each frame while in shortcut
+ * Shortcuts->UpdateActiveShortcut(PlayerLocation, DeltaTime);
+ *
+ * // When player reaches exit
+ * Shortcuts->ExitShortcut(true); // true = successful completion
+ *
+ * // End session and get stats
+ * FMGShortcutSessionStats Stats = Shortcuts->GetSessionStats();
+ * // Stats.TotalTimeSaved, Stats.ShortcutsUsed, etc.
+ * @endcode
+ *
+ * @subsection DiscoveryExample Discovery Flow Example
+ * @code
+ * // Level designer places hint triggers near shortcuts but not at entry
+ * void AShortcutHintTrigger::OnOverlap(AActor* OtherActor)
+ * {
+ *     if (IsPlayerVehicle(OtherActor))
+ *     {
+ *         // Hint appears on minimap as "?" marker
+ *         Shortcuts->HintShortcut(ShortcutId);
+ *     }
+ * }
+ *
+ * // When player finds actual entry
+ * void AShortcutEntryTrigger::OnOverlap(AActor* OtherActor)
+ * {
+ *     // Shortcut now appears with full icon on map
+ *     Shortcuts->DiscoverShortcut(ShortcutId);
+ * }
+ * @endcode
+ *
+ * @subsection EventsExample Listening for Events
+ * @code
+ * // Bind to shortcut events
+ * Shortcuts->OnShortcutDiscovered.AddDynamic(this, &AMyClass::HandleDiscovery);
+ * Shortcuts->OnShortcutCompleted.AddDynamic(this, &AMyClass::HandleCompletion);
+ * Shortcuts->OnShortcutMastered.AddDynamic(this, &AMyClass::HandleMastery);
+ *
+ * void AMyClass::HandleDiscovery(const FString& ShortcutId, int32 DiscoveryPoints)
+ * {
+ *     ShowDiscoveryPopup(ShortcutId, DiscoveryPoints);
+ * }
+ *
+ * void AMyClass::HandleCompletion(const FString& ShortcutId, float TimeTaken, float TimeSaved)
+ * {
+ *     ShowTimeSavedUI(TimeSaved);
+ * }
+ * @endcode
+ *
+ * @subsection BreakablesExample Breaking Through Obstacles
+ * @code
+ * void AVehicle::OnCollision(const FHitResult& Hit)
+ * {
+ *     // Check if we hit a breakable obstacle
+ *     FString ObstacleId = GetObstacleId(Hit.GetActor());
+ *     if (!ObstacleId.IsEmpty())
+ *     {
+ *         float ImpactSpeed = GetVelocity().Size();
+ *         if (Shortcuts->TryBreakObstacle(ObstacleId, ImpactSpeed))
+ *         {
+ *             // Obstacle broken! Shortcut path is now open.
+ *         }
+ *     }
+ * }
+ * @endcode
+ *
+ * @section DiscoveryFlow Discovery Flow Summary
+ * 1. Place hint triggers in the world (near shortcuts but not at entry)
+ * 2. When player drives through hint trigger, call HintShortcut(ShortcutId)
+ * 3. Hint appears on minimap as "?" marker
+ * 4. When player finds actual entry, call DiscoverShortcut(ShortcutId)
+ * 5. Shortcut now appears with full icon on map
+ * 6. After successful use, state changes to "Used"
+ * 7. After 10 successful uses (configurable), state becomes "Mastered"
+ *
+ * @section Events Events to Listen For
+ *   - OnShortcutDiscovered: First time player finds a shortcut (show discovery popup)
+ *   - OnShortcutEntered: Player entered a shortcut (start shortcut UI)
+ *   - OnShortcutCompleted: Player successfully exited (show time saved)
+ *   - OnShortcutFailed: Player crashed or went wrong way (show failure message)
+ *   - OnShortcutMastered: Player mastered a shortcut (bonus XP/cash)
+ *   - OnBreakableDestroyed: Player broke through an obstacle
+ *   - OnSecretShortcutFound: Player found a secret shortcut (big bonus)
+ *
+ * @see UMGRaceModeSubsystem Race timing factors in shortcut time savings
+ * @see UMGNavigationSubsystem Shortcuts can appear on minimap
+ *
+ * @author Midnight Grind Team
+ */
 
 #pragma once
 
@@ -52,34 +225,53 @@ enum class EMGShortcutDifficulty : uint8
 };
 
 /**
- * Shortcut entry point
+ * Shortcut entry point - Where a shortcut begins
+ *
+ * Defines the conditions required to enter a shortcut successfully:
+ * - Location: Where the trigger volume is
+ * - Approach Angle: Must enter from roughly the right direction
+ * - Speed Requirements: Some shortcuts require minimum/maximum speed
+ * - Breakable Gate: Some shortcuts require smashing through an obstacle
+ *
+ * Example: A rooftop jump shortcut might require:
+ * - MinSpeed = 80 km/h (need enough speed to make the jump)
+ * - MaxSpeed = 150 km/h (too fast and you'll overshoot)
+ * - ApproachTolerance = 30 degrees (must approach the ramp straight)
  */
 USTRUCT(BlueprintType)
 struct FMGShortcutEntry
 {
 	GENERATED_BODY()
 
+	/** World position of the shortcut entry trigger */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location = FVector::ZeroVector;
 
+	/** Direction player should be facing to enter correctly */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator RequiredApproach = FRotator::ZeroRotator;
 
+	/** How many degrees off from RequiredApproach is still valid (cone angle) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ApproachTolerance = 45.0f;
 
+	/** Minimum speed required to enter (0 = no minimum). In km/h. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MinSpeed = 0.0f;
 
+	/** Maximum speed allowed to enter (999 = no maximum). In km/h. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaxSpeed = 999.0f;
 
+	/** Radius of the entry trigger volume in meters */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TriggerRadius = 10.0f;
 
+	/** Does this shortcut require breaking through an obstacle first? */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bRequiresBreakable = false;
 
+	/** ID of the breakable obstacle that must be destroyed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString BreakableId;
 };
@@ -133,67 +325,101 @@ struct FMGShortcutWaypoint
 };
 
 /**
- * Shortcut definition
+ * Shortcut definition - Complete data for a single shortcut
+ *
+ * This is the main data structure defining a shortcut in the game.
+ * It includes everything needed to:
+ * - Locate the shortcut (entry/exit points, waypoints)
+ * - Validate player's attempt (speed, direction, waypoint hits)
+ * - Reward the player (time saved, discovery points, mastery)
+ *
+ * REWARD SYSTEM:
+ * - DiscoveryPoints: Awarded first time player finds/uses shortcut
+ * - UsePoints: Awarded each time shortcut is successfully used
+ * - Mastery: After MasteryUses successful completions, extra bonus
+ *
+ * RISK/REWARD:
+ * - Higher RiskLevel = harder to execute but more time saved
+ * - Secret shortcuts have bigger rewards but no hints
  */
 USTRUCT(BlueprintType)
 struct FMGShortcutDefinition
 {
 	GENERATED_BODY()
 
+	/** Unique identifier for this shortcut */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ShortcutId;
 
+	/** Display name (e.g., "Warehouse Rooftop Jump") */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText ShortcutName;
 
+	/** Flavor text describing the shortcut */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Description;
 
+	/** Category of shortcut (alley, tunnel, jump, etc.) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGShortcutType Type = EMGShortcutType::Alley;
 
+	/** How hard is this shortcut to execute? */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMGShortcutDifficulty Difficulty = EMGShortcutDifficulty::Medium;
 
+	/** Entry point configuration */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FMGShortcutEntry Entry;
 
+	/** Exit point configuration */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FMGShortcutExit Exit;
 
+	/** Waypoints that must be hit (in order) during the shortcut */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FMGShortcutWaypoint> Waypoints;
 
+	/** How much time this shortcut saves vs the normal route (seconds) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float EstimatedTimeSaved = 2.0f;
 
+	/** Length of the shortcut path in meters */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PathLength = 100.0f;
 
+	/** Points/XP awarded when player first discovers this shortcut */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 DiscoveryPoints = 100;
 
+	/** Points/XP awarded each time shortcut is used successfully */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 UsePoints = 25;
 
+	/** How many successful uses to achieve "Mastered" status */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MasteryUses = 10;
 
+	/** Risk rating from 0.0 (safe) to 1.0 (very risky). Affects AI usage. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RiskLevel = 0.5f;
 
+	/** Is this a secret shortcut? (No hints, no minimap marker until found) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsSecret = false;
 
+	/** Does this shortcut require a special unlock condition? */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bRequiresUnlock = false;
 
+	/** Description of what's needed to unlock (e.g., "Win the Downtown King event") */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString UnlockRequirement;
 
+	/** IDs of shortcuts that connect to this one (for combo bonuses) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> ConnectedShortcuts;
 
+	/** Which track/route this shortcut belongs to (for race-specific shortcuts) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString TrackId;
 };

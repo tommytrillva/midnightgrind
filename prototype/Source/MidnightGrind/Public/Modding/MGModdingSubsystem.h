@@ -1,7 +1,333 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MidnightGrind - Arcade Street Racing Game
-// Modding Subsystem - User-generated content, custom tracks, mods, and workshop integration
+/**
+ * @file MGModdingSubsystem.h
+ * @brief User-Generated Content and Mod Workshop Integration System
+ * @author Midnight Grind Team
+ * @date 2024
+ *
+ * @section overview_sec Overview
+ * This subsystem enables user-generated content (UGC) and mod support in Midnight Grind.
+ * It handles the complete mod lifecycle: browsing workshop, downloading, installing,
+ * managing dependencies, detecting conflicts, configuring load order, and runtime loading.
+ *
+ * Think of it as the game's connection to a mod workshop (like Steam Workshop),
+ * allowing players to extend the game with community-created content.
+ *
+ * @section quickstart_sec Quick Start Example
+ * @code
+ * // Get the subsystem
+ * UMGModdingSubsystem* Mods = GetGameInstance()->GetSubsystem<UMGModdingSubsystem>();
+ *
+ * // Search for vehicle mods
+ * FMGModSearchFilter Filter;
+ * Filter.SearchQuery = "Nissan";
+ * Filter.ModTypes.Add(EMGModType::Vehicle);
+ * Filter.MinRating = 4.0f;
+ * Mods->OnModSearchComplete.AddDynamic(this, &UMyUI::OnSearchResults);
+ * Mods->SearchMods(Filter);
+ *
+ * // Install a mod
+ * Mods->SubscribeToMod(ModId);    // Mark as subscribed
+ * Mods->DownloadMod(ModId);        // Start download
+ * // ... wait for OnModDownloadComplete ...
+ * Mods->InstallMod(ModId);         // Install to disk
+ * Mods->EnableMod(ModId);          // Activate in game
+ *
+ * // Check for updates
+ * TArray<FString> Outdated = Mods->GetModsWithUpdates();
+ * if (Outdated.Num() > 0)
+ * {
+ *     Mods->UpdateAllMods();
+ * }
+ *
+ * // Get list of active mods
+ * TArray<FMGModItem> ActiveMods = Mods->GetEnabledMods();
+ * @endcode
+ *
+ * @section concepts_sec Key Concepts for Beginners
+ *
+ * @subsection types_subsec Mod Types (EMGModType)
+ * | Type            | Description                                |
+ * |-----------------|--------------------------------------------|
+ * | Vehicle         | New cars with custom models/stats          |
+ * | Track           | User-created race courses                  |
+ * | Vinyl/Livery    | Custom paint job templates                 |
+ * | Wheels/BodyKit  | Vehicle customization parts                |
+ * | Audio           | Custom engine sounds, music                |
+ * | Gameplay        | Rule modifications                         |
+ * | TotalConversion | Complete game overhauls                    |
+ *
+ * @subsection lifecycle_subsec Mod Lifecycle (EMGModStatus)
+ * @verbatim
+ * NotInstalled -> Downloading -> Installing -> Installed -> Enabled
+ *                                                        -> Disabled
+ *                                           -> UpdateAvailable
+ *              -> Error (at any step)
+ * @endverbatim
+ *
+ * @subsection verification_subsec Verification Levels (EMGModVerification)
+ * | Level      | Description                             |
+ * |------------|-----------------------------------------|
+ * | Unverified | Not reviewed (use at own risk)          |
+ * | Pending    | Submitted for review                    |
+ * | Verified   | Passed safety/quality review            |
+ * | Featured   | Highlighted by the team                 |
+ * | Staff      | Official staff pick                     |
+ *
+ * @section dependencies_sec Dependency Management
+ * Mods can require other mods to function:
+ * @code
+ * // Check if dependencies are satisfied
+ * if (!Mods->AreDependenciesSatisfied(ModId))
+ * {
+ *     // Get missing dependencies
+ *     TArray<FMGModDependency> Deps = Mods->GetModDependencies(ModId);
+ *
+ *     // Auto-install missing ones
+ *     Mods->InstallMissingDependencies(ModId);
+ * }
+ * @endcode
+ *
+ * @section conflicts_sec Conflict Detection
+ * When mods are incompatible with each other:
+ * @code
+ * // Get all conflicts
+ * TArray<FMGModConflict> Conflicts = Mods->GetAllConflicts();
+ * for (const FMGModConflict& Conflict : Conflicts)
+ * {
+ *     UE_LOG(LogMods, Warning, TEXT("Conflict: %s vs %s - %s"),
+ *            *Conflict.ModIdA, *Conflict.ModIdB, *Conflict.ConflictDescription.ToString());
+ *
+ *     if (Conflict.bCanResolve)
+ *     {
+ *         Mods->ResolveConflict(Conflict);
+ *     }
+ * }
+ * @endcode
+ *
+ * @section loadorder_sec Load Order
+ * The order mods load affects which changes "win" when mods overlap:
+ * - Lower LoadOrder = loads first
+ * - Higher LoadOrder = loads later (overwrites earlier mods)
+ * @code
+ * Mods->SetModLoadOrder(ModId, 5);
+ * Mods->MoveModUp(ModId);    // Decrease load order (load earlier)
+ * Mods->MoveModDown(ModId);  // Increase load order (load later)
+ * @endcode
+ *
+ * @section collections_sec Collections
+ * Curated mod lists that work well together:
+ * @code
+ * // Subscribe to all mods in a collection
+ * Mods->SubscribeToCollection(CollectionId);
+ *
+ * // Create your own collection
+ * FMGWorkshopCollection MyCollection = Mods->CreateCollection(
+ *     FText::FromString("JDM Dreams"),
+ *     FText::FromString("Best Japanese car mods")
+ * );
+ * Mods->AddModToCollection(MyCollection.CollectionId, ModId);
+ * @endcode
+ *
+ * @section events_subsec Delegates/Events
+ * | Event                  | Description                          |
+ * |------------------------|--------------------------------------|
+ * | OnModInstalled         | Mod successfully installed           |
+ * | OnModDownloadProgress  | Download percentage updates          |
+ * | OnModDownloadComplete  | Download finished (success/fail)     |
+ * | OnModSearchComplete    | Search results arrived               |
+ * | OnModConflictDetected  | New conflict found                   |
+ * | OnModListChanged       | Installed mod list changed           |
+ *
+ * @section safety_sec Safety Note
+ * Unverified mods may contain unexpected content or bugs. The verification system
+ * helps players find quality-checked mods. Always check ratings and reviews.
+ *
+ * @section related_sec Related Files
+ * - MGModdingSubsystem.cpp: Implementation
+ * - Steam Workshop API (for Steam builds)
+ *
+ * @see EMGModType, EMGModStatus, EMGModVerification, EMGModRating
+ * @see FMGModItem, FMGModDependency, FMGModConflict, FMGWorkshopCollection
+ */
+
+/**
+ * =============================================================================
+ * MGModdingSubsystem.h - Mod/Workshop Integration System
+ * =============================================================================
+ *
+ * OVERVIEW
+ * --------
+ * This file defines the modding system that enables user-generated content in
+ * Midnight Grind. It handles the complete mod lifecycle: browsing, downloading,
+ * installing, managing dependencies, detecting conflicts, and loading mods.
+ *
+ * Think of it as the game's connection to a mod workshop (like Steam Workshop),
+ * allowing players to extend the game with community-created content.
+ *
+ * KEY CONCEPTS FOR BEGINNERS
+ * --------------------------
+ *
+ * 1. GAME INSTANCE SUBSYSTEM
+ *    This inherits from UGameInstanceSubsystem:
+ *    - Persists for the entire game session
+ *    - Mods stay loaded across level transitions
+ *    - Access via: GetGameInstance()->GetSubsystem<UMGModdingSubsystem>()
+ *
+ * 2. MOD TYPES (EMGModType)
+ *    Different categories of mods that can be created:
+ *    - Vehicle: New cars with custom models/stats
+ *    - Track: User-created race courses
+ *    - Vinyl/Livery: Custom paint job templates
+ *    - Wheels/BodyKit: Vehicle customization parts
+ *    - Audio: Custom engine sounds, music
+ *    - Gameplay: Rule modifications
+ *    - TotalConversion: Complete game overhauls
+ *
+ * 3. MOD LIFECYCLE (EMGModStatus)
+ *    A mod progresses through these states:
+ *    - NotInstalled: Available in workshop but not on disk
+ *    - Downloading: Currently being downloaded
+ *    - Installing: Being unpacked/set up
+ *    - Installed: On disk but not active
+ *    - Enabled: Active and loaded into the game
+ *    - Disabled: Installed but turned off
+ *    - UpdateAvailable: Newer version exists
+ *    - Error: Something went wrong
+ *
+ * 4. VERIFICATION (EMGModVerification)
+ *    Trust levels for mods:
+ *    - Unverified: Not reviewed (use at own risk)
+ *    - Pending: Submitted for review
+ *    - Verified: Passed safety/quality review
+ *    - Featured: Highlighted by the team
+ *    - Staff: Official staff pick
+ *
+ * 5. MOD ITEM (FMGModItem)
+ *    Complete information about a single mod:
+ *    - ModId: Unique identifier
+ *    - Title/Description: Display information
+ *    - Author: Creator information (FMGModAuthor)
+ *    - CurrentVersion/InstalledVersion: Version tracking
+ *    - Stats: Download counts, ratings (FMGModStats)
+ *    - Dependencies: Required mods (TArray<FMGModDependency>)
+ *    - Status: Current installation state
+ *    - LoadOrder: When to load relative to other mods
+ *
+ * 6. DEPENDENCIES (FMGModDependency)
+ *    Mods can require other mods to function:
+ *    - ModId: The required mod
+ *    - MinVersion: Minimum version needed
+ *    - bIsOptional: Required vs. recommended
+ *    - bIsSatisfied: Is the dependency met?
+ *
+ *    The system can auto-install missing dependencies:
+ *      ModSubsystem->InstallMissingDependencies(ModId);
+ *
+ * 7. CONFLICTS (FMGModConflict)
+ *    When mods are incompatible with each other:
+ *    - Two mods modify the same vehicle
+ *    - Load order issues
+ *    - Resource conflicts
+ *
+ *    The system detects and helps resolve:
+ *      TArray<FMGModConflict> Issues = ModSubsystem->GetAllConflicts();
+ *      ModSubsystem->ResolveConflict(Issues[0]);
+ *
+ * 8. LOAD ORDER
+ *    The order mods load affects which "wins" when they overlap:
+ *    - Lower LoadOrder = loads first
+ *    - Higher LoadOrder = loads later (overwrites earlier)
+ *
+ *    Manage via:
+ *      ModSubsystem->SetModLoadOrder(ModId, 5);
+ *      ModSubsystem->MoveModUp(ModId);
+ *      ModSubsystem->MoveModDown(ModId);
+ *
+ * 9. COLLECTIONS (FMGWorkshopCollection)
+ *    Curated lists of mods that work well together:
+ *    - "JDM Car Pack" - 10 Japanese vehicles
+ *    - "Tokyo Drift Experience" - Tracks + cars + music
+ *    Subscribe to install all mods in a collection at once.
+ *
+ * 10. SEARCH AND FILTERING (FMGModSearchFilter)
+ *     Browse workshop with filters:
+ *     - SearchQuery: Text search
+ *     - ModTypes: Filter by category
+ *     - Tags: Filter by tags
+ *     - MinRating: Quality threshold
+ *     - SortBy: Popular, Recent, Top Rated
+ *
+ * COMMON USAGE PATTERNS
+ * ---------------------
+ *
+ * Searching the workshop:
+ *   FMGModSearchFilter Filter;
+ *   Filter.SearchQuery = "Nissan";
+ *   Filter.ModTypes.Add(EMGModType::Vehicle);
+ *   Filter.MinRating = 4.0f;
+ *   ModSubsystem->OnModSearchComplete.AddDynamic(this, &MyUI::OnResults);
+ *   ModSubsystem->SearchMods(Filter);
+ *
+ * Installing a mod:
+ *   ModSubsystem->SubscribeToMod(ModId);  // Mark as subscribed
+ *   ModSubsystem->DownloadMod(ModId);      // Start download
+ *   // Listen for OnModDownloadComplete
+ *   // Then:
+ *   ModSubsystem->InstallMod(ModId);
+ *   ModSubsystem->EnableMod(ModId);
+ *
+ * Checking for updates:
+ *   TArray<FString> OutdatedMods = ModSubsystem->GetModsWithUpdates();
+ *   if (OutdatedMods.Num() > 0)
+ *   {
+ *       ModSubsystem->UpdateAllMods();
+ *   }
+ *
+ * Listing enabled mods:
+ *   TArray<FMGModItem> ActiveMods = ModSubsystem->GetEnabledMods();
+ *   for (const FMGModItem& Mod : ActiveMods)
+ *   {
+ *       UE_LOG(LogTemp, Log, TEXT("Active: %s v%s"),
+ *           *Mod.Title.ToString(),
+ *           *Mod.InstalledVersion.GetVersionString());
+ *   }
+ *
+ * Uploading user content:
+ *   FMGModItem MyMod;
+ *   MyMod.Title = FText::FromString("My Custom Track");
+ *   MyMod.ModType = EMGModType::Track;
+ *   // ... fill in other details ...
+ *   ModSubsystem->UploadMod(MyMod, "/Path/To/Track/Content");
+ *
+ * EVENT DELEGATES
+ * ---------------
+ * Subscribe to these for async operation results:
+ *   - OnModInstalled: Mod successfully installed
+ *   - OnModDownloadProgress: Download percentage updates
+ *   - OnModDownloadComplete: Download finished (success or fail)
+ *   - OnModSearchComplete: Search results arrived
+ *   - OnModConflictDetected: New conflict found
+ *   - OnModListChanged: Installed mod list changed
+ *
+ * CONTENT RATINGS (EMGModRating)
+ * ------------------------------
+ * Age-appropriate content filtering:
+ *   - Everyone: Safe for all ages
+ *   - Teen: Mild content
+ *   - Mature: Adult content
+ *   - Unrated: Not yet rated
+ *
+ * SAFETY NOTE
+ * -----------
+ * Unverified mods may contain unexpected content or bugs.
+ * The Verification system helps players find quality-checked mods.
+ * Always check mod ratings and reviews before installing.
+ *
+ * @see EMGModType for all mod categories
+ * @see FMGModItem for complete mod data structure
+ */
 
 #pragma once
 

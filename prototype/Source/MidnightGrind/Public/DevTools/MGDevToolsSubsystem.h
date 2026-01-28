@@ -1,35 +1,99 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGDevToolsSubsystem.h
- * @brief Developer Tools and Debug Utilities Subsystem
+ * =============================================================================
+ * MGDevToolsSubsystem.h - Developer Tools and Debug Utilities
+ * =============================================================================
  *
- * This subsystem provides development and debugging functionality for
- * Midnight Grind. It includes cheat commands, performance monitoring,
- * debug visualizations, and time manipulation tools.
+ * PURPOSE:
+ * This is the main developer tools subsystem that provides cheats, performance
+ * monitoring, debug visualizations, and time manipulation. Unlike MGDevCommands
+ * which focuses on console commands, this subsystem provides a more complete
+ * developer toolkit with metrics, profiling, and configurable access control.
  *
- * Key Features:
- * - Console command system with cheat registration
- * - Quick cheats for currency, unlocks, and race manipulation
- * - Real-time performance metrics monitoring
- * - Debug visualization overlays (collision, AI, racing lines)
- * - Time control (pause, slow-mo, frame stepping)
- * - Configurable access levels for different build types
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
  *
- * @warning This subsystem should only be enabled in development builds.
- *          Production builds should have AccessLevel set to Disabled.
+ * 1. ACCESS CONTROL (EMGDevToolAccess):
+ *    - Disabled: Cheats completely off (for shipping builds)
+ *    - DevBuildOnly: Only works in Editor and Development builds
+ *    - AllBuilds: Works everywhere (DANGEROUS for production!)
+ *    - This prevents players from cheating in the released game.
  *
- * Usage Example:
- * @code
- * UMGDevToolsSubsystem* DevTools = GameInstance->GetSubsystem<UMGDevToolsSubsystem>();
- * if (DevTools->IsDevBuild())
- * {
- *     DevTools->GiveGrindCash(1000000);
- *     DevTools->SetTimeScale(0.5f);
- * }
- * @endcode
+ * 2. PERFORMANCE METRICS (FMGPerformanceMetrics):
+ *    - FPS: Frames Per Second - how smoothly the game runs
+ *    - FrameTimeMS: Milliseconds per frame (16.67ms = 60 FPS)
+ *    - GameThreadMS: Time spent on game logic (AI, physics, etc.)
+ *    - RenderThreadMS: Time spent preparing graphics commands
+ *    - GPUTimeMS: Time the graphics card spends drawing
+ *    - DrawCalls: Number of separate draw commands (fewer = better)
+ *    - If any of these are too high, the game will lag.
  *
+ * 3. DEBUG VISUALIZATION (FMGDebugVisualization):
+ *    - Visual overlays that help debug specific systems
+ *    - ShowCollision: See collision boxes/spheres
+ *    - ShowAIDebug: See what AI is "thinking"
+ *    - ShowRacingLine: See the optimal path around the track
+ *    - ShowCheckpoints: See checkpoint triggers
+ *    - These are only visible in development builds.
+ *
+ * 4. TIME CONTROL:
+ *    - SetTimeScale(): Slow motion (0.5) or fast forward (2.0)
+ *    - PauseGame(): Completely stop time
+ *    - StepFrame(): Advance exactly one frame while paused
+ *    - Essential for debugging physics and animations frame-by-frame.
+ *
+ * 5. DELEGATES (DECLARE_DYNAMIC_MULTICAST_DELEGATE):
+ *    - OnCheatExecuted: Fires when any cheat is used (for logging/telemetry)
+ *    - OnDevConsoleToggled: Fires when the dev console opens/closes
+ *    - "Dynamic" means it works with Blueprints
+ *    - "Multicast" means multiple listeners can subscribe
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ *
+ *    [Developer Input]
+ *           |
+ *           v
+ *    [UMGDevToolsSubsystem]
+ *           |
+ *           +---> [Cheat Commands] -- Modify game state directly
+ *           +---> [Performance Monitor] -- Collect and display metrics
+ *           +---> [Debug Visualization] -- Toggle visual overlays
+ *           +---> [Time Control] -- Manipulate game time
+ *           |
+ *           v
+ *    [Various Game Subsystems] -- Currency, Vehicles, Races, etc.
+ *
+ * SECURITY CONSIDERATIONS:
+ * - This subsystem can completely break game balance (infinite money, etc.)
+ * - ALWAYS set AccessLevel to Disabled for shipping builds
+ * - Consider logging cheat usage for QA tracking
+ * - Never expose these functions in player-facing UI
+ *
+ * COMMON USE CASES:
+ * - GiveGrindCash/GiveNeonCredits: Test purchases without grinding
+ * - UnlockAllVehicles/Tracks: Access all content for testing
+ * - SetTimeScale: Debug physics in slow motion
+ * - StartProfiling: Find performance bottlenecks
+ * - ToggleFPSDisplay: Monitor performance during play
+ *
+ * USAGE EXAMPLE (C++):
+ *   UMGDevToolsSubsystem* DevTools = GetGameInstance()->GetSubsystem<UMGDevToolsSubsystem>();
+ *   if (DevTools->IsDevBuild())
+ *   {
+ *       DevTools->GiveGrindCash(1000000);
+ *       DevTools->SetTimeScale(0.5f);  // Half speed for debugging
+ *   }
+ *
+ * USAGE EXAMPLE (Blueprint):
+ *   1. Get Game Instance
+ *   2. Get Subsystem (UMGDevToolsSubsystem)
+ *   3. Check IsDevBuild()
+ *   4. Call desired cheat function
+ *
+ * @see UMGDevCommands for console command-based cheats
  * @see UMGEconomySubsystem for legitimate currency operations
+ *
+ * =============================================================================
  */
 
 #pragma once

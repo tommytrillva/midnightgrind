@@ -1,0 +1,272 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Gas Stations and Refueling System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "FuelSystem": true,
+    "ConvenienceStores": true,
+    "CarWash": true
+  },
+
+  "StationTypes": {
+    "Standard": {
+      "ID": "STATION_STD",
+      "Description": "Standard gas station",
+      "FuelGrades": ["Regular", "Plus", "Premium"],
+      "Pumps": 4,
+      "Services": ["Fuel", "Store"],
+      "OpenHours": "24/7"
+    },
+    "Premium": {
+      "ID": "STATION_PREMIUM",
+      "Description": "Premium brand station",
+      "FuelGrades": ["Regular", "Plus", "Premium", "V-Power"],
+      "Pumps": 8,
+      "Services": ["Fuel", "Store", "CarWash", "Air"],
+      "OpenHours": "24/7"
+    },
+    "Performance": {
+      "ID": "STATION_PERF",
+      "Description": "Performance fuel station",
+      "FuelGrades": ["Premium", "E85", "RaceFuel"],
+      "Pumps": 6,
+      "Services": ["Fuel", "Store"],
+      "RacerFriendly": true,
+      "OpenHours": "24/7"
+    },
+    "Budget": {
+      "ID": "STATION_BUDGET",
+      "Description": "Budget gas station",
+      "FuelGrades": ["Regular", "Plus"],
+      "Pumps": 2,
+      "Services": ["Fuel"],
+      "Discount": true,
+      "OpenHours": "6AM-11PM"
+    },
+    "Truck Stop": {
+      "ID": "STATION_TRUCK",
+      "Description": "Highway truck stop",
+      "FuelGrades": ["Regular", "Plus", "Premium", "Diesel"],
+      "Pumps": 12,
+      "Services": ["Fuel", "Store", "Restaurant", "Showers"],
+      "OpenHours": "24/7"
+    }
+  },
+
+  "FuelGrades": {
+    "Regular": {
+      "ID": "FUEL_87",
+      "Description": "Regular unleaded",
+      "Octane": 87,
+      "PriceMultiplier": 1.0,
+      "Color": "Green"
+    },
+    "Plus": {
+      "ID": "FUEL_89",
+      "Description": "Mid-grade",
+      "Octane": 89,
+      "PriceMultiplier": 1.1,
+      "Color": "Yellow"
+    },
+    "Premium": {
+      "ID": "FUEL_93",
+      "Description": "Premium unleaded",
+      "Octane": 91-93,
+      "PriceMultiplier": 1.2,
+      "Color": "Red"
+    },
+    "V-Power": {
+      "ID": "FUEL_VPOWER",
+      "Description": "High-performance fuel",
+      "Octane": 93,
+      "PriceMultiplier": 1.3,
+      "Additives": true,
+      "Color": "Black"
+    },
+    "E85": {
+      "ID": "FUEL_E85",
+      "Description": "85% ethanol",
+      "Octane": 105,
+      "PriceMultiplier": 0.85,
+      "Requires": "FlexFuel",
+      "Color": "Blue"
+    },
+    "RaceFuel": {
+      "ID": "FUEL_RACE",
+      "Description": "Racing gasoline",
+      "Octane": 110,
+      "PriceMultiplier": 4.0,
+      "PerformanceBonus": true,
+      "Color": "Orange"
+    },
+    "Diesel": {
+      "ID": "FUEL_DIESEL",
+      "Description": "Diesel fuel",
+      "ForDiesel": true,
+      "PriceMultiplier": 1.15,
+      "Color": "Yellow"
+    }
+  },
+
+  "Pricing": {
+    "BasePrice": {
+      "PerGallon": 3.50,
+      "Currency": "Credits"
+    },
+    "Variation": {
+      "ByLocation": { "Range": [-0.30, 0.50] },
+      "ByTime": { "NightPremium": 0.10 },
+      "ByBrand": { "PremiumBrands": 0.20 }
+    },
+    "Discounts": {
+      "LoyaltyCard": { "Percentage": 5 },
+      "BulkPurchase": { "Over20Gal": 3 }
+    }
+  },
+
+  "RefuelingProcess": {
+    "Interaction": {
+      "ApproachPump": true,
+      "SelectGrade": true,
+      "StartFueling": true,
+      "WaitOrSkip": true,
+      "Payment": "Automatic"
+    },
+    "Timing": {
+      "FuelRate": { "GallonsPerSecond": 0.5 },
+      "SkipOption": true,
+      "QuickFill": { "InstantFull": true }
+    },
+    "Validation": {
+      "CorrectFuelType": true,
+      "TankCapacity": true,
+      "SufficientFunds": true
+    }
+  },
+
+  "Services": {
+    "ConvenienceStore": {
+      "Items": {
+        "Snacks": { "Available": true },
+        "Drinks": { "Available": true },
+        "Maps": { "Available": true },
+        "Accessories": { "Available": true }
+      },
+      "OpenHours": { "ByStation": true }
+    },
+    "CarWash": {
+      "Types": {
+        "Basic": { "Cost": 10, "CleanLevel": 0.5 },
+        "Deluxe": { "Cost": 20, "CleanLevel": 0.8 },
+        "Premium": { "Cost": 35, "CleanLevel": 1.0, "Wax": true }
+      },
+      "Process": {
+        "DriveThrough": true,
+        "Duration": { "Seconds": 30 }
+      }
+    },
+    "AirPump": {
+      "Cost": 2,
+      "TirePressure": true,
+      "FreeWithFill": { "Optional": true }
+    },
+    "VacuumStation": {
+      "Cost": 3,
+      "InteriorClean": true
+    },
+    "Restrooms": {
+      "Available": true,
+      "Cleanliness": { "Varies": true }
+    }
+  },
+
+  "StationFeatures": {
+    "PumpCount": { "Range": [2, 16] },
+    "Canopy": { "Covered": true, "Lighting": true },
+    "PayAtPump": { "Available": true },
+    "FullService": { "Rare": true },
+    "Attendant": { "ByStation": true }
+  },
+
+  "LocationTypes": {
+    "Urban": {
+      "Description": "City gas station",
+      "Size": "Small",
+      "Traffic": "High",
+      "Prices": "Higher"
+    },
+    "Suburban": {
+      "Description": "Suburban station",
+      "Size": "Medium",
+      "Traffic": "Medium",
+      "Prices": "Average"
+    },
+    "Highway": {
+      "Description": "Highway exit station",
+      "Size": "Large",
+      "Traffic": "High",
+      "Prices": "Higher"
+    },
+    "Rural": {
+      "Description": "Country gas station",
+      "Size": "Small",
+      "Traffic": "Low",
+      "Prices": "Variable"
+    }
+  },
+
+  "Brands": {
+    "Premium": ["Shell", "Chevron", "Mobil", "BP"],
+    "Standard": ["Texaco", "Citgo", "Sunoco", "Phillips 66"],
+    "Budget": ["Arco", "QuikTrip", "RaceTrac", "Sheetz"],
+    "Generic": ["Gas-N-Go", "FuelUp", "QuickFuel"]
+  },
+
+  "NPCBehavior": {
+    "OtherDrivers": {
+      "AtPumps": true,
+      "WaitingInLine": true,
+      "InStore": true
+    },
+    "Attendants": {
+      "AtRegister": true,
+      "Greeting": true
+    }
+  },
+
+  "RacerFeatures": {
+    "MeetingSpot": {
+      "Enabled": true,
+      "ParkingArea": true,
+      "LateNight": true
+    },
+    "QuickFill": {
+      "Enabled": true,
+      "BeforeRace": true
+    },
+    "FuelSelection": {
+      "PerformanceFuels": true,
+      "E85Available": { "AtSome": true }
+    }
+  },
+
+  "UI": {
+    "StationMenu": {
+      "FuelGradeSelector": true,
+      "AmountSelector": true,
+      "ServicesMenu": true,
+      "PriceDisplay": true
+    },
+    "WorldMap": {
+      "StationIcons": true,
+      "FuelTypeFilter": true,
+      "PriceDisplay": true
+    },
+    "InVehicle": {
+      "FuelGauge": true,
+      "NearestStation": true,
+      "RangeEstimate": true
+    }
+  }
+}

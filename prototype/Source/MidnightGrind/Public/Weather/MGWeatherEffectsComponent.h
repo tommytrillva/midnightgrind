@@ -1,5 +1,142 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGWeatherEffectsComponent.h
+ * @brief Weather Visual and Audio Effects Components for Vehicles and World
+ *
+ * @section overview Overview
+ * This file defines components that handle the visual and audio representation of
+ * weather effects in Midnight Grind. While MGWeatherSubsystem manages the weather
+ * state and logic, these components handle what players actually see and hear -
+ * rain particles, windshield effects, thunder sounds, tire spray, and more.
+ *
+ * @section architecture Architecture
+ * This file contains three main classes:
+ * 1. **UMGWeatherEffectsComponent** - Attaches to vehicles for localized weather effects
+ * 2. **AMGWeatherEffectActor** - Spawnable actor for world-space weather effects
+ * 3. **UMGRoadSurfaceEffectComponent** - Handles tire spray and puddle effects
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection particles Particle Systems (Niagara)
+ * Unreal Engine uses Niagara for particle effects. This component manages several:
+ * - **RainParticleSystem**: Falling raindrops around the vehicle
+ * - **RainSplashSystem**: Splashes when rain hits surfaces
+ * - **SnowParticleSystem**: Falling snowflakes
+ * - **DustParticleSystem**: Dust/sand in storms
+ * - **FogPatchSystem**: Volumetric fog clouds
+ *
+ * These are UNiagaraSystem assets assigned in the Blueprint defaults.
+ *
+ * @subsection windshield Windshield Effects (FMGWindshieldEffectData)
+ * When driving in rain, the windshield shows realistic effects:
+ * - **DropletCount**: Number of water droplets on glass
+ * - **DropletSize**: Size of individual droplets
+ * - **StreakAmount**: Water streaks running down the glass
+ * - **WiperPosition**: Current windshield wiper position (0-1 for animation)
+ * - **WetnessAmount**: Overall wetness of the glass
+ * - **InteriorFog**: Condensation/fogging inside the car
+ *
+ * Controlled via a dynamic material instance (WindshieldMID).
+ *
+ * @subsection screen Screen Effects (FMGScreenWeatherEffect)
+ * Post-process effects applied to the camera during weather:
+ * - **VignetteIntensity**: Darkening at screen edges (storm immersion)
+ * - **BlurAmount**: Motion blur/rain blur
+ * - **ContrastMultiplier**: Adjust image contrast
+ * - **SaturationMultiplier**: Color saturation (muted in fog)
+ * - **ColorTint**: Overall color grading (blue for rain, grey for fog)
+ * - **FilmGrainIntensity**: Adds graininess for atmosphere
+ *
+ * @subsection wipers Wiper System
+ * Realistic windshield wipers with multiple modes:
+ * - Mode 0: Off
+ * - Mode 1: Intermittent (every few seconds)
+ * - Mode 2: Normal speed
+ * - Mode 3: Fast (heavy rain)
+ *
+ * WiperTimer and WiperInterval control the animation timing.
+ *
+ * @subsection audio Weather Audio
+ * Ambient sounds that change with weather:
+ * - **RainAmbientSound**: Light rain loop
+ * - **HeavyRainAmbientSound**: Intense rain loop
+ * - **ThunderSounds**: Array of thunder sound effects (randomized)
+ * - **WindAmbientSound**: Wind noise
+ * - **SnowAmbientSound**: Quiet snow ambiance
+ *
+ * @section usage Usage Example
+ * @code
+ * // The component is typically added to vehicle Blueprints
+ * // In C++, you can access it like this:
+ *
+ * // Get the weather effects component from your vehicle
+ * UMGWeatherEffectsComponent* WeatherFX = Vehicle->FindComponentByClass<UMGWeatherEffectsComponent>();
+ *
+ * // Enable/disable effects (useful for performance options)
+ * WeatherFX->SetWeatherEffectsEnabled(true);
+ *
+ * // Set interior camera mode (affects windshield visibility)
+ * WeatherFX->SetInteriorMode(true);
+ *
+ * // Control wipers (player input)
+ * WeatherFX->SetWiperMode(2);  // Normal speed
+ *
+ * // Get current windshield state for UI display
+ * FMGWindshieldEffectData WindshieldState = WeatherFX->GetWindshieldEffects();
+ * float WetnessPercent = WindshieldState.WetnessAmount * 100.0f;
+ *
+ * // Force update (after weather transition)
+ * WeatherFX->ForceUpdateEffects();
+ * @endcode
+ *
+ * @section roadeffects Road Surface Effects
+ * The UMGRoadSurfaceEffectComponent handles vehicle-road interaction:
+ * - **TireSpraySystem**: Water spray from tires on wet roads
+ * - **PuddleSplashSystem**: Large splashes when hitting puddles
+ * - Spray intensity scales with vehicle speed and road wetness
+ * - IsInPuddle() returns true when over standing water
+ *
+ * @code
+ * // Road surface component usage
+ * UMGRoadSurfaceEffectComponent* RoadFX = Vehicle->FindComponentByClass<UMGRoadSurfaceEffectComponent>();
+ *
+ * // Update speed for spray calculations (call from vehicle tick)
+ * RoadFX->SetVehicleSpeed(CurrentSpeedKPH);
+ *
+ * // Check if in a puddle (for handling/physics)
+ * if (RoadFX->IsInPuddle())
+ * {
+ *     // Apply aquaplaning effects
+ * }
+ *
+ * // Get spray intensity for visual feedback
+ * float SprayAmount = RoadFX->GetSprayIntensity();
+ * @endcode
+ *
+ * @section worldactor Weather Effect Actor
+ * AMGWeatherEffectActor is a spawnable actor for world-space effects:
+ * - Contains a UMGWeatherEffectsComponent
+ * - Can follow a target actor (usually the player vehicle)
+ * - HeightOffset positions effects above the vehicle
+ * - Use for global weather effects that aren't attached to a specific vehicle
+ *
+ * @section delegates Event Handling
+ * The component subscribes to weather system events:
+ * - **OnWeatherChanged**: Updates all effects when weather state changes
+ * - **OnLightningStrike**: Triggers flash and schedules thunder sound
+ *
+ * @section performance Performance Considerations
+ * - Effects can be disabled via SetWeatherEffectsEnabled(false)
+ * - Particle spawn rates scale with weather intensity
+ * - Screen effects use post-process which has GPU cost
+ * - Consider reducing effects for lower-end hardware
+ *
+ * @see UMGWeatherSubsystem for weather state management
+ * @see EMGWeatherType for weather type definitions
+ * @see EMGRoadCondition for road surface states
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

@@ -1,5 +1,153 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGUIDataAssets.h
+ * @brief Data assets for UI theming, HUD layouts, and track minimap configuration
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines data asset classes that allow designers to configure UI
+ * appearance without modifying code. These assets store visual themes, HUD
+ * element layouts, and track-specific minimap data that can be created and
+ * edited in the Unreal Editor.
+ *
+ * Data assets defined here:
+ * - **UMGHUDThemeData**: Complete visual theme including colors, textures, sounds
+ * - **UMGHUDLayoutPresetData**: Quick layout presets for HUD element positioning
+ * - **UMGTrackMinimapData**: Track-specific minimap textures and bounds
+ * - **UMGUIConfigData**: Master configuration referencing themes and presets
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Data Assets vs Blueprints**: Data Assets are pure data containers (no logic),
+ *   making them ideal for configuration. They load faster than Blueprints and are
+ *   easier for non-programmers to edit.
+ *
+ * - **Theme System**: The HUD theme system allows complete visual customization
+ *   through data. Players could unlock or purchase different HUD themes, or
+ *   designers can create era-specific themes (90s arcade, modern minimal, etc.).
+ *
+ * - **Layout Presets**: Predefined HUD element positions that players can switch
+ *   between. Useful for different screen sizes, preferences, or streaming setups.
+ *
+ * - **Anchor System**: HUD elements use a 9-point anchor system (TopLeft to
+ *   BottomRight) plus offset values, making layouts resolution-independent.
+ *
+ * - **Track Minimap Data**: Each track has associated minimap configuration
+ *   including the texture, world-to-minimap coordinate bounds, checkpoint
+ *   positions, and optimal racing line for display.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [UMGUIConfigData] (Master Config)
+ *          |
+ *          +-- AvailableThemes[] --> [UMGHUDThemeData]
+ *          |                              |
+ *          |                              +-- TachometerStyle
+ *          |                              +-- MinimapStyle
+ *          |                              +-- NotificationStyle
+ *          |                              +-- Colors
+ *          |                              +-- Sounds
+ *          |
+ *          +-- LayoutPresets[] --> [UMGHUDLayoutPresetData]
+ *          |                              |
+ *          |                              +-- ElementLayouts[]
+ *          |
+ *          +-- Widget Classes
+ *          |
+ *          v
+ *   [Race HUD Subsystem] applies theme/layout to widgets
+ *
+ *   [UMGTrackMinimapData] (Per-Track)
+ *          |
+ *          +-- MinimapTexture
+ *          +-- TrackBounds (world space)
+ *          +-- CheckpointPositions[]
+ *          +-- RacingLinePoints[]
+ *          |
+ *          v
+ *   [UMGMinimapWidget] uses this data for rendering
+ *
+ * =============================================================================
+ * @section Usage
+ *
+ * @subsection CreatingTheme Creating a HUD Theme
+ * @code
+ * // In Editor: Content Browser -> Right Click -> Miscellaneous -> Data Asset
+ * // Select UMGHUDThemeData, name it "DA_HUDTheme_Retro"
+ *
+ * // In C++, load and apply a theme:
+ * UMGHUDThemeData* RetroTheme = LoadObject<UMGHUDThemeData>(nullptr,
+ *     TEXT("/Game/UI/Themes/DA_HUDTheme_Retro"));
+ *
+ * // Apply to HUD subsystem
+ * HUDSubsystem->ApplyTheme(RetroTheme);
+ *
+ * // Or directly configure widgets:
+ * TachWidget->SetStyle(RetroTheme->TachometerStyle);
+ * MinimapWidget->SetStyle(RetroTheme->MinimapStyle);
+ * @endcode
+ *
+ * @subsection UsingLayoutPresets Using Layout Presets
+ * @code
+ * // Get available presets
+ * TArray<UMGHUDLayoutPresetData*> Presets = UIConfig->LayoutPresets;
+ *
+ * // Apply a preset
+ * for (const FMGHUDElementLayout& Layout : SelectedPreset->ElementLayouts)
+ * {
+ *     Widget->SetElementPosition(Layout.ElementName, Layout.Anchor, Layout.Offset);
+ *     Widget->SetElementScale(Layout.ElementName, Layout.Scale);
+ *     Widget->SetElementVisible(Layout.ElementName, Layout.bVisibleByDefault);
+ * }
+ * @endcode
+ *
+ * @subsection TrackMinimapSetup Setting Up Track Minimap Data
+ * @code
+ * // Create minimap data asset for a track
+ * // In Editor: Create UMGTrackMinimapData asset
+ *
+ * // Configure in Details panel:
+ * // - Assign minimap texture (top-down track render)
+ * // - Set TrackBoundsMin/Max to match world coordinates
+ * // - Add checkpoint positions
+ * // - Optionally add racing line points
+ *
+ * // In code, apply to minimap widget:
+ * UMGTrackMinimapData* TrackData = GetMinimapDataForTrack(TrackName);
+ * TrackData->ApplyToMinimap(MinimapWidget);
+ *
+ * // This sets:
+ * // - Texture
+ * // - World bounds for coordinate conversion
+ * // - Checkpoint markers
+ * // - Racing line (if enabled)
+ * @endcode
+ *
+ * =============================================================================
+ * @section UnrealMacros Unreal Engine Macros Explained
+ *
+ * - UCLASS(BlueprintType): Allows this class to be used as a variable type in
+ *   Blueprints. Combined with UDataAsset base, creates editable data containers.
+ *
+ * - USTRUCT(BlueprintType): Structs that can be used in Blueprints as variables,
+ *   function parameters, and in data tables.
+ *
+ * - UPROPERTY(EditAnywhere): Property can be edited in any property window
+ *   (Details panel in Editor, archetype properties, instance properties).
+ *
+ * - UDataAsset base class: Provides automatic serialization and Editor support
+ *   for creating data-only assets without Blueprint overhead.
+ *
+ * - TSubclassOf<UWidget>: A type-safe reference to a UClass that must derive
+ *   from UWidget. Used to specify which widget class to instantiate at runtime.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

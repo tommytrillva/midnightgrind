@@ -1,5 +1,149 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGEmoteSubsystem.h - Emote and Player Expression System
+ *******************************************************************************
+ *
+ * OVERVIEW FOR NEW DEVELOPERS
+ * ===========================
+ * This file defines the Emote system - visual expressions players can perform
+ * to communicate and celebrate. Think of Fortnite dances, Rocket League goal
+ * celebrations, or victory poses in Overwatch. Emotes let players express
+ * personality without words.
+ *
+ * WHAT ARE EMOTES?
+ * ----------------
+ * Emotes are visual/audio expressions including:
+ * - Character dances and animations
+ * - Vehicle effects (burnouts, tire smoke, honks)
+ * - Celebration animations (fist pumps, waves)
+ * - Taunts to playfully mock opponents
+ * - Stickers and banners displayed on your vehicle
+ *
+ * EMOTE CATEGORIES (EMGEmoteType)
+ * -------------------------------
+ * - Celebration: Happy expressions for victories
+ * - Taunt: Competitive expressions directed at opponents
+ * - Greeting: Friendly waves and acknowledgments
+ * - Reaction: Surprised, frustrated, confused expressions
+ * - Dance: Full character dance animations
+ * - Horn: Custom vehicle horn sounds
+ * - Burnout: Tire smoke and engine revving effects
+ * - Drift: Special effects during drift maneuvers
+ * - Sticker: Temporary decals on your vehicle
+ * - Banner: Flags or banners displayed
+ *
+ * WHEN CAN YOU USE EMOTES? (EMGEmoteContext)
+ * ------------------------------------------
+ * Not all emotes work everywhere. Context determines availability:
+ * - PreRace: On the starting grid before GO
+ * - Victory: After winning (automatic victory emote)
+ * - Defeat: After losing (automatic defeat emote)
+ * - Podium: During the podium ceremony
+ * - Garage: In the vehicle customization screen
+ * - Lobby: In multiplayer waiting rooms
+ * - InRace: During active racing (limited options)
+ * - Spectating: While watching other players
+ *
+ * RARITY SYSTEM (EMGEmoteRarity)
+ * ------------------------------
+ * Like many modern games, emotes have rarity tiers:
+ * - Common (gray): Easy to get, everyone has them
+ * - Uncommon (green): Slightly harder to earn
+ * - Rare (blue): Requires significant play time
+ * - Epic (purple): Difficult challenges or premium
+ * - Legendary (gold): Very rare and prestigious
+ * - Exclusive (special): Limited-time events only
+ *
+ * Higher rarity = harder to obtain = more impressive to show off!
+ *
+ * KEY DATA STRUCTURES
+ * -------------------
+ * 1. FMGEmoteDefinition: Complete emote data
+ *    - ID, name, description
+ *    - Animations, sounds, particles
+ *    - Unlock requirements, rarity
+ *
+ * 2. FMGActiveEmote: Currently playing emote state
+ *    - Who's playing it, how long, where
+ *
+ * 3. FMGEmoteWheelSlot: One slot in the selection wheel
+ *
+ * 4. FMGEmoteLoadout: Player's equipped emote configuration
+ *    - Wheel assignments
+ *    - Auto-trigger emotes (victory, defeat, etc.)
+ *    - Quick-select hotkey bindings
+ *
+ * 5. FMGEmoteCollection: Player's unlocked emotes and stats
+ *
+ * EMOTE WHEEL UI
+ * --------------
+ * The emote wheel is a radial menu that appears when the player holds
+ * a button. Move the stick/mouse to select a slot, release to play.
+ * Players customize which emotes go in which slots.
+ *
+ *          [Slot 0]
+ *     [7]     |     [1]
+ *       \     |     /
+ *        \    |    /
+ *   [6]---[CENTER]---[2]
+ *        /    |    \
+ *       /     |     \
+ *     [5]     |     [3]
+ *          [Slot 4]
+ *
+ * QUICK-SELECT HOTKEYS
+ * --------------------
+ * For fast access, players can bind emotes to number keys (1-4 typically).
+ * Press the key = immediately play that emote, no wheel needed.
+ *
+ * LOADOUTS
+ * --------
+ * Players can save multiple emote configurations (loadouts) and switch
+ * between them. Example:
+ * - "Racing" loadout: Horn, burnout, "See ya!" taunt
+ * - "Social" loadout: Dances, waves, friendly emotes
+ *
+ * COOLDOWNS
+ * ---------
+ * Each emote has a cooldown period after use to prevent spam.
+ * While on cooldown, the emote is grayed out in the wheel.
+ *
+ * AUTOMATIC EMOTES
+ * ----------------
+ * Some emotes trigger automatically:
+ * - Victory Emote: Plays when you win
+ * - Defeat Emote: Plays when you lose
+ * - Podium Emote: Plays during podium ceremony
+ * - Greeting Emote: Can be set to auto-greet at race start
+ *
+ * HOW TO USE THIS SYSTEM (EXAMPLE)
+ * --------------------------------
+ * // Get the subsystem:
+ * UMGEmoteSubsystem* Emotes = GetGameInstance()->GetSubsystem<UMGEmoteSubsystem>();
+ *
+ * // Check if we can play an emote:
+ * if (!Emotes->IsPlayingEmote() && !Emotes->IsEmoteOnCooldown(TEXT("Dance_Floss")))
+ * {
+ *     Emotes->PlayEmote(TEXT("Dance_Floss"), EMGEmoteContext::Lobby);
+ * }
+ *
+ * // Unlock a new emote for the player:
+ * Emotes->UnlockEmote(TEXT("Celebration_Champion"));
+ *
+ * // Set victory emote:
+ * FMGEmoteLoadout Loadout = Emotes->GetActiveLoadout();
+ * Loadout.VictoryEmote = TEXT("Celebration_Champion");
+ * Emotes->SetActiveLoadout(Loadout);
+ *
+ * REMOTE EMOTES
+ * -------------
+ * When another player performs an emote, we receive it over the network
+ * and call PlayRemoteEmote() to show it on our screen. The ActiveRemoteEmotes
+ * array tracks all emotes currently being performed by other players.
+ *
+ ******************************************************************************/
+
 /**
  * @file MGEmoteSubsystem.h
  * @brief Emote and Expression Subsystem for Midnight Grind

@@ -1,5 +1,172 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGDriftComboSystem.h
+ * @brief Drift scoring system with combo chains, multipliers, and style bonuses
+ *
+ * =============================================================================
+ * OVERVIEW
+ * =============================================================================
+ *
+ * The Drift Combo System tracks and scores player drifting with arcade-style
+ * combo mechanics. Players earn points for maintaining drifts, chaining multiple
+ * drifts together, and performing stylish maneuvers. The system is inspired by
+ * classic arcade racers like Ridge Racer and Initial D.
+ *
+ * =============================================================================
+ * @section concepts KEY CONCEPTS FOR BEGINNERS
+ * =============================================================================
+ *
+ * 1. WHAT IS A DRIFT?
+ *    - A drift is when the car slides sideways while moving forward.
+ *    - Measured by "drift angle" - the difference between car direction and velocity.
+ *    - MinDriftAngle (default 15 degrees) is required to start scoring.
+ *    - MinDriftSpeed (default 40 km/h) prevents slow-speed cheese.
+ *
+ * 2. COMBO STATES (EMGDriftComboState):
+ *    - Idle: Not drifting, no active combo.
+ *    - Drifting: Currently in a drift, accumulating points.
+ *    - Grace: Drift ended, brief window to start another drift.
+ *    - Failed: Combo broken (collision, spin, etc).
+ *
+ * 3. COMBO CHAIN:
+ *    - Each consecutive drift increases ComboCount.
+ *    - ComboGracePeriod (default 2 seconds) is time allowed between drifts.
+ *    - If you start a new drift within grace period, combo continues.
+ *    - If grace period expires or you crash, combo is "dropped".
+ *
+ * 4. MULTIPLIER TIERS (FMGComboTier):
+ *    - Higher combo counts unlock better multipliers.
+ *    - Example tiers: 1x (1 drift), 1.5x (3 drifts), 2x (5 drifts), 3x (10 drifts).
+ *    - Each tier has a name, color for UI, and multiplier value.
+ *    - OnComboTierReached fires when entering a new tier.
+ *
+ * 5. DRIFT SCORING:
+ *    - BasePointsPerSecond: Points earned each second of drifting.
+ *    - AngleMultiplier: Bonus for steeper drift angles.
+ *    - SpeedMultiplier: Bonus for drifting at higher speeds.
+ *    - Final score = (Time * BasePoints) * (1 + Angle*AngleMult + Speed*SpeedMult) * ComboMultiplier
+ *
+ * 6. STYLE BONUSES (EMGDriftStyleBonus):
+ *    - Extra points for skilled or risky moves:
+ *    - Marathon: Long continuous drift (>5 seconds).
+ *    - Extreme: High angle drift (>60 degrees).
+ *    - NearMiss: Nearly hit something while drifting.
+ *    - Overtake: Pass another car while drifting.
+ *    - ChainLink: Chain multiple corners together.
+ *    - Transition: Quick direction change (left-right-left).
+ *    - HighSpeed: Drift at high speed (>120 km/h).
+ *    - Perfect: Hit the racing line apex while drifting.
+ *    - Checkpoint: Cross checkpoint while drifting.
+ *
+ * 7. DRIFT DATA (FMGDriftData):
+ *    - Statistics for each individual drift:
+ *    - Duration: How long the drift lasted.
+ *    - MaxAngle/AverageAngle: Drift angle statistics.
+ *    - MaxSpeed/AverageSpeed: Speed during drift.
+ *    - Distance: How far traveled while drifting.
+ *    - bWasLeftDrift: Direction for transition detection.
+ *
+ * 8. BANKING SCORES:
+ *    - CurrentComboScore: Points accumulated but not yet "banked".
+ *    - TotalBankedScore: Safely stored points.
+ *    - Dropping a combo loses CurrentComboScore.
+ *    - BankComboScore() manually banks the current score.
+ *    - Scores are automatically banked when combo ends successfully.
+ *
+ * 9. EXTERNAL NOTIFICATIONS:
+ *    - NotifyNearMiss(): Call when near miss system detects close call.
+ *    - NotifyOvertake(): Call when player passes another vehicle.
+ *    - NotifyCheckpointCrossed(): Call when crossing a checkpoint.
+ *    - DropCombo(): Call on collision or spin to break the combo.
+ *
+ * =============================================================================
+ * @section usage USAGE EXAMPLE
+ * =============================================================================
+ *
+ * @code
+ * // The component auto-updates from vehicle physics in TickComponent
+ * // You mainly need to handle external events:
+ *
+ * // Get the component
+ * UMGDriftComboSystem* DriftSystem = Vehicle->FindComponentByClass<UMGDriftComboSystem>();
+ *
+ * // Subscribe to events for UI updates
+ * DriftSystem->OnDriftStarted.AddDynamic(this, &UMyHUD::ShowDriftStarted);
+ * DriftSystem->OnDriftEnded.AddDynamic(this, &UMyHUD::ShowDriftScore);
+ * DriftSystem->OnComboUpdated.AddDynamic(this, &UMyHUD::UpdateComboDisplay);
+ * DriftSystem->OnComboDropped.AddDynamic(this, &UMyHUD::ShowComboDropped);
+ * DriftSystem->OnStyleBonusEarned.AddDynamic(this, &UMyHUD::ShowStyleBonus);
+ * DriftSystem->OnComboTierReached.AddDynamic(this, &UMyHUD::ShowTierUp);
+ *
+ * // Notify of external events
+ * void AMyVehicle::OnNearMissDetected()
+ * {
+ *     DriftSystem->NotifyNearMiss();
+ * }
+ *
+ * void AMyVehicle::OnOvertakeComplete()
+ * {
+ *     DriftSystem->NotifyOvertake();
+ * }
+ *
+ * void AMyVehicle::OnCollision(float ImpactForce)
+ * {
+ *     if (ImpactForce > SpinThreshold)
+ *     {
+ *         DriftSystem->DropCombo(); // Crash breaks the combo
+ *     }
+ * }
+ *
+ * // Query current state for UI
+ * void UMyHUD::UpdateDriftUI()
+ * {
+ *     if (DriftSystem->IsInCombo())
+ *     {
+ *         int32 Combo = DriftSystem->GetComboCount();
+ *         float Multiplier = DriftSystem->GetCurrentMultiplier();
+ *         float Score = DriftSystem->GetCurrentComboScore();
+ *         float Grace = DriftSystem->GetGraceTimeRemaining();
+ *         FMGComboTier Tier = DriftSystem->GetCurrentTier();
+ *
+ *         // Update UI with these values...
+ *     }
+ * }
+ *
+ * // At race end, get total drift score
+ * float FinalDriftScore = DriftSystem->GetTotalScore();
+ * @endcode
+ *
+ * =============================================================================
+ * @section configuration CONFIGURATION IN EDITOR
+ * =============================================================================
+ *
+ * Configure the component in the Blueprint editor or Details panel:
+ *
+ * 1. DRIFT THRESHOLDS:
+ *    - MinDriftAngle: Lower = easier to start scoring (15-20 recommended).
+ *    - MinDriftSpeed: Prevents exploits at low speed (30-50 km/h).
+ *
+ * 2. SCORING BALANCE:
+ *    - BasePointsPerSecond: Base earning rate (100 = casual, 50 = hardcore).
+ *    - AngleMultiplier: How much angle matters (0.02 = moderate).
+ *    - SpeedMultiplier: How much speed matters (0.01 = moderate).
+ *
+ * 3. COMBO SETTINGS:
+ *    - ComboGracePeriod: Time between drifts (2s = forgiving, 1s = tight).
+ *    - ComboTiers: Array of tiers with thresholds and multipliers.
+ *
+ * 4. STYLE BONUS THRESHOLDS:
+ *    - MarathonDriftThreshold: Seconds for marathon bonus (5s default).
+ *    - ExtremeAngleThreshold: Angle for extreme bonus (60 degrees).
+ *    - HighSpeedThreshold: Speed for high-speed bonus (120 km/h).
+ *    - TransitionTimeWindow: Max time for transition bonus (0.5s).
+ *
+ * @see FMGComboTier for multiplier tier setup
+ * @see FMGStyleBonusConfig for style bonus configuration
+ * @see EMGDriftStyleBonus for available style bonus types
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

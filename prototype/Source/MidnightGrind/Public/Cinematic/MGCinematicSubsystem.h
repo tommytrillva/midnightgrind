@@ -1,5 +1,59 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGCinematicSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * This file defines the Cinematic Subsystem for Midnight Grind, a Y2K-themed
+ * arcade street racing game. The subsystem manages all in-game cinematics,
+ * including race intros, victory sequences, car showcases, and camera transitions.
+ *
+ * KEY CONCEPTS FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * 1. GAME INSTANCE SUBSYSTEM:
+ *    - This class inherits from UGameInstanceSubsystem, which means it lives
+ *      for the entire lifetime of the game session (not just one level).
+ *    - Subsystems are automatically created and managed by Unreal Engine.
+ *    - Access it from anywhere using: GetGameInstance()->GetSubsystem<UMGCinematicSubsystem>()
+ *
+ * 2. CINEMATIC SEQUENCES:
+ *    - A sequence is a pre-defined series of camera shots that play together.
+ *    - Think of it like a mini movie: race intro, podium ceremony, car reveal, etc.
+ *    - Each sequence has multiple "shots" (camera angles) that play in order.
+ *
+ * 3. CAMERA SHOTS:
+ *    - Individual camera positions/movements within a sequence.
+ *    - Each shot has properties like position, duration, FOV (field of view),
+ *      and depth of field settings for that cinematic blur effect.
+ *
+ * 4. TRANSITIONS:
+ *    - How the screen moves from one shot/scene to another.
+ *    - Examples: Cut (instant), Fade, CrossDissolve, VHS (retro effect).
+ *
+ * 5. DELEGATES (Events):
+ *    - The DECLARE_DYNAMIC_MULTICAST_DELEGATE macros create "events" that other
+ *      parts of the game can subscribe to.
+ *    - Example: When a cinematic starts, the UI can hide the HUD by listening
+ *      to OnCinematicStarted.
+ *
+ * 6. UPROPERTY AND UFUNCTION MACROS:
+ *    - UPROPERTY: Exposes variables to Unreal's reflection system (Blueprints,
+ *      serialization, garbage collection).
+ *    - UFUNCTION: Exposes functions to Blueprints and the reflection system.
+ *    - BlueprintCallable: Can be called from Blueprints.
+ *    - BlueprintPure: A "getter" function with no side effects.
+ *
+ * USAGE EXAMPLES:
+ * - Play race intro before a race starts
+ * - Show podium ceremony after race ends
+ * - Display car showcase in garage menu
+ * - Add cinematic transitions between game states
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

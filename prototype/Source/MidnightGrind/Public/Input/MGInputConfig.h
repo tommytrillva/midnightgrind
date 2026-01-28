@@ -1,5 +1,165 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGInputConfig.h
+ * @brief Input configuration data assets for vehicle and menu controls.
+ *
+ * @section Overview
+ * This file defines data assets that configure how player input is mapped to
+ * game actions in Midnight Grind. It uses Unreal Engine 5's Enhanced Input System
+ * to provide flexible, rebindable controls for both driving and menu navigation.
+ *
+ * Data assets are created in the Unreal Editor and assigned to vehicles/UI systems.
+ * This separates input configuration from code, making it easy to:
+ * - Create different control schemes (casual vs. simulation)
+ * - Support multiple input devices
+ * - Allow player rebinding without code changes
+ *
+ * @section Architecture
+ *
+ * Enhanced Input System Overview:
+ * ```
+ * UInputAction (abstract action like "Accelerate")
+ *     |
+ *     +-- Bound to keys via UInputMappingContext
+ *     |
+ *     +-- Triggers callbacks in UMGVehicleInputHandler
+ * ```
+ *
+ * Config Classes:
+ * - **UMGVehicleInputConfig**: Driving controls (throttle, brake, steering, etc.)
+ * - **UMGMenuInputConfig**: UI navigation (confirm, back, tab switching)
+ * - **FMGInputActionBinding**: Single action with its default bindings
+ * - **UMGInputUtility**: Helper functions for icons and input processing
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Data Asset**:
+ * A UDataAsset is an object stored as a .uasset file. Unlike Blueprints, it's
+ * just data - no logic. Create one via: Content Browser > Right-Click >
+ * Miscellaneous > Data Asset > Select Class.
+ *
+ * **Input Action (UInputAction)**:
+ * Represents an abstract action like "Accelerate" or "Brake". Actions can have:
+ * - Value type: Bool (pressed/released), Axis1D (trigger), Axis2D (stick)
+ * - Triggers: Conditions for when action fires (pressed, released, held)
+ * - Modifiers: Transform input (negate, dead zone, scale)
+ *
+ * **Input Mapping Context (UInputMappingContext)**:
+ * Maps Input Actions to physical controls. Multiple contexts can be active
+ * with different priorities. Example mappings:
+ * ```
+ * ThrottleAction -> Gamepad Right Trigger
+ * ThrottleAction -> Keyboard W Key
+ * SteeringAction -> Gamepad Left Stick X
+ * SteeringAction -> Keyboard A/D Keys
+ * ```
+ *
+ * **Input Priority**:
+ * When multiple mapping contexts are active, priority determines which wins.
+ * Higher priority = checked first. Vehicle context (priority 1) vs Menu (priority 2).
+ *
+ * **FKey**:
+ * Unreal's type for representing any input key (keyboard key, gamepad button,
+ * mouse button, etc.). Examples: EKeys::Gamepad_RightTrigger, EKeys::W
+ *
+ * **Soft Object Pointer (TSoftObjectPtr)**:
+ * A reference that doesn't load the asset until needed. Used for icons to
+ * avoid loading all button textures into memory at once.
+ *
+ * @section Usage Example Usage
+ *
+ * @code
+ * // In the Editor:
+ * // 1. Create Data Asset: Right-click > Miscellaneous > Data Asset
+ * // 2. Select UMGVehicleInputConfig as the class
+ * // 3. Fill in Input Actions and Mapping Context
+ * // 4. Assign to your Vehicle Blueprint
+ *
+ * // In Code - Using the config:
+ * UPROPERTY(EditDefaultsOnly, Category = "Input")
+ * TObjectPtr<UMGVehicleInputConfig> InputConfig;
+ *
+ * void AMyVehicle::SetupPlayerInput(UInputComponent* PlayerInputComponent)
+ * {
+ *     if (APlayerController* PC = Cast<APlayerController>(GetController()))
+ *     {
+ *         // Add the mapping context
+ *         if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+ *             ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+ *         {
+ *             Subsystem->AddMappingContext(InputConfig->MappingContext, InputConfig->InputPriority);
+ *         }
+ *
+ *         // Bind actions
+ *         if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+ *         {
+ *             EIC->BindAction(InputConfig->ThrottleAction, ETriggerEvent::Triggered,
+ *                             this, &AMyVehicle::OnThrottle);
+ *         }
+ *     }
+ * }
+ *
+ * // Getting default bindings for UI:
+ * FKey DefaultBrake = UMGVehicleInputConfig::GetDefaultGamepadBinding(TEXT("Brake"));
+ * // Returns Gamepad_LeftTrigger
+ *
+ * // Getting key icons for prompt display:
+ * TSoftObjectPtr<UTexture2D> Icon = UMGInputUtility::GetKeyIcon(EKeys::Gamepad_FaceButton_Bottom, true);
+ * // Returns Xbox A button or PlayStation X button texture
+ *
+ * // Checking input device type for UI adaptation:
+ * if (UMGInputUtility::IsUsingGamepad(GetWorld()))
+ * {
+ *     ShowGamepadPrompts();
+ * }
+ * else
+ * {
+ *     ShowKeyboardPrompts();
+ * }
+ *
+ * // Applying dead zone to raw input:
+ * float RawStick = GetGamepadStickValue();
+ * float Processed = UMGInputUtility::ApplyDeadZone(RawStick, 0.15f);
+ *
+ * // Applying sensitivity curve:
+ * float WithCurve = UMGInputUtility::ApplySensitivityCurve(Processed, 1.5f, 2.0f);
+ * @endcode
+ *
+ * @section DefaultBindings Default Control Schemes
+ *
+ * **Gamepad (Xbox/PlayStation)**:
+ * | Action      | Xbox          | PlayStation  |
+ * |-------------|---------------|--------------|
+ * | Throttle    | RT            | R2           |
+ * | Brake       | LT            | L2           |
+ * | Steering    | Left Stick    | Left Stick   |
+ * | Handbrake   | A / X         | X / Square   |
+ * | NOS         | B / Circle    | Circle       |
+ * | Shift Up    | RB            | R1           |
+ * | Shift Down  | LB            | L1           |
+ * | Camera      | Y / Triangle  | Triangle     |
+ * | Look Back   | RS Click      | R3           |
+ *
+ * **Keyboard**:
+ * | Action      | Primary | Alternate |
+ * |-------------|---------|-----------|
+ * | Throttle    | W       | Up Arrow  |
+ * | Brake       | S       | Down Arrow|
+ * | Steer Left  | A       | Left Arrow|
+ * | Steer Right | D       | Right Arrow|
+ * | Handbrake   | Space   | -         |
+ * | NOS         | Left Shift | -      |
+ * | Shift Up    | E       | -         |
+ * | Shift Down  | Q       | -         |
+ * | Camera      | C       | -         |
+ * | Look Back   | R       | -         |
+ *
+ * @see UMGVehicleInputHandler For input processing and assists
+ * @see UInputAction Unreal's Enhanced Input action class
+ * @see UInputMappingContext Unreal's input mapping system
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

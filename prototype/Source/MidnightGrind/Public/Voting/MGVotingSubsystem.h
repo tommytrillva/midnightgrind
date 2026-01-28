@@ -1,5 +1,102 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVotingSubsystem.h
+ * @brief Voting System - Democratic decision-making for multiplayer lobbies and sessions
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ==========================
+ * This system handles all voting mechanics in multiplayer sessions. When players need to
+ * collectively decide on something (which track to race, whether to kick a disruptive player,
+ * etc.), this subsystem manages the entire voting process.
+ *
+ * Think of it like the voting systems in Counter-Strike (vote to kick), Call of Duty
+ * (map voting), or any multiplayer game where players collectively make decisions.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * --------------------------
+ *
+ * 1. WHAT IS A "VOTE SESSION"?
+ *    - A vote session (FMGVoteSession) is an active vote in progress.
+ *    - It has a type (map selection, kick player, etc.), options to choose from,
+ *      a time limit, and rules for determining the winner.
+ *    - Only ONE vote can be active at a time (see ActiveVote member variable).
+ *
+ * 2. VOTE TYPES (EMGVoteType):
+ *    - MapSelection: Players vote on which track to race next
+ *    - GameMode: Vote on race type (circuit, sprint, drift, etc.)
+ *    - RaceSettings: Vote on race options (laps, weather, etc.)
+ *    - KickPlayer: Vote to remove a disruptive player
+ *    - SkipRace: Vote to skip current race/return to lobby
+ *    - RestartRace: Vote to restart the current race
+ *    - EndSession: Vote to end the multiplayer session entirely
+ *    - Custom: For any other voting needs
+ *
+ * 3. VOTE STATES (EMGVoteState):
+ *    - Inactive: No vote happening
+ *    - Pending: Vote initialized but not yet started (server sync)
+ *    - Active: Vote is live, players can cast votes
+ *    - Passed: Vote succeeded (enough votes for winning option)
+ *    - Failed: Vote failed (not enough votes or threshold not met)
+ *    - Cancelled: Vote was manually cancelled (by host usually)
+ *    - Expired: Vote ran out of time
+ *
+ * 4. WHAT IS A "THRESHOLD"?
+ *    - The threshold is the percentage of votes needed to pass.
+ *    - PassThreshold of 0.5 means 50% of votes needed to win.
+ *    - KickVoteThreshold of 0.6 means 60% must agree to kick a player.
+ *    - Higher thresholds for serious actions (kicking) prevent abuse.
+ *
+ * 5. HOW MAP VOTING WORKS:
+ *    - System selects several maps (usually 4) from AvailableMaps
+ *    - Recent maps can be excluded to ensure variety
+ *    - Players vote for their preferred map
+ *    - Winner is determined when time expires or everyone votes
+ *    - OnMapVoteResult fires with the selected map
+ *
+ * 6. NETWORKING CONSIDERATIONS:
+ *    - Voting must sync across all players in a multiplayer game.
+ *    - The host/server manages the authoritative vote state.
+ *    - Functions like ReceiveVoteStart, ReceiveVoteCast handle incoming
+ *      network messages from other players.
+ *    - When you cast a vote, it's sent to the server, validated, then
+ *      broadcast to all players via ReceiveVoteCast.
+ *
+ * SYSTEM ARCHITECTURE:
+ * -------------------
+ *
+ * VOTE LIFECYCLE:
+ * 1. StartVote() or StartMapVote() is called
+ * 2. ActiveVote is populated, timer starts
+ * 3. OnVoteStarted delegate fires (UI shows voting panel)
+ * 4. Players call CastVote() with their choice
+ * 5. OnVoteUpdated fires as votes come in (UI updates counts)
+ * 6. OnVoteTick() runs each frame, updating TimeRemaining
+ * 7. When time expires or all voted: ProcessVoteEnd()
+ * 8. DetermineResult() finds the winner
+ * 9. OnVoteEnded fires with results
+ * 10. For map votes, OnMapVoteResult fires with selected map
+ *
+ * CONFIGURATION (FMGVotingConfig):
+ * - Vote durations: How long each vote type lasts
+ * - Pass thresholds: Required percentage to pass
+ * - MinPlayersForVote: Prevents voting with too few players
+ * - VoteCooldown: Time between votes to prevent spam
+ * - bHostCanOverride: Whether host can bypass voting
+ *
+ * IMPORTANT FUNCTIONS:
+ * -------------------
+ * - StartVote/StartMapVote: Initiate a vote
+ * - CastVote/ChangeVote: Submit player's choice
+ * - CanStartVote: Check if voting is allowed right now
+ * - GetWinningOption: Get current leader or final winner
+ * - RegisterMap: Add maps to the available pool
+ *
+ * @see FMGVoteSession - Active vote state and options
+ * @see FMGVotingConfig - Voting system configuration
+ * @see FMGMapVoteData - Map information for map voting
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

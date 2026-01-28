@@ -1,5 +1,139 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * ============================================================================
+ * MGInsuranceSubsystem.h - Vehicle Insurance & Protection System
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file defines the Insurance Subsystem for Midnight Grind. Insurance is
+ * a CRITICAL system that protects players' vehicles from permanent loss during
+ * pink slip races (where you bet your car and the loser loses their vehicle
+ * FOREVER). This creates meaningful risk management gameplay.
+ *
+ * WHY INSURANCE MATTERS:
+ * - Pink slip races have PERMANENT consequences (lose your car forever)
+ * - Insurance lets players protect valuable vehicles
+ * - Creates interesting cost/benefit decisions
+ * - Adds depth to the risk/reward gameplay loop
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. INSURANCE TIERS (EInsuranceTier):
+ *    - None: No protection (cheapest, highest risk)
+ *    - Basic: Theft only
+ *    - Standard: Pink slip protection
+ *    - Premium: Full coverage
+ *    - Elite: Platinum protection with extras
+ *    - Collector: For rare/valuable vehicles
+ *
+ * 2. COVERAGE TYPES (ECoverageType):
+ *    - PinkSlipLoss: THE BIG ONE - protects if you lose a pink slip race
+ *    - TheftRecovery: If vehicle is "stolen" (game mechanic)
+ *    - CollisionDamage: Race accident damage
+ *    - PartsDamage: Performance part damage
+ *    - TotalLoss: Complete vehicle write-off
+ *    - ModificationLoss: Aftermarket parts protection
+ *    - RaceAccident: General race damage
+ *    - PoliceSeizure: If cops impound your car
+ *
+ * 3. POLICY LIFECYCLE (EPolicyStatus):
+ *    Pending -> Active -> ClaimInProgress -> Active
+ *                     -> Lapsed (missed payment)
+ *                     -> Cancelled
+ *                     -> Expired
+ *
+ * 4. CLAIMS PROCESS (EClaimStatus):
+ *    Pending -> UnderReview -> Approved -> Paid
+ *                           -> Denied -> Appealed -> (re-reviewed)
+ *                           -> Fraudulent (flagged)
+ *
+ * 5. RISK ASSESSMENT (FDriverRiskProfile):
+ *    - Tracks player's racing history
+ *    - Win rate, accidents, previous claims
+ *    - Affects premium pricing (bad drivers pay more)
+ *    - FraudulentClaimsCount can lock players out
+ *    - SafeDriverStreak gives discounts
+ *
+ * 6. PREMIUM CALCULATION:
+ *    Premium = BaseRate * VehicleValue * RiskMultiplier - Discounts
+ *    - Higher tier = higher base rate
+ *    - Expensive vehicles cost more to insure
+ *    - Bad drivers (high risk) pay more
+ *    - Safe drivers get discounts
+ *
+ * 7. DEDUCTIBLES (EDeductibleLevel):
+ *    - The amount YOU pay before insurance kicks in
+ *    - Higher deductible = lower premium
+ *    - None/$500/$1000/$2500/$5000 options
+ *    - Risk vs cost tradeoff
+ *
+ * 8. PAYMENT FREQUENCY (EPaymentFrequency):
+ *    - PerRace: Pay only when racing pink slips
+ *    - Daily/Weekly/Monthly: Regular payments
+ *    - Seasonal/Annual: Long-term savings
+ *    - Longer terms = better rates
+ *
+ * 9. VEHICLE VALUATION (FVehicleValuation):
+ *    - BaseValue: Stock vehicle value
+ *    - ModificationValue: Aftermarket parts added
+ *    - RarityBonus: For rare/limited vehicles
+ *    - ConditionModifier: Based on vehicle state
+ *    - MarketAdjustment: Current market conditions
+ *    - InsuredValue: What insurance will pay out
+ *
+ * 10. INSURANCE PROVIDERS (FInsuranceProvider):
+ *     - Multiple fictional insurance companies
+ *     - Different rates, approval rates, processing times
+ *     - Some specialize in certain vehicle types
+ *     - Unlock better providers as you level up
+ *
+ * 11. POLICY RIDERS (Add-ons):
+ *     - Optional coverage enhancements
+ *     - Higher payout limits
+ *     - Lower deductibles
+ *     - Extra coverage types
+ *     - Cost extra but provide better protection
+ *
+ * 12. FRAUD DETECTION:
+ *     - FraudScore: 0.0 to 1.0 probability
+ *     - Suspicious patterns trigger investigation
+ *     - Repeated claims, disconnect losses, etc.
+ *     - Fraud can result in denied claims and bans
+ *
+ * GAMEPLAY INTEGRATION:
+ * - Before pink slip race: Check if vehicle is insured
+ * - After loss: Automatically file claim if insured
+ * - Claim approved: Receive payout (minus deductible)
+ * - No insurance: Vehicle lost forever
+ *
+ * DELEGATES (Events):
+ * - OnPolicyCreated: New policy purchased
+ * - OnPolicyUpdated: Policy status changed
+ * - OnClaimFiled: Player filed a claim
+ * - OnClaimResolved: Claim approved/denied
+ * - OnPremiumDue: Payment reminder
+ * - OnPremiumPaid: Payment successful
+ * - OnPolicyLapsed: Missed payment, coverage lost
+ * - OnQuoteGenerated: New insurance quote ready
+ * - OnRiskProfileUpdated: Risk assessment changed
+ *
+ * DESIGN PHILOSOPHY:
+ * - Insurance should feel like a meaningful choice
+ * - Not so cheap it's automatic
+ * - Not so expensive it's useless
+ * - Risk/reward balance is key
+ *
+ * RELATED FILES:
+ * - MGInsuranceSubsystem.cpp (implementation)
+ * - MGPinkSlipSubsystem.h (pink slip races that trigger claims)
+ * - MGGarageSubsystem.h (vehicle management)
+ * - MGWagerSubsystem.h (wager/race management)
+ *
+ * ============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

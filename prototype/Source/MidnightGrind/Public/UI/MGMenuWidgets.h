@@ -1,5 +1,149 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGMenuWidgets.h
+ * @brief Collection of core menu widgets (Main Menu, Pause, Settings, Results)
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the primary menu widgets used throughout the game's UI flow.
+ * These widgets handle navigation between game modes, settings management, and
+ * post-race results display. All widgets follow the game's Y2K neon aesthetic
+ * and support both gamepad and mouse/keyboard navigation.
+ *
+ * Widgets included in this file:
+ * - **UMGMainMenuWidget**: The game's entry point UI with play, garage, settings
+ * - **UMGPauseMenuWidget**: In-race pause menu for resume/restart/quit
+ * - **UMGSettingsWidget**: Multi-tab settings interface (graphics, audio, controls)
+ * - **UMGResultsWidget**: Post-race results display with stats and rewards
+ * - **UMGNotificationWidget**: Pop-up notifications for achievements/events
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Menu Subsystem Integration**: All menu widgets communicate through
+ *   UMGMenuSubsystem to manage game state, handle transitions, and persist
+ *   settings. Never modify game state directly from widgets.
+ *
+ * - **Abstract/Blueprintable Pattern**: These base classes define the core
+ *   functionality in C++, while Blueprint subclasses handle visual layout
+ *   and animations. This separates logic from presentation.
+ *
+ * - **BlueprintImplementableEvent**: Functions marked with this specifier are
+ *   "hooks" for Blueprint to add custom animations, sounds, and visual effects
+ *   without modifying C++ code.
+ *
+ * - **Settings Flow**: Settings changes are staged in PendingSettings until
+ *   explicitly applied. This allows preview and revert functionality.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [Game State]
+ *        |
+ *        v
+ *   [MGMenuSubsystem] <----> [Menu Widgets]
+ *        |                        |
+ *        |                        +-- UMGMainMenuWidget
+ *        |                        +-- UMGPauseMenuWidget
+ *        |                        +-- UMGSettingsWidget
+ *        |                        +-- UMGResultsWidget
+ *        |                        +-- UMGNotificationWidget
+ *        v
+ *   [Level Transitions / Settings Persistence]
+ *
+ * =============================================================================
+ * @section Usage
+ *
+ * @subsection MainMenuUsage Main Menu
+ * @code
+ * // Main menu is typically created by the game mode
+ * UMGMainMenuWidget* MainMenu = CreateWidget<UMGMainMenuWidget>(
+ *     GetWorld(), MainMenuClass);
+ * MainMenu->AddToViewport();
+ *
+ * // Button handlers are connected in Blueprint or via delegates
+ * // The widget calls MenuSubsystem methods to trigger transitions:
+ * // - OnQuickPlayClicked() -> MenuSubsystem->StartQuickPlay()
+ * // - OnGarageClicked() -> MenuSubsystem->OpenGarage()
+ * @endcode
+ *
+ * @subsection PauseMenuUsage Pause Menu
+ * @code
+ * // Pause menu is shown when player pauses during a race
+ * void AMyController::TogglePause()
+ * {
+ *     if (IsPaused())
+ *     {
+ *         PauseWidget->OnResumeClicked();
+ *     }
+ *     else
+ *     {
+ *         PauseWidget = CreateWidget<UMGPauseMenuWidget>(GetWorld(), PauseClass);
+ *         PauseWidget->AddToViewport();
+ *         SetPause(true);
+ *     }
+ * }
+ * @endcode
+ *
+ * @subsection SettingsUsage Settings Widget
+ * @code
+ * // Create settings widget, optionally jumping to a specific category
+ * UMGSettingsWidget* Settings = CreateWidget<UMGSettingsWidget>(
+ *     GetWorld(), SettingsClass);
+ * Settings->SetInitialCategory(EMGSettingsCategory::Audio);
+ * Settings->AddToViewport();
+ *
+ * // Settings flow: Edit -> Preview -> Apply or Revert
+ * // Changes are staged in PendingSettings until ApplySettings() is called
+ * // RevertSettings() restores to last saved values
+ * // ResetToDefaults() clears all customizations
+ * @endcode
+ *
+ * @subsection ResultsUsage Results Widget
+ * @code
+ * // Show race results after finishing
+ * UMGResultsWidget* Results = CreateWidget<UMGResultsWidget>(
+ *     GetWorld(), ResultsClass);
+ * Results->ShowResults(
+ *     Position,        // e.g., 1 for first place
+ *     TotalTime,       // Race completion time in seconds
+ *     BestLapTime,     // Best lap time in seconds
+ *     CashEarned,      // Currency reward
+ *     ReputationEarned // XP/reputation reward
+ * );
+ * Results->AddToViewport();
+ * @endcode
+ *
+ * @subsection NotificationUsage Notification Widget
+ * @code
+ * // Show a notification (achievement, position change, etc.)
+ * NotificationWidget->ShowNotification(
+ *     FText::FromString("Achievement Unlocked!"),
+ *     FText::FromString("Complete your first race"),
+ *     AchievementIcon
+ * );
+ *
+ * // Auto-hides after duration, or hide manually:
+ * NotificationWidget->HideNotification();
+ * @endcode
+ *
+ * =============================================================================
+ * @section UnrealMacros Unreal Engine Macros Explained
+ *
+ * - UCLASS(Abstract, Blueprintable): Cannot instantiate this C++ class directly;
+ *   must create a Blueprint subclass. The Blueprint handles visual layout.
+ *
+ * - UFUNCTION(BlueprintImplementableEvent): A function with no C++ body that
+ *   Blueprints can implement. If not implemented, calling it does nothing.
+ *
+ * - UPROPERTY(BlueprintReadOnly): Exposes the variable to Blueprint for reading
+ *   but prevents modification from Blueprint graphs.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

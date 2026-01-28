@@ -237,6 +237,42 @@ struct FMGPursuitUnit
 	/// Reference to the unit's visual/gameplay asset
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<UObject> UnitAsset;
+
+	// =========================================================================
+	// TACTIC COOLDOWNS (Added in Iteration 95)
+	// =========================================================================
+
+	/// Time remaining before unit can attempt RAM tactic again
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RamCooldownRemaining = 0.0f;
+
+	/// Time remaining before unit can attempt PIT maneuver again
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PITCooldownRemaining = 0.0f;
+
+	/// Time remaining before unit can attempt EMP again
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EMPCooldownRemaining = 0.0f;
+
+	/// Last known player location for prediction
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector LastKnownPlayerLocation = FVector::ZeroVector;
+
+	/// Last known player velocity for prediction
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector LastKnownPlayerVelocity = FVector::ZeroVector;
+
+	/// Time since last visual contact
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TimeSinceLastVisual = 0.0f;
+
+	/// Number of successful tactic executions
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 SuccessfulTactics = 0;
+
+	/// Number of failed tactic attempts
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 FailedTactics = 0;
 };
 
 /**
@@ -508,6 +544,34 @@ struct FMGPursuitConfig
 	/// List of tactics enabled for this configuration
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<EMGPursuitTactic> AvailableTactics;
+
+	// =========================================================================
+	// TACTIC COOLDOWNS (Added in Iteration 95)
+	// =========================================================================
+
+	/// Cooldown time after executing RAM tactic (seconds)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RamCooldown = 8.0f;
+
+	/// Cooldown time after attempting PIT maneuver (seconds)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PITCooldown = 12.0f;
+
+	/// Cooldown time after EMP deployment attempt (seconds)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float EMPCooldown = 30.0f;
+
+	/// How far ahead to predict player position (seconds)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PredictionTime = 2.0f;
+
+	/// Distance threshold for successful RAM execution
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RamExecutionDistance = 300.0f;
+
+	/// Distance threshold for successful PIT execution
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PITExecutionDistance = 200.0f;
 };
 
 /**
@@ -944,6 +1008,58 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Pursuit|Tactics")
 	TArray<FMGRoadblock> GetActiveRoadblocks(const FString& PlayerId) const;
+
+	// =========================================================================
+	// INTELLIGENT ROADBLOCK POSITIONING (Added in Iteration 95)
+	// =========================================================================
+
+	/**
+	 * @brief Calculate optimal roadblock position ahead of player using track data
+	 *
+	 * Uses the track spline and player velocity to predict where to place
+	 * roadblocks for maximum effectiveness. Considers:
+	 * - Player speed and direction
+	 * - Track layout (straights vs corners)
+	 * - Minimum warning distance for fairness
+	 * - Existing roadblock positions
+	 *
+	 * @param PlayerId Player to target
+	 * @param PlayerLocation Current player position
+	 * @param PlayerVelocity Current player velocity
+	 * @param MinDistanceAhead Minimum meters ahead to place (default: 500m)
+	 * @param OutLocation Calculated roadblock position
+	 * @param OutRotation Calculated roadblock rotation (facing oncoming traffic)
+	 * @return True if valid position found, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Pursuit|Tactics|Roadblock")
+	bool CalculateOptimalRoadblockPosition(
+		const FString& PlayerId,
+		FVector PlayerLocation,
+		FVector PlayerVelocity,
+		float MinDistanceAhead,
+		FVector& OutLocation,
+		FRotator& OutRotation) const;
+
+	/**
+	 * @brief Deploy a roadblock at the optimal position ahead of player
+	 *
+	 * Combines CalculateOptimalRoadblockPosition with DeployRoadblock for
+	 * convenient one-call roadblock deployment.
+	 *
+	 * @param PlayerId Player to target
+	 * @param PlayerLocation Current player position
+	 * @param PlayerVelocity Current player velocity
+	 * @param NumUnits Number of police units in roadblock (default: 3)
+	 * @param bIncludeSpikeStrip Whether to add spike strips (default: false)
+	 * @return True if roadblock was deployed, false if no valid position
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Pursuit|Tactics|Roadblock")
+	bool DeployOptimalRoadblock(
+		const FString& PlayerId,
+		FVector PlayerLocation,
+		FVector PlayerVelocity,
+		int32 NumUnits = 3,
+		bool bIncludeSpikeStrip = false);
 
 	//=========================================================================
 	// Bounty System

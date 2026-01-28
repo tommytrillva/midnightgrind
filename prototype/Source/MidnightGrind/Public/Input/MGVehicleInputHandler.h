@@ -1,5 +1,145 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehicleInputHandler.h
+ * @brief Vehicle input processing component with controller support, input assists, and force feedback.
+ *
+ * @section Overview
+ * The Vehicle Input Handler is a component that processes all player input for
+ * vehicle control in Midnight Grind. It sits between raw input devices and the
+ * vehicle movement system, handling input smoothing, assists, and feedback.
+ *
+ * This component supports multiple input devices (keyboard/mouse, gamepad, racing
+ * wheel), automatically detecting which device the player is using and adapting
+ * the input processing accordingly.
+ *
+ * @section Architecture
+ *
+ * Input Flow:
+ * ```
+ * Input Device (Gamepad/Keyboard/Wheel)
+ *     |
+ *     v
+ * Enhanced Input System (UE5)
+ *     |
+ *     v
+ * UMGVehicleInputHandler
+ *     |-- Apply Deadzone
+ *     |-- Apply Sensitivity/Linearity
+ *     |-- Apply Input Assists (steering, counter-steer, braking)
+ *     |-- Apply Speed-Sensitive Steering
+ *     v
+ * UMGVehicleMovementComponent (receives processed input)
+ * ```
+ *
+ * Key Components:
+ * - **Input Actions**: UE5 Enhanced Input actions for each control
+ * - **Input State**: Current frame's input values (FMGVehicleInputState)
+ * - **Assist Settings**: Configurable assists (FMGInputAssistSettings)
+ * - **Sensitivity Settings**: Customizable response curves (FMGInputSensitivity)
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Enhanced Input System**:
+ * UE5's new input system uses "Input Actions" (abstract actions like "Accelerate")
+ * that are bound to physical controls via "Input Mapping Contexts". This allows
+ * easy rebinding and multi-device support.
+ *
+ * **Deadzone**:
+ * A small range around the center of analog sticks where input is ignored.
+ * This prevents "drift" from worn controllers. A deadzone of 0.1 means inputs
+ * below 10% are treated as zero.
+ *
+ * **Sensitivity**:
+ * How much the output changes relative to input. Sensitivity of 1.5 means
+ * moving the stick 50% results in 75% output.
+ *
+ * **Linearity (Response Curve)**:
+ * Controls how input ramps up. Linear (1.0) = straight line. Higher values
+ * (like 2.0) give more precision near center with faster response near edges.
+ * ```
+ * Linearity 1.0:  |----/        Linearity 2.0:  |    __/
+ *                 | /                           | _-
+ *                 |/___                         |/____
+ * ```
+ *
+ * **Speed-Sensitive Steering**:
+ * Reduces steering sensitivity at high speeds to prevent overcorrection.
+ * At 200 km/h, full stick might only turn 50% as much as at low speed.
+ *
+ * **Counter-Steer Assist**:
+ * Automatically applies opposite steering input when the car is sliding
+ * (oversteer) to help maintain control. Strength is configurable.
+ *
+ * **Input Mode (EMGVehicleInputMode)**:
+ * The handler can operate in different modes:
+ * - Racing: Normal driving controls
+ * - PhotoMode: Camera controls, vehicle frozen
+ * - Menu: Disabled, UI handles input
+ * - Garage: Limited controls for customization view
+ *
+ * **Force Feedback**:
+ * Rumble effects sent to controllers/wheels to simulate road feel, collisions,
+ * and engine vibration. Intensity is configurable per effect type.
+ *
+ * @section Usage Example Usage
+ *
+ * @code
+ * // The input handler is typically attached to AMGVehiclePawn
+ * // Input binding happens automatically in BeginPlay
+ *
+ * // Query current input state (useful for HUD):
+ * float CurrentThrottle = InputHandler->GetThrottle();
+ * float CurrentSteering = InputHandler->GetSteering();
+ * float ProcessedSteering = InputHandler->GetProcessedSteering(); // With assists
+ *
+ * // Check button states:
+ * if (InputHandler->IsNOSPressed())
+ * {
+ *     // Activate NOS boost
+ * }
+ *
+ * // Adjust assists for difficulty:
+ * FMGInputAssistSettings NewAssists;
+ * NewAssists.bSteeringAssist = true;
+ * NewAssists.SteeringAssistStrength = 0.75f;
+ * NewAssists.bCounterSteerAssist = true;
+ * NewAssists.bAutoShift = true;  // Automatic transmission
+ * InputHandler->SetAssistSettings(NewAssists);
+ *
+ * // Customize sensitivity:
+ * FMGInputSensitivity Sensitivity;
+ * Sensitivity.SteeringSensitivity = 1.2f;
+ * Sensitivity.SteeringLinearity = 2.0f;  // More center precision
+ * Sensitivity.SteeringDeadzone = 0.08f;
+ * InputHandler->SetSensitivitySettings(Sensitivity);
+ *
+ * // Trigger force feedback for collision:
+ * InputHandler->TriggerForceFeedback(0.8f, 0.3f); // 80% intensity, 0.3 seconds
+ *
+ * // Switch to photo mode:
+ * InputHandler->SetInputMode(EMGVehicleInputMode::PhotoMode);
+ *
+ * // Listen for events:
+ * InputHandler->OnNOSActivated.AddDynamic(this, &AMyClass::HandleNOSActivated);
+ * InputHandler->OnGearShift.AddDynamic(this, &AMyClass::HandleGearShift);
+ * InputHandler->OnControllerTypeChanged.AddDynamic(this, &AMyClass::OnDeviceChanged);
+ * @endcode
+ *
+ * @section RacingWheel Racing Wheel Support
+ * The handler integrates with UMGRacingWheelSubsystem for dedicated wheel hardware:
+ * - Full rotation range (900+ degrees)
+ * - Pedal input with clutch support
+ * - Advanced force feedback (road texture, weight transfer, collisions)
+ * - H-pattern shifter support
+ *
+ * Use IsRacingWheelConnected() to detect wheel presence and adapt UI accordingly.
+ *
+ * @see UMGVehicleMovementComponent For how input affects vehicle physics
+ * @see UMGInputConfig For input action definitions
+ * @see UMGRacingWheelSubsystem For racing wheel hardware integration
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

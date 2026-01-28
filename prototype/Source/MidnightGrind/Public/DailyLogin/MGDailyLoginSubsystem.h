@@ -1,5 +1,100 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGDailyLoginSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the comprehensive Daily Login system for Midnight Grind.
+ * While MGDailyRewardsSubsystem handles basic daily rewards, THIS subsystem
+ * provides a more feature-rich engagement system including:
+ * - Daily login tracking and rewards
+ * - Daily CHALLENGES (tasks to complete for bonus rewards)
+ * - Weekly bonuses (special effects like Double XP)
+ * - Return player bonuses (welcome back rewards for players who were away)
+ * - Tiered reward systems based on login consistency
+ *
+ * Think of this as the "engagement hub" - it's designed to give players
+ * multiple reasons to log in daily beyond just collecting a reward.
+ *
+ * KEY CONCEPTS:
+ * -------------
+ * 1. DAILY CHALLENGES: Small tasks players can complete each day for rewards.
+ *    Examples: "Win 3 races", "Drift for 1000 points", "Use nitro 50 times"
+ *    These refresh every 24 hours and keep gameplay interesting.
+ *
+ * 2. REWARD TIERS (EMGDailyRewardTier): Players progress through tiers based
+ *    on their login consistency. Higher tiers = better base rewards.
+ *    Bronze -> Silver -> Gold -> Platinum -> Diamond -> Champion
+ *    This rewards long-term dedicated players.
+ *
+ * 3. WEEKLY BONUSES: Time-limited effects that enhance gameplay.
+ *    Examples: Double XP, Double Currency, Rare Drop Boost
+ *    These create "special" feeling days that players look forward to.
+ *
+ * 4. RETURN PLAYER BONUS: If a player hasn't logged in for several days,
+ *    they get a "Welcome Back" bonus to re-engage them. This helps prevent
+ *    churn (players leaving permanently).
+ *
+ * 5. MONTHLY CALENDAR: A visual calendar showing what rewards are available
+ *    each day of the month. Reaching the end grants completion bonuses.
+ *
+ * 6. CHALLENGE TYPES (EMGDailyChallengeType): Various gameplay objectives:
+ *    - WinRaces: Win a certain number of races
+ *    - DriftScore: Accumulate drift points
+ *    - NearMisses: Narrowly avoid obstacles
+ *    - Takedowns: Knock out opponents
+ *    - And many more...
+ *
+ * ARCHITECTURE:
+ * -------------
+ * UGameInstanceSubsystem - Singleton that persists for the entire game session.
+ *
+ * Key Data Structures:
+ * - FMGDailyReward: A single reward item (currency, parts, cosmetics, etc.)
+ * - FMGDailyChallenge: A challenge with objectives, progress, and rewards
+ * - FMGLoginStreak: Player's streak data including tier and history
+ * - FMGWeeklyBonus: Active bonus effects with duration tracking
+ * - FMGCalendarDay: One day in the monthly calendar
+ * - FMGMonthlyCalendar: The full month's reward layout
+ * - FMGReturnPlayerBonus: Special bonuses for returning players
+ * - FMGDailyLoginState: Complete state snapshot of the entire system
+ *
+ * TYPICAL WORKFLOW:
+ * -----------------
+ * 1. Player logs in -> ProcessLogin() called
+ * 2. System checks: Is this a new day? First login today?
+ * 3. If returning player after absence -> Grant return bonus
+ * 4. Update streak, check for tier upgrades
+ * 5. Generate new daily challenges if needed
+ * 6. UI displays available rewards and challenges
+ * 7. Player claims daily reward -> ClaimDailyReward()
+ * 8. During gameplay, challenge progress updates via UpdateChallengeProgress()
+ * 9. When challenge complete -> ClaimChallengeReward()
+ *
+ * DELEGATES (Events):
+ * -------------------
+ * - OnDailyLoginClaimed: Daily reward was claimed
+ * - OnStreakUpdated: Streak changed (could be increase or reset)
+ * - OnStreakLost: Player lost their streak (missed a day)
+ * - OnChallengeProgressUpdated: Challenge made progress
+ * - OnChallengeCompleted: A challenge was finished
+ * - OnWeeklyBonusActivated/Expired: Bonus effects started/ended
+ * - OnTierUpgrade: Player reached a new reward tier
+ *
+ * WHY TWO DAILY SYSTEMS?
+ * ----------------------
+ * MGDailyRewardsSubsystem: Simple, lightweight daily rewards
+ * MGDailyLoginSubsystem: Full-featured engagement with challenges and tiers
+ *
+ * Games often have both - one for quick basic rewards, one for deeper engagement.
+ * They can work together or be used independently based on game design needs.
+ *
+ * =============================================================================
+ */
+
 // MidnightGrind - Arcade Street Racing Game
 // Daily Login Subsystem - Login rewards, streaks, and daily challenges
 

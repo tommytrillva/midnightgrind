@@ -1,5 +1,107 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGTrackBoundaryActor.h
+ * @brief Track boundary definition and off-track penalty system.
+ *
+ * This file defines the AMGTrackBoundaryActor class, which creates invisible
+ * (or visible) boundaries along track edges. Boundaries detect when vehicles
+ * leave the valid racing surface and apply appropriate responses like speed
+ * penalties, collision forces, or vehicle resets.
+ *
+ * @section boundary_concepts Key Concepts
+ *
+ * TRACK BOUNDARY: The edge of the valid racing surface. In real racing, leaving
+ * the track (exceeding track limits) can result in penalties. Boundaries define
+ * where the track ends and the off-track area begins.
+ *
+ * SPLINE-BASED BOUNDARY: Rather than using many individual collision volumes,
+ * boundaries are defined by a USplineComponent that follows the track edge.
+ * This allows smooth, continuous boundary detection along complex track shapes.
+ *
+ * BOUNDARY TYPES: Different boundary types have different effects:
+ * - Soft: Slows the vehicle (like gravel traps in real racing)
+ * - Hard: Bounces the vehicle back (like barriers/walls)
+ * - Invisible: Teleports vehicle back to track (arcade-style)
+ * - KillZone: Resets vehicle after a delay (cliffs, water hazards)
+ *
+ * RECOVERY POSITION: When a vehicle goes off-track, the boundary system
+ * calculates a safe position to return the vehicle to the racing surface.
+ *
+ * @section boundary_physics Physics Interactions
+ *
+ * Boundaries affect vehicles in several ways:
+ * - SPEED PENALTY: Soft boundaries reduce vehicle speed while in contact
+ * - BOUNCE FORCE: Hard boundaries apply impulse forces to push vehicles back
+ * - GRIP REDUCTION: Off-track areas typically have reduced tire grip
+ * - TIME PENALTY: Extended off-track time may incur race time penalties
+ *
+ * @section boundary_architecture Architecture
+ *
+ * The boundary system operates as follows:
+ * 1. Designer places AMGTrackBoundaryActor along track edges
+ * 2. Spline points define the boundary path
+ * 3. Collision volumes are generated along the spline
+ * 4. On overlap, the system identifies the vehicle and boundary type
+ * 5. Appropriate effects are applied (speed penalty, bounce, reset)
+ * 6. Events broadcast to other systems (HUD, race management)
+ *
+ * @section boundary_usage Usage Examples
+ *
+ * @code
+ * // Setting up a soft boundary (gravel trap style)
+ * AMGTrackBoundaryActor* GravelTrap = SpawnActor<AMGTrackBoundaryActor>();
+ * GravelTrap->BoundaryType = EMGBoundaryType::Soft;
+ * GravelTrap->SpeedPenaltyMultiplier = 0.6f; // Reduce speed to 60%
+ * GravelTrap->bIsLeftBoundary = true; // Normal points into track
+ *
+ * // Setting up a hard boundary (wall)
+ * AMGTrackBoundaryActor* Wall = SpawnActor<AMGTrackBoundaryActor>();
+ * Wall->BoundaryType = EMGBoundaryType::Hard;
+ * Wall->BounceForce = 800.0f;
+ * Wall->bShowInGame = true; // Make wall visible
+ *
+ * // Querying boundary from vehicle code
+ * AMGTrackBoundaryActor* NearestBoundary = FindNearestBoundary(VehicleLocation);
+ * float DistanceToBoundary = NearestBoundary->GetDistanceToBoundary(VehicleLocation);
+ *
+ * // Responding to boundary events
+ * Boundary->OnBoundaryHit.AddDynamic(this, &AMyClass::HandleBoundaryHit);
+ *
+ * void AMyClass::HandleBoundaryHit(AActor* Vehicle, const FMGBoundaryHitResult& Hit, float Force)
+ * {
+ *     // Play crash sound, show damage, apply penalty
+ *     if (Force > CrashThreshold)
+ *     {
+ *         PlayCrashEffects(Hit.HitLocation, Force);
+ *     }
+ * }
+ *
+ * // Getting recovery position after going off-track
+ * FMGBoundaryHitResult RecoveryInfo = Boundary->GetRecoveryInfo(VehicleLocation, VehicleVelocity);
+ * Vehicle->SetActorTransform(FTransform(RecoveryInfo.RecoveryRotation, RecoveryInfo.RecoveryPosition));
+ * @endcode
+ *
+ * @section boundary_visuals Visual Representation
+ *
+ * Boundaries can optionally be made visible using spline meshes:
+ * - Set bShowInGame = true to render the boundary
+ * - Configure BoundaryMesh and BoundaryMaterial for appearance
+ * - BoundaryColor controls the tint (red for dangerous, yellow for caution)
+ *
+ * @section boundary_related Related Systems
+ * - UMGTrackSubsystem: May track off-track time for penalties
+ * - Vehicle Physics: Receives speed multipliers from soft boundaries
+ * - Respawn System: Uses recovery positions from boundary hits
+ * - Race HUD: Displays "off track" warnings
+ *
+ * @see EMGBoundaryType
+ * @see FMGBoundaryHitResult
+ * @see FOnBoundaryHit
+ * @see FOnBoundaryEnter
+ * @see FOnBoundaryExit
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

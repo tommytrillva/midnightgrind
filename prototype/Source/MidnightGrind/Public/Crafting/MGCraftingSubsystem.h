@@ -1,5 +1,92 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGCraftingSubsystem.h - Crafting and Salvaging System
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This header defines the Crafting Subsystem - a system that lets players:
+ * 1. COLLECT materials from racing and salvaging unwanted items
+ * 2. CRAFT new items using recipes (combine materials to create parts/cosmetics)
+ * 3. UPGRADE existing items to make them better
+ * 4. SALVAGE unwanted items to recover materials
+ *
+ * Think of it like Minecraft crafting meets car customization!
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. MATERIALS (FMGCraftingMaterial):
+ *    - Raw resources collected during gameplay
+ *    - Types: Metal, Carbon Fiber, Electronics, Paint, Rubber, etc.
+ *    - Each has a rarity (Common to Legendary) - rare materials make better items
+ *    - Materials stack (you can have 999 Metal in one slot)
+ *
+ * 2. RECIPES (FMGCraftingRecipe):
+ *    - "Instructions" for creating items
+ *    - Define: what materials you need, how much it costs, crafting time
+ *    - Some recipes are locked until you reach certain crafting levels
+ *    - Some require finding/buying a "blueprint" first (bRequiresBlueprint)
+ *
+ * 3. CRAFTING QUEUE (FMGCraftingQueue):
+ *    - Items don't craft instantly - they take time (like mobile games)
+ *    - Multiple items can be queued, processed one at a time
+ *    - You can spend premium currency to "speed up" crafting
+ *    - GetProgress() and GetTimeRemaining() help show UI progress bars
+ *
+ * 4. SALVAGING (FMGSalvageResult):
+ *    - Destroy items you don't want to get materials back
+ *    - You won't get 100% of materials back (intentional game balance)
+ *    - Sometimes you get "bonus drops" (bBonusDrop) - extra lucky materials
+ *    - PreviewSalvage() shows what you'll get BEFORE you commit
+ *
+ * 5. UPGRADE SLOTS (FMGUpgradeSlot):
+ *    - Items can be upgraded in specific slots (like gem sockets in RPGs)
+ *    - Each slot has a max level and compatible upgrade types
+ *    - Upgrading costs materials and currency
+ *
+ * 6. CRAFTING LEVEL:
+ *    - Player has a crafting skill that levels up with use
+ *    - Higher levels unlock better recipes
+ *    - More crafting = more XP = higher level
+ *
+ * COMMON PATTERNS IN THIS FILE:
+ * -----------------------------
+ *
+ * FDateTime: Unreal's date/time type
+ *   - FDateTime::Now() gets current time
+ *   - Used for tracking when crafting started/ends
+ *
+ * FTimespan: Duration between two times
+ *   - GetTotalSeconds() converts to a float for math
+ *   - Used for calculating "time remaining" on crafts
+ *
+ * TSoftObjectPtr<UTexture2D>: A "soft reference" to a texture
+ *   - Doesn't load the asset until needed (memory optimization)
+ *   - Used for item icons that might not all be loaded at once
+ *
+ * HOW TO USE THIS SYSTEM:
+ * -----------------------
+ * 1. Check what you can craft: GetUnlockedRecipes(), CanCraftRecipe()
+ * 2. Start crafting: StartCrafting(RecipeId, Quantity)
+ * 3. Monitor progress: GetCraftingQueue()[0].GetProgress()
+ * 4. Collect finished items: ClaimCraftedItem(CraftId)
+ * 5. Salvage junk: Preview with PreviewSalvage(), then SalvageItem()
+ * 6. Upgrade items: GetUpgradeSlots(), UpgradeItem()
+ *
+ * DELEGATES (EVENTS):
+ * -------------------
+ * - OnCraftingStarted: Fires when you begin crafting
+ * - OnCraftingComplete: Fires when timer finishes (item ready to claim)
+ * - OnItemCrafted: Fires when you claim the finished item
+ * - OnRecipeUnlocked: Fires when leveling up reveals new recipes
+ * - OnCraftingLevelUp: Fires when your crafting skill increases
+ *
+ ******************************************************************************/
+
 // MidnightGrind - Arcade Street Racing Game
 // Crafting Subsystem - Salvage, crafting, and item upgrading system
 

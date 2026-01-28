@@ -1,4 +1,216 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Midnight Grind. All Rights Reserved.
+
+/**
+ * @file MGSpeedtrapSubsystem.h
+ * @brief Speed trap system for measuring player performance at designated locations
+ *
+ * @section overview Overview
+ * This file defines the Speedtrap Subsystem for Midnight Grind - a comprehensive
+ * system that manages speed cameras, speed zones, jump challenges, and drift zones
+ * scattered throughout the game world. Speed traps provide optional challenges that
+ * reward skillful driving and encourage exploration.
+ *
+ * @section what_are_speedtraps What Are Speed Traps?
+ * Speed traps are designated areas in the game world that measure and record
+ * player performance. They come in various types:
+ * - **Speed Cameras**: Single-point measurement of instantaneous speed
+ * - **Speed Zones**: Sustained average speed through a section
+ * - **Jump Distances**: Measure how far you fly through the air
+ * - **Drift Zones**: Score based on drift angle and duration
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * ### 1. Speed Trap Types (EMGSpeedtrapType)
+ * Different challenges test different skills:
+ * - Camera: Pass through at maximum speed (instant snapshot)
+ * - Zone: Maintain high speed through an entire section
+ * - Checkpoint: Hit multiple points in sequence
+ * - TopSpeed: Achieve highest possible speed anywhere in zone
+ * - Average: Maintain consistent speed (no braking!)
+ * - Jump: Launch off a ramp and travel maximum distance
+ * - Drift: Chain drifts through a designated area
+ * - NearMiss: Pass close to traffic without hitting
+ * - Combo: Combine multiple actions for bonus points
+ *
+ * ### 2. Rating System (EMGSpeedtrapRating)
+ * Performance is rated on a tier system:
+ * - None: Below minimum threshold
+ * - Bronze: Entry level achievement
+ * - Silver: Competent performance
+ * - Gold: Skilled driving
+ * - Platinum: Expert level
+ * - Diamond: Exceptional mastery
+ * - Legend: Near-perfect execution
+ *
+ * Each rating tier has:
+ * - A threshold value (e.g., 150 mph for Gold)
+ * - Point rewards that increase with tier
+ *
+ * ### 3. Speed Trap States (EMGSpeedtrapState)
+ * Tracks the player's interaction with a speed trap:
+ * - Inactive: Player not near the speed trap
+ * - Active: Player is in detection range but hasn't entered
+ * - InProgress: Player is currently in a speed zone
+ * - Completed: Successfully finished the challenge
+ * - Failed: Exited zone early, crashed, or slowed too much
+ *
+ * ### 4. Speed Trap Definition (FMGSpeedtrapDefinition)
+ * The complete setup for a speed trap:
+ * - SpeedtrapId: Unique identifier
+ * - Type: What kind of challenge (camera, zone, jump, etc.)
+ * - StartLocation/EndLocation: Physical boundaries
+ * - TriggerWidth/TriggerHeight: Detection zone size
+ * - Rating thresholds: Bronze through Legend requirements
+ * - Point values: Rewards for each rating tier
+ * - TimeLimit: Optional time constraint for zones
+ *
+ * ### 5. Speed Trap Attempt (FMGSpeedtrapAttempt)
+ * Record of a single attempt:
+ * - RecordedValue: The measured performance (speed, distance, etc.)
+ * - MaxSpeed/AverageSpeed: Speed statistics
+ * - EntrySpeed/ExitSpeed: Velocities at boundaries
+ * - Rating: What tier was achieved
+ * - PointsEarned: Reward for this attempt
+ * - bIsPersonalBest/bIsWorldRecord: Achievement flags
+ * - DeltaFromBest: How close to beating your record
+ *
+ * ### 6. Active Speed Trap Progress (FMGActiveSpeedtrap)
+ * Real-time tracking during a zone:
+ * - CurrentValue: Live measurement being accumulated
+ * - MaxValue: Highest point during this attempt
+ * - TimeRemaining/DistanceRemaining: Progress indicators
+ * - CurrentRating: What tier you're trending toward
+ *
+ * ### 7. Records (FMGSpeedtrapRecord)
+ * Persistent best performances:
+ * - PersonalBest: Your highest recorded value
+ * - WorldRecord: Global best (from all players)
+ * - FriendBest: Best among your friends
+ * - TotalAttempts/TotalCompletions: Usage statistics
+ *
+ * ### 8. Player Stats (FMGSpeedtrapPlayerStats)
+ * Overall progress tracking:
+ * - TotalSpeedtrapsFound: Discovery progress
+ * - TotalGoldRatings (etc.): Count at each tier
+ * - TotalPoints: Cumulative score
+ * - HighestSpeedRecorded: All-time personal best speed
+ *
+ * @section workflow Typical Workflow
+ * @code
+ * // Get the speedtrap subsystem
+ * UMGSpeedtrapSubsystem* Speedtrap = GetGameInstance()->GetSubsystem<UMGSpeedtrapSubsystem>();
+ *
+ * // Called every frame from vehicle to check for speed traps
+ * Speedtrap->UpdateSpeedtrapDetection(PlayerId, Location, Velocity, DeltaTime);
+ *
+ * // When approaching a speed camera, system automatically:
+ * // 1. Fires OnSpeedtrapEntered when player enters trigger zone
+ * // 2. Records speed at the exact measurement point
+ * // 3. Fires OnSpeedtrapRecorded with result and rating
+ * // 4. Fires OnSpeedtrapNewPersonalBest if applicable
+ *
+ * // For speed zones, the flow is:
+ * // 1. OnSpeedtrapEntered when entering the zone
+ * // 2. OnSpeedtrapProgress fires periodically with live data
+ * // 3. OnSpeedtrapExited when leaving (with Attempt data)
+ *
+ * // Check current progress during a zone
+ * if (Speedtrap->HasActiveSpeedtrap(PlayerId))
+ * {
+ *     FMGActiveSpeedtrap Active = Speedtrap->GetActiveSpeedtrap(PlayerId);
+ *     float CurrentSpeed = Active.CurrentValue;
+ *     EMGSpeedtrapRating CurrentRating = Active.CurrentRating;
+ *     // Update HUD with live feedback
+ * }
+ * @endcode
+ *
+ * @section discovery Discovery System
+ * Speed traps can be hidden until discovered:
+ * @code
+ * // Check if a speed trap has been found
+ * if (!Speedtrap->IsSpeedtrapDiscovered(SpeedtrapId))
+ * {
+ *     // Show "???" on map instead of details
+ * }
+ *
+ * // Mark as discovered when player passes through first time
+ * Speedtrap->DiscoverSpeedtrap(SpeedtrapId);
+ * // Fires OnSpeedtrapDiscovered delegate
+ *
+ * // Track discovery progress
+ * int32 Found = Speedtrap->GetTotalSpeedtrapsDiscovered();
+ * float CompletionPercent = Speedtrap->GetCompletionPercentage();
+ * @endcode
+ *
+ * @section leaderboards Leaderboards
+ * Compare performance with other players:
+ * @code
+ * // Get global top 10
+ * TArray<FMGSpeedtrapLeaderboardEntry> TopScores = Speedtrap->GetLeaderboard(SpeedtrapId, 10);
+ *
+ * // Get friends leaderboard
+ * TArray<FString> FriendIds = { "friend1", "friend2", "friend3" };
+ * TArray<FMGSpeedtrapLeaderboardEntry> FriendsScores = Speedtrap->GetFriendsLeaderboard(SpeedtrapId, FriendIds);
+ *
+ * // Check your rank
+ * int32 MyRank = Speedtrap->GetPlayerRank(SpeedtrapId);
+ * @endcode
+ *
+ * @section rating_calc Rating Calculation
+ * @code
+ * // Calculate what rating a value would achieve
+ * EMGSpeedtrapRating Rating = Speedtrap->CalculateRating(SpeedtrapId, 185.0f); // Returns Gold
+ *
+ * // Get threshold for next tier
+ * float NextThreshold = Speedtrap->GetNextRatingThreshold(SpeedtrapId, EMGSpeedtrapRating::Gold);
+ * // Returns 200.0f (Platinum threshold)
+ *
+ * // Get points for a rating
+ * int32 Points = Speedtrap->GetPointsForRating(SpeedtrapId, EMGSpeedtrapRating::Platinum);
+ * @endcode
+ *
+ * @section speed_zones Speed Zone Configuration
+ * @code
+ * // Configure speed zone behavior
+ * FMGSpeedZoneConfig Config;
+ * Config.MinSpeedMPH = 50.0f;        // Minimum speed to stay in zone
+ * Config.SpeedDecayRate = 10.0f;      // How fast speed requirement drops if you slow down
+ * Config.ComboMultiplierPerZone = 0.1f; // Bonus for chaining zones
+ * Config.NearMissBonusPercent = 10.0f;  // Extra points for near misses
+ * Config.DriftBonusPercent = 15.0f;     // Extra points for drifting through
+ * Speedtrap->SetSpeedZoneConfig(Config);
+ * @endcode
+ *
+ * @section events Delegate Events
+ * Subscribe to these for real-time updates:
+ * - OnSpeedtrapEntered: Player entered a speed trap zone
+ * - OnSpeedtrapExited: Player left a speed trap zone
+ * - OnSpeedtrapRecorded: A speed camera recorded a value
+ * - OnSpeedtrapNewPersonalBest: Player beat their previous best
+ * - OnSpeedtrapNewWorldRecord: Player set a new global record
+ * - OnSpeedtrapRatingAchieved: Player earned a rating tier
+ * - OnSpeedtrapDiscovered: Player found a new speed trap
+ * - OnSpeedtrapProgress: Live updates during a zone
+ *
+ * @section units Unit Conversion
+ * The system uses cm/s internally but provides conversions:
+ * @code
+ * float SpeedMPH = Speedtrap->ConvertToMPH(VelocityCMPerSec);
+ * float SpeedKPH = Speedtrap->ConvertToKPH(VelocityCMPerSec);
+ * FText DisplayText = Speedtrap->FormatSpeed(SpeedMPH, bUseMetric);
+ * @endcode
+ *
+ * @section persistence Data Persistence
+ * Progress is saved automatically:
+ * @code
+ * Speedtrap->SaveSpeedtrapData();  // Save all progress
+ * Speedtrap->LoadSpeedtrapData();  // Load on game start
+ * @endcode
+ *
+ * @see UMGStatsTracker - Records speed trap attempts as part of overall stats
+ * @see EMGSpeedtrapType - All challenge types
+ * @see EMGSpeedtrapRating - All rating tiers
+ */
 
 #pragma once
 

@@ -1,6 +1,150 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * =============================================================================
+ * MGABTestingSubsystem.h - A/B Testing and Feature Flag Management
+ * =============================================================================
+ *
+ * OVERVIEW FOR BEGINNERS:
+ * -----------------------
+ * This file implements an A/B Testing system for Midnight Grind. A/B testing is
+ * a method used by game developers (and websites, apps, etc.) to test different
+ * versions of a feature with real users to see which one performs better.
+ *
+ * WHAT IS A/B TESTING?
+ * --------------------
+ * Imagine you're not sure if a blue "RACE!" button or a red "RACE!" button will
+ * get more players to click it. With A/B testing:
+ *
+ * 1. You show the blue button to 50% of players (Group A / "Control")
+ * 2. You show the red button to 50% of players (Group B / "Variant")
+ * 3. You track how many players in each group click the button
+ * 4. After enough data, you know which color works better!
+ *
+ * This is called a "controlled experiment" and it removes guesswork from game
+ * development decisions.
+ *
+ * WHAT ARE FEATURE FLAGS?
+ * -----------------------
+ * Feature flags (also called "feature toggles") are on/off switches for features
+ * in your game. Instead of deploying a feature to everyone at once, you can:
+ *
+ * - Turn features on/off remotely without a game update
+ * - Roll out features gradually (10% of users, then 50%, then 100%)
+ * - Enable features only for certain player segments (beta testers, VIPs)
+ * - Quickly disable a broken feature if something goes wrong
+ *
+ * WHY IS THIS IMPORTANT?
+ * ----------------------
+ * 1. DATA-DRIVEN DECISIONS: Instead of guessing what players will like, you
+ *    can test and measure. "Players spend 20% more credits with the new shop
+ *    layout" is much better than "I think players will like the new shop."
+ *
+ * 2. RISK REDUCTION: New features can be tested with a small percentage of
+ *    players first. If there are bugs, only a few players are affected.
+ *
+ * 3. LIVE OPS: You can tune the game after release without requiring players
+ *    to download updates. Want to try a weekend event with 2x rewards? Just
+ *    flip a feature flag.
+ *
+ * 4. PERSONALIZATION: Different player segments might respond better to
+ *    different features. Casual players might want more assists, while
+ *    competitive players want none.
+ *
+ * KEY CONCEPTS:
+ * -------------
+ *
+ * 1. EXPERIMENT: A single test comparing multiple variants (e.g., testing if
+ *    the new garage UI increases engagement).
+ *
+ * 2. VARIANT: One version of the feature being tested. "Control" is usually
+ *    the existing behavior; "VariantA", "VariantB" are the new options.
+ *
+ * 3. ASSIGNMENT: When a player is put into a specific variant group. This is
+ *    typically random but deterministic - the same player always sees the
+ *    same variant.
+ *
+ * 4. EXPOSURE: Tracking when a player actually SEES the experimental feature.
+ *    A player might be assigned to VariantA but never visit the garage - they
+ *    shouldn't count in the experiment results.
+ *
+ * 5. CONVERSION: The action you're trying to optimize for. Could be:
+ *    - Clicking a button
+ *    - Completing a race
+ *    - Making a purchase
+ *    - Returning to the game the next day
+ *
+ * 6. SEGMENT: A group of players with shared characteristics (e.g., "new_players",
+ *    "high_spenders", "competitive_tier"). Experiments can target specific segments.
+ *
+ * 7. ROLLOUT PERCENTAGE: How many players see a feature flag. Start at 0%,
+ *    gradually increase to 10%, 50%, 100% as confidence grows.
+ *
+ * 8. USER BUCKETING: A technique to deterministically assign users to variants.
+ *    Uses a hash of the user ID to ensure:
+ *    - Same user always gets the same variant
+ *    - Distribution is statistically random
+ *    - No server-side state needed for assignment
+ *
+ * HOW TO USE THIS SYSTEM:
+ * -----------------------
+ * @code
+ * // Get the subsystem
+ * UMGABTestingSubsystem* ABTesting = GameInstance->GetSubsystem<UMGABTestingSubsystem>();
+ *
+ * // FEATURE FLAGS - Simple on/off checks
+ * if (ABTesting->IsFeatureEnabled("new_garage_ui"))
+ * {
+ *     // Show the new garage
+ * }
+ * else
+ * {
+ *     // Show the old garage
+ * }
+ *
+ * // A/B EXPERIMENTS - More complex with multiple variants
+ * EMGVariantType Variant = ABTesting->GetExperimentVariant("shop_layout_test");
+ * switch (Variant)
+ * {
+ *     case EMGVariantType::Control:
+ *         ShowGridLayout();
+ *         break;
+ *     case EMGVariantType::VariantA:
+ *         ShowListLayout();
+ *         break;
+ *     case EMGVariantType::VariantB:
+ *         ShowCarouselLayout();
+ *         break;
+ * }
+ *
+ * // IMPORTANT: Track when the user actually sees the experiment
+ * ABTesting->TrackExperimentExposure("shop_layout_test");
+ *
+ * // Track when they complete the target action
+ * ABTesting->TrackExperimentConversion("shop_layout_test", "purchase_made", 1.0f);
+ *
+ * // QA TESTING - Force a specific variant for testing
+ * ABTesting->OverrideExperimentVariant("shop_layout_test", EMGVariantType::VariantB);
+ * @endcode
+ *
+ * STATISTICAL SIGNIFICANCE:
+ * -------------------------
+ * An experiment needs enough participants to be "statistically significant" -
+ * meaning the results are unlikely to be due to random chance. The system tracks:
+ * - MinSampleSize: Minimum participants needed per variant
+ * - ConfidenceLevel: Typically 95% (1 in 20 chance results are random)
+ *
+ * Don't make decisions based on experiments that haven't reached significance!
+ *
+ * BEST PRACTICES:
+ * ---------------
+ * 1. Only change ONE thing per experiment to know what caused the difference
+ * 2. Run experiments long enough to reach statistical significance
+ * 3. Always track EXPOSURE, not just assignment
+ * 4. Don't peek at results too early - let the experiment run its course
+ * 5. Document the hypothesis before running the experiment
+ * 6. Have a clear primary metric you're optimizing for
+ *
  * @file MGABTestingSubsystem.h
  * @brief A/B Testing and Feature Flag Management Subsystem
  *

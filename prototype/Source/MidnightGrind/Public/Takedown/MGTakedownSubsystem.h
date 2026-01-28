@@ -1,5 +1,158 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * @file MGTakedownSubsystem.h
+ * @brief Arcade-Style Aggressive Driving and Takedown Combat System
+ *
+ * @section overview Overview
+ * This subsystem implements the aggressive driving mechanics inspired by games like
+ * Burnout. It handles vehicle-to-vehicle combat through takedowns, tracks aggression
+ * levels, manages revenge mechanics, and provides the iconic crash camera effects.
+ *
+ * @section key_concepts Key Concepts for Beginners
+ *
+ * 1. WHAT IS A TAKEDOWN?
+ *    A takedown occurs when you force another vehicle to crash through aggressive
+ *    contact. Different techniques yield different takedown types:
+ *    - Ram: Hit from behind at high speed
+ *    - Sideswipe: Scrape along the side to push them off course
+ *    - PIT Maneuver: Tap their rear quarter-panel to spin them out
+ *    - Shunt: Push them into obstacles
+ *    - Slam: Force them into walls
+ *    - Traffic Check: Push them into oncoming traffic
+ *    - Air Strike: Land on them from a jump
+ *
+ * 2. TAKEDOWN FLOW:
+ *    @code
+ *    Collision Detected -> ProcessCollision() -> IsValidTakedown()?
+ *                                                    |
+ *                              No: Just a bump       | Yes: Real takedown
+ *                                   |                v
+ *                                   v          RegisterTakedown()
+ *                              No points              |
+ *                                              CalculatePoints()
+ *                                                     |
+ *                                              UpdateStreak()
+ *                                                     |
+ *                                              StartCrashCamera()
+ *                                                     |
+ *                                              OnTakedownOccurred fires
+ *    @endcode
+ *
+ * 3. COLLISION PROCESSING:
+ *    When two vehicles collide, the physics system sends collision data to
+ *    ProcessCollision(). The system analyzes:
+ *    - Impact force (MinTakedownImpactForce threshold = 5000 Newtons)
+ *    - Impact angle (determines takedown type)
+ *    - Relative velocities (who was the aggressor)
+ *    - Attacker vs Victim determination
+ *
+ * 4. AGGRESSION SYSTEM:
+ *    The aggression meter tracks how aggressively you're driving:
+ *    - Builds from collisions, near-misses, and takedowns
+ *    - Decays over time (DecayRate per second)
+ *    - Higher levels = higher score multipliers
+ *    - Max level triggers "Rampage" mode with bonus effects
+ *
+ *    Levels: None -> Mild -> Moderate -> Aggressive -> Violent -> Rampage
+ *
+ * 5. STREAK SYSTEM:
+ *    Chain takedowns together for multiplied rewards:
+ *    - Each takedown resets the streak timer (StreakWindow = 10 seconds)
+ *    - Consecutive takedowns within the window build your streak
+ *    - Higher streaks = exponentially better rewards
+ *    - OnStreakUpdated fires each time you extend your streak
+ *    - OnStreakEnded fires when the timer expires
+ *
+ * 6. REVENGE SYSTEM:
+ *    When an opponent takes you down, they become a "Revenge Target":
+ *    - TrackRevengeTarget() marks them
+ *    - Taking them down awards bonus "Revenge" points
+ *    - RevengeMultiplier increases reward (default 1.5x)
+ *    - Satisfying gameplay loop: get wrecked, seek revenge, profit
+ *
+ * 7. CRASH CAMERA:
+ *    The dramatic slow-motion camera when you score a takedown:
+ *    - Multiple modes: QuickSlowMo, CinematicChase, ImpactZoom, etc.
+ *    - Aftertouch: Control your wreck to cause more damage
+ *    - ApplyAftertouch() lets player steer their crashed vehicle
+ *
+ * 8. POINTS AND REWARDS:
+ *    FMGTakedownPoints defines scoring for each takedown type:
+ *    - BasePoints: Fixed amount for the takedown type
+ *    - SpeedMultiplier: Bonus based on impact speed
+ *    - ForceMultiplier: Bonus based on collision force
+ *    - Special bonuses: Airborne, Revenge, Traffic, Wall
+ *    - BoostReward: Refills your boost meter
+ *
+ * @section usage_examples Code Examples
+ *
+ * @code
+ * // Get the takedown subsystem
+ * UMGTakedownSubsystem* Takedown = GetGameInstance()->GetSubsystem<UMGTakedownSubsystem>();
+ *
+ * // Start a takedown session
+ * Takedown->StartSession();
+ *
+ * // When a collision happens (usually from physics callback)
+ * FMGTakedownCollision CollisionData;
+ * CollisionData.AttackerId = TEXT("Player1");
+ * CollisionData.VictimId = TEXT("AI_Racer_3");
+ * CollisionData.ImpactPoint = HitResult.ImpactPoint;
+ * CollisionData.ImpactNormal = HitResult.ImpactNormal;
+ * CollisionData.AttackerVelocity = MyVehicle->GetVelocity();
+ * CollisionData.VictimVelocity = OtherVehicle->GetVelocity();
+ *
+ * // Process the collision
+ * if (Takedown->ProcessCollision(CollisionData))
+ * {
+ *     // A valid takedown was registered
+ *     // Events will fire automatically
+ * }
+ *
+ * // Check current aggression state
+ * EMGAggressionLevel Level = Takedown->GetAggressionLevel();
+ * float Percent = Takedown->GetAggressionPercent();
+ *
+ * // Check for active revenge targets
+ * TArray<FMGRevengeTarget> Targets = Takedown->GetActiveRevengeTargets();
+ * for (const FMGRevengeTarget& Target : Targets)
+ * {
+ *     ShowRevengeIndicator(Target.TargetId, Target.RevengeMultiplier);
+ * }
+ *
+ * // Listen for takedown events
+ * Takedown->OnTakedownOccurred.AddDynamic(this, &MyClass::HandleTakedown);
+ * Takedown->OnRampageActivated.AddDynamic(this, &MyClass::HandleRampage);
+ * Takedown->OnRevengeTakedown.AddDynamic(this, &MyClass::HandleRevenge);
+ *
+ * // Get session statistics
+ * FMGTakedownSessionStats Stats = Takedown->GetSessionStats();
+ * UE_LOG(LogGame, Log, TEXT("Total Takedowns: %d, Best Streak: %d"),
+ *        Stats.TotalTakedowns, Stats.BestStreak);
+ *
+ * // End session and save
+ * Takedown->EndSession();
+ * Takedown->SaveTakedownData();
+ * @endcode
+ *
+ * @section events_to_listen Events to Listen For
+ * - OnTakedownOccurred: A takedown happened (shows points, triggers UI)
+ * - OnPlayerWrecked: Local player got taken down (show respawn UI)
+ * - OnStreakUpdated: Streak count changed (update HUD)
+ * - OnStreakEnded: Streak timer expired (hide streak UI)
+ * - OnAggressionLevelChanged: Aggression tier changed (update meter color)
+ * - OnRampageActivated: Maximum aggression reached (special effects)
+ * - OnRevengeAvailable: Someone who wrecked you is nearby
+ * - OnRevengeTakedown: You got revenge (bonus celebration)
+ * - OnCrashCameraStarted/Ended: Crash camera lifecycle
+ * - OnAftertouchApplied: Player is controlling their wreck
+ *
+ * @see UMGVehicleSubsystem - Vehicle physics and damage
+ * @see UMGBoostSubsystem - Boost meter rewards from takedowns
+ * @see UMGScoreSubsystem - Score integration
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

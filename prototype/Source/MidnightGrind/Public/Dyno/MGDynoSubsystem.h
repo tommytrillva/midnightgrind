@@ -1,6 +1,129 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * =============================================================================
+ * MGDynoSubsystem.h - Chassis Dynamometer Testing System
+ * =============================================================================
+ *
+ * OVERVIEW FOR BEGINNERS:
+ * -----------------------
+ * This file implements a "dyno" (dynamometer) system for Midnight Grind. In the
+ * real world, a chassis dynamometer is a machine used to measure the power output
+ * of a vehicle's engine. The car drives onto large rollers, and as the driver
+ * accelerates through the RPM range, sensors measure how much force the wheels
+ * produce. This data is then converted into horsepower and torque numbers.
+ *
+ * WHAT IS A DYNO RUN?
+ * -------------------
+ * A dyno run (or "dyno pull") is the process of:
+ * 1. Strapping the vehicle securely to the dyno
+ * 2. Warming up the engine to operating temperature
+ * 3. Doing a "pull" - accelerating from low RPM to redline in a high gear
+ * 4. Recording power and torque at each RPM point
+ * 5. Generating a power curve graph showing the results
+ *
+ * WHY DO PLAYERS CARE ABOUT DYNO?
+ * -------------------------------
+ * In a car tuning/racing game like Midnight Grind, the dyno serves several purposes:
+ *
+ * 1. BRAGGING RIGHTS: "My Skyline makes 650 wheel horsepower!"
+ *
+ * 2. TUNING VALIDATION: After installing performance parts, players want to see
+ *    the actual power gains. "That turbo upgrade gave me +87 HP!"
+ *
+ * 3. COMPARISON: Before/after comparisons let players see exactly how much
+ *    their modifications improved the car.
+ *
+ * 4. DIAGNOSIS: If a car isn't performing well, the power curve might reveal
+ *    issues (like boost falling off at high RPM).
+ *
+ * 5. IMMERSION: Real car enthusiasts love dyno culture. This feature makes
+ *    the game feel authentic.
+ *
+ * KEY TERMINOLOGY:
+ * ----------------
+ *
+ * HORSEPOWER (HP):
+ * A measure of how much work the engine can do. Higher HP = higher top speed.
+ * In this game, we track both:
+ * - Wheel HP (WHP): Power measured at the wheels
+ * - Crank HP: Estimated power at the crankshaft (higher than wheel HP)
+ *
+ * TORQUE:
+ * A measure of rotational force. Higher torque = better acceleration.
+ * Like horsepower, we track wheel torque and crank torque.
+ *
+ * DRIVETRAIN LOSS:
+ * Power is lost between the engine and wheels due to friction in the
+ * transmission, differential, and wheel bearings. Typical losses:
+ * - FWD (Front Wheel Drive): 10-15%
+ * - RWD (Rear Wheel Drive): 12-17%
+ * - AWD (All Wheel Drive): 18-25%
+ *
+ * The system estimates crank HP by adding back the drivetrain loss.
+ * Example: 400 WHP with 15% loss = 400 / 0.85 = ~471 crank HP
+ *
+ * POWER CURVE:
+ * A graph showing HP and torque across the RPM range. Helps visualize:
+ * - Where peak power occurs (important for shift points)
+ * - The "power band" - the RPM range where the engine makes good power
+ * - Turbo spool characteristics (boost builds with RPM)
+ *
+ * CORRECTION STANDARDS:
+ * Real dynos adjust for atmospheric conditions (temperature, pressure, humidity)
+ * because these affect engine performance. Different standards (SAE, DIN, JIS)
+ * use different correction formulas. SAE J1349 is most common in North America.
+ *
+ * DATA STRUCTURES:
+ * ----------------
+ * - EMGDynoRunState: What phase the dyno run is in (Preparing, Running, etc.)
+ * - EMGDynoCorrectionStandard: Which correction formula to use
+ * - FMGDynoDataPoint: Power/torque at a single RPM point
+ * - FMGDynoResult: Complete results from a dyno run
+ * - FMGDynoComparison: Before/after comparison data
+ *
+ * USAGE EXAMPLE:
+ * --------------
+ * @code
+ * UMGDynoSubsystem* Dyno = GetGameInstance()->GetSubsystem<UMGDynoSubsystem>();
+ *
+ * // Check if player can afford a dyno pull
+ * if (Dyno->CanAffordDynoPull())
+ * {
+ *     // Subscribe to completion event
+ *     Dyno->OnDynoRunComplete.AddDynamic(this, &UMyClass::HandleDynoComplete);
+ *
+ *     // Start the dyno run
+ *     Dyno->StartDynoRun(VehicleID, VehicleData, BaseModel, "Stage 2 Turbo Tune");
+ * }
+ *
+ * // Later, compare before and after mods
+ * if (Dyno->HasComparisonBaseline(VehicleID))
+ * {
+ *     FMGDynoComparison Comparison;
+ *     if (Dyno->CompareLatestToBaseline(VehicleID, Comparison))
+ *     {
+ *         UE_LOG(LogTemp, Log, TEXT("Gained %.1f WHP!"), Comparison.WheelHPGain);
+ *     }
+ * }
+ *
+ * // Export results for sharing
+ * FString CSVData = Dyno->ExportDynoData(ResultID, EMGDynoExportFormat::CSV);
+ * @endcode
+ *
+ * INTEGRATION WITH OTHER SYSTEMS:
+ * -------------------------------
+ * - ECONOMY: Dyno pulls cost credits, teaching resource management
+ * - VEHICLE DATA: Results are based on the actual vehicle configuration
+ * - ANALYTICS: Track which builds players create and how they tune
+ *
+ * GAMEPLAY BALANCE CONSIDERATIONS:
+ * --------------------------------
+ * - Dyno cost should be meaningful but not prohibitive
+ * - Power numbers should feel "right" for the parts installed
+ * - Before/after gains should match player expectations
+ * - Export feature lets players share builds on social media
+ *
  * @file MGDynoSubsystem.h
  * @brief Dyno testing subsystem for power and torque visualization
  *

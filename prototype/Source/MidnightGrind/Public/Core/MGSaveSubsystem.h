@@ -1,5 +1,108 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGSaveSubsystem.h - Game Save/Load System
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file implements the complete save/load system for Midnight Grind.
+ * It handles persisting player progress, vehicle collections, race records,
+ * and all game settings to disk (and optionally cloud storage).
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. GAME INSTANCE SUBSYSTEM (UGameInstanceSubsystem):
+ *    - A subsystem attached to the Game Instance
+ *    - Lives for the entire game session (doesn't reset on level change)
+ *    - Perfect for save systems that need to persist across levels
+ *    - Auto-created by Unreal when the game starts
+ *    - Access via: GameInstance->GetSubsystem<UMGSaveSubsystem>()
+ *
+ * 2. USAVEGAME:
+ *    - Unreal's built-in base class for save data
+ *    - Handles serialization (converting objects to bytes and back)
+ *    - Works with UGameplayStatics::SaveGameToSlot/LoadGameFromSlot
+ *    - Stores data in platform-specific save locations
+ *
+ * 3. USTRUCT (Data Structures):
+ *    - Plain data containers (no inheritance, no virtual functions)
+ *    - Lighter weight than UObjects - good for data storage
+ *    - Can be nested, used in arrays, and serialized automatically
+ *    - Each struct here represents a category of save data
+ *
+ * 4. SAVE SLOT SYSTEM:
+ *    - Multiple save slots let players have separate playthroughs
+ *    - Slot 0 = Quick Save, Slot 9 = Auto Save (by default)
+ *    - Slot metadata (FMGSaveSlotInfo) provides preview without loading
+ *
+ * 5. DELEGATES (Events):
+ *    - Broadcast notifications when save/load operations occur
+ *    - UI can bind to these to show progress indicators
+ *    - Async operations notify when complete
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ * -----------------------------------------
+ *
+ *   [UMGGameInstance]
+ *         |
+ *         +-- [UMGSaveSubsystem] <-- This file
+ *         |         |
+ *         |         +-- FMGSaveGameData (all save data)
+ *         |                 |
+ *         |                 +-- FMGSaveProfileData (player identity)
+ *         |                 +-- FMGSaveVehicleData[] (garage)
+ *         |                 +-- FMGSaveProgressionData (unlocks)
+ *         |                 +-- FMGSaveRivalData[] (AI rivals)
+ *         |
+ *         +-- [UMGCloudSaveSubsystem] (optional cloud sync)
+ *
+ * SAVE DATA HIERARCHY:
+ * --------------------
+ * - FMGSaveSlotInfo: Quick metadata for slot selection UI
+ * - FMGSaveProfileData: Player name, level, cash, settings
+ * - FMGSaveVehicleData: Per-vehicle builds, colors, stats
+ * - FMGSaveProgressionData: Story progress, unlocks, achievements
+ * - FMGSaveRivalData: AI rival relationships and history
+ * - FMGSaveGameData: Container holding all of the above
+ *
+ * COMMON PATTERNS:
+ * ----------------
+ * @code
+ * // Get the save subsystem
+ * UMGSaveSubsystem* Save = GameInstance->GetSubsystem<UMGSaveSubsystem>();
+ *
+ * // Save current game to slot 1
+ * Save->SaveGame(1);
+ *
+ * // Load from slot 1
+ * Save->LoadGame(1);
+ *
+ * // Check player's cash
+ * int64 Cash = Save->GetCurrentCash();
+ *
+ * // Add a new vehicle to the garage
+ * FMGSaveVehicleData NewCar;
+ * NewCar.VehicleDefinitionID = "Mustang_GT";
+ * FGuid CarID = Save->AddOwnedVehicle(NewCar);
+ *
+ * // Listen for save completion
+ * Save->OnSaveCompleted.AddDynamic(this, &MyClass::OnSaveFinished);
+ * @endcode
+ *
+ * PINK SLIP SYSTEM:
+ * -----------------
+ * The save system tracks "pink slip" racing where players can win or lose
+ * vehicles permanently. Includes cooldown timers and trade locks to prevent
+ * exploitation.
+ *
+ * @see UMGCloudSaveSubsystem For cloud save synchronization
+ * @see UMGGameInstance For the parent game instance
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,8 +112,16 @@
 #include "Racing/MGRaceModeSubsystem.h"
 #include "MGSaveSubsystem.generated.h"
 
+// ============================================================================
+// SAVE SLOT INFO - Metadata for slot selection UI
+// ============================================================================
+
 /**
- * Save slot metadata
+ * Save slot metadata - lightweight info for displaying in save/load UI
+ *
+ * This struct provides just enough information to show in a slot selection
+ * menu without having to load the entire save file. Think of it as a
+ * "preview" of what's in each save slot.
  */
 USTRUCT(BlueprintType)
 struct FMGSaveSlotInfo
@@ -54,8 +165,15 @@ struct FMGSaveSlotInfo
 	int32 SaveVersion = 1;
 };
 
+// ============================================================================
+// PLAYER PROFILE - Core player identity and preferences
+// ============================================================================
+
 /**
- * Saved player profile data
+ * Saved player profile data - who the player is and their preferences
+ *
+ * This is the "identity" portion of the save - player name, level,
+ * currency, and gameplay preferences like metric vs imperial units.
  */
 USTRUCT(BlueprintType)
 struct FMGSaveProfileData
@@ -98,8 +216,24 @@ struct FMGSaveProfileData
 	int32 DifficultyLevel = 1; // 0=Easy, 4=Legendary
 };
 
+// ============================================================================
+// VEHICLE DATA - Per-vehicle state for the player's garage
+// ============================================================================
+
 /**
- * Saved vehicle data
+ * Saved vehicle data - everything about a single owned vehicle
+ *
+ * Each vehicle the player owns gets one of these structs. It tracks:
+ * - Which vehicle it is (definition ID) and unique instance (GUID)
+ * - Current parts/build configuration
+ * - Visual customization (colors, body kits, wheels)
+ * - Wear/damage state (if wear simulation is enabled)
+ * - Per-vehicle statistics (races, wins, miles driven)
+ * - Economic data (purchase price, total invested)
+ *
+ * NOTE: VehicleInstanceID is a GUID (globally unique identifier) that
+ * distinguishes this specific car instance from others of the same model.
+ * A player might own two Mustangs - each has a different instance ID.
  */
 USTRUCT(BlueprintType)
 struct FMGSaveVehicleData
@@ -193,8 +327,24 @@ struct FMGSaveVehicleData
 	FDateTime PurchaseDate;
 };
 
+// ============================================================================
+// PROGRESSION DATA - Career progress, unlocks, and achievements
+// ============================================================================
+
 /**
- * Saved progression data
+ * Saved progression data - tracking player's journey through the game
+ *
+ * This struct holds all the "progress" data - what the player has
+ * accomplished, unlocked, and achieved. It includes:
+ * - Story/career chapter progress
+ * - Completed missions and unlocked areas
+ * - Race statistics and personal best times
+ * - Achievements and their progress
+ * - Unlocked vehicles, parts, and cosmetics
+ * - Police pursuit history (busts, escapes, fines)
+ *
+ * TIP: TMap<FName, int32> is like a dictionary/hash table mapping
+ * names to integers. Great for tracking "how many times did X happen".
  */
 USTRUCT(BlueprintType)
 struct FMGSaveProgressionData
@@ -255,8 +405,16 @@ struct FMGSaveProgressionData
 	float LongestPursuitTime = 0.0f;
 };
 
+// ============================================================================
+// RIVAL DATA - AI opponent relationships
+// ============================================================================
+
 /**
- * Saved rival/social data
+ * Saved rival/social data - tracks relationships with AI racers
+ *
+ * The rivalry system creates persistent AI opponents that remember
+ * your race history. Beat someone enough times and they become
+ * your rival. Lose to them and the "heat" between you increases.
  */
 USTRUCT(BlueprintType)
 struct FMGSaveRivalData
@@ -279,8 +437,21 @@ struct FMGSaveRivalData
 	int32 HeatLevel = 0;
 };
 
+// ============================================================================
+// COMPLETE SAVE DATA - The master container for all save data
+// ============================================================================
+
 /**
- * Complete save game data
+ * Complete save game data - the top-level container holding everything
+ *
+ * This struct aggregates all the individual data types into one
+ * complete save file. When you save, this entire struct gets
+ * serialized to disk. When you load, it gets deserialized back.
+ *
+ * SAVE VERSIONING:
+ * SaveVersion allows for backwards compatibility when the save format
+ * changes. If you add new fields, increment the version and add
+ * migration code to handle loading old saves.
  */
 USTRUCT(BlueprintType)
 struct FMGSaveGameData
@@ -365,8 +536,30 @@ struct FMGSaveGameData
 	int64 PinkSlipValueLost = 0;
 };
 
+// ============================================================================
+// DELEGATES - Event notifications for save/load operations
+// ============================================================================
+
 /**
- * Delegates
+ * WHAT ARE DELEGATES?
+ * Delegates are Unreal's type-safe callback/event system. They allow one
+ * piece of code to notify many listeners when something happens.
+ *
+ * DECLARE_DYNAMIC_MULTICAST_DELEGATE_*:
+ * - DYNAMIC: Can be bound from Blueprints (uses reflection)
+ * - MULTICAST: Multiple listeners can subscribe (like C# events)
+ * - The suffix indicates parameter count (OneParam, TwoParams, etc.)
+ *
+ * HOW TO USE:
+ * @code
+ * // In C++ - bind a member function:
+ * SaveSubsystem->OnSaveCompleted.AddDynamic(this, &MyClass::HandleSaveComplete);
+ *
+ * // In Blueprint - use "Bind Event" node on the delegate
+ *
+ * // The delegate owner broadcasts when the event occurs:
+ * OnSaveCompleted.Broadcast(SlotIndex, bSuccess);
+ * @endcode
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveStarted, int32, SlotIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSaveCompleted, int32, SlotIndex, bool, bSuccess);
@@ -375,9 +568,24 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLoadCompleted, int32, SlotIndex,
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAutoSave, int32, SlotIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSaveSlotDeleted, int32, SlotIndex, bool, bSuccess);
 
+// ============================================================================
+// SAVE GAME OBJECT - USaveGame wrapper for Unreal serialization
+// ============================================================================
+
 /**
  * Save game object wrapper for UE serialization
- * Contains all save data in a USaveGame-compatible format
+ *
+ * WHY DO WE NEED THIS?
+ * Unreal's built-in save functions (SaveGameToSlot/LoadGameFromSlot) require
+ * a USaveGame-derived object. This wrapper holds our FMGSaveGameData struct.
+ *
+ * We use a struct for the actual data because:
+ * - Structs are easier to copy and pass around
+ * - We can nest structs cleanly
+ * - The UObject wrapper is just for serialization compatibility
+ *
+ * This is a common pattern in Unreal - wrap your data struct in a
+ * minimal USaveGame class for disk serialization.
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGSaveGameObject : public USaveGame
@@ -389,11 +597,44 @@ public:
 	FMGSaveGameData SaveData;
 };
 
+// ============================================================================
+// MAIN SAVE SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Save/Load System Subsystem
+ * Save/Load System Subsystem - The main API for all save operations
  *
- * Handles all game persistence including player progress,
- * vehicle builds, and game settings.
+ * This is the primary interface for saving and loading game data.
+ * It provides functions for:
+ *
+ * CORE OPERATIONS:
+ * - SaveGame() / LoadGame() - Manual save/load to specific slots
+ * - QuickSave() / QuickLoad() - Fast access to slot 0
+ * - TriggerAutoSave() - Automatic periodic saves
+ *
+ * DATA ACCESS (Read/Write current save data):
+ * - Profile: SetPlayerName, AddCash, SpendCash, AddREP, AddXP
+ * - Vehicles: AddOwnedVehicle, RemoveOwnedVehicle, UpdateVehicleData
+ * - Progression: CompleteRace, CompleteMission, UnlockAchievement
+ * - Inventory: AddPartToInventory, RemovePartFromInventory
+ * - Settings: SetGameSetting, GetGameSetting
+ *
+ * SLOT MANAGEMENT:
+ * - GetAllSaveSlots() - List all slots with metadata
+ * - DeleteSaveSlot() - Erase a save
+ * - CopySaveSlot() - Duplicate a save to another slot
+ *
+ * IMPORTANT PATTERNS:
+ * - Always call MarkDirty() after modifying data to enable auto-save
+ * - Use OnSaveCompleted/OnLoadCompleted for async UI feedback
+ * - Check IsSaveSlotValid() before loading
+ *
+ * THREAD SAFETY:
+ * Save operations can be async (SaveGameAsync). The subsystem handles
+ * queuing and prevents concurrent operations on the same slot.
+ *
+ * @see UMGGameInstance For the owning game instance
+ * @see UMGCloudSaveSubsystem For cloud synchronization
  */
 UCLASS(BlueprintType)
 class MIDNIGHTGRIND_API UMGSaveSubsystem : public UGameInstanceSubsystem

@@ -1,5 +1,193 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVFXSubsystem.h
+ * @brief Central VFX management subsystem with pooling and quality scaling
+ *
+ * @section Overview
+ * UMGVFXSubsystem is a World Subsystem that provides centralized management for all
+ * visual effects in the game. It handles Niagara system pooling for performance,
+ * quality-based scaling, global parameter synchronization, and event-driven VFX
+ * triggering.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **World Subsystem**
+ * A World Subsystem is automatically created for each game world and provides
+ * global services. Unlike Actors, subsystems:
+ * - Are created/destroyed automatically with the world
+ * - Don't need to be placed in levels
+ * - Are accessed via GetWorld()->GetSubsystem<UMGVFXSubsystem>()
+ * - Have a single instance per world
+ *
+ * **VFX Pooling**
+ * Creating and destroying Niagara components every frame is expensive. Pooling
+ * keeps a cache of inactive components that can be reused:
+ * 1. Request a VFX -> Get from pool (or create if pool empty)
+ * 2. VFX plays and completes
+ * 3. Component returns to pool instead of being destroyed
+ * 4. Next request reuses the pooled component
+ *
+ * This dramatically improves performance for frequently-spawned effects like
+ * tire smoke, sparks, and exhaust flames.
+ *
+ * **Quality Scaling**
+ * Different hardware needs different VFX intensity. The quality system:
+ * - Low: Minimal particles, no screen effects
+ * - Medium: Reduced particle counts
+ * - High: Full quality
+ * - Ultra: Maximum detail with extra effects
+ *
+ * Effects check ShouldSpawnAtQuality() before spawning, and use
+ * GetParticleCountMultiplier() to scale particle counts.
+ *
+ * **Global Parameters**
+ * Many VFX need to respond to game state (race intensity, player speed, time of
+ * day). Global parameters (FMGGlobalVFXParams) are synchronized to:
+ * - Material Parameter Collections for shader access
+ * - Active Niagara systems via user parameters
+ *
+ * **Event-Driven VFX**
+ * Register Niagara systems for specific game events (drift start, NOS activate,
+ * collision). When events occur, call TriggerVFXEvent() and the subsystem spawns
+ * the appropriate effect.
+ *
+ * @section Architecture
+ * The subsystem operates on several levels:
+ *
+ * 1. **Spawning Layer**: SpawnVFX/SpawnVFXAttached create or retrieve pooled components
+ * 2. **Event Layer**: Maps EMGVFXEvent enums to Niagara systems
+ * 3. **Quality Layer**: Filters spawns based on current quality and priority
+ * 4. **Parameter Layer**: Synchronizes global state to materials and particles
+ * 5. **Screen Effects Layer**: Manages shake, flash, blur, and other post-process
+ *
+ * Other VFX components (vehicle, camera, environment) use this subsystem for
+ * spawning and global state access.
+ *
+ * @section UsageExamples Usage Examples
+ *
+ * **Getting the Subsystem:**
+ * @code
+ * // In any actor or component
+ * UMGVFXSubsystem* VFXSubsystem = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ * @endcode
+ *
+ * **Spawning a One-Shot VFX:**
+ * @code
+ * // Spawn explosion at location
+ * void AMyActor::SpawnExplosion(FVector Location)
+ * {
+ *     UMGVFXSubsystem* VFX = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ *     if (VFX && ExplosionSystem)
+ *     {
+ *         VFX->SpawnVFX(ExplosionSystem, Location, FRotator::ZeroRotator);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Spawning Attached VFX:**
+ * @code
+ * // Attach exhaust flames to vehicle
+ * void AMyVehicle::SetupExhaustVFX()
+ * {
+ *     UMGVFXSubsystem* VFX = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ *     if (VFX && ExhaustFlameSystem)
+ *     {
+ *         ExhaustComp = VFX->SpawnVFXAttached(ExhaustFlameSystem, this, FName("ExhaustSocket"));
+ *     }
+ * }
+ * @endcode
+ *
+ * **Using VFX Events:**
+ * @code
+ * // Register event VFX at game start
+ * void AMyGameMode::InitializeVFXEvents()
+ * {
+ *     UMGVFXSubsystem* VFX = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ *     if (VFX)
+ *     {
+ *         VFX->RegisterEventVFX(EMGVFXEvent::DriftStart, DriftStartSystem, 5);
+ *         VFX->RegisterEventVFX(EMGVFXEvent::NOSActivate, NOSActivateSystem, 10);
+ *     }
+ * }
+ *
+ * // Trigger event from gameplay
+ * void AMyVehicle::OnDriftStart(FVector DriftLocation)
+ * {
+ *     UMGVFXSubsystem* VFX = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ *     if (VFX)
+ *     {
+ *         VFX->TriggerVFXEvent(EMGVFXEvent::DriftStart, DriftLocation, GetActorRotation(), this);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Setting Global Parameters:**
+ * @code
+ * // Update global VFX state each frame
+ * void AMyGameMode::UpdateVFXState()
+ * {
+ *     UMGVFXSubsystem* VFX = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ *     if (VFX)
+ *     {
+ *         // Update race intensity based on position gap
+ *         float Intensity = CalculateRaceIntensity();
+ *         VFX->SetRaceIntensity(Intensity);
+ *
+ *         // Update player speed for global effects
+ *         float SpeedNorm = PlayerVehicle->GetSpeedNormalized();
+ *         VFX->SetPlayerSpeed(SpeedNorm);
+ *
+ *         // Set crew color for themed effects
+ *         VFX->SetCrewColor(PlayerCrewColor);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Quality Settings:**
+ * @code
+ * // In options menu
+ * void UOptionsWidget::SetVFXQuality(EMGVFXQuality Quality)
+ * {
+ *     UMGVFXSubsystem* VFX = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ *     if (VFX)
+ *     {
+ *         VFX->SetQuality(Quality);
+ *     }
+ * }
+ *
+ * // In VFX component, respect quality
+ * void UMyVFXComponent::SpawnOptionalEffect()
+ * {
+ *     UMGVFXSubsystem* VFX = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ *     if (VFX && VFX->ShouldSpawnAtQuality(3))  // Priority 3 = medium importance
+ *     {
+ *         VFX->SpawnVFX(OptionalSystem, Location);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Screen Effects:**
+ * @code
+ * // Trigger screen shake on impact
+ * void AMyVehicle::OnHit(float ImpactForce)
+ * {
+ *     UMGVFXSubsystem* VFX = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ *     if (VFX)
+ *     {
+ *         float Intensity = FMath::Clamp(ImpactForce / 10000.0f, 0.0f, 1.0f);
+ *         VFX->TriggerScreenShake(Intensity, 0.3f, true);  // 0.3s duration, with falloff
+ *         VFX->FlashScreen(FLinearColor::White, 0.1f, 0.5f);  // White flash
+ *     }
+ * }
+ * @endcode
+ *
+ * @see UMGVehicleVFXComponent For vehicle-specific VFX
+ * @see UMGCameraVFXComponent For camera VFX
+ * @see AMGEnvironmentVFXManager For environmental VFX
+ * @see UMGVFXConfigData For configuring VFX presets
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

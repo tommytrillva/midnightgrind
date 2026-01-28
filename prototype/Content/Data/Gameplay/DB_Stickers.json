@@ -1,0 +1,181 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Stickers and Decals System",
+
+  "StickerSystem": {
+    "Enabled": true,
+    "MaxStickersPerVehicle": 50,
+    "LayerSystem": true,
+    "MaxLayers": 100,
+    "MirrorSupported": true
+  },
+
+  "StickerCategories": {
+    "Logos": {
+      "ID": "STICKER_LOGOS",
+      "Name": "Brand Logos",
+      "Description": "Sponsor and brand logos",
+      "Items": [
+        { "ID": "LOGO_MIDNIGHT", "Name": "Midnight Performance", "Unlocked": true },
+        { "ID": "LOGO_GRIP", "Name": "Grip Masters", "UnlockCondition": "SHOP_GRIP_VISIT" },
+        { "ID": "LOGO_BOOST", "Name": "Boost Brothers", "UnlockCondition": "SHOP_BOOST_VISIT" },
+        { "ID": "LOGO_NOS", "Name": "NOS Energy", "UnlockCondition": "NOS_USE_100" },
+        { "ID": "LOGO_TIRE_BRAND", "Name": "Apex Tires", "UnlockCondition": "LEVEL_10" },
+        { "ID": "LOGO_OIL", "Name": "Speed Oil", "UnlockCondition": "LEVEL_15" }
+      ]
+    },
+    "Numbers": {
+      "ID": "STICKER_NUMBERS",
+      "Name": "Racing Numbers",
+      "Description": "Number decals for your race car",
+      "Fonts": ["Block", "Italic", "Script", "Digital", "Grunge"],
+      "Colors": "Any",
+      "OutlineSupported": true,
+      "Range": { "Min": 0, "Max": 999 },
+      "Unlocked": true
+    },
+    "Text": {
+      "ID": "STICKER_TEXT",
+      "Name": "Custom Text",
+      "Description": "Add your own text",
+      "Fonts": ["Sans", "Serif", "Script", "Graffiti", "Japanese", "Racing"],
+      "MaxCharacters": 20,
+      "Colors": "Any",
+      "OutlineSupported": true,
+      "ShadowSupported": true,
+      "FilterEnabled": true,
+      "Unlocked": true
+    },
+    "Stripes": {
+      "ID": "STICKER_STRIPES",
+      "Name": "Racing Stripes",
+      "Description": "Classic racing stripe designs",
+      "Items": [
+        { "ID": "STRIPE_SINGLE", "Name": "Single Center Stripe", "Unlocked": true },
+        { "ID": "STRIPE_DOUBLE", "Name": "Double Racing Stripes", "Unlocked": true },
+        { "ID": "STRIPE_OFFSET", "Name": "Offset Stripes", "UnlockCondition": "LEVEL_5" },
+        { "ID": "STRIPE_WIDE", "Name": "Wide Body Stripe", "UnlockCondition": "LEVEL_8" },
+        { "ID": "STRIPE_GRADIENT", "Name": "Gradient Stripes", "UnlockCondition": "LEVEL_12" },
+        { "ID": "STRIPE_TRIBAL", "Name": "Tribal Stripes", "UnlockCondition": "LEVEL_15" }
+      ]
+    },
+    "Flames": {
+      "ID": "STICKER_FLAMES",
+      "Name": "Flame Designs",
+      "Description": "Classic and modern flame graphics",
+      "Items": [
+        { "ID": "FLAME_CLASSIC", "Name": "Classic Flames", "UnlockCondition": "LEVEL_8" },
+        { "ID": "FLAME_TRIBAL", "Name": "Tribal Flames", "UnlockCondition": "LEVEL_12" },
+        { "ID": "FLAME_GHOST", "Name": "Ghost Flames", "UnlockCondition": "LEVEL_18" },
+        { "ID": "FLAME_REALISTIC", "Name": "Realistic Fire", "UnlockCondition": "LEVEL_25" },
+        { "ID": "FLAME_BLUE", "Name": "Blue Flames", "UnlockCondition": "WIN_RACE_100" }
+      ]
+    },
+    "Geometric": {
+      "ID": "STICKER_GEO",
+      "Name": "Geometric Shapes",
+      "Description": "Basic shapes for custom designs",
+      "Items": [
+        { "ID": "GEO_CIRCLE", "Name": "Circle", "Unlocked": true },
+        { "ID": "GEO_SQUARE", "Name": "Square", "Unlocked": true },
+        { "ID": "GEO_TRIANGLE", "Name": "Triangle", "Unlocked": true },
+        { "ID": "GEO_STAR", "Name": "Star", "Unlocked": true },
+        { "ID": "GEO_HEXAGON", "Name": "Hexagon", "UnlockCondition": "LEVEL_5" },
+        { "ID": "GEO_ARROW", "Name": "Arrow", "Unlocked": true },
+        { "ID": "GEO_LIGHTNING", "Name": "Lightning Bolt", "UnlockCondition": "LEVEL_10" }
+      ]
+    },
+    "Cultural": {
+      "ID": "STICKER_CULTURAL",
+      "Name": "Cultural Designs",
+      "Description": "Cultural and artistic patterns",
+      "Items": [
+        { "ID": "CULT_KANJI", "Name": "Kanji Characters", "UnlockCondition": "JDM_VEHICLE_OWN" },
+        { "ID": "CULT_RISING_SUN", "Name": "Rising Sun", "UnlockCondition": "JDM_RACE_WIN_10" },
+        { "ID": "CULT_CHERRY", "Name": "Cherry Blossoms", "UnlockCondition": "TEMPLE_VISIT" },
+        { "ID": "CULT_DRAGON", "Name": "Dragon", "UnlockCondition": "LEVEL_20" },
+        { "ID": "CULT_EAGLE", "Name": "American Eagle", "UnlockCondition": "MUSCLE_VEHICLE_OWN" },
+        { "ID": "CULT_CHECKERED", "Name": "Checkered Flag", "Unlocked": true }
+      ]
+    },
+    "Achievements": {
+      "ID": "STICKER_ACHIEVE",
+      "Name": "Achievement Badges",
+      "Description": "Earned through gameplay",
+      "Items": [
+        { "ID": "BADGE_CHAMPION", "Name": "Champion Badge", "UnlockCondition": "ACH_CHAMPION" },
+        { "ID": "BADGE_DRIFT_KING", "Name": "Drift King Badge", "UnlockCondition": "ACH_DRIFT_KING" },
+        { "ID": "BADGE_MOST_WANTED", "Name": "Most Wanted Badge", "UnlockCondition": "ACH_MOST_WANTED" },
+        { "ID": "BADGE_SPEEDSTER", "Name": "Speedster Badge", "UnlockCondition": "ACH_SPEED_250" },
+        { "ID": "BADGE_LEGEND", "Name": "Legend Badge", "UnlockCondition": "REP_TIER_LEGEND" }
+      ]
+    },
+    "Seasonal": {
+      "ID": "STICKER_SEASONAL",
+      "Name": "Seasonal Exclusives",
+      "Description": "Limited time seasonal stickers",
+      "Items": [
+        { "ID": "SEASON_HALLOWEEN", "Name": "Halloween Pack", "AvailableMonths": [10] },
+        { "ID": "SEASON_CHRISTMAS", "Name": "Christmas Pack", "AvailableMonths": [12] },
+        { "ID": "SEASON_SUMMER", "Name": "Summer Pack", "AvailableMonths": [6, 7, 8] },
+        { "ID": "SEASON_SAKURA", "Name": "Sakura Pack", "AvailableMonths": [3, 4] }
+      ]
+    }
+  },
+
+  "StickerProperties": {
+    "Placement": {
+      "Areas": ["Hood", "Roof", "Trunk", "Doors", "Fenders", "Bumpers", "Windows", "Mirrors"],
+      "FreePositioning": true,
+      "SnapToGrid": { "Enabled": true, "Optional": true }
+    },
+    "Transformations": {
+      "Scale": { "Min": 0.1, "Max": 10.0 },
+      "Rotation": { "Min": 0, "Max": 360 },
+      "Skew": { "Enabled": true, "Range": { "Min": -45, "Max": 45 } },
+      "Flip": { "Horizontal": true, "Vertical": true }
+    },
+    "Appearance": {
+      "Color": { "Primary": true, "Secondary": true, "Tertiary": false },
+      "Opacity": { "Min": 0.0, "Max": 1.0 },
+      "Finish": ["Matte", "Gloss", "Metallic", "Chrome", "Holographic"],
+      "Outline": { "Enabled": true, "Width": { "Min": 0, "Max": 10 }, "Color": true }
+    }
+  },
+
+  "LayerManagement": {
+    "MaxLayers": 100,
+    "Operations": {
+      "BringToFront": true,
+      "SendToBack": true,
+      "MoveUp": true,
+      "MoveDown": true,
+      "Duplicate": true,
+      "Delete": true,
+      "Group": true,
+      "Lock": true,
+      "Hide": true
+    },
+    "GroupLimit": 20,
+    "UndoSteps": 50
+  },
+
+  "Sharing": {
+    "Enabled": true,
+    "ShareAsVinyl": true,
+    "DownloadOthers": true,
+    "Rating": true,
+    "Attribution": true
+  },
+
+  "PremiumStickers": {
+    "Enabled": true,
+    "Currency": "Premium",
+    "Packs": [
+      { "ID": "PACK_RACING", "Name": "Pro Racing Pack", "Price": 200, "Items": 25 },
+      { "ID": "PACK_JDM", "Name": "JDM Legends Pack", "Price": 300, "Items": 40 },
+      { "ID": "PACK_MUSCLE", "Name": "American Muscle Pack", "Price": 300, "Items": 40 },
+      { "ID": "PACK_NEON", "Name": "Neon Nights Pack", "Price": 250, "Items": 30 }
+    ]
+  }
+}

@@ -1,5 +1,245 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehicleSFXComponent.h
+ * @brief Vehicle Sound Effects Component (Non-Engine Audio)
+ *
+ * @section overview Overview
+ * This component handles all vehicle sound effects except for engine sounds.
+ * It manages tire sounds (rolling, skidding), collision impacts, scraping,
+ * wind noise, suspension, and brakes. The component responds to vehicle
+ * physics state and surface types to create immersive audio feedback.
+ *
+ * @section beginners Key Concepts for Beginners
+ *
+ * @subsection why_separate Why Separate from Engine Audio?
+ * Vehicle audio is typically split into:
+ * - Engine sounds: Complex RPM-based system (handled elsewhere)
+ * - Everything else: This component
+ *
+ * Separation allows:
+ * - Different audio designers to work on each
+ * - Different update rates (engine needs high precision)
+ * - Easier debugging and tuning
+ * - Modular vehicle configuration
+ *
+ * @subsection surface_sounds Surface-Dependent Sounds
+ * Real tires sound different on different surfaces. This component:
+ * - Detects the surface type under each wheel
+ * - Plays appropriate tire roll/skid sounds
+ * - Adjusts pitch and volume based on surface properties
+ *
+ * @subsection surface_types Surface Types (EMGSurfaceType)
+ * - Asphalt: Standard road (most common)
+ * - Concrete: Harder, slightly different tone
+ * - Gravel: Crunchy, louder spray sounds
+ * - Dirt: Softer, earthier tone
+ * - Grass: Very soft, muted
+ * - Sand: Soft, whooshing spray
+ * - Water: Splashing effects
+ * - Metal: Loud, resonant (bridges, grates)
+ * - Wood: Hollow, thumping (docks, bridges)
+ *
+ * @subsection tire_physics Tire Sound Physics
+ * Tire sounds depend on:
+ * - Speed: Faster = higher pitch, louder
+ * - Slip ratio: How much the tire is sliding vs rolling
+ * - Surface: Different textures = different sounds
+ *
+ * Slip ratio > threshold = skidding/screeching begins
+ *
+ * @subsection collision_sounds Collision System
+ * Collisions are classified by force intensity:
+ * - Light: Gentle tap (<50kN)
+ * - Medium: Noticeable impact (50-200kN)
+ * - Heavy: Hard crash (200-500kN)
+ * - Extreme: Massive collision (>500kN)
+ *
+ * Each level has its own sound pool for variety.
+ *
+ * @section sound_types Sound Categories
+ *
+ * @subsection tire_sounds Tire Sounds
+ * - Roll: Continuous sound while wheels turn on surface
+ * - Skid: Screeching when tires lose traction
+ * - Spray: Debris/water kicked up (gravel, water)
+ *
+ * @subsection impact_sounds Impact Sounds
+ * - Collision: One-shot impacts of varying intensity
+ * - Scrape: Loop while grinding against surfaces
+ * - Glass: Breaking windows/lights
+ * - Metal: Crunching bodywork
+ *
+ * @subsection ambient_sounds Ambient Sounds
+ * - Wind: Increases with speed
+ * - Suspension: Thumps on bumps/landings
+ * - Brakes: Squeal when braking hard
+ *
+ * @section usage Usage Examples
+ *
+ * @subsection setup Component Setup
+ * @code
+ * // In your vehicle class header
+ * UPROPERTY(VisibleAnywhere)
+ * UMGVehicleSFXComponent* VehicleSFX;
+ *
+ * // In constructor
+ * VehicleSFX = CreateDefaultSubobject<UMGVehicleSFXComponent>(TEXT("VehicleSFX"));
+ *
+ * // Configure surfaces in Blueprint or code
+ * FMGSurfaceSoundConfig AsphaltConfig;
+ * AsphaltConfig.SurfaceType = EMGSurfaceType::Asphalt;
+ * AsphaltConfig.TireRollSound = LoadObject<USoundBase>(...);
+ * AsphaltConfig.TireSkidSound = LoadObject<USoundBase>(...);
+ * AsphaltConfig.SkidThreshold = 0.2f;
+ * VehicleSFX->AddSurfaceConfig(AsphaltConfig);
+ * @endcode
+ *
+ * @subsection per_frame Per-Frame Updates
+ * @code
+ * // In your vehicle's Tick
+ * void AMyVehicle::Tick(float DeltaTime)
+ * {
+ *     Super::Tick(DeltaTime);
+ *
+ *     // Update SFX component with current state
+ *     VehicleSFX->SetSpeed(GetVehicleMovement()->GetForwardSpeed());
+ *
+ *     // Tire slip from physics
+ *     float FrontSlip = GetFrontWheelSlipRatio();
+ *     float RearSlip = GetRearWheelSlipRatio();
+ *     VehicleSFX->SetTireSlip(FrontSlip, RearSlip);
+ *
+ *     // Surface detection
+ *     UPhysicalMaterial* WheelSurface = GetSurfaceUnderWheel(0);
+ *     VehicleSFX->SetSurfaceFromPhysMat(WheelSurface);
+ *
+ *     // Brake input
+ *     VehicleSFX->SetBrakeInput(BrakeValue);
+ *
+ *     // Airborne state
+ *     VehicleSFX->SetAirborne(!AnyWheelTouchingGround());
+ * }
+ * @endcode
+ *
+ * @subsection collision_handling Collision Handling
+ * @code
+ * // In your vehicle's collision response
+ * void AMyVehicle::NotifyHit(...)
+ * {
+ *     Super::NotifyHit(...);
+ *
+ *     // Get impact force from physics
+ *     float Force = NormalImpulse.Size();
+ *
+ *     // Notify SFX component
+ *     VehicleSFX->OnCollision(Force, HitLocation, HitNormal);
+ * }
+ *
+ * // For continuous scraping
+ * void AMyVehicle::OnScrapeBegin()
+ * {
+ *     VehicleSFX->StartScrape(1.0f);  // Full intensity
+ * }
+ *
+ * void AMyVehicle::OnScrapeEnd()
+ * {
+ *     VehicleSFX->StopScrape();
+ * }
+ *
+ * // Glass breaking
+ * void AMyVehicle::OnWindowSmash(FVector Location)
+ * {
+ *     VehicleSFX->PlayGlassBreak(Location);
+ * }
+ * @endcode
+ *
+ * @subsection configuration Configuration
+ * @code
+ * // Set collision thresholds for your vehicle
+ * VehicleSFX->LightCollisionThreshold = 30000.0f;   // Lighter vehicle
+ * VehicleSFX->MediumCollisionThreshold = 100000.0f;
+ * VehicleSFX->HeavyCollisionThreshold = 300000.0f;
+ *
+ * // Wind noise range
+ * VehicleSFX->WindNoiseMinSpeed = 1500.0f;  // Start at 54 km/h
+ * VehicleSFX->WindNoiseMaxSpeed = 6000.0f;  // Full at 216 km/h
+ *
+ * // Master volume control
+ * VehicleSFX->SetMasterVolume(0.8f);
+ *
+ * // Disable for replays/ghosts
+ * VehicleSFX->SetEnabled(false);
+ * @endcode
+ *
+ * @subsection surface_mapping Physical Material Mapping
+ * @code
+ * // The component can auto-detect surface from physical materials
+ * // Override PhysMatToSurfaceType() for custom mapping:
+ *
+ * EMGSurfaceType UMyVehicleSFX::PhysMatToSurfaceType(UPhysicalMaterial* PhysMat)
+ * {
+ *     if (!PhysMat) return EMGSurfaceType::Asphalt;
+ *
+ *     FName MatName = PhysMat->GetFName();
+ *     if (MatName == TEXT("PM_Road")) return EMGSurfaceType::Asphalt;
+ *     if (MatName == TEXT("PM_Gravel")) return EMGSurfaceType::Gravel;
+ *     if (MatName == TEXT("PM_Grass")) return EMGSurfaceType::Grass;
+ *     // etc.
+ *
+ *     return Super::PhysMatToSurfaceType(PhysMat);
+ * }
+ * @endcode
+ *
+ * @section config_structs Configuration Structures
+ *
+ * @subsection surface_config FMGSurfaceSoundConfig
+ * Per-surface sound settings:
+ * - TireRollSound: Loop while driving on surface
+ * - TireSkidSound: Loop while skidding
+ * - SurfaceSpraySound: Debris/water spray
+ * - PitchMultiplier: Surface-specific pitch adjust
+ * - VolumeMultiplier: Surface-specific volume adjust
+ * - SkidThreshold: Slip ratio to start skidding
+ *
+ * @subsection collision_config FMGCollisionSoundConfig
+ * Collision sound pools:
+ * - LightImpacts: Array for variety
+ * - MediumImpacts: Array for variety
+ * - HeavyImpacts: Array for variety
+ * - ExtremeImpacts: Array for variety
+ * - ScrapeLoop: Continuous grinding
+ * - GlassBreak: Window smash
+ * - MetalCrunch: Bodywork damage
+ *
+ * @section audio_components Audio Components
+ * The component manages several UAudioComponents internally:
+ * - TireRollComponent: Surface roll loop
+ * - TireSkidComponent: Skid/screech loop
+ * - WindNoiseComponent: Speed-based wind
+ * - ScrapeComponent: Wall grinding loop
+ * - BrakeComponent: Brake squeal
+ *
+ * These are created at BeginPlay and cleaned up at EndPlay.
+ *
+ * @section state_queries State Queries
+ * @code
+ * // Check current state
+ * EMGSurfaceType CurrentSurface = VehicleSFX->GetCurrentSurface();
+ * bool bIsSkidding = VehicleSFX->IsSkidding();
+ * bool bIsScraping = VehicleSFX->IsScraping();
+ * @endcode
+ *
+ * @section performance Performance Notes
+ * - Collision sounds have a cooldown (CollisionCooldown) to prevent spam
+ * - Sounds only play when enabled and component is active
+ * - Loops use UAudioComponent for efficiency
+ * - One-shots use PlaySoundAtLocation for simplicity
+ *
+ * @see MGMusicManager.h For background music system
+ * @see MGVehicleAudioComponent.h For engine audio (if separate)
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

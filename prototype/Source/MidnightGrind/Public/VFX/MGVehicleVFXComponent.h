@@ -1,5 +1,236 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehicleVFXComponent.h
+ * @brief Vehicle-specific visual effects component for racing vehicles
+ *
+ * @section Overview
+ * UMGVehicleVFXComponent manages all particle effects attached to a vehicle,
+ * including tire smoke, drift trails, exhaust flames, damage sparks, and
+ * environmental interactions. It creates the visual feedback that makes driving
+ * feel responsive and impactful.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Socket-Based Attachment**
+ * VFX are attached to "sockets" - named points on the vehicle's skeletal mesh.
+ * Common sockets include:
+ * - Wheel_FL, Wheel_FR, Wheel_RL, Wheel_RR: Tire positions
+ * - Exhaust_L, Exhaust_R: Exhaust pipe tips
+ * - Engine: Hood/bonnet area for smoke
+ * - Headlight_L, Headlight_R: Light positions
+ *
+ * The component uses socket names from WheelSocketNames and ExhaustConfigs arrays.
+ *
+ * **Tire VFX System**
+ * Each wheel has independent VFX state (FMGTireVFXState) tracking:
+ * - Slip amount: How much the tire is sliding (0-1)
+ * - Temperature: Simulated heat from friction
+ * - Surface type: Asphalt, dirt, grass, etc.
+ * - Active smoke/skidmark components
+ *
+ * Tire smoke intensity scales with slip and temperature. Drift trails appear
+ * when slip angle exceeds a threshold (stylized colored ribbons).
+ *
+ * **Exhaust Effects**
+ * The exhaust system responds to throttle and RPM:
+ * - Idle: Subtle flame flicker
+ * - Acceleration: Larger flames
+ * - Deceleration/Shift: Backfire pops
+ * - NOS: Blue flame jets and trailing ribbons
+ *
+ * Multiple exhaust positions can be configured for vehicles with dual or quad pipes.
+ *
+ * **Damage VFX**
+ * Damage state (FMGVehicleDamageVFXState) triggers progressive effects:
+ * - Light damage: Occasional sparks
+ * - Medium damage: Engine smoke
+ * - Heavy damage: Engine fire
+ * - Collision impact: Spark bursts and debris
+ * - Scraping: Continuous spark trail
+ *
+ * **Wear System Integration**
+ * The component provides VFX hooks for the mechanical wear system:
+ * - Clutch overheat smoke
+ * - Tire blowouts
+ * - Brake glow (hot brakes)
+ * - Oil leaks
+ * - Transmission grind sparks
+ *
+ * @section Architecture
+ * The component works in a producer-consumer pattern:
+ *
+ * 1. **Input**: Vehicle physics/gameplay systems call Update methods with current state
+ *    (UpdateTireState, SetDamageState, UpdateSpeedEffects)
+ * 2. **Processing**: Component calculates VFX intensities and thresholds
+ * 3. **Output**: Spawns/updates Niagara components via UMGVFXSubsystem
+ *
+ * The component caches active Niagara components to avoid repeated spawning.
+ * It uses the VFX subsystem's pooling for one-shot effects (sparks, debris).
+ *
+ * @section UsageExamples Usage Examples
+ *
+ * **Basic Setup:**
+ * @code
+ * // In vehicle class header
+ * UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VFX")
+ * UMGVehicleVFXComponent* VFXComponent;
+ *
+ * // In constructor
+ * VFXComponent = CreateDefaultSubobject<UMGVehicleVFXComponent>(TEXT("VFXComponent"));
+ *
+ * // Configure wheel sockets (must match skeletal mesh socket names)
+ * VFXComponent->WheelSocketNames = { "Wheel_FL", "Wheel_FR", "Wheel_RL", "Wheel_RR" };
+ * @endcode
+ *
+ * **Updating Tire State from Physics:**
+ * @code
+ * // Called each physics tick
+ * void AMyVehicle::UpdateTireVFX()
+ * {
+ *     for (int32 i = 0; i < 4; i++)
+ *     {
+ *         // Get tire physics data
+ *         float SlipRatio = GetWheelSlipRatio(i);     // Longitudinal slip
+ *         float SlipAngle = GetWheelSlipAngle(i);     // Lateral slip in degrees
+ *         bool bOnGround = IsWheelOnGround(i);
+ *         FName Surface = GetWheelSurfaceType(i);     // "Asphalt", "Dirt", etc.
+ *
+ *         VFXComponent->UpdateTireState(i, SlipRatio, SlipAngle, bOnGround, Surface);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Exhaust and NOS Effects:**
+ * @code
+ * // Configure exhaust positions
+ * void AMyVehicle::SetupExhaust()
+ * {
+ *     TArray<FMGExhaustConfig> Configs;
+ *
+ *     FMGExhaustConfig LeftExhaust;
+ *     LeftExhaust.SocketName = "Exhaust_L";
+ *     LeftExhaust.bEnabled = true;
+ *     Configs.Add(LeftExhaust);
+ *
+ *     FMGExhaustConfig RightExhaust;
+ *     RightExhaust.SocketName = "Exhaust_R";
+ *     RightExhaust.bEnabled = true;
+ *     Configs.Add(RightExhaust);
+ *
+ *     VFXComponent->SetExhaustConfigs(Configs);
+ * }
+ *
+ * // Update exhaust intensity each frame
+ * void AMyVehicle::Tick(float DeltaTime)
+ * {
+ *     float Throttle = GetThrottleInput();        // 0-1
+ *     float RPMNorm = GetRPM() / GetMaxRPM();     // 0-1
+ *     VFXComponent->SetExhaustIntensity(Throttle, RPMNorm);
+ * }
+ *
+ * // Trigger backfire on downshift
+ * void AMyVehicle::OnGearDown()
+ * {
+ *     if (GetRPM() > HighRPMThreshold)
+ *     {
+ *         VFXComponent->TriggerBackfire();
+ *     }
+ * }
+ *
+ * // NOS activation
+ * void AMyVehicle::ActivateNOS()
+ * {
+ *     VFXComponent->ActivateNOS();
+ * }
+ *
+ * void AMyVehicle::DeactivateNOS()
+ * {
+ *     VFXComponent->DeactivateNOS();
+ * }
+ * @endcode
+ *
+ * **Handling Collisions:**
+ * @code
+ * void AMyVehicle::OnComponentHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
+ *     UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+ * {
+ *     float ImpactForce = NormalImpulse.Size();
+ *
+ *     if (ImpactForce > MinImpactForSparks)
+ *     {
+ *         VFXComponent->TriggerCollisionImpact(Hit.ImpactPoint, Hit.ImpactNormal, ImpactForce);
+ *     }
+ *
+ *     // Spawn debris for hard hits
+ *     if (ImpactForce > HeavyImpactThreshold)
+ *     {
+ *         VFXComponent->SpawnDebris(Hit.ImpactPoint, NormalImpulse.GetSafeNormal(), 10);
+ *     }
+ * }
+ *
+ * // Continuous scraping (e.g., against wall)
+ * void AMyVehicle::OnScrapeStart(FVector ContactPoint, FVector Direction)
+ * {
+ *     VFXComponent->StartScrapeSparks(ContactPoint, Direction);
+ * }
+ *
+ * void AMyVehicle::OnScrapeEnd()
+ * {
+ *     VFXComponent->StopScrapeSparks();
+ * }
+ * @endcode
+ *
+ * **Damage State Updates:**
+ * @code
+ * void AMyVehicle::UpdateDamageVFX()
+ * {
+ *     FMGVehicleDamageVFXState DamageState;
+ *     DamageState.OverallDamage = GetOverallDamagePercent();
+ *     DamageState.FrontDamage = GetFrontDamagePercent();
+ *     DamageState.RearDamage = GetRearDamagePercent();
+ *     DamageState.bEngineSmoking = GetOverallDamagePercent() > 0.5f;
+ *     DamageState.bOnFire = GetOverallDamagePercent() > 0.9f;
+ *
+ *     VFXComponent->SetDamageState(DamageState);
+ * }
+ * @endcode
+ *
+ * **Wear System Integration:**
+ * @code
+ * // Called from wear system when components overheat/fail
+ * void AMyVehicle::OnClutchOverheat(float Temperature)
+ * {
+ *     float Intensity = FMath::Clamp((Temperature - SafeTemp) / (MaxTemp - SafeTemp), 0.0f, 1.0f);
+ *     VFXComponent->TriggerClutchOverheatSmoke(Intensity);
+ * }
+ *
+ * void AMyVehicle::OnTireBlowout(int32 WheelIndex)
+ * {
+ *     VFXComponent->TriggerTireBlowout(WheelIndex);
+ * }
+ *
+ * void AMyVehicle::UpdateBrakeTemperature(int32 WheelIndex, float Temperature)
+ * {
+ *     float GlowIntensity = FMath::Clamp((Temperature - 200.0f) / 600.0f, 0.0f, 1.0f);
+ *     VFXComponent->SetBrakeGlowIntensity(WheelIndex, GlowIntensity);
+ * }
+ * @endcode
+ *
+ * **Crew Color Customization:**
+ * @code
+ * // Set drift trail color to match crew/team color
+ * void AMyVehicle::SetCrewColor(FLinearColor Color)
+ * {
+ *     VFXComponent->SetDriftTrailColor(Color);
+ * }
+ * @endcode
+ *
+ * @see UMGVFXSubsystem For global VFX management and pooling
+ * @see UMGVehicleVFXPresetData For configuring vehicle VFX presets
+ * @see UMGCameraVFXComponent For camera-based effects
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

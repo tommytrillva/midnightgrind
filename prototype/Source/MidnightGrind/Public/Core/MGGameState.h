@@ -1,50 +1,97 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGGameState.h
- * @brief Game State - Replicated race state visible to all connected clients
+ * =============================================================================
+ * MGGameState.h - Multiplayer Race State (Replicated)
+ * =============================================================================
  *
- * The AMGGameState class manages the authoritative, replicated state of a race
- * session. Unlike UMGGameStateSubsystem (which handles local game flow), this
- * class specifically handles multiplayer race synchronization.
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines the "Game State" - the authoritative, server-controlled
+ * data about the current race that ALL players need to see. Think of it as
+ * the "scoreboard" and "race control" that everyone shares.
  *
- * @section Overview
- * GameState is spawned by the server and replicated to all clients. It contains
- * the "source of truth" for race phase, positions, timing, and settings that
- * all players need to see consistently.
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
  *
- * @section KeyConcepts Key Concepts
- * - **Race Phase**: The global phase of the race (Lobby, Countdown, Racing, etc.)
- *   All clients see the same phase, controlled by the server.
- * - **Positions**: The current race standings, updated by the server and replicated.
- * - **Race Settings**: Track, lap count, game mode, etc. - set by host, visible to all.
- * - **Timing**: Server-authoritative race time and countdown synchronization.
+ * 1. GAME STATE (AGameStateBase):
+ *    - A special Actor that exists in every multiplayer game
+ *    - Spawned by the server, automatically replicated to all clients
+ *    - Contains data that ALL players need to see (race phase, positions, etc.)
+ *    - NOT the same as "game flow state" (that's UMGGameStateSubsystem)
  *
- * @section Authority Server Authority
- * Only the server (Authority) can modify game state. All "Auth" prefixed functions
- * should only be called on the server. Clients receive updates via replication.
+ *    CONFUSION WARNING: "GameState" in Unreal specifically means this
+ *    replicated Actor class. Don't confuse it with general "state".
  *
- * @section Events
- * Subscribe to events for race state changes:
- * - OnRacePhaseChanged: When race transitions between phases
- * - OnCountdownUpdate: Each second tick during countdown
- * - OnRaceStart: When GO! happens
- * - OnRacerFinished: When any player crosses the finish line
- * - OnPositionsUpdated: When race positions change
+ * 2. REPLICATION (Multiplayer):
+ *    - Server is the "authority" - it owns the truth
+ *    - Clients receive copies of replicated data automatically
+ *    - UPROPERTY(Replicated) marks variables that sync to clients
+ *    - ReplicatedUsing = OnRep_X calls a function when value changes on client
  *
- * @section Usage
- * Access from any Actor:
+ *    DATA FLOW:
+ *    Server changes value -> Unreal replicates to clients -> OnRep_ fires on clients
+ *
+ * 3. SERVER AUTHORITY PATTERN:
+ *    Functions prefixed with "Auth" (like AuthStartRace) should ONLY
+ *    be called on the server. They modify authoritative game state.
+ *    Clients call Server RPCs which eventually call these Auth functions.
+ *
+ * 4. RACE PHASES:
+ *    The race progresses through phases:
+ *    Lobby -> PreRace -> Countdown -> Racing -> Finishing -> Results -> PostRace
+ *
+ *    Each phase change is replicated so all players see the same state.
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ * -----------------------------------------
+ *
+ *   [Server]
+ *      |
+ *      +-- [AMGGameState] (authority) <-- This file
+ *      |        |
+ *      |        +-- Race Phase, Positions, Settings
+ *      |        +-- Timing (countdown, race time)
+ *      |
+ *      +-- [AMGPlayerState] (per-player, also replicated)
+ *
+ *   [Client A]     [Client B]     [Client C]
+ *      |              |              |
+ *      +-- Receives replicated GameState
+ *      +-- Receives replicated PlayerStates
+ *
+ * IMPORTANT DISTINCTION:
+ * - AMGGameState: REPLICATED, multiplayer race data (this file)
+ * - UMGGameStateSubsystem: LOCAL ONLY, game flow (menus, loading, etc.)
+ *
+ * COMMON PATTERNS:
+ * ----------------
  * @code
+ * // Get the game state from any Actor
  * AMGGameState* GameState = GetWorld()->GetGameState<AMGGameState>();
  * if (GameState && GameState->IsRaceInProgress())
  * {
  *     TArray<FMGRacePositionEntry> Positions = GameState->GetPositions();
  *     float RaceTime = GameState->GetRaceTime();
  * }
+ *
+ * // On server only - start the race
+ * if (HasAuthority())
+ * {
+ *     GameState->AuthStartRace();
+ * }
  * @endcode
+ *
+ * EVENTS TO SUBSCRIBE TO:
+ * - OnRacePhaseChanged: Race state transitions (use for UI updates)
+ * - OnCountdownUpdate: Each second of countdown (show 3, 2, 1, GO!)
+ * - OnRaceStart: When GO! happens (enable player input)
+ * - OnRacerFinished: When any player finishes (update leaderboard)
+ * - OnPositionsUpdated: Position changes (update race HUD)
  *
  * @see AMGPlayerState For individual player race data
  * @see UMGGameStateSubsystem For local (non-replicated) game flow
+ * =============================================================================
  */
 
 #pragma once
@@ -55,8 +102,24 @@
 
 class AMGPlayerState;
 
+// ============================================================================
+// RACE PHASE ENUM - Where are we in the race lifecycle?
+// ============================================================================
+
 /**
  * Global race phase visible to all clients
+ *
+ * This enum represents the "state machine" of a race session.
+ * The server controls transitions; clients just observe.
+ *
+ * TYPICAL FLOW:
+ * Lobby (waiting for players)
+ *   -> PreRace (everyone loaded, preparing grid)
+ *     -> Countdown (3, 2, 1...)
+ *       -> Racing (main gameplay)
+ *         -> Finishing (leader crossed finish, others still racing)
+ *           -> Results (everyone done, showing standings)
+ *             -> PostRace (returning to lobby or next race)
  */
 UENUM(BlueprintType)
 enum class EMGGlobalRacePhase : uint8
@@ -77,8 +140,18 @@ enum class EMGGlobalRacePhase : uint8
 	PostRace
 };
 
+// ============================================================================
+// RACE SETTINGS - Configuration for the current race session
+// ============================================================================
+
 /**
  * Race settings visible to all clients
+ *
+ * The host configures these settings in the lobby. Once set, they're
+ * replicated to all players so everyone knows the race parameters.
+ *
+ * NOTE: These are read-only for clients. Only the server (host)
+ * can modify these via AMGGameState::AuthSetRaceSettings().
  */
 USTRUCT(BlueprintType)
 struct FMGReplicatedRaceSettings
@@ -125,8 +198,16 @@ struct FMGReplicatedRaceSettings
 	FString SessionPassword; // Empty = no password
 };
 
+// ============================================================================
+// POSITION ENTRY - One racer's standing in the leaderboard
+// ============================================================================
+
 /**
  * Position entry for sorted leaderboard
+ *
+ * The Positions array in GameState contains one of these for each racer,
+ * sorted by current race position. This provides everything needed to
+ * display a race leaderboard or position indicator.
  */
 USTRUCT(BlueprintType)
 struct FMGRacePositionEntry
@@ -161,8 +242,28 @@ struct FMGRacePositionEntry
 	bool bIsAI = false;
 };
 
+// ============================================================================
+// DELEGATES - Events broadcast when race state changes
+// ============================================================================
+
 /**
- * Delegates
+ * GameState Delegates
+ *
+ * These events fire on BOTH server and clients when race state changes.
+ * This is because replicated properties trigger OnRep_ which then
+ * broadcasts these delegates.
+ *
+ * USAGE PATTERN:
+ * @code
+ * void AMyHUD::BeginPlay()
+ * {
+ *     if (AMGGameState* GS = GetWorld()->GetGameState<AMGGameState>())
+ *     {
+ *         GS->OnRacePhaseChanged.AddDynamic(this, &AMyHUD::OnPhaseChanged);
+ *         GS->OnCountdownUpdate.AddDynamic(this, &AMyHUD::ShowCountdown);
+ *     }
+ * }
+ * @endcode
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGlobalRacePhaseChanged, EMGGlobalRacePhase, NewPhase);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountdownUpdate, int32, SecondsRemaining);
@@ -174,16 +275,37 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNewBestLap, AMGPlayerState*, Pla
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerJoined, AMGPlayerState*, PlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerLeft, AMGPlayerState*, PlayerState);
 
+// ============================================================================
+// MAIN GAME STATE CLASS
+// ============================================================================
+
 /**
- * Game State
- * Replicated game state visible to all clients
+ * Game State - The authoritative, replicated race state
  *
- * Features:
- * - Global race phase synchronization
+ * This Actor is the "source of truth" for race information that all
+ * players need to see. The server owns it; clients receive copies.
+ *
+ * FEATURES:
+ * ---------
+ * - Global race phase synchronization (everyone sees same phase)
  * - Position tracking and leaderboard
- * - Countdown synchronization
- * - Race settings replication
- * - Best lap tracking
+ * - Countdown synchronization (3, 2, 1, GO!)
+ * - Race settings replication (track, laps, rules)
+ * - Best lap tracking (who has the fastest lap?)
+ *
+ * KEY UNREAL CONCEPTS:
+ * --------------------
+ * - GetLifetimeReplicatedProps(): Defines which properties replicate
+ * - ReplicatedUsing: Calls OnRep_ function when value changes on client
+ * - AddPlayerState/RemovePlayerState: Called when players join/leave
+ * - Tick(): Called every frame - updates race timing
+ *
+ * SERVER vs CLIENT:
+ * -----------------
+ * On SERVER: Call Auth* functions to change state
+ * On CLIENT: Read-only, receive state via replication, react via events
+ *
+ * @see AGameStateBase The Unreal base class for game states
  */
 UCLASS()
 class MIDNIGHTGRIND_API AMGGameState : public AGameStateBase

@@ -1,58 +1,116 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGPlayerState.h
- * @brief Player State - Replicated per-player data visible to all clients
+ * =============================================================================
+ * MGPlayerState.h - Per-Player Replicated Data
+ * =============================================================================
  *
- * AMGPlayerState stores and replicates individual player information during
- * a multiplayer session. Each connected player (and AI racer) has a PlayerState
- * that tracks their identity, vehicle selection, ready state, and race performance.
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * The Player State holds all the data about a specific player that other
+ * players need to see. While GameState is "global race data", PlayerState
+ * is "this player's race data".
  *
- * @section Overview
- * PlayerState is the multiplayer-aware representation of a player. It's spawned
- * when a player joins and persists throughout their session. All players can see
- * each other's PlayerState data (names, positions, vehicles, etc.).
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
  *
- * @section KeyData Key Data Tracked
- * - **Identity**: Platform ID, display name, profile level, crew/club membership
- * - **Lobby State**: Ready/not ready status for pre-race coordination
- * - **Vehicle Selection**: Which car and livery the player has selected
- * - **Race Performance**: Position, lap, checkpoint, lap times, finish status
+ * 1. PLAYER STATE (APlayerState):
+ *    - One PlayerState per player in the game (including AI)
+ *    - Replicated to all clients so everyone sees each other's data
+ *    - Persists for the player's session (survives vehicle respawns)
+ *    - Contains: name, score, race position, vehicle selection, etc.
  *
- * @section Replication Replication Flow
- * - Clients call Server RPCs (ServerToggleReady, ServerSelectVehicle) to request changes
- * - Server validates and applies changes via "Auth" functions
- * - Changes replicate automatically to all clients via RepNotify
- * - Clients receive OnRep_ callbacks and broadcast events for UI updates
+ *    IMPORTANT: PlayerState is REPLICATED (multiplayer data)
+ *    Don't confuse with PlayerController (input handling, local only)
  *
- * @section Events
- * Subscribe to track player changes:
- * - OnReadyStateChanged: Player toggled ready in lobby
- * - OnRaceStatusChanged: Player started racing, finished, DNF'd, etc.
- * - OnPositionChanged: Player's race position changed
- * - OnLapChanged: Player completed a lap
+ * 2. THE TRINITY OF PLAYER CLASSES:
+ *    - PlayerController: Handles input, camera, local-only logic
+ *    - PlayerState: Replicated data others see (name, score, position)
+ *    - Pawn: The physical vehicle being controlled
  *
- * @section Usage
- * Get a player's state:
+ *    Together they form a complete "player":
+ *    Controller -> Controls -> Pawn (body)
+ *    Controller -> Owns -> PlayerState (stats/identity)
+ *
+ * 3. CLIENT-SERVER FLOW:
+ *    When a client wants to change their PlayerState:
+ *
+ *    [Client] "I want to toggle ready"
+ *       |
+ *       v (Server RPC)
+ *    [Server] ServerToggleReady()
+ *       |
+ *       v (validates, then calls)
+ *    AuthSetReadyState()
+ *       |
+ *       v (changes replicated property)
+ *    ReadyState = Ready
+ *       |
+ *       v (automatic replication)
+ *    [All Clients] receive new value
+ *       |
+ *       v (RepNotify)
+ *    OnRep_ReadyState() fires
+ *       |
+ *       v (broadcasts event)
+ *    OnReadyStateChanged delegate fires
+ *
+ * 4. RACE SNAPSHOT (FMGRaceSnapshot):
+ *    A struct containing the player's current race performance:
+ *    - Position, lap, checkpoint
+ *    - Timing (total time, best lap, current lap)
+ *    - Speed and nitro state
+ *    Updated frequently and replicated to all clients.
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ * -----------------------------------------
+ *
+ *   [AMGGameState]
+ *         |
+ *         +-- Contains array of all PlayerStates
+ *         |
+ *   [AMGPlayerState] x N players <-- This file
+ *         |
+ *         +-- Identity (name, platform ID, crew)
+ *         +-- Ready state (for lobby)
+ *         +-- Vehicle selection
+ *         +-- Race performance (snapshot)
+ *         +-- Finish position and lap times
+ *
+ * COMMON PATTERNS:
+ * ----------------
  * @code
- * // From a PlayerController
+ * // Get your own PlayerState from PlayerController
  * AMGPlayerState* MyState = GetPlayerState<AMGPlayerState>();
  *
  * // Get all player states from GameState
  * AMGGameState* GS = GetWorld()->GetGameState<AMGGameState>();
  * TArray<AMGPlayerState*> AllPlayers = GS->GetMGPlayerStates();
  *
- * // Check race status
+ * // Check if a specific player has finished
  * if (PlayerState->HasFinished())
  * {
  *     int32 FinalPosition = PlayerState->GetFinishPosition();
  *     float TotalTime = PlayerState->GetTotalRaceTime();
  * }
+ *
+ * // Client requesting to toggle ready state
+ * if (!HasAuthority()) // Only clients call Server RPCs
+ * {
+ *     ServerToggleReady(); // This is a Server RPC
+ * }
  * @endcode
  *
+ * EVENTS TO SUBSCRIBE TO:
+ * - OnReadyStateChanged: Player toggled ready in lobby
+ * - OnRaceStatusChanged: Started racing, finished, DNF'd, etc.
+ * - OnPositionChanged: Race position changed
+ * - OnLapChanged: Completed a lap
+ *
  * @see AMGGameState For global race state
+ * @see AMGPlayerController For the controller that owns this state
  * @see FMGVehicleSelection For vehicle customization data
- * @see FMGRaceSnapshot For detailed race performance data
+ * =============================================================================
  */
 
 #pragma once
@@ -63,8 +121,17 @@
 
 class AMGVehiclePawn;
 
+// ============================================================================
+// READY STATE ENUM - Is the player ready to start?
+// ============================================================================
+
 /**
  * Player ready state for lobby
+ *
+ * In multiplayer lobbies, players must indicate they're ready before
+ * the race can start. This enum tracks that state machine.
+ *
+ * FLOW: NotInLobby -> NotReady -> Ready -> Loading -> Loaded
  */
 UENUM(BlueprintType)
 enum class EMGPlayerReadyState : uint8
@@ -81,8 +148,15 @@ enum class EMGPlayerReadyState : uint8
 	Loaded
 };
 
+// ============================================================================
+// RACE STATUS ENUM - What is the player's current race state?
+// ============================================================================
+
 /**
  * Player race status
+ *
+ * Tracks what the player is currently doing in the race.
+ * Used to determine UI display, input handling, and scoring.
  */
 UENUM(BlueprintType)
 enum class EMGPlayerRaceStatus : uint8
@@ -101,8 +175,16 @@ enum class EMGPlayerRaceStatus : uint8
 	Disconnected
 };
 
+// ============================================================================
+// VEHICLE SELECTION - What car is the player using?
+// ============================================================================
+
 /**
  * Replicated vehicle selection
+ *
+ * When a player selects their vehicle in the lobby, this struct is
+ * populated and replicated so other players can see what car they chose.
+ * Used for displaying car previews in lobby and spawning the correct vehicle.
  */
 USTRUCT(BlueprintType)
 struct FMGVehicleSelection
@@ -125,8 +207,21 @@ struct FMGVehicleSelection
 	int32 PerformanceIndex = 0;
 };
 
+// ============================================================================
+// RACE SNAPSHOT - Current race performance data
+// ============================================================================
+
 /**
  * Race performance snapshot - replicated periodically
+ *
+ * This struct captures the player's current race performance at a point
+ * in time. It's updated frequently on the server and replicated to clients.
+ *
+ * Used for:
+ * - Race HUD (position, lap, time displays)
+ * - Leaderboard updates
+ * - Race director/camera logic
+ * - Commentary/narration systems
  */
 USTRUCT(BlueprintType)
 struct FMGRaceSnapshot
@@ -164,23 +259,60 @@ struct FMGRaceSnapshot
 	float NitroAmount = 1.0f;
 };
 
+// ============================================================================
+// DELEGATES - Events broadcast when player state changes
+// ============================================================================
+
 /**
- * Delegates
+ * PlayerState Delegates
+ *
+ * These fire on both server and clients when this player's state changes.
+ * Useful for updating UI elements that show other players' status.
+ *
+ * NOTE: The first parameter is the PlayerState itself, allowing handlers
+ * to identify WHICH player changed (important when tracking multiple players).
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayerReadyStateChanged, AMGPlayerState*, PlayerState, EMGPlayerReadyState, NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayerRaceStatusChanged, AMGPlayerState*, PlayerState, EMGPlayerRaceStatus, NewStatus);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayerPositionChanged, AMGPlayerState*, PlayerState, int32, NewPosition);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayerLapChanged, AMGPlayerState*, PlayerState, int32, NewLap);
 
+// ============================================================================
+// MAIN PLAYER STATE CLASS
+// ============================================================================
+
 /**
- * Player State
- * Replicated player data visible to all clients
+ * Player State - Replicated per-player data visible to all
  *
- * Features:
- * - Race position/lap tracking
- * - Vehicle selection replication
- * - Ready state for lobbies
- * - Performance stats
+ * Each player (and AI) in the game has a PlayerState that holds their
+ * identity and race performance. This data is replicated so all players
+ * can see each other's names, positions, vehicles, etc.
+ *
+ * FEATURES:
+ * ---------
+ * - Race position/lap tracking (where are they in the race?)
+ * - Vehicle selection replication (what car did they choose?)
+ * - Ready state for lobbies (are they ready to start?)
+ * - Performance stats (lap times, finish position)
+ *
+ * KEY FUNCTIONS:
+ * --------------
+ * Read functions (client-safe):
+ * - GetRacePosition(), GetCurrentLap(), GetBestLapTime()
+ * - GetReadyState(), IsReady(), HasFinished()
+ * - GetVehicleSelection(), GetDisplayName()
+ *
+ * Server RPCs (client calls, server executes):
+ * - ServerToggleReady() - Request ready state change
+ * - ServerSelectVehicle() - Request vehicle selection
+ *
+ * Auth functions (server-only, called by GameMode):
+ * - AuthUpdateRaceSnapshot() - Update position/lap/time
+ * - AuthSetRaceStatus() - Change racing/finished/DNF
+ * - AuthRecordLapTime() - Save completed lap time
+ *
+ * @see APlayerState The Unreal base class
+ * @see AMGGameState For global race state
  */
 UCLASS()
 class MIDNIGHTGRIND_API AMGPlayerState : public APlayerState

@@ -1,7 +1,84 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MidnightGrind - Arcade Street Racing Game
-// Replay Share Subsystem - Social media sharing, clip editing, community features
+/**
+ * =============================================================================
+ * MGReplayShareSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * This file defines the Replay Share Subsystem for Midnight Grind. It handles
+ * clip editing, social media integration, video export, and community features.
+ * This is the bridge between raw replay data and shareable content.
+ *
+ * KEY CONCEPTS FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * 1. CLIP vs. REPLAY:
+ *    - REPLAY: Raw recorded gameplay data (from MGReplayBufferSubsystem).
+ *    - CLIP: An edited, polished video created from replay data.
+ *    - This subsystem converts replays into shareable clips with effects.
+ *
+ * 2. CLIP SEGMENTS (FMGClipSegment):
+ *    - A clip can have multiple segments with different settings.
+ *    - Each segment has: start/end time, playback speed, camera angle, effects.
+ *    - Example: Segment 1 at normal speed, Segment 2 in slow motion.
+ *
+ * 3. CLIP EFFECTS (EMGClipEffect):
+ *    - Visual effects applied to clips: SlowMotion, SpeedRamp, VHSFilter,
+ *      NeonGlow, ChromaticAberration, FilmGrain, LetterBox, etc.
+ *    - These add cinematic flair to raw gameplay footage.
+ *
+ * 4. SOCIAL PLATFORM INTEGRATION:
+ *    - Connect accounts for Twitter, YouTube, TikTok, Discord, etc.
+ *    - FMGSocialAccount stores connection state and tokens.
+ *    - OAuth tokens expire, so IsTokenExpired() checks validity.
+ *
+ * 5. SHARE REQUESTS (FMGShareRequest):
+ *    - When sharing a clip, a request is created and processed asynchronously.
+ *    - Tracks status: Pending -> Processing -> Uploading -> Complete/Failed.
+ *    - Progress callbacks let UI show upload progress bars.
+ *
+ * 6. COMMUNITY CLIPS (FMGCommunityClip):
+ *    - Clips shared to the game's community hub.
+ *    - Has social features: ViewCount, LikeCount, ShareCount, Comments.
+ *    - bIsFeatured highlights clips selected by moderators.
+ *
+ * 7. EXPORT SETTINGS (FMGExportSettings):
+ *    - Control output format (MP4, GIF, WebM), resolution (720p/1080p/4K).
+ *    - Options for bitrate, framerate, audio inclusion, watermarks.
+ *    - bAddIntroOutro can add game branding to the video.
+ *
+ * 8. WATERMARKS:
+ *    - Game branding added to shared clips.
+ *    - Default: "Midnight Grind" but customizable per clip.
+ *    - Helps with game visibility when clips are shared.
+ *
+ * 9. DELEGATES (Events):
+ *    - OnClipCreated: Fired when a new clip is created.
+ *    - OnShareProgressUpdated: Fired during upload to update progress bar.
+ *    - OnShareCompleted: Fired when share succeeds with result URL.
+ *    - OnShareFailed: Fired on error with error message.
+ *    - OnAccountConnected/Disconnected: For social account state changes.
+ *
+ * 10. HASHTAGS AND CAPTIONS:
+ *     - Clips can include captions and hashtags for social posts.
+ *     - These are platform-specific (Twitter character limits, etc.).
+ *
+ * WORKFLOW EXAMPLE:
+ * 1. Player creates clip from replay: CreateClipFromReplay()
+ * 2. Player edits clip: adds slow motion segment, VHS filter
+ * 3. Player sets title, adds tags, chooses music
+ * 4. Player exports: ExportClip() with 1080p settings
+ * 5. Player shares: ShareClip() to Twitter with caption
+ * 6. System uploads, fires OnShareCompleted with tweet URL
+ * 7. Clip also uploaded to community: UploadToCommunity()
+ *
+ * ARCHITECTURE NOTE:
+ * This subsystem works closely with MGReplayBufferSubsystem (provides replay
+ * data) and MGSocialShareSubsystem (provides platform APIs). It acts as the
+ * creative layer between raw recordings and social sharing.
+ *
+ * =============================================================================
+ */
 
 #pragma once
 

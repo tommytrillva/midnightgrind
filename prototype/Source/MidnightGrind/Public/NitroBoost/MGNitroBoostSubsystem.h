@@ -1,31 +1,95 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGNitroBoostSubsystem.h
- * @brief Nitro Boost System Subsystem
+ * =============================================================================
+ * MGNitroBoostSubsystem.h
+ * Nitro Boost System for Midnight Grind Racing Game
+ * =============================================================================
  *
- * This subsystem manages the nitro boost mechanic in Midnight Grind.
- * Nitro provides temporary speed boosts that players can activate
- * strategically during races or free roam.
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This subsystem manages the nitro boost mechanic - the "turbo" or "NOS" button
+ * that gives players a temporary speed burst. Think Fast & Furious style nitrous
+ * oxide injection, or arcade racing game boost mechanics.
  *
- * Key Features:
- * - Multiple nitro types with unique characteristics (Standard, Cryogenic, Electric, etc.)
- * - Various charge methods (time-based, drifting, near misses, pickups)
- * - Multi-level boost system for increased power at higher levels
- * - "Perfect Boost" timing mechanic for bonus power
- * - Heat management system to prevent overuse
- * - Boost zones in the world that enhance nitro effectiveness
- * - Upgrade system for nitro capacity, recharge rate, and power
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
  *
- * How Nitro Works:
- * 1. Nitro charges through various methods (drifting, near misses, etc.)
- * 2. When ready, player activates boost with a button press
- * 3. Nitro depletes while active, providing speed multiplier
- * 4. Perfect timing during activation gives bonus power
- * 5. Overuse causes overheating, requiring cooldown
+ * 1. NITRO/NOS (Nitrous Oxide System):
+ *    In real cars, nitrous oxide provides extra oxygen for combustion,
+ *    creating a power boost. In games, it's simplified to a "boost meter"
+ *    that depletes while providing extra speed.
+ *
+ * 2. NITRO TANK:
+ *    - Has a capacity (how much nitro you can store)
+ *    - Has a current amount (how much is left)
+ *    - Depletes while boosting
+ *    - Recharges through various methods
+ *
+ * 3. CHARGING METHODS:
+ *    Unlike real NOS which needs refilling, game nitro "charges" through:
+ *    - Time (passive regeneration)
+ *    - Drifting (skill-based)
+ *    - Near misses (risky driving rewards)
+ *    - Drafting (staying behind other cars)
+ *    - Pickups (collecting items on track)
+ *
+ * 4. BOOST LEVELS:
+ *    Many racing games have multi-level boosts (Level 1, 2, 3).
+ *    Higher levels = more power but faster depletion.
+ *    Players must decide: use small boosts frequently or save for big ones.
+ *
+ * 5. PERFECT BOOST:
+ *    A timing-based skill mechanic. If the player activates boost at the
+ *    exact right moment (e.g., when a gear shifts or at a visual cue),
+ *    they get bonus power. Rewards skilled players.
+ *
+ * 6. OVERHEATING:
+ *    Using boost continuously generates "heat". If heat reaches 100%,
+ *    the system overheats and boost is disabled until cooldown completes.
+ *    This prevents players from just holding boost constantly.
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ * - This is a UWorldSubsystem (one instance per game world/level)
+ * - Works alongside:
+ *   - MGSlipstreamSubsystem: Drafting charges nitro
+ *   - MGAerodynamicsSubsystem: Some aero profiles affect nitro efficiency
+ *   - Vehicle Pawn: Applies the speed multiplier to movement
+ *   - UI System: Binds to events to show boost meter/heat gauge
+ *
+ * USAGE FLOW:
+ * 1. Vehicle spawns, gets reference to this subsystem
+ * 2. Configure nitro type and charge sources
+ * 3. Each frame: Update vehicle location, call charging methods
+ * 4. When player presses boost: Call ActivateBoost()
+ * 5. While boosting: Apply GetCurrentBoostMultiplier() to speed
+ * 6. When player releases or nitro depletes: Call DeactivateBoost()
+ *
+ * EXAMPLE USAGE:
+ * --------------
+ *   // In your vehicle pawn:
+ *   UMGNitroBoostSubsystem* Nitro = GetWorld()->GetSubsystem<UMGNitroBoostSubsystem>();
+ *
+ *   // Setup (in BeginPlay):
+ *   Nitro->SetNitroType(EMGNitroType::Standard);
+ *   Nitro->RegisterChargeSource(DriftingSource);
+ *
+ *   // In Tick:
+ *   if (bBoostButtonPressed && Nitro->CanActivateBoost())
+ *   {
+ *       Nitro->ActivateBoost();
+ *   }
+ *
+ *   if (Nitro->IsBoostActive())
+ *   {
+ *       float Multiplier = Nitro->GetCurrentBoostMultiplier();
+ *       CurrentSpeed *= Multiplier;
+ *   }
  *
  * @see FMGNitroState for current nitro tank state
  * @see FMGNitroConfig for tuning parameters
+ * @see UMGSlipstreamSubsystem for drafting-based nitro charging
  */
 
 #pragma once

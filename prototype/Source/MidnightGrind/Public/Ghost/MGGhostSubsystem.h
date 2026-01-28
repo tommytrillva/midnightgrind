@@ -1,5 +1,206 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGGhostSubsystem.h
+ * @brief Ghost Recording and Playback System for Racing Time Trials
+ *
+ * @section overview Overview
+ * This file defines the Ghost Subsystem, which records and plays back "ghost" vehicles
+ * that represent previous race performances. Ghosts are transparent representations of
+ * a vehicle's path through a race, allowing players to compete against their own best
+ * times, world records, friends, or rivals.
+ *
+ * @section beginners Key Concepts for Beginners
+ *
+ * @subsection what_is_ghost What is a Racing Ghost?
+ * A "ghost" in racing games is a semi-transparent replay of a previous race run.
+ * Think of it like a recording of someone driving - you can see where they went,
+ * how fast they were going, and compete directly against that recording.
+ *
+ * Common uses:
+ * - Racing against your personal best time
+ * - Competing with world record holders
+ * - Practicing by following faster players' lines
+ * - Social competition with friends/rivals
+ *
+ * @subsection recording How Recording Works
+ * During a race, the system captures "frames" of vehicle data at regular intervals
+ * (default: ~30fps). Each frame stores:
+ * - Position and rotation (where the car is)
+ * - Velocity and speed (how fast it's moving)
+ * - Control inputs (throttle, brake, steering)
+ * - Vehicle state (gear, RPM, nitro, drifting)
+ * - Track progress (lap, sector, distance along track)
+ *
+ * @subsection playback How Playback Works
+ * When playing back a ghost, the system:
+ * 1. Spawns a semi-transparent vehicle actor
+ * 2. Interpolates between recorded frames to get smooth movement
+ * 3. Updates position/rotation each tick based on current playback time
+ * 4. Calculates time deltas (how far ahead/behind the player is)
+ *
+ * @subsection ghost_types Ghost Types (EMGGhostType)
+ * - Personal: Your own previous runs
+ * - Rival: From players you're competing against
+ * - WorldRecord: The fastest time globally
+ * - Friend: From your friends list
+ * - Developer: Official reference ghosts
+ * - Challenge: For specific challenge events
+ * - Tutorial: Teaching optimal racing lines
+ * - AI: Computer-generated reference ghosts
+ *
+ * @subsection visibility Visibility Modes (EMGGhostVisibility)
+ * - Full: Solid vehicle (can obstruct view)
+ * - Transparent: Semi-see-through (most common)
+ * - Outline: Just the vehicle silhouette
+ * - Trail: Shows path as a line/ribbon
+ * - Markers: Periodic position markers only
+ * - Hidden: Ghost is tracked but not visible
+ *
+ * @section data_flow Data Flow
+ * @code
+ *   [Start Recording]
+ *         |
+ *         v
+ *   [Capture Frames] --> [FMGGhostFrame array in FMGGhostData]
+ *         |
+ *   [Stop Recording]
+ *         |
+ *         v
+ *   [Save/Upload Ghost]
+ *         |
+ *   ======|======= (later) =======
+ *         |
+ *         v
+ *   [Load/Download Ghost]
+ *         |
+ *         v
+ *   [Start Playback] --> [FMGGhostInstance tracks current state]
+ *         |
+ *         v
+ *   [Interpolate frames based on time]
+ *         |
+ *         v
+ *   [Update ghost vehicle position]
+ * @endcode
+ *
+ * @section usage Usage Examples
+ *
+ * @subsection recording_example Recording a Ghost
+ * @code
+ * // Get the subsystem
+ * UMGGhostSubsystem* GhostSystem = GetGameInstance()->GetSubsystem<UMGGhostSubsystem>();
+ *
+ * // Start recording at race start
+ * FGuid RecordingID = GhostSystem->StartRecording(
+ *     TEXT("Track_DowntownLoop"),
+ *     TEXT("Vehicle_Nissan_GTR"),
+ *     TEXT("Player_001")
+ * );
+ *
+ * // Each frame during the race, record vehicle state
+ * FMGGhostFrame Frame;
+ * Frame.Timestamp = RaceTime;
+ * Frame.Position = Vehicle->GetActorLocation();
+ * Frame.Rotation = Vehicle->GetActorRotation();
+ * Frame.Speed = Vehicle->GetCurrentSpeed();
+ * Frame.Throttle = Vehicle->GetThrottleInput();
+ * // ... fill other fields
+ * GhostSystem->RecordFrame(RecordingID, Frame);
+ *
+ * // Mark lap/sector completions for split times
+ * GhostSystem->MarkLapComplete(RecordingID, LapTime);
+ *
+ * // Stop recording at race end
+ * GhostSystem->StopRecording(RecordingID);
+ * // Ghost is automatically saved if it's a new personal best
+ * @endcode
+ *
+ * @subsection playback_example Playing Back a Ghost
+ * @code
+ * // Load your personal best ghost
+ * FMGGhostData PersonalBest = GhostSystem->GetPersonalBest(TEXT("Track_DowntownLoop"));
+ *
+ * // Start playback - returns an instance ID for this playback session
+ * FGuid PlaybackID = GhostSystem->StartPlayback(PersonalBest);
+ *
+ * // Customize appearance
+ * GhostSystem->SetGhostVisibility(PlaybackID, EMGGhostVisibility::Transparent);
+ * GhostSystem->SetGhostColor(PlaybackID, FLinearColor::Blue);
+ * GhostSystem->SetGhostOpacity(PlaybackID, 0.5f);
+ *
+ * // Get current interpolated state for rendering
+ * FMGGhostFrame CurrentFrame = GhostSystem->GetCurrentFrame(PlaybackID);
+ * GhostVehicleActor->SetActorLocation(CurrentFrame.Position);
+ * GhostVehicleActor->SetActorRotation(CurrentFrame.Rotation);
+ * @endcode
+ *
+ * @subsection comparison_example Comparing with Ghosts
+ * @code
+ * // Start comparing player vs personal best
+ * GhostSystem->StartComparison(PlayerGhostID, PersonalBestGhostID);
+ *
+ * // Get current time difference
+ * float TimeDelta = GhostSystem->GetTimeDelta(PlayerGhostID, PersonalBestGhostID);
+ * // Negative = player is ahead, Positive = player is behind
+ *
+ * // Get comparison status
+ * EMGGhostComparison Status = GhostSystem->GetComparisonStatus();
+ * if (Status == EMGGhostComparison::Ahead)
+ * {
+ *     ShowGreenTimeDelta(-TimeDelta);  // Player is faster
+ * }
+ * else if (Status == EMGGhostComparison::Behind)
+ * {
+ *     ShowRedTimeDelta(TimeDelta);  // Player is slower
+ * }
+ * @endcode
+ *
+ * @subsection quick_race Quick Race Functions
+ * @code
+ * // Convenient shortcuts for common use cases
+ * GhostSystem->RacePersonalBest(TEXT("Track_DowntownLoop"));  // Race your best
+ * GhostSystem->RaceWorldRecord(TEXT("Track_DowntownLoop"));   // Race the WR
+ * GhostSystem->RaceRival(TEXT("Track_DowntownLoop"), TEXT("Rival_Speedy")); // Race a rival
+ * @endcode
+ *
+ * @section settings Ghost Settings
+ * The FMGGhostSettings struct allows customization of ghost behavior:
+ * - bShowGhosts: Master toggle for ghost visibility
+ * - MaxGhostsOnTrack: Performance limit (default: 3)
+ * - DefaultVisibility: How new ghosts appear
+ * - PersonalBestColor/WorldRecordColor/RivalColor: Visual differentiation
+ * - RecordingInterval: Frame capture rate (default: 33ms = ~30fps)
+ * - bCompressGhostData: Reduces storage size
+ *
+ * @section compression Data Compression
+ * Ghost data can become large (thousands of frames). The system supports:
+ * - Removing redundant frames (no significant change)
+ * - Quantizing position/rotation to reduce precision
+ * - Run-length encoding for repeated values
+ * CompressedSize in FMGGhostData tracks the compressed byte count.
+ *
+ * @section online Online Features
+ * - UploadGhost(): Share ghosts to leaderboards
+ * - DownloadGhost(): Get ghosts from other players
+ * - FetchLeaderboard(): Get top times and ghost availability
+ * - DownloadRivalGhost(): Get a specific rank's ghost
+ *
+ * @section events Events/Delegates
+ * Subscribe to these for UI updates:
+ * - OnGhostRecordingStarted/Completed: Recording lifecycle
+ * - OnGhostPlaybackStarted/Completed: Playback lifecycle
+ * - OnGhostComparison: Real-time time delta updates
+ * - OnNewPersonalBest: Celebrate improvements!
+ * - OnGhostDownloaded/Uploaded: Online operations complete
+ * - OnLeaderboardFetched: Leaderboard data ready
+ *
+ * @see FMGGhostFrame For individual frame data structure
+ * @see FMGGhostData For complete ghost recording structure
+ * @see FMGGhostInstance For playback state tracking
+ * @see FMGGhostSettings For configuration options
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

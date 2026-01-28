@@ -1,7 +1,75 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MidnightGrind - Arcade Street Racing Game
-// Social Hub Subsystem - Social lobby spaces, meetups, and player interactions
+/**
+ * @file MGSocialHubSubsystem.h
+ * @brief Social Hub System - Virtual spaces where players can meet, show off vehicles, and socialize
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ==========================
+ * This file defines the Social Hub system for Midnight Grind. Think of Social Hubs as virtual
+ * "car meets" or "hangout spots" where players can gather outside of races. It's similar to
+ * the social spaces you might find in games like Forza Horizon's festival sites or GTA Online's
+ * car meets.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * --------------------------
+ *
+ * 1. WHAT IS A GAMEINSTANCE SUBSYSTEM?
+ *    - This class inherits from UGameInstanceSubsystem, which means it lives for the entire
+ *      duration of the game session (not just one level/map).
+ *    - Subsystems are Unreal Engine's way of creating modular, self-contained systems that
+ *      automatically initialize and clean up with their parent object.
+ *    - You can access this subsystem from anywhere using:
+ *      UMGSocialHubSubsystem* HubSystem = GetGameInstance()->GetSubsystem<UMGSocialHubSubsystem>();
+ *
+ * 2. WHAT ARE STRUCTS (USTRUCT)?
+ *    - Structs are data containers that group related information together.
+ *    - For example, FMGHubPlayer contains all info about a player: their name, vehicle, location, etc.
+ *    - The 'F' prefix is an Unreal convention for structs (F = "F"ile or "F"actory struct).
+ *    - BlueprintType allows these to be used in Unreal's visual scripting system (Blueprints).
+ *
+ * 3. WHAT ARE ENUMS (UENUM)?
+ *    - Enums define a list of named options/states.
+ *    - EMGHubType lists all possible hub types (Garage, Meetup, Showroom, etc.).
+ *    - Using enums instead of strings prevents typos and makes code more readable.
+ *
+ * 4. WHAT ARE DELEGATES?
+ *    - Delegates are like "event broadcasters" - they notify other parts of the code when
+ *      something happens.
+ *    - For example, OnPlayerJoinedHub fires whenever a new player enters the hub, allowing
+ *      the UI to update, sounds to play, etc.
+ *    - "Dynamic Multicast" means multiple listeners can subscribe and it works with Blueprints.
+ *
+ * 5. WHAT ARE UPROPERTY AND UFUNCTION?
+ *    - These macros expose variables and functions to Unreal's reflection system.
+ *    - BlueprintReadWrite: Can be read and modified in Blueprints.
+ *    - BlueprintCallable: Function can be called from Blueprints.
+ *    - BlueprintPure: Function doesn't modify anything (like a "getter").
+ *    - BlueprintAssignable: Delegate that can be bound in Blueprints.
+ *
+ * SYSTEM OVERVIEW:
+ * ---------------
+ * The Social Hub system provides:
+ *
+ * - HUB NAVIGATION: Join/leave different social spaces (meetups, showrooms, lounges)
+ * - PERSONAL GARAGES: Each player has a customizable garage they can invite others to visit
+ * - PLAYER INTERACTIONS: Wave, honk, rev engine, challenge to race, trade requests
+ * - HUB EVENTS: Schedule and host car meets or community events
+ * - CHAT SYSTEM: Public messages and private whispers
+ * - PHOTO SPOTS: Designated locations for taking screenshots with vehicles
+ *
+ * DATA FLOW EXAMPLE:
+ * -----------------
+ * 1. Player calls JoinHub("hub_downtown_meetup")
+ * 2. System validates the player meets requirements (level, VIP status, etc.)
+ * 3. Player is added to the hub's player list
+ * 4. OnHubJoined delegate fires, notifying UI to show the hub
+ * 5. OnPlayerJoinedHub fires for all other players in the hub
+ * 6. Player can now use interactions, chat, and see other players
+ *
+ * @see UGameInstanceSubsystem - Base class for game-wide subsystems
+ * @see UMGRivalsSubsystem - Related system for tracking player rivalries
+ */
 
 #pragma once
 

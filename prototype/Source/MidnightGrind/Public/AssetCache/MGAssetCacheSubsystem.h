@@ -1,5 +1,227 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGAssetCacheSubsystem.h
+ * @brief Intelligent Asset Caching and Preloading System for optimized performance
+ *
+ * @section Overview
+ * This header defines the Asset Cache Subsystem - a system that manages loading
+ * and caching game assets (textures, meshes, sounds, etc.) to optimize performance
+ * and memory usage.
+ *
+ * @section Problem Problem it Solves
+ *   - Games have LOTS of assets (models, textures, sounds, animations)
+ *   - Loading everything at once = long load times + memory explosion
+ *   - Loading on-demand = stutters and hitches during gameplay
+ *   - SOLUTION: Smart caching + predictive preloading!
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * @subsection WhatIsAsset 1. What is an "Asset"?
+ *   - Any file loaded into memory: textures, meshes, sounds, blueprints
+ *   - Identified by FSoftObjectPath (path like "/Game/Vehicles/SportsCar.SportsCar")
+ *   - "Soft reference" = knows the path but doesn't load until needed
+ *
+ * @subsection CachingBasics 2. Caching Basics
+ *   - Cache = temporary storage for recently/frequently used items
+ *   - Hit = asset found in cache (fast!)
+ *   - Miss = asset not in cache, must load (slow)
+ *   - HitRate = hits / (hits + misses) - higher is better!
+ *
+ * @subsection PriorityLevels 3. Priority Levels (EMGCachePriority)
+ *   - Critical: MUST be in memory (core gameplay)
+ *   - High: Very important (current level assets)
+ *   - Normal: Standard priority (most things)
+ *   - Low: Nice to have but can wait
+ *   - Background: Load when nothing else needs CPU
+ *
+ * @subsection EvictionPolicies 4. Eviction Policies (EMGCacheEvictionPolicy)
+ * When cache is full, which assets do we remove?
+ *   - LRU (Least Recently Used): Remove oldest-accessed
+ *   - LFU (Least Frequently Used): Remove rarely-accessed
+ *   - FIFO (First In First Out): Remove oldest-loaded
+ *   - Priority: Remove lowest-priority first
+ *   - Size: Remove largest assets first
+ *   - Adaptive: AI-like combination of above
+ *
+ * @subsection PreloadStrategies 5. Preload Strategies (EMGPreloadStrategy)
+ *   - Immediate: Load RIGHT NOW (blocking)
+ *   - OnDemand: Load only when actually needed
+ *   - Predictive: Guess what's needed and preload (AI-like)
+ *   - Progressive: Load gradually over time
+ *   - Lazy: Delay loading as long as possible
+ *
+ * @subsection LoadStates 6. Asset Load States (EMGAssetLoadState)
+ * @code
+ *    NotLoaded -> Queued -> Loading -> Loaded -> Cached
+ *                                            -> Evicted (removed)
+ *                          -> Failed (error)
+ * @endcode
+ *
+ * @subsection Bundles 7. Bundles (FMGAssetBundle)
+ *   - Group related assets together
+ *   - Example: "VehicleBundle_SportsCar" contains model, textures, sounds
+ *   - Load/unload bundles as a unit
+ *   - More organized than individual assets
+ *
+ * @subsection PredictiveLoading 8. Predictive Loading
+ *   - System learns what assets are used together
+ *   - AccessPatterns track: "After loading X, Y is usually needed"
+ *   - TriggerPredictivePreload() uses this data to preload
+ *   - Like how Netflix preloads the next episode!
+ *
+ * @section DataStructures Important Data Structures
+ *
+ * @subsection CachedAsset FMGCachedAsset - Data about a cached asset
+ *   - AssetPath: Where to find it
+ *   - SizeBytes: Memory usage
+ *   - AccessCount: How often used
+ *   - LastAccessTime: When last used
+ *   - bPersistent: Never evict this one
+ *
+ * @subsection CacheStats FMGCacheStats - Performance metrics
+ *   - CacheHits/CacheMisses: Did we find it?
+ *   - HitRate: Success percentage
+ *   - PendingLoads: Queue size
+ *   - AverageLoadTimeSeconds: Performance tracking
+ *
+ * @subsection PreloadRequest FMGPreloadRequest - A batch load request
+ *   - AssetPaths: What to load
+ *   - Progress: 0.0 to 1.0
+ *   - bCompleted: Is it done?
+ *
+ * @section CodeExamples Code Examples
+ *
+ * @subsection BasicLoading Basic Loading
+ * @code
+ * // Get the subsystem
+ * UMGAssetCacheSubsystem* AssetCache = GetGameInstance()->GetSubsystem<UMGAssetCacheSubsystem>();
+ *
+ * // Load a single asset
+ * FSoftObjectPath Path("/Game/Textures/CarPaint.CarPaint");
+ * AssetCache->LoadAsset(Path, EMGCachePriority::Normal);
+ *
+ * // Later, retrieve it
+ * UObject* Asset = AssetCache->GetCachedAsset(Path);
+ * UTexture2D* Texture = Cast<UTexture2D>(Asset);
+ * @endcode
+ *
+ * @subsection BatchLoading Batch Loading
+ * @code
+ * // Load multiple assets at once
+ * TArray<FSoftObjectPath> Paths;
+ * Paths.Add(FSoftObjectPath("/Game/Textures/CarPaint.CarPaint"));
+ * Paths.Add(FSoftObjectPath("/Game/Meshes/CarBody.CarBody"));
+ * Paths.Add(FSoftObjectPath("/Game/Sounds/Engine.Engine"));
+ *
+ * // Request preload and get tracking ID
+ * FGuid RequestId = AssetCache->RequestPreload(Paths, EMGPreloadStrategy::Progressive);
+ *
+ * // Check progress (e.g., for loading screen)
+ * void ALoadingScreen::Tick(float DeltaTime)
+ * {
+ *     float Progress = AssetCache->GetPreloadProgress(RequestId);
+ *     UpdateProgressBar(Progress);
+ *
+ *     if (AssetCache->IsPreloadComplete(RequestId))
+ *     {
+ *         StartGame();
+ *     }
+ * }
+ * @endcode
+ *
+ * @subsection BundleUsage Using Bundles
+ * @code
+ * // Create a bundle for a vehicle's assets
+ * TArray<FSoftObjectPath> CarAssets;
+ * CarAssets.Add(FSoftObjectPath("/Game/Vehicles/Skyline/Mesh.Mesh"));
+ * CarAssets.Add(FSoftObjectPath("/Game/Vehicles/Skyline/Textures/Body.Body"));
+ * CarAssets.Add(FSoftObjectPath("/Game/Vehicles/Skyline/Sounds/Engine.Engine"));
+ *
+ * FGuid BundleId = AssetCache->CreateBundle(FName("VehicleBundle_Skyline"), CarAssets);
+ *
+ * // Load the entire bundle when entering garage
+ * void AGarage::OnVehicleSelected(FName VehicleId)
+ * {
+ *     AssetCache->LoadBundleByName(FName("VehicleBundle_" + VehicleId.ToString()));
+ * }
+ *
+ * // Unload when switching vehicles
+ * void AGarage::OnVehicleDeselected(FGuid BundleId)
+ * {
+ *     AssetCache->UnloadBundle(BundleId);
+ * }
+ * @endcode
+ *
+ * @subsection SceneTransitions Scene Transitions
+ * @code
+ * // When starting to load a new track
+ * void ARaceManager::StartLoadingTrack(FName TrackId)
+ * {
+ *     AssetCache->OnSceneTransitionStart(TrackId);
+ *     // System preloads predicted assets for that scene
+ *     ShowLoadingScreen();
+ * }
+ *
+ * // When loading is complete
+ * void ARaceManager::OnTrackLoadComplete()
+ * {
+ *     AssetCache->OnSceneTransitionComplete(CurrentTrackId);
+ *     HideLoadingScreen();
+ * }
+ * @endcode
+ *
+ * @subsection PredictiveExample Predictive Loading
+ * @code
+ * // Record what assets are used in each context
+ * void AGarage::OnVehicleViewed(FSoftObjectPath VehiclePath)
+ * {
+ *     AssetCache->RecordAssetAccess(VehiclePath, "GarageScreen");
+ * }
+ *
+ * // When entering garage, system predicts what's needed
+ * void AGarage::OnEnter()
+ * {
+ *     AssetCache->SetPredictionContext("GarageScreen");
+ *     AssetCache->TriggerPredictivePreload();
+ *     // Automatically loads assets commonly used in garage!
+ * }
+ * @endcode
+ *
+ * @subsection MemoryManagement Memory Management
+ * @code
+ * // Manual eviction when you know an asset won't be needed
+ * AssetCache->EvictAsset(OldAssetPath);
+ * AssetCache->EvictAssetsByCategory(EMGAssetCategory::VFX);
+ *
+ * // Keep important assets that should never be evicted
+ * AssetCache->SetAssetPersistent(ImportantPath, true);
+ *
+ * // Free up memory space
+ * AssetCache->TrimCache();  // Evict to target size
+ * AssetCache->ClearCache(); // Remove everything (level transition)
+ * @endcode
+ *
+ * @subsection Monitoring Monitoring Cache Performance
+ * @code
+ * FMGCacheStats Stats = AssetCache->GetCacheStats();
+ * UE_LOG(LogGame, Log, TEXT("Hit Rate: %.1f%%"), Stats.HitRate * 100.0f);
+ * UE_LOG(LogGame, Log, TEXT("Cache Size: %lld MB"), Stats.TotalCacheSizeBytes / (1024 * 1024));
+ * UE_LOG(LogGame, Log, TEXT("Pending Loads: %d"), Stats.PendingLoads);
+ *
+ * // Generate detailed report for debugging
+ * FString Report = AssetCache->GenerateCacheReport();
+ * @endcode
+ *
+ * @section WhyMatters Why This Matters
+ *   - No stutters: Assets preloaded before needed
+ *   - Fast loads: Frequently-used assets stay cached
+ *   - Memory efficient: Unused assets evicted automatically
+ *   - Smart: Learns player patterns and predicts needs
+ *
+ * @author Midnight Grind Team
+ */
+
 // MGAssetCacheSubsystem.h
 // Midnight Grind - Asset Caching and Preloading System
 // Manages intelligent asset preloading, caching strategies, and memory-efficient loading

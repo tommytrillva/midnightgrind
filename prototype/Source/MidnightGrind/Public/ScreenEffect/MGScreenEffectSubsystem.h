@@ -1,5 +1,137 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGScreenEffectSubsystem.h
+ * @brief Screen-Space Visual Effects System for Racing Feedback
+ *
+ * =============================================================================
+ * Screen-Space Visual Effects System
+ * =============================================================================
+ *
+ * @section overview OVERVIEW
+ * --------
+ * This file defines the screen effect system that creates dynamic visual feedback
+ * overlaid on the game view. These effects communicate game state to the player
+ * through visual language - speed lines show velocity, red vignettes indicate
+ * damage, chromatic aberration emphasizes impacts, and Y2K effects add style.
+ *
+ * @section screen_effects WHAT ARE SCREEN EFFECTS?
+ * ------------------------
+ * Screen effects are 2D visual modifications applied to the entire rendered frame
+ * (post-process effects). Unlike 3D world effects (particles, lights), these exist
+ * in "screen space" and are rendered after the 3D scene is complete.
+ *
+ * Common examples in games:
+ *   - Vignette: Darkening around screen edges
+ *   - Motion blur: Streaking when moving fast
+ *   - Chromatic aberration: RGB color separation (lens distortion look)
+ *   - Screen shake: Camera displacement for impact
+ *
+ * @section beginners KEY CONCEPTS FOR BEGINNERS
+ * --------------------------
+ *
+ * 1. GAME INSTANCE SUBSYSTEM
+ *    This class inherits from UGameInstanceSubsystem:
+ *    - Persists for the entire game session
+ *    - One instance shared across all levels
+ *    - Access via: GetGameInstance()->GetSubsystem<UMGScreenEffectSubsystem>()
+ *
+ * 2. EFFECT CATEGORIES (EMGScreenEffectCategory)
+ *    Effects are organized by their purpose:
+ *    - Speed: Velocity-based effects (speed lines, FOV changes)
+ *    - Damage: Health/impact feedback (red vignette, desaturation)
+ *    - Boost: Nitro/turbo activation visuals (blur trails, glow)
+ *    - Impact: Collision feedback (screen shake, flash)
+ *    - Y2K: Stylized aesthetic effects (glitch, scanlines, neon)
+ *
+ * 3. BLEND MODES (EMGEffectBlendMode)
+ *    How effects combine with the game image:
+ *    - Additive: Brightens (effect + scene) - good for glows
+ *    - Multiply: Darkens (effect * scene) - good for vignettes
+ *    - Screen: Brightens without over-saturation
+ *    - Overlay: Contrast enhancement
+ *    - AlphaBlend: Standard transparency blending
+ *
+ * 4. INTENSITY CURVES (EMGIntensityCurve)
+ *    How effect intensity changes over time:
+ *    - Linear: Constant rate change
+ *    - EaseIn: Starts slow, accelerates
+ *    - EaseOut: Starts fast, decelerates (most natural for impacts)
+ *    - Bounce/Elastic: Overshoots and settles (cartoon-style)
+ *    - Pulse/Flicker: Repeating patterns (damage warnings)
+ *
+ * 5. ACTIVE EFFECTS (FMGActiveEffect)
+ *    Each playing effect tracks its state:
+ *    - EffectId: Unique identifier (GUID) for stopping/modifying
+ *    - Intensity: Current strength (0.0 - 1.0)
+ *    - Duration: Total play time
+ *    - ElapsedTime: Time since started
+ *    - Priority: Higher priority effects render on top
+ *    - bLooping: Whether effect repeats
+ *
+ * 6. EFFECT PARAMETERS
+ *    Each effect category has a parameter struct for customization:
+ *    - FMGSpeedEffectParams: Line count, blur amount, FOV increase
+ *    - FMGDamageEffectParams: Vignette style, pulse rate, desaturation
+ *    - FMGBoostEffectParams: Trail length, bloom intensity, colors
+ *    - FMGImpactEffectParams: Shake intensity, flash duration
+ *    - FMGY2KEffectParams: Glitch intensity, scanlines, RGB split
+ *
+ * @section usage COMMON USAGE PATTERNS
+ * ---------------------
+ *
+ * Speed-based effects (called from vehicle each frame):
+ *   ScreenEffectSubsystem->UpdateSpeedEffect(CurrentSpeedKPH);
+ *
+ * Damage feedback (called when hit):
+ *   ScreenEffectSubsystem->TriggerDamageFlash(1.0f);
+ *   ScreenEffectSubsystem->UpdateDamageEffect(HealthPercent);
+ *
+ * Boost activation:
+ *   ScreenEffectSubsystem->StartBoostEffect(1.0f);
+ *   // When boost ends:
+ *   ScreenEffectSubsystem->StopBoostEffect(0.3f); // 0.3s fade out
+ *
+ * Impact from collision:
+ *   ScreenEffectSubsystem->TriggerImpact(EMGImpactEffectType::HeavyCrash, Force);
+ *
+ * Screen transitions (level changes):
+ *   ScreenEffectSubsystem->FadeOut(0.5f);
+ *   // Load new level, then:
+ *   ScreenEffectSubsystem->FadeIn(0.5f);
+ *
+ * Y2K stylized effects (race finish celebration):
+ *   FGuid EffectId = ScreenEffectSubsystem->StartY2KEffect(EMGY2KEffectType::NeonPulse, 3.0f);
+ *
+ * @section presets PRESETS
+ * -------
+ * Presets (FMGEffectPreset) store complete effect configurations.
+ * Use ApplyPreset("Cinematic") to quickly switch between visual styles.
+ * SavePreset() captures current settings for later use.
+ *
+ * @section output OUTPUT VALUES
+ * -------------
+ * The subsystem calculates final values each frame that can be read by materials:
+ *   - GetRadialBlurAmount(): For post-process material parameters
+ *   - GetChromaticAberrationAmount(): RGB separation strength
+ *   - GetVignetteIntensity(): Edge darkening amount
+ *   - GetGlitchIntensity(): Y2K glitch effect strength
+ *
+ * These output values are typically bound to Material Parameter Collections
+ * that drive the actual post-process materials in the world.
+ *
+ * @section performance PERFORMANCE NOTES
+ * -----------------
+ * - Effects are composited, so many active effects have minimal extra cost
+ * - GlobalEffectScale can reduce all effects for performance/accessibility
+ * - Categories can be individually disabled in settings
+ * - Screen shake uses a separate update path from visual effects
+ *
+ * @see EMGScreenEffectCategory For all effect categories
+ * @see FMGEffectPreset For preset configuration
+ * @see FMGActiveEffect For active effect instance tracking
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

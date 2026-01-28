@@ -1,5 +1,161 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGInputRemapSubsystem.h
+ * @brief Complete input remapping system with accessibility features and wheel support
+ *
+ * =============================================================================
+ * OVERVIEW
+ * =============================================================================
+ *
+ * The Input Remap Subsystem provides comprehensive control customization for
+ * Midnight Grind. Players can remap any action to any key/button, choose from
+ * preset control schemes, adjust sensitivity settings, and enable accessibility
+ * assists. The system also supports racing wheels with force feedback.
+ *
+ * =============================================================================
+ * @section concepts KEY CONCEPTS FOR BEGINNERS
+ * =============================================================================
+ *
+ * 1. INPUT ACTIONS (EMGInputAction):
+ *    - Game actions that can be bound to keys/buttons.
+ *    - Examples: Accelerate, Brake, SteerLeft, Nitro, Handbrake.
+ *    - Each action can have a primary key, secondary key, AND gamepad binding.
+ *    - This allows keyboard+gamepad players to have both working.
+ *
+ * 2. INPUT BINDINGS (FMGInputBinding):
+ *    - Maps an action to physical inputs.
+ *    - PrimaryKey: Main keyboard/mouse binding (e.g., W for accelerate).
+ *    - SecondaryKey: Alternate binding (e.g., Up Arrow).
+ *    - GamepadKey: Controller binding (e.g., Right Trigger).
+ *    - AxisScale: Multiplier for analog inputs (1.0 = normal).
+ *    - DeadZone: Minimum input before registering (avoids stick drift).
+ *    - bInvertAxis: Flip the input direction.
+ *
+ * 3. CONTROL SCHEMES (EMGControlScheme):
+ *    - Preset binding configurations for quick setup.
+ *    - Default: Standard racing game layout.
+ *    - Alternate: Alternative button layout.
+ *    - Racing: Optimized for racing (triggers for gas/brake).
+ *    - Casual: Simplified controls.
+ *    - OneHanded_Left/Right: Accessibility for single-hand play.
+ *    - Custom1/2/3: Player-saved custom schemes.
+ *
+ * 4. CONTROL PROFILES (FMGControlProfile):
+ *    - Complete settings package including bindings and preferences.
+ *    - SteeringSensitivity: How responsive steering is.
+ *    - TriggerDeadZone/StickDeadZone: Input thresholds.
+ *    - VibrationEnabled/VibrationIntensity: Haptic feedback settings.
+ *    - bSwapSticksEnabled: Swap left/right stick functions.
+ *    - bSwapTriggersEnabled: Swap trigger functions.
+ *
+ * 5. DRIVING ASSISTS (FMGDrivingAssists):
+ *    - Accessibility features that help players drive.
+ *    - bAutoAccelerate: Vehicle accelerates automatically.
+ *    - bSteeringAssist: Helps keep the car on track.
+ *    - bBrakingAssist: Automatic braking for corners.
+ *    - bAutoShift: Automatic transmission.
+ *    - bTractionControl: Prevents wheel spin.
+ *    - bStabilityControl: Prevents spinouts.
+ *    - bAntiLockBrakes: Prevents wheel lockup.
+ *    - bSimplifiedControls: Reduced input complexity.
+ *
+ * 6. RACING WHEEL SUPPORT (FMGWheelSettings):
+ *    - Settings for racing wheel peripherals.
+ *    - SteeringRotation: Wheel rotation range (900, 1080 degrees).
+ *    - SteeringLinearity: Center precision curve.
+ *    - Pedal deadzones: Throttle, Brake, Clutch individually.
+ *    - Force Feedback settings: Self-centering, road feel, collisions.
+ *    - bCombinedPedals: Support for older wheels with combined axis.
+ *
+ * 7. INPUT DEVICE DETECTION:
+ *    - System auto-detects which device the player is using.
+ *    - EMGInputDevice: Keyboard, Gamepad, Wheel, Touch.
+ *    - UI can change prompts based on GetActiveDevice().
+ *    - SetPreferredDevice() lets player choose their default.
+ *
+ * 8. PERSISTENCE:
+ *    - Bindings are automatically saved and loaded.
+ *    - ExportBindingsToString() creates shareable config text.
+ *    - ImportBindingsFromString() applies shared configs.
+ *    - Useful for sharing setups with friends or community.
+ *
+ * =============================================================================
+ * @section usage USAGE EXAMPLE
+ * =============================================================================
+ *
+ * @code
+ * // Get the subsystem
+ * UMGInputRemapSubsystem* InputRemap = GetGameInstance()->GetSubsystem<UMGInputRemapSubsystem>();
+ *
+ * // Change a single binding
+ * InputRemap->SetBinding(EMGInputAction::Nitro, EKeys::SpaceBar, true); // Primary
+ * InputRemap->SetGamepadBinding(EMGInputAction::Nitro, EKeys::Gamepad_FaceButton_Bottom);
+ *
+ * // Apply a preset control scheme
+ * InputRemap->SetControlScheme(EMGControlScheme::Racing);
+ *
+ * // Enable accessibility assists
+ * FMGDrivingAssists Assists;
+ * Assists.bAutoAccelerate = true;
+ * Assists.bSteeringAssist = true;
+ * Assists.SteeringAssistStrength = 0.7f;
+ * InputRemap->SetDrivingAssists(Assists);
+ *
+ * // Check if auto-accelerate is on (for vehicle code)
+ * if (InputRemap->IsAutoAccelerateEnabled())
+ * {
+ *     ThrottleInput = 1.0f; // Full throttle
+ * }
+ *
+ * // Configure racing wheel
+ * FMGWheelSettings WheelConfig;
+ * WheelConfig.SteeringRotation = 900.0f;
+ * WheelConfig.ForceFeedbackStrength = 0.8f;
+ * WheelConfig.RoadFeelStrength = 0.6f;
+ * InputRemap->SetWheelSettings(WheelConfig);
+ *
+ * // Save current setup as custom scheme
+ * InputRemap->SaveCurrentAsCustomScheme(0); // Saves to Custom1
+ *
+ * // Share bindings with a friend
+ * FString ExportedConfig = InputRemap->ExportBindingsToString();
+ * // ... send to friend ...
+ * InputRemap->ImportBindingsFromString(ReceivedConfig);
+ *
+ * // Listen for device changes (for UI prompt switching)
+ * InputRemap->OnInputDeviceChanged.AddDynamic(this, &UMyWidget::UpdateButtonPrompts);
+ * @endcode
+ *
+ * =============================================================================
+ * @section accessibility ACCESSIBILITY CONSIDERATIONS
+ * =============================================================================
+ *
+ * This system was designed with accessibility as a priority:
+ *
+ * 1. ONE-HANDED PLAY:
+ *    - OneHanded_Left/Right schemes consolidate controls.
+ *    - All essential actions reachable with one hand.
+ *
+ * 2. MOTOR ACCESSIBILITY:
+ *    - Auto-accelerate removes need for constant throttle input.
+ *    - Steering/braking assists reduce precision requirements.
+ *    - Adjustable dead zones accommodate limited mobility.
+ *
+ * 3. REMAPPING EVERYTHING:
+ *    - Every action can be rebound to any key/button.
+ *    - Multiple bindings per action (primary + secondary + gamepad).
+ *    - Axis inversion for those who prefer it.
+ *
+ * 4. SIMPLIFIED MODE:
+ *    - bSimplifiedControls reduces the number of required inputs.
+ *    - Good for new players or those who prefer simpler controls.
+ *
+ * @see FMGDrivingAssists for accessibility assist options
+ * @see FMGWheelSettings for racing wheel configuration
+ * @see EMGControlScheme for available preset schemes
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,16 +163,6 @@
 #include "InputCoreTypes.h"
 #include "GameFramework/PlayerInput.h"
 #include "MGInputRemapSubsystem.generated.h"
-
-/**
- * Input Remap System - Full Controller Customization
- * - Complete control remapping for all inputs
- * - Multiple control schemes and presets
- * - One-handed control options
- * - Accessibility assists (auto-accelerate, steering assist)
- * - Per-profile bindings
- * - Export/import configurations
- */
 
 UENUM(BlueprintType)
 enum class EMGInputAction : uint8

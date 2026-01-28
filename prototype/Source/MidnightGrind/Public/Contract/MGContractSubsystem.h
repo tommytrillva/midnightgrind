@@ -1,5 +1,216 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGContractSubsystem.h
+ * @brief Contract System - Missions, Objectives, Sponsors, and Rewards
+ * =============================================================================
+ *
+ * @section Overview
+ * This subsystem manages the contract (mission) system for Midnight Grind.
+ * Contracts are structured tasks that players accept and complete to earn
+ * rewards. Think of it like the mission system in games like Need for Speed,
+ * Forza Horizon, or GTA - you pick up jobs, complete objectives, and get paid.
+ *
+ * @section WhyContracts Why a Contract System?
+ *
+ * Contracts provide:
+ * - PROGRESSION: Players have clear goals to work toward
+ * - VARIETY: Different contract types keep gameplay fresh
+ * - REWARDS: Meaningful progression through credits, XP, unlocks
+ * - ENGAGEMENT: Daily/weekly contracts encourage regular play
+ * - NARRATIVE: Sponsor relationships and story contracts add depth
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * 1. GAME INSTANCE SUBSYSTEM
+ *    Inherits from UGameInstanceSubsystem:
+ *    - One instance for entire game session
+ *    - Persists across level loads
+ *    - Access via: GetGameInstance()->GetSubsystem<UMGContractSubsystem>()
+ *
+ * 2. CONTRACT TYPES (EMGContractType)
+ *    Different categories of contracts:
+ *    - Race: Complete a specific race or series
+ *    - Championship: Multi-race series with points
+ *    - Sponsor: Contracts from in-game sponsors (brands)
+ *    - Team: Crew/team-based objectives
+ *    - Manufacturer: Use specific car brands
+ *    - Special: Limited-time events
+ *    - Daily: Refresh every 24 hours
+ *    - Weekly: Refresh every 7 days
+ *    - Story: Main campaign missions
+ *
+ * 3. CONTRACT STATES (EMGContractState)
+ *    Lifecycle of a contract:
+ *    - Available: Can be accepted
+ *    - Locked: Requirements not met
+ *    - Active: Currently in progress
+ *    - Completed: Successfully finished
+ *    - Failed: Did not meet objectives
+ *    - Expired: Time limit passed
+ *    - Abandoned: Player gave up
+ *
+ * 4. OBJECTIVES (FMGContractObjective, EMGObjectiveType)
+ *    What players must accomplish:
+ *    - Race objectives: WinRace, Podium (top 3), FinishPosition
+ *    - Performance: FastestLap, LapTime, TopSpeed, PerfectStart
+ *    - Style: DriftScore, NearMisses, CleanLaps (no collisions)
+ *    - Progress: Overtakes, EarnCredits, GainXP, WinStreak
+ *    - Restrictions: UseCar (specific vehicle), UseTrack
+ *
+ * 5. REWARDS (FMGContractReward, EMGRewardType)
+ *    What players earn:
+ *    - Credits: In-game currency
+ *    - XP: Experience points for leveling
+ *    - Vehicle: Unlock new cars
+ *    - Part: Performance upgrades
+ *    - Cosmetic: Visual customizations
+ *    - Title/Badge: Profile decorations
+ *    - Exclusive: Limited items
+ *
+ * 6. REQUIREMENTS (FMGContractRequirements)
+ *    What players need before accepting:
+ *    - MinLevel: Player level requirement
+ *    - MinReputation: Street cred needed
+ *    - RequiredVehicles: Must own specific cars
+ *    - RequiredLicenses: Racing license tiers
+ *    - CompletedContracts: Prerequisite missions
+ *
+ * 7. SPONSORS (FMGSponsorData)
+ *    In-game brands that offer contracts:
+ *    - Build reputation with each sponsor
+ *    - Higher rep = better contracts, bonuses
+ *    - Level up sponsors for exclusive rewards
+ *    - BonusMultiplier increases earnings
+ *
+ * 8. DAILY/WEEKLY ROTATION
+ *    Time-limited contracts that refresh:
+ *    - Daily: 3 new contracts every 24 hours
+ *    - Weekly: Bigger challenges, better rewards
+ *    - Completing all daily = streak bonus
+ *    - GetTimeUntilDailyReset() for countdown
+ *
+ * 9. CONTRACT STREAKS
+ *    Consecutive contract completions:
+ *    - ContractStreak: Current streak count
+ *    - BestStreak: All-time record
+ *    - Streaks may unlock bonus rewards
+ *
+ * @section Usage Common Usage Patterns
+ *
+ * @code
+ * // Get the contract subsystem
+ * UMGContractSubsystem* Contracts =
+ *     GetGameInstance()->GetSubsystem<UMGContractSubsystem>();
+ *
+ * // Get available contracts to show in UI
+ * TArray<FMGContract> Available = Contracts->GetAvailableContracts();
+ * for (const FMGContract& Contract : Available)
+ * {
+ *     // Display contract title, rewards, difficulty
+ *     ShowContractUI(Contract.Title, Contract.Rewards, Contract.Difficulty);
+ * }
+ *
+ * // Check if player can accept a contract
+ * FName ContractID = "SprintRace_Downtown_01";
+ * if (Contracts->CanAcceptContract(ContractID))
+ * {
+ *     // Player meets all requirements
+ *     if (Contracts->AcceptContract(ContractID))
+ *     {
+ *         // Contract accepted! Show objectives
+ *     }
+ * }
+ *
+ * // After completing a race, update contract progress
+ * Contracts->ProcessRaceResult(
+ *     Position,      // e.g., 1 for first place
+ *     BestLapTime,   // in seconds
+ *     OvertakeCount,
+ *     DriftScore,
+ *     bNoCollisions  // clean race?
+ * );
+ *
+ * // Update specific objective manually
+ * Contracts->UpdateObjectiveProgress(
+ *     ContractID,
+ *     "DriftMaster",  // ObjectiveID
+ *     15000.0f        // Progress value (drift score)
+ * );
+ *
+ * // Check if an objective is complete
+ * if (Contracts->IsObjectiveComplete(ContractID, "DriftMaster"))
+ * {
+ *     ShowObjectiveComplete();
+ * }
+ *
+ * // When all objectives complete, claim rewards
+ * Contracts->ClaimRewards(ContractID);
+ * // Optional bonus objectives
+ * Contracts->ClaimBonusRewards(ContractID);
+ *
+ * // Get daily contracts for the rotating challenge board
+ * TArray<FMGContract> Dailies = Contracts->GetDailyContracts();
+ * FTimespan TimeUntilReset = Contracts->GetTimeUntilDailyReset();
+ * // Show countdown: TimeUntilReset.GetHours(), TimeUntilReset.GetMinutes()
+ *
+ * // Work with sponsors
+ * FMGSponsorData Sponsor = Contracts->GetSponsor("NitroEnergy");
+ * // Show sponsor level, contracts, reputation progress
+ *
+ * // After completing sponsor contract, add reputation
+ * Contracts->AddSponsorReputation("NitroEnergy", 500);
+ *
+ * // Listen for contract events
+ * Contracts->OnContractCompleted.AddDynamic(this, &AMyActor::HandleContractComplete);
+ * Contracts->OnObjectiveProgress.AddDynamic(this, &AMyActor::HandleProgress);
+ * Contracts->OnSponsorLevelUp.AddDynamic(this, &AMyActor::HandleSponsorLevelUp);
+ *
+ * void AMyActor::HandleContractComplete(const FMGContract& Contract)
+ * {
+ *     ShowCompletionScreen(Contract.Title, Contract.Rewards);
+ * }
+ * @endcode
+ *
+ * @section Architecture Architecture Notes
+ *
+ * CONTRACT DATABASE:
+ * - ContractDatabase: All registered contracts
+ * - Contracts defined in data assets or code
+ * - RegisterContract() to add new contracts
+ *
+ * STATE PERSISTENCE:
+ * - SaveContractData() / LoadContractData()
+ * - Saves progress, completed contracts, sponsor rep
+ * - Called automatically on session start/end
+ *
+ * TIMING:
+ * - OnContractTick() runs on timer
+ * - Updates time-limited contracts
+ * - Checks for expirations
+ * - Handles daily/weekly resets
+ *
+ * OBJECTIVE CHECKING:
+ * - ProcessRaceResult() bulk-updates race-related objectives
+ * - UpdateObjectiveProgress() for manual progress
+ * - CheckAllObjectivesComplete() auto-completes contracts
+ *
+ * EVENTS/DELEGATES:
+ * - OnContractAccepted: Player started a contract
+ * - OnContractCompleted: Successfully finished
+ * - OnContractFailed: Did not meet objectives
+ * - OnObjectiveProgress: Progress toward objective
+ * - OnObjectiveCompleted: Single objective done
+ * - OnRewardClaimed: Reward granted to player
+ * - OnSponsorLevelUp: Sponsor reputation increased
+ * - OnDailyContractsRefreshed: New daily contracts available
+ *
+ * @see UMGProgressionSubsystem - Player level and XP
+ * @see UMGInventorySubsystem - Reward item storage
+ * @see UMGCurrencySubsystem - Credit rewards
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

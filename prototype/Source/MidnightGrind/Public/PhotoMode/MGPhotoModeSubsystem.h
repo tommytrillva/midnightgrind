@@ -1,14 +1,94 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * =============================================================================
+ * MGPhotoModeSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * This file defines the Photo Mode Subsystem - the "brain" behind the in-game
+ * photography feature that lets players pause the game, compose shots with a
+ * free camera, apply visual effects/filters, and capture screenshots.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ *
+ * 1. WHAT IS A SUBSYSTEM?
+ *    - A subsystem is an automatically-created singleton that lives alongside
+ *      something else (in this case, the game World)
+ *    - UWorldSubsystem exists once per loaded level/world
+ *    - It's automatically created when the level loads - no manual setup
+ *    - Access via: GetWorld()->GetSubsystem<UMGPhotoModeSubsystem>()
+ *
+ * 2. WHAT IS PHOTO MODE?
+ *    - A feature in many modern games (Forza, Gran Turismo, Spider-Man, etc.)
+ *    - Pauses gameplay so you can compose the perfect shot
+ *    - Gives you a free camera to position anywhere
+ *    - Applies Instagram-like filters and effects
+ *    - Saves high-quality screenshots to your device
+ *
+ * 3. RENDER TARGETS AND SCENE CAPTURE:
+ *    - A "Render Target" is like a virtual photograph - it captures what a
+ *      camera sees into a texture
+ *    - "Scene Capture" is a special component that renders the scene to a
+ *      render target (instead of to the screen)
+ *    - This lets us apply filters and then save the result as an image file
+ *
+ * 4. POST-PROCESSING:
+ *    - Effects applied AFTER the scene is rendered (hence "post")
+ *    - Includes: color correction, blur, vignette, bloom, film grain
+ *    - Controlled via Materials (FilterMaterialInstance) with parameters
+ *    - Each filter preset just sets different material parameters
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ *
+ *    [Player presses Photo Mode button]
+ *                |
+ *                v
+ *    [MGPhotoModeSubsystem::EnterPhotoMode()]
+ *                |
+ *    +-----------+-----------+
+ *    |           |           |
+ *    v           v           v
+ * [Pause Game] [Hide HUD] [Setup Camera]
+ *                |
+ *                v
+ *    [Player adjusts camera, applies filters]
+ *                |
+ *                v
+ *    [MGPhotoModeSubsystem::CapturePhoto()]
+ *                |
+ *                v
+ *    [Scene Capture -> Render Target -> Save to Disk]
+ *                |
+ *                v
+ *    [Photo added to gallery, OnPhotoCaptured event fires]
+ *
+ * USAGE EXAMPLE:
+ * @code
+ * // Get the subsystem
+ * UMGPhotoModeSubsystem* PhotoMode = GetWorld()->GetSubsystem<UMGPhotoModeSubsystem>();
+ *
+ * // Enter photo mode
+ * PhotoMode->EnterPhotoMode();
+ *
+ * // Apply a filter
+ * PhotoMode->SetFilter(EMGPhotoFilter::Noir);
+ *
+ * // Adjust depth of field
+ * PhotoMode->SetDepthOfFieldEnabled(true);
+ * PhotoMode->SetFocalDistance(500.0f);  // Focus at 5 meters
+ * PhotoMode->SetAperture(2.8f);         // Shallow DOF for bokeh
+ *
+ * // Take the photo
+ * PhotoMode->CapturePhoto();
+ *
+ * // Exit photo mode
+ * PhotoMode->ExitPhotoMode();
+ * @endcode
+ *
+ * =============================================================================
  * @file MGPhotoModeSubsystem.h
  * @brief Photo Mode Subsystem for in-game photography and image capture.
- *
- * This subsystem provides a comprehensive photo mode feature that allows players
- * to pause the game, position a free-moving camera, apply visual filters and effects,
- * and capture high-quality screenshots. The system supports multiple camera modes
- * (free, orbit, track, locked), various filter presets, depth of field controls,
- * and customizable overlays.
  *
  * Key Features:
  * - Multiple camera modes for flexible shot composition
@@ -18,17 +98,10 @@
  * - Photo gallery management with save/delete/share functionality
  * - High-resolution capture support up to 4K
  *
- * Usage:
- * @code
- * UMGPhotoModeSubsystem* PhotoMode = GetWorld()->GetSubsystem<UMGPhotoModeSubsystem>();
- * PhotoMode->EnterPhotoMode();
- * PhotoMode->SetFilter(EMGPhotoFilter::Noir);
- * PhotoMode->CapturePhoto();
- * @endcode
- *
  * @see UWorldSubsystem
  * @see EMGPhotoCamera
  * @see EMGPhotoFilter
+ * =============================================================================
  */
 
 #pragma once

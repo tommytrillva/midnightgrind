@@ -1,5 +1,142 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * ============================================================================
+ * MGPinkSlipSubsystem.h - Pink Slip Racing Core System
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This is arguably the MOST IMPORTANT file in the Midnight Grind codebase.
+ * Pink slip races are the UNIQUE SELLING POINT of the game - races where
+ * the loser PERMANENTLY loses their vehicle to the winner. No refunds.
+ * No do-overs. The stakes are real (within the game).
+ *
+ * "Pink slip" refers to a vehicle's title/ownership document. In street
+ * racing culture, "racing for pink slips" means the winner takes the
+ * loser's car. This system makes that permanent and consequential.
+ *
+ * CRITICAL DESIGN PILLARS:
+ *
+ * 1. PERMANENCE:
+ *    - When you lose, your vehicle is GONE FOREVER
+ *    - No "undo" button, no admin recovery
+ *    - This creates meaningful consequences
+ *    - Players must weigh risk vs reward carefully
+ *
+ * 2. FAIRNESS:
+ *    - PI (Performance Index) matching ensures fair races
+ *    - Both players risk vehicles of similar value/power
+ *    - No sandbagging or exploitation
+ *
+ * 3. CONSENT:
+ *    - Triple confirmation required (3 separate "I understand" clicks)
+ *    - Players must acknowledge they could lose their car
+ *    - No accidental pink slip races
+ *
+ * 4. ANTI-EXPLOITATION:
+ *    - Disconnect = automatic loss (no rage-quitting)
+ *    - Trade locks prevent immediate resale of won vehicles
+ *    - Cooldowns after losses prevent rage-betting
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. ELIGIBILITY (EMGPinkSlipEligibility):
+ *    Players must meet ALL requirements:
+ *    - Own more than one vehicle (can't lose your only car)
+ *    - Minimum REP tier (respect level, per GDD: tier 3+)
+ *    - Minimum player level
+ *    - Not on cooldown from recent loss
+ *    - Vehicle not trade-locked
+ *    - Vehicle PI within range of opponent
+ *    - No active account restrictions
+ *
+ * 2. TRIPLE CONFIRMATION SYSTEM:
+ *    Before a pink slip race starts:
+ *    - Confirmation 1: "I understand I could lose my vehicle"
+ *    - Confirmation 2: "I acknowledge this is permanent"
+ *    - Confirmation 3: "Final confirmation - start the race"
+ *    This is NOT optional and cannot be bypassed.
+ *
+ * 3. TRADE LOCKS (FMGVehicleTradeLock):
+ *    - Vehicles WON in pink slips are locked for X days
+ *    - Cannot be traded, wagered, or sold during lock
+ *    - Prevents "vehicle laundering" exploits
+ *    - Maintains "earned through racing" philosophy
+ *
+ * 4. COOLDOWNS (FMGPinkSlipCooldown):
+ *    - After LOSING a pink slip race
+ *    - Player cannot enter another pink slip for X hours
+ *    - Prevents "tilt" behavior (rage-betting more cars)
+ *    - Protects players from themselves
+ *
+ * 5. TRANSFER RECORDS (FMGPinkSlipTransferRecord):
+ *    - Permanent history of all pink slip outcomes
+ *    - Records winner, loser, vehicle, track, timestamp
+ *    - Used for statistics, achievements, leaderboards
+ *    - Cannot be modified or deleted
+ *
+ * 6. VEHICLE PROTECTION:
+ *    - Players can insure vehicles (see MGInsuranceSubsystem.h)
+ *    - Insurance can cover pink slip losses (expensive!)
+ *    - Uninsured = permanent loss
+ *
+ * TYPICAL FLOW:
+ *
+ * 1. Player A challenges Player B to pink slip race
+ * 2. Both select vehicles to wager
+ * 3. System checks eligibility (CheckEligibility/CheckVehicleEligibility)
+ * 4. System verifies PI matching (MaxPIDifference)
+ * 5. Triple confirmation for both players
+ * 6. Race begins
+ * 7. Race ends, winner determined
+ * 8. ExecuteTransfer() called - POINT OF NO RETURN
+ * 9. Loser's vehicle removed from their garage
+ * 10. Winner's garage gains the vehicle
+ * 11. Trade lock applied to won vehicle
+ * 12. Cooldown applied to loser
+ * 13. Transfer record saved to history
+ *
+ * DELEGATES (Events for UI):
+ * - OnEligibilityChecked: Result of eligibility check
+ * - OnConfirmationRequired: UI needs to show confirmation dialog
+ * - OnTransferExecuted: Transfer completed (for cutscenes/animations)
+ * - OnVehicleLost: Local player lost their vehicle (sad moment)
+ * - OnVehicleWon: Local player won a vehicle (celebration!)
+ * - OnCooldownStarted: Cooldown began (show timer in UI)
+ *
+ * SAVE INTEGRATION:
+ * - Uses SaveGame UPROPERTY specifier for persistence
+ * - Transfer history survives game restarts
+ * - Cooldowns persist across sessions
+ * - Trade locks persist across sessions
+ *
+ * CONFIGURATION PROPERTIES:
+ * - CooldownHours: Hours before player can pink slip again (default: 24)
+ * - TradeLockDays: Days won vehicle is locked (default: 7)
+ * - MaxPIDifference: Maximum PI gap allowed (default: 50)
+ * - MinREPTier: Minimum reputation tier (default: 3)
+ * - MinPlayerLevel: Minimum level (default: 20)
+ * - RequiredConfirmations: Number of confirms needed (default: 3)
+ *
+ * RELATED FILES:
+ * - MGPinkSlipSubsystem.cpp (implementation)
+ * - MGPinkSlipTypes.h (enums, constants, helper functions)
+ * - MGPinkSlipHandler.h (race-time mechanics)
+ * - MGWagerSubsystem.h (general wager management)
+ * - MGInsuranceSubsystem.h (vehicle protection)
+ * - MGGarageSubsystem.h (vehicle storage)
+ * - MGSaveSubsystem.h (persistence)
+ *
+ * WARNING TO DEVELOPERS:
+ * - Be EXTREMELY careful modifying this code
+ * - Bugs here can cause players to lose vehicles unfairly
+ * - All changes should be thoroughly tested
+ * - Consider the emotional impact on players
+ *
+ * ============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

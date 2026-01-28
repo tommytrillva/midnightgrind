@@ -1,5 +1,154 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehicleCatalogSubsystem.h
+ * @brief Vehicle Catalog Data Access System - Central Repository for Vehicle Information
+ *
+ * @section overview Overview for New Developers
+ *
+ * This file defines the Vehicle Catalog Subsystem, which serves as the central
+ * database for all vehicle information in Midnight Grind. Think of it as the
+ * "vehicle encyclopedia" that other systems query to get vehicle data.
+ *
+ * The catalog contains:
+ * - Vehicle identity (names, manufacturers, model years)
+ * - Pricing information (purchase prices, street values, insurance classes)
+ * - Performance specifications (horsepower, torque, weight, PI ratings)
+ * - Unlock requirements (reputation tier, player level, special conditions)
+ *
+ * @section why Why Does This System Exist?
+ *
+ * In a racing game, many different systems need vehicle data:
+ * - Dealership: "How much does this car cost?"
+ * - Garage: "What are this car's base stats?"
+ * - Insurance: "What insurance class is this vehicle?"
+ * - Pink Slips: "What's this car worth for betting?"
+ * - Matchmaking: "What performance class is this vehicle?"
+ *
+ * Instead of duplicating this data everywhere, we centralize it in DataTables
+ * and provide this subsystem as a clean interface to access it.
+ *
+ * @section concepts Key Concepts
+ *
+ * 1. DATA TABLES:
+ *    - Vehicle data is stored in Unreal Engine DataTables
+ *    - DataTables can be edited in the Unreal Editor or imported from JSON
+ *    - Data path: Content/Data/Vehicles/*.json
+ *    - The subsystem loads and caches this data for fast access
+ *
+ * 2. VEHICLE PRICING (FMGVehiclePricingInfo):
+ *    - BasePurchasePrice: MSRP - the "new" price at dealerships
+ *    - StreetValue: Used condition price - what you'd pay/receive in player trades
+ *    - LegendaryValue: Pristine/rare condition - collectors pay premium
+ *    - MaintenanceCostMultiplier: Affects repair costs (luxury cars cost more)
+ *    - PartsPriceMultiplier: Affects upgrade costs (exotic parts are pricier)
+ *    - InsuranceClass: A-F rating affecting insurance premiums
+ *
+ * 3. VEHICLE PERFORMANCE (FMGVehiclePerformanceInfo):
+ *    - BasePI: Performance Index - single number rating (like Forza's PI)
+ *    - PerformanceClass: Letter grade (D, C, B, A, S, X) derived from PI
+ *    - MaxPIPotential: Highest PI achievable with full upgrades
+ *    - BaseHorsepower/Torque/Weight: Raw specs for physics calculations
+ *    - Drivetrain: FWD, RWD, or AWD
+ *
+ * 4. VEHICLE CATALOG ROW (FMGVehicleCatalogRow):
+ *    The complete vehicle entry containing:
+ *    - Identity: VehicleID, DisplayName, Manufacturer, Year, Category
+ *    - Economy: Pricing struct with all price data
+ *    - Performance: Performance struct with all specs
+ *    - Requirements: What player needs to purchase (level, reputation)
+ *    - Tags: Search/filter metadata (JDM, Muscle, Starter, etc.)
+ *
+ * 5. PERFORMANCE CLASSES:
+ *    - D Class: PI 100-399 (beginner cars)
+ *    - C Class: PI 400-499 (budget sports cars)
+ *    - B Class: PI 500-599 (sports cars)
+ *    - A Class: PI 600-699 (high-end sports)
+ *    - S Class: PI 700-799 (supercars)
+ *    - X Class: PI 800-999 (hypercars)
+ *
+ * 6. CACHING:
+ *    - On Initialize(), the subsystem builds a cache from the DataTable
+ *    - Lookups are O(1) via TMap instead of scanning the table each time
+ *    - Cache is rebuilt if DataTable is modified
+ *
+ * @section usage Usage Examples
+ *
+ * @code
+ * // Get the subsystem
+ * UMGVehicleCatalogSubsystem* Catalog = GetGameInstance()->GetSubsystem<UMGVehicleCatalogSubsystem>();
+ *
+ * // Example 1: Get vehicle purchase price for dealership
+ * int32 Price = Catalog->GetBasePurchasePrice(FName("KAZE_CIVIC"));
+ * // Returns: 15000 (or whatever is configured)
+ *
+ * // Example 2: Get full pricing info for insurance calculations
+ * FMGVehiclePricingInfo Pricing = Catalog->GetVehiclePricing(FName("RYUSEI_SKYLINE"));
+ * int32 InsurableValue = Pricing.StreetValue;
+ * FString InsuranceClass = Pricing.InsuranceClass; // "B"
+ *
+ * // Example 3: Get performance class for matchmaking
+ * FString PerfClass = Catalog->GetPerformanceClass(FName("FENRIR_M3"));
+ * // Returns: "A" (for A-class cars)
+ *
+ * // Example 4: Get all JDM cars for a filter menu
+ * TArray<FMGVehicleCatalogRow> JDMCars = Catalog->GetVehiclesByTag("JDM");
+ * for (const FMGVehicleCatalogRow& Car : JDMCars)
+ * {
+ *     UE_LOG(LogTemp, Log, TEXT("JDM Car: %s"), *Car.DisplayName);
+ * }
+ *
+ * // Example 5: Get all B-class vehicles for a restricted race
+ * TArray<FMGVehicleCatalogRow> BClassCars = Catalog->GetVehiclesByClass("B");
+ *
+ * // Example 6: Check if a vehicle exists before using it
+ * if (Catalog->IsVehicleInCatalog(FName("CUSTOM_VEHICLE")))
+ * {
+ *     // Safe to proceed
+ * }
+ *
+ * // Example 7: Get full vehicle data for detailed display
+ * FMGVehicleCatalogRow VehicleData;
+ * if (Catalog->GetVehicleData(FName("HAYABUSA_RX7"), VehicleData))
+ * {
+ *     UE_LOG(LogTemp, Log, TEXT("Vehicle: %s by %s (%d)"),
+ *         *VehicleData.DisplayName,
+ *         *VehicleData.Manufacturer,
+ *         VehicleData.Year);
+ *     UE_LOG(LogTemp, Log, TEXT("  Base PI: %d, Max PI: %d"),
+ *         VehicleData.Performance.BasePI,
+ *         VehicleData.Performance.MaxPIPotential);
+ * }
+ * @endcode
+ *
+ * @section blueprint Blueprint Usage
+ *
+ * All functions are marked BlueprintPure and can be called from Blueprints:
+ * 1. Get a reference to the subsystem using "Get Game Instance Subsystem"
+ * 2. Select UMGVehicleCatalogSubsystem as the class
+ * 3. Call any of the lookup functions
+ *
+ * @section setup Setup Instructions
+ *
+ * 1. Create vehicle data JSON files in Content/Data/Vehicles/
+ * 2. Import JSON files as DataTable assets with FMGVehicleCatalogRow row type
+ * 3. Set VehicleCatalogTable reference in DefaultEngine.ini or Blueprint
+ * 4. The subsystem will automatically load on game start
+ *
+ * @section related Related Files
+ *
+ * - MGVehicleCatalogSubsystem.cpp - Implementation
+ * - MGGarageSubsystem.h - Uses catalog for vehicle management
+ * - MGDealershipSubsystem.h - Uses catalog for vehicle purchases
+ * - MGInsuranceSubsystem.h - Uses catalog for insurance calculations
+ * - MGPinkSlipSubsystem.h - Uses catalog for vehicle valuations
+ * - Content/Data/Vehicles/*.json - Source vehicle data
+ *
+ * @see FMGVehicleCatalogRow for the complete vehicle data structure
+ * @see FMGVehiclePricingInfo for pricing breakdown
+ * @see FMGVehiclePerformanceInfo for performance specifications
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

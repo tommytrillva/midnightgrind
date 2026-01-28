@@ -1,5 +1,73 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRacingLineActor.h
+ * @brief Racing line visualization and query system for optimal path guidance.
+ *
+ * This file defines the AMGRacingLineActor class, which represents the optimal racing
+ * path around a track. The racing line is the theoretical "fastest" path through a
+ * circuit, taking into account corner entry/exit points, apex positions, and
+ * acceleration/braking zones.
+ *
+ * @section racing_line_concepts Key Concepts
+ *
+ * RACING LINE: In motorsport, the racing line is the route around a track that
+ * minimizes lap time. It typically involves:
+ * - Late braking into corners
+ * - Hitting the apex (innermost point of a corner)
+ * - Early acceleration on corner exit
+ * - Using the full width of the track
+ *
+ * SPLINE: A mathematical curve that smoothly passes through a series of control
+ * points. Unreal Engine's USplineComponent allows us to define complex 3D paths
+ * that can be queried for positions, directions, and distances.
+ *
+ * IDEAL SPEED: Each point on the racing line has an associated "ideal speed" -
+ * the maximum safe velocity for that section. This helps AI drivers and can
+ * provide guidance to players.
+ *
+ * @section racing_line_architecture Architecture
+ *
+ * The racing line system works as follows:
+ * 1. Designer places AMGRacingLineActor in the level
+ * 2. Control points are added to define the optimal path
+ * 3. Each point has associated metadata (speed, braking zones, etc.)
+ * 4. At runtime, AI and ghost systems query the racing line for guidance
+ * 5. The line can optionally be visualized for player assistance
+ *
+ * @section racing_line_usage Usage Examples
+ *
+ * @code
+ * // Get the racing line actor (typically found by subsystem)
+ * AMGRacingLineActor* RacingLine = GetRacingLineActor();
+ *
+ * // Query the optimal position 100 meters into the track
+ * FVector OptimalPosition = RacingLine->GetPositionAtDistance(10000.0f); // cm
+ *
+ * // Check if AI should be braking at current position
+ * float CurrentDistance = RacingLine->GetDistanceAlongLine(VehicleLocation);
+ * if (RacingLine->IsInBrakingZone(CurrentDistance))
+ * {
+ *     ApplyBrakes();
+ * }
+ *
+ * // Get ideal speed for speed advisory
+ * float TargetSpeed = RacingLine->GetIdealSpeedAtDistance(CurrentDistance);
+ *
+ * // Calculate how far off the racing line the player is
+ * float Deviation = RacingLine->GetDeviationFromLine(VehicleLocation);
+ * @endcode
+ *
+ * @section racing_line_related Related Systems
+ * - UMGTrackSubsystem: Manages overall track data and may reference racing line
+ * - AI Driving System: Uses racing line for pathfinding decisions
+ * - Ghost System: Records and plays back racing line data
+ * - HUD: Can display racing line for player assistance
+ *
+ * @see FMGRacingLinePoint
+ * @see USplineComponent
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

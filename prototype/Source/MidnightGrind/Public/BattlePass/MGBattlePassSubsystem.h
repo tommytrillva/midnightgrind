@@ -1,7 +1,164 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MidnightGrind - Arcade Street Racing Game
-// Battle Pass Subsystem - Seasonal progression with free and premium reward tracks
+/**
+ * =============================================================================
+ * MGBattlePassSubsystem.h
+ * Battle Pass Subsystem - Seasonal Progression with Free and Premium Tracks
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file implements the Battle Pass system for Midnight Grind, providing
+ * seasonal progression with tiered rewards. Players earn XP through gameplay
+ * to unlock rewards on both free and premium tracks. This is the most feature-
+ * complete season pass implementation in the codebase.
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
+ *
+ * 1. WHAT IS A BATTLE PASS?
+ *    A battle pass is a seasonal progression system popularized by games like
+ *    Fortnite. Players earn XP through gameplay to "level up" through tiers,
+ *    each tier unlocking rewards. There are usually two tracks:
+ *    - Free Track: Available to all players
+ *    - Premium Track: Requires one-time purchase for the season
+ *
+ * 2. SEASONS (FMGBattlePassSeason)
+ *    A season is a themed content period (typically 8-12 weeks) with:
+ *    - Unique identity (name, theme, banner image)
+ *    - MaxTier: Standard tiers (usually 100)
+ *    - BonusTiers: Extra tiers beyond 100 for dedicated players
+ *    - DailyChallenges/WeeklyChallenges: Bonus XP objectives
+ *    - Pricing info for premium pass, bundles, tier skips
+ *
+ * 3. TIERS (FMGBattlePassTierInfo)
+ *    Each tier in the pass has:
+ *    - TierNumber: 1 through MaxTier (+BonusTiers)
+ *    - XPRequired: How much XP to unlock this tier
+ *    - CumulativeXP: Total XP needed from tier 1
+ *    - TierType: Standard, Milestone (every 10), Featured, Ultimate (tier 100)
+ *    - FreeReward/PremiumReward: Items for each track
+ *
+ * 4. REWARD TRACKS (EMGBattlePassTrack)
+ *    - Free: Everyone can claim these rewards
+ *    - Premium: Requires purchased premium pass
+ *
+ * 5. TIER TYPES (EMGBattlePassTier)
+ *    - Standard: Normal tiers with regular rewards
+ *    - Milestone: Every 10 tiers, better rewards
+ *    - Featured: Highlighted rewards (usually cosmetics)
+ *    - Ultimate: The final tier (100), best reward
+ *
+ * 6. REWARD TYPES (EMGRewardType)
+ *    The many types of items players can earn:
+ *    - Currency: GrindCash or premium currency
+ *    - Vehicle: Unlockable cars
+ *    - Customization: BodyKit, Vinyl, Decal, Wheels, Spoiler, Interior
+ *    - Effects: Underglow, NeonKit, ExhaustEffect, TireSmoke, NitroTrail
+ *    - Sound: HornSound, EngineSound
+ *    - Identity: PlayerCard, ProfileBanner, Avatar, Title
+ *    - Expression: Emote, VictoryPose, LoadingScreen
+ *    - Boosters: XPBoost, LootBox
+ *
+ * 7. CHALLENGES (FMGBattlePassChallenge)
+ *    Optional objectives that grant bonus XP:
+ *    - Daily: Small tasks refreshing every 24 hours
+ *    - Weekly: Larger goals for each week of the season
+ *    - Track progress via TargetValue/CurrentValue
+ *    - Must be claimed after completion to get XP
+ *
+ * 8. BUNDLES (FMGBattlePassBundle)
+ *    Premium purchase options:
+ *    - Standard premium pass
+ *    - Bundles with bonus tiers and rewards
+ *    - XP boost multipliers for faster progression
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ *
+ *     +-------------------+     +-------------------+
+ *     | Race System       |     | Challenge System  |
+ *     | (completes races) |     | (objectives)      |
+ *     +-------------------+     +-------------------+
+ *              |                         |
+ *              v                         v
+ *         AddXP(amt, "Race")      UpdateChallengeProgress()
+ *              |                         |
+ *              +------------+------------+
+ *                           |
+ *                           v
+ *              +------------------------+
+ *              | UMGBattlePassSubsystem |  <-- This file
+ *              +------------------------+
+ *                           |
+ *         +-----------------+-----------------+
+ *         |                 |                 |
+ *         v                 v                 v
+ *    [Tier Up?]      [Challenge      [Reward
+ *         |           Complete?]      Claimable?]
+ *         v                 |                 |
+ *    OnTierUp               v                 v
+ *         |           OnChallengeComplete   ClaimReward()
+ *         v                                   |
+ *    [Show                                    v
+ *     rewards]                          OnRewardClaimed
+ *
+ * XP CALCULATION:
+ * ---------------
+ * XP is earned from multiple sources:
+ * - Racing: CalculateRaceXP() based on position, time, racers
+ * - Challenges: Fixed XP per challenge
+ * - Events: Bonus XP from live events
+ * - Multipliers: GetXPMultiplier() from premium bundles
+ *
+ * TYPICAL USAGE FLOW:
+ * -------------------
+ * 1. Initialize(): Sets up season data, loads player progress
+ * 2. Player completes race -> AddXP(xp, "Race") called
+ * 3. CheckTierProgression() sees if new tier reached
+ * 4. If tier up -> OnTierUp broadcasts, UI shows animation
+ * 5. Player views battle pass -> GetProgress(), GetAllTiers()
+ * 6. Player claims reward -> ClaimReward(tier, track)
+ * 7. OnRewardClaimed broadcasts, item added to inventory
+ *
+ * CHALLENGE FLOW:
+ * ---------------
+ * 1. GenerateDailyChallenges() creates daily objectives
+ * 2. Player races -> UpdateChallengesByType("Race", 1)
+ * 3. Challenge progress updates -> OnChallengeProgress broadcasts
+ * 4. When complete -> OnChallengeComplete broadcasts
+ * 5. Player claims -> ClaimChallengeReward(id) adds XP
+ * 6. Daily challenges refresh at midnight UTC
+ *
+ * PREMIUM FEATURES:
+ * -----------------
+ * - PurchasePremium(): Buy standard premium pass
+ * - PurchaseBundle(): Buy premium + bonus tiers + rewards
+ * - PurchaseTiers(): Skip tiers with premium currency
+ * - HasPremium(): Check if player has premium access
+ *
+ * DELEGATES (Events to listen to):
+ * --------------------------------
+ * - OnTierUp: New tier reached, show rewards
+ * - OnXPGained: XP earned, update progress bar
+ * - OnRewardClaimed: Reward collected, play animation
+ * - OnPremiumPurchased: Premium unlocked, refresh UI
+ * - OnChallengeComplete: Challenge done, show claim button
+ * - OnChallengeProgress: Progress updated, refresh UI
+ * - OnSeasonStarted/Ended: Season lifecycle events
+ * - OnChallengesRefreshed: New daily challenges available
+ *
+ * IMPLEMENTATION NOTES:
+ * ---------------------
+ * - This is a GameInstanceSubsystem (persists across levels)
+ * - Progress is saved locally and synced to server
+ * - Uses FTimerHandle for daily challenge refresh
+ * - Rewards use TSoftObjectPtr for lazy loading (memory efficient)
+ *
+ * @see UMGSeasonPassSubsystem - Simpler implementation with same concepts
+ * @see UMGSeasonSubsystem - Older implementation (being deprecated)
+ * =============================================================================
+ */
 
 #pragma once
 

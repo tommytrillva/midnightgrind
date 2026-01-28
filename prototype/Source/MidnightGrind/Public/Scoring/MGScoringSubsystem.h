@@ -1,5 +1,184 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * @file MGScoringSubsystem.h
+ * @brief Central Scoring System for Midnight Grind Racing
+ *
+ * @section overview Overview
+ * This file defines the Scoring Subsystem - the central system that tracks,
+ * calculates, and manages all player scores during races. It handles everything
+ * from basic position scoring to complex combo chains, multipliers, and grades.
+ *
+ * @section beginner_concepts Key Concepts for Beginners
+ *
+ * 1. GAME INSTANCE SUBSYSTEM
+ *    UGameInstanceSubsystem is a special Unreal Engine class that:
+ *    - Creates ONE instance automatically when the game starts
+ *    - Persists across level/map changes (unlike Actors)
+ *    - Accessible from anywhere via UGameInstance::GetSubsystem<>()
+ *    Perfect for scoring since we need to track scores across the entire race.
+ *
+ * 2. SCORE EVENTS (FMGScoreEvent)
+ *    Individual scoring actions that award points. Examples:
+ *    - Drift: Points for sliding/drifting your car
+ *    - NearMiss: Points for narrowly avoiding traffic
+ *    - Takedown: Points for causing opponents to crash
+ *    - Overtake: Points for passing other racers
+ *    Each event has BasePoints that get multiplied by active multipliers.
+ *
+ * 3. SCORE CATEGORIES (EMGScoreCategory)
+ *    Events are grouped into categories for stat tracking:
+ *    - Racing: Position, overtakes, clean sections
+ *    - Style: Drifts, airtime, tricks
+ *    - Combat: Takedowns, destruction
+ *    - Exploration: Hidden paths, shortcuts
+ *    - Technical: Perfect landings, nitro usage
+ *    - Bonus/Penalty: Special modifiers
+ *
+ * 4. COMBO CHAINS (FMGScoreChain)
+ *    Performing multiple score events in quick succession creates a "chain":
+ *    - Each event extends the ChainTimer
+ *    - ChainMultiplier increases with each event
+ *    - Chain breaks if ChainTimer reaches zero
+ *    - Longer chains = higher multipliers = more points!
+ *    Think of it like combo systems in fighting games.
+ *
+ * 5. MULTIPLIERS (FMGScoreMultiplierSource)
+ *    Temporary or permanent bonuses that multiply all earned points:
+ *    - Chain multiplier (from combos)
+ *    - Difficulty multiplier
+ *    - Special event multipliers
+ *    Multiple multipliers stack: 2x chain * 1.5x difficulty = 3x total!
+ *
+ * 6. GRADES (EMGScoreGrade)
+ *    Letter grades evaluate overall performance:
+ *    F -> D -> C -> B -> A -> S -> SS -> SSS
+ *    Grades consider: total score, average multiplier, longest chain.
+ *    Higher grades unlock better rewards!
+ *
+ * 7. MILESTONES
+ *    Score thresholds that trigger special events:
+ *    - 10,000 points: Bronze milestone
+ *    - 50,000 points: Silver milestone
+ *    - 100,000 points: Gold milestone
+ *    OnMilestoneScore delegate fires when reached.
+ *
+ * @section data_structures Important Data Structures
+ *
+ * - FMGScoreEvent: Single scoring action (type, points, multiplier, location)
+ * - FMGScoreChain: Active combo chain (events, timer, multiplier)
+ * - FMGPlayerScore: Player's complete score state (total, categories, grade)
+ * - FMGScoreEventDefinition: Configuration for each event type
+ * - FMGScoreGradeThreshold: Requirements for each grade level
+ * - FMGRaceScoreSummary: End-of-race score breakdown
+ * - FMGScoreMultiplierSource: Active multiplier effect
+ *
+ * @section delegates Delegates (Events)
+ *
+ * Delegates let other code react to scoring events:
+ * - OnScoreEvent: Any score event occurs
+ * - OnChainStarted/Extended/Ended: Chain state changes
+ * - OnMultiplierChanged: Multiplier value changes
+ * - OnGradeChanged: Player's grade improves
+ * - OnMilestoneScore: Score milestone reached
+ * - OnScoreSummary: Race ends, final summary available
+ *
+ * @section usage_example Code Examples
+ *
+ * Getting the subsystem:
+ * @code
+ * UMGScoringSubsystem* Scoring = GetGameInstance()->GetSubsystem<UMGScoringSubsystem>();
+ * @endcode
+ *
+ * Starting a scoring session for a race:
+ * @code
+ * Scoring->StartScoringSession(PlayerID, RaceID);
+ * @endcode
+ *
+ * Adding score events during gameplay:
+ * @code
+ * // Player performed a drift
+ * FMGScoreEvent Event = Scoring->AddScore(PlayerID, EMGScoreEventType::Drift, 500);
+ *
+ * // Player performed a near miss with bonus multiplier
+ * FMGScoreEvent Event = Scoring->AddScoreWithMultiplier(PlayerID, EMGScoreEventType::NearMiss, 200, 1.5f);
+ *
+ * // Player hit a wall (penalty)
+ * Scoring->AddPenalty(PlayerID, 100, NSLOCTEXT("Scoring", "WallHit", "Wall Collision"));
+ * @endcode
+ *
+ * Checking current score state:
+ * @code
+ * int32 Total = Scoring->GetTotalScore(PlayerID);
+ * EMGScoreGrade Grade = Scoring->GetCurrentGrade(PlayerID);
+ * float Multiplier = Scoring->GetTotalMultiplier(PlayerID);
+ * bool HasChain = Scoring->HasActiveChain(PlayerID);
+ * @endcode
+ *
+ * Ending a race and getting summary:
+ * @code
+ * FMGRaceScoreSummary Summary = Scoring->EndScoringSession(PlayerID);
+ * // Summary contains: TotalScore, FinalGrade, CategoryBreakdown, etc.
+ * @endcode
+ *
+ * Subscribing to scoring events (in BeginPlay):
+ * @code
+ * Scoring->OnScoreEvent.AddDynamic(this, &AMyHUD::HandleScoreEvent);
+ * Scoring->OnGradeChanged.AddDynamic(this, &AMyHUD::HandleGradeChange);
+ * Scoring->OnChainExtended.AddDynamic(this, &AMyHUD::HandleChainUpdate);
+ * @endcode
+ *
+ * @section chain_mechanics How Chains Work
+ *
+ * 1. Player performs first scoreable action (e.g., Drift)
+ * 2. StartChain() is called, ChainTimer starts (default 3 seconds)
+ * 3. ChainMultiplier = 1.0
+ *
+ * 4. Player performs another action within 3 seconds
+ * 5. ExtendChain() called, ChainTimer resets, ChainMultiplier increases
+ * 6. Each event in chain gets ChainMultiplier applied to points
+ *
+ * 7. If 3 seconds pass with no new events:
+ * 8. Chain ends, ChainMultiplier bonus is applied, combo resets
+ *
+ * Chain bonuses per event (configurable per event type):
+ * - ChainBonusPerEvent: How much multiplier increases per chain event
+ * - MaxChainBonus: Cap on chain multiplier
+ * - bCanChain: Whether this event type can be part of chains
+ * - bExtendsChainTimer: Whether this event refreshes the timer
+ *
+ * @section grade_calculation Grade Calculation
+ *
+ * Grades are calculated using multiple factors:
+ * @code
+ * EMGScoreGrade Grade = CalculateGrade(TotalScore, AverageMultiplier, LongestChain);
+ * @endcode
+ *
+ * Each grade threshold (FMGScoreGradeThreshold) defines:
+ * - MinScore: Minimum points needed
+ * - MinMultiplierAverage: Average multiplier throughout race
+ * - MinChainLength: Longest combo achieved
+ *
+ * All three conditions must be met for a grade. This encourages:
+ * - Consistent scoring (not just one big combo)
+ * - Maintaining multipliers
+ * - Building long chains
+ *
+ * @section session_flow Typical Session Flow
+ *
+ * 1. Race starts -> StartScoringSession(PlayerID, RaceID)
+ * 2. During race -> AddScore(), chains build automatically
+ * 3. UpdateScoringSystem(DeltaTime) called each frame (ticks chains/multipliers)
+ * 4. Race ends -> EndScoringSession(PlayerID) returns summary
+ * 5. Display results, save to leaderboard
+ * 6. ResetPlayerScore(PlayerID) to clean up
+ *
+ * @section related_files Related Files
+ * - MGScoringSubsystem.cpp: Implementation of scoring logic
+ * - MGRaceHUD: Displays score, chains, grades to player
+ * - MGLeaderboardSubsystem: Saves/loads score records
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

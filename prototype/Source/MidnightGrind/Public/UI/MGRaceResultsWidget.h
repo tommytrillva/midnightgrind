@@ -1,6 +1,142 @@
 // Copyright Midnight Grind. All Rights Reserved.
 // Updated Stage 51: Race Flow Integration
 
+/**
+ * =============================================================================
+ * @file MGRaceResultsWidget.h
+ * @brief Race results screen widget displaying final standings, times, and rewards
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the race results widget that appears after a race ends.
+ * It displays the final standings, lap times, rewards earned, and provides
+ * navigation options for the player. The widget integrates with both the
+ * legacy RaceGameMode results and the newer RaceFlowSubsystem for MVP races.
+ *
+ * Key features:
+ * - Final position and standings display
+ * - Time and gap calculations for all racers
+ * - Reward breakdown (cash, reputation, XP)
+ * - Personal best and track record tracking
+ * - Win streak and career statistics display
+ * - Pink slip race results (vehicle won/lost)
+ * - Animated reveal of results rows
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **FMGResultRowData**: Represents one row in the results table. Contains
+ *   position, driver name, vehicle, times, and special flags (player highlight,
+ *   DNF status, best lap indicator).
+ *
+ * - **Dual Data Sources**: The widget can receive data from either:
+ *   1. FMGRaceResults (from MGRaceGameMode) - Legacy race system
+ *   2. FMGRaceFlowResult (from MGRaceFlowSubsystem) - MVP race flow system
+ *   Use DisplayResults() for legacy, DisplayFlowResults() for MVP.
+ *
+ * - **History Integration**: Connects with MGRaceHistorySubsystem to show
+ *   personal bests, win streaks, and track-specific statistics.
+ *
+ * - **Pink Slip Races**: Special high-stakes races where vehicles are wagered.
+ *   The widget shows if the player won or lost a vehicle.
+ *
+ * - **Animated Row Reveal**: Results are revealed one row at a time using
+ *   PlayRowRevealAnimation() for dramatic effect.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [Race Ends]
+ *        |
+ *        +-- RaceGameMode.OnRaceFinished --> DisplayResults(FMGRaceResults)
+ *        |
+ *        +-- RaceFlowSubsystem.OnRaceComplete --> DisplayFlowResults(FMGRaceFlowResult)
+ *        |
+ *        v
+ *   [MGRaceResultsWidget]
+ *        |
+ *        +-- ProcessResultsData() --> Creates FMGResultRowData array
+ *        |
+ *        +-- CreateUIElements() --> Builds result rows
+ *        |
+ *        +-- UpdateHistoryStatsDisplay() --> Shows PB, streak, career
+ *        |
+ *        +-- PlayVictoryAnimation() or PlayDefeatAnimation()
+ *        |
+ *        v
+ *   [User Actions]
+ *        |
+ *        +-- OnContinue --> ContinueToGarage()
+ *        +-- OnRestart --> RestartRace()
+ *        +-- OnQuit --> HandleQuit()
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Create and display results widget (typically done by RaceFlowSubsystem)
+ * UMGRaceResultsWidget* ResultsWidget = CreateWidget<UMGRaceResultsWidget>(
+ *     GetWorld(), ResultsWidgetClass);
+ * ResultsWidget->AddToViewport();
+ *
+ * // Method 1: Display from RaceFlowSubsystem automatically
+ * ResultsWidget->DisplayFromFlowSubsystem();
+ *
+ * // Method 2: Display with specific flow result data
+ * FMGRaceFlowResult FlowResult;
+ * FlowResult.Position = 1;
+ * FlowResult.CashEarned = 15000;
+ * FlowResult.ReputationEarned = 500;
+ * FlowResult.XPEarned = 250;
+ * ResultsWidget->DisplayFlowResults(FlowResult);
+ *
+ * // Method 3: Display with legacy race results
+ * FMGRaceResults LegacyResults;
+ * LegacyResults.bPlayerWon = true;
+ * LegacyResults.FinalStandings = StandingsArray;
+ * ResultsWidget->DisplayResults(LegacyResults);
+ *
+ * // Subscribe to navigation events
+ * ResultsWidget->OnContinue.AddDynamic(this, &AMyController::HandleResultsContinue);
+ * ResultsWidget->OnRestart.AddDynamic(this, &AMyController::HandleResultsRestart);
+ *
+ * // Query result data
+ * TArray<FMGResultRowData> Rows = ResultsWidget->GetResultRows();
+ * bool bWon = ResultsWidget->DidPlayerWin();
+ * bool bNewPB = ResultsWidget->IsNewPersonalBest();
+ * int32 Streak = ResultsWidget->GetCurrentWinStreak();
+ *
+ * // Check pink slip results
+ * if (ResultsWidget->WonPinkSlipVehicle())
+ * {
+ *     FText VehicleName = ResultsWidget->GetPinkSlipVehicleText();
+ *     // Show "You won: [VehicleName]!"
+ * }
+ * @endcode
+ *
+ * =============================================================================
+ * @section BlueprintIntegration Blueprint Integration
+ *
+ * For Blueprint designers creating the visual layout:
+ *
+ * 1. Create a Blueprint widget inheriting from MGRaceResultsWidget
+ * 2. Add the following widgets with matching names (BindWidgetOptional):
+ *    - RootCanvas: Main canvas panel
+ *    - HeaderText: "RACE RESULTS" or "YOU WIN!"
+ *    - SubHeaderText: Track name or additional info
+ *    - ResultsListBox: Vertical box for result rows
+ *    - CreditsText, ReputationText, BestLapText: Reward displays
+ *    - PersonalBestText, WinStreakText, CareerStatsText: History stats
+ *    - PromptText: "Press A to Continue" etc.
+ *
+ * 3. Implement BlueprintImplementableEvents:
+ *    - OnResultsReady: Called when data is loaded
+ *    - PlayVictoryAnimation: Celebration effects for wins
+ *    - PlayDefeatAnimation: Consolation effects for losses
+ *    - PlayRowRevealAnimation(int32 RowIndex): Per-row reveal
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

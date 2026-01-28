@@ -1,5 +1,198 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGOnlineProfile.h
+ * @brief Online Profile Subsystem - Server-authoritative player profile management
+ *
+ * This subsystem manages the player's profile data with server-authoritative synchronization.
+ * All progression, economy, and garage data is stored on the server to prevent cheating
+ * and enable cross-device play. The local cache provides UI responsiveness while pending
+ * operations are validated server-side.
+ *
+ * ============================================================================
+ * KEY CONCEPTS FOR BEGINNERS
+ * ============================================================================
+ *
+ * SERVER-AUTHORITATIVE:
+ * The server is the "source of truth" for all player data. This means:
+ * - You can't cheat by editing local save files
+ * - Your progress syncs across devices (PC, console, mobile)
+ * - Race results are validated before rewards are granted
+ * - The server can rollback suspicious transactions
+ *
+ * LOCAL CACHE:
+ * To make the game feel responsive, we keep a local copy of your profile.
+ * When you win a race:
+ * 1. UI immediately shows "optimistic" rewards (from local cache)
+ * 2. Background request sends result to server for validation
+ * 3. Server confirms/adjusts rewards and updates authoritative data
+ * 4. Local cache syncs with server response
+ *
+ * SYNC STATUS:
+ * @see EMGSyncStatus for understanding connection state:
+ * - NotSynced: Fresh start, need to fetch from server
+ * - Syncing: Currently downloading/uploading data
+ * - Synced: Local cache matches server
+ * - PendingUpload: Local changes waiting to send
+ * - SyncFailed: Communication error, will retry
+ * - Offline: Operating in degraded mode (limited features)
+ *
+ * ============================================================================
+ * DATA FLOW ARCHITECTURE
+ * ============================================================================
+ *
+ * @verbatim
+ *   [Player Action]              [Server Response]
+ *         |                             |
+ *         v                             v
+ *   +-----------+                +-----------+
+ *   | Local UI  |<-------------->| API Server|
+ *   | (Cache)   |   HTTP/REST    | (Truth)   |
+ *   +-----------+                +-----------+
+ *         |                             |
+ *         v                             v
+ *   Optimistic                   Validated
+ *   Update                       Update
+ *
+ *   Race Complete Flow:
+ *   1. Race ends -> SubmitRaceResult(result)
+ *   2. UI shows estimated rewards immediately
+ *   3. Server validates: anti-cheat, timing, difficulty
+ *   4. Server calculates final rewards
+ *   5. OnProfileSyncComplete -> UI shows final rewards
+ * @endverbatim
+ *
+ * ============================================================================
+ * PROFILE DATA CATEGORIES
+ * ============================================================================
+ *
+ * @see EMGProfileDataFlags for partial sync categories:
+ * - PlayerInfo: Name, ID, titles
+ * - Progression: Level, XP, crew reputation
+ * - Economy: Credits, transaction history
+ * - Garage: Owned vehicles, customizations
+ * - Statistics: Race history, records
+ * - Settings: Cross-device preferences
+ *
+ * @see FMGPlayerProfileData for complete profile structure.
+ *
+ * ============================================================================
+ * AUTHENTICATION FLOW
+ * ============================================================================
+ *
+ * Before using the profile system, the player must authenticate:
+ *
+ * @code
+ * // After successful login (via platform services or custom auth)
+ * UMGOnlineProfileSubsystem* Profile = GetGameInstance()->GetSubsystem<UMGOnlineProfileSubsystem>();
+ *
+ * // Set authenticated session
+ * Profile->SetAuthenticatedPlayer(PlayerId, AuthToken);
+ *
+ * // Request full profile sync
+ * Profile->OnProfileSyncComplete.AddDynamic(this, &UMyMenu::OnProfileLoaded);
+ * Profile->RequestFullSync();
+ * @endcode
+ *
+ * ============================================================================
+ * USAGE EXAMPLES
+ * ============================================================================
+ *
+ * SUBMITTING RACE RESULTS:
+ * @code
+ * // After race completion
+ * FMGRaceResult Result;
+ * Result.RaceId = RaceFlowSubsystem->GetCurrentRaceId();
+ * Result.TrackId = CurrentTrackId;
+ * Result.FinishPosition = PlayerPosition;
+ * Result.TotalRacers = TotalRacers;
+ * Result.FinishTime = RaceTime;
+ * Result.VehicleId = PlayerVehicleGuid;
+ * Result.BasePrize = TrackBasePrize;
+ * Result.DifficultyMultiplier = AIDifficulty;
+ *
+ * ProfileSubsystem->SubmitRaceResult(Result);
+ * // Server will validate and apply rewards
+ * @endcode
+ *
+ * PURCHASING A VEHICLE:
+ * @code
+ * // Check if can afford (local cache check for UI)
+ * if (ProfileSubsystem->GetProfileData().Credits >= VehiclePrice)
+ * {
+ *     // Queue purchase request
+ *     ProfileSubsystem->RequestVehiclePurchase(FName("Nissan_GTR"));
+ *     // Server validates credits, deducts, and adds vehicle to garage
+ * }
+ * @endcode
+ *
+ * HANDLING SYNC EVENTS:
+ * @code
+ * void UMyWidget::SetupProfileEvents()
+ * {
+ *     auto* Profile = GetGameInstance()->GetSubsystem<UMGOnlineProfileSubsystem>();
+ *
+ *     Profile->OnSyncStatusChanged.AddDynamic(this, &UMyWidget::HandleSyncStatus);
+ *     Profile->OnProfileDataUpdated.AddDynamic(this, &UMyWidget::RefreshUI);
+ *     Profile->OnAuthenticationRequired.AddDynamic(this, &UMyWidget::ShowLoginScreen);
+ * }
+ *
+ * void UMyWidget::HandleSyncStatus(EMGSyncStatus NewStatus)
+ * {
+ *     switch (NewStatus)
+ *     {
+ *         case EMGSyncStatus::Syncing:
+ *             ShowLoadingIndicator();
+ *             break;
+ *         case EMGSyncStatus::Synced:
+ *             HideLoadingIndicator();
+ *             break;
+ *         case EMGSyncStatus::SyncFailed:
+ *             ShowRetryButton();
+ *             break;
+ *         case EMGSyncStatus::Offline:
+ *             ShowOfflineWarning();
+ *             break;
+ *     }
+ * }
+ * @endcode
+ *
+ * ============================================================================
+ * ANTI-CHEAT CONSIDERATIONS
+ * ============================================================================
+ *
+ * The server validates all incoming data:
+ * - Race times are checked against track records and physics limits
+ * - Credit transactions are verified against purchase history
+ * - Vehicle modifications are validated against owned parts
+ * - Progression jumps are flagged for review
+ *
+ * FMGRaceResult includes a ValidationHash field that the server uses
+ * to verify the race wasn't tampered with. This hash is generated
+ * from race telemetry and signed with a session key.
+ *
+ * @see FMGRaceResult::ValidationHash for anti-cheat hash
+ *
+ * ============================================================================
+ * OFFLINE MODE
+ * ============================================================================
+ *
+ * When offline, the system operates in degraded mode:
+ * - Can view cached profile data
+ * - Cannot participate in ranked races
+ * - Single-player results are queued for sync
+ * - Purchases are disabled (server validation required)
+ *
+ * Upon reconnection:
+ * - Queued results are submitted
+ * - Any conflicts are resolved (server wins)
+ * - Cache is refreshed with latest server state
+ *
+ * @see UMGSessionManager for multiplayer session handling
+ * @see UMGEconomySubsystem for transaction processing
+ * @see UMGGarageSubsystem for vehicle management
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

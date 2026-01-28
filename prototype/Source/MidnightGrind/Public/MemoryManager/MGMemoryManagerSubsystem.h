@@ -1,8 +1,144 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MGMemoryManagerSubsystem.h
-// Memory Management System - Budgets, streaming, loading optimization
-// Midnight Grind - Y2K Arcade Street Racing
+/**
+ * @file MGMemoryManagerSubsystem.h
+ * @brief Memory Management, Asset Streaming, and Loading Optimization System
+ *
+ * @section overview_mm Overview
+ * The Memory Manager Subsystem is responsible for managing memory budgets, streaming
+ * assets in and out of memory, and optimizing loading times. It ensures the game runs
+ * smoothly without running out of memory, especially important for open-world racing
+ * where players drive through large environments.
+ *
+ * @section concepts_mm Key Concepts for Beginners
+ *
+ * ### Why Memory Management Matters
+ * Games have limited memory (RAM). A racing game with a large open world has far more
+ * content (textures, meshes, audio) than can fit in memory at once. We need to:
+ * 1. Load what the player needs NOW
+ * 2. Unload what they don't need anymore
+ * 3. Stay within memory budgets to prevent crashes
+ *
+ * ### Memory Pools (EMemoryPool)
+ * Memory is divided into "pools" for different asset types:
+ * - **Textures**: Car paint, road surfaces, buildings (often the largest consumer)
+ * - **Meshes**: 3D models of cars, buildings, props
+ * - **Audio**: Engine sounds, music, ambient audio
+ * - **Physics**: Collision data, physics simulation
+ * - **Animation**: Vehicle animations, character animations
+ * - **Particles**: Smoke, sparks, tire marks, weather effects
+ * - **UI**: Menu textures, HUD elements
+ * - **Scripts**: Blueprint and code data
+ * - **Streaming**: Temporary buffer for loading operations
+ *
+ * ### Memory Budgets (FMemoryBudget)
+ * Each pool has a "budget" - the maximum memory it should use. Budgets help:
+ * - Prevent any one system from hogging all memory
+ * - Catch memory leaks early (usage keeps growing)
+ * - Balance quality settings across different hardware
+ *
+ * ### Asset Streaming
+ * "Streaming" means loading assets in the background while the game runs.
+ * Key concepts:
+ * - **Priority (EAssetPriority)**: Critical assets load first, Background last
+ * - **State (EStreamingState)**: NotLoaded -> Queued -> Loading -> Loaded
+ * - **Predictive Loading**: Load assets BEFORE the player needs them
+ *
+ * ### Memory Pressure (EMemoryPressureLevel)
+ * When memory gets tight, the system enters "pressure" states:
+ * - **None**: Plenty of free memory
+ * - **Low**: Starting to get full, be careful
+ * - **Medium**: Actively unloading low-priority assets
+ * - **High**: Aggressively unloading, reducing quality
+ * - **Critical**: Emergency mode, may cause hitches
+ *
+ * ### Unload Strategies (EUnloadStrategy)
+ * When we need to free memory, how do we choose what to unload?
+ * - **LeastRecentlyUsed (LRU)**: Remove what hasn't been used in a while
+ * - **LeastFrequentlyUsed (LFU)**: Remove what's rarely used overall
+ * - **DistanceBased**: Remove what's far from the player
+ * - **PriorityBased**: Remove low-priority items first
+ * - **Hybrid**: Combination of all factors (recommended)
+ *
+ * ### Streaming Levels
+ * Large levels are split into "streaming levels" that load/unload based on
+ * player position. This is how open worlds work - you're never loading the
+ * ENTIRE world, just the parts near you.
+ *
+ * @section usage_mm Usage Examples
+ *
+ * @code
+ * // Get the subsystem
+ * UMGMemoryManagerSubsystem* MemMgr = GetGameInstance()->GetSubsystem<UMGMemoryManagerSubsystem>();
+ *
+ * // Check memory status
+ * float UsagePercent = MemMgr->GetOverallUsagePercent();
+ * bool bOverBudget = MemMgr->IsAnyPoolOverBudget();
+ *
+ * // Request an asset load
+ * FGuid RequestId = MemMgr->RequestAssetLoad(
+ *     "/Game/Vehicles/Nissan_Skyline/Body.uasset",
+ *     EAssetPriority::High,
+ *     "VehicleSpawner"
+ * );
+ *
+ * // Update player position for predictive loading
+ * // (typically called by the player vehicle each frame)
+ * MemMgr->UpdatePlayerPosition(PlayerLocation, PlayerVelocity);
+ *
+ * // Take a memory snapshot for debugging
+ * FMemorySnapshot Snapshot = MemMgr->TakeMemorySnapshot();
+ * UE_LOG(LogTemp, Log, TEXT("Total Used: %lld bytes"), Snapshot.TotalUsed);
+ *
+ * // Force cleanup when entering a new race
+ * MemMgr->ForceMemoryCleanup();
+ *
+ * // Set budgets for different quality levels
+ * if (bLowMemoryDevice)
+ * {
+ *     MemMgr->SetPoolBudget(EMemoryPool::Textures, 512 * 1024 * 1024); // 512 MB
+ * }
+ * else
+ * {
+ *     MemMgr->SetPoolBudget(EMemoryPool::Textures, 2048 * 1024 * 1024); // 2 GB
+ * }
+ * @endcode
+ *
+ * @section events_mm Events to Listen For
+ * - **OnAssetLoaded**: Asset finished loading, ready to use
+ * - **OnAssetUnloaded**: Asset removed from memory
+ * - **OnAssetLoadFailed**: Loading failed (file not found, corrupt, etc.)
+ * - **OnMemoryPressureChanged**: Memory pressure level changed
+ * - **OnBudgetViolation**: A pool exceeded its budget
+ * - **OnStreamingLevelLoaded**: A streaming level finished loading
+ * - **OnGarbageCollectionComplete**: GC finished, freed memory
+ *
+ * @section tuning_mm Performance Tuning
+ *
+ * **For faster level streaming:**
+ * - Increase MaxStreamingBandwidthMBps (if disk can handle it)
+ * - Increase MaxConcurrentLoads (uses more memory during loading)
+ *
+ * **For lower memory usage:**
+ * - Enable bAggressiveUnloading
+ * - Lower AssetRetentionTimeSeconds
+ * - Reduce pool budgets
+ *
+ * **For smoother gameplay:**
+ * - Enable bPredictiveLoading
+ * - Increase PredictiveLoadDistance
+ * - Use larger UnloadDelaySeconds (assets stay loaded longer)
+ *
+ * @section debugging_mm Debugging Tips
+ * - Call GenerateMemoryReport() for detailed breakdown
+ * - Watch for OnBudgetViolation events
+ * - Monitor MemoryPressureLevel during gameplay
+ * - Take snapshots at different game states to compare
+ *
+ * @see FMemoryBudget For per-pool budget configuration
+ * @see FStreamingAsset For individual asset tracking
+ * @see FStreamingSettings For global streaming configuration
+ */
 
 #pragma once
 

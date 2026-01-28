@@ -1,5 +1,194 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGTradeSubsystem.h
+ * @brief Secure Player-to-Player Trading System for Items, Vehicles, and Currency
+ * @author Midnight Grind Team
+ * @date 2024
+ *
+ * @section overview_sec Overview
+ * This subsystem handles real-time item trading between two players in Midnight Grind.
+ * Trading allows players to exchange vehicles, parts, cosmetics, and currency in a
+ * secure, verified manner with built-in scam protection.
+ *
+ * @section quickstart_sec Quick Start Example
+ * @code
+ * // Get the subsystem
+ * UMGTradeSubsystem* Trade = GetGameInstance()->GetSubsystem<UMGTradeSubsystem>();
+ *
+ * // Send a trade request to another player
+ * FGuid RequestId = Trade->SendTradeRequest(OtherPlayerID, FText::FromString("Want to trade cars?"));
+ *
+ * // Add items to your offer once trade is accepted
+ * FMGTradeItem MyItem;
+ * MyItem.ItemInstanceID = MyVehicleGuid;
+ * MyItem.ItemType = EMGTradeItemType::Vehicle;
+ * MyItem.DisplayName = FText::FromString("1999 Skyline GT-R");
+ * Trade->AddItemToOffer(MyItem);
+ *
+ * // Add currency to the offer
+ * Trade->SetOfferedCurrency(50000);
+ *
+ * // Lock your offer when ready (prevents further changes)
+ * Trade->LockOffer();
+ *
+ * // Confirm the trade once both parties have locked
+ * if (Trade->AreBothLocked())
+ * {
+ *     Trade->ConfirmTrade();
+ * }
+ *
+ * // Listen for completion
+ * Trade->OnTradeCompleted.AddDynamic(this, &UMyClass::OnTradeFinished);
+ * @endcode
+ *
+ * @section concepts_sec Key Concepts for Beginners
+ *
+ * @subsection flow_subsec Trade Flow
+ * The complete trading process follows these steps:
+ * @verbatim
+ * Step 1: Player A sends trade request to Player B
+ * Step 2: Player B accepts, opening the trade window
+ * Step 3: Both players add items/currency to their offers
+ * Step 4: Both players "Lock" their offers (can no longer modify)
+ * Step 5: Both players "Confirm" the trade
+ * Step 6: Items are exchanged atomically (all or nothing)
+ * @endverbatim
+ *
+ * @subsection state_subsec Trade State Machine (EMGTradeState)
+ * | State       | Description                                    |
+ * |-------------|------------------------------------------------|
+ * | Proposed    | Request sent, waiting for acceptance           |
+ * | Negotiating | Trade window open, players modifying offers    |
+ * | Locked      | Both offers locked, awaiting confirmation      |
+ * | Confirmed   | Both confirmed, executing transfer             |
+ * | Completed   | Trade successful                               |
+ * | Cancelled   | Trade was cancelled by a player                |
+ * | Declined    | Trade request was declined                     |
+ * | Expired     | Trade timed out                                |
+ *
+ * @subsection lockconfirm_subsec Lock-Confirm Pattern (Scam Protection)
+ * This safety mechanism prevents last-second scams:
+ * 1. Players must LOCK their offer before they can confirm
+ * 2. Once locked, items cannot be added or removed
+ * 3. A cooldown period (LockCooldownSeconds) prevents rapid lock/unlock
+ * 4. This gives both players time to review the final offer
+ *
+ * @subsection fairness_subsec Value Fairness Warning
+ * The system calculates total value of each offer:
+ * - If one offer is worth significantly less than ValueWarningThreshold
+ * - OnTradeValueWarning fires to alert the potentially disadvantaged player
+ * - Helps prevent accidental unfair trades
+ *
+ * @subsection rarity_subsec Item Rarity (EMGTradeItemRarity)
+ * @verbatim
+ * Common < Uncommon < Rare < Epic < Legendary < Mythic < Unique
+ * @endverbatim
+ * Rarity affects item value calculations and may impose trade restrictions.
+ *
+ * @section security_sec Security Features
+ * - **Atomic Transfers**: All items move or none do (no partial trades)
+ * - **Item Locking**: Items in active trades cannot be sold or used elsewhere
+ * - **Server Validation**: All operations validated server-side in online mode
+ * - **Trade History**: Complete history saved for dispute resolution
+ *
+ * @section events_subsec Delegates/Events
+ * | Event                   | Description                              |
+ * |-------------------------|------------------------------------------|
+ * | OnTradeRequestReceived  | Someone wants to trade with you          |
+ * | OnTradeStarted          | Trade window opened                      |
+ * | OnTradeStateChanged     | State machine transition                 |
+ * | OnTradeOfferUpdated     | Partner added/removed items              |
+ * | OnTradeLocked           | Lock status changed                      |
+ * | OnTradeCompleted        | Trade finished successfully              |
+ * | OnTradeCancelled        | Trade was cancelled                      |
+ * | OnTradeValueWarning     | Unfair trade value detected              |
+ *
+ * @section related_sec Related Files
+ * - MGTradeSubsystem.cpp: Implementation
+ * - MGInventorySubsystem.h: Item management and ownership
+ * - MGGarageSubsystem.h: Vehicle management for vehicle trades
+ *
+ * @see EMGTradeState, EMGTradeItemType, EMGTradeItemRarity
+ * @see FMGTrade, FMGTradeOffer, FMGTradeItem, FMGTradeConfig
+ */
+
+/**
+ * ============================================================================
+ * MGTradeSubsystem.h - Player-to-Player Trading System
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file defines the Trade Subsystem, which handles real-time item trading
+ * between two players in Midnight Grind. Trading allows players to exchange
+ * vehicles, parts, cosmetics, and currency in a secure, verified manner.
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. TRADE FLOW (How Trading Works):
+ *    Step 1: Player A sends trade request to Player B
+ *    Step 2: Player B accepts, opening the trade window
+ *    Step 3: Both players add items/currency to their offers
+ *    Step 4: Both players "Lock" their offers (can no longer modify)
+ *    Step 5: Both players "Confirm" the trade
+ *    Step 6: Items are exchanged atomically (all or nothing)
+ *
+ * 2. TRADE STATE MACHINE (EMGTradeState):
+ *    - Proposed: Request sent, waiting for acceptance
+ *    - Negotiating: Trade window open, players modifying offers
+ *    - Locked: Both offers locked, awaiting confirmation
+ *    - Confirmed: Both confirmed, executing transfer
+ *    - Completed: Trade successful
+ *    - Cancelled/Declined/Expired: Trade failed
+ *
+ * 3. LOCK-CONFIRM PATTERN:
+ *    This is a safety mechanism to prevent last-second scams:
+ *    - Players must LOCK their offer before confirming
+ *    - Once locked, you cannot add/remove items
+ *    - There's a cooldown (LockCooldownSeconds) before you can lock again
+ *    - This gives players time to review the final offer
+ *
+ * 4. VALUE FAIRNESS WARNING:
+ *    - The system calculates total value of each offer
+ *    - If one offer is worth significantly less (< ValueWarningThreshold)
+ *    - OnTradeValueWarning fires to alert the player
+ *    - Helps prevent accidental unfair trades
+ *
+ * 5. ITEM RARITY SYSTEM (EMGTradeItemRarity):
+ *    Common < Uncommon < Rare < Epic < Legendary < Mythic < Unique
+ *    - Rarity affects item value calculations
+ *    - Some items may have trade restrictions based on rarity
+ *
+ * 6. DELEGATES (Events):
+ *    - OnTradeRequestReceived: Someone wants to trade with you
+ *    - OnTradeStarted: Trade window opened
+ *    - OnTradeStateChanged: State machine transition
+ *    - OnTradeOfferUpdated: Partner added/removed items
+ *    - OnTradeLocked: Lock status changed
+ *    - OnTradeCompleted: Trade finished successfully
+ *    - OnTradeCancelled: Trade was cancelled
+ *    - OnTradeValueWarning: Unfair trade detected
+ *
+ * 7. FGUID (Globally Unique Identifier):
+ *    - Used to uniquely identify trades, items, requests
+ *    - 128-bit unique ID that won't collide
+ *    - FGuid::NewGuid() creates a new one
+ *
+ * SECURITY CONSIDERATIONS:
+ * - All transfers are atomic (all items move or none do)
+ * - Items are "locked" during active trades (can't be sold/used)
+ * - Server validates all trade operations in online mode
+ * - Trade history is saved for dispute resolution
+ *
+ * RELATED FILES:
+ * - MGTradeSubsystem.cpp (implementation)
+ * - MGInventorySubsystem.h (item management)
+ * - MGGarageSubsystem.h (vehicle management for vehicle trades)
+ *
+ * ============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

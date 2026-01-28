@@ -1,5 +1,98 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGCheckpoint.h
+ * @brief Checkpoint system for lap validation, timing, and race progression.
+ *
+ * This file defines checkpoint actors used to track race progress. Checkpoints
+ * are invisible trigger volumes placed around the track that vehicles must pass
+ * through in sequence to complete a valid lap. They enable lap counting, split
+ * timing, position tracking, and anti-cheat validation.
+ *
+ * @section checkpoint_concepts Key Concepts
+ *
+ * CHECKPOINT: An invisible trigger zone that detects when vehicles pass through.
+ * Think of checkpoints like timing gates in a ski race - racers must pass through
+ * each one in order for their run to count.
+ *
+ * TRIGGER VOLUME: A UBoxComponent configured to generate "overlap" events when
+ * actors enter or exit its bounds. The overlap system allows detection without
+ * blocking vehicle movement.
+ *
+ * START/FINISH LINE: A special checkpoint that marks the beginning and end of
+ * each lap. When a vehicle crosses the start/finish line after passing all
+ * required checkpoints, a lap is complete.
+ *
+ * SECTOR: Racing tracks are typically divided into sectors (usually 3) for
+ * detailed performance analysis. Sector checkpoints record split times,
+ * allowing players to compare their performance in each track section.
+ *
+ * @section checkpoint_types Checkpoint Types
+ *
+ * The system supports several checkpoint types:
+ * - Normal: Standard checkpoint that must be passed for lap validation
+ * - StartFinish: The main timing line that counts laps
+ * - Split: Timing marker that does not affect lap validation
+ * - Sector: Boundary between track sectors for detailed timing
+ *
+ * @section checkpoint_architecture Architecture
+ *
+ * The checkpoint system works with UMGTrackSubsystem:
+ * 1. Checkpoints are placed around the track in the level editor
+ * 2. Each checkpoint has an index (0 = start/finish, 1 = first checkpoint, etc.)
+ * 3. At runtime, checkpoints register with UMGTrackSubsystem
+ * 4. When a vehicle overlaps a checkpoint, it notifies the subsystem
+ * 5. The subsystem validates the checkpoint (correct order) and updates timing
+ * 6. Invalid checkpoint passes (wrong order, skipped) are rejected
+ *
+ * @section checkpoint_usage Usage Examples
+ *
+ * @code
+ * // Setting up checkpoints (done in level editor, but shown for reference)
+ * AMGCheckpoint* StartFinish = SpawnActor<AMGCheckpoint>();
+ * StartFinish->CheckpointType = EMGCheckpointType::StartFinish;
+ * StartFinish->CheckpointIndex = 0;
+ *
+ * AMGCheckpoint* Checkpoint1 = SpawnActor<AMGCheckpoint>();
+ * Checkpoint1->CheckpointType = EMGCheckpointType::Normal;
+ * Checkpoint1->CheckpointIndex = 1;
+ *
+ * // Linking checkpoints for respawn direction
+ * StartFinish->NextCheckpoint = Checkpoint1;
+ *
+ * // Getting respawn location from last checkpoint
+ * AMGCheckpoint* LastCheckpoint = GetLastPassedCheckpoint(RacerID);
+ * FTransform RespawnTransform = LastCheckpoint->GetRespawnTransform();
+ *
+ * // Responding to checkpoint events
+ * Checkpoint->OnCheckpointTriggered.AddDynamic(this, &AMyClass::HandleCheckpoint);
+ *
+ * void AMyClass::HandleCheckpoint(AMGVehiclePawn* Vehicle, int32 Index)
+ * {
+ *     // Update UI, play sound, record split time, etc.
+ *     UpdateRaceHUD(Vehicle, Index);
+ * }
+ * @endcode
+ *
+ * @section checkpoint_start_grid Start/Finish Line Grid
+ *
+ * AMGStartFinishLine extends AMGCheckpoint to provide starting grid functionality:
+ * - Defines spawn positions for all racers in grid formation
+ * - Supports staggered (offset) or inline grid layouts
+ * - Configurable spacing between grid positions
+ *
+ * @section checkpoint_related Related Systems
+ * - UMGTrackSubsystem: Manages checkpoint validation and race timing
+ * - Race HUD: Displays checkpoint split times and lap counts
+ * - Respawn System: Uses last passed checkpoint for respawn position
+ * - Ghost Recording: Records checkpoint passage times for playback
+ *
+ * @see AMGCheckpoint
+ * @see AMGStartFinishLine
+ * @see EMGCheckpointType
+ * @see FOnCheckpointTriggered
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

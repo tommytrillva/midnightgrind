@@ -1,6 +1,186 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * =============================================================================
+ * MGPlayerTitleSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the Player Title Subsystem for Midnight Grind, managing all
+ * cosmetic elements that define a player's public identity. Think of this as the
+ * "calling card" system - everything other players see when they look at your
+ * profile or race against you.
+ *
+ * WHAT ARE PLAYER TITLES AND BANNERS?
+ * ------------------------------------
+ * In many competitive games (like Call of Duty, Rocket League, or Apex Legends),
+ * players can display:
+ * - TITLES: Text labels like "Road Legend" or "Drift King" shown with your name
+ * - BANNERS: Graphical backgrounds shown on your profile or loading screens
+ * - NAMEPLATES: How your name appears above your car during races
+ *
+ * These are cosmetic rewards that show off achievements and let players
+ * express their personality without affecting gameplay.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. RARITY SYSTEM (EMGTitleRarity):
+ *    Items have rarity tiers that indicate how difficult they are to obtain:
+ *    - Common: Easy to get (play a few races)
+ *    - Uncommon: Some effort required (win 10 races)
+ *    - Rare: Significant challenge (reach a certain rank)
+ *    - Epic: Difficult achievement (win a tournament)
+ *    - Legendary: Very prestigious (top 1% of players)
+ *    - Mythic: Near-impossible feats (perfect season)
+ *    - Unique: One-of-a-kind (special event winners)
+ *
+ *    Rarity affects the visual presentation - rarer items often have
+ *    glowing effects, animations, and special colors.
+ *
+ * 2. BANNER LAYERS (EMGBannerSlot):
+ *    Banners are built from multiple layers stacked together:
+ *
+ *    +--------------------------------------------------+
+ *    |  EFFECT LAYER (animated particles, glow)         | <- Top
+ *    +--------------------------------------------------+
+ *    |  ACCENT LAYER (decorative elements)              |
+ *    +--------------------------------------------------+
+ *    |  FRAME LAYER (border around everything)          |
+ *    +--------------------------------------------------+
+ *    |  EMBLEM LAYER (central logo/symbol)              |
+ *    +--------------------------------------------------+
+ *    |  BACKGROUND LAYER (base pattern/color)           | <- Bottom
+ *    +--------------------------------------------------+
+ *
+ *    Players mix and match elements from each layer to create unique banners.
+ *
+ * 3. UNLOCK REQUIREMENTS:
+ *    Items are locked until players meet certain criteria:
+ *    - Play X races
+ *    - Win in specific game modes
+ *    - Reach certain ranks
+ *    - Complete seasonal challenges
+ *    - Participate in special events
+ *
+ *    The UnlockRequirement field stores which achievement/condition unlocks each item.
+ *
+ * 4. SOFT REFERENCES (TSoftObjectPtr):
+ *    Instead of loading all textures/materials at startup, soft references
+ *    let us load assets only when needed. This saves memory since players
+ *    might own hundreds of items but only view a few at a time.
+ *
+ * ARCHITECTURE OVERVIEW:
+ * ----------------------
+ *
+ *    +-------------------+
+ *    |   UI System       |  <- Displays customization menu
+ *    +--------+----------+
+ *             |
+ *             v
+ *    +-------------------+
+ *    | PlayerTitle       |  <- THIS SUBSYSTEM
+ *    | Subsystem         |     Manages titles, banners, nameplates
+ *    +--------+----------+
+ *             |
+ *             v
+ *    +-------------------+
+ *    |   Save System     |  <- Persists equipped items and unlocks
+ *    +-------------------+
+ *             |
+ *             v
+ *    +-------------------+
+ *    |   Backend Server  |  <- Validates unlocks, syncs with other players
+ *    +-------------------+
+ *
+ * DATA STRUCTURES EXPLAINED:
+ * --------------------------
+ *
+ * FMGPlayerTitle: A single title definition
+ *    - What text to display
+ *    - Visual effects (color, glow, animation)
+ *    - Unlock conditions
+ *    - Whether the player has unlocked it
+ *
+ * FMGBannerElement: One piece of a banner (background, emblem, etc.)
+ *    - Which layer it belongs to
+ *    - Visual assets (texture, material)
+ *    - Color options
+ *    - Unlock conditions
+ *
+ * FMGPlayerBanner: Complete banner configuration
+ *    - Which element is selected for each layer
+ *    - Color choices for customization
+ *
+ * FMGNameplate: In-game name display style
+ *    - Background and border appearance
+ *    - Text color
+ *    - Animation effects
+ *
+ * FMGPlayerProfile: Everything combined
+ *    - Which title is equipped
+ *    - Banner configuration
+ *    - Nameplate selection
+ *    - Display preferences
+ *
+ * FMGTitlePreset: Saved profile loadout
+ *    - Lets players save favorite combinations
+ *    - Quick switching between different looks
+ *
+ * TYPICAL WORKFLOW:
+ * -----------------
+ * 1. Player opens customization menu
+ * 2. UI calls GetAllTitles() to show available titles
+ * 3. Locked titles show their UnlockHint
+ * 4. Player selects a title, calls EquipTitle()
+ * 5. OnTitleEquipped delegate fires
+ * 6. UI updates to show new selection
+ * 7. SaveTitleData() persists the change
+ * 8. When racing, other players see the equipped title/banner
+ *
+ * DELEGATE PATTERN:
+ * -----------------
+ * This subsystem uses delegates to notify other systems of changes:
+ *
+ *    OnTitleUnlocked: "Hey, the player just earned a new title!"
+ *       -> UI shows unlock notification
+ *       -> Sound system plays fanfare
+ *
+ *    OnBannerChanged: "The player changed their banner!"
+ *       -> Profile preview updates
+ *       -> Server syncs new banner to other players
+ *
+ * CODE EXAMPLE:
+ * -------------
+ *    // Get the subsystem
+ *    UMGPlayerTitleSubsystem* TitleSys =
+ *        GetGameInstance()->GetSubsystem<UMGPlayerTitleSubsystem>();
+ *
+ *    // Check if a title is unlocked
+ *    if (TitleSys->IsTitleUnlocked(TEXT("Title_DriftKing")))
+ *    {
+ *        // Equip it
+ *        TitleSys->EquipTitle(TEXT("Title_DriftKing"));
+ *    }
+ *
+ *    // Customize banner colors
+ *    TitleSys->SetBannerColors(
+ *        FLinearColor::Red,    // Primary
+ *        FLinearColor::Black,  // Secondary
+ *        FLinearColor::Gold    // Accent
+ *    );
+ *
+ *    // Save a preset
+ *    TitleSys->SavePreset(TEXT("MyFavorite"), LOCTEXT("Preset", "Racing Look"));
+ *
+ * RELATED FILES:
+ * --------------
+ * - MGPlayerTitleSubsystem.cpp: Implementation of all functions
+ * - MGEmoteSubsystem: Similar system for emotes and celebrations
+ * - MGAchievementSubsystem: Triggers title unlocks
+ * - MGSeasonSubsystem: Provides seasonal titles and limited-time items
+ *
  * @file MGPlayerTitleSubsystem.h
  * @brief Player Title, Banner, and Profile Customization Subsystem for Midnight Grind
  *
@@ -26,6 +206,8 @@
  * @see UMGEmoteSubsystem for expression features
  * @see EMGTitleRarity for rarity classifications
  * @see EMGTitleCategory for title groupings
+ *
+ * =============================================================================
  */
 
 #pragma once

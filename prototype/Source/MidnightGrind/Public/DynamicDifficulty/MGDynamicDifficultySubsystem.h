@@ -1,5 +1,322 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGDynamicDifficultySubsystem.h
+ * @brief Dynamic Difficulty Adjustment (DDA) - Adaptive AI and challenge scaling system
+ * @author Midnight Grind Team
+ * @version 1.0
+ *
+ * @section overview Overview
+ * ============================================================================
+ * MGDynamicDifficultySubsystem.h
+ * Midnight Grind - Dynamic Difficulty Adjustment (DDA) System
+ * ============================================================================
+ *
+ * This subsystem implements Dynamic Difficulty Adjustment (DDA) for Midnight Grind.
+ * DDA is a technique used in modern games to automatically adjust the game's
+ * challenge level based on the player's performance. The goal is to keep players
+ * in the "flow state" - challenged enough to stay engaged, but not so frustrated
+ * that they want to quit.
+ *
+ * This is one of the most important systems for player retention and satisfaction
+ * in a racing game!
+ *
+ * @section features What This System Does
+ *
+ * @subsection tracking 1. Tracks Player Performance
+ * - Win rate, podium finishes, DNFs (Did Not Finish)
+ * - Lap times and racing line efficiency
+ * - Drift scores, overtakes, and collision frequency
+ * - Nitro usage patterns and shortcut discovery
+ *
+ * @subsection adjusting 2. Adjusts Game Difficulty
+ * - AI opponent speed and aggression
+ * - Rubber-banding intensity (AI catching up when behind)
+ * - Traffic and obstacle density
+ * - Catch-up assist strength for the player
+ *
+ * @subsection assists 3. Manages Driving Assists
+ * - Steering, braking, and drift assists
+ * - Racing line display
+ * - Collision avoidance hints
+ * - Auto-recovery and rewind features
+ *
+ * @subsection frustration 4. Detects Player Frustration
+ * - Monitors patterns that suggest the player is struggling
+ * - Automatically responds with helpful adjustments
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection rubberbanding 1. Rubber-Banding
+ * A controversial but common racing game technique where AI opponents slow
+ * down when ahead and speed up when behind to keep races close and exciting.
+ * Too much rubber-banding feels unfair; too little makes races boring.
+ * This system lets you fine-tune the intensity.
+ *
+ * @subsection catchup 2. Catch-Up Assist
+ * The opposite of rubber-banding - helps the PLAYER catch up when behind.
+ * Can include speed boosts, better slipstream effects, or AI making mistakes.
+ * Important for new players who might fall too far behind to recover.
+ *
+ * @subsection skill 3. Skill Level Estimation
+ * The system estimates player skill from Beginner to Legend based on their
+ * performance metrics. This helps match them against appropriate AI opponents
+ * and suggest suitable difficulty settings.
+ *
+ * @subsection adaptation 4. Adaptation Speed
+ * How quickly the system responds to player performance. "Instant" might feel
+ * jarring (sudden difficulty spikes), while "Gradual" provides smoother but
+ * slower adjustments. Different players prefer different speeds.
+ *
+ * @subsection aiprofiles 5. AI Behavior Profiles
+ * AI opponents can have different "personalities":
+ * - Defensive: Blocks overtakes, races conservatively
+ * - Aggressive: Takes risks, rams other racers
+ * - Tactical: Makes strategic decisions based on race position
+ * - TrainingWheel: Intentionally makes mistakes to help new players win
+ *
+ * @subsection frustrationdetect 6. Frustration Detection
+ * The system watches for signs of frustration:
+ * - Multiple consecutive losses
+ * - Frequent collisions
+ * - Restarting races repeatedly
+ * - Long times in last place
+ * When detected, it can automatically make the game easier.
+ *
+ * @section datastructs Data Structures Overview
+ * - FPlayerPerformanceData: Complete history of player performance metrics
+ * - FDifficultyModifiers: All the knobs that control game difficulty
+ * - FAIOpponentSettings: Configuration for a single AI racer
+ * - FAssistSettings: Player assist options (steering help, etc.)
+ * - FRaceAnalysis: Detailed breakdown of a single race's performance
+ * - FDifficultyAdjustment: Record of a single difficulty change
+ * - FDifficultyProfile: Complete difficulty preset configuration
+ *
+ * @section usage Usage Examples
+ *
+ * @code
+ * // Get the subsystem
+ * UMGDynamicDifficultySubsystem* DDA = GetGameInstance()->GetSubsystem<UMGDynamicDifficultySubsystem>();
+ *
+ * // === DIFFICULTY PRESETS ===
+ * // Set a difficulty preset
+ * DDA->SetDifficultyPreset(EDifficultyPreset::Normal);
+ *
+ * // Enable adaptive difficulty (auto-adjusts based on performance)
+ * DDA->EnableAdaptiveDifficulty(true);
+ * DDA->SetAdaptationSpeed(EAdaptationSpeed::Medium);
+ *
+ * // === RECORDING RACE RESULTS ===
+ * // After a race, record the results for tracking
+ * FRaceAnalysis Analysis;
+ * Analysis.FinalPosition = 3;
+ * Analysis.BestLapTime = 75.5f;
+ * Analysis.TotalCollisions = 5;
+ * Analysis.OvertakesMade = 8;
+ * Analysis.TotalDriftScore = 150000.0f;
+ * // ... fill in other fields
+ * DDA->RecordRaceResult(Analysis);
+ *
+ * // === AI OPPONENT GENERATION ===
+ * // Generate AI opponents calibrated to player skill
+ * TArray<FAIOpponentSettings> Opponents = DDA->GenerateOpponentGrid(7);
+ *
+ * // Generate a specific opponent
+ * FAIOpponentSettings BossRival = DDA->GenerateOpponentSettings(ESkillLevel::Expert, EAIBehaviorProfile::Aggressive);
+ *
+ * // === FRUSTRATION DETECTION ===
+ * // Check if player needs help
+ * EFrustrationLevel Frustration = DDA->GetCurrentFrustrationLevel();
+ * if (Frustration >= EFrustrationLevel::Frustrated)
+ * {
+ *     // Maybe show a "Would you like to lower the difficulty?" prompt
+ *     ShowDifficultyAssistUI();
+ * }
+ *
+ * // Enable automatic frustration response
+ * DDA->SetFrustrationResponseEnabled(true);
+ *
+ * // === DRIVING ASSISTS ===
+ * // Enable/disable individual assists
+ * DDA->ToggleAssist(EAssistType::Steering, true);
+ * DDA->ToggleAssist(EAssistType::RacingLine, true);
+ * DDA->SetAssistStrength(EAssistType::Braking, 0.5f);
+ *
+ * // Get suggested assists for skill level
+ * DDA->SuggestAssistsForSkillLevel(ESkillLevel::Beginner);
+ *
+ * // === REAL-TIME ADJUSTMENTS (during race) ===
+ * // Update race progress for real-time catch-up calculations
+ * DDA->UpdateRaceProgress(PlayerPosition, GapToLeader, RaceProgressPercent);
+ *
+ * // Record collisions for frustration tracking
+ * DDA->OnPlayerCollision(ImpactSeverity);
+ *
+ * // Get dynamic catch-up boost (for player behind)
+ * float CatchUpBoost = DDA->GetDynamicCatchUpBoost();
+ *
+ * // Get AI slowdown factor (for rubber-banding)
+ * float AISlowdown = DDA->GetDynamicAISlowdown();
+ *
+ * // === PLAYER STATS ===
+ * // Get player performance data
+ * FPlayerPerformanceData Performance = DDA->GetPlayerPerformance();
+ * ESkillLevel Skill = DDA->GetEstimatedSkillLevel();
+ * float Trend = DDA->GetPerformanceTrend();  // Positive = improving
+ *
+ * // === EVENT LISTENERS ===
+ * DDA->OnDifficultyChanged.AddDynamic(this, &UMyClass::HandleDifficultyChange);
+ * DDA->OnSkillLevelChanged.AddDynamic(this, &UMyClass::HandleSkillChange);
+ * DDA->OnFrustrationDetected.AddDynamic(this, &UMyClass::HandleFrustration);
+ * @endcode
+ *
+ * @section bestpractices Best Practices
+ * 1. Always call RecordRaceResult() after every race for accurate tracking
+ * 2. Let players see and control their assists - transparency builds trust
+ * 3. Don't make rubber-banding too obvious - players hate feeling cheated
+ * 4. Gradual adjustments feel fairer than sudden difficulty spikes
+ * 5. Give players the option to disable adaptive difficulty entirely
+ *
+ * @section delegates Available Delegates
+ * - OnDifficultyChanged: Difficulty preset changed
+ * - OnDifficultyAdjusted: A specific difficulty aspect was adjusted
+ * - OnSkillLevelChanged: Player's estimated skill level changed
+ * - OnFrustrationDetected: Frustration level changed
+ * - OnAssistToggled: An assist was enabled/disabled
+ * - OnRaceAnalyzed: Race result was processed
+ * - OnAISettingsChanged: AI opponent settings were modified
+ *
+ * @see UMGBalancingSubsystem For economy and global balance settings
+ * @see UMGStatsTracker For persistent stat tracking
+ * ============================================================================
+ */
+
+// MGDynamicDifficultySubsystem.h
+// Dynamic Difficulty Adjustment System - Adaptive AI and challenge scaling
+// Midnight Grind - Y2K Arcade Street Racing
+
+/**
+ * OVERVIEW:
+ * ---------
+ * This file implements Dynamic Difficulty Adjustment (DDA) for Midnight Grind.
+ * DDA is a technique used in modern games to automatically adjust the game's
+ * challenge level based on the player's performance. The goal is to keep players
+ * in the "flow state" - challenged enough to stay engaged, but not so frustrated
+ * that they want to quit.
+ *
+ * This is one of the most important systems for player retention and satisfaction
+ * in a racing game!
+ *
+ * WHAT DOES THIS SYSTEM DO?
+ * -------------------------
+ * 1. TRACKS PLAYER PERFORMANCE
+ *    - Win rate, podium finishes, DNFs (Did Not Finish)
+ *    - Lap times and racing line efficiency
+ *    - Drift scores, overtakes, and collision frequency
+ *    - Nitro usage patterns and shortcut discovery
+ *
+ * 2. ADJUSTS GAME DIFFICULTY
+ *    - AI opponent speed and aggression
+ *    - Rubber-banding intensity (AI catching up when behind)
+ *    - Traffic and obstacle density
+ *    - Catch-up assist strength for the player
+ *
+ * 3. MANAGES DRIVING ASSISTS
+ *    - Steering, braking, and drift assists
+ *    - Racing line display
+ *    - Collision avoidance hints
+ *    - Auto-recovery and rewind features
+ *
+ * 4. DETECTS PLAYER FRUSTRATION
+ *    - Monitors patterns that suggest the player is struggling
+ *    - Automatically responds with helpful adjustments
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. RUBBER-BANDING:
+ *    A controversial but common racing game technique where AI opponents slow
+ *    down when ahead and speed up when behind to keep races close and exciting.
+ *    Too much rubber-banding feels unfair; too little makes races boring.
+ *    This system lets you fine-tune the intensity.
+ *
+ * 2. CATCH-UP ASSIST:
+ *    The opposite of rubber-banding - helps the PLAYER catch up when behind.
+ *    Can include speed boosts, better slipstream effects, or AI making mistakes.
+ *    Important for new players who might fall too far behind to recover.
+ *
+ * 3. SKILL LEVEL ESTIMATION:
+ *    The system estimates player skill from Beginner to Legend based on their
+ *    performance metrics. This helps match them against appropriate AI opponents
+ *    and suggest suitable difficulty settings.
+ *
+ * 4. ADAPTATION SPEED:
+ *    How quickly the system responds to player performance. "Instant" might feel
+ *    jarring (sudden difficulty spikes), while "Gradual" provides smoother but
+ *    slower adjustments. Different players prefer different speeds.
+ *
+ * 5. AI BEHAVIOR PROFILES:
+ *    AI opponents can have different "personalities":
+ *    - Defensive: Blocks overtakes, races conservatively
+ *    - Aggressive: Takes risks, rams other racers
+ *    - Tactical: Makes strategic decisions based on race position
+ *    - TrainingWheel: Intentionally makes mistakes to help new players win
+ *
+ * 6. FRUSTRATION DETECTION:
+ *    The system watches for signs of frustration:
+ *    - Multiple consecutive losses
+ *    - Frequent collisions
+ *    - Restarting races repeatedly
+ *    - Long times in last place
+ *    When detected, it can automatically make the game easier.
+ *
+ * DATA STRUCTURES OVERVIEW:
+ * -------------------------
+ * - FPlayerPerformanceData: Complete history of player performance metrics
+ * - FDifficultyModifiers: All the knobs that control game difficulty
+ * - FAIOpponentSettings: Configuration for a single AI racer
+ * - FAssistSettings: Player assist options (steering help, etc.)
+ * - FRaceAnalysis: Detailed breakdown of a single race's performance
+ * - FDifficultyAdjustment: Record of a single difficulty change
+ * - FDifficultyProfile: Complete difficulty preset configuration
+ *
+ * USAGE EXAMPLE:
+ * --------------
+ * @code
+ * UMGDynamicDifficultySubsystem* DDA = GetGameInstance()->GetSubsystem<UMGDynamicDifficultySubsystem>();
+ *
+ * // Enable adaptive difficulty
+ * DDA->EnableAdaptiveDifficulty(true);
+ *
+ * // After a race, record the results
+ * FRaceAnalysis Analysis;
+ * Analysis.FinalPosition = 3;
+ * Analysis.BestLapTime = 75.5f;
+ * // ... fill in other fields
+ * DDA->RecordRaceResult(Analysis);
+ *
+ * // Generate AI opponents for the next race
+ * TArray<FAIOpponentSettings> Opponents = DDA->GenerateOpponentGrid(7);
+ *
+ * // Check if player needs help
+ * if (DDA->GetCurrentFrustrationLevel() >= EFrustrationLevel::Frustrated)
+ * {
+ *     // Maybe show a "Would you like to lower the difficulty?" prompt
+ * }
+ * @endcode
+ *
+ * BEST PRACTICES:
+ * ---------------
+ * 1. Always call RecordRaceResult() after every race for accurate tracking
+ * 2. Let players see and control their assists - transparency builds trust
+ * 3. Don't make rubber-banding too obvious - players hate feeling cheated
+ * 4. Gradual adjustments feel fairer than sudden difficulty spikes
+ * 5. Give players the option to disable adaptive difficulty entirely
+ *
+ * @see UMGBalancingSubsystem for economy and global balance settings
+ * @see UMGStatsTracker for persistent stat tracking
+ */
+
 // MGDynamicDifficultySubsystem.h
 // Dynamic Difficulty Adjustment System - Adaptive AI and challenge scaling
 // Midnight Grind - Y2K Arcade Street Racing
@@ -17,103 +334,213 @@ class UWorld;
 // Enums
 // ============================================================================
 
+/**
+ * Difficulty presets that players can choose from.
+ *
+ * "Adaptive" is special - it means the system will automatically adjust
+ * based on player performance. "Custom" means the player has manually
+ * tweaked individual settings.
+ */
 UENUM(BlueprintType)
 enum class EDifficultyPreset : uint8
 {
+    /** Minimal challenge - lots of assists, very slow AI */
     VeryEasy,
+    /** Reduced challenge - helpful assists, slower AI */
     Easy,
+    /** Balanced experience - the intended default */
     Normal,
+    /** Increased challenge - fewer assists, faster AI */
     Hard,
+    /** Significant challenge - minimal assists, aggressive AI */
     VeryHard,
+    /** Maximum challenge - no assists, fastest AI */
     Extreme,
+    /** Automatically adjusts based on player performance */
     Adaptive,
+    /** Player has manually configured individual settings */
     Custom
 };
 
+/**
+ * Metrics used to measure player performance.
+ *
+ * The DDA system tracks these metrics to understand how well the player
+ * is doing and whether difficulty should be adjusted.
+ */
 UENUM(BlueprintType)
 enum class EPerformanceMetric : uint8
 {
+    /** Where the player finishes in races (1st, 2nd, etc.) */
     RacePosition,
+    /** How fast the player completes laps */
     LapTime,
+    /** Points earned from drifting */
     DriftScore,
+    /** How often the player crashes */
     CollisionCount,
+    /** How effectively player uses nitro boosts */
     NitroUsage,
+    /** Whether player discovers and uses shortcuts */
     ShortcutUsage,
+    /** How many opponents the player passes */
     OvertakeCount,
+    /** Percentage of races won */
     WinRate,
+    /** Percentage of races completed (not DNF) */
     FinishRate,
+    /** Typical speed maintained during races */
     AverageSpeed
 };
 
+/**
+ * Personality profiles that define how AI opponents race.
+ *
+ * Each profile creates a distinct racing style. Mixing different
+ * profiles in a race creates variety and more interesting competition.
+ */
 UENUM(BlueprintType)
 enum class EAIBehaviorProfile : uint8
 {
+    /** Blocks overtakes, takes safe lines, avoids contact */
     Defensive,
+    /** Standard racing behavior, mix of offense and defense */
     Balanced,
+    /** Rams opponents, takes risky lines, fights for position */
     Aggressive,
+    /** Makes smart decisions based on race situation and position */
     Tactical,
+    /** Random behavior - hard to predict, keeps races interesting */
     Unpredictable,
+    /** Speeds up when behind, slows when ahead (controversial but common) */
     Rubberband,
+    /** Intentionally makes mistakes to help new players win */
     TrainingWheel
 };
 
+/**
+ * Individual aspects of difficulty that can be adjusted independently.
+ *
+ * The DDA system can tune each of these separately for fine-grained
+ * control over the game's challenge level.
+ */
 UENUM(BlueprintType)
 enum class EDifficultyAspect : uint8
 {
+    /** How fast AI opponents drive */
     AISpeed,
+    /** How aggressively AI races (ramming, blocking) */
     AIAggression,
+    /** How often AI makes mistakes (missed corners, poor lines) */
     AIErrorRate,
+    /** How many civilian cars are on the road */
     TrafficDensity,
+    /** How many hazards/obstacles appear on track */
     ObstacleDensity,
+    /** How much help the player gets when behind */
     CatchUpAssist,
+    /** Boost received when drafting behind opponents */
     SlipstreamBoost,
+    /** How fast nitro refills */
     NitroRecharge,
+    /** Severity of speed loss from collisions */
     CollisionPenalty,
+    /** Strictness of time limits in timed events */
     TimePressure
 };
 
+/**
+ * Estimated player skill levels used for matchmaking and AI calibration.
+ *
+ * The system estimates skill from performance metrics and uses it to
+ * generate appropriately challenging AI opponents.
+ */
 UENUM(BlueprintType)
 enum class ESkillLevel : uint8
 {
+    /** New to racing games - needs significant help */
     Beginner,
+    /** Learning the basics - still developing core skills */
     Novice,
+    /** Competent racer - understands game mechanics */
     Intermediate,
+    /** Skilled player - consistent performance */
     Advanced,
+    /** Highly skilled - can compete at high level */
     Expert,
+    /** Top tier player - near perfect execution */
     Master,
+    /** Elite player - among the best */
     Legend
 };
 
+/**
+ * How quickly the adaptive difficulty system responds to player performance.
+ *
+ * Faster adaptation responds quickly but can feel jarring (sudden difficulty
+ * spikes). Slower adaptation feels smoother but might not help struggling
+ * players quickly enough.
+ */
 UENUM(BlueprintType)
 enum class EAdaptationSpeed : uint8
 {
+    /** Immediate changes - can feel jarring but responsive */
     Instant,
+    /** Quick response - noticeable but not abrupt */
     Fast,
+    /** Balanced response - recommended for most players */
     Medium,
+    /** Gradual changes - very smooth but slow to respond */
     Slow,
+    /** Very gradual - barely noticeable, long-term trends only */
     Gradual
 };
 
+/**
+ * Types of driving assists available to help players.
+ *
+ * Assists help new players enjoy the game while they learn. Advanced
+ * players typically disable them for a purer experience.
+ */
 UENUM(BlueprintType)
 enum class EAssistType : uint8
 {
+    /** Helps keep the car going straight and through corners */
     Steering,
+    /** Automatically applies brakes before corners */
     Braking,
+    /** Helps maintain and control drifts */
     Drifting,
+    /** Suggests optimal moments to use nitro */
     NitroTiming,
+    /** Shows the optimal path through corners */
     RacingLine,
+    /** Warns about imminent collisions */
     CollisionAvoidance,
+    /** Reveals hidden shortcuts on the track */
     ShortcutHints,
+    /** Shows where opponents are (minimap/arrows) */
     OpponentTracking
 };
 
+/**
+ * Detected frustration level of the player.
+ *
+ * The system monitors for signs of frustration and can automatically
+ * intervene to help (if frustration response is enabled).
+ */
 UENUM(BlueprintType)
 enum class EFrustrationLevel : uint8
 {
+    /** Player is cruising - might need more challenge */
     Relaxed,
+    /** Player is comfortable - ideal state */
     Comfortable,
+    /** Player is challenged but engaged - good difficulty */
     Challenged,
+    /** Player showing signs of frustration - consider easing up */
     Frustrated,
+    /** Player very frustrated - needs immediate help or might quit */
     Overwhelmed
 };
 

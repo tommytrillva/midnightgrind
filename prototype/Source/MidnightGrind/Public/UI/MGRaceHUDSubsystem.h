@@ -1,9 +1,168 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGRaceHUDSubsystem.h
+ * @brief Central management subsystem for all racing UI elements
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the Race HUD Subsystem, which serves as the central hub
+ * for managing all racing-related UI elements. It provides a unified interface
+ * for updating vehicle telemetry, race status, notifications, damage feedback,
+ * and minimap data that HUD widgets can subscribe to and display.
+ *
+ * The subsystem is a WorldSubsystem, meaning it exists per-world and
+ * automatically initializes when a game world is created. This makes it
+ * ideal for race-specific UI that should reset between race sessions.
+ *
+ * Key responsibilities:
+ * - Vehicle telemetry data (speed, RPM, gear, NOS)
+ * - Race status tracking (position, laps, times, gaps)
+ * - Drift scoring display
+ * - In-race notification queue management
+ * - Damage feedback and impact effects
+ * - Minimap position updates
+ * - HUD display mode control
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **HUD Modes**: The HUD can operate in different modes:
+ *   - Full: All elements visible (normal racing)
+ *   - Minimal: Just speed and position (clean view)
+ *   - Hidden: No HUD (cinematic)
+ *   - PhotoMode: Special UI for photo mode
+ *   - Replay: Replay-specific controls visible
+ *
+ * - **Telemetry Data (FMGVehicleTelemetry)**: Real-time vehicle data including
+ *   speed (KPH/MPH), RPM, gear, NOS amount, throttle/brake positions, and
+ *   drift state. Updated every frame by the vehicle pawn.
+ *
+ * - **Race Status (FMGRaceStatus)**: Current race state including position,
+ *   lap number, lap times, gaps to other racers, and pace comparison.
+ *
+ * - **Notification System**: This subsystem has its own lightweight notification
+ *   queue separate from MGNotificationManager. These are racing-specific
+ *   notifications like position changes, lap times, and drift scores.
+ *
+ * - **Damage Feedback**: Visual indicators for vehicle damage including
+ *   engine health, damage vignette, and impact flash effects.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [Vehicle Pawn]                    [Race Manager]
+ *        |                                  |
+ *        | UpdateVehicleTelemetry()         | UpdateRaceStatus()
+ *        v                                  v
+ *   +--------------------------------------------------+
+ *   |            UMGRaceHUDSubsystem                   |
+ *   +--------------------------------------------------+
+ *   | CurrentTelemetry   | CurrentRaceStatus          |
+ *   | CurrentDriftData   | ActiveNotifications        |
+ *   | CurrentDamageData  | CurrentHUDMode             |
+ *   +--------------------------------------------------+
+ *        |           |            |            |
+ *        v           v            v            v
+ *   [Speedometer] [Position] [Minimap] [Notifications]
+ *   [Tachometer]  [Lap Info] [Damage]  [Drift Score]
+ *
+ *   Widgets subscribe to delegates like OnPositionChanged, OnLapCompleted,
+ *   OnDamageStateChanged to react to state changes.
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Get the HUD subsystem from world
+ * UMGRaceHUDSubsystem* HUDSubsystem = GetWorld()->GetSubsystem<UMGRaceHUDSubsystem>();
+ *
+ * // Update vehicle telemetry (called from vehicle pawn)
+ * FMGVehicleTelemetry Telemetry;
+ * Telemetry.SpeedKPH = VehicleMovement->GetForwardSpeed() * 0.036f;
+ * Telemetry.SpeedMPH = Telemetry.SpeedKPH * 0.621371f;
+ * Telemetry.RPM = Engine->GetCurrentRPM();
+ * Telemetry.CurrentGear = Transmission->GetCurrentGear();
+ * Telemetry.NOSAmount = NOSComponent->GetNOSPercent();
+ * HUDSubsystem->UpdateVehicleTelemetry(Telemetry);
+ *
+ * // Update race status (called from race manager)
+ * FMGRaceStatus Status;
+ * Status.CurrentPosition = GetPlayerPosition();
+ * Status.TotalRacers = GetTotalRacers();
+ * Status.CurrentLap = GetPlayerLap();
+ * Status.TotalLaps = GetTotalLaps();
+ * Status.CurrentLapTime = GetCurrentLapTime();
+ * HUDSubsystem->UpdateRaceStatus(Status);
+ *
+ * // Show race-specific notifications
+ * HUDSubsystem->ShowPositionChange(3, 2);  // Moved from 3rd to 2nd
+ * HUDSubsystem->ShowLapNotification(2, 45.5f, true, false);  // Lap 2, best lap
+ * HUDSubsystem->ShowDriftScorePopup(5000, 2.5f);  // 5000 pts at 2.5x multiplier
+ *
+ * // Subscribe to events in widgets
+ * HUDSubsystem->OnPositionChanged.AddDynamic(this, &UMyWidget::HandlePositionChange);
+ * HUDSubsystem->OnDamageStateChanged.AddDynamic(this, &UMyWidget::HandleDamageUpdate);
+ *
+ * // Control HUD visibility
+ * HUDSubsystem->SetHUDMode(EMGHUDMode::Minimal);  // Clean view
+ * HUDSubsystem->ToggleHUD();  // Toggle visibility
+ * HUDSubsystem->SetElementVisibility(TEXT("Minimap"), false);  // Hide specific element
+ *
+ * // Trigger damage feedback
+ * FMGImpactFeedback Impact;
+ * Impact.Intensity = 0.8f;
+ * Impact.bShowVignette = true;
+ * Impact.bTriggerShake = true;
+ * HUDSubsystem->TriggerImpactFeedback(Impact);
+ *
+ * // Get current state for widgets
+ * FMGVehicleTelemetry CurrentTelemetry = HUDSubsystem->GetVehicleTelemetry();
+ * FMGRaceStatus CurrentStatus = HUDSubsystem->GetRaceStatus();
+ * bool bCritical = HUDSubsystem->IsVehicleCriticallyDamaged();
+ * @endcode
+ *
+ * =============================================================================
+ * @section NotificationQueue Notification Queue System
+ *
+ * The subsystem maintains its own notification queue for race-specific feedback.
+ * This is separate from the game-wide MGNotificationManager to allow:
+ * - Racing-optimized display (corner popups, floating text)
+ * - Independent timing and animation
+ * - Category-based filtering and dismissal
+ *
+ * @code
+ * // Show generic notification
+ * HUDSubsystem->ShowNotification(
+ *     FText::FromString("Near Miss!"),
+ *     2.0f,                              // Duration
+ *     FLinearColor(1.0f, 0.8f, 0.0f)     // Gold color
+ * );
+ *
+ * // Show advanced notification with all options
+ * FMGHUDNotification Notif;
+ * Notif.Message = FText::FromString("Perfect Drift Chain!");
+ * Notif.Duration = 3.0f;
+ * Notif.Priority = EMGHUDNotificationPriority::High;
+ * Notif.Category = TEXT("Drift");
+ * Notif.Progress = 0.75f;  // For progress-style notifications
+ * int32 NotifID = HUDSubsystem->ShowNotificationAdvanced(Notif);
+ *
+ * // Update progress
+ * HUDSubsystem->UpdateNotificationProgress(NotifID, 1.0f);
+ *
+ * // Dismiss by category
+ * HUDSubsystem->DismissNotificationsByCategory(TEXT("Drift"));
+ * @endcode
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+#include "Engine/TimerManager.h"
 #include "MGRaceHUDSubsystem.generated.h"
 
 class UMGRaceHUDWidget;
@@ -250,6 +409,84 @@ struct FMGImpactFeedback
 };
 
 /**
+ * HUD notification priority for display ordering
+ */
+UENUM(BlueprintType)
+enum class EMGHUDNotificationPriority : uint8
+{
+	/** Low priority - informational */
+	Low,
+	/** Normal priority - standard gameplay feedback */
+	Normal,
+	/** High priority - important events */
+	High,
+	/** Critical priority - warnings and errors */
+	Critical
+};
+
+/**
+ * A queued notification to display
+ */
+USTRUCT(BlueprintType)
+struct FMGHUDNotification
+{
+	GENERATED_BODY()
+
+	/** Unique ID for this notification */
+	UPROPERTY(BlueprintReadOnly)
+	int32 NotificationID = 0;
+
+	/** Display message */
+	UPROPERTY(BlueprintReadWrite)
+	FText Message;
+
+	/** Display duration in seconds */
+	UPROPERTY(BlueprintReadWrite)
+	float Duration = 2.0f;
+
+	/** Remaining time before removal */
+	UPROPERTY(BlueprintReadOnly)
+	float RemainingTime = 0.0f;
+
+	/** Display color */
+	UPROPERTY(BlueprintReadWrite)
+	FLinearColor Color = FLinearColor::White;
+
+	/** Priority for ordering */
+	UPROPERTY(BlueprintReadWrite)
+	EMGHUDNotificationPriority Priority = EMGHUDNotificationPriority::Normal;
+
+	/** Optional icon name */
+	UPROPERTY(BlueprintReadWrite)
+	FName IconName;
+
+	/** Whether notification should stack with duplicates or replace */
+	UPROPERTY(BlueprintReadWrite)
+	bool bStackable = true;
+
+	/** Progress value (0-1) for progress-style notifications, -1 for no progress */
+	UPROPERTY(BlueprintReadWrite)
+	float Progress = -1.0f;
+
+	/** Category tag for filtering/grouping */
+	UPROPERTY(BlueprintReadWrite)
+	FName Category;
+
+	/** Animation state (0 = entering, 1 = visible, fading out when < Duration threshold) */
+	UPROPERTY(BlueprintReadOnly)
+	float AnimationAlpha = 0.0f;
+
+	/** World time when notification was created */
+	UPROPERTY(BlueprintReadOnly)
+	float CreationTime = 0.0f;
+
+	FMGHUDNotification() = default;
+
+	FMGHUDNotification(const FText& InMessage, float InDuration, FLinearColor InColor)
+		: Message(InMessage), Duration(InDuration), RemainingTime(InDuration), Color(InColor) {}
+};
+
+/**
  * Race HUD Subsystem
  * Central management for all racing UI elements
  *
@@ -351,6 +588,42 @@ public:
 	/** Show generic notification */
 	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
 	void ShowNotification(const FText& Message, float Duration = 2.0f, FLinearColor Color = FLinearColor::White);
+
+	/** Show notification with full options */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
+	int32 ShowNotificationAdvanced(const FMGHUDNotification& Notification);
+
+	/** Update an existing notification's progress */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
+	void UpdateNotificationProgress(int32 NotificationID, float Progress);
+
+	/** Dismiss a specific notification */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
+	void DismissNotification(int32 NotificationID);
+
+	/** Dismiss all notifications in a category */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
+	void DismissNotificationsByCategory(FName Category);
+
+	/** Clear all notifications */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
+	void ClearAllNotifications();
+
+	/** Get all active notifications */
+	UFUNCTION(BlueprintPure, Category = "HUD|Notifications")
+	TArray<FMGHUDNotification> GetActiveNotifications() const { return ActiveNotifications; }
+
+	/** Get notification count */
+	UFUNCTION(BlueprintPure, Category = "HUD|Notifications")
+	int32 GetActiveNotificationCount() const { return ActiveNotifications.Num(); }
+
+	/** Set maximum simultaneous notifications (oldest will be removed) */
+	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
+	void SetMaxNotifications(int32 MaxCount);
+
+	/** Get maximum notifications */
+	UFUNCTION(BlueprintPure, Category = "HUD|Notifications")
+	int32 GetMaxNotifications() const { return MaxActiveNotifications; }
 
 	/** Show countdown */
 	UFUNCTION(BlueprintCallable, Category = "HUD|Notifications")
@@ -473,6 +746,10 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLapCompleted, int32, LapNumber);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStateChanged, const FMGDamageHUDData&, DamageData);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnImpactReceived, const FMGImpactFeedback&, Feedback);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationAdded, const FMGHUDNotification&, Notification);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationRemoved, int32, NotificationID);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNotificationProgressUpdated, int32, NotificationID, float, Progress);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllNotificationsCleared);
 
 	UPROPERTY(BlueprintAssignable, Category = "HUD|Events")
 	FOnHUDModeChanged OnHUDModeChanged;
@@ -488,6 +765,22 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "HUD|Events")
 	FOnImpactReceived OnImpactReceived;
+
+	/** Fired when a notification is added to the queue */
+	UPROPERTY(BlueprintAssignable, Category = "HUD|Notifications")
+	FOnNotificationAdded OnNotificationAdded;
+
+	/** Fired when a notification expires or is dismissed */
+	UPROPERTY(BlueprintAssignable, Category = "HUD|Notifications")
+	FOnNotificationRemoved OnNotificationRemoved;
+
+	/** Fired when a notification's progress is updated */
+	UPROPERTY(BlueprintAssignable, Category = "HUD|Notifications")
+	FOnNotificationProgressUpdated OnNotificationProgressUpdated;
+
+	/** Fired when all notifications are cleared */
+	UPROPERTY(BlueprintAssignable, Category = "HUD|Notifications")
+	FOnAllNotificationsCleared OnAllNotificationsCleared;
 
 protected:
 	// ==========================================
@@ -543,6 +836,29 @@ protected:
 	float ImpactFlashAlpha = 0.0f;
 
 	// ==========================================
+	// NOTIFICATION STATE
+	// ==========================================
+
+	/** Active notifications being displayed */
+	UPROPERTY()
+	TArray<FMGHUDNotification> ActiveNotifications;
+
+	/** Next notification ID to assign */
+	int32 NextNotificationID = 1;
+
+	/** Maximum simultaneous notifications */
+	int32 MaxActiveNotifications = 5;
+
+	/** Notification fade in duration */
+	float NotificationFadeInDuration = 0.2f;
+
+	/** Notification fade out duration */
+	float NotificationFadeOutDuration = 0.3f;
+
+	/** Timer handle for notification tick */
+	FTimerHandle NotificationTickHandle;
+
+	// ==========================================
 	// WIDGETS (References)
 	// ==========================================
 
@@ -564,4 +880,25 @@ protected:
 
 	/** Apply HUD mode settings */
 	void ApplyHUDMode(EMGHUDMode Mode);
+
+	/** Process notification timers and animations */
+	void TickNotifications();
+
+	/** Start the notification tick timer */
+	void StartNotificationTicker();
+
+	/** Stop the notification tick timer */
+	void StopNotificationTicker();
+
+	/** Find notification by ID */
+	FMGHUDNotification* FindNotificationByID(int32 NotificationID);
+
+	/** Remove expired notifications */
+	void RemoveExpiredNotifications();
+
+	/** Enforce max notification limit */
+	void EnforceNotificationLimit();
+
+	/** Sort notifications by priority */
+	void SortNotificationsByPriority();
 };

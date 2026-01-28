@@ -1,5 +1,93 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGDefaultRaceOverlay.h - Race Overlay System (Countdown, Notifications, Finish)
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines the overlay layer that appears ON TOP of the regular HUD
+ * for important race events. While the HUD shows constant information (speed,
+ * position), the overlay handles temporary, attention-grabbing displays:
+ *
+ * - Race countdown ("3... 2... 1... GO!")
+ * - Notifications ("POSITION GAINED!", "NEW BEST LAP!")
+ * - Wrong way warning (big flashing "WRONG WAY" text)
+ * - Race finish screen (final position, total time, new record indicator)
+ *
+ * Think of it as the "pop-up" layer that grabs the player's attention for
+ * important moments, then fades away.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * Overlay vs HUD:
+ *   - HUD: Always visible, shows current state (speed, position, lap)
+ *   - Overlay: Appears temporarily for events, then hides
+ *
+ *   Visual Layer Stack:
+ *   +-------------------+
+ *   |  Race Overlay     |  <-- Top (countdown, notifications)
+ *   +-------------------+
+ *   |  Race HUD         |  <-- Middle (speedometer, position)
+ *   +-------------------+
+ *   |  Game World       |  <-- Bottom (3D rendered scene)
+ *   +-------------------+
+ *
+ * USTRUCT (FMGNotificationDisplayEntry):
+ *   A struct that groups related data together. This one holds all the UI
+ *   elements needed for a single notification (panel, text, icon). Using
+ *   structs keeps related widgets organized and makes cleanup easier.
+ *
+ * Animation in UI:
+ *   The overlay uses manual animation in NativeTick() rather than UMG animations.
+ *   Each frame:
+ *   1. Update animation time: AnimTime += DeltaTime
+ *   2. Calculate current value: Scale = 1.0 + sin(AnimTime) * 0.1
+ *   3. Apply to widget: Widget->SetRenderScale(Scale)
+ *
+ *   This gives precise control but requires more code than Timeline animations.
+ *
+ * Input Handling (NativeOnKeyDown):
+ *   The overlay can intercept keyboard input. During finish screen, it might
+ *   wait for a key press before transitioning. Return FReply::Handled() to
+ *   consume the input, or FReply::Unhandled() to pass it through.
+ *
+ * Notification Queue:
+ *   Multiple notifications can be active simultaneously. The TArray holds
+ *   all active entries, and LayoutNotificationEntries() stacks them vertically.
+ *   Each notification has its own timer and is removed when Duration expires.
+ *
+ * HOW IT FITS IN THE ARCHITECTURE:
+ * --------------------------------
+ *
+ *   [Race Manager] ---> [Overlay Widget] ---> [Screen Display]
+ *        |                    |
+ *        v                    v
+ *   "Start Race!"      CreateCountdownDisplay()
+ *   "Lap Complete!"    DisplayNotification()
+ *   "Wrong Way!"       UpdateWrongWayDisplay()
+ *   "Race Over!"       DisplayRaceFinish()
+ *
+ * Game systems call the overlay's public methods when events happen.
+ * The overlay creates/animates UI and handles its own cleanup.
+ *
+ * STYLE CONSTANTS:
+ * ----------------
+ * The overlay uses a Y2K neon aesthetic matching the main HUD:
+ * - CyanNeon: Primary text color (0, 255, 230)
+ * - PinkNeon: Accent/emphasis (255, 0, 153)
+ * - YellowNeon: Warnings (255, 255, 0)
+ * - GoldColor: 1st place finish
+ * - SilverColor: 2nd place finish
+ * - BronzeColor: 3rd place finish
+ *
+ * Font sizes are defined as static constexpr for consistency and easy adjustment.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

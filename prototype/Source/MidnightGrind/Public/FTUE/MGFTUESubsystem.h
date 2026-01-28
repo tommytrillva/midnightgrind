@@ -1,47 +1,116 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGFTUESubsystem.h
- * @brief First-Time User Experience (FTUE) Subsystem for Midnight Grind
+ * =============================================================================
+ * MGFTUESubsystem.h - First-Time User Experience (FTUE) Onboarding System
+ * =============================================================================
  *
- * This subsystem manages the new player onboarding experience, ensuring that
- * first-time players are guided through the game's core features in a
- * structured, rewarding way.
+ * OVERVIEW:
+ * ---------
+ * This file defines the FTUE Subsystem, which manages the new player onboarding
+ * experience in Midnight Grind. It ensures first-time players are guided through
+ * the game's core features in a structured, rewarding way without overwhelming them.
  *
- * ## Key Features
+ * Think of this as the "game concierge" - it introduces new players to features
+ * one at a time and keeps more advanced features locked until they're ready.
  *
- * - **Guided Onboarding**: Step-by-step introduction to game mechanics,
- *   from choosing a first car to joining multiplayer races.
  *
- * - **Progressive Unlocking**: Features are unlocked gradually as players
- *   complete onboarding stages, preventing information overload.
+ * KEY CONCEPTS & TERMINOLOGY:
+ * ---------------------------
  *
- * - **Contextual Hints**: Smart tooltips that appear when players encounter
- *   new mechanics, with configurable show limits to avoid repetition.
+ * 1. ONBOARDING STAGE: A major milestone in the new player journey.
+ *    The stages progress in order:
+ *    - Welcome: Initial game introduction and setup
+ *    - ChooseFirstCar: Selecting a starter vehicle from the initial lineup
+ *    - FirstRace: Completing the tutorial/first race
+ *    - JoinMultiplayer: Entering an online race for the first time
+ *    - CustomizeCar: Using the garage customization features
+ *    - JoinOrCreateCrew: Experiencing the social/crew system
+ *    - CompleteChallenge: Learning about daily/weekly challenges
+ *    - ExploreSeason: Understanding the season pass system
+ *    - Completed: All onboarding finished, full game unlocked
  *
- * - **Rewards**: GrindCash rewards for completing onboarding steps,
- *   incentivizing players to complete the tutorial.
+ * 2. ONBOARDING STEP: Configuration for displaying one stage's UI.
+ *    - Title/Description: What to show the player
+ *    - Instruction: Action prompt ("Tap a car to select it")
+ *    - TargetWidgetID: Which UI element to spotlight/highlight
+ *    - RewardGrindCash: Currency reward for completing this step
+ *    - UnlockFeature: What game feature to unlock when completed
  *
- * - **Skip Options**: Experienced players can skip individual steps or
- *   the entire onboarding process.
+ * 3. CONTEXTUAL HINT: Smart tooltips that appear during gameplay.
+ *    - Triggered by specific contexts (first garage visit, low nitro, etc.)
+ *    - MaxShowCount prevents annoying experienced players
+ *    - Can be permanently dismissed by the player
  *
- * ## Onboarding Flow
+ * 4. PROGRESSIVE UNLOCKING: Features hidden until the right moment.
+ *    - New players don't see "Multiplayer" button until they've done basics
+ *    - Prevents information overload and confusion
+ *    - Use IsFeatureUnlocked() to check before showing UI elements
  *
- * 1. **Welcome** - Initial game introduction
- * 2. **ChooseFirstCar** - Selecting a starter vehicle
- * 3. **FirstRace** - Completing the first race
- * 4. **JoinMultiplayer** - Entering an online race
- * 5. **CustomizeCar** - Using the customization garage
- * 6. **JoinOrCreateCrew** - Social features introduction
- * 7. **CompleteChallenge** - Daily/weekly challenge system
- * 8. **ExploreSeason** - Season pass and progression
- * 9. **Completed** - Onboarding finished
+ * 5. GRINDCASH: In-game currency awarded for completing steps.
+ *    - Incentivizes completing the onboarding
+ *    - Gives new players starting capital
  *
- * @note The subsystem persists progress to local storage, so players can
- *       resume onboarding across game sessions.
  *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ *
+ * This is a UGameInstanceSubsystem that:
+ * - Persists for the entire game session
+ * - Tracks new player status and onboarding progress
+ * - Controls feature visibility throughout the UI
+ * - Saves/loads progress to local storage
+ *
+ * Key relationships:
+ * - MGTutorialSubsystem: FTUE = WHAT to do; Tutorial = HOW to do it
+ *   (FTUE says "Complete a race", Tutorial teaches racing controls)
+ * - MGCampaignSubsystem: Campaign missions unlock after FTUE stages
+ * - UI System: All menus check IsFeatureUnlocked() before showing options
+ * - Economy System: FTUE grants starting GrindCash rewards
+ *
+ *
+ * FTUE vs TUTORIAL - IMPORTANT DISTINCTION:
+ * -----------------------------------------
+ * - FTUE: HIGH-LEVEL journey stages ("Choose car" -> "First race" -> "Multiplayer")
+ *   Controls WHAT features are available and WHEN
+ *
+ * - Tutorial: DETAILED interactive lessons within a specific feature
+ *   Teaches HOW to use accelerate, brake, drift, etc.
+ *
+ * The FTUE stage "FirstRace" might trigger the "BasicControls" Tutorial sequence.
+ *
+ *
+ * COMMON USAGE PATTERNS:
+ * ----------------------
+ *
+ * // In UI: Check if a button should be visible
+ * if (FTUESubsystem->IsFeatureUnlocked("Multiplayer"))
+ * {
+ *     ShowMultiplayerButton();
+ * }
+ *
+ * // When player completes an onboarding action:
+ * FTUESubsystem->CompleteCurrentStep();
+ *
+ * // For returning players who want to skip:
+ * if (PlayerRequestsSkip && !FTUESubsystem->IsOnboardingComplete())
+ * {
+ *     FTUESubsystem->SkipOnboarding();
+ * }
+ *
+ * // Trigger hints when player encounters new mechanics:
+ * FTUESubsystem->TriggerHint("Garage.PaintShop");
+ *
+ * // Listen for feature unlocks to update UI:
+ * FTUESubsystem->OnFeatureUnlocked.AddDynamic(this, &UMainMenu::OnFeatureUnlocked);
+ *
+ *
+ * DETAILED DOCUMENTATION BELOW:
+ * -----------------------------
+ * The following sections use Doxygen-style comments for API documentation.
  * @see FMGOnboardingStep for step configuration
  * @see FMGContextualHint for hint configuration
+ * =============================================================================
  */
 
 #pragma once

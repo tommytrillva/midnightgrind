@@ -1,0 +1,318 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Street Racing Events and Mechanics",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "StreetRaces": true,
+    "PinkSlips": true,
+    "PoliceChases": true,
+    "Betting": true
+  },
+
+  "RaceTypes": {
+    "Sprint": {
+      "ID": "STREET_SPRINT",
+      "Description": "Point-to-point sprint",
+      "Format": "PointToPoint",
+      "Distance": { "Miles": { "Min": 0.5, "Max": 5 } },
+      "Participants": { "Min": 2, "Max": 8 },
+      "Popular": true
+    },
+    "Circuit": {
+      "ID": "STREET_CIRCUIT",
+      "Description": "Street circuit laps",
+      "Format": "Laps",
+      "Laps": { "Min": 2, "Max": 5 },
+      "Participants": { "Min": 2, "Max": 12 },
+      "Technical": true
+    },
+    "Drag": {
+      "ID": "STREET_DRAG",
+      "Description": "Quarter mile drag",
+      "Format": "Drag",
+      "Distance": { "Feet": 1320 },
+      "Participants": 2,
+      "Brackets": true
+    },
+    "Roll": {
+      "ID": "STREET_ROLL",
+      "Description": "Rolling start race",
+      "Format": "Rolling",
+      "StartSpeed": { "MPH": [40, 60, 80] },
+      "Participants": 2,
+      "HighwaySuitable": true
+    },
+    "Touge": {
+      "ID": "STREET_TOUGE",
+      "Description": "Mountain pass racing",
+      "Format": "Downhill",
+      "Technical": true,
+      "Participants": 2,
+      "Japanese": true
+    },
+    "Drift": {
+      "ID": "STREET_DRIFT",
+      "Description": "Street drift battle",
+      "Format": "Tandem",
+      "Scoring": "Style",
+      "Participants": 2
+    },
+    "Checkpoint": {
+      "ID": "STREET_CHECK",
+      "Description": "Checkpoint race",
+      "Format": "OpenRoute",
+      "Checkpoints": { "Min": 3, "Max": 10 },
+      "Participants": { "Min": 2, "Max": 8 }
+    },
+    "Crew": {
+      "ID": "STREET_CREW",
+      "Description": "Crew vs crew race",
+      "Format": "Team",
+      "TeamsOf": [2, 3, 4],
+      "Combined": true
+    }
+  },
+
+  "RaceSetup": {
+    "Organizing": {
+      "FindRace": {
+        "WorldMap": true,
+        "Contacts": true,
+        "Random": true
+      },
+      "CreateRace": {
+        "SetRoute": true,
+        "InvitePlayers": true,
+        "SetStakes": true
+      }
+    },
+    "Stakes": {
+      "Cash": {
+        "Enabled": true,
+        "Range": { "Min": 100, "Max": 100000 }
+      },
+      "PinkSlip": {
+        "Enabled": true,
+        "RiskCar": true,
+        "HighStakes": true
+      },
+      "Reputation": {
+        "Enabled": true,
+        "RepPoints": true
+      },
+      "None": {
+        "Enabled": true,
+        "JustForFun": true
+      }
+    },
+    "StartProcedure": {
+      "Countdown": {
+        "Person": true,
+        "Timer": true,
+        "Light": false
+      },
+      "FlagDrop": {
+        "Classic": true,
+        "Visual": "PersonWaving"
+      },
+      "Honk": {
+        "Signal": true,
+        "Count": 3
+      }
+    }
+  },
+
+  "RaceFlow": {
+    "PreRace": {
+      "Meeting": { "Location": "Designated" },
+      "Scouting": { "Optional": true },
+      "LookoutPosting": { "ForPolice": true },
+      "BettingWindow": { "Duration": { "Minutes": 2 } }
+    },
+    "During": {
+      "NoRules": true,
+      "TrafficActive": true,
+      "PoliceRisk": true,
+      "Shortcuts": { "Allowed": "Depends" }
+    },
+    "PostRace": {
+      "WinnerDeclared": true,
+      "PayOut": true,
+      "Dispersal": { "QuickExit": true },
+      "Rematch": { "Option": true }
+    }
+  },
+
+  "BettingSystem": {
+    "PlayerBets": {
+      "OnSelf": true,
+      "OnOthers": true,
+      "SideBets": true
+    },
+    "NPCBetting": {
+      "Spectators": true,
+      "OtherRacers": true
+    },
+    "Odds": {
+      "BasedOn": ["CarClass", "DriverRep", "TrackHistory"],
+      "Dynamic": true
+    },
+    "Payout": {
+      "WinnerTakesAll": true,
+      "OddsBased": { "ForSideBets": true }
+    }
+  },
+
+  "PoliceInteraction": {
+    "Detection": {
+      "Triggers": ["NoiseComplaints", "SpottedRacing", "Patrol"],
+      "Chance": { "ByArea": true, "ByTime": true }
+    },
+    "Response": {
+      "Warning": { "InitialResponse": true },
+      "Chase": { "IfFleeing": true },
+      "Bust": { "IfCaught": true },
+      "Helicopter": { "HighHeat": true }
+    },
+    "Consequences": {
+      "Caught": {
+        "Fine": true,
+        "VehicleImpound": { "Possible": true },
+        "RepLoss": true
+      },
+      "Escape": {
+        "HeatDecay": true,
+        "Cooldown": { "Minutes": 5 }
+      }
+    }
+  },
+
+  "PinkSlipRacing": {
+    "Mechanics": {
+      "BothCarsAtStake": true,
+      "WinnerTakesCar": true,
+      "HighestStakes": true
+    },
+    "Requirements": {
+      "OwnedCarOnly": true,
+      "NotFinanced": true,
+      "ValueMatch": { "Tolerance": 20 }
+    },
+    "Winning": {
+      "ReceiveCar": true,
+      "FullOwnership": true,
+      "KeepMods": true
+    },
+    "Losing": {
+      "LoseCar": true,
+      "Permanent": true,
+      "Confirmation": { "Required": true }
+    }
+  },
+
+  "Reputation": {
+    "Earning": {
+      "Win": { "Points": 100 },
+      "CloseRace": { "Bonus": 25 },
+      "StylePoints": { "ForDrift": true },
+      "PoliceEscape": { "Bonus": 50 }
+    },
+    "Losing": {
+      "Loss": { "Points": -25 },
+      "DNF": { "Points": -50 },
+      "Busted": { "Points": -100 }
+    },
+    "Ranks": {
+      "Unknown": { "Rep": 0 },
+      "Rookie": { "Rep": 500 },
+      "Regular": { "Rep": 2000 },
+      "Respected": { "Rep": 5000 },
+      "Legend": { "Rep": 15000 },
+      "Icon": { "Rep": 50000 }
+    }
+  },
+
+  "NPCRacers": {
+    "Types": {
+      "Novice": {
+        "Skill": "Low",
+        "Cars": "Economy",
+        "Stakes": "Low"
+      },
+      "Regular": {
+        "Skill": "Medium",
+        "Cars": "Sports",
+        "Stakes": "Medium"
+      },
+      "Veteran": {
+        "Skill": "High",
+        "Cars": "Performance",
+        "Stakes": "High"
+      },
+      "Boss": {
+        "Skill": "Expert",
+        "Cars": "Exotic",
+        "Stakes": "Extreme",
+        "Unique": true
+      }
+    },
+    "Behavior": {
+      "Challenging": true,
+      "Revenge": true,
+      "Crew": true
+    }
+  },
+
+  "RouteGeneration": {
+    "Types": {
+      "Preset": { "DesignedRoutes": true },
+      "Random": { "AIGenerated": true },
+      "Custom": { "PlayerCreated": true }
+    },
+    "Characteristics": {
+      "Urban": { "Traffic": "High", "Corners": "Many" },
+      "Highway": { "Speed": "High", "Traffic": "Medium" },
+      "Mountain": { "Technical": true, "Elevation": true },
+      "Industrial": { "Wide": true, "Traffic": "Low" }
+    }
+  },
+
+  "Atmosphere": {
+    "Spectators": {
+      "Presence": true,
+      "Cheering": true,
+      "PhoneRecording": true
+    },
+    "OtherRacers": {
+      "Watching": true,
+      "NextChallengers": true
+    },
+    "Environment": {
+      "NightTime": { "Preferred": true },
+      "StreetLights": true,
+      "CityAmbiance": true
+    }
+  },
+
+  "UI": {
+    "RaceMenu": {
+      "TypeSelector": true,
+      "RoutePreview": true,
+      "StakesSelector": true,
+      "OpponentInfo": true
+    },
+    "HUD": {
+      "Position": true,
+      "Distance": true,
+      "MiniMap": true,
+      "PoliceWarning": true
+    },
+    "Results": {
+      "Times": true,
+      "Earnings": true,
+      "RepGain": true,
+      "Rematch": true
+    }
+  }
+}

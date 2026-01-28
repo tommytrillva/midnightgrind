@@ -1,5 +1,145 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGLiveryEditorSubsystem.h
+ * @brief Vehicle Livery Editor and Paint Customization System
+ *
+ * @section overview Overview
+ * This subsystem provides a comprehensive in-game livery editor that allows players
+ * to customize the visual appearance of their vehicles. Similar to paint editors in
+ * games like Forza Horizon or Gran Turismo, players can create unique designs using
+ * paint materials, decals, and various visual effects.
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection livery What is a Livery?
+ * A "livery" is the complete visual design of a vehicle, including:
+ * - Base paint color and material properties
+ * - Secondary and accent colors
+ * - Decals (stickers, logos, numbers, stripes)
+ * - Window tint, rim color, brake caliper color
+ * - Underglow/neon lighting effects
+ *
+ * Think of it like a "skin" for your car that you can fully customize.
+ *
+ * @subsection decals Decal System (FMGDecalData)
+ * Decals are 2D images placed on the vehicle's surface:
+ * - **Shape**: Basic geometric shapes (circles, squares, triangles)
+ * - **Text**: Custom text with selectable fonts
+ * - **Number**: Racing numbers (commonly used on doors/hood)
+ * - **Logo**: Pre-made brand logos and designs
+ * - **Stripe**: Racing stripes and lines
+ * - **Pattern**: Repeating patterns (carbon fiber, camo, etc.)
+ * - **Sponsor**: Sponsor logos for realistic racing liveries
+ * - **Custom**: User-imported images
+ *
+ * Each decal has position, scale, rotation, color, opacity, and layer order.
+ *
+ * @subsection paint Paint Materials (FMGPaintMaterial)
+ * Paint materials define how the vehicle surface looks:
+ * - **BaseColor**: The primary color (RGB)
+ * - **Metallic**: How reflective/metallic (0 = matte plastic, 1 = chrome)
+ * - **Roughness**: Surface texture (0 = mirror smooth, 1 = rough)
+ * - **ClearCoat**: Protective glossy layer intensity
+ * - **Pearlescent**: Color-shifting effect based on viewing angle
+ * - **Matte/Chrome**: Special finish flags
+ * - **SpecialFinish**: Named finishes like "Carbon", "Camo", "Brushed Metal"
+ *
+ * @subsection layers Layer System (EMGLiveryLayer)
+ * Liveries are built in layers that stack on top of each other:
+ * 1. **Base**: Primary paint covering the entire vehicle
+ * 2. **Secondary**: Secondary color zones (roof, mirrors, etc.)
+ * 3. **Accent**: Trim and detail areas
+ * 4. **Decal**: Stickers and graphics layer
+ * 5. **Effect**: Special effects like pearlescent or color-shift
+ *
+ * @section workflow Typical Workflow
+ * @code
+ * // Get the subsystem
+ * UMGLiveryEditorSubsystem* Livery = GetGameInstance()->GetSubsystem<UMGLiveryEditorSubsystem>();
+ *
+ * // Enter editor mode for a specific vehicle
+ * Livery->EnterEditor(FName("nissan_skyline_r34"));
+ *
+ * // Start with a fresh livery
+ * Livery->NewLivery();
+ *
+ * // Set up base paint (metallic blue)
+ * FMGPaintMaterial BluePaint;
+ * BluePaint.BaseColor = FLinearColor(0.0f, 0.2f, 0.8f);
+ * BluePaint.Metallic = 0.8f;
+ * BluePaint.Roughness = 0.2f;
+ * BluePaint.ClearCoat = 1.0f;
+ * Livery->SetBasePaint(BluePaint);
+ *
+ * // Add a racing number decal
+ * FGuid NumberDecal = Livery->AddDecal(
+ *     EMGDecalType::Number,
+ *     FName("RacingNumber_32"),
+ *     FVector2D(0.3f, 0.5f)  // Position on UV map
+ * );
+ *
+ * // Customize the decal
+ * Livery->SetDecalColor(NumberDecal, FLinearColor::White);
+ * Livery->SetDecalScale(NumberDecal, FVector2D(1.5f, 1.5f));
+ *
+ * // Add text decal
+ * FGuid TeamName = Livery->AddTextDecal(
+ *     "MIDNIGHT GRIND",
+ *     FName("Font_Racing"),
+ *     FVector2D(0.5f, 0.8f),
+ *     FLinearColor::Yellow
+ * );
+ *
+ * // Enable underglow
+ * Livery->SetNeon(true, FLinearColor::Blue);
+ *
+ * // Save the livery
+ * Livery->SetLiveryName(FText::FromString("Blue Thunder"));
+ * Livery->SaveLivery();
+ *
+ * // Share with the community
+ * Livery->PublishLivery();
+ *
+ * // Exit editor
+ * Livery->ExitEditor();
+ * @endcode
+ *
+ * @section undo Undo/Redo System
+ * The editor maintains an undo stack for mistake recovery:
+ * - Every action (paint change, decal placement) pushes to the stack
+ * - Undo() reverts to the previous state
+ * - Redo() restores an undone action
+ * - CanUndo()/CanRedo() check if operations are available
+ *
+ * @section community Community Features
+ * Players can share their creations:
+ * - **PublishLivery()**: Upload to community servers
+ * - **GetCommunityLiveries()**: Browse other players' designs
+ * - **SearchLiveries()**: Find specific designs by keyword
+ * - **DownloadLivery()**: Get a community livery
+ * - **LikeLivery()**: Show appreciation for a design
+ * - Downloads and likes tracked per livery
+ *
+ * @section delegates Event Delegates
+ * Subscribe to these events to respond to editor actions:
+ * - **OnDecalPlaced**: A decal was added to the livery
+ * - **OnPaintChanged**: Paint material was modified
+ * - **OnLiverySaved**: Livery was saved locally
+ * - **OnLiveryPublished**: Livery was uploaded to community
+ *
+ * @section technical Technical Notes
+ * - This is a GameInstanceSubsystem (persists across level loads)
+ * - UV coordinates use 0-1 normalized space
+ * - Decal LayerOrder determines render priority (higher = on top)
+ * - Mirrored decals automatically duplicate to opposite side
+ * - Thumbnails are captured for preview in menus
+ *
+ * @see FMGLiveryData for the complete livery data structure
+ * @see FMGDecalData for individual decal properties
+ * @see FMGPaintMaterial for paint surface properties
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

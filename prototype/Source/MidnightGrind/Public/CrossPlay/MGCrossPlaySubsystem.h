@@ -1,7 +1,105 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MidnightGrind - Arcade Street Racing Game
-// Cross-Play Subsystem - Cross-platform play management
+/**
+ * ============================================================================
+ * MGCrossPlaySubsystem.h
+ * Cross-Platform Multiplayer Management Subsystem
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file defines the Cross-Play Subsystem, which manages multiplayer gaming
+ * between players on different platforms (PC, PlayStation, Xbox, Nintendo, Mobile).
+ * Cross-play allows a Steam player to race against someone on PlayStation, for example.
+ *
+ * WHY CROSS-PLAY MATTERS:
+ * -----------------------
+ * 1. LARGER PLAYER POOL: More players = faster matchmaking and fuller lobbies
+ * 2. PLAY WITH FRIENDS: Friends can play together regardless of their platform
+ * 3. LONGER GAME LIFESPAN: Keeps the community active across all platforms
+ *
+ * KEY CONCEPTS:
+ * -------------
+ * 1. PLATFORM: The gaming system (PC, PlayStation, Xbox, Nintendo Switch, Mobile)
+ *    Each platform has its own online service and player base.
+ *
+ * 2. INPUT TYPE: What controller the player uses (Keyboard/Mouse, Gamepad, Touch,
+ *    Racing Wheel). Some games let players filter matchmaking by input type
+ *    for fairness, since keyboard/mouse may have advantages in some games.
+ *
+ * 3. CROSS-PLAY STATUS: Whether cross-play is enabled, disabled, or using
+ *    filtered modes (platform-only, input-based matching).
+ *
+ * 4. POOLING: How matchmaking groups players together:
+ *    - AllPlatforms: Everyone plays together
+ *    - ConsoleOnly: Xbox, PlayStation, Nintendo only (no PC)
+ *    - PCOnly: Steam, Epic, etc. only
+ *    - SameFamily: Same console family (e.g., all Xbox variants)
+ *    - InputMatched: Players using similar input devices
+ *
+ * 5. LATENCY: Network delay in milliseconds. Cross-play matchmaking considers
+ *    latency to ensure fair, lag-free gameplay.
+ *
+ * ARCHITECTURE NOTES:
+ * -------------------
+ * This is a UGameInstanceSubsystem, meaning:
+ *   - One instance exists for the entire game session
+ *   - Survives level transitions
+ *   - Access via: GameInstance->GetSubsystem<UMGCrossPlaySubsystem>()
+ *
+ * STRUCT BREAKDOWN:
+ * -----------------
+ * - FMGCrossPlayPlayer: Info about a player in cross-play (ID, platform, input, etc.)
+ * - FMGCrossPlaySettings: User preferences for cross-play filtering
+ * - FMGPlatformStats: Statistics about a platform's player population
+ * - FMGCrossPlaySession: Current multiplayer session with mixed platforms
+ * - FMGCrossPlayReport: Analytics data about cross-play usage
+ *
+ * EVENTS/DELEGATES:
+ * -----------------
+ * Delegates are Unreal's event system. You can "bind" functions to them,
+ * and they get called when something happens:
+ *   - OnCrossPlayStatusChanged: Cross-play was enabled/disabled
+ *   - OnCrossPlayPlayerJoined: A player from another platform joined
+ *   - OnInputTypeChanged: A player switched controllers mid-session
+ *
+ * USAGE EXAMPLE:
+ * --------------
+ * @code
+ * // Get the subsystem
+ * UMGCrossPlaySubsystem* CrossPlay = GameInstance->GetSubsystem<UMGCrossPlaySubsystem>();
+ *
+ * // Enable cross-play
+ * CrossPlay->SetCrossPlayEnabled(true);
+ *
+ * // Only match with console players
+ * CrossPlay->SetPoolingPreference(EMGCrossPlayPooling::ConsoleOnly);
+ *
+ * // Check if we can match with a specific player
+ * if (CrossPlay->CanMatchWith(OtherPlayer))
+ * {
+ *     // Add to matchmaking pool
+ * }
+ *
+ * // Listen for players joining from other platforms
+ * CrossPlay->OnCrossPlayPlayerJoined.AddDynamic(this, &MyClass::HandlePlayerJoined);
+ * @endcode
+ *
+ * PLATFORM CONSIDERATIONS:
+ * ------------------------
+ * - Some platforms (Nintendo, PlayStation) require explicit opt-in for cross-play
+ * - Voice chat across platforms may have limitations
+ * - Friend systems don't automatically bridge platforms (need unified friends)
+ * - Platform policies may restrict certain cross-play combinations
+ *
+ * RELATED FILES:
+ * --------------
+ * - MGAccountLinkSubsystem.h: Links accounts across platforms
+ * - MGCrossProgressionSubsystem.h: Syncs progress across platforms
+ * - MGPlatformIntegrationSubsystem.h: Platform-specific features
+ *
+ * ============================================================================
+ */
 
 #pragma once
 

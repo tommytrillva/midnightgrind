@@ -1,5 +1,136 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGHapticsSubsystem.h
+ * @brief Controller Haptic Feedback System for immersive racing feedback
+ *
+ * @section Overview
+ * This file defines the haptic feedback (vibration/rumble) system for Midnight Grind.
+ * Haptic feedback creates physical sensations in the player's controller to enhance
+ * immersion - you feel the engine rumble, collisions shake the controller, and
+ * different road surfaces create distinct vibration patterns.
+ *
+ * @section WhatIsHaptic What is Haptic Feedback?
+ * Haptic feedback refers to any technology that creates touch sensations. In gaming:
+ *   - Basic rumble: Simple motor vibration (Xbox/PlayStation controllers)
+ *   - HD rumble: More precise vibrations that can simulate textures
+ *   - Adaptive triggers: Resistance in L2/R2 triggers (PS5 DualSense only)
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * @subsection GameInstanceSubsystem 1. Game Instance Subsystem
+ * This class inherits from UGameInstanceSubsystem, meaning:
+ *   - One instance exists for the entire game session
+ *   - It persists across level loads (unlike World subsystems)
+ *   - Access it via: GetGameInstance()->GetSubsystem<UMGHapticsSubsystem>()
+ *
+ * @subsection HapticPatterns 2. Haptic Patterns (FMGHapticPattern)
+ * A pattern defines how vibration changes over time using arrays:
+ *   - Amplitudes[]: How strong the vibration is (0.0 = off, 1.0 = max)
+ *   - Frequencies[]: How fast the vibration oscillates (higher = buzzier)
+ *   - Durations[]: How long each step lasts in seconds
+ *
+ * Example: A collision might be high amplitude briefly, then fade out.
+ *
+ * @subsection PrioritySystem 3. Priority System
+ * Multiple haptic effects can play simultaneously, but controllers have limits.
+ * Priority (0-10) determines which effects play when at capacity:
+ *   - Collision = high priority (9) - always felt
+ *   - Surface texture = low priority (2) - dropped if busy
+ *
+ * @subsection Channels 4. Channels (EMGHapticChannel)
+ * Controllers have left and right motors. Effects can target:
+ *   - Both: Full controller vibration
+ *   - LeftOnly/RightOnly: Directional feedback (e.g., left-side collision)
+ *
+ * @subsection AdaptiveTriggers 5. Adaptive Triggers (PS5 DualSense)
+ * The FMGTriggerFeedback struct controls resistance in the trigger buttons:
+ *   - Resistance: How hard to push (simulates brake pressure)
+ *   - StartPosition: Where resistance begins (0.0 = top, 1.0 = bottom)
+ *   - Frequency/Strength: For vibration effects in the trigger
+ *
+ * Note: Falls back to regular haptics on non-DualSense controllers.
+ *
+ * @subsection SurfaceTypes 6. Surface Types (EMGSurfaceType)
+ * Different driving surfaces create unique haptic signatures:
+ *   - Asphalt: Smooth, low-frequency hum
+ *   - Gravel: High-frequency, irregular rumble
+ *   - Rumblestrip: Rapid pulsing (like real rumble strips)
+ *
+ * @section CodeExamples Code Examples
+ *
+ * @subsection GettingSubsystem Getting the Subsystem
+ * @code
+ * // From any UObject with access to GameInstance
+ * UMGHapticsSubsystem* Haptics = GetGameInstance()->GetSubsystem<UMGHapticsSubsystem>();
+ * @endcode
+ *
+ * @subsection OneShotEffects Playing One-Shot Effects (collision, checkpoint)
+ * @code
+ * // Simple haptic trigger
+ * HapticsSubsystem->PlayHaptic(EMGHapticType::Collision, 0.8f);
+ *
+ * // With priority
+ * FGuid HapticId = HapticsSubsystem->PlayHaptic(EMGHapticType::Collision, 0.8f, 9);
+ *
+ * // Stop it early if needed
+ * HapticsSubsystem->StopHaptic(HapticId);
+ * @endcode
+ *
+ * @subsection ContinuousFeedback Continuous Feedback (engine rumble)
+ * @code
+ * // Called every frame from vehicle code
+ * void AVehicle::Tick(float DeltaTime)
+ * {
+ *     HapticsSubsystem->UpdateEngineRPM(CurrentRPM, MaxRPM);
+ *     HapticsSubsystem->UpdateSpeed(GetVehicleSpeedKPH());
+ * }
+ * @endcode
+ *
+ * @subsection SurfaceChanges Surface Changes (detected by tire trace)
+ * @code
+ * void AVehicle::OnSurfaceChanged(EMGSurfaceType NewSurface)
+ * {
+ *     HapticsSubsystem->SetCurrentSurface(NewSurface);
+ * }
+ * @endcode
+ *
+ * @subsection TriggerFeedback Adaptive Triggers (brake pedal feel)
+ * @code
+ * // Set brake trigger resistance based on brake pressure
+ * HapticsSubsystem->SetBrakeTrigger(BrakePressure, 0.1f);
+ *
+ * // Set throttle trigger with engine vibration
+ * HapticsSubsystem->SetThrottleTrigger(0.2f, EngineFrequency);
+ * @endcode
+ *
+ * @subsection EventListening Listening for Events
+ * @code
+ * // In your class setup
+ * HapticsSubsystem->OnSurfaceChanged.AddDynamic(this, &AMyClass::HandleSurfaceChange);
+ *
+ * void AMyClass::HandleSurfaceChange(EMGSurfaceType NewSurface)
+ * {
+ *     // Update UI or audio based on surface
+ * }
+ * @endcode
+ *
+ * @section WheelIntegration Racing Wheel Integration
+ * When a racing wheel is connected, haptic feedback can be routed to the wheel's
+ * Force Feedback (FFB) motors via RouteToWheelFFB(). This provides more realistic
+ * steering feel compared to controller vibration.
+ *
+ * @section Performance Performance Notes
+ *   - MaxConcurrentHaptics limits simultaneous effects (default: 4)
+ *   - Low battery detection reduces intensity to save power
+ *   - UpdateActiveHaptics() runs on a timer, not every frame
+ *
+ * @see UMGRacingWheelSubsystem for wheel force feedback integration
+ * @see EMGHapticType for all supported haptic event types
+ *
+ * @author Midnight Grind Team
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

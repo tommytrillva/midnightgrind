@@ -1,5 +1,199 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGAIDriverProfile.h
+ * @brief AI Driver Profile System - Personality, Skills, and Adaptive Behavior
+ *
+ * @section overview Overview
+ * This file defines the AI Driver Profile system, which gives each AI opponent
+ * a unique identity with distinct personality, skills, and behavior patterns.
+ * Profiles are stored as Data Assets, making them easy to create and configure
+ * in the Unreal Editor without code changes.
+ *
+ * The system creates varied, believable opponents rather than generic bots.
+ * Each AI racer feels like a distinct character with their own driving style.
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection data_asset What is a Data Asset?
+ * A Data Asset (UDataAsset) is a way to store configuration data:
+ * - Created in the Content Browser (right-click > Data Asset)
+ * - Edited in Unreal Editor's Details panel
+ * - No code changes needed to add new drivers
+ * - Can be referenced by Blueprints and C++
+ * Think of it as a "character sheet" for AI racers.
+ *
+ * @subsection personality_types Personality Types
+ * EMGDriverPersonality defines the AI's general racing approach:
+ * - Aggressive: Takes risks, late braking, forces overtakes
+ * - Defensive: Protects position, avoids contact
+ * - Calculated: Optimal lines, consistent pace
+ * - Unpredictable: Erratic behavior, makes mistakes
+ * - Rookie: Slower, wider lines, learning
+ * - Veteran: Fast, consistent, good racecraft
+ * - Rival: Specifically targets the player
+ *
+ * @subsection skill_params Skill Parameters
+ * FMGAISkillParams controls HOW WELL the AI drives:
+ * - SkillLevel: Overall ability (0-1)
+ * - BrakingAccuracy: How close to optimal braking points
+ * - LineAccuracy: How close to optimal racing line
+ * - ReactionTime: Response to changes (lower = faster)
+ * - Consistency: How stable performance is race-to-race
+ * - MistakeFrequency: How often errors occur
+ * - RecoverySkill: How quickly they recover from mistakes
+ *
+ * @subsection aggression Aggression System
+ * FMGAIAggressionParams controls racing aggression:
+ * - OvertakeAggression: How hard they push to pass
+ * - DefenseAggression: How hard they defend position
+ * - RiskTaking: Willingness to take chances
+ * - ProximityTolerance: Comfort with close racing
+ * - OvertakePatience: Time before forcing a pass
+ *
+ * The aggression ESCALATION system tracks grudges:
+ * - AI remembers who hit them and may retaliate
+ * - Aggression builds up with repeated contact
+ * - Can enter "rage mode" where they make mistakes
+ *
+ * @subsection adaptive Adaptive Learning
+ * FMGAIAdaptiveData enables AI that learns from racing the player:
+ * - Tracks win/loss record against player
+ * - Learns player's tendencies (braking points, overtake side)
+ * - Adjusts strategy based on past encounters
+ * - Creates evolving rivalries over a career
+ *
+ * @subsection mood Current Mood System
+ * EMGAIMood affects in-race behavior based on events:
+ * - Neutral: Normal racing
+ * - Frustrated: More aggressive after bad luck
+ * - Confident: Conservative when things go well
+ * - Desperate: Takes big risks when losing badly
+ * - InTheZone: Peak performance, focused
+ * - Intimidated: Backs off after being dominated
+ * - Vengeful: Seeking payback for contact
+ *
+ * @section usage Usage Examples
+ *
+ * @subsection creating_profile Creating a Driver Profile
+ * @code
+ * // In Unreal Editor:
+ * // 1. Content Browser > Right-click > Miscellaneous > Data Asset
+ * // 2. Select UMGAIDriverProfile
+ * // 3. Name it (e.g., "DA_Driver_MaxVelocity")
+ * // 4. Configure in Details panel
+ *
+ * // In C++ (loading an existing profile):
+ * UMGAIDriverProfile* Profile = LoadObject<UMGAIDriverProfile>(
+ *     nullptr,
+ *     TEXT("/Game/Data/AI/DA_Driver_MaxVelocity.DA_Driver_MaxVelocity")
+ * );
+ * @endcode
+ *
+ * @subsection using_profile Using a Profile
+ * @code
+ * // Apply profile to an AI controller
+ * AIController->SetDriverProfile(Profile);
+ *
+ * // Query profile properties
+ * FText DriverName = Profile->DriverName;
+ * int32 OverallRating = Profile->GetOverallRating();
+ * float EffectiveSkill = Profile->GetEffectiveSkill();
+ * float EffectiveAggression = Profile->GetEffectiveAggression();
+ *
+ * // Check personality behaviors
+ * FMGPersonalityBehaviors Behaviors = Profile->GetEffectivePersonalityBehaviors();
+ * float BrakePointBias = Behaviors.BrakePointBias;  // Early or late braker?
+ * @endcode
+ *
+ * @subsection adaptive_usage Adaptive Learning
+ * @code
+ * // After a race against player
+ * Profile->RecordRaceResult(
+ *     bAIWon,           // Did AI beat the player?
+ *     TrackID,          // Which track?
+ *     FinishTimeDelta   // How close was it?
+ * );
+ *
+ * // AI learns player behavior
+ * Profile->LearnPlayerBehavior(
+ *     ObservedAggression,  // How aggressive was player?
+ *     ObservedBraking,     // When did player brake?
+ *     OvertakeSide         // Which side did player prefer?
+ * );
+ *
+ * // Get predictions for next race
+ * float PredictedAggression, PredictedBraking, PredictedSide;
+ * Profile->GetPredictedPlayerBehavior(PredictedAggression, PredictedBraking, PredictedSide);
+ * @endcode
+ *
+ * @subsection aggression_system Aggression Escalation
+ * @code
+ * // Record a contact event
+ * Profile->RecordContact(
+ *     OffenderActor,      // Who hit us?
+ *     Severity,           // How hard? (0-1)
+ *     bWasPlayer,         // Was it the player?
+ *     bSeemedIntentional  // Did it look deliberate?
+ * );
+ *
+ * // Update aggression state each frame
+ * Profile->UpdateAggressionState(
+ *     DeltaTime,
+ *     CurrentPosition,
+ *     bUnderPressure,     // Someone close behind?
+ *     bApplyingPressure   // Chasing someone?
+ * );
+ *
+ * // Query current state
+ * float Aggression = Profile->GetEscalatedAggression();
+ * bool HasGrudge = Profile->HasGrudgeAgainst(PlayerVehicle);
+ * bool WillBeDirty = Profile->WillUseDirtyTactics(Position, bDefending);
+ * @endcode
+ *
+ * @subsection roster Using Driver Roster
+ * @code
+ * // Get random drivers for a race
+ * UMGAIDriverRoster* Roster = LoadRosterAsset();
+ * TArray<UMGAIDriverProfile*> Opponents = Roster->GetRandomDrivers(
+ *     7,      // Count
+ *     0.5f,   // Min skill
+ *     0.9f    // Max skill
+ * );
+ *
+ * // Get drivers by personality
+ * TArray<UMGAIDriverProfile*> Aggressive = Roster->GetDriversByPersonality(
+ *     EMGDriverPersonality::Aggressive
+ * );
+ *
+ * // Find a specific driver
+ * UMGAIDriverProfile* Rival = Roster->GetDriverByName("Max Velocity");
+ * @endcode
+ *
+ * @section architecture Data Architecture
+ * @verbatim
+ *   [UMGAIDriverRoster] - Collection of drivers
+ *          |
+ *          +---> [UMGAIDriverProfile] - Individual driver
+ *                     |
+ *                     +---> [FMGAISkillParams] - Driving ability
+ *                     +---> [FMGAIAggressionParams] - Racing aggression
+ *                     +---> [FMGAIRacecraftParams] - Racing intelligence
+ *                     +---> [FMGAISpeedParams] - Speed characteristics
+ *                     +---> [FMGAIWeatherParams] - Weather adaptation
+ *                     +---> [FMGPersonalityBehaviors] - Unique quirks
+ *                     +---> [FMGAIAdaptiveData] - Learning data
+ *                     +---> [FMGRivalRelationship] - Player rivalry
+ * @endverbatim
+ *
+ * @see AMGAIRacerController - Uses profiles to drive vehicles
+ * @see UMGAIRacerSubsystem - Manages AI spawning with profiles
+ * @see EMGDriverPersonality - Personality type enumeration
+ * @see EMGAIMood - Current mood enumeration
+ *
+ * Midnight Grind - Y2K Arcade Street Racing
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

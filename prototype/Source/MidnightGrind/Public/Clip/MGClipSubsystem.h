@@ -1,5 +1,187 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGClipSubsystem.h
+ * @brief Video Clip Recording, Management, and Social Sharing System
+ * @author Midnight Grind Team
+ * @date 2024
+ *
+ * @section overview_sec Overview
+ * This subsystem handles video recording, clip management, and sharing functionality.
+ * Players can capture gameplay moments, save highlights, edit clips, and share to
+ * social media platforms directly from the game.
+ *
+ * @section quickstart_sec Quick Start Example
+ * @code
+ * // Get the subsystem
+ * UMGClipSubsystem* Clips = GetGameInstance()->GetSubsystem<UMGClipSubsystem>();
+ *
+ * // Save the last 30 seconds (replay buffer) when something cool happens
+ * FGuid ClipId = Clips->SaveLastSeconds(30.0f, "Epic Drift Victory");
+ *
+ * // Or start/stop manual recording
+ * Clips->StartRecording();
+ * // ... gameplay ...
+ * FGuid ClipId = Clips->StopRecording("My Race Highlights");
+ *
+ * // Mark as favorite
+ * Clips->SetClipFavorite(ClipId, true);
+ *
+ * // Share to social media
+ * Clips->ShareClip(ClipId, EMGSharePlatform::YouTube);
+ *
+ * // Listen for highlight detection
+ * Clips->OnHighlightDetected.AddDynamic(this, &UMyClass::OnHighlightFound);
+ * @endcode
+ *
+ * @section concepts_sec Key Concepts for Beginners
+ *
+ * @subsection clip_subsec What is a Clip?
+ * A short video recording of gameplay (typically 10-120 seconds) used to capture
+ * memorable moments like race wins, photo finishes, or epic drifts. Clips are
+ * stored locally and can be shared to social media platforms.
+ *
+ * @subsection buffer_subsec Replay Buffer
+ * The game continuously records the last X seconds in the background:
+ * - When something cool happens, save that buffer as a clip
+ * - This is how "Save last 30 seconds" features work in modern games
+ * - Configurable via FMGClipSettings::BufferDuration
+ *
+ * @subsection highlight_subsec Automatic Highlight Detection
+ * The system automatically detects exciting moments:
+ * - Overtakes, near misses, victories
+ * - Photo finishes, epic drifts, crashes
+ * - Each highlight has a "score" indicating excitement level
+ * - OnHighlightDetected fires when a moment is detected
+ *
+ * @subsection categories_subsec Clip Categories (EMGClipCategory)
+ * | Category    | Description                           |
+ * |-------------|---------------------------------------|
+ * | General     | Uncategorized clips                   |
+ * | Highlight   | Auto-detected exciting moments        |
+ * | PhotoFinish | Close race finishes                   |
+ * | NearMiss    | Close calls with traffic/obstacles    |
+ * | Overtake    | Passing maneuvers                     |
+ * | Drift       | Impressive drift sequences            |
+ * | Crash       | Spectacular crashes                   |
+ * | Victory     | Race wins                             |
+ * | Custom      | User-defined category                 |
+ *
+ * @section workflow_sec Typical Workflow
+ * @verbatim
+ * 1. Game constantly buffers last 60 seconds
+ * 2. Player gets a photo finish victory
+ * 3. System detects this as a "highlight moment"
+ * 4. OnHighlightDetected fires, UI shows "Save Clip?" prompt
+ * 5. Player saves clip -> SaveLastSeconds(30.0f)
+ * 6. Clip is processed, thumbnail generated, metadata saved
+ * 7. Player can later share to YouTube/Twitter via ShareClip()
+ * @endverbatim
+ *
+ * @section editing_sec Clip Editing
+ * @code
+ * // Trim a clip
+ * FGuid TrimmedClipId = Clips->TrimClip(OriginalClipId, 5.0f, 25.0f);
+ *
+ * // Create an edited version with effects
+ * FMGClipEditSettings EditSettings;
+ * EditSettings.StartTime = 5.0f;
+ * EditSettings.EndTime = 25.0f;
+ * EditSettings.bSlowMotionAtEnd = true;
+ * EditSettings.SlowMotionSpeed = 0.5f;
+ * EditSettings.bAddWatermark = true;
+ * FGuid EditedClipId = Clips->CreateEditedClip(OriginalClipId, EditSettings);
+ * @endcode
+ *
+ * @section storage_sec Storage Management
+ * Clips consume disk space and the system helps manage it:
+ * - FMGClipSettings::MaxStoredClips limits total clip count
+ * - FMGClipSettings::MaxStorageSizeMB limits total storage
+ * - EnforceStorageLimits() automatically deletes old clips (respects favorites)
+ * - GetRemainingStorage() returns available space
+ *
+ * @section events_subsec Delegates/Events
+ * | Event               | Description                           |
+ * |---------------------|---------------------------------------|
+ * | OnRecordingStarted  | Manual recording began                |
+ * | OnRecordingStopped  | Manual recording ended                |
+ * | OnClipReady         | Clip fully processed and ready        |
+ * | OnClipShared        | Clip uploaded to a platform           |
+ * | OnClipDeleted       | Clip removed from storage             |
+ * | OnHighlightDetected | Exciting moment auto-detected         |
+ * | OnAutoClipSaved     | Automatic highlight clip saved        |
+ * | OnClipUploadProgress| Upload percentage update              |
+ *
+ * @section related_sec Related Files
+ * - MGClipSubsystem.cpp: Implementation
+ * - MGPlatformIntegrationSubsystem.h: Platform capture features
+ *
+ * @see EMGClipQuality, EMGClipStatus, EMGClipCategory, EMGSharePlatform
+ * @see FMGClipMetadata, FMGClipSettings, FMGClipEditSettings, FMGHighlightMoment
+ */
+
+/**
+ * =============================================================================
+ * MGClipSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * This file defines the Clip Subsystem for Midnight Grind. It handles video
+ * recording, clip management, and sharing functionality. Players can capture
+ * gameplay moments, save highlights, and share clips to social platforms.
+ *
+ * KEY CONCEPTS FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * 1. WHAT IS A "CLIP"?
+ *    - A short video recording of gameplay (typically 10-120 seconds).
+ *    - Used to capture cool moments like race wins, close finishes, or epic drifts.
+ *    - Stored locally and can be shared to social media platforms.
+ *
+ * 2. REPLAY BUFFER:
+ *    - The game continuously records the last X seconds in the background.
+ *    - When something cool happens, you can "save" that buffer as a clip.
+ *    - This is how "Save last 30 seconds" features work in modern games.
+ *
+ * 3. HIGHLIGHT DETECTION:
+ *    - The system automatically detects exciting moments (overtakes, near
+ *      misses, victories) and marks them as potential highlights.
+ *    - Each highlight has a "score" indicating how exciting it was.
+ *
+ * 4. CLIP CATEGORIES:
+ *    - Clips are organized by type: Highlight, PhotoFinish, NearMiss, etc.
+ *    - This helps players find specific types of moments in their library.
+ *
+ * 5. METADATA:
+ *    - Each clip stores additional info: track name, vehicle used, race
+ *      position, timestamp, tags, etc.
+ *    - This metadata helps with organization and when sharing clips.
+ *
+ * 6. FGUID (Globally Unique Identifier):
+ *    - Each clip has a unique ID (GUID/UUID) to identify it.
+ *    - This ensures no two clips have the same identifier, even across
+ *      different players' games.
+ *
+ * 7. STORAGE MANAGEMENT:
+ *    - Clips take up disk space! The system tracks total storage used.
+ *    - EnforceStorageLimits() automatically deletes old clips when storage
+ *      is full (respecting favorites).
+ *
+ * 8. SOFT OBJECT POINTERS (TSoftObjectPtr):
+ *    - Used for the thumbnail texture to avoid loading it into memory until
+ *      actually needed. Saves memory when dealing with many clips.
+ *
+ * WORKFLOW EXAMPLE:
+ * 1. Game constantly buffers last 60 seconds
+ * 2. Player gets a photo finish victory
+ * 3. System detects this as a "highlight moment"
+ * 4. OnHighlightDetected fires, UI shows "Save Clip?" prompt
+ * 5. Player saves clip -> SaveLastSeconds(30.0f)
+ * 6. Clip is processed, thumbnail generated, metadata saved
+ * 7. Player can later share to YouTube/Twitter via ShareClip()
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

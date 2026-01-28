@@ -1,5 +1,88 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRaceConfiguration.h
+ * @brief Race Configuration Data Assets for Midnight Grind racing game.
+ *
+ * This file contains data asset classes and supporting structures that define
+ * the complete configuration for race events. Race configurations are the
+ * "recipe" for a race - they specify everything from track selection and
+ * opponent difficulty to rewards and unlock requirements.
+ *
+ * @section overview_config Overview
+ * The race configuration system provides:
+ * - UMGRaceConfiguration: Primary data asset for complete race setup
+ * - UMGQuickRacePreset: Simplified preset for instant/casual play
+ * - FMGAIOpponentConfig: Per-opponent AI behavior settings
+ * - FMGRaceRewardConfig: Reward distribution configuration
+ *
+ * @section concepts_config Key Concepts for Beginners
+ *
+ * 1. **Data Assets**: In Unreal Engine, Data Assets are Blueprint-editable
+ *    configuration files that live in your Content folder. Unlike regular
+ *    Blueprints, they don't spawn into the world - they just hold data.
+ *    Designers can create many race configurations in the Editor without code.
+ *
+ * 2. **Primary Data Asset**: UMGRaceConfiguration extends UPrimaryDataAsset,
+ *    which allows the Asset Manager to load/manage these assets efficiently.
+ *    Each configuration has a unique RaceID for lookup.
+ *
+ * 3. **Soft Object Pointers**: TSoftObjectPtr references (like VehicleModel,
+ *    RaceLevel) are "lazy" references that don't load the asset until needed.
+ *    This prevents loading every car model when loading a single race config.
+ *
+ * 4. **USTRUCT**: The FMG* structs bundle related settings together and are
+ *    editable in Blueprint property panels. They're simpler than UObjects
+ *    but can still be exposed to designers.
+ *
+ * @section architecture_config Architecture
+ *
+ *    [Content Browser]
+ *           |
+ *    [UMGRaceConfiguration Data Assets]  <-- Designer creates these
+ *           |
+ *    [CreateRaceConfig()]  <-- Converts to runtime FMGRaceConfig
+ *           |
+ *    [AMGRaceGameMode]  <-- Receives config and runs the race
+ *           |
+ *    [UMGRaceFlowManager]  <-- Handles rewards using config data
+ *
+ * @section usage_config Usage Example
+ *
+ * @code
+ * // In Blueprint or C++, load and use a race configuration:
+ *
+ * // 1. Get the race configuration from the asset manager
+ * UMGRaceConfiguration* Config = Cast<UMGRaceConfiguration>(
+ *     UAssetManager::GetPrimaryAssetObject(FPrimaryAssetId("RaceConfig", "Race_Downtown_Sprint")));
+ *
+ * // 2. Check if player can access this race
+ * if (Config->CanPlayerAccess(PlayerLevel, PlayerRep, CompletedRaces))
+ * {
+ *     // 3. Convert to runtime config and start race
+ *     FMGRaceConfig RuntimeConfig = Config->CreateRaceConfig();
+ *     GameMode->SetRaceConfig(RuntimeConfig);
+ *     GameMode->StartCountdown();
+ * }
+ *
+ * // Or for quick races:
+ * UMGQuickRacePreset* Preset = LoadObject<UMGQuickRacePreset>(...);
+ * // Apply preset values directly to the game mode
+ * @endcode
+ *
+ * @section creating_config Creating Race Configurations
+ *
+ * 1. In Content Browser, right-click > Miscellaneous > Data Asset
+ * 2. Select MGRaceConfiguration as the class
+ * 3. Name it descriptively (e.g., "RC_Downtown_Circuit_Hard")
+ * 4. Double-click to open and configure all settings
+ * 5. Save - it's now available for use in menus and career mode
+ *
+ * @see AMGRaceGameMode For the game mode that uses these configurations
+ * @see UMGRaceFlowManager For reward processing
+ * @see FMGRaceConfig For the runtime configuration struct
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

@@ -1,29 +1,149 @@
 // Copyright Midnight Grind. All Rights Reserved.
+
+/**
+ * @file MidnightGrind.h
+ * @brief Primary game module header for the Midnight Grind project.
+ *
+ * This file defines the main game module class and logging category for the
+ * Midnight Grind game. It serves as the central entry point for module-level
+ * initialization and provides singleton access to the module instance.
+ *
+ * @section main_module Main Game Module
+ *
+ * This is the **primary game module** for Midnight Grind. In Unreal Engine's
+ * architecture, every game or plugin is organized into one or more "modules."
+ * The main game module (defined here) is the first module loaded when your
+ * game starts and the last to be unloaded when it shuts down.
+ *
+ * The module system provides:
+ * - Clean separation of code into logical units
+ * - Dependency management between different parts of the engine and game
+ * - Hot-reload support during development (Editor only)
+ * - Control over initialization and cleanup timing
+ *
+ * @section ue_modules Understanding Unreal Engine Modules (For Beginners)
+ *
+ * @subsection what_is_module What is a Module?
+ *
+ * A **module** in Unreal Engine is a self-contained unit of C++ code that:
+ * - Compiles into a single DLL (Windows) or shared library (Mac/Linux)
+ * - Has explicit dependencies on other modules
+ * - Can be loaded/unloaded at runtime (in some cases)
+ * - Defines its own public API through header files
+ *
+ * Think of modules like "packages" or "libraries" in other programming
+ * environments. Your game's source code lives in at least one module (this one),
+ * and you can create additional modules for organization (e.g., a separate
+ * module for AI, networking, etc.).
+ *
+ * @subsection module_components Module Components
+ *
+ * Every Unreal module consists of these key files:
+ *
+ * | File | Purpose |
+ * |------|---------|
+ * | `ModuleName.h` | Module header (this file) - declares the module class |
+ * | `ModuleName.cpp` | Module implementation - defines startup/shutdown logic |
+ * | `ModuleName.Build.cs` | Build configuration - specifies dependencies |
+ *
+ * @subsection module_lifecycle Module Lifecycle
+ *
+ * 1. **Loading**: Engine loads the module DLL into memory
+ * 2. **StartupModule()**: Called to initialize the module (your custom code runs here)
+ * 3. **Runtime**: Module is active, all classes and functions are available
+ * 4. **ShutdownModule()**: Called during engine shutdown for cleanup
+ * 5. **Unloading**: Module DLL is removed from memory
+ *
+ * @section log_category_section Understanding DECLARE_LOG_CATEGORY_EXTERN
+ *
+ * Unreal Engine has a powerful logging system that allows filtering and
+ * categorization of log messages. The macro `DECLARE_LOG_CATEGORY_EXTERN`
+ * creates a custom log category for your game.
+ *
+ * @subsection log_syntax Syntax Breakdown
+ *
+ * @code{.cpp}
+ * DECLARE_LOG_CATEGORY_EXTERN(CategoryName, DefaultVerbosity, CompileTimeVerbosity);
+ * @endcode
+ *
+ * - **CategoryName**: The identifier used in UE_LOG calls (e.g., `LogMidnightGrind`)
+ * - **DefaultVerbosity**: What level shows by default (Log, Warning, Error, etc.)
+ * - **CompileTimeVerbosity**: Maximum level that gets compiled in (use `All` for development)
+ *
+ * @subsection log_usage How to Use the Log Category
+ *
+ * @code{.cpp}
+ * // Basic logging
+ * UE_LOG(LogMidnightGrind, Log, TEXT("Player spawned at location: %s"), *Location.ToString());
+ *
+ * // Warning (shows in yellow in Output Log)
+ * UE_LOG(LogMidnightGrind, Warning, TEXT("Health is critically low!"));
+ *
+ * // Error (shows in red)
+ * UE_LOG(LogMidnightGrind, Error, TEXT("Failed to load save game!"));
+ *
+ * // Verbose (only shows when verbosity is increased)
+ * UE_LOG(LogMidnightGrind, Verbose, TEXT("Tick called with DeltaTime: %f"), DeltaTime);
+ * @endcode
+ *
+ * @subsection log_filtering Filtering Logs
+ *
+ * In the Output Log window, you can filter to show only `LogMidnightGrind`
+ * messages, making it easy to focus on your game's specific output without
+ * noise from engine subsystems.
+ *
+ * @section architecture Module Architecture Overview
+ *
+ * @subsection arch_hierarchy Where This Module Fits
+ *
+ * @verbatim
+ * Unreal Engine Architecture
+ * ==========================
+ *
+ *     +------------------+
+ *     |   Unreal Engine  |  (Core, CoreUObject, Engine modules)
+ *     +--------+---------+
+ *              |
+ *              v
+ *     +------------------+
+ *     |  Game Framework  |  (GameplayAbilities, EnhancedInput, etc.)
+ *     +--------+---------+
+ *              |
+ *              v
+ *     +------------------+
+ *     |  MidnightGrind   |  <-- THIS MODULE (Your game code)
+ *     +------------------+
+ *              |
+ *              v
+ *     +------------------+
+ *     |   Game Content   |  (Blueprints, Assets, Levels)
+ *     +------------------+
+ * @endverbatim
+ *
+ * @subsection arch_dependencies Module Dependencies
+ *
+ * This module depends on several Unreal modules (defined in MidnightGrind.Build.cs):
+ * - **Core**: Fundamental types, containers, and utilities
+ * - **CoreUObject**: UObject system, reflection, serialization
+ * - **Engine**: Actors, Components, World, GameFramework classes
+ *
+ * @subsection arch_extension Extending the Module
+ *
+ * As your game grows, you might:
+ * - Add global managers in StartupModule() (e.g., custom subsystems)
+ * - Register console commands for debugging
+ * - Initialize third-party libraries or services
+ * - Create additional modules for large feature sets
+ *
+ * @see FMidnightGrindModule The main module class implementation
+ * @see IModuleInterface Unreal's base interface for all modules
+ * @see FModuleManager The engine system that manages module loading
+ *
+ * @author Midnight Grind Team
+ */
+
 // ============================================================================
-// MIDNIGHTGRIND.H - PRIMARY GAME MODULE HEADER
-// ============================================================================
-//
-// PURPOSE:
-//   This is the main entry point header for the Midnight Grind game module.
-//   Every Unreal Engine game/plugin needs a module class that handles
-//   initialization and shutdown. This file defines that module.
-//
-// WHAT IS A MODULE?
-//   In Unreal Engine, a "module" is a self-contained unit of code that can be
-//   loaded and unloaded. Your game is a module, and it can have dependencies
-//   on other modules (like the Engine module, Slate for UI, etc.).
-//
-// WHEN IS THIS USED?
-//   - StartupModule() is called when the game first loads
-//   - ShutdownModule() is called when the game exits
-//   - Get() and IsAvailable() let other code safely access this module
-//
-// KEY CONCEPTS FOR NEW DEVELOPERS:
-//   1. DECLARE_LOG_CATEGORY_EXTERN - Creates a log category so you can filter
-//      game-specific logs in the Output Log (e.g., UE_LOG(LogMidnightGrind, Log, TEXT("Hello"));)
-//   2. IModuleInterface - Base class all modules must inherit from
-//   3. FModuleManager - Unreal's system for loading/unloading modules
-//
+// INCLUDES
 // ============================================================================
 
 #pragma once

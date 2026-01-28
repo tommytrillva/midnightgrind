@@ -1,5 +1,113 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGPlayerController.h - Player Input and Control Management
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * The Player Controller is the bridge between the human player and the game.
+ * It receives input from keyboard/gamepad, processes it, and sends commands
+ * to the vehicle (Pawn). It also manages camera control, UI input modes,
+ * spectator functionality, and multiplayer input replication.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. PLAYER CONTROLLER (APlayerController):
+ *    - Represents the "player" - the human sitting at the computer
+ *    - Persists across Pawn deaths/respawns (unlike the Pawn itself)
+ *    - Handles input processing before passing to the Pawn
+ *    - Manages possession (which Pawn the player controls)
+ *    - One PlayerController per human player in the game
+ *
+ *    IMPORTANT DISTINCTION:
+ *    - PlayerController = The player's "soul" - handles input, UI, cameras
+ *    - Pawn = The player's "body" - the vehicle they're driving
+ *    - PlayerState = The player's "stats" - score, name, replicated data
+ *
+ * 2. ENHANCED INPUT SYSTEM:
+ *    - Unreal Engine 5's modern, flexible input system
+ *    - Input Actions: Named actions (Accelerate, Brake, Steer)
+ *    - Input Mapping Contexts: Which keys/buttons trigger which actions
+ *    - FInputActionValue: The value from an input (axis values, booleans)
+ *
+ *    INPUT FLOW:
+ *    Physical Input -> Mapping Context -> Input Action -> Handler Function
+ *
+ * 3. INPUT MODES:
+ *    - Driving: Full vehicle control, minimal UI
+ *    - Menu: Cursor visible, UI-focused input
+ *    - Spectating: Camera control only, no vehicle
+ *    - Replay: Playback controls, timeline scrubbing
+ *    - PhotoMode: Camera positioning, no vehicle physics
+ *    - Chat: Text input focused
+ *
+ * 4. NETWORK REPLICATION (Multiplayer):
+ *    - Server: Has authority, validates all actions
+ *    - Client: Predicts locally, sends requests to server
+ *    - RPCs (Remote Procedure Calls): Functions that run on server/client
+ *      - Server RPC: Client calls, server executes (e.g., ServerUpdateVehicleInput)
+ *      - Client RPC: Server calls, client executes (e.g., ClientOnRaceStarted)
+ *
+ * 5. VEHICLE INPUT STATE (FMGVehicleInputState):
+ *    - Captures all current input values in one struct
+ *    - Replicated to server for authoritative physics
+ *    - Includes: throttle, brake, steering, nitro, handbrake, gear shifts
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ * -----------------------------------------
+ *
+ *   [Human Player]
+ *         |
+ *         v (input)
+ *   [AMGPlayerController] <-- This file
+ *         |
+ *         +-- Possesses --> [AMGVehiclePawn] (the car)
+ *         |
+ *         +-- References --> [AMGPlayerState] (multiplayer data)
+ *         |
+ *         +-- Uses --> [UMGInputRemapSubsystem] (rebindable controls)
+ *
+ *   In Multiplayer:
+ *   [Client PlayerController] --ServerRPC--> [Server] --Replication--> [All Clients]
+ *
+ * EVENT HANDLERS:
+ * ---------------
+ * This controller subscribes to MANY game events (near misses, drifts, jumps,
+ * takedowns, etc.) to provide feedback to the player. These handlers are at
+ * the bottom of the file and demonstrate how to:
+ * - Subscribe to subsystem events
+ * - Filter events for the local player
+ * - Trigger UI feedback (HUD notifications, sounds)
+ *
+ * COMMON PATTERNS:
+ * ----------------
+ * @code
+ * // Get the local player's controller
+ * AMGPlayerController* PC = Cast<AMGPlayerController>(GetWorld()->GetFirstPlayerController());
+ *
+ * // Check if we can drive
+ * if (PC && PC->CanDrive())
+ * {
+ *     // Vehicle controls are active
+ * }
+ *
+ * // Switch to spectator mode
+ * PC->EnterSpectatorMode();
+ * PC->SpectateNextPlayer();
+ *
+ * // Send a quick chat message
+ * PC->SendQuickChat(0); // "Good race!"
+ * @endcode
+ *
+ * @see AMGVehiclePawn The vehicle being controlled
+ * @see AMGPlayerState The player's replicated state
+ * @see UMGInputConfig The input configuration asset
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -69,9 +177,30 @@ enum class EMGCareerChapter : uint8;
 enum class EMGCareerMilestone : uint8;
 struct FMGCareerObjective;
 struct FMGRival;
+enum class EMGTimeOfDay : uint8;
+enum class EMGDraftingZone : uint8;
+
+// ============================================================================
+// INPUT STATE STRUCT - Captures all vehicle control inputs
+// ============================================================================
 
 /**
  * Vehicle input state - replicated for multiplayer
+ *
+ * This struct captures the complete state of all vehicle controls at a
+ * point in time. It's sent to the server each frame (via unreliable RPC)
+ * so the server can simulate the vehicle authoritatively.
+ *
+ * WHY A STRUCT?
+ * - Groups all inputs together for easy transmission
+ * - Single replicated property instead of many
+ * - Can be interpolated/predicted on clients
+ *
+ * VALUES:
+ * - Throttle/Brake: 0.0 to 1.0 (how hard you're pressing)
+ * - Steering: -1.0 (full left) to 1.0 (full right)
+ * - Booleans: Digital on/off states
+ * - GearShift: -1 = shift down, 0 = none, 1 = shift up
  */
 USTRUCT(BlueprintType)
 struct FMGVehicleInputState
@@ -106,8 +235,20 @@ struct FMGVehicleInputState
 	FVector LookDirection = FVector::ForwardVector;
 };
 
+// ============================================================================
+// INPUT MODE ENUM - What type of input is currently active
+// ============================================================================
+
 /**
  * Player controller input mode
+ *
+ * Different game situations require different input handling:
+ * - Driving needs precise analog control
+ * - Menus need mouse/cursor support
+ * - Spectating needs camera-only controls
+ *
+ * When the mode changes, the controller swaps Input Mapping Contexts
+ * to change which actions are available.
  */
 UENUM(BlueprintType)
 enum class EMGInputMode : uint8
@@ -126,8 +267,18 @@ enum class EMGInputMode : uint8
 	Chat
 };
 
+// ============================================================================
+// DELEGATES - Events broadcast by the controller
+// ============================================================================
+
 /**
- * Delegates
+ * Controller event delegates
+ *
+ * These events let other systems (especially UI) react to controller
+ * state changes. For example:
+ * - OnInputModeChanged: Update HUD visibility
+ * - OnVehiclePossessed: Initialize vehicle-specific UI
+ * - OnQuickChatSent: Show chat bubble animation
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputModeChanged, EMGInputMode, NewMode);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVehiclePossessed, AMGVehiclePawn*, Vehicle);
@@ -135,17 +286,51 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnVehicleUnpossessed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuickChatSent, int32, QuickChatIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResetVehicleRequested);
 
+// ============================================================================
+// MAIN PLAYER CONTROLLER CLASS
+// ============================================================================
+
 /**
- * Player Controller
- * Handles player input, camera control, and multiplayer communication
+ * Player Controller - The bridge between human input and game systems
  *
- * Features:
- * - Enhanced Input System integration
- * - Multiplayer input replication
- * - Input remapping support
- * - Camera management
- * - Quick chat system
- * - Spectator mode
+ * RESPONSIBILITIES:
+ * -----------------
+ * 1. INPUT PROCESSING
+ *    - Receives raw input from Enhanced Input System
+ *    - Converts to game actions (accelerate, steer, etc.)
+ *    - Applies input mode filtering (can't drive in menus)
+ *
+ * 2. VEHICLE CONTROL
+ *    - Possesses/unpossesses vehicle pawns
+ *    - Sends input to vehicle for physics simulation
+ *    - Handles camera switching
+ *
+ * 3. MULTIPLAYER
+ *    - Replicates input to server (Server RPCs)
+ *    - Receives game events from server (Client RPCs)
+ *    - Manages local prediction vs server authority
+ *
+ * 4. UI COORDINATION
+ *    - Toggles pause menu
+ *    - Manages input mode (game vs UI)
+ *    - Broadcasts events for HUD updates
+ *
+ * 5. SPECTATING
+ *    - Allows watching other players after finishing/crashing
+ *    - Cycles through active racers
+ *
+ * LIFECYCLE:
+ * ----------
+ * BeginPlay() -> SetupInputComponent() -> OnPossess() -> PlayerTick() -> OnUnPossess() -> EndPlay()
+ *
+ * IMPORTANT OVERRIDES:
+ * - SetupInputComponent(): Binds input actions to handler functions
+ * - OnPossess(): Called when taking control of a vehicle
+ * - PlayerTick(): Called every frame, applies input to vehicle
+ * - GetLifetimeReplicatedProps(): Defines what replicates in multiplayer
+ *
+ * @see APlayerController The Unreal base class
+ * @see AMGVehiclePawn The vehicle being controlled
  */
 UCLASS()
 class MIDNIGHTGRIND_API AMGPlayerController : public APlayerController
@@ -404,8 +589,14 @@ protected:
 	TObjectPtr<UMGInputRemapSubsystem> InputRemapSubsystem;
 
 	// ==========================================
-	// INPUT HANDLERS
+	// INPUT HANDLERS - Enhanced Input callbacks
 	// ==========================================
+	// These functions are bound to Input Actions in SetupInputComponent().
+	// They receive FInputActionValue which contains the input data:
+	// - For digital inputs: Get<bool>()
+	// - For 1D axis: Get<float>()
+	// - For 2D axis: Get<FVector2D>()
+	// - For 3D axis: Get<FVector>()
 
 	void OnAccelerate(const FInputActionValue& Value);
 	void OnAccelerateReleased(const FInputActionValue& Value);
@@ -434,10 +625,12 @@ protected:
 	void OnRewind(const FInputActionValue& Value);
 
 	// ==========================================
-	// INTERNAL
+	// INTERNAL HELPERS
 	// ==========================================
+	// Private implementation functions that support the public API.
+	// These handle the "how" while public functions define the "what".
 
-	/** Apply vehicle input to pawn */
+	/** Apply vehicle input to pawn - called every tick */
 	void ApplyVehicleInput();
 
 	/** Update input mapping context based on mode */
@@ -446,7 +639,18 @@ protected:
 	/** Find spectate targets */
 	TArray<APlayerState*> GetSpectateTargets() const;
 
-	/** Server RPC to update vehicle input */
+	// ==========================================
+	// NETWORK RPCs - Remote Procedure Calls
+	// ==========================================
+	// RPCs are functions that execute on a different machine (client/server).
+	// - Server: Client calls this, server executes it
+	// - Client: Server calls this, specific client executes it
+	// - NetMulticast: Server calls, all clients execute
+	//
+	// Reliable: Guaranteed delivery (use for important game events)
+	// Unreliable: May be dropped (use for frequent updates like input)
+
+	/** Server RPC to update vehicle input - called frequently, unreliable is fine */
 	UFUNCTION(Server, Unreliable)
 	void ServerUpdateVehicleInput(const FMGVehicleInputState& Input);
 
@@ -461,6 +665,19 @@ protected:
 	/** Client callback when race ends */
 	UFUNCTION(Client, Reliable)
 	void ClientOnRaceEnded();
+
+	// ==========================================
+	// GAME EVENT HANDLERS - Subsystem callbacks
+	// ==========================================
+	// The controller subscribes to events from various game subsystems.
+	// When events occur, these handlers are called to provide player feedback.
+	//
+	// PATTERN: Each handler typically:
+	// 1. Checks if the event is for the local player (GetLocalPlayerId())
+	// 2. Triggers HUD notifications, sounds, or visual effects
+	// 3. Updates any local state tracking
+	//
+	// These are bound in BeginPlay() using AddDynamic() on subsystem delegates.
 
 	/** Handle wrong-way detection from checkpoint subsystem */
 	UFUNCTION()
@@ -812,4 +1029,36 @@ protected:
 	/** Handle nemesis designated from rivals subsystem */
 	UFUNCTION()
 	void OnNemesisDesignated(const FMGRival& Nemesis);
+
+	// ==========================================
+	// TIME OF DAY HANDLERS
+	// ==========================================
+
+	/** Handle time of day period change */
+	UFUNCTION()
+	void OnTimeOfDayChanged(EMGTimeOfDay OldTime, EMGTimeOfDay NewTime);
+
+	/** Handle midnight reached */
+	UFUNCTION()
+	void OnMidnightReached(int32 GameDay);
+
+	// ==========================================
+	// SLIPSTREAM HANDLERS
+	// ==========================================
+
+	/** Handle entering slipstream draft zone */
+	UFUNCTION()
+	void OnSlipstreamEntered(AActor* LeadVehicle, EMGDraftingZone Zone);
+
+	/** Handle exiting slipstream */
+	UFUNCTION()
+	void OnSlipstreamExited();
+
+	/** Handle slingshot boost ready */
+	UFUNCTION()
+	void OnSlingshotReady();
+
+	/** Handle slingshot boost activated */
+	UFUNCTION()
+	void OnSlingshotActivated(float BonusSpeed);
 };

@@ -1,5 +1,140 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRetroRenderingSettings.h
+ * @brief PS1/PS2 era retro rendering effects system for Midnight Grind
+ *
+ * This file defines the retro rendering component and utility classes that recreate
+ * the visual aesthetic of PlayStation 1 and PlayStation 2 era racing games. These
+ * effects are central to Midnight Grind's unique Y2K visual identity.
+ *
+ * @section Overview
+ *
+ * The retro rendering system provides a comprehensive suite of post-processing and
+ * rendering modifications that simulate the technical limitations and distinctive
+ * visual characteristics of late 90s/early 2000s hardware. This includes vertex
+ * wobble, texture warping, color quantization, and CRT display simulation.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **1. Why PS1/PS2 Graphics Look Different**
+ *
+ * Early 3D consoles had hardware limitations that created distinctive visual artifacts:
+ * - **Vertex Snapping**: PS1 had no floating-point math, so vertices "snapped" to a grid
+ * - **Affine Texture Mapping**: Textures warped because of simplified projection math
+ * - **Limited Color Depth**: PS1 used 15-bit color (32,768 colors vs 16.7 million today)
+ * - **No Z-Buffer**: Objects could flicker and intersect incorrectly
+ *
+ * **2. Intensity Presets (EMGRetroIntensity)**
+ *
+ * The system offers presets for different levels of retro authenticity:
+ * - Subtle: Modern graphics with light retro touches
+ * - Medium: Balanced PS2-era look
+ * - Authentic: Strong PS1-era characteristics
+ * - Extreme: Maximum lo-fi, very stylized
+ * - Custom: User-defined settings
+ *
+ * **3. Key Effects Explained**
+ *
+ * - **Vertex Snap/Wobble**: Positions snap to a grid, causing geometry to "wobble"
+ *   as the camera moves. This is THE signature PS1 look.
+ *
+ * - **Affine Texture Mapping**: Textures warp and swim on surfaces, especially
+ *   noticeable on large polygons viewed at angles.
+ *
+ * - **Color Quantization & Dithering**: Reduces color palette and uses dithering
+ *   patterns (like Bayer matrix) to simulate gradients with fewer colors.
+ *
+ * - **CRT Simulation**: Adds scanlines, curvature, chromatic aberration, and
+ *   phosphor glow to simulate viewing on an old CRT television.
+ *
+ * **4. Component-Based Architecture**
+ *
+ * UMGRetroRenderingComponent can be attached to any actor (usually the camera)
+ * to apply retro effects. Multiple components can coexist for layered effects.
+ *
+ * @section Usage Usage Example
+ *
+ * @code
+ * // In your camera actor or player controller
+ * void AMyPlayerController::BeginPlay()
+ * {
+ *     Super::BeginPlay();
+ *
+ *     // Add retro rendering component
+ *     UMGRetroRenderingComponent* RetroFX = NewObject<UMGRetroRenderingComponent>(this);
+ *     RetroFX->RegisterComponent();
+ *
+ *     // Apply a preset
+ *     RetroFX->ApplyPreset(EMGRetroIntensity::Authentic);
+ *
+ *     // Or customize individual settings
+ *     FMGRetroRenderConfig Config;
+ *     Config.bEnableVertexSnap = true;
+ *     Config.VertexSnapGridSize = 160.0f;  // Classic PS1 grid
+ *     Config.ColorLevelsPerChannel = 32;   // 15-bit color simulation
+ *     Config.DitherPattern = EMGDitherPattern::Bayer4x4;
+ *     Config.CRTType = EMGCRTType::Standard;
+ *     Config.ScanlineIntensity = 0.3f;
+ *     RetroFX->SetConfiguration(Config);
+ * }
+ *
+ * // Toggle retro effects at runtime (e.g., from options menu)
+ * void AMyPlayerController::ToggleRetroEffects(bool bEnabled)
+ * {
+ *     RetroFX->SetRetroEffectsEnabled(bEnabled);
+ * }
+ *
+ * // Utility functions for shader calculations
+ * FLinearColor QuantizedColor = UMGRetroRenderingUtility::QuantizeColor(
+ *     OriginalColor, 32);  // 32 levels per channel
+ *
+ * FVector SnappedPos = UMGRetroRenderingUtility::SnapVertexPosition(
+ *     WorldPosition, 160.0f);  // 160-unit grid
+ * @endcode
+ *
+ * @section Settings Configuration Settings Breakdown
+ *
+ * | Category      | Key Settings                              | PS1-Authentic Values |
+ * |---------------|-------------------------------------------|---------------------|
+ * | Resolution    | ResolutionScale, bPointFilterUpscale     | 0.25, true          |
+ * | Vertex        | VertexSnapGridSize, VertexJitterIntensity| 160, 0.3            |
+ * | Texture       | AffineMappingIntensity, TextureLODBias   | 0.5, 1.0            |
+ * | Color         | ColorLevelsPerChannel, DitherPattern     | 32, Bayer4x4        |
+ * | CRT           | ScanlineIntensity, CRTCurvature          | 0.3, 0.1            |
+ * | Special       | NeonGlowIntensity, LightStreakLength     | 1.5, 0.3            |
+ *
+ * @section Architecture Architecture
+ *
+ * @code
+ * UMGRetroRenderingComponent (Actor Component)
+ *     |
+ *     +-- FMGRetroRenderConfig (Configuration struct)
+ *     |       |
+ *     |       +-- Resolution settings
+ *     |       +-- Vertex effects
+ *     |       +-- Texture effects
+ *     |       +-- Color/Dithering
+ *     |       +-- CRT simulation
+ *     |       +-- Lighting/Fog
+ *     |       +-- Special effects (neon glow)
+ *     |
+ *     +-- UMaterialInterface* RetroPostProcessMaterial
+ *     +-- UMaterialParameterCollection* RetroParameterCollection
+ *
+ * UMGRetroRenderingUtility (Static Function Library)
+ *     +-- GetPresetConfig()
+ *     +-- CalculateBayerDither()
+ *     +-- QuantizeColor()
+ *     +-- SnapVertexPosition()
+ *     +-- CalculateAffineUV()
+ * @endcode
+ *
+ * @see UMGPostProcessSubsystem for additional post-processing effects
+ * @see EMGRetroIntensity for preset intensity levels
+ * @see EMGCRTType for CRT display simulation types
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

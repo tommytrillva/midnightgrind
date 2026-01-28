@@ -1,5 +1,276 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGMarketplaceSubsystem.h
+ * @brief Player-to-Player Marketplace - Trading, auctions, and item exchange system
+ * @author Midnight Grind Team
+ * @version 1.0
+ *
+ * @section overview Overview
+ * ============================================================================
+ * MGMarketplaceSubsystem.h
+ * Midnight Grind - Player-to-Player Trading and Marketplace System
+ * ============================================================================
+ *
+ * This subsystem implements an in-game economy where players can buy from, sell to,
+ * and trade with other players. Think of it like eBay or the Grand Exchange
+ * (RuneScape) but for car parts and cosmetics!
+ *
+ * @section features Three Main Features
+ * 1. FIXED PRICE LISTINGS: "I'm selling this for 1000 credits - buy it or don't"
+ * 2. AUCTIONS: "Bid on this item, highest bidder wins when time runs out"
+ * 3. DIRECT TRADES: "Hey, I'll give you my wheels if you give me your spoiler"
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection listingtypes 1. Listing Types (EMGListingType)
+ * - FixedPrice: Set a price, first buyer gets it
+ * - Auction: Players bid, highest wins when timer ends
+ * - BuyNow: Auction with a "skip bidding" instant-buy option
+ * - Trade: Direct player-to-player item swaps
+ *
+ * @subsection listingstatus 2. Listing Status (EMGListingStatus)
+ * - Active: Currently for sale/auction
+ * - Pending: Awaiting approval (if moderation exists)
+ * - Sold: Transaction completed
+ * - Expired: Time ran out with no sale
+ * - Cancelled: Seller removed it
+ * - Disputed: Problem reported (chargebacks, etc.)
+ *
+ * @subsection reputation 3. Seller Reputation (FMGMarketplaceSeller)
+ * - Players build reputation through successful trades
+ * - SellerRating: Average score from buyers
+ * - PositiveFeedback/NegativeFeedback: Counts of reviews
+ * - bIsVerified: Account verification status
+ * - bIsPremiumSeller: Special seller perks/status
+ *
+ * @subsection bidding 4. Bidding Mechanics (FMGBidInfo)
+ * - Players place bids on auctions
+ * - MinBidIncrement: Minimum amount above current bid
+ * - Auto-bid (bIsAutoBid): System auto-bids up to your MaxAutoBid
+ * - Reserve price: Minimum the seller will accept (hidden or shown)
+ *
+ * @subsection trading 5. Trading (FMGTradeOffer)
+ * - Two players exchange items directly
+ * - Both must confirm (bInitiatorConfirmed, bRecipientConfirmed)
+ * - Counter-offers: "No, but how about this instead?"
+ * - Can include currency on either side (items + cash)
+ *
+ * @subsection watchlist 6. Watch List
+ * - Players can "watch" listings they're interested in
+ * - Get notified when price drops or auction is ending
+ * - bIsWatched on listing, WatchedListingIds stored locally
+ *
+ * @subsection pricehistory 7. Price History (FMGPriceHistory)
+ * - Historical data on what items have sold for
+ * - Helps players know if a price is fair
+ * - Shows trends: LowestPrice, HighestPrice, AveragePrice
+ *
+ * @section datatypes Important Data Types
+ * - int64: 64-bit integer for large numbers (currency can get big!)
+ *   Don't use int32 for currency - can overflow with millions
+ * - FDateTime: Point in time (when listed, when expires)
+ *   EndTime - FDateTime::Now() = time remaining
+ * - FTimespan: Duration (time remaining on auction)
+ *   GetTimeRemaining() calculates this from EndTime
+ * - TMap<FString, ...>: Dictionary/hashtable
+ *   AllListings maps listing IDs to their data
+ *
+ * @section usage Usage Examples
+ *
+ * @code
+ * // Get the subsystem
+ * UMGMarketplaceSubsystem* Market = GetGameInstance()->GetSubsystem<UMGMarketplaceSubsystem>();
+ *
+ * // === SELLING ===
+ * // Create a fixed-price listing
+ * FMGMarketItem MyItem;
+ * MyItem.ItemId = FName("Spoiler_Carbon_001");
+ * MyItem.ItemName = FText::FromString("Carbon Fiber Spoiler");
+ * MyItem.Category = EMGMarketCategory::Spoilers;
+ * MyItem.Rarity = EMGMarketRarity::Rare;
+ * Market->CreateListing(MyItem, EMGListingType::FixedPrice, 5000, FTimespan::FromDays(7));
+ *
+ * // Create an auction
+ * Market->CreateAuction(MyItem, 1000, 4000, 6000, FTimespan::FromHours(24));
+ * // StartingBid=1000, Reserve=4000, BuyNow=6000, Duration=24hrs
+ *
+ * // Monitor your listings
+ * TArray<FMGMarketplaceListing> MyListings = Market->GetMyListings();
+ *
+ * // === BUYING ===
+ * // Search for items
+ * FMGMarketSearchFilter Filter;
+ * Filter.Categories.Add(EMGMarketCategory::Wheels);
+ * Filter.MaxPrice = 10000;
+ * Filter.bVerifiedSellersOnly = true;
+ * Market->SearchListings(Filter);
+ *
+ * // Buy a fixed-price listing
+ * Market->BuyListing("listing_123");
+ *
+ * // Place a bid on an auction
+ * Market->PlaceBid("auction_456", 2500);
+ * // Or set up auto-bidding
+ * Market->SetAutoBid("auction_456", 5000);  // Bid up to 5000 automatically
+ *
+ * // Watch an item for later
+ * Market->AddToWatchList("listing_789");
+ *
+ * // === TRADING ===
+ * // Create a trade offer
+ * TArray<FMGMarketItem> MyItems;  // Items I'm offering
+ * TArray<FMGMarketItem> WantItems; // Items I want
+ * Market->CreateTradeOffer("player_456", MyItems, WantItems, 1000, 0);
+ * // Offering my items + 1000 credits for their items
+ *
+ * // Respond to trade offers
+ * TArray<FMGTradeOffer> Pending = Market->GetPendingTrades();
+ * Market->AcceptTrade("trade_123");
+ * // Or counter
+ * Market->CounterTrade("trade_123", CounterItems, WantItems, 500, 0);
+ *
+ * // Listen for events
+ * Market->OnListingSold.AddDynamic(this, &UMyClass::HandleSold);
+ * Market->OnBidOutbid.AddDynamic(this, &UMyClass::HandleOutbid);
+ * @endcode
+ *
+ * @section delegates Available Delegates
+ * - OnListingCreated: New listing successfully created
+ * - OnListingSold: Your item sold!
+ * - OnBidPlaced: A bid was placed on a listing
+ * - OnBidOutbid: Someone outbid you
+ * - OnAuctionWon: You won an auction
+ * - OnTradeOfferReceived: Someone wants to trade with you
+ * - OnTradeCompleted: Trade successfully completed
+ * - OnMarketSearchComplete: Search results returned
+ * - OnListingExpiring: Auction ending soon (for urgency UI)
+ *
+ * @section fees Marketplace Fee
+ * The marketplace takes a percentage cut of sales (MarketplaceFeePercent).
+ * Use GetMarketplaceFee(SalePrice) to calculate what the seller actually receives.
+ * This is standard for player economies to act as a "gold sink."
+ *
+ * @see UMGEconomySubsystem For managing player currency
+ * @see UMGInventorySubsystem For tracking owned items
+ * ============================================================================
+ */
+
+// MidnightGrind - Arcade Street Racing Game
+// Marketplace Subsystem - Player-to-player trading, auctions, and marketplace
+
+/*******************************************************************************
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This header defines the Marketplace Subsystem - an in-game economy where players
+ * can buy from, sell to, and trade with other players. Think of it like eBay or
+ * a Grand Exchange (RuneScape) but for car parts and cosmetics!
+ *
+ * THREE MAIN FEATURES:
+ * 1. FIXED PRICE LISTINGS: "I'm selling this for 1000 credits - buy it or don't"
+ * 2. AUCTIONS: "Bid on this item, highest bidder wins when time runs out"
+ * 3. DIRECT TRADES: "Hey, I'll give you my wheels if you give me your spoiler"
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. LISTING TYPES (EMGListingType):
+ *    - FixedPrice: Set a price, first buyer gets it
+ *    - Auction: Players bid, highest wins when timer ends
+ *    - BuyNow: Auction with a "skip bidding" instant-buy option
+ *    - Trade: Direct player-to-player item swaps
+ *
+ * 2. LISTING STATUS (EMGListingStatus):
+ *    - Active: Currently for sale/auction
+ *    - Pending: Awaiting approval (if moderation exists)
+ *    - Sold: Transaction completed
+ *    - Expired: Time ran out with no sale
+ *    - Cancelled: Seller removed it
+ *    - Disputed: Problem reported (chargebacks, etc.)
+ *
+ * 3. SELLER REPUTATION (FMGMarketplaceSeller):
+ *    - Players build reputation through successful trades
+ *    - SellerRating: Average score from buyers
+ *    - PositiveFeedback/NegativeFeedback: Counts of reviews
+ *    - bIsVerified: Account verification status
+ *    - bIsPremiumSeller: Special seller perks/status
+ *
+ * 4. BIDDING MECHANICS (FMGBidInfo):
+ *    - Players place bids on auctions
+ *    - MinBidIncrement: Minimum amount above current bid
+ *    - Auto-bid (bIsAutoBid): System auto-bids up to your MaxAutoBid
+ *    - Reserve price: Minimum the seller will accept (hidden or shown)
+ *
+ * 5. TRADING (FMGTradeOffer):
+ *    - Two players exchange items directly
+ *    - Both must confirm (bInitiatorConfirmed, bRecipientConfirmed)
+ *    - Counter-offers: "No, but how about this instead?"
+ *    - Can include currency on either side (items + cash)
+ *
+ * 6. WATCH LIST:
+ *    - Players can "watch" listings they're interested in
+ *    - Get notified when price drops or auction is ending
+ *    - bIsWatched on listing, WatchedListingIds stored locally
+ *
+ * 7. PRICE HISTORY (FMGPriceHistory):
+ *    - Historical data on what items have sold for
+ *    - Helps players know if a price is fair
+ *    - Shows trends: LowestPrice, HighestPrice, AveragePrice
+ *
+ * IMPORTANT DATA TYPES:
+ * ---------------------
+ *
+ * int64: 64-bit integer for large numbers (currency can get big!)
+ *   - Don't use int32 for currency - can overflow with millions
+ *
+ * FDateTime: Point in time (when listed, when expires)
+ *   - EndTime - FDateTime::Now() = time remaining
+ *
+ * FTimespan: Duration (time remaining on auction)
+ *   - GetTimeRemaining() calculates this from EndTime
+ *
+ * TMap<FString, ...>: Dictionary/hashtable
+ *   - AllListings maps listing IDs to their data
+ *   - Fast lookup: AllListings[ListingId]
+ *
+ * HOW TO USE THIS SYSTEM:
+ * -----------------------
+ * SELLING:
+ *   1. Create listing: CreateListing(Item, Type, Price, Duration)
+ *   2. For auctions: CreateAuction(Item, StartBid, Reserve, BuyNow, Duration)
+ *   3. Monitor: GetMyListings()
+ *   4. Cancel if needed: CancelListing(ListingId)
+ *
+ * BUYING:
+ *   1. Search: SearchListings(Filter)
+ *   2. Fixed price: BuyListing(ListingId)
+ *   3. Auctions: PlaceBid(ListingId, Amount) or SetAutoBid()
+ *   4. Watch items: AddToWatchList(ListingId)
+ *
+ * TRADING:
+ *   1. Create offer: CreateTradeOffer(PlayerId, MyItems, WantItems, MyCurrency, WantCurrency)
+ *   2. Respond: AcceptTrade(), DeclineTrade(), or CounterTrade()
+ *   3. Check offers: GetPendingTrades()
+ *
+ * DELEGATES (EVENTS):
+ * -------------------
+ * - OnListingSold: Your item sold!
+ * - OnBidOutbid: Someone outbid you
+ * - OnAuctionWon: You won an auction
+ * - OnTradeOfferReceived: Someone wants to trade with you
+ * - OnListingExpiring: Auction ending soon (for urgency UI)
+ *
+ * MARKETPLACE FEE:
+ * ----------------
+ * The marketplace takes a percentage cut of sales (MarketplaceFeePercent).
+ * Use GetMarketplaceFee(SalePrice) to calculate what the seller actually receives.
+ * This is standard for player economies to act as a "gold sink."
+ *
+ ******************************************************************************/
+
 // MidnightGrind - Arcade Street Racing Game
 // Marketplace Subsystem - Player-to-player trading, auctions, and marketplace
 

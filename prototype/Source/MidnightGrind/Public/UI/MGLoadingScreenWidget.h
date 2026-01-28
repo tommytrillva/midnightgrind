@@ -1,5 +1,85 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGLoadingScreenWidget.h
+ * @brief Loading screen UI with progress bar, tips, and race info display
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the loading screen widget displayed during level transitions.
+ * The loading screen provides visual feedback during potentially long load times
+ * and uses that time to inform/engage players with:
+ *
+ * - Animated progress bar showing load completion percentage
+ * - Rotating gameplay tips appropriate to player skill level
+ * - Track and vehicle previews when loading into races
+ * - Race configuration summary (laps, weather, opponents)
+ *
+ * The visual design follows the Y2K neon aesthetic with animated backgrounds,
+ * glowing progress bars, and bold typography.
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Loading Context**: Different content based on what's loading (race track
+ *   shows track preview, main menu shows game logo, etc.)
+ *
+ * - **Tip Rotation**: Tips cycle automatically on a timer, filtered by player
+ *   level so beginners see basic tips and experts see advanced techniques.
+ *
+ * - **Smooth Progress**: The displayed progress interpolates smoothly rather
+ *   than jumping, creating a more polished feel even with uneven load times.
+ *
+ * - **Fade Transitions**: Fade-in on appear, fade-out when load completes to
+ *   smooth the transition to gameplay.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [Level Loading System]
+ *          |
+ *          +-- SetProgress(0.0 to 1.0) --> [MGLoadingScreenWidget]
+ *          |                                      |
+ *          +-- SetContext(Race/Garage/...)        +-- Progress Bar Animation
+ *          |                                      |
+ *          +-- SetRaceData(track, vehicle...)     +-- Tip Rotation Timer
+ *          |                                      |
+ *          +-- SetLoadingComplete()               +-- Race Info Display
+ *                                                 |
+ *                                                 +-- Animated Background
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Create loading screen
+ * UMGLoadingScreenWidget* LoadScreen = CreateWidget<UMGLoadingScreenWidget>(
+ *     GetWorld(), LoadingScreenClass);
+ *
+ * // Configure for race loading
+ * FMGRaceLoadingData RaceData;
+ * RaceData.TrackName = FText::FromString("Downtown Circuit");
+ * RaceData.LapCount = 3;
+ * RaceData.RacerCount = 8;
+ * LoadScreen->SetContext(EMGLoadingContext::Race);
+ * LoadScreen->SetRaceData(RaceData);
+ *
+ * // Add loading tips
+ * TArray<FMGLoadingTip> Tips;
+ * FMGLoadingTip Tip;
+ * Tip.TipText = FText::FromString("Draft behind opponents for a speed boost!");
+ * Tips.Add(Tip);
+ * LoadScreen->SetLoadingTips(Tips);
+ *
+ * // Display and update progress
+ * LoadScreen->AddToViewport(100); // High Z-order to be on top
+ * LoadScreen->SetProgress(0.5f);  // 50% loaded
+ * LoadScreen->SetLoadingComplete(); // Triggers fade-out
+ * @endcode
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,8 +91,13 @@ class UImage;
 class UProgressBar;
 class UCanvasPanel;
 
+// =============================================================================
+// Enums and Structs
+// =============================================================================
+
 /**
  * Loading screen context - what we're loading into
+ * Determines which UI sections to display and what content to show
  */
 UENUM(BlueprintType)
 enum class EMGLoadingContext : uint8

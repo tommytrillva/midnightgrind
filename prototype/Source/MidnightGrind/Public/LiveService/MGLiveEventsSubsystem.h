@@ -1,36 +1,135 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGLiveEventsSubsystem.h
- * @brief Live Events Subsystem for managing time-limited events, challenges, and community goals.
+ * =============================================================================
+ * MGLiveEventsSubsystem.h
+ * Live Events Subsystem - Time-Limited Events, Challenges, and Community Goals
+ * =============================================================================
  *
- * This subsystem is the central hub for all live service event functionality in Midnight Grind.
- * It handles the lifecycle of time-limited events, tracks player progress through challenges,
- * manages community-wide goals, and coordinates featured playlists with bonus multipliers.
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This subsystem is the central hub for all live service event functionality in
+ * Midnight Grind. It manages time-limited events, tracks player progress through
+ * challenges, handles community-wide goals, and coordinates featured playlists
+ * with bonus multipliers.
  *
- * ## Key Concepts for Entry-Level Developers:
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
  *
- * **Live Events**: Time-limited gameplay experiences that appear on a schedule. Events can be
- * weekend specials, weekly challenges, holiday celebrations, or flash events lasting only hours.
+ * 1. LIVE EVENTS (FMGLiveEvent)
+ *    Time-limited gameplay experiences that appear on a schedule:
+ *    - Weekend specials (Friday-Sunday bonus events)
+ *    - Weekly challenges (reset every Monday)
+ *    - Holiday celebrations (Halloween, Christmas themes)
+ *    - Flash events (2-6 hours, creates urgency)
+ *    - Collaboration events (cross-promotion with other brands)
  *
- * **Challenges**: Specific objectives players must complete within an event (e.g., "Win 5 races",
- * "Drift 10,000 meters"). Each challenge tracks progress and awards rewards upon completion.
+ * 2. CHALLENGES (FMGEventChallenge)
+ *    Specific objectives players must complete within an event:
+ *    - "Win 5 races" -> Type: WinRaces, TargetValue: 5
+ *    - "Drift 10,000 meters" -> Type: DriftDistance, TargetValue: 10000
+ *    - Challenges contain one or more Objectives (FMGChallengeObjective)
+ *    - Each tracks progress toward TargetValue
+ *    - Rewards are granted when all objectives complete
  *
- * **Community Goals**: Server-wide objectives where all players contribute to a shared target.
- * These create a sense of collective achievement and unlock tiered rewards for everyone.
+ * 3. COMMUNITY GOALS (FMGCommunityGoal)
+ *    Server-wide objectives where ALL players contribute:
+ *    - "Community drives 1 billion meters"
+ *    - Progress is synced from server
+ *    - Rewards unlock at tier thresholds (25%, 50%, 75%, 100%)
+ *    - Everyone who participates gets the unlocked rewards
  *
- * **Featured Playlists**: Curated collections of tracks/races with bonus XP and cash multipliers
- * to incentivize players to try specific content during events.
+ * 4. FEATURED PLAYLISTS (FMGFeaturedPlaylist)
+ *    Curated collections of races with bonus multipliers:
+ *    - Specific tracks/weather/time of day combinations
+ *    - XP multiplier (e.g., 1.5x) and Cash multiplier
+ *    - Rotate based on current events
+ *    - Incentivize players to try specific content
  *
- * ## Typical Usage Flow:
- * 1. Call RefreshEvents() at startup and periodically to sync with server
- * 2. Use GetActiveEvents() to display current events to players
- * 3. Call ReportChallengeProgress() after races to update challenge completion
- * 4. Listen to OnChallengeCompleted to notify players and show claim UI
- * 5. Call ClaimChallengeReward() when player acknowledges completion
+ * 5. EVENT LIFECYCLE (EMGEventStatus)
+ *    Events automatically progress through states:
+ *    Upcoming -> Active -> EndingSoon -> Completed/Expired
+ *    - UI uses status to show countdown timers, warnings
+ *    - EndingSoon triggers "1 hour left!" notifications
  *
- * @see UMGSeasonPassSubsystem for season pass progression
- * @see UMGEventCalendarSubsystem for event scheduling
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ *
+ *     +-------------------+
+ *     | Server Backend    |
+ *     | (Event Config)    |
+ *     +-------------------+
+ *              |
+ *              | RefreshEvents()
+ *              v
+ *     +------------------------+
+ *     | UMGLiveEventsSubsystem |  <-- This file
+ *     | (GameInstanceSubsystem)|
+ *     +------------------------+
+ *              |
+ *    +---------+---------+
+ *    |         |         |
+ *    v         v         v
+ * [Events] [Challenges] [Community]
+ *    |         |         |
+ *    +---------+---------+
+ *              |
+ *              | ReportChallengeProgress()
+ *              v
+ *     +-------------------+
+ *     | Race Results      |
+ *     | (Gameplay System) |
+ *     +-------------------+
+ *              |
+ *              | Delegates
+ *              v
+ *     +-------------------+
+ *     | UI Widgets        |
+ *     | (Progress/Rewards)|
+ *     +-------------------+
+ *
+ * TYPICAL USAGE FLOW:
+ * -------------------
+ * 1. At login: RefreshEvents() syncs event data from server
+ * 2. Tick(): UpdateEventStatuses() checks times, transitions states
+ * 3. Player views Events screen -> GetActiveEvents() returns current events
+ * 4. Player completes race -> ReportChallengeProgress(WinRaces, 1, TrackID, VehicleID)
+ * 5. Subsystem updates matching challenges -> OnChallengeProgress fires
+ * 6. When objective completes -> OnChallengeCompleted fires
+ * 7. Player clicks "Claim" -> ClaimChallengeReward() grants items
+ * 8. At midnight UTC -> GenerateDailyChallenges() refreshes dailies
+ *
+ * DELEGATES (Events you can listen to):
+ * ------------------------------------
+ * - OnEventStarted: New event became active
+ * - OnEventEnded: Event expired or completed
+ * - OnChallengeProgress: Challenge progress updated (for progress bars)
+ * - OnChallengeCompleted: Challenge finished, show claim button
+ * - OnCommunityGoalProgress: Server synced new community progress
+ * - OnCommunityGoalTierReached: Community unlocked a reward tier
+ * - OnDailyChallengesRefreshed: New daily challenges available
+ *
+ * CHALLENGE TYPES (EMGChallengeType):
+ * -----------------------------------
+ * Racing:      WinRaces, CompleteRaces, AchievePosition, WinStreak
+ * Performance: BeatLapTime, ReachTopSpeed, PerfectLaps
+ * Accumulative: DriveDistance, DriftDistance, NearMisses, Overtakes
+ * Specific:    UseVehicle, RaceOnTrack
+ * Economy:     EarnCurrency
+ * Community:   CommunityTotal (aggregates all players)
+ *
+ * IMPORTANT NOTES:
+ * ----------------
+ * - This is a GameInstanceSubsystem (persists across level loads)
+ * - All public methods are game thread only
+ * - Server sync is async but callbacks run on game thread
+ * - Progress is saved locally and synced to server
+ * - CreateMockEvents() generates test data for development
+ *
+ * @see UMGSeasonPassSubsystem - For season pass progression
+ * @see UMGLiveEventsManager - Alternative implementation in LiveOps
+ * @see UMGEventCalendarSubsystem - For event scheduling
+ * =============================================================================
  */
 
 #pragma once

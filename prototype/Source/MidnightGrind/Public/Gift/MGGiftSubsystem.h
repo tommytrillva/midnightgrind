@@ -1,6 +1,61 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * ============================================================================
+ * MGGiftSubsystem.h - Player-to-Player Gifting System
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file defines the Gift Subsystem, which allows players to send items,
+ * currency, and gift bundles to other players in Midnight Grind. This is a
+ * social feature that strengthens community bonds and enables generous
+ * interactions between players.
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. GAME INSTANCE SUBSYSTEM:
+ *    - This class inherits from UGameInstanceSubsystem
+ *    - Subsystems are automatically created and managed by Unreal Engine
+ *    - GameInstance subsystems persist for the entire game session
+ *    - Access via: GameInstance->GetSubsystem<UMGGiftSubsystem>()
+ *
+ * 2. BLUEPRINTTYPE / BLUEPRINTCALLABLE:
+ *    - UENUM(BlueprintType): Makes enum usable in Blueprints (visual scripting)
+ *    - USTRUCT(BlueprintType): Makes struct usable in Blueprints
+ *    - UFUNCTION(BlueprintCallable): Function can be called from Blueprints
+ *    - UFUNCTION(BlueprintPure): Function has no side effects, only returns data
+ *    - UPROPERTY(BlueprintAssignable): Delegate can be bound in Blueprints
+ *
+ * 3. DELEGATES:
+ *    - DECLARE_DYNAMIC_MULTICAST_DELEGATE: Event system for notifying listeners
+ *    - Multiple listeners can subscribe to one delegate
+ *    - Used here for events like OnGiftSent, OnGiftReceived, etc.
+ *    - UI widgets typically bind to these to update when gifts arrive
+ *
+ * 4. GENERATED_BODY():
+ *    - Required macro in all UCLASS, USTRUCT, UENUM declarations
+ *    - Unreal Header Tool (UHT) generates reflection code here
+ *    - Never remove or modify this macro
+ *
+ * 5. SOFT OBJECT POINTERS (TSoftObjectPtr):
+ *    - Reference to an asset that isn't loaded into memory immediately
+ *    - Useful for textures/icons that may not always be needed
+ *    - Prevents memory bloat from loading all gift icons at once
+ *
+ * GIFT LIFECYCLE (State Machine):
+ *    Pending -> Sent -> Delivered -> Claimed (success)
+ *                                 -> Expired (timeout)
+ *                                 -> Returned (declined)
+ *                    -> Cancelled (by sender)
+ *
+ * RELATED FILES:
+ * - MGGiftSubsystem.cpp (implementation)
+ * - MGSocialSubsystem.h (friends list integration)
+ * - MGInventorySubsystem.h (item management)
+ *
+ * ============================================================================
+ *
  * @file MGGiftSubsystem.h
  * @brief Player-to-player gifting system for Midnight Grind
  *

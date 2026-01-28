@@ -1,8 +1,130 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MGCrossProgressionSubsystem.h
-// Cross-Platform Progression System - Syncs progress across platforms and devices
-// Midnight Grind - Y2K Arcade Street Racing
+/**
+ * ============================================================================
+ * MGCrossProgressionSubsystem.h
+ * Cross-Platform Save Data Synchronization Subsystem
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file defines the Cross-Progression Subsystem, which synchronizes player
+ * save data (progress, unlocks, currency, etc.) across all platforms and devices.
+ * If a player earns a car on PlayStation, they can see it on their PC too!
+ *
+ * WHY CROSS-PROGRESSION MATTERS:
+ * ------------------------------
+ * 1. SEAMLESS EXPERIENCE: Play on any device, keep your progress
+ * 2. PLAYER RETENTION: Players don't lose progress when switching platforms
+ * 3. UNIFIED IDENTITY: One player profile across all their devices
+ *
+ * KEY CONCEPTS:
+ * -------------
+ * 1. UNIFIED PLAYER ID: A unique identifier for the player that spans all
+ *    platforms. Links together Steam ID, PSN ID, Xbox ID, etc.
+ *
+ * 2. PROGRESSION SNAPSHOT: A "photo" of the player's current state:
+ *    - Player level, XP, currencies
+ *    - Vehicles owned, customizations
+ *    - Achievements, statistics
+ *    - Battle pass progress
+ *    Used for comparing local vs cloud data.
+ *
+ * 3. SYNC STATUS: Current state of synchronization:
+ *    - NotSynced: Data hasn't been synced yet
+ *    - Syncing: Currently uploading/downloading
+ *    - Synced: Local and cloud data match
+ *    - ConflictDetected: Local and cloud have different data (needs resolution)
+ *    - Offline: Can't reach the server
+ *
+ * 4. CONFLICT RESOLUTION: When local and cloud data disagree:
+ *    - UseLocal: Keep what's on this device
+ *    - UseCloud: Use what's on the server
+ *    - UseMostRecent: Keep whichever was saved most recently
+ *    - UseHighestProgress: Keep the higher value (e.g., higher level)
+ *    - MergeData: Intelligently combine both (e.g., add currencies together)
+ *    - AskUser: Show UI to let the player decide
+ *
+ * 5. CLOUD BACKUP: Automatic or manual save points that can be restored if
+ *    something goes wrong. Safety net for data loss.
+ *
+ * DATA TYPES SYNCED:
+ * ------------------
+ * - PlayerProfile: Name, avatar, preferences
+ * - VehicleCollection: Owned cars, upgrades, customizations
+ * - GarageData: Garage layouts, favorites
+ * - Currency: In-game money and premium currency
+ * - Reputation: Player rank/standing
+ * - Unlocks: Items, tracks, modes unlocked
+ * - Achievements: Completed achievements
+ * - Statistics: Races won, miles driven, etc.
+ * - Settings: Game options (can be excluded from sync)
+ * - Cosmetics: Visual customizations
+ * - BattlePass: Season pass tier and rewards
+ * - Challenges: Active and completed challenges
+ * - Social: Friends list, blocked players
+ *
+ * SYNC ARCHITECTURE:
+ * ------------------
+ * 1. On game startup: Download cloud data, compare with local
+ * 2. During gameplay: Track changes locally
+ * 3. Periodically (configurable): Upload changes to cloud
+ * 4. On shutdown: Final sync upload
+ * 5. On major events: Sync immediately (level up, purchase, etc.)
+ *
+ * ENTITLEMENTS:
+ * -------------
+ * "Entitlements" are things the player has paid for:
+ * - DLC packs
+ * - Season passes
+ * - Premium currency purchases
+ * Some are cross-platform (buy once, own everywhere), others are platform-specific.
+ *
+ * DEVICE MANAGEMENT:
+ * ------------------
+ * Players can see which devices have accessed their account:
+ * - Helpful for security (spot unauthorized access)
+ * - Can remove/trust devices
+ * - See when each device last synced
+ *
+ * USAGE EXAMPLE:
+ * --------------
+ * @code
+ * // Get the subsystem
+ * UMGCrossProgressionSubsystem* CrossProg = GameInstance->GetSubsystem<UMGCrossProgressionSubsystem>();
+ *
+ * // On game start, sync with cloud
+ * CrossProg->SyncAllData();
+ *
+ * // Check sync status
+ * if (CrossProg->GetSyncStatus() == ESyncStatus::ConflictDetected)
+ * {
+ *     // Show conflict resolution UI
+ *     TArray<FSyncConflict> Conflicts = CrossProg->GetPendingConflicts();
+ * }
+ *
+ * // Listen for sync events
+ * CrossProg->OnSyncCompleted.AddDynamic(this, &MyClass::HandleSyncDone);
+ * CrossProg->OnConflictDetected.AddDynamic(this, &MyClass::HandleConflict);
+ *
+ * // Create manual backup before risky operation
+ * CrossProg->CreateBackup("Before Account Merge", "Manual backup");
+ * @endcode
+ *
+ * ERROR HANDLING:
+ * ---------------
+ * - Network failures: Queue changes, retry when online
+ * - Corrupt data: Validate checksums, restore from backup
+ * - Version mismatch: Use DataMigration system to upgrade
+ *
+ * RELATED FILES:
+ * --------------
+ * - MGAccountLinkSubsystem.h: Links platform accounts together
+ * - MGDataMigrationSubsystem.h: Handles save data version upgrades
+ * - MGPlatformIntegrationSubsystem.h: Platform-specific cloud save APIs
+ *
+ * ============================================================================
+ */
 
 #pragma once
 

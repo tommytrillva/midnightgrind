@@ -1,5 +1,128 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRaceCountdownManager.h
+ * @brief Race Countdown Manager - Controls the start sequence countdown for races
+ *
+ * This subsystem manages the race start countdown sequence, providing visual and audio
+ * cues to synchronize the race start across all participants. It supports multiple
+ * countdown styles to match different racing aesthetics.
+ *
+ * ============================================================================
+ * KEY CONCEPTS FOR BEGINNERS
+ * ============================================================================
+ *
+ * WHAT IS A COUNTDOWN MANAGER?
+ * The countdown manager handles the "3... 2... 1... GO!" sequence that starts
+ * every race. While this seems simple, there are many details to coordinate:
+ * - Visual display (numbers, lights, animations)
+ * - Audio cues (beeps, sounds)
+ * - Timing precision (critical for fair starts)
+ * - Network synchronization (multiplayer)
+ * - Different presentation styles
+ *
+ * COUNTDOWN STYLES:
+ * Different racing games use different countdown presentations:
+ * - Classic: Standard 3-2-1-GO numbers
+ * - Traffic Lights: Red-Red-Red-Green (F1 style)
+ * - Christmas Tree: Drag racing staging lights
+ * - Wangan: Minimal Japanese style
+ *
+ * STATE MACHINE:
+ * The countdown progresses through states:
+ *   Inactive -> PreDelay -> Counting -> Go -> Complete
+ *
+ * PRE-DELAY:
+ * A brief pause before counting starts. This allows:
+ * - UI elements to appear
+ * - Players to prepare
+ * - Network sync to stabilize
+ *
+ * ============================================================================
+ * COUNTDOWN FLOW
+ * ============================================================================
+ *
+ * @verbatim
+ *   StartCountdown()
+ *         |
+ *         v
+ *   [PreDelay] -- OnCountdownStarted
+ *         |
+ *         v
+ *   [Counting: 3] -- OnCountdownTick(3)
+ *         |
+ *         v
+ *   [Counting: 2] -- OnCountdownTick(2)
+ *         |
+ *         v
+ *   [Counting: 1] -- OnCountdownTick(1)
+ *         |
+ *         v
+ *   [Go] -------- OnCountdownGo (RACE STARTS!)
+ *         |
+ *         v
+ *   [Complete] -- OnCountdownComplete
+ * @endverbatim
+ *
+ * ============================================================================
+ * USAGE EXAMPLE
+ * ============================================================================
+ *
+ * @code
+ * // Get the countdown manager
+ * UMGRaceCountdownManager* CountdownManager = GetWorld()->GetSubsystem<UMGRaceCountdownManager>();
+ *
+ * // Subscribe to events
+ * CountdownManager->OnCountdownTick.AddDynamic(this, &UMyWidget::ShowNumber);
+ * CountdownManager->OnCountdownGo.AddDynamic(this, &UMyWidget::ShowGo);
+ * CountdownManager->OnCountdownGo.AddDynamic(this, &UMyVehicle::EnableControls);
+ *
+ * // Start countdown with traffic light style
+ * CountdownManager->StartCountdown(3, EMGCountdownStyle::TrafficLights);
+ *
+ * // Or start with custom timing
+ * CountdownManager->StartCountdownCustom(
+ *     3,      // Start from 3
+ *     0.5f,   // 0.5 second pre-delay
+ *     1.0f,   // 1 second per tick
+ *     1.5f    // Show "GO" for 1.5 seconds
+ * );
+ * @endcode
+ *
+ * ============================================================================
+ * BLUEPRINT USAGE
+ * ============================================================================
+ *
+ * In Blueprint, you can:
+ * 1. Get the Countdown Manager from any World context
+ * 2. Bind to the countdown events (OnCountdownTick, OnCountdownGo, etc.)
+ * 3. Call StartCountdown to begin the sequence
+ * 4. Query GetTickData for smooth animations (returns progress within each tick)
+ *
+ * For custom countdown UI:
+ * @code
+ * // In your widget's tick
+ * FMGCountdownTick TickData = CountdownManager->GetTickData();
+ * // Use TickData.Progress (0-1) for smooth number scaling/fading
+ * // Use TickData.Value for the current number to display
+ * @endcode
+ *
+ * ============================================================================
+ * NETWORK SYNCHRONIZATION
+ * ============================================================================
+ *
+ * For multiplayer races, the countdown must be synchronized:
+ * 1. Server starts the countdown and broadcasts the start time
+ * 2. Clients receive the start time and begin their local countdowns
+ * 3. All clients reach "GO" at the same game time
+ *
+ * The countdown manager itself is network-aware but relies on the
+ * RaceFlowSubsystem for actual synchronization commands.
+ *
+ * @see UMGRaceFlowSubsystem for race lifecycle management
+ * @see AMGRaceGameMode for multiplayer race coordination
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

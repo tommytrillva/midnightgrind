@@ -1,5 +1,248 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGLiveEventSubsystem.h
+ * @brief Live Events System - Time-limited special events with challenges, rewards, and leaderboards
+ * @author Midnight Grind Team
+ * @version 1.0
+ *
+ * @section overview Overview
+ * ============================================================================
+ * MGLiveEventSubsystem.h
+ * Midnight Grind - Live Event and Time-Limited Content System
+ * ============================================================================
+ *
+ * This subsystem manages time-limited special events that appear in-game with
+ * unique challenges, rewards, and leaderboards. Think of it like Fortnite's
+ * live events or Destiny's seasonal activities.
+ *
+ * @section difference Difference from Event Calendar
+ * - EventCalendar: Schedules WHEN things happen (like a TV guide)
+ * - LiveEvents: Manages the CONTENT and PROGRESS of active events
+ *
+ * In practice, EventCalendar might schedule a "Double XP Weekend" (simple bonus),
+ * while LiveEvents handles a "Drift King Challenge" with objectives, tiers,
+ * leaderboards, and exclusive rewards.
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * @subsection eventtypes 1. Event Types (EMGEventType)
+ * Different flavors of live events:
+ * - RacingChallenge: Win races, earn points
+ * - DriftChallenge: Accumulate drift score
+ * - TimeAttack: Beat target times on tracks
+ * - CommunityGoal: Everyone contributes to shared progress
+ * - Tournament: Bracketed competitive event
+ * - HolidayEvent: Seasonal themed content (Halloween, etc.)
+ * - BrandCollaboration: Sponsored content (real car brands)
+ * - CreatorEvent: Content creator partnership events
+ *
+ * @subsection objectives 2. Objectives (FMGEventObjective)
+ * Tasks players complete for event points:
+ * - "Win 5 races" (TargetValue: 5)
+ * - "Accumulate 1,000,000 drift score" (TargetValue: 1000000)
+ * - "Beat the target time on Midnight Circuit" (TargetValue: 1, time-based)
+ *
+ * Objectives can be repeatable (bIsRepeatable) for farming points.
+ * UpdateObjectiveProgress() tracks completion.
+ *
+ * @subsection tiers 3. Tier System (EMGEventTier)
+ * Points earned unlock reward tiers:
+ * Participation -> Bronze -> Silver -> Gold -> Platinum -> Diamond -> Champion
+ *
+ * Higher tiers require more points but give better rewards.
+ * OnTierReached fires when player advances to a new tier.
+ *
+ * @subsection rewards 4. Rewards (FMGEventReward)
+ * What players earn from events:
+ * - Currency (in-game money)
+ * - Premium Currency (real-money equivalent)
+ * - Exclusive Items (vehicles, cosmetics) - often tied to high tiers
+ * - bIsExclusive: Only available during this event
+ *
+ * Players must manually claim rewards via ClaimReward().
+ *
+ * @subsection community 5. Community Goals (FMGCommunityProgress)
+ * Server-wide collaborative challenges:
+ * - "Community: Drift 1 billion total meters"
+ * - Everyone's progress combines toward the goal
+ * - MilestoneThresholds unlock community-wide bonuses
+ * - OnCommunityMilestone fires when thresholds are reached
+ *
+ * @subsection leaderboards 6. Leaderboards (FMGEventLeaderboardEntry)
+ * Per-event rankings:
+ * - FetchEventLeaderboard() requests data from server
+ * - GetEventLeaderboard() returns cached results
+ * - Shows rank, player name, score, achieved tier
+ *
+ * @section usage Usage Examples
+ *
+ * @code
+ * // Get the subsystem
+ * UMGLiveEventSubsystem* LiveEvents = GetGameInstance()->GetSubsystem<UMGLiveEventSubsystem>();
+ *
+ * // For Event UI - Display available events
+ * TArray<FMGLiveEvent> ActiveEvents = LiveEvents->GetActiveEvents();
+ * FMGLiveEvent Featured = LiveEvents->GetFeaturedEvent();
+ * TArray<FMGLiveEvent> Upcoming = LiveEvents->GetUpcomingEvents();
+ *
+ * // Join an event and track progress
+ * LiveEvents->JoinEvent("drift_challenge_2024");
+ * float Progress = LiveEvents->GetEventProgress("drift_challenge_2024");
+ *
+ * // After player completes a drift, update the objective
+ * LiveEvents->UpdateObjectiveProgress("drift_challenge_2024", FName("DriftScore"), 50000.0f);
+ *
+ * // Check and claim rewards
+ * TArray<FMGEventReward> Unclaimed = LiveEvents->GetUnclaimedRewards("drift_challenge_2024");
+ * LiveEvents->ClaimAllRewards("drift_challenge_2024");
+ *
+ * // Get player's current tier
+ * EMGEventTier CurrentTier = LiveEvents->GetPlayerTier("drift_challenge_2024");
+ *
+ * // Contribute to community goals
+ * LiveEvents->ContributeToCommunityGoal("community_drift", 1000.0f);
+ *
+ * // Listen for events
+ * LiveEvents->OnTierReached.AddDynamic(this, &UMyClass::HandleTierReached);
+ * LiveEvents->OnEventEnded.AddDynamic(this, &UMyClass::HandleEventEnded);
+ * @endcode
+ *
+ * @section lifecycle Event Lifecycle
+ * 1. Event appears in GetUpcomingEvents() with future StartTime
+ * 2. At StartTime, moves to GetActiveEvents(), OnEventStarted fires
+ * 3. Players JoinEvent() to participate
+ * 4. Players complete objectives, earn points, climb tiers
+ * 5. At EndTime, OnEventEnded fires
+ * 6. Players can still claim unclaimed rewards for a grace period
+ *
+ * @section delegates Available Delegates
+ * - OnEventStarted: Event becomes active
+ * - OnEventEnded: Event ends
+ * - OnEventJoined: Player joins an event
+ * - OnObjectiveProgress: Objective progress updated
+ * - OnObjectiveCompleted: Objective fully completed
+ * - OnTierReached: Player advances to new tier
+ * - OnCommunityMilestone: Community goal reaches threshold
+ * - OnRewardClaimed: Player claims a reward
+ * - OnEventScheduleRefreshed: Event list updated from server
+ *
+ * @see UMGEventCalendarSubsystem For scheduling when events occur
+ * @see UMGRewardsSubsystem For general reward distribution
+ * ============================================================================
+ */
+
+// MidnightGrind - Arcade Street Racing Game
+// Live Event Subsystem - Live in-game events, special challenges, time-limited content
+
+/**
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file implements the Live Events system - time-limited special events
+ * that appear in-game with unique challenges, rewards, and leaderboards.
+ * Think of it like Fortnite's live events or Destiny's seasonal activities.
+ *
+ * DIFFERENCE FROM EVENT CALENDAR:
+ * - EventCalendar: Schedules WHEN things happen (like a TV guide)
+ * - LiveEvents: Manages the CONTENT and PROGRESS of active events
+ *
+ * In practice, EventCalendar might schedule a "Double XP Weekend" (simple bonus),
+ * while LiveEvents handles a "Drift King Challenge" with objectives, tiers,
+ * leaderboards, and exclusive rewards.
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. EVENT TYPES (EMGEventType)
+ *    Different flavors of live events:
+ *    - RacingChallenge: Win races, earn points
+ *    - DriftChallenge: Accumulate drift score
+ *    - TimeAttack: Beat target times on tracks
+ *    - CommunityGoal: Everyone contributes to shared progress
+ *    - Tournament: Bracketed competitive event
+ *    - HolidayEvent: Seasonal themed content (Halloween, etc.)
+ *    - BrandCollaboration: Sponsored content (real car brands)
+ *    - CreatorEvent: Content creator partnership events
+ *
+ * 2. OBJECTIVES (FMGEventObjective)
+ *    Tasks players complete for event points:
+ *    - "Win 5 races" (TargetValue: 5)
+ *    - "Accumulate 1,000,000 drift score" (TargetValue: 1000000)
+ *    - "Beat the target time on Midnight Circuit" (TargetValue: 1, time-based)
+ *
+ *    Objectives can be repeatable (bIsRepeatable) for farming points.
+ *    UpdateObjectiveProgress() tracks completion.
+ *
+ * 3. TIER SYSTEM (EMGEventTier)
+ *    Points earned unlock reward tiers:
+ *    Participation -> Bronze -> Silver -> Gold -> Platinum -> Diamond -> Champion
+ *
+ *    Higher tiers require more points but give better rewards.
+ *    OnTierReached fires when player advances to a new tier.
+ *
+ * 4. REWARDS (FMGEventReward)
+ *    What players earn from events:
+ *    - Currency (in-game money)
+ *    - Premium Currency (real-money equivalent)
+ *    - Exclusive Items (vehicles, cosmetics) - often tied to high tiers
+ *    - bIsExclusive: Only available during this event
+ *
+ *    Players must manually claim rewards via ClaimReward().
+ *
+ * 5. COMMUNITY GOALS (FMGCommunityProgress)
+ *    Server-wide collaborative challenges:
+ *    - "Community: Drift 1 billion total meters"
+ *    - Everyone's progress combines toward the goal
+ *    - MilestoneThresholds unlock community-wide bonuses
+ *    - OnCommunityMilestone fires when thresholds are reached
+ *
+ * 6. LEADERBOARDS (FMGEventLeaderboardEntry)
+ *    Per-event rankings:
+ *    - FetchEventLeaderboard() requests data from server
+ *    - GetEventLeaderboard() returns cached results
+ *    - Shows rank, player name, score, achieved tier
+ *
+ * COMMON USE CASES:
+ *
+ * For Event UI:
+ * - GetActiveEvents() for the events hub
+ * - GetFeaturedEvent() for the main menu spotlight
+ * - GetUpcomingEvents() for the "coming soon" section
+ * - GetEventProgress() for progress bars
+ * - GetUnclaimedRewards() for the rewards screen
+ *
+ * For Gameplay Integration:
+ * - JoinEvent() when player starts participating
+ * - UpdateObjectiveProgress() after relevant actions (race win, drift, etc.)
+ * - AddEventScore() for direct point additions
+ * - ContributeToCommunityGoal() for community events
+ *
+ * For Progression:
+ * - GetPlayerTier() to show current tier badge
+ * - GetEligibleRewards() to show what can be claimed
+ * - ClaimAllRewards() when player visits reward screen
+ *
+ * EVENT LIFECYCLE:
+ * 1. Event appears in GetUpcomingEvents() with future StartTime
+ * 2. At StartTime, moves to GetActiveEvents(), OnEventStarted fires
+ * 3. Players JoinEvent() to participate
+ * 4. Players complete objectives, earn points, climb tiers
+ * 5. At EndTime, OnEventEnded fires
+ * 6. Players can still claim unclaimed rewards for a grace period
+ *
+ * DELEGATES:
+ * - OnEventStarted: Event becomes active
+ * - OnEventEnded: Event ends
+ * - OnEventJoined: Player joins an event
+ * - OnObjectiveProgress: Objective progress updated
+ * - OnObjectiveCompleted: Objective fully completed
+ * - OnTierReached: Player advances to new tier
+ * - OnCommunityMilestone: Community goal reaches threshold
+ * - OnRewardClaimed: Player claims a reward
+ * - OnEventScheduleRefreshed: Event list updated from server
+ *
+ * ============================================================================
+ */
+
 // MidnightGrind - Arcade Street Racing Game
 // Live Event Subsystem - Live in-game events, special challenges, time-limited content
 

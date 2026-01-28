@@ -1,5 +1,129 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGTrackEditorSubsystem.h - Player Track Creation Tool
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This header defines the Track Editor Subsystem - an in-game tool that lets
+ * players BUILD THEIR OWN racing tracks! Think of it like:
+ * - Mario Maker but for racing games
+ * - Trackmania's track editor
+ * - A snap-together construction kit for roads
+ *
+ * Players place pre-made track pieces, connect them, add decorations, then
+ * share their creations with the community!
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. TRACK PIECES (FMGTrackPiece):
+ *    - Pre-built road segments players snap together
+ *    - Types: Straight, Curve90, Curve45, S-Curve, Hairpin, Jump, Tunnel, Bridge...
+ *    - Each piece has a Transform (position + rotation) and Scale
+ *    - ConnectedPieces: Links to adjacent pieces (for validation)
+ *
+ * 2. SNAP POINTS:
+ *    - Connection points where pieces can join
+ *    - GetNearestSnapPoint() finds valid attachment positions
+ *    - Makes building intuitive - pieces "snap" together like LEGO
+ *
+ * 3. DECORATIONS (FMGTrackDecoration):
+ *    - Non-road objects that add visual detail
+ *    - Trees, buildings, barriers, signs, lights
+ *    - Different decorations available per environment/theme
+ *
+ * 4. TRACK ENVIRONMENTS (EMGTrackEnvironment):
+ *    - Visual themes: Downtown, Industrial, Harbor, Highway, Mountain, etc.
+ *    - Affects available decorations and visual style
+ *    - "Neon" = the Y2K aesthetic with glowing signs
+ *
+ * 5. TRACK DATA (FMGCustomTrackData):
+ *    - Complete track information:
+ *      - Metadata: Name, description, author, creation date
+ *      - Content: All pieces and decorations
+ *      - Settings: Lap count, max racers
+ *      - Community: Downloads, likes, rating
+ *    - Thumbnail: Preview image for browsing
+ *
+ * 6. EDITOR MODE:
+ *    - EnterEditor(): Switch to building mode
+ *    - ExitEditor(): Return to normal gameplay
+ *    - IsInEditor(): Check current mode
+ *    - NewTrack(): Start fresh with chosen environment
+ *
+ * 7. UNDO/REDO SYSTEM:
+ *    - UndoStack/RedoStack store previous states
+ *    - Undo(): Go back one action
+ *    - Redo(): Restore undone action
+ *    - PushUndoState(): Called internally when you change something
+ *
+ * 8. VALIDATION:
+ *    - ValidateTrack(): Check if track is raceable
+ *    - IsTrackClosed(): Does the track loop back to start?
+ *    - HasStartFinish(): Is there a start/finish line piece?
+ *    - OutErrors: Returns list of problems to fix
+ *
+ * 9. PUBLISHING:
+ *    - SaveTrack(): Save locally
+ *    - PublishTrack(): Upload to community servers
+ *    - bIsPublished: Track is public
+ *    - bIsFeatured: Track is highlighted by devs
+ *
+ * COMMUNITY FEATURES:
+ * -------------------
+ * - GetCommunityTracks(): Browse player-made tracks
+ * - GetFeaturedTracks(): See dev-picked highlights
+ * - SearchTracks(): Find tracks by name/keyword
+ * - GetMyTracks(): View your created tracks
+ * - DownloadTrack(): Get someone else's track
+ * - RateTrack() / LikeTrack(): Give feedback
+ *
+ * FGuid EXPLAINED:
+ * ----------------
+ * - FGuid = Globally Unique Identifier (like a UUID)
+ * - 128-bit number that's virtually guaranteed unique
+ * - Each piece and track gets one for identification
+ * - Example: "A2B4C6D8-1234-5678-9ABC-DEF012345678"
+ *
+ * FTransform EXPLAINED:
+ * ---------------------
+ * - Combines Position (FVector) + Rotation (FRotator) + Scale (FVector)
+ * - Represents where something is, how it's rotated, and how big it is
+ * - Used for placing pieces and decorations in the world
+ *
+ * HOW TO USE THIS SYSTEM:
+ * -----------------------
+ * BUILDING:
+ *   1. EnterEditor()
+ *   2. NewTrack(EMGTrackEnvironment::Downtown)
+ *   3. PlacePiece(EMGTrackPieceType::StartFinish, Transform)
+ *   4. PlacePiece(EMGTrackPieceType::Straight, NextTransform)
+ *   5. ConnectPieces(PieceA_Id, PieceB_Id)
+ *   6. Add decorations: PlaceDecoration(AssetName, Transform)
+ *   7. Validate: ValidateTrack(Errors)
+ *   8. Save/Publish: SaveTrack() then PublishTrack()
+ *
+ * EDITING:
+ *   - MovePiece(): Reposition a piece
+ *   - RotatePiece(): Turn a piece
+ *   - ScalePiece(): Resize a piece
+ *   - SetPieceBanking(): Tilt the road (for banked curves)
+ *   - RemovePiece(): Delete a piece
+ *   - Undo()/Redo(): Fix mistakes
+ *
+ * DELEGATES (EVENTS):
+ * -------------------
+ * - OnTrackPiecePlaced: Piece added
+ * - OnTrackSaved: Track saved locally
+ * - OnTrackPublished: Track uploaded to community
+ * - OnTrackValidated: Validation completed
+ *
+ ******************************************************************************/
+
 #pragma once
 
 #include "CoreMinimal.h"

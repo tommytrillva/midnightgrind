@@ -1,7 +1,242 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MidnightGrind - Arcade Street Racing Game
-// Platform Integration Subsystem - Cross-platform services, achievements, rich presence
+/**
+ * @file MGPlatformIntegrationSubsystem.h
+ * @brief Platform Services Integration for achievements, presence, entitlements, and more
+ *
+ * @section Overview
+ * This file defines the Platform Integration Subsystem, which connects the game
+ * to platform-specific features like achievements, rich presence, friends lists,
+ * entitlements (DLC), and platform overlays. Each platform (Steam, PlayStation,
+ * Xbox, etc.) has its own APIs for these features, and this subsystem provides
+ * a unified interface.
+ *
+ * @section WhatIsPlatform What Does "Platform Integration" Mean?
+ * When you play a game on Steam, you see Steam achievements pop up, your Steam
+ * friends can see you're playing, and Steam handles your purchases. On PlayStation,
+ * you get trophies instead, see PSN friends, etc. This subsystem abstracts away
+ * those differences so game code can just call "UnlockAchievement" without caring
+ * which platform it's running on.
+ *
+ * @section KeyFeatures Key Features
+ *
+ * @subsection Achievements 1. Achievements/Trophies
+ * Progress tracking and unlocks:
+ *   - Steam Achievements
+ *   - PlayStation Trophies
+ *   - Xbox Achievements
+ *   - Google Play / Game Center achievements
+ *
+ * @subsection RichPresence 2. Rich Presence
+ * Shows what you're doing in friends lists:
+ *   - "Racing at Midnight Boulevard"
+ *   - "Customizing 1999 Skyline GT-R"
+ *   - "In Party (3/8)"
+ *
+ * @subsection Entitlements 3. Entitlements
+ * Verifying ownership of DLC, season passes, etc.:
+ *   - Did they buy the Deluxe Edition?
+ *   - Do they own the Japan Car Pack DLC?
+ *   - Is their subscription active?
+ *
+ * @subsection Friends 4. Friends
+ * Access to platform friend lists:
+ *   - See who's online
+ *   - See who's playing the game
+ *   - Invite friends to races
+ *
+ * @subsection Overlay 5. Overlay
+ * Platform UI that appears over the game:
+ *   - Steam overlay (Shift+Tab)
+ *   - PlayStation quick menu
+ *   - Xbox guide
+ *
+ * @subsection Capture 6. Screenshots/Video
+ * Platform capture features:
+ *   - Trigger screenshots
+ *   - Start/stop video recording
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * @subsection PlatformType 1. Platform Type
+ * Which gaming platform (Steam, Epic, PlayStation 4/5, Xbox One/Series,
+ * Nintendo Switch, iOS, Android). Each has different capabilities.
+ *
+ * @subsection Capabilities 2. Capabilities
+ * What features the current platform supports. Not all platforms have all
+ * features (e.g., Nintendo Switch doesn't have achievements the same way Steam does).
+ *
+ * @subsection AchievementStatus 3. Achievement Status
+ *   - Locked: Not yet earned
+ *   - InProgress: Partially complete (e.g., "Win 5/10 races")
+ *   - Unlocked: Fully earned
+ *   - Hidden: Secret achievement, description hidden until unlocked
+ *
+ * @subsection PresenceState 4. Presence State
+ * What the player is currently doing:
+ *   - Online, Away, Busy
+ *   - InGame, InRace, InMenu, InGarage
+ *   - Matchmaking, Spectating
+ *
+ * @subsection EntitlementType 5. Entitlement Type
+ * Categories of purchasable content:
+ *   - BaseGame: The main game itself
+ *   - DLC: Downloadable content packs
+ *   - SeasonPass: Bundle of future DLC
+ *   - Subscription: Time-limited access
+ *   - Microtransaction: In-game purchases
+ *
+ * @section PlatformNotes Platform-Specific Notes
+ *
+ * @subsection SteamNotes STEAM
+ *   - Rich achievements system with global unlock percentages
+ *   - Steamworks overlay with browser, chat, etc.
+ *   - Steam Cloud for save data
+ *
+ * @subsection PSNotes PLAYSTATION
+ *   - Trophies (Bronze, Silver, Gold, Platinum)
+ *   - Activity Cards on PS5
+ *   - PlayStation Network friends
+ *
+ * @subsection XboxNotes XBOX
+ *   - Gamerscore achievements
+ *   - Xbox Game Bar
+ *   - Xbox Live friends and parties
+ *
+ * @subsection SwitchNotes NINTENDO SWITCH
+ *   - Limited online features
+ *   - Nintendo Switch Online required for multiplayer
+ *
+ * @subsection MobileNotes MOBILE (iOS/Android)
+ *   - Game Center / Google Play Games achievements
+ *   - No overlay system
+ *   - In-app purchases
+ *
+ * @section CodeExamples Code Examples
+ *
+ * @subsection GettingSubsystem Getting the Subsystem
+ * @code
+ * UMGPlatformIntegrationSubsystem* Platform =
+ *     GetGameInstance()->GetSubsystem<UMGPlatformIntegrationSubsystem>();
+ * @endcode
+ *
+ * @subsection AchievementExample Unlocking Achievements
+ * @code
+ * // Unlock an achievement when player wins their first race
+ * void ARaceManager::OnRaceFinished(int32 Position)
+ * {
+ *     if (Position == 1)
+ *     {
+ *         Platform->UnlockAchievement(FName("FirstVictory"));
+ *     }
+ * }
+ *
+ * // Update achievement progress (win 10 races)
+ * void ARaceManager::OnRaceWon()
+ * {
+ *     WinCount++;
+ *     Platform->UpdateAchievementProgress(FName("TenWins"), static_cast<float>(WinCount));
+ * }
+ *
+ * // Increment progress by a specific amount
+ * Platform->IncrementAchievementProgress(FName("DistanceDriven"), DistanceThisRace);
+ * @endcode
+ *
+ * @subsection PresenceExample Setting Rich Presence
+ * @code
+ * // Set presence when entering different game states
+ * void AGameMode::OnStateChanged(EGameState NewState)
+ * {
+ *     switch (NewState)
+ *     {
+ *         case EGameState::InRace:
+ *             Platform->SetPresenceInRace(TrackId, VehicleId, Position, TotalRacers);
+ *             break;
+ *         case EGameState::InGarage:
+ *             Platform->SetPresenceInGarage(CurrentVehicleId);
+ *             break;
+ *         case EGameState::InMenu:
+ *             Platform->SetPresenceInMenu("Main Menu");
+ *             break;
+ *         case EGameState::Matchmaking:
+ *             Platform->SetPresenceMatchmaking("Quick Race");
+ *             break;
+ *     }
+ * }
+ * @endcode
+ *
+ * @subsection EntitlementExample Checking Entitlements
+ * @code
+ * // Check if player owns DLC before showing DLC content
+ * void ACarDealership::PopulateVehicleList()
+ * {
+ *     // Show base game vehicles
+ *     AddBaseVehicles();
+ *
+ *     // Show DLC vehicles if owned
+ *     if (Platform->HasDLC(FName("JapanCarPack")))
+ *     {
+ *         AddJapanCarPackVehicles();
+ *     }
+ *
+ *     if (Platform->HasSeasonPass())
+ *     {
+ *         AddSeasonPassBonusVehicle();
+ *     }
+ * }
+ * @endcode
+ *
+ * @subsection FriendsExample Working with Friends
+ * @code
+ * // Get friends who are playing the game
+ * TArray<FMGPlatformUser> PlayingFriends = Platform->GetFriendsPlayingGame();
+ *
+ * for (const FMGPlatformUser& Friend : PlayingFriends)
+ * {
+ *     DisplayFriendInLobby(Friend.DisplayName, Friend.PresenceText);
+ * }
+ *
+ * // Show platform friend list UI
+ * Platform->ShowFriendsUI();
+ * @endcode
+ *
+ * @subsection EventsExample Listening for Events
+ * @code
+ * // Bind to platform events
+ * Platform->OnAchievementUnlocked.AddDynamic(this, &AMyClass::HandleAchievement);
+ * Platform->OnOverlayActivated.AddDynamic(this, &AMyClass::HandleOverlayOpen);
+ * Platform->OnOverlayDeactivated.AddDynamic(this, &AMyClass::HandleOverlayClose);
+ *
+ * void AMyClass::HandleAchievement(const FMGPlatformAchievement& Achievement)
+ * {
+ *     // Show custom achievement celebration
+ *     ShowAchievementPopup(Achievement.DisplayName, Achievement.Description);
+ * }
+ *
+ * void AMyClass::HandleOverlayOpen()
+ * {
+ *     // Pause game when platform overlay opens
+ *     PauseGame();
+ * }
+ *
+ * void AMyClass::HandleOverlayClose()
+ * {
+ *     // Resume game when overlay closes
+ *     ResumeGame();
+ * }
+ * @endcode
+ *
+ * @section Performance Performance Considerations
+ *   - Achievement updates are batched; don't call every frame
+ *   - Rich presence updates have rate limits (typically once per 15-30 seconds)
+ *   - Friends list queries can be slow; cache results
+ *
+ * @see MGAccountLinkSubsystem.h Manages cross-platform account identity
+ * @see MGCrossPlaySubsystem.h Cross-platform multiplayer
+ * @see MGCrossProgressionSubsystem.h Cross-platform save data
+ *
+ * @author Midnight Grind Team
+ */
 
 #pragma once
 

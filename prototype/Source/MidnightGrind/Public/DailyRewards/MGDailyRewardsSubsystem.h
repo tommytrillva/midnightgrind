@@ -1,5 +1,77 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGDailyRewardsSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the Daily Rewards system for the Midnight Grind racing game.
+ * The Daily Rewards system is a common player engagement feature in modern games
+ * that incentivizes players to log in every day by offering escalating rewards.
+ *
+ * Think of it like a digital "punch card" - the more consecutive days you play,
+ * the better rewards you receive. This system helps with player retention by
+ * creating a habit of daily play.
+ *
+ * KEY CONCEPTS:
+ * -------------
+ * 1. LOGIN STREAK: The number of consecutive days a player has logged in.
+ *    If a player misses a day, their streak may reset (depending on settings).
+ *    Example: Log in Mon, Tue, Wed = 3-day streak. Miss Thu = streak might reset.
+ *
+ * 2. DAILY REWARD: A gift the player receives for logging in on a specific day.
+ *    Day 1 might give 100 coins, Day 7 might give a rare vehicle part.
+ *
+ * 3. STREAK MILESTONE: Special bonus rewards given at significant streak lengths.
+ *    Example: 7-day milestone (Week1), 30-day milestone (Month1), etc.
+ *
+ * 4. LOGIN CALENDAR: A monthly or cyclic schedule of what rewards are available
+ *    on each day. Think of it like an advent calendar for the game.
+ *
+ * 5. SPECIAL EVENTS: Limited-time periods with enhanced rewards or multipliers.
+ *    Example: "Holiday Event" with double rewards for 2 weeks.
+ *
+ * ARCHITECTURE:
+ * -------------
+ * This is a UGameInstanceSubsystem, meaning:
+ * - It's automatically created when the game starts
+ * - There's only ONE instance for the entire game session
+ * - It persists across level changes (unlike Actor-based systems)
+ * - Access it via: GetGameInstance()->GetSubsystem<UMGDailyRewardsSubsystem>()
+ *
+ * The system uses several data structures (USTRUCT):
+ * - FMGDailyReward: Describes a single reward item
+ * - FMGStreakBonus: Defines milestone bonuses
+ * - FMGLoginCalendar: The full reward schedule
+ * - FMGPlayerLoginData: Tracks the player's login history
+ * - FMGRewardClaimResult: The outcome when claiming a reward
+ *
+ * TYPICAL WORKFLOW:
+ * -----------------
+ * 1. Player launches game -> ProcessLogin() is called
+ * 2. System checks if it's a new day -> Updates streak accordingly
+ * 3. UI shows "Claim Reward" button -> Player clicks it
+ * 4. ClaimDailyReward() is called -> Returns FMGRewardClaimResult
+ * 5. Game grants the items (currency, parts, etc.) to the player
+ *
+ * DELEGATES (Events):
+ * -------------------
+ * The system broadcasts events that other parts of the game can listen to:
+ * - OnDailyRewardClaimed: Fired when player claims their daily reward
+ * - OnStreakUpdated: Fired when the streak count changes
+ * - OnMilestoneReached: Fired when player hits a major milestone (Week1, Month1, etc.)
+ *
+ * RELATED SYSTEMS:
+ * ----------------
+ * - MGDailyLoginSubsystem: More detailed daily login tracking with challenges
+ * - MGStreakSubsystem: Handles in-game performance streaks (win streaks, etc.)
+ * - MGMilestoneSubsystem: General achievement and progression tracking
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

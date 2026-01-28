@@ -1,5 +1,96 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGHighwayBattleHandler.h
+ * @brief Highway Battle Handler - Wangan-style high-speed gap racing.
+ *
+ * Highway Battles are inspired by Japanese highway racing culture, particularly
+ * the "Wangan" (bayshore) racing scene. Two drivers compete at extreme speeds
+ * on long highway stretches, with victory determined by creating and maintaining
+ * a decisive gap rather than crossing a finish line.
+ *
+ * @section overview_highway Overview
+ * Unlike traditional circuit racing, Highway Battles have no fixed distance or
+ * finish line. The race continues until one driver creates a gap of 200+ meters
+ * and holds it for 5 seconds. This creates intense, sustained high-speed racing
+ * where maintaining top speed and navigating traffic are paramount.
+ *
+ * @section concepts_highway Key Concepts for Beginners
+ *
+ * 1. **Gap-Based Victory**: Instead of racing to a finish line, you win by
+ *    "losing" your opponent - creating enough distance that they can't catch up.
+ *    The RequiredGap (200m) and RequiredGapTime (5s) define victory conditions.
+ *
+ * 2. **Battle States**: The race progresses through states:
+ *    - WaitingToStart: Pre-race positioning
+ *    - Racing: Normal racing, no significant gap
+ *    - BuildingGap: One driver is pulling ahead
+ *    - DecisiveGap: Gap threshold reached, countdown to victory
+ *    - Finished: Winner determined
+ *
+ * 3. **Minimum Speed Requirement**: The leader must maintain MinimumSpeedForGap
+ *    (100 km/h) for the gap to count. You can't win by stopping while your
+ *    opponent crashes - you must actually outrun them.
+ *
+ * 4. **Top Speed Focus**: Unlike technical tracks, highways reward raw speed.
+ *    Vehicle tuning should prioritize top speed and high-speed stability over
+ *    acceleration or cornering.
+ *
+ * @section win_highway Win Condition
+ * Create a gap of RequiredGap (default 200 meters) and maintain it for
+ * RequiredGapTime (default 5 seconds) while traveling above MinimumSpeedForGap.
+ *
+ * Alternative endings:
+ * - Opponent crashes: Automatic victory
+ * - Time limit reached (MaxRaceDuration): Closest gap wins
+ * - Both crash: Race voided
+ *
+ * @section traffic_highway Traffic System
+ * Highway battles typically include AI traffic that both racers must navigate.
+ * Traffic adds unpredictability and tests drivers' ability to find gaps at
+ * high speed. Collision with traffic usually results in significant speed loss,
+ * making it critical to maintain clear sight lines.
+ *
+ * @section ui_highway UI Elements
+ * - Current speed (km/h)
+ * - Gap distance to opponent (positive = you're ahead)
+ * - Decisive gap progress bar (fills during 5s countdown)
+ * - Top speed achieved
+ * - Total distance traveled
+ *
+ * @section example_highway Example Configuration
+ *
+ * @code
+ * // Create and configure a Highway Battle:
+ * UMGHighwayBattleHandler* Handler = NewObject<UMGHighwayBattleHandler>();
+ *
+ * // Customize victory conditions
+ * Handler->RequiredGap = 30000.0f;       // 300 meters for harder races
+ * Handler->RequiredGapTime = 7.0f;       // Hold for 7 seconds
+ * Handler->MinimumSpeedForGap = 150.0f;  // Must be going 150+ km/h
+ * Handler->MaxRaceDuration = 600.0f;     // 10 minute time limit
+ *
+ * // Initialize and start
+ * Handler->InitializeRace(Config);
+ * Handler->StartRace();
+ *
+ * // Subscribe to events
+ * Handler->OnLeadChanged.AddDynamic(this, &UMyClass::OnLeadSwitch);
+ * Handler->OnDecisiveGapProgress.AddDynamic(this, &UMyClass::UpdateGapUI);
+ * Handler->OnGapAchieved.AddDynamic(this, &UMyClass::ShowVictory);
+ * @endcode
+ *
+ * @section history_highway Cultural Background
+ * Highway battles were popularized by the manga/anime "Wangan Midnight" which
+ * depicted illegal racing on Tokyo's Shuto Expressway. The format emphasizes
+ * the thrill of sustained high-speed driving and the psychological battle of
+ * trying to shake off a pursuer at 300+ km/h.
+ *
+ * @see UMGRaceTypeHandler Base class for all race type handlers
+ * @see UMGTougeHandler For technical mountain pass racing
+ * @see PRD Section 4.3 For design requirements
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

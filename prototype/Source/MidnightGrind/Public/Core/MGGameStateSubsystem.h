@@ -1,43 +1,126 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
- * @file MGGameStateSubsystem.h
- * @brief Game State Subsystem - Controls overall game flow and state transitions
+ * =============================================================================
+ * MGGameStateSubsystem.h - Local Game Flow State Machine
+ * =============================================================================
  *
- * This subsystem manages the high-level game state machine for Midnight Grind.
- * It controls transitions between major game states (menus, garage, racing, etc.)
- * and handles level loading coordination.
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This subsystem manages the high-level game flow - navigating between
+ * main menu, garage, racing, and other major game screens. Think of it as
+ * the "director" that coordinates where the player is in the game.
  *
- * @section Overview
- * The Game State Subsystem is a GameInstanceSubsystem, meaning it persists across
- * level transitions and exists for the entire lifetime of the game session. Use this
- * subsystem when you need to:
- * - Navigate between game screens (main menu, garage, lobby browser, etc.)
- * - Check what state the game is currently in
- * - Listen for state changes to update UI or other systems
- * - Manage level loading with proper state coordination
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
  *
- * @section Usage
- * Access this subsystem through the GameInstance:
+ * 1. GAME INSTANCE SUBSYSTEM (UGameInstanceSubsystem):
+ *    - Lives for the ENTIRE game session (from launch to quit)
+ *    - Survives level transitions (unlike level Actors)
+ *    - Auto-created by Unreal when the game starts
+ *    - Access via: GameInstance->GetSubsystem<UMGGameStateSubsystem>()
+ *
+ * 2. STATE MACHINE PATTERN:
+ *    The game is always in exactly ONE state at a time:
+ *    Boot -> MainMenu -> Garage -> Lobby -> Loading -> Racing -> Results
+ *
+ *    Transitions are validated - you can't go directly from Boot to Racing.
+ *    Use CanTransitionTo() to check if a transition is allowed.
+ *
+ * 3. IMPORTANT DISTINCTION - TWO DIFFERENT "GAME STATES":
+ *    - UMGGameStateSubsystem (THIS FILE): LOCAL game flow (menus, loading)
+ *      - NOT replicated, each player has their own
+ *      - Controls what screen/level you're on
+ *
+ *    - AMGGameState: REPLICATED race state (multiplayer)
+ *      - Synced across all players
+ *      - Controls race phase (countdown, racing, finished)
+ *
+ *    They work TOGETHER but serve different purposes:
+ *    GameStateSubsystem.GoToState(Racing) -> loads level
+ *    AMGGameState.AuthStartRace() -> starts the replicated countdown
+ *
+ * 4. LEVEL LOADING:
+ *    Many state transitions involve loading a new level (map).
+ *    This subsystem coordinates:
+ *    - Showing loading screen (OnLoadingStarted)
+ *    - Async level loading (LoadLevelAsync)
+ *    - Hiding loading screen (OnLoadingCompleted)
+ *    - Entering the new state after load
+ *
+ * 5. CONTEXT DATA:
+ *    Data can be passed between states using SetContextData/GetContextData.
+ *    Example: When entering a race, store the TrackID so the loading
+ *    screen knows which track name to display.
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ * -----------------------------------------
+ *
+ *   [UMGGameInstance]
+ *         |
+ *         +-- [UMGGameStateSubsystem] <-- This file (LOCAL flow)
+ *         |         |
+ *         |         +-- Current State (MainMenu, Garage, Racing, etc.)
+ *         |         +-- Level Loading coordination
+ *         |         +-- Context Data (track ID, session ID, etc.)
+ *         |
+ *         +-- [UMGSaveSubsystem]
+ *         +-- [UMGSessionSubsystem]
+ *         +-- ... other subsystems ...
+ *
+ *   Meanwhile, in the race level:
+ *   [AMGGameState] (REPLICATED race phases)
+ *         |
+ *         +-- Race Phase (Countdown, Racing, Finished)
+ *         +-- Positions, Timing, Settings
+ *
+ * COMMON PATTERNS:
+ * ----------------
  * @code
- * UMGGameStateSubsystem* StateSubsystem = GameInstance->GetSubsystem<UMGGameStateSubsystem>();
- * if (StateSubsystem->GetCurrentState() == EMGGameState::MainMenu)
+ * // Get the subsystem
+ * UMGGameStateSubsystem* GSS = GameInstance->GetSubsystem<UMGGameStateSubsystem>();
+ *
+ * // Check current state
+ * if (GSS->GetCurrentState() == EMGGameState::MainMenu)
  * {
- *     StateSubsystem->GoToGarage();
+ *     // We're on the main menu
  * }
+ *
+ * // Navigate to garage
+ * GSS->GoToGarage();
+ *
+ * // Or use the generic method with validation
+ * if (GSS->CanTransitionTo(EMGGameState::Garage))
+ * {
+ *     GSS->GoToState(EMGGameState::Garage);
+ * }
+ *
+ * // Listen for state changes
+ * GSS->OnGameStateChanged.AddDynamic(this, &MyClass::HandleStateChange);
  * @endcode
  *
- * @section StateFlow State Flow
- * Common state transitions:
- * - Boot -> MainMenu (initial startup)
- * - MainMenu -> Garage, LobbyBrowser, Settings, Leaderboards
- * - Garage -> LobbyBrowser, MainMenu
- * - LobbyBrowser -> InLobby
- * - InLobby -> Loading -> PreRace -> Racing -> PostRace
- * - Racing -> PhotoMode, Replay (can return to Racing)
+ * STATE FLOW DIAGRAM:
+ * -------------------
+ *   Boot -> MainMenu <-> Garage
+ *              |           |
+ *              v           v
+ *          Settings    LobbyBrowser
+ *                          |
+ *                          v
+ *                       InLobby
+ *                          |
+ *                          v
+ *                       Loading
+ *                          |
+ *                          v
+ *   PhotoMode <------> Racing <------> Replay
+ *                          |
+ *                          v
+ *                      PostRace
  *
  * @see UMGGameInstance For the parent game instance
- * @see EMGGameState For the list of all game states
+ * @see AMGGameState For multiplayer race state (different purpose!)
+ * =============================================================================
  */
 
 #pragma once

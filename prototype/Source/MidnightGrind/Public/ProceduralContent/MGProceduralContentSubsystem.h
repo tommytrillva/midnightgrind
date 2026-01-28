@@ -1,5 +1,152 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGProceduralContentSubsystem.h - Central Procedural Content Generation Hub
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This is the MASTER SYSTEM for procedural (algorithmically generated) content
+ * in Midnight Grind. While MGRouteGeneratorSubsystem handles just road geometry,
+ * THIS subsystem handles EVERYTHING that gets generated:
+ *
+ * - TRACKS: Road layouts with segments and checkpoints
+ * - ENVIRONMENTS: Lighting, weather, decorations, atmosphere
+ * - CHALLENGES: Race objectives and goals
+ * - OBSTACLES: Hazards and barriers
+ * - SHORTCUTS: Hidden paths
+ * - TRAFFIC: AI civilian vehicles
+ * - COLLECTIBLES: Pickup items
+ * - WEATHER: Rain, fog, etc.
+ *
+ * Think of it as the "director" that coordinates all procedural systems!
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. SEEDS AND DETERMINISM (FProceduralSeed):
+ *    - A "seed" is a number that initializes random number generators
+ *    - SAME seed = SAME generated content (deterministic)
+ *    - This lets players share tracks: "Try seed ABC123!"
+ *    - Master seed generates sub-seeds for each content type
+ *    - SeedCode: Human-readable version for sharing
+ *
+ * 2. GENERATION HIERARCHY:
+ *    MasterSeed
+ *       |---> TrackSeed (road layout)
+ *       |---> EnvironmentSeed (decorations, lights)
+ *       |---> ObstacleSeed (hazards)
+ *       |---> WeatherSeed (rain, fog, etc.)
+ *       |---> TrafficSeed (NPC vehicles)
+ *
+ * 3. TRACK SEGMENTS (FTrackSegment):
+ *    - Building blocks of tracks
+ *    - Types: Straight, GentleCurve, SharpCurve, Hairpin, Chicane, Jump, etc.
+ *    - Each has: positions, rotations, length, width, banking, speed limit
+ *    - Segments connect to form complete tracks
+ *
+ * 4. ENVIRONMENT THEMES (EEnvironmentTheme):
+ *    - Visual style of the track
+ *    - Y2K aesthetic themes: NeonAlley, CyberpunkSlums, RetroArcade, Y2KMall
+ *    - Classic themes: UrbanDowntown, IndustrialDistrict, MountainPass
+ *    - Affects: lighting, props, colors, decorations
+ *
+ * 5. DIFFICULTY LEVELS (EGenerationDifficulty):
+ *    - VeryEasy -> Easy -> Medium -> Hard -> VeryHard -> Extreme -> Nightmare
+ *    - Affects: curve tightness, hazard frequency, time limits
+ *    - Match difficulty to player skill!
+ *
+ * 6. QUALITY SETTINGS (EProceduralQuality):
+ *    - Draft -> Low -> Medium -> High -> Ultra
+ *    - Higher = more detail but slower generation
+ *    - Affects segment count, decoration density, etc.
+ *
+ * 7. OBSTACLES (FProceduralObstacle):
+ *    - Hazards on the track
+ *    - Categories: Static (walls), Dynamic (moving), Destructible (breakable),
+ *                 Hazardous (damaging), Interactive (triggers)
+ *    - DamageOnImpact: How much hitting it hurts
+ *    - SpeedPenalty: How much it slows you down
+ *
+ * 8. SHORTCUTS (FProceduralShortcut):
+ *    - Hidden alternate routes that save time
+ *    - Risk vs Reward: RiskLevel indicates danger
+ *    - Some require: jumps, drifts, minimum speed
+ *    - DiscoveryPoints: XP for finding hidden ones
+ *
+ * 9. CHALLENGES (FProceduralChallenge):
+ *    - Objectives to complete
+ *    - Types: TimeAttack, Drift, Speed, etc.
+ *    - TargetValue: Goal to achieve
+ *    - Rewards: Credits, XP, Items
+ *    - Modifiers: Special rules (NoNitro, ReverseTrack, etc.)
+ *
+ * 10. TRAFFIC PATTERNS (FTrafficPattern):
+ *     - NPC vehicle behavior
+ *     - Density: How many cars
+ *     - AggressivenessLevel: How "dangerous" traffic is
+ *     - SpawnPoints/DespawnPoints: Where cars appear/disappear
+ *
+ * 11. COLLECTIBLES (FProceduralCollectible):
+ *     - Pickup items on the track
+ *     - Types: NitroBoost, Coin, etc.
+ *     - bIsRare: Special valuable ones
+ *     - bIsHidden: Off the main path
+ *     - RespawnTime: How long until it reappears
+ *
+ * GENERATION FLOW:
+ * ----------------
+ * 1. Create FGenerationSettings (what you want)
+ * 2. Call GenerateTrack() or GenerateTrackAsync()
+ * 3. Receive FGenerationResult with all content
+ * 4. Result contains: Track, Environment, Challenges, Shortcuts, Collectibles
+ *
+ * SYNC VS ASYNC:
+ * --------------
+ * - GenerateTrack(): Blocks until done (use during loading screens)
+ * - GenerateTrackAsync(): Returns immediately, fires OnGenerationComplete
+ * - Listen to OnGenerationProgress for loading bar updates
+ *
+ * STATISTICS (FProceduralContentStats):
+ * -------------------------------------
+ * Tracks player activity with procedural content:
+ * - TotalTracksGenerated: How many you've made
+ * - TotalShortcutsDiscovered: Hidden paths found
+ * - TotalSecretAreasFound: Secret locations discovered
+ * - FavoritedTracks/SharedTracks: Social engagement
+ *
+ * SHARING TRACKS:
+ * ---------------
+ * - GetSeedCode(): Convert seed to shareable string
+ * - ShareTrack(): Generate share code for a track
+ * - ImportSharedTrack(): Load track from share code
+ * - Friends can play your exact track!
+ *
+ * HOW TO USE THIS SYSTEM:
+ * -----------------------
+ * BASIC GENERATION:
+ *   FGenerationSettings Settings;
+ *   Settings.PreferredTheme = EEnvironmentTheme::NeonAlley;
+ *   Settings.TargetDifficulty = EGenerationDifficulty::Hard;
+ *   FGenerationResult Result = PCG->GenerateTrack(Settings);
+ *
+ * WITH SPECIFIC SEED:
+ *   FProceduralSeed Seed = PCG->CreateSeedFromCode("ABC123");
+ *   Result = PCG->GenerateTrackFromSeed(Seed, Settings);
+ *
+ * ASYNC WITH PROGRESS:
+ *   PCG->OnGenerationProgress.AddDynamic(this, &MyClass::OnProgress);
+ *   PCG->OnGenerationComplete.AddDynamic(this, &MyClass::OnComplete);
+ *   PCG->GenerateTrackAsync(Settings);
+ *
+ * DAILY/WEEKLY CHALLENGES:
+ *   FProceduralChallenge Today = PCG->GenerateDailyChallenge();
+ *   // Same challenge for everyone that day (seed based on date)
+ *
+ ******************************************************************************/
+
 /**
  * @file MGProceduralContentSubsystem.h
  * @brief Procedural Content Generation System for Midnight Grind

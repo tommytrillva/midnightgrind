@@ -1,5 +1,130 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGRaceFlowManager.h
+ * @brief Race Flow Manager - Orchestrates the complete race lifecycle and progression.
+ *
+ * The Race Flow Manager is the central coordinator for everything that happens
+ * before, during, and after a race. It handles level loading, state transitions,
+ * reward calculations, and integration with all the game's progression systems.
+ *
+ * @section overview_flow Overview
+ * Think of the Race Flow Manager as the "producer" of a race event. While the
+ * Game Mode is the "director" handling moment-to-moment gameplay, the Flow
+ * Manager handles the bigger picture: loading the track, showing loading screens,
+ * processing rewards, updating career progress, and handling the results screen.
+ *
+ * @section concepts_flow Key Concepts for Beginners
+ *
+ * 1. **Game Instance Subsystem**: This class extends UGameInstanceSubsystem,
+ *    meaning there's one instance that persists across level loads. Perfect for
+ *    managing race flow since we need to survive the level transition when
+ *    loading a new track.
+ *
+ * 2. **State Machine**: The manager progresses through defined states
+ *    (Idle -> LoadingTrack -> PreRace -> Racing -> ShowingResults -> etc.).
+ *    Each state has specific responsibilities and valid transitions.
+ *
+ * 3. **Reward Breakdown**: Rather than just giving players a lump sum, the
+ *    FMGRaceRewardBreakdown struct itemizes every bonus (clean race, best lap,
+ *    difficulty, etc.) for a satisfying results screen.
+ *
+ * 4. **Unlocks**: The FMGRaceUnlock struct represents things players earn
+ *    (new cars, parts, tracks, achievements) based on race performance.
+ *
+ * @section lifecycle_flow Race Lifecycle
+ *
+ * The complete flow of a race session:
+ *
+ * @code
+ *    [Idle] -- BeginRaceLoad() --> [LoadingTrack]
+ *       |                              |
+ *       |                        Level loads async
+ *       |                              |
+ *       |   <-- OnTrackLoaded() -- [PreRace]
+ *       |                              |
+ *       |                        Player ready, countdown
+ *       |                              |
+ *       |                         [Countdown]
+ *       |                              |
+ *       |                          [Racing]
+ *       |                              |
+ *       |   <-- OnRaceFinished() -- [RaceEnding]
+ *       |                              |
+ *       |                        [ShowingResults]
+ *       |                              |
+ *       |   <-- ConfirmResults() -- [ProcessingRewards]
+ *       |                              |
+ *       |                        [ShowingUnlocks]
+ *       |                              |
+ *       |   <-- SkipToPostRace() -- [PostRace]
+ *       |                              |
+ *       | <-- ExitRace()/Restart() -- [Exiting]
+ *       |                              |
+ *       +------------------------------+
+ * @endcode
+ *
+ * @section architecture_flow Architecture
+ *
+ * The Flow Manager integrates with multiple subsystems:
+ *
+ *    [AMGRaceGameMode]  <---> [UMGRaceFlowManager]
+ *           |                        |
+ *    Race Events             +-------+-------+-------+
+ *    (Lap, Finish)           |       |       |       |
+ *                            v       v       v       v
+ *                    [Progression] [Shop] [Career] [Leaderboard]
+ *                          |         |       |         |
+ *                         XP      Credits  Progress  Rankings
+ *
+ * @section usage_flow Usage Example
+ *
+ * @code
+ * // Starting a race from a menu:
+ * UMGRaceFlowManager* FlowManager = GetGameInstance()->GetSubsystem<UMGRaceFlowManager>();
+ *
+ * // 1. Configure and start loading
+ * FSoftObjectPath TrackPath("/Game/Maps/Downtown");
+ * FMGRaceConfig Config;
+ * Config.RaceType = EMGRaceType::Circuit;
+ * Config.LapCount = 3;
+ *
+ * FlowManager->BeginRaceLoad(TrackPath, Config, PlayerVehicleID);
+ *
+ * // 2. Subscribe to events for UI updates
+ * FlowManager->OnFlowStateChanged.AddDynamic(this, &UMyWidget::OnStateChanged);
+ * FlowManager->OnRewardsProcessed.AddDynamic(this, &UMyWidget::ShowRewards);
+ *
+ * // 3. When race completes (called by GameMode):
+ * // FlowManager->OnRaceFinished(Results);
+ *
+ * // 4. Player confirms results screen
+ * // FlowManager->ConfirmResults();  // Triggers reward processing
+ *
+ * // 5. Exit when done
+ * // FlowManager->ExitRace("MainMenu");  // Returns to menu
+ * // -or-
+ * // FlowManager->QuickRestart();  // Restart same race
+ * @endcode
+ *
+ * @section rewards_flow Reward Calculation
+ *
+ * The reward system considers multiple factors:
+ * - **Base Position Reward**: Credits based on finishing position (1st-8th+)
+ * - **Lap Bonus**: Extra credits for longer races
+ * - **Difficulty Bonus**: Higher AI difficulty = more credits
+ * - **Perfect Start Bonus**: No collisions on first lap
+ * - **Clean Race Bonus**: Completing without collisions
+ * - **Drift Bonus**: Points from drift score (drift races)
+ * - **Best Lap Bonus**: Setting the race's fastest lap
+ * - **Modifier Multiplier**: Active modifiers may increase/decrease rewards
+ *
+ * @see AMGRaceGameMode For the game mode that runs the actual race
+ * @see UMGRaceConfiguration For race setup data assets
+ * @see UMGPlayerProgression For XP and leveling
+ * @see UMGCareerSubsystem For career mode progress
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

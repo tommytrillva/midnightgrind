@@ -1,6 +1,134 @@
 // Copyright Midnight Grind. All Rights Reserved.
 // Stage 50: Racing Performance Configuration - 60 FPS Target
 
+/**
+ * =============================================================================
+ * MGRacingPerformanceConfig.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines performance configuration settings for Midnight Grind's
+ * racing gameplay. Racing games are particularly demanding because they require:
+ * - Consistent high frame rates (60+ FPS) for smooth controls
+ * - Fast-moving visuals with many objects on screen
+ * - Complex physics for vehicle handling
+ * - Real-time AI for opponent racers and traffic
+ *
+ * WHY PERFORMANCE CONFIGURATION MATTERS:
+ * --------------------------------------
+ * Different players have different hardware. A gaming PC with an RTX 4090 can
+ * handle ultra settings, while a Nintendo Switch needs reduced settings.
+ * This system allows the game to automatically adjust quality settings to
+ * maintain smooth gameplay across all platforms.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. DATA ASSET (UDataAsset):
+ *    A Data Asset is a special Unreal class that holds configuration data.
+ *    Unlike regular C++ constants, Data Assets can be:
+ *    - Edited in the Unreal Editor without recompiling
+ *    - Tweaked by designers, not just programmers
+ *    - Saved as separate files for easy version control
+ *    Think of it as a "settings file" that the game reads at runtime.
+ *
+ * 2. FRAME RATE AND FRAME TIME:
+ *    - Frame Rate (FPS): How many images the game draws per second
+ *    - Frame Time: How long each frame takes (16.67ms = 60 FPS)
+ *    - Budget: How much time each system (physics, AI, rendering) gets per frame
+ *    If all budgets exceed the frame time, the game stutters!
+ *
+ * 3. LOD (Level of Detail):
+ *    Objects far away don't need as much detail as nearby objects.
+ *    LOD systems swap high-detail models for simpler ones at distance:
+ *    - LOD0: Full detail (player's car, close objects)
+ *    - LOD1: Slightly reduced (medium distance)
+ *    - LOD2: Low detail (far away)
+ *    - LOD3: Very low detail (background)
+ *    - Culled: Not rendered at all (too far to see)
+ *
+ * 4. PLATFORM TIERS:
+ *    Hardware is categorized into performance tiers:
+ *    - Low: Nintendo Switch, older mobile devices, entry-level PCs
+ *    - Medium: Steam Deck, mid-range PCs
+ *    - High: PS5, Xbox Series X, good gaming PCs
+ *    - Ultra: High-end gaming PCs with top-tier GPUs
+ *
+ * PERFORMANCE BUDGET BREAKDOWN:
+ * -----------------------------
+ * For 60 FPS, each frame has ~16.67ms total budget:
+ *
+ *    |-- Game Thread (8ms) --|-- Render Thread (10ms) --|
+ *    |  Physics (3ms)        |  Draw calls, materials   |
+ *    |  AI (2ms)             |  Shadows, reflections    |
+ *    |  Game logic           |  Post-processing         |
+ *
+ *    |---------------- GPU (14ms) -------------------|
+ *    |  Geometry   |  Shading   |  Post FX   |  UI  |
+ *
+ * Note: Some work happens in parallel (CPU and GPU work simultaneously)
+ *
+ * WHAT EACH SETTINGS STRUCT CONTROLS:
+ * -----------------------------------
+ *
+ * FMGVehicleRenderSettings:
+ *    How cars look - reflections, shadows, damage effects, interior detail.
+ *    Cars are the visual focus, so their quality is prioritized.
+ *
+ * FMGVFXSettings:
+ *    Visual effects - tire smoke, sparks, nitrous flames, weather particles.
+ *    These are "nice to have" and scale down first when performance is tight.
+ *
+ * FMGPhysicsSettings:
+ *    How the cars feel - suspension, tire grip, collision detection.
+ *    Physics must stay consistent for fair gameplay; substepping ensures accuracy.
+ *
+ * FMGAudioSettings:
+ *    Sound effects - engine sounds, tire squeals, ambient sounds.
+ *    Audio has lower CPU impact but still needs budgeting for many sound sources.
+ *
+ * FMGAISettings:
+ *    Opponent and traffic behavior - how often AI recalculates, how many AI cars.
+ *    Far-away AI can use simplified logic without players noticing.
+ *
+ * FMGStreamingSettings:
+ *    Loading content as you drive - tracks are too big to load all at once.
+ *    The game loads nearby areas and unloads distant ones dynamically.
+ *
+ * HOW TO USE THIS SYSTEM:
+ * -----------------------
+ * 1. At game startup, call DetectPlatformTier() to identify hardware
+ * 2. Get the appropriate profile using GetProfile(DetectedTier)
+ * 3. Apply the profile's settings to game systems
+ * 4. Optionally let players override with custom settings
+ *
+ * Example:
+ *    EMGPlatformTier Tier = UMGRacingPerformanceConfig::DetectPlatformTier();
+ *    const FMGPerformanceProfile& Profile = ConfigAsset->GetProfile(Tier);
+ *    PhysicsSystem->ApplySettings(Profile.PhysicsSettings);
+ *    VFXSystem->ApplySettings(Profile.VFXSettings);
+ *
+ * TUNING TIPS FOR DESIGNERS:
+ * --------------------------
+ * - Always test on lowest-tier target hardware
+ * - If FPS drops below target, reduce settings in this order:
+ *   1. VFX (particle counts, effects)
+ *   2. Shadows and reflections
+ *   3. LOD distances
+ *   4. AI complexity (last resort - affects gameplay)
+ * - Monitor frame time in milliseconds, not FPS (more precise)
+ *
+ * RELATED FILES:
+ * --------------
+ * - MGRacingPerformanceConfig.cpp: Default profile initialization
+ * - MGSettingsSubsystem: Applies these settings to game systems
+ * - MGVehicleRenderComponent: Uses VehicleRenderSettings
+ * - MGPhysicsVehicle: Uses PhysicsSettings
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

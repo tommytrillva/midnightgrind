@@ -1,5 +1,138 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVFXDataAssets.h
+ * @brief Data assets for configuring VFX presets and settings
+ *
+ * @section Overview
+ * This file contains UDataAsset classes that allow designers to configure VFX
+ * settings without modifying code. These assets can be created in the Unreal Editor
+ * and assigned to vehicles, environments, or the global VFX system to customize
+ * visual effects.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Data Assets**
+ * Data Assets (UDataAsset) are Blueprint-like assets that store configuration data.
+ * Unlike regular Blueprints, they don't have visual scripting - they're pure data
+ * containers. This makes them perfect for:
+ * - Storing VFX references (Niagara systems) in one place
+ * - Creating multiple presets that can be swapped at runtime
+ * - Allowing designers to tweak values without programmer help
+ *
+ * **Preset Pattern**
+ * Each data asset type represents a "preset" - a complete configuration for a
+ * specific aspect of VFX:
+ * - UMGVehicleVFXPresetData: All particle systems for a vehicle type
+ * - UMGWeatherVFXPresetData: Weather condition VFX configuration
+ * - UMGZoneVFXPresetData: Ambient particles for an environment zone
+ * - UMGCameraVFXPresetData: Camera shake and post-process settings
+ * - UMGEventVFXPresetData: VFX triggered by race events
+ *
+ * **Master Config**
+ * UMGVFXConfigData is the top-level asset that combines all presets. Assign one
+ * master config to your game instance to control all VFX behavior.
+ *
+ * @section Architecture
+ * Data flow for VFX configuration:
+ *
+ * 1. Designer creates Data Assets in Editor (Content Browser > Right-click >
+ *    Miscellaneous > Data Asset > Select appropriate class)
+ * 2. Assigns Niagara systems and tweaks parameters
+ * 3. Master config (UMGVFXConfigData) references all presets
+ * 4. At runtime, VFX components/subsystems load presets and apply settings
+ * 5. Presets can be swapped dynamically (e.g., different vehicle classes)
+ *
+ * @section UsageExamples Usage Examples
+ *
+ * **Creating a Vehicle VFX Preset in Editor:**
+ * 1. Content Browser > Right-click > Miscellaneous > Data Asset
+ * 2. Select "MGVehicleVFXPresetData"
+ * 3. Name it (e.g., "DA_VFX_SportsCar")
+ * 4. Open and assign Niagara systems for each effect type
+ * 5. Configure thresholds and colors
+ *
+ * **Applying Preset to Vehicle in C++:**
+ * @code
+ * // In your vehicle class
+ * UPROPERTY(EditDefaultsOnly, Category = "VFX")
+ * UMGVehicleVFXPresetData* VFXPreset;
+ *
+ * void AMyVehicle::BeginPlay()
+ * {
+ *     Super::BeginPlay();
+ *
+ *     if (VFXPreset && VFXComponent)
+ *     {
+ *         VFXPreset->ApplyToComponent(VFXComponent);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Loading Preset by Vehicle Class:**
+ * @code
+ * // Using the master config
+ * void AMyVehicle::InitializeVFX()
+ * {
+ *     UMGVFXConfigData* MasterConfig = LoadObject<UMGVFXConfigData>(
+ *         nullptr, TEXT("/Game/VFX/DA_MasterVFXConfig"));
+ *
+ *     if (MasterConfig)
+ *     {
+ *         // Get preset for this vehicle class (e.g., "Muscle", "JDM", "Euro")
+ *         UMGVehicleVFXPresetData* Preset = MasterConfig->GetVehiclePresetForClass(VehicleClassName);
+ *         if (Preset)
+ *         {
+ *             Preset->ApplyToComponent(VFXComponent);
+ *         }
+ *     }
+ * }
+ * @endcode
+ *
+ * **Configuring Weather Presets:**
+ * @code
+ * // In game mode or environment manager setup
+ * void AMyGameMode::SetupWeatherPresets()
+ * {
+ *     // Load weather preset for storm
+ *     UMGWeatherVFXPresetData* StormPreset = LoadObject<UMGWeatherVFXPresetData>(
+ *         nullptr, TEXT("/Game/VFX/Weather/DA_VFX_Storm"));
+ *
+ *     if (StormPreset && EnvironmentManager)
+ *     {
+ *         StormPreset->ApplyToEnvironmentManager(EnvironmentManager);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Registering Event VFX:**
+ * @code
+ * // Register special event effects with the VFX subsystem
+ * void AMyGameMode::InitializeEventVFX()
+ * {
+ *     UMGEventVFXPresetData* EventPreset = LoadObject<UMGEventVFXPresetData>(
+ *         nullptr, TEXT("/Game/VFX/Events/DA_VFX_RaceEvents"));
+ *
+ *     UMGVFXSubsystem* VFXSubsystem = GetWorld()->GetSubsystem<UMGVFXSubsystem>();
+ *     if (EventPreset && VFXSubsystem)
+ *     {
+ *         EventPreset->RegisterWithVFXSubsystem(VFXSubsystem);
+ *     }
+ * }
+ * @endcode
+ *
+ * **Blueprint Usage:**
+ * 1. Create a variable of type "MG Vehicle VFX Preset Data" (or other preset type)
+ * 2. Set the default value to your created Data Asset
+ * 3. Call "Apply To Component" on BeginPlay
+ * 4. Or use "Get Vehicle Preset For Class" on the master config for dynamic selection
+ *
+ * @see UMGVehicleVFXComponent Uses vehicle presets
+ * @see AMGEnvironmentVFXManager Uses weather and zone presets
+ * @see UMGCameraVFXComponent Uses camera presets
+ * @see UMGVFXSubsystem Uses event presets
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

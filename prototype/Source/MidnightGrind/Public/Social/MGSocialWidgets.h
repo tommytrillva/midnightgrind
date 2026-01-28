@@ -1,5 +1,212 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGSocialWidgets.h
+ * @brief UI Widget Classes for Social Features (Friends, Crews, Invites)
+ *
+ * @section overview Overview
+ * This file defines the UI widget classes used to display and interact with
+ * the social systems in Midnight Grind. These widgets work with the
+ * MGSocialSubsystem to present friends lists, crew management, friend requests,
+ * game invites, and the social hub interface.
+ *
+ * @section beginners Key Concepts for Beginners
+ *
+ * @subsection ue_widgets UMG Widget Basics
+ * Unreal's UMG (Unreal Motion Graphics) system creates UI using:
+ * - UUserWidget: Base class for all custom widgets
+ * - Blueprint + C++ hybrid: C++ logic with Blueprint visual design
+ * - Widget binding: Connect visual elements to C++ variables
+ *
+ * These classes are marked "Abstract, Blueprintable":
+ * - Abstract: Cannot create directly, must be subclassed
+ * - Blueprintable: Can create Blueprint subclasses to design visuals
+ *
+ * @subsection widget_hierarchy Widget Hierarchy
+ * @code
+ * UMGSocialHubWidget (Main Container)
+ * |
+ * +-- UMGFriendsListWidget (Tab: Friends)
+ * |   +-- UMGFriendEntryWidget (for each friend)
+ * |
+ * +-- UMGCrewPanelWidget (Tab: Crew)
+ * |   +-- UMGCrewMemberWidget (for each member)
+ * |
+ * +-- UMGRecentPlayersWidget (Tab: Recent)
+ *
+ * Popup/Overlays:
+ * - UMGFriendRequestWidget (friend request notification)
+ * - UMGGameInviteWidget (game invite notification)
+ * - UMGCreateCrewWidget (crew creation dialog)
+ * @endcode
+ *
+ * @subsection widget_patterns Common Widget Patterns
+ *
+ * 1. Entry Widget Pattern (UMGFriendEntryWidget, UMGCrewMemberWidget):
+ *    - Represents a single item in a list
+ *    - Has SetXXXData() to populate with model data
+ *    - Broadcasts events when user interacts (selected, clicked button)
+ *    - UpdateDisplay() is BlueprintNativeEvent for visual customization
+ *
+ * 2. List/Panel Pattern (UMGFriendsListWidget, UMGCrewPanelWidget):
+ *    - Contains multiple entry widgets
+ *    - Subscribes to subsystem events for data updates
+ *    - RefreshList() rebuilds entries from current data
+ *    - Manages entry widget pool for performance
+ *
+ * 3. Dialog Pattern (UMGCreateCrewWidget, UMGFriendRequestWidget):
+ *    - Modal popup for specific actions
+ *    - Input validation with error feedback
+ *    - Success/Cancel delegates for parent to handle
+ *
+ * @section widget_classes Widget Classes Summary
+ *
+ * @subsection friend_widgets Friend Widgets
+ * - UMGFriendEntryWidget: Single friend row (avatar, name, status, buttons)
+ * - UMGFriendsListWidget: Scrollable friends list with filtering
+ * - UMGFriendRequestWidget: Incoming friend request with Accept/Decline
+ *
+ * @subsection crew_widgets Crew Widgets
+ * - UMGCrewMemberWidget: Single crew member (rank, name, role, kick/promote)
+ * - UMGCrewPanelWidget: Crew overview and member list
+ * - UMGCreateCrewWidget: Dialog to create a new crew
+ *
+ * @subsection misc_widgets Other Widgets
+ * - UMGRecentPlayersWidget: Players you've raced recently
+ * - UMGGameInviteWidget: Incoming game invite notification
+ * - UMGSocialHubWidget: Main social screen with tabs
+ *
+ * @section usage Usage Examples
+ *
+ * @subsection creating_widgets Creating and Displaying Widgets
+ * @code
+ * // In your HUD or menu class
+ * void AMyHUD::ShowSocialHub()
+ * {
+ *     // Create widget from Blueprint class
+ *     UMGSocialHubWidget* SocialHub = CreateWidget<UMGSocialHubWidget>(
+ *         GetOwningPlayerController(),
+ *         SocialHubWidgetClass  // Set in Blueprint
+ *     );
+ *
+ *     if (SocialHub)
+ *     {
+ *         SocialHub->AddToViewport(10);  // Z-order 10
+ *     }
+ * }
+ * @endcode
+ *
+ * @subsection blueprint_setup Blueprint Setup
+ * @code
+ * 1. Create Blueprint "WBP_FriendEntry" inheriting from UMGFriendEntryWidget
+ * 2. Design visual layout in UMG Designer:
+ *    - Add Image widget, name it "AvatarImage"
+ *    - Add TextBlock widget, name it "NameText"
+ *    - Add TextBlock widget, name it "StatusText"
+ *    - Add Button widget, name it "JoinButton"
+ *
+ * 3. In C++, UpdateDisplay_Implementation shows/hides elements:
+ *    void UMGFriendEntryWidget::UpdateDisplay_Implementation()
+ *    {
+ *        if (NameText) NameText->SetText(FriendData.DisplayName);
+ *        if (StatusText) StatusText->SetText(GetStatusText());
+ *        if (JoinButton) JoinButton->SetVisibility(
+ *            FriendData.bInGame ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+ *    }
+ * @endcode
+ *
+ * @subsection binding_events Binding to Events
+ * @code
+ * void UMyWidget::NativeConstruct()
+ * {
+ *     Super::NativeConstruct();
+ *
+ *     if (FriendsListWidget)
+ *     {
+ *         // When a friend entry is clicked, handle it
+ *         FriendsListWidget->OnFriendSelected.AddDynamic(
+ *             this, &UMyWidget::HandleFriendSelected);
+ *     }
+ * }
+ *
+ * void UMyWidget::HandleFriendSelected(const FMGFriendData& Friend)
+ * {
+ *     // Show friend profile popup
+ *     ShowFriendProfile(Friend);
+ * }
+ * @endcode
+ *
+ * @subsection filter_search Filtering and Searching
+ * @code
+ * // Show only online friends
+ * FriendsListWidget->SetStatusFilter(true);  // bOnlineOnly = true
+ *
+ * // Search by name
+ * FriendsListWidget->SearchFriends(TEXT("Speed"));  // Matches "SpeedDemon", "SpeedyGonzales"
+ *
+ * // Clear filter
+ * FriendsListWidget->SetStatusFilter(false);
+ * FriendsListWidget->SearchFriends(TEXT(""));
+ * @endcode
+ *
+ * @subsection game_invites Handling Game Invites
+ * @code
+ * // In your HUD class
+ * void AMyHUD::ShowGameInvite(const FMGFriendData& FromFriend, const FString& SessionID)
+ * {
+ *     UMGGameInviteWidget* InviteWidget = CreateWidget<UMGGameInviteWidget>(
+ *         GetOwningPlayerController(), GameInviteWidgetClass);
+ *
+ *     if (InviteWidget)
+ *     {
+ *         InviteWidget->ShowInvite(FromFriend, SessionID);
+ *         InviteWidget->AddToViewport(100);  // High Z for overlay
+ *         // Widget auto-hides after timeout or user action
+ *     }
+ * }
+ * @endcode
+ *
+ * @section blueprintnativeevent BlueprintNativeEvent Pattern
+ * Many functions are BlueprintNativeEvent, meaning:
+ * - C++ provides default implementation (if any)
+ * - Blueprint can override with custom visuals/logic
+ * - Called via FunctionName() which routes to FunctionName_Implementation()
+ *
+ * @code
+ * // C++ header
+ * UFUNCTION(BlueprintNativeEvent, Category = "Display")
+ * void UpdateDisplay();
+ *
+ * // C++ implementation (optional)
+ * void UMGFriendEntryWidget::UpdateDisplay_Implementation()
+ * {
+ *     // Default behavior
+ * }
+ *
+ * // Blueprint can override by implementing "Update Display" event
+ * @endcode
+ *
+ * @section meta_bindwidget BindWidget Meta Specifier
+ * @code
+ * UPROPERTY(meta = (BindWidget))
+ * UTextBlock* NameText;
+ *
+ * UPROPERTY(meta = (BindWidgetOptional))
+ * UButton* OptionalButton;
+ * @endcode
+ * - BindWidget: Widget with this name MUST exist in Blueprint
+ * - BindWidgetOptional: Widget may or may not exist
+ *
+ * @section crew_permissions Crew Permission System
+ * UMGCrewMemberWidget checks viewer's rank to show/hide actions:
+ * - Regular members: No actions on others
+ * - Officers: Can kick regular members
+ * - Leader: Can kick anyone, promote to officer
+ *
+ * @see MGSocialSubsystem.h For the data backend these widgets display
+ * @see FMGFriendData, FMGCrewData For data structures
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

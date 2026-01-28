@@ -1,5 +1,85 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGMinimapWidget.h
+ * @brief Track minimap display showing racer positions and checkpoints
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the minimap widget that displays a top-down view of the
+ * race track with markers for all racers, checkpoints, and waypoints. The
+ * minimap helps players navigate the track and track opponent positions.
+ *
+ * The minimap supports multiple display modes:
+ * - Rotating: Map rotates so player always faces "up" (most common in racing)
+ * - Fixed: North is always up, player icon rotates (useful for learning tracks)
+ * - Full Track: Zoomed out to show the entire track at once
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **World-to-Minimap Coordinates**: The widget converts 3D world positions
+ *   to 2D minimap positions using track bounds. This mapping is essential for
+ *   correctly placing markers.
+ *
+ * - **Marker System**: A flexible marker system supports different types
+ *   (player, opponents, checkpoints, hazards) with unique icons and colors.
+ *
+ * - **Smooth Interpolation**: Marker positions and rotations interpolate
+ *   smoothly rather than jumping, preventing visual jitter.
+ *
+ * - **Zoom Levels**: Higher zoom values show more detail around the player
+ *   but less of the overall track context.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [Race Manager] ---> Positions ---> [MGMinimapWidget]
+ *                                            |
+ *   [Track Data] ---> Bounds/Texture --------|
+ *                                            |
+ *                                            v
+ *                                      World-to-Minimap Transform
+ *                                            |
+ *                                            +-- Player Marker (green arrow)
+ *                                            |
+ *                                            +-- Opponent Markers (red dots)
+ *                                            |
+ *                                            +-- Checkpoint Markers (yellow)
+ *                                            |
+ *                                            +-- Optional Racing Line
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Setup minimap with track data
+ * MinimapWidget->SetTrackTexture(TrackMinimapTexture);
+ * MinimapWidget->SetTrackBounds(FVector2D(-5000, -5000), FVector2D(5000, 5000));
+ * MinimapWidget->SetMinimapMode(EMGMinimapMode::RotatingMap);
+ * MinimapWidget->SetZoomLevel(2.5f);
+ *
+ * // Set opponent count (creates markers)
+ * MinimapWidget->SetOpponentCount(7);
+ *
+ * // Update positions each frame
+ * MinimapWidget->UpdatePlayerMarker(PlayerLocation, PlayerYaw);
+ * for (int32 i = 0; i < Opponents.Num(); i++)
+ * {
+ *     MinimapWidget->UpdateOpponentMarker(i, OpponentLocation, OpponentYaw, Position);
+ * }
+ *
+ * // Add custom markers
+ * FMGMinimapMarker HazardMarker;
+ * HazardMarker.Type = EMGMinimapMarkerType::Hazard;
+ * HazardMarker.WorldPosition = OilSlickLocation;
+ * HazardMarker.Color = FLinearColor::Red;
+ * int32 MarkerID = MinimapWidget->AddMarker(HazardMarker);
+ * @endcode
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -10,8 +90,13 @@ class UImage;
 class UCanvasPanel;
 class UTexture2D;
 
+// =============================================================================
+// Enums and Structs
+// =============================================================================
+
 /**
  * Minimap display mode
+ * Determines how the map orients relative to player facing direction
  */
 UENUM(BlueprintType)
 enum class EMGMinimapMode : uint8

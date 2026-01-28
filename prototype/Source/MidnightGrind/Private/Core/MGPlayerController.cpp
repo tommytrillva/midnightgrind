@@ -44,6 +44,8 @@
 #include "Shortcut/MGShortcutSubsystem.h"
 #include "Career/MGCareerSubsystem.h"
 #include "Rivals/MGRivalsSubsystem.h"
+#include "TimeOfDay/MGTimeOfDaySubsystem.h"
+#include "Slipstream/MGSlipstreamSubsystem.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
@@ -358,6 +360,25 @@ void AMGPlayerController::BeginPlay()
 				RivalsSubsystem->OnRivalDefeated.AddDynamic(this, &AMGPlayerController::OnRivalDefeated);
 				RivalsSubsystem->OnNemesisDesignated.AddDynamic(this, &AMGPlayerController::OnNemesisDesignated);
 			}
+
+			// Bind to time of day subsystem for time-based events
+			if (UMGTimeOfDaySubsystem* TimeSubsystem = GI->GetSubsystem<UMGTimeOfDaySubsystem>())
+			{
+				TimeSubsystem->OnTimeOfDayChanged.AddDynamic(this, &AMGPlayerController::OnTimeOfDayChanged);
+				TimeSubsystem->OnMidnightReached.AddDynamic(this, &AMGPlayerController::OnMidnightReached);
+			}
+		}
+
+		// Bind to slipstream subsystem for drafting events
+		if (UWorld* World = GetWorld())
+		{
+			if (UMGSlipstreamSubsystem* SlipstreamSubsystem = World->GetSubsystem<UMGSlipstreamSubsystem>())
+			{
+				SlipstreamSubsystem->OnSlipstreamEntered.AddDynamic(this, &AMGPlayerController::OnSlipstreamEntered);
+				SlipstreamSubsystem->OnSlipstreamExited.AddDynamic(this, &AMGPlayerController::OnSlipstreamExited);
+				SlipstreamSubsystem->OnSlingshotReady.AddDynamic(this, &AMGPlayerController::OnSlingshotReady);
+				SlipstreamSubsystem->OnSlingshotActivated.AddDynamic(this, &AMGPlayerController::OnSlingshotActivated);
+			}
 		}
 	}
 }
@@ -607,6 +628,24 @@ void AMGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			RivalsSubsystem->OnNewRivalDiscovered.RemoveDynamic(this, &AMGPlayerController::OnNewRivalDiscovered);
 			RivalsSubsystem->OnRivalDefeated.RemoveDynamic(this, &AMGPlayerController::OnRivalDefeated);
 			RivalsSubsystem->OnNemesisDesignated.RemoveDynamic(this, &AMGPlayerController::OnNemesisDesignated);
+		}
+
+		if (UMGTimeOfDaySubsystem* TimeSubsystem = GI->GetSubsystem<UMGTimeOfDaySubsystem>())
+		{
+			TimeSubsystem->OnTimeOfDayChanged.RemoveDynamic(this, &AMGPlayerController::OnTimeOfDayChanged);
+			TimeSubsystem->OnMidnightReached.RemoveDynamic(this, &AMGPlayerController::OnMidnightReached);
+		}
+	}
+
+	// Unbind from slipstream subsystem
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGSlipstreamSubsystem* SlipstreamSubsystem = World->GetSubsystem<UMGSlipstreamSubsystem>())
+		{
+			SlipstreamSubsystem->OnSlipstreamEntered.RemoveDynamic(this, &AMGPlayerController::OnSlipstreamEntered);
+			SlipstreamSubsystem->OnSlipstreamExited.RemoveDynamic(this, &AMGPlayerController::OnSlipstreamExited);
+			SlipstreamSubsystem->OnSlingshotReady.RemoveDynamic(this, &AMGPlayerController::OnSlingshotReady);
+			SlipstreamSubsystem->OnSlingshotActivated.RemoveDynamic(this, &AMGPlayerController::OnSlingshotActivated);
 		}
 	}
 
@@ -3324,6 +3363,145 @@ void AMGPlayerController::OnNemesisDesignated(const FMGRival& Nemesis)
 			FText NemesisMessage = FText::FromString(FString::Printf(TEXT("NEMESIS: %s"), *Nemesis.DisplayName.ToString()));
 			FLinearColor NemesisColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f); // Red
 			HUDSubsystem->ShowNotification(NemesisMessage, 5.0f, NemesisColor);
+		}
+	}
+}
+
+// ==========================================
+// TIME OF DAY HANDLERS
+// ==========================================
+
+void AMGPlayerController::OnTimeOfDayChanged(EMGTimeOfDay OldTime, EMGTimeOfDay NewTime)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString TimeStr;
+			FLinearColor TimeColor;
+
+			switch (NewTime)
+			{
+			case EMGTimeOfDay::Dawn:
+				TimeStr = TEXT("DAWN - New day begins");
+				TimeColor = FLinearColor(1.0f, 0.6f, 0.3f, 1.0f); // Orange-gold
+				break;
+			case EMGTimeOfDay::Morning:
+				TimeStr = TEXT("MORNING");
+				TimeColor = FLinearColor(1.0f, 0.9f, 0.5f, 1.0f); // Light gold
+				break;
+			case EMGTimeOfDay::Midday:
+				TimeStr = TEXT("MIDDAY");
+				TimeColor = FLinearColor(1.0f, 1.0f, 0.8f, 1.0f); // Bright
+				break;
+			case EMGTimeOfDay::Afternoon:
+				TimeStr = TEXT("AFTERNOON");
+				TimeColor = FLinearColor(1.0f, 0.85f, 0.6f, 1.0f); // Warm
+				break;
+			case EMGTimeOfDay::Dusk:
+				TimeStr = TEXT("DUSK - Sun setting");
+				TimeColor = FLinearColor(1.0f, 0.5f, 0.2f, 1.0f); // Orange
+				break;
+			case EMGTimeOfDay::Evening:
+				TimeStr = TEXT("EVENING - Nightlife begins");
+				TimeColor = FLinearColor(0.6f, 0.4f, 0.8f, 1.0f); // Purple
+				break;
+			case EMGTimeOfDay::Night:
+				TimeStr = TEXT("NIGHT - Street racing time!");
+				TimeColor = FLinearColor(0.3f, 0.5f, 1.0f, 1.0f); // Blue
+				break;
+			case EMGTimeOfDay::LateNight:
+				TimeStr = TEXT("LATE NIGHT - Underground hours");
+				TimeColor = FLinearColor(0.2f, 0.2f, 0.6f, 1.0f); // Dark blue
+				break;
+			}
+
+			FText TimeMessage = FText::FromString(TimeStr);
+			HUDSubsystem->ShowNotification(TimeMessage, 3.0f, TimeColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnMidnightReached(int32 GameDay)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText MidnightMessage = FText::FromString(FString::Printf(TEXT("MIDNIGHT GRIND - Day %d"), GameDay));
+			FLinearColor MidnightColor = FLinearColor(0.8f, 0.0f, 1.0f, 1.0f); // Purple
+			HUDSubsystem->ShowNotification(MidnightMessage, 4.0f, MidnightColor);
+		}
+	}
+}
+
+// ==========================================
+// SLIPSTREAM HANDLERS
+// ==========================================
+
+void AMGPlayerController::OnSlipstreamEntered(AActor* LeadVehicle, EMGDraftingZone Zone)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FString ZoneStr;
+			FLinearColor SlipstreamColor;
+
+			switch (Zone)
+			{
+			case EMGDraftingZone::Optimal:
+				ZoneStr = TEXT("OPTIMAL DRAFT");
+				SlipstreamColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f); // Green
+				break;
+			case EMGDraftingZone::Strong:
+				ZoneStr = TEXT("STRONG DRAFT");
+				SlipstreamColor = FLinearColor(0.0f, 0.8f, 1.0f, 1.0f); // Cyan
+				break;
+			case EMGDraftingZone::Medium:
+				ZoneStr = TEXT("DRAFTING");
+				SlipstreamColor = FLinearColor(0.5f, 0.8f, 1.0f, 1.0f); // Light blue
+				break;
+			case EMGDraftingZone::Weak:
+			default:
+				ZoneStr = TEXT("DRAFTING");
+				SlipstreamColor = FLinearColor(0.7f, 0.7f, 1.0f, 1.0f); // Pale blue
+				break;
+			}
+
+			FText SlipstreamMessage = FText::FromString(ZoneStr);
+			HUDSubsystem->ShowNotification(SlipstreamMessage, 1.5f, SlipstreamColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSlipstreamExited()
+{
+	// Could clear any drafting indicator here if needed
+}
+
+void AMGPlayerController::OnSlingshotReady()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText BoostMessage = FText::FromString(TEXT("SLINGSHOT READY!"));
+			FLinearColor BoostColor = FLinearColor(1.0f, 0.84f, 0.0f, 1.0f); // Gold
+			HUDSubsystem->ShowNotification(BoostMessage, 2.0f, BoostColor);
+		}
+	}
+}
+
+void AMGPlayerController::OnSlingshotActivated(float BonusSpeed)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (UMGRaceHUDSubsystem* HUDSubsystem = World->GetSubsystem<UMGRaceHUDSubsystem>())
+		{
+			FText SlingshotMessage = FText::FromString(FString::Printf(TEXT("SLINGSHOT! +%.0f KPH"), BonusSpeed));
+			FLinearColor SlingshotColor = FLinearColor(1.0f, 0.5f, 0.0f, 1.0f); // Orange
+			HUDSubsystem->ShowNotification(SlingshotMessage, 2.5f, SlingshotColor);
 		}
 	}
 }

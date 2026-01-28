@@ -7,6 +7,7 @@
 #include "HAL/PlatformFileManager.h"
 #include "Serialization/BufferArchive.h"
 #include "Serialization/MemoryReader.h"
+#include "Track/MGTrackSubsystem.h"
 
 void UMGPursuitSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -36,6 +37,14 @@ void UMGPursuitSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	PursuitConfig.IntensityUpgradeThresholds.Add(EMGPursuitIntensity::Medium, 60.0f);
 	PursuitConfig.IntensityUpgradeThresholds.Add(EMGPursuitIntensity::High, 120.0f);
 	PursuitConfig.IntensityUpgradeThresholds.Add(EMGPursuitIntensity::Extreme, 180.0f);
+
+	// Tactic cooldowns (Iteration 95)
+	PursuitConfig.RamCooldown = 8.0f;
+	PursuitConfig.PITCooldown = 12.0f;
+	PursuitConfig.EMPCooldown = 30.0f;
+	PursuitConfig.PredictionTime = 2.0f;
+	PursuitConfig.RamExecutionDistance = 300.0f;
+	PursuitConfig.PITExecutionDistance = 200.0f;
 
 	// Default scoring
 	PursuitScoring.BaseEscapeBonus = 1000;
@@ -609,6 +618,111 @@ TArray<FMGRoadblock> UMGPursuitSubsystem::GetActiveRoadblocks(const FString& Pla
 }
 
 // ============================================================================
+// INTELLIGENT ROADBLOCK POSITIONING (Iteration 95)
+// ============================================================================
+
+bool UMGPursuitSubsystem::CalculateOptimalRoadblockPosition(
+	const FString& PlayerId,
+	FVector PlayerLocation,
+	FVector PlayerVelocity,
+	float MinDistanceAhead,
+	FVector& OutLocation,
+	FRotator& OutRotation) const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	// Get track subsystem for track data
+	UMGTrackSubsystem* TrackSubsystem = World->GetSubsystem<UMGTrackSubsystem>();
+	if (!TrackSubsystem)
+	{
+		// Fallback: Place roadblock along velocity vector
+		if (PlayerVelocity.SizeSquared() < 100.0f)
+		{
+			return false; // Player not moving fast enough
+		}
+
+		FVector VelocityDir = PlayerVelocity.GetSafeNormal();
+		OutLocation = PlayerLocation + (VelocityDir * MinDistanceAhead * 100.0f); // cm conversion
+		OutRotation = (-VelocityDir).Rotation(); // Face oncoming traffic
+		return true;
+	}
+
+	// Use track spline for intelligent positioning
+	// Get current distance along track
+	float CurrentDistance = TrackSubsystem->GetDistanceAlongTrack(PlayerLocation);
+
+	// Calculate minimum placement distance based on player speed
+	float PlayerSpeed = PlayerVelocity.Size(); // cm/s
+	float MinReactionDistance = PlayerSpeed * 3.0f; // 3 seconds ahead minimum
+	float ActualMinDistance = FMath::Max(MinDistanceAhead * 100.0f, MinReactionDistance);
+
+	// Target distance along track
+	float TargetDistance = CurrentDistance + ActualMinDistance;
+
+	// Get position at target distance
+	OutLocation = TrackSubsystem->GetPositionAtDistance(TargetDistance);
+	OutRotation = TrackSubsystem->GetDirectionAtDistance(TargetDistance);
+
+	// Rotate to face oncoming traffic (opposite of track direction)
+	OutRotation.Yaw += 180.0f;
+
+	// Check if position is too close to existing roadblocks
+	TArray<FMGRoadblock> ExistingRoadblocks = GetActiveRoadblocks(PlayerId);
+	for (const FMGRoadblock& Existing : ExistingRoadblocks)
+	{
+		float DistToExisting = FVector::Dist(OutLocation, Existing.Location);
+		if (DistToExisting < 5000.0f) // 50m minimum between roadblocks
+		{
+			// Adjust further ahead
+			TargetDistance += 5000.0f;
+			OutLocation = TrackSubsystem->GetPositionAtDistance(TargetDistance);
+			OutRotation = TrackSubsystem->GetDirectionAtDistance(TargetDistance);
+			OutRotation.Yaw += 180.0f;
+		}
+	}
+
+	return true;
+}
+
+bool UMGPursuitSubsystem::DeployOptimalRoadblock(
+	const FString& PlayerId,
+	FVector PlayerLocation,
+	FVector PlayerVelocity,
+	int32 NumUnits,
+	bool bIncludeSpikeStrip)
+{
+	FVector RoadblockLocation;
+	FRotator RoadblockRotation;
+
+	// Calculate optimal position
+	float MinDistance = 500.0f; // 500m default
+	if (!CalculateOptimalRoadblockPosition(PlayerId, PlayerLocation, PlayerVelocity,
+	                                       MinDistance, RoadblockLocation, RoadblockRotation))
+	{
+		return false;
+	}
+
+	// Create and deploy the roadblock
+	FMGRoadblock Roadblock;
+	Roadblock.Location = RoadblockLocation;
+	Roadblock.Rotation = RoadblockRotation;
+	Roadblock.NumUnits = NumUnits;
+	Roadblock.Width = 1500.0f; // 15m wide
+	Roadblock.bHasSpikeStrip = bIncludeSpikeStrip;
+	Roadblock.SpikeStripOffset = bIncludeSpikeStrip ? 300.0f : 0.0f;
+	Roadblock.bIsActive = true;
+	Roadblock.TimeUntilActive = 0.0f; // Active immediately
+
+	DeployRoadblock(PlayerId, Roadblock);
+
+	return true;
+}
+
+// ============================================================================
 // Bounty
 // ============================================================================
 
@@ -753,14 +867,34 @@ void UMGPursuitSubsystem::UpdateUnitAI(const FString& PlayerId, float DeltaTime)
 	FVector EstimatedPlayerVelocity = FVector::ZeroVector;
 	bool bHasPlayerLocation = false;
 
+	// First pass: Find unit with best visual information
 	for (const FMGPursuitUnit& Unit : Status->ActiveUnits)
 	{
 		if (!Unit.bIsDisabled && Unit.bHasVisual)
 		{
 			// Use unit's knowledge of player location
 			EstimatedPlayerLocation = Unit.Location + (Unit.Rotation.Vector() * Unit.DistanceToTarget);
+			EstimatedPlayerVelocity = Unit.LastKnownPlayerVelocity;
 			bHasPlayerLocation = true;
 			break;
+		}
+	}
+
+	// Fallback: Use last known location from any unit for prediction
+	if (!bHasPlayerLocation)
+	{
+		for (const FMGPursuitUnit& Unit : Status->ActiveUnits)
+		{
+			if (!Unit.bIsDisabled && Unit.LastKnownPlayerLocation != FVector::ZeroVector)
+			{
+				// Predict player position based on last known velocity
+				float TimeSinceLost = Unit.TimeSinceLastVisual;
+				EstimatedPlayerLocation = Unit.LastKnownPlayerLocation +
+					(Unit.LastKnownPlayerVelocity * FMath::Min(TimeSinceLost, PursuitConfig.PredictionTime));
+				EstimatedPlayerVelocity = Unit.LastKnownPlayerVelocity;
+				bHasPlayerLocation = true;
+				break;
+			}
 		}
 	}
 
@@ -771,9 +905,42 @@ void UMGPursuitSubsystem::UpdateUnitAI(const FString& PlayerId, float DeltaTime)
 			continue;
 		}
 
-		// Calculate direction to target
+		// Update cooldowns (Iteration 95)
+		if (Unit.RamCooldownRemaining > 0.0f)
+		{
+			Unit.RamCooldownRemaining = FMath::Max(0.0f, Unit.RamCooldownRemaining - DeltaTime);
+		}
+		if (Unit.PITCooldownRemaining > 0.0f)
+		{
+			Unit.PITCooldownRemaining = FMath::Max(0.0f, Unit.PITCooldownRemaining - DeltaTime);
+		}
+		if (Unit.EMPCooldownRemaining > 0.0f)
+		{
+			Unit.EMPCooldownRemaining = FMath::Max(0.0f, Unit.EMPCooldownRemaining - DeltaTime);
+		}
+
+		// Update last known player info when visual (Iteration 95)
+		if (Unit.bHasVisual && bHasPlayerLocation)
+		{
+			Unit.LastKnownPlayerLocation = EstimatedPlayerLocation;
+			Unit.LastKnownPlayerVelocity = EstimatedPlayerVelocity;
+			Unit.TimeSinceLastVisual = 0.0f;
+		}
+		else
+		{
+			Unit.TimeSinceLastVisual += DeltaTime;
+		}
+
+		// Calculate predicted player position (Iteration 95)
+		FVector PredictedPlayerLocation = bHasPlayerLocation ?
+			EstimatedPlayerLocation + (EstimatedPlayerVelocity * PursuitConfig.PredictionTime) :
+			EstimatedPlayerLocation;
+
+		// Calculate direction to target (use prediction for intercept)
 		FVector ToTarget = bHasPlayerLocation ?
 			(EstimatedPlayerLocation - Unit.Location).GetSafeNormal() : FVector::ZeroVector;
+		FVector ToIntercept = bHasPlayerLocation ?
+			(PredictedPlayerLocation - Unit.Location).GetSafeNormal() : FVector::ZeroVector;
 
 		// Base movement speed based on role
 		float BaseSpeed = 2500.0f; // cm/s (about 90 km/h)
@@ -811,22 +978,43 @@ void UMGPursuitSubsystem::UpdateUnitAI(const FString& PlayerId, float DeltaTime)
 
 		case EMGPursuitTactic::Ram:
 			{
-				// Aggressive pursuit - close distance for ramming
+				// Aggressive pursuit - close distance for ramming (with cooldown - Iteration 95)
 				TargetSpeed = BaseSpeed * 1.4f; // Faster approach
 				float RamDistance = 1500.0f; // Attempt ram when within 15m
 
 				if (Unit.bHasVisual && bHasPlayerLocation)
 				{
-					if (Unit.DistanceToTarget <= RamDistance)
+					// Check if on cooldown
+					bool bCanRam = Unit.RamCooldownRemaining <= 0.0f;
+
+					if (Unit.DistanceToTarget <= RamDistance && bCanRam)
 					{
-						// Ram approach - aim slightly ahead of target
-						FVector PredictedLocation = EstimatedPlayerLocation + (EstimatedPlayerVelocity * 0.5f);
-						FVector RamDirection = (PredictedLocation - Unit.Location).GetSafeNormal();
+						// Ram approach - use prediction for intercept (Iteration 95)
+						FVector RamDirection = ToIntercept;
 						Unit.Velocity = RamDirection * TargetSpeed * 1.5f;
+
+						// Check if ram executed (very close)
+						if (Unit.DistanceToTarget <= PursuitConfig.RamExecutionDistance)
+						{
+							// Trigger cooldown after ram attempt
+							Unit.RamCooldownRemaining = PursuitConfig.RamCooldown;
+							Unit.SuccessfulTactics++;
+						}
+					}
+					else if (Unit.DistanceToTarget <= RamDistance && !bCanRam)
+					{
+						// On cooldown - switch to follow behavior temporarily
+						float DesiredDistance = 3000.0f;
+						if (Unit.DistanceToTarget < DesiredDistance * 0.5f)
+						{
+							TargetSpeed = BaseSpeed * 0.8f; // Maintain distance
+						}
+						Unit.Velocity = ToTarget * TargetSpeed;
 					}
 					else
 					{
-						Unit.Velocity = ToTarget * TargetSpeed;
+						// Use intercept prediction for approach (Iteration 95)
+						Unit.Velocity = ToIntercept * TargetSpeed;
 					}
 					Unit.Rotation = Unit.Velocity.GetSafeNormal().Rotation();
 				}
@@ -835,23 +1023,43 @@ void UMGPursuitSubsystem::UpdateUnitAI(const FString& PlayerId, float DeltaTime)
 
 		case EMGPursuitTactic::PitManeuver:
 			{
-				// Position alongside target for PIT maneuver
+				// Position alongside target for PIT maneuver (with cooldown - Iteration 95)
 				float PITDistance = 500.0f; // Need to be very close
 				float ApproachAngle = 30.0f; // Degrees offset from directly behind
 
 				if (Unit.bHasVisual && bHasPlayerLocation)
 				{
-					if (Unit.DistanceToTarget <= PITDistance)
+					// Check if on cooldown
+					bool bCanPIT = Unit.PITCooldownRemaining <= 0.0f;
+
+					if (Unit.DistanceToTarget <= PITDistance && bCanPIT)
 					{
-						// Execute PIT - aim for rear quarter panel
-						FVector OffsetDirection = FRotator(0.0f, ApproachAngle, 0.0f).RotateVector(ToTarget);
-						Unit.Velocity = OffsetDirection * BaseSpeed * 1.2f;
+						// Execute PIT - aim for rear quarter panel using prediction (Iteration 95)
+						// Calculate perpendicular to player velocity for optimal PIT angle
+						FVector PlayerRight = FVector::CrossProduct(FVector::UpVector, EstimatedPlayerVelocity.GetSafeNormal());
+						FVector PITTarget = EstimatedPlayerLocation + (PlayerRight * 150.0f) - (EstimatedPlayerVelocity.GetSafeNormal() * 100.0f);
+						FVector PITDirection = (PITTarget - Unit.Location).GetSafeNormal();
+						Unit.Velocity = PITDirection * BaseSpeed * 1.3f;
+
+						// Check if PIT executed (very close at angle)
+						if (Unit.DistanceToTarget <= PursuitConfig.PITExecutionDistance)
+						{
+							// Trigger cooldown after PIT attempt
+							Unit.PITCooldownRemaining = PursuitConfig.PITCooldown;
+							Unit.SuccessfulTactics++;
+						}
+					}
+					else if (Unit.DistanceToTarget <= PITDistance && !bCanPIT)
+					{
+						// On cooldown - maintain position but don't execute
+						FVector SideApproach = FRotator(0.0f, 45.0f, 0.0f).RotateVector(ToTarget);
+						Unit.Velocity = SideApproach * BaseSpeed * 0.9f;
 					}
 					else
 					{
-						// Approach from side
-						FVector SideApproach = FRotator(0.0f, 45.0f, 0.0f).RotateVector(ToTarget);
-						Unit.Velocity = SideApproach * TargetSpeed * 1.3f;
+						// Approach from side using intercept prediction (Iteration 95)
+						FVector InterceptSide = FRotator(0.0f, 45.0f, 0.0f).RotateVector(ToIntercept);
+						Unit.Velocity = InterceptSide * TargetSpeed * 1.3f;
 					}
 					Unit.Rotation = Unit.Velocity.GetSafeNormal().Rotation();
 				}
@@ -943,19 +1151,31 @@ void UMGPursuitSubsystem::UpdateUnitAI(const FString& PlayerId, float DeltaTime)
 
 		case EMGPursuitTactic::EMPDisable:
 			{
-				// Get close for EMP deployment
+				// Get close for EMP deployment (with cooldown - Iteration 95)
 				float EMPRange = 2000.0f;
 				if (Unit.bHasVisual && bHasPlayerLocation)
 				{
+					// Check if on cooldown
+					bool bCanEMP = Unit.EMPCooldownRemaining <= 0.0f;
+
 					if (Unit.DistanceToTarget > EMPRange)
 					{
-						// Close distance
-						Unit.Velocity = ToTarget * BaseSpeed * 1.3f;
+						// Close distance using intercept prediction (Iteration 95)
+						Unit.Velocity = ToIntercept * BaseSpeed * 1.3f;
+					}
+					else if (bCanEMP)
+					{
+						// In range and can deploy - maintain position for deployment
+						Unit.Velocity = ToTarget * BaseSpeed * 0.5f;
+
+						// EMP deployment (trigger cooldown)
+						Unit.EMPCooldownRemaining = PursuitConfig.EMPCooldown;
+						Unit.SuccessfulTactics++;
 					}
 					else
 					{
-						// In range - maintain position for deployment
-						Unit.Velocity = ToTarget * BaseSpeed * 0.5f;
+						// In range but on cooldown - maintain pursuit distance
+						Unit.Velocity = ToTarget * BaseSpeed * 0.8f;
 					}
 					Unit.Rotation = ToTarget.Rotation();
 				}

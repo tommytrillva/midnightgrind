@@ -1,5 +1,264 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGNotificationWidgets.h
+ * @brief Widget classes for displaying various notification styles
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines the widget classes that visually display notifications.
+ * Each widget style corresponds to a display mode:
+ *
+ * - **Toast**: Small corner popup for quick, non-intrusive messages
+ * - **Banner**: Horizontal strip at screen top/bottom for moderate importance
+ * - **Popup**: Center-screen popup for rewards and confirmations
+ * - **FullScreen**: Dramatic announcements (level up, race results)
+ * - **Minimal**: Ultra-simple text-only display for subtle feedback
+ * - **Achievement**: Special format for achievement unlocks with rarity
+ *
+ * Also includes the NotificationContainerWidget which manages positioning
+ * and lifecycle of all notification widgets on screen, plus the
+ * NotificationHistoryWidget for viewing past notifications.
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Widget Binding**: Uses meta = (BindWidgetOptional) so Blueprint designers
+ *   can create visual layouts while C++ handles the logic. Missing widgets
+ *   are simply skipped rather than causing crashes.
+ *
+ * - **Show/Hide Animations**: Each widget can have ShowAnimation and HideAnimation
+ *   bound from Blueprint using meta = (BindWidgetAnimOptional). The C++ code
+ *   plays these automatically on Show()/Hide().
+ *
+ * - **Notification Container**: A parent widget that holds containers for each
+ *   notification position (corner for toasts, center for popups, etc.) and
+ *   routes notifications to the appropriate container based on style.
+ *
+ * - **Action Buttons**: Banner and Popup types support action buttons. When
+ *   clicked, they call OnActionClicked() which notifies the subsystem.
+ *
+ * - **Reward Display**: Popup and FullScreen types can display lists of rewards
+ *   using the FMGRewardDisplayData struct and UMGRewardItemWidget.
+ *
+ * - **Time Progress Bar**: Toast notifications can show a progress bar that
+ *   drains as the notification timer counts down.
+ *
+ * =============================================================================
+ * @section WidgetClasses Widget Class Hierarchy
+ *
+ *   UMGNotificationWidgetBase (Abstract Base)
+ *        |
+ *        +-- UMGToastNotificationWidget
+ *        |       Small corner popup with icon, title, message, time progress
+ *        |
+ *        +-- UMGBannerNotificationWidget
+ *        |       Horizontal strip with action buttons
+ *        |
+ *        +-- UMGPopupNotificationWidget
+ *        |       Center popup with rewards list and close button
+ *        |
+ *        +-- UMGFullScreenNotificationWidget
+ *        |       Full screen with stats, rewards, continue button
+ *        |
+ *        +-- UMGMinimalNotificationWidget
+ *        |       Simple text-only display
+ *        |
+ *        +-- UMGAchievementNotificationWidget
+ *                Special achievement format with rarity display
+ *
+ *   UMGNotificationContainerWidget
+ *        Manages positioning and routing to appropriate containers
+ *
+ *   UMGNotificationHistoryWidget
+ *        Displays notification history with filtering
+ *
+ *   UMGRewardItemWidget
+ *        Individual reward item display (icon, name, quantity, rarity)
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [MGNotificationSubsystem]
+ *          |
+ *          | OnNotificationShown event
+ *          v
+ *   [UMGNotificationContainerWidget]
+ *          |
+ *          +-- OnNotificationShown() handler
+ *          |       |
+ *          |       +-- GetContainerForStyle(Style) --> Returns UPanelWidget*
+ *          |       |       Toast     --> ToastContainer (VerticalBox)
+ *          |       |       Banner    --> TopBannerContainer or BottomBannerContainer
+ *          |       |       Popup     --> CenterContainer (Overlay)
+ *          |       |       FullScreen --> FullScreenContainer (Overlay)
+ *          |       |
+ *          |       +-- CreateNotificationWidget(Data) --> Spawns widget
+ *          |               |
+ *          |               +-- Based on Style, creates appropriate widget type
+ *          |               +-- Adds to ActiveWidgets array
+ *          |               +-- Calls SetNotificationData() and Show()
+ *          |
+ *          +-- OnNotificationDismissed() handler
+ *                  |
+ *                  +-- RemoveNotificationWidget() --> Cleans up
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // === SETTING UP THE CONTAINER ===
+ * // The container widget is typically added to the main HUD
+ * UMGNotificationContainerWidget* Container = CreateWidget<UMGNotificationContainerWidget>(
+ *     GetWorld(), ContainerWidgetClass);
+ * Container->AddToViewport(50); // High Z-order for notifications
+ *
+ * // Widget types are configured in the container widget Blueprint defaults:
+ * // - ToastWidgetClass
+ * // - BannerWidgetClass
+ * // - PopupWidgetClass
+ * // - FullScreenWidgetClass
+ * // - MinimalWidgetClass
+ *
+ * // === CREATING CUSTOM TOAST WIDGET ===
+ * // For custom notification widgets, inherit from the appropriate base:
+ * UCLASS()
+ * class UMyCustomToast : public UMGToastNotificationWidget
+ * {
+ *     GENERATED_BODY()
+ *
+ * protected:
+ *     // Custom widgets bound from Blueprint
+ *     UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional))
+ *     UImage* CustomBorderImage;
+ *
+ *     virtual void UpdateDisplay_Implementation() override
+ *     {
+ *         Super::UpdateDisplay_Implementation();
+ *
+ *         // Add custom display logic
+ *         if (CustomBorderImage)
+ *         {
+ *             FLinearColor TypeColor = GetNotificationTypeColor(NotificationData.Type);
+ *             CustomBorderImage->SetColorAndOpacity(TypeColor);
+ *         }
+ *     }
+ * };
+ *
+ * // === ACCESSING NOTIFICATION DATA ===
+ * // In Blueprint or C++, access the notification data:
+ * void UMyWidget::UpdateDisplay_Implementation()
+ * {
+ *     FMGNotificationData Data = GetNotificationData();
+ *
+ *     if (TitleText)
+ *         TitleText->SetText(Data.Title);
+ *
+ *     if (MessageText)
+ *         MessageText->SetText(Data.Message);
+ *
+ *     if (IconImage && Data.Icon)
+ *         IconImage->SetBrushFromTexture(Data.Icon);
+ *
+ *     // Display rewards if present
+ *     for (const FMGRewardDisplayData& Reward : Data.Rewards)
+ *     {
+ *         UMGRewardItemWidget* RewardWidget = CreateWidget<UMGRewardItemWidget>(
+ *             this, RewardItemWidgetClass);
+ *         RewardWidget->SetRewardData(Reward);
+ *         RewardsContainer->AddChild(RewardWidget);
+ *     }
+ * }
+ *
+ * // === ACHIEVEMENT NOTIFICATION ===
+ * // Achievement widgets have special handling:
+ * void UMyAchievementWidget::SetAchievementData(const FMGAchievementNotification& Achievement)
+ * {
+ *     AchievementData = Achievement;
+ *
+ *     if (AchievementNameText)
+ *         AchievementNameText->SetText(Achievement.Name);
+ *
+ *     if (PointsText)
+ *         PointsText->SetText(FText::AsNumber(Achievement.Points));
+ *
+ *     if (RarityText)
+ *     {
+ *         FText Rarity = FText::Format(
+ *             NSLOCTEXT("UI", "RarityFormat", "{0}% of players have this"),
+ *             FText::AsNumber(Achievement.RarityPercent));
+ *         RarityText->SetText(Rarity);
+ *     }
+ *
+ *     PlayUnlockAnimation();
+ * }
+ *
+ * // === NOTIFICATION HISTORY ===
+ * // The history widget displays past notifications:
+ * void UMyHistoryScreen::SetupHistory()
+ * {
+ *     UMGNotificationHistoryWidget* History = CreateWidget<UMGNotificationHistoryWidget>(
+ *         this, HistoryWidgetClass);
+ *
+ *     // Refresh to show current history
+ *     History->RefreshHistory();
+ *
+ *     // Filter by type
+ *     History->FilterByType(EMGNotificationType::Achievement);
+ *
+ *     // Clear filter to show all
+ *     History->ClearFilter();
+ * }
+ * @endcode
+ *
+ * =============================================================================
+ * @section BlueprintSetup Blueprint Setup Guide
+ *
+ * To create a notification widget in Blueprint:
+ *
+ * 1. **Create Blueprint Class**
+ *    - Create new Widget Blueprint
+ *    - Set parent class to appropriate base (e.g., MGToastNotificationWidget)
+ *
+ * 2. **Add Required Widgets** (BindWidgetOptional - use exact names)
+ *    For Toast:
+ *    - IconImage (Image)
+ *    - TitleText (TextBlock)
+ *    - MessageText (TextBlock)
+ *    - TimeProgressBar (ProgressBar) - optional countdown
+ *    - AccentImage (Image) - for type color accent
+ *
+ *    For Banner:
+ *    - IconImage, TitleText, MessageText (same as Toast)
+ *    - ActionButtonsBox (HorizontalBox) - for action buttons
+ *    - BackgroundImage (Image)
+ *
+ *    For Popup:
+ *    - TitleText, MessageText, IconImage
+ *    - RewardsContainer (VerticalBox) - for reward items
+ *    - CloseButton (Button)
+ *
+ *    For FullScreen:
+ *    - TitleText, SubtitleText
+ *    - ContentOverlay (Overlay)
+ *    - RewardsContainer (VerticalBox)
+ *    - StatsContainer (VerticalBox)
+ *    - ContinueButton (Button)
+ *    - PositionText (TextBlock) - for race position
+ *    - NewRecordIndicator (Image)
+ *
+ * 3. **Add Animations** (BindWidgetAnimOptional - use exact names)
+ *    - ShowAnimation: Plays when notification appears
+ *    - HideAnimation: Plays when notification dismisses
+ *
+ * 4. **Configure Container Widget**
+ *    In your NotificationContainerWidget Blueprint:
+ *    - Set ToastWidgetClass, BannerWidgetClass, etc. in Details panel
+ *    - Add container widgets: ToastContainer, CenterContainer, etc.
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -16,8 +275,13 @@ class UHorizontalBox;
 class UOverlay;
 class UWidgetAnimation;
 
+// =============================================================================
+// Base Notification Widget
+// =============================================================================
+
 /**
  * Base notification widget
+ * All notification widget types inherit from this class
  */
 UCLASS(Abstract, Blueprintable)
 class MIDNIGHTGRIND_API UMGNotificationWidgetBase : public UUserWidget

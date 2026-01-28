@@ -211,7 +211,16 @@ struct FMGBroadcastCameraPoint
 };
 
 /**
- * Camera cut/transition info
+ * FMGCameraCut - Information about a camera transition/cut.
+ *
+ * When the camera switches from one view to another, this struct describes
+ * the transition. Used primarily by the UI to show what camera is active
+ * and by the replay system to record camera changes.
+ *
+ * SMOOTH TRANSITION VS CUT:
+ * - A "cut" is an instant switch (like TV changing cameras)
+ * - A "smooth transition" blends between positions over time
+ * - bSmoothTransition controls which behavior is used
  */
 USTRUCT(BlueprintType)
 struct FMGCameraCut
@@ -236,7 +245,11 @@ struct FMGCameraCut
 };
 
 /**
- * Spectator overlay info
+ * FMGSpectatorOverlay - Settings for what HUD elements to show while spectating.
+ *
+ * The spectator HUD can show various informational overlays like race standings,
+ * lap times, and speedometers. This struct controls which elements are visible.
+ * Each boolean toggles a different UI element on/off.
  */
 USTRUCT(BlueprintType)
 struct FMGSpectatorOverlay
@@ -269,7 +282,35 @@ struct FMGSpectatorOverlay
 };
 
 /**
- * Delegates
+ * =============================================================================
+ * DELEGATES (EVENT DISPATCHERS)
+ * =============================================================================
+ *
+ * WHAT ARE DELEGATES?
+ * Delegates are Unreal's way of implementing the "observer pattern" - they let
+ * objects broadcast events that other objects can listen to. Think of them like
+ * a radio station (the delegate) that many radios (listeners) can tune into.
+ *
+ * HOW TO USE IN BLUEPRINTS:
+ * 1. Get a reference to the SpectatorSubsystem
+ * 2. Right-click the "On Target Changed" pin and "Assign"
+ * 3. This creates an event node that fires whenever the target changes
+ *
+ * HOW TO USE IN C++:
+ * @code
+ * // Subscribe to the event
+ * SpectatorSubsystem->OnTargetChanged.AddDynamic(this, &UMyClass::HandleTargetChanged);
+ *
+ * // Your handler function
+ * void UMyClass::HandleTargetChanged(const FMGSpectatorTarget& NewTarget)
+ * {
+ *     // Update UI with new target info
+ * }
+ * @endcode
+ *
+ * DYNAMIC_MULTICAST explained:
+ * - DYNAMIC: Can be bound to Blueprint functions (not just C++)
+ * - MULTICAST: Multiple listeners can subscribe to the same event
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSpectatorTargetChanged, const FMGSpectatorTarget&, NewTarget);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSpectatorCameraModeChanged, EMGSpectatorCameraMode, NewMode);
@@ -278,15 +319,41 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSpectatorModeEntered);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSpectatorModeExited);
 
 /**
- * Spectator Subsystem
- * Manages spectator camera and target tracking
+ * UMGSpectatorSubsystem - The central manager for all spectator functionality.
  *
- * Features:
- * - Multiple camera modes
- * - Target cycling
- * - Auto-director for cinematic viewing
- * - Broadcast-style cameras
- * - Smooth camera transitions
+ * This is a World Subsystem, meaning:
+ * - ONE instance exists per game world (level)
+ * - It's automatically created when the world loads
+ * - It's automatically destroyed when the world is unloaded
+ * - Access it via: GetWorld()->GetSubsystem<UMGSpectatorSubsystem>()
+ *
+ * MAIN RESPONSIBILITIES:
+ * 1. Enter/Exit spectator mode - Switch players between playing and spectating
+ * 2. Camera Mode Management - Handle different camera behaviors (chase, orbit, etc.)
+ * 3. Target Tracking - Keep track of all spectatable actors and who's being watched
+ * 4. Auto-Director - AI system that picks interesting camera angles automatically
+ * 5. Broadcast Cameras - Manage pre-placed level cameras for TV-style coverage
+ *
+ * TYPICAL USAGE FLOW:
+ * @code
+ * // Get the subsystem
+ * UMGSpectatorSubsystem* Spectator = GetWorld()->GetSubsystem<UMGSpectatorSubsystem>();
+ *
+ * // Enter spectator mode
+ * Spectator->EnterSpectatorMode(PlayerController);
+ *
+ * // Set up what to watch
+ * Spectator->SetTarget(LeadingVehicle);
+ * Spectator->SetCameraMode(EMGSpectatorCameraMode::Chase);
+ *
+ * // Or let the AI handle it
+ * Spectator->EnableAutoDirector(true);
+ *
+ * // Later, exit spectator mode
+ * Spectator->ExitSpectatorMode(PlayerController);
+ * @endcode
+ *
+ * The "U" prefix indicates this is a UObject-derived class (Unreal naming convention).
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGSpectatorSubsystem : public UWorldSubsystem

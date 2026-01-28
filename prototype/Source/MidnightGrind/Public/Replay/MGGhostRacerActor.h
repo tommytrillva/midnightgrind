@@ -1,5 +1,101 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGGhostRacerActor.h
+ * @brief Ghost Racer Actor - Visual representation of recorded race replays
+ *
+ * @section overview Overview
+ * The Ghost Racer Actor provides a visual "ghost" representation of a previously
+ * recorded race. This allows players to race against their previous attempts or
+ * other players' best times, creating a competitive time-trial experience.
+ *
+ * Ghost racers are semi-transparent vehicles that replay recorded race data,
+ * showing the exact path, speed, and inputs from a previous run. They provide
+ * real-time delta timing so players know if they are ahead or behind.
+ *
+ * @section concepts Key Concepts for Beginners
+ *
+ * **What is a Ghost Racer?**
+ * In racing games, a "ghost" is a transparent replay of a previous race. Unlike
+ * AI opponents, ghosts follow a pre-recorded path exactly. They cannot react to
+ * the player - they simply replay historical data. This is commonly used in
+ * time-attack modes to help players improve their times.
+ *
+ * **Delta Time**
+ * Delta time is the time difference between the player and the ghost at any given
+ * point on the track. A negative delta means the player is ahead (faster), while
+ * a positive delta means the ghost is ahead (player is slower). Delta is typically
+ * calculated based on track distance rather than elapsed time for accuracy.
+ *
+ * **Interpolation**
+ * Since replays are recorded at a fixed frame rate (e.g., 30 FPS), the ghost's
+ * position between recorded frames must be interpolated (smoothly blended) to
+ * avoid jerky movement during playback.
+ *
+ * **Ghost States**
+ * - Waiting: Ghost is initialized but not yet playing
+ * - Playing: Ghost is actively replaying recorded data
+ * - Paused: Playback is temporarily stopped
+ * - Finished: Ghost has completed its replay
+ *
+ * @section usage Usage Examples
+ *
+ * **Spawning a Ghost from Replay Data:**
+ * @code
+ * // Get the replay subsystem
+ * UMGReplaySubsystem* ReplaySubsystem = GetWorld()->GetSubsystem<UMGReplaySubsystem>();
+ *
+ * // Configure the ghost
+ * FMGGhostConfig Config;
+ * Config.ReplayData = MyReplayData;
+ * Config.Transparency = 0.5f;
+ * Config.GhostColor = FLinearColor(0.0f, 0.5f, 1.0f);
+ * Config.bShowDelta = true;
+ *
+ * // Spawn the ghost
+ * AMGGhostRacerActor* Ghost = ReplaySubsystem->SpawnGhost(Config);
+ * @endcode
+ *
+ * **Controlling Ghost Playback:**
+ * @code
+ * // Start playback when race begins
+ * Ghost->StartPlayback();
+ *
+ * // Sync ghost with race timer for accurate delta
+ * Ghost->SyncWithRaceTime(CurrentRaceTime);
+ *
+ * // Check if player is ahead
+ * float DeltaTime = Ghost->GetDeltaAtDistance(PlayerDistance);
+ * if (DeltaTime < 0.0f)
+ * {
+ *     // Player is ahead of ghost by |DeltaTime| seconds
+ * }
+ * @endcode
+ *
+ * **Customizing Ghost Appearance:**
+ * @code
+ * // Make ghost more visible
+ * Ghost->SetTransparency(0.7f);
+ *
+ * // Change ghost color to gold for world record
+ * Ghost->SetGhostColor(FLinearColor(1.0f, 0.84f, 0.0f));
+ *
+ * // Hide delta widget for cleaner HUD
+ * Ghost->SetDeltaWidgetVisible(false);
+ * @endcode
+ *
+ * @section bestpractices Best Practices
+ * - Always call InitializeGhost() before StartPlayback()
+ * - Use SyncWithRaceTime() to keep ghost and player in sync
+ * - Consider spawning ghosts slightly before race start for seamless experience
+ * - Limit the number of simultaneous ghosts (3-5) for performance
+ * - Use different colors to distinguish ghost types (personal best, friend, world record)
+ *
+ * @see UMGReplaySubsystem
+ * @see UMGReplayRecordingComponent
+ * @see FMGGhostConfig
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

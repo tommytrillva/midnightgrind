@@ -1,6 +1,139 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * =============================================================================
+ * MGCasterToolsSubsystem.h - Broadcast Production Tools for Esports/Streaming
+ * =============================================================================
+ *
+ * OVERVIEW
+ * --------
+ * This file defines the caster/spectator tools used by commentators, streamers,
+ * and esports broadcasters to produce professional race coverage. Think of it as
+ * the "TV director's control room" for Midnight Grind races.
+ *
+ * WHO USES THIS?
+ * --------------
+ * - Esports commentators covering competitive races
+ * - Content creators/streamers doing race coverage
+ * - Community tournament organizers
+ * - In-game spectator mode for viewers
+ *
+ * KEY CONCEPTS FOR BEGINNERS
+ * --------------------------
+ *
+ * 1. WORLD SUBSYSTEM (vs Game Instance Subsystem)
+ *    This class inherits from UWorldSubsystem, which means:
+ *    - One instance exists PER LEVEL (not per game session)
+ *    - Destroyed and recreated on level transitions
+ *    - Access via: GetWorld()->GetSubsystem<UMGCasterToolsSubsystem>()
+ *    This makes sense because camera positions and race data are level-specific.
+ *
+ * 2. CAMERA MODES (EMGCasterCameraMode)
+ *    Different camera behaviors for various broadcast needs:
+ *    - FollowLeader: Automatically tracks whoever is in P1
+ *    - FollowPlayer: Locks onto a specific racer
+ *    - BattleCam: AI finds and focuses on close racing action
+ *    - HelicopterCam: Aerial overview shots
+ *    - FreeCam: Manual control for custom angles
+ *    - OnboardCam: First-person from inside a vehicle
+ *
+ * 3. OVERLAY SYSTEM
+ *    On-screen graphics showing race information:
+ *    - Leaderboard/timing tower (who's in what position)
+ *    - Driver cards (name, photo, stats)
+ *    - Battle indicators (highlighting close racing)
+ *    - Minimap (track overview with positions)
+ *    Presets (EMGOverlayPreset) provide quick configurations:
+ *    - Minimal: Just positions (for cinematic shots)
+ *    - Broadcast: Full TV-style graphics
+ *    - Analysis: Detailed telemetry (post-race review)
+ *
+ * 4. BATTLE ZONES (FMGBattleZone)
+ *    The system automatically detects "battles" - areas where multiple
+ *    racers are competing closely. Data includes:
+ *    - Which players are involved
+ *    - Intensity score (how exciting is this battle?)
+ *    - What position they're fighting for
+ *    BattleCam uses this to automatically show exciting moments.
+ *
+ * 5. HIGHLIGHTS (FMGHighlightMoment)
+ *    Key moments are automatically detected and catalogued:
+ *    - Overtakes: Position changes
+ *    - NearMiss: Close calls without contact
+ *    - LeadChange: First place changes
+ *    - PhotoFinish: Super close finishes
+ *    Each has a "significance" score (0-1) for prioritization.
+ *    High-significance moments can trigger automatic instant replays.
+ *
+ * 6. INSTANT REPLAY
+ *    The system maintains a replay buffer for showing recent action:
+ *    - TriggerInstantReplay(): Play a specific highlight
+ *    - TriggerInstantReplayOfLast(5.0f): Show last 5 seconds
+ *    - Auto-replay can trigger on high-significance moments
+ *
+ * 7. TELESTRATOR (Drawing Tools)
+ *    Like a sports broadcast, casters can draw on screen:
+ *    - StartDrawing()/StopDrawing(): Enter/exit drawing mode
+ *    - SetDrawingColor()/SetDrawingThickness(): Customize pen
+ *    - ClearDrawings(): Erase all annotations
+ *    Used for analysis segments explaining racing lines, etc.
+ *
+ * 8. RACER DATA (FMGRacerOverlayData)
+ *    Real-time statistics for each racer:
+ *    - Position, gap to leader, lap times
+ *    - Speed, nitro level, overtakes made
+ *    - Team color, driver photo (for graphics)
+ *    Updated constantly during the race.
+ *
+ * 9. DELEGATES (Events)
+ *    Bindable events for UI and broadcast triggers:
+ *    - OnHighlightDetected: New exciting moment found
+ *    - OnLeadChanged: First place changed
+ *    - OnFastestLapSet: New track record
+ *    - OnInstantReplayStarted/Ended: Replay state changes
+ *
+ * COMMON USAGE PATTERNS
+ * ---------------------
+ *
+ * Setting up broadcast view:
+ *   CasterTools->SetCameraMode(EMGCasterCameraMode::BattleCam);
+ *   CasterTools->SetOverlayPreset(EMGOverlayPreset::Broadcast);
+ *
+ * Focusing on race leader:
+ *   FString LeaderID = CasterTools->GetRaceStats().CurrentLeaderID;
+ *   CasterTools->FocusOnPlayer(LeaderID);
+ *
+ * Checking for battles:
+ *   if (CasterTools->GetActiveBattles().Num() > 0)
+ *   {
+ *       FMGBattleZone TopBattle = CasterTools->GetMostIntenseBattle();
+ *       CasterTools->FocusOnBattle(TopBattle);
+ *   }
+ *
+ * Instant replay on highlight:
+ *   // Bind to event
+ *   CasterTools->OnHighlightDetected.AddDynamic(this, &MyClass::OnHighlight);
+ *
+ *   // In handler:
+ *   void MyClass::OnHighlight(const FMGHighlightMoment& Highlight)
+ *   {
+ *       if (Highlight.Significance > 0.8f)
+ *       {
+ *           CasterTools->TriggerInstantReplay(Highlight);
+ *       }
+ *   }
+ *
+ * HOTKEY SYSTEM
+ * -------------
+ * Casters can bind keyboard shortcuts for quick access:
+ *   CasterTools->SetHotkeyBinding(EKeys::F1, "FocusLeader");
+ *   CasterTools->SetHotkeyBinding(EKeys::R, "TriggerReplayLast10");
+ *
+ * @see UMGEsportsSubsystem for tournament and match management
+ * @see UMGBroadcastSubsystem for output and streaming controls
+ */
+
+/**
  * @file MGCasterToolsSubsystem.h
  * @brief Professional broadcast production tools for commentators and casters.
  *

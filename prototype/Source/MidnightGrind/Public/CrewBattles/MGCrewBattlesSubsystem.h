@@ -1,5 +1,85 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * ============================================================================
+ * MGCrewBattlesSubsystem.h
+ * ============================================================================
+ *
+ * OVERVIEW FOR NEW DEVELOPERS:
+ * ----------------------------
+ * This file implements the Crew Battles system - competitive team-vs-team
+ * racing matches between player "crews" (clans/guilds). Think of it like
+ * ranked team matches in competitive games.
+ *
+ * KEY CONCEPTS:
+ *
+ * 1. GAME INSTANCE SUBSYSTEM
+ *    UGameInstanceSubsystem is a special Unreal class that:
+ *    - Automatically creates one instance when the game starts
+ *    - Persists across level changes (unlike level-specific objects)
+ *    - Can be accessed from anywhere via UGameInstance::GetSubsystem<>()
+ *    This is perfect for crew battles since match state needs to persist.
+ *
+ * 2. CREW BATTLE FLOW
+ *    A typical crew battle follows these states (EMGCrewBattleState):
+ *    None -> Scheduled -> Matchmaking -> Preparing -> InProgress -> Completed
+ *
+ *    Flow: Challenge/Queue -> Match Found -> Both Ready -> Race Rounds -> Winner
+ *
+ * 3. BATTLE FORMATS (EMGCrewBattleFormat)
+ *    - BestOf1/3/5: First crew to win N rounds wins the match
+ *    - PointBased: Crews earn points per race; highest total wins
+ *    - Elimination: Similar to tournament brackets
+ *
+ * 4. MATCHMAKING SYSTEM
+ *    - Crews search for opponents via StartMatchmaking()
+ *    - System finds crews with similar ratings (Elo-based)
+ *    - OnCrewBattleMatchFound fires when opponent is found
+ *
+ * 5. CHALLENGE SYSTEM
+ *    - Crews can directly challenge specific opponents via SendChallenge()
+ *    - Challenged crew can Accept or Decline
+ *    - Supports wagering in-game currency
+ *
+ * 6. RATING SYSTEM
+ *    Uses Elo-style rating (starting at 1500):
+ *    - Win against higher-rated crew = more points gained
+ *    - Lose against lower-rated crew = more points lost
+ *    - Rating determines leaderboard position
+ *
+ * 7. DELEGATES (Events)
+ *    Delegates are Unreal's event system. Other code subscribes to these
+ *    to react when things happen:
+ *    - OnCrewBattleMatchFound: Fires when matchmaking finds an opponent
+ *    - OnCrewBattleStarted: Both crews ready, battle begins
+ *    - OnCrewBattleRoundComplete: A race round finished
+ *    - OnCrewBattleComplete: Entire battle finished
+ *
+ * COMMON USE CASES:
+ *
+ * For UI Developers:
+ * - Call GetCrewStats() for the crew stats screen
+ * - Call GetTopCrews() for leaderboard display
+ * - Call GetActiveBattle() during a match for live updates
+ * - Subscribe to OnCrewBattleRoundComplete for results screens
+ *
+ * For Gameplay Programmers:
+ * - Call StartMatchmaking() from lobby UI
+ * - Call SetRosterReady() when crew confirms lineup
+ * - Call ReportRoundResult() after each race finishes
+ *
+ * DATA STRUCTURES:
+ * - FMGCrewBattleParticipant: Info about one crew in a battle
+ * - FMGCrewBattleRound: Results of one race round
+ * - FMGCrewBattle: Complete battle state (both crews, all rounds)
+ * - FMGCrewBattleChallenge: A pending challenge request
+ * - FMGCrewBattleHistory: Past battle summary for history screen
+ * - FMGCrewBattleStats: Aggregate crew statistics
+ * - FMGCrewLeaderboardEntry: One row in the leaderboard
+ *
+ * ============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

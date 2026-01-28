@@ -1,5 +1,137 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGTrafficSubsystem.h
+ * @brief Traffic AI System - Civilian Vehicle Management and Road Network
+ * =============================================================================
+ *
+ * @section Overview
+ * This subsystem manages all civilian traffic vehicles in Midnight Grind's open
+ * world. It handles spawning, AI behavior, traffic lights, road networks, and
+ * player interactions. The traffic system creates a living, reactive city where
+ * vehicles respond realistically to the player's racing through streets.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * 1. WORLD SUBSYSTEM
+ *    This class inherits from UWorldSubsystem, meaning:
+ *    - One instance exists per game world (level)
+ *    - Created when the world loads, destroyed when it unloads
+ *    - Access via: GetWorld()->GetSubsystem<UMGTrafficSubsystem>()
+ *
+ * 2. TRAFFIC VEHICLE TYPES (EMGTrafficVehicleType)
+ *    Different vehicle categories populate the streets:
+ *    - Civilian: Sedan, SUV, Truck, Van, SportsCar, Motorcycle, Bus, Semi
+ *    - Service: Taxi, DeliveryVan
+ *    - Emergency: Ambulance, FireTruck, PoliceCar (special behavior)
+ *
+ * 3. TRAFFIC BEHAVIOR (EMGTrafficBehavior)
+ *    AI state machine controlling how each vehicle acts:
+ *    - Normal: Standard driving, follows traffic laws
+ *    - Aggressive: Faster, less following distance
+ *    - Cautious: Slower, more space, easier to overtake
+ *    - Panicked: Erratic driving, triggered by collisions/emergencies
+ *    - StoppedAtLight: Waiting at red traffic light
+ *    - LaneChanging: Currently moving between lanes
+ *    - Swerving: Avoiding collision with player
+ *
+ * 4. DENSITY PRESETS (EMGTrafficDensityPreset)
+ *    Controls how many vehicles are on the road:
+ *    - None: Empty streets (for races/events)
+ *    - Light: Few vehicles, easy navigation
+ *    - Medium: Normal gameplay traffic
+ *    - Heavy: Challenging weaving required
+ *    - RushHour: Peak traffic, time-of-day linked
+ *    - Gridlock: Maximum density, near-standstill
+ *
+ * 5. ROAD NETWORK (FMGRoadSegment, FMGIntersection)
+ *    The traffic system uses a graph-based road network:
+ *    - Roads: Spline-based paths with lanes, speed limits
+ *    - Intersections: Junction points with traffic lights
+ *    - Connections: How roads link together for routing
+ *
+ * 6. SPAWN SYSTEM (FMGTrafficSpawnPoint)
+ *    Vehicles spawn outside player view and despawn when distant:
+ *    - SpawnDistance: How far from player to create vehicles
+ *    - DespawnDistance: How far before vehicles are removed
+ *    - Spawn points placed around the map for natural flow
+ *
+ * 7. NEAR-MISS DETECTION
+ *    System tracks close calls with traffic for scoring:
+ *    - Detects when player passes very close to traffic
+ *    - Triggers OnTrafficNearMiss delegate
+ *    - Integrates with scoring system for bonus points
+ *
+ * 8. TRAFFIC REACTIONS (EMGTrafficReaction)
+ *    How vehicles respond to dangerous situations:
+ *    - Honk: Audio feedback when player is too close
+ *    - SwerveLeft/Right: Evasive maneuver
+ *    - BrakeHard: Emergency stop
+ *    - PullOver: Move to roadside
+ *    - Panic: Erratic behavior after collision
+ *
+ * @section Usage Common Usage Patterns
+ *
+ * @code
+ * // Get the traffic subsystem
+ * UMGTrafficSubsystem* Traffic = GetWorld()->GetSubsystem<UMGTrafficSubsystem>();
+ *
+ * // Set traffic density for a race event (clear streets)
+ * Traffic->SetTrafficDensity(EMGTrafficDensityPreset::None);
+ *
+ * // For free roam gameplay, use medium traffic
+ * Traffic->SetTrafficDensity(EMGTrafficDensityPreset::Medium);
+ *
+ * // Update player position each frame (for AI reactions)
+ * Traffic->UpdatePlayerState(PlayerLocation, PlayerVelocity, SpeedMPH, bIsDrifting);
+ *
+ * // Listen for near-misses (bind in Blueprint or C++)
+ * Traffic->OnTrafficNearMiss.AddDynamic(this, &AMyActor::HandleNearMiss);
+ *
+ * // Spawn emergency vehicle for a scripted event
+ * int32 AmbulanceID = Traffic->SpawnEmergencyVehicle(
+ *     SpawnLocation,
+ *     SpawnRotation,
+ *     EMGTrafficVehicleType::Ambulance,
+ *     true  // Sirens active
+ * );
+ *
+ * // Make traffic panic in an area (explosion, crash, etc.)
+ * Traffic->PanicVehiclesInRadius(ExplosionLocation, 3000.0f);
+ *
+ * // Query nearby traffic for gameplay decisions
+ * TArray<FMGTrafficVehicleState> NearbyVehicles =
+ *     Traffic->GetVehiclesInRadius(PlayerLocation, 5000.0f);
+ *
+ * // Force all traffic lights green (for race start countdown)
+ * Traffic->ForceAllLightsGreen();
+ * // Later, resume normal operation
+ * Traffic->ResumeNormalLightCycle();
+ * @endcode
+ *
+ * @section Architecture Architecture Notes
+ *
+ * TICK SYSTEM:
+ * - UpdateTraffic() runs on a timer, not every frame
+ * - Individual vehicle AI updated in batches for performance
+ * - Distance-based LOD: Far vehicles have simpler AI
+ *
+ * MEMORY MANAGEMENT:
+ * - MaxActiveVehicles limits total spawned vehicles
+ * - Vehicles pooled and reused to avoid GC hitches
+ * - TWeakObjectPtr used for vehicle actor references
+ *
+ * MULTIPLAYER NOTES:
+ * - Traffic state is server-authoritative
+ * - Clients receive replication of nearby vehicles only
+ * - Near-miss detection happens server-side
+ *
+ * @see AMGTrafficVehicle - The pawn class representing traffic vehicles
+ * @see UMGTimeOfDaySubsystem - Provides time data for density scaling
+ * @see UMGNearMissSubsystem - Scoring integration for near-misses
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

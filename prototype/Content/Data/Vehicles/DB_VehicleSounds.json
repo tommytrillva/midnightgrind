@@ -1,0 +1,283 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Sound Profiles and Engine Audio",
+
+  "VehicleSoundSystem": {
+    "Enabled": true,
+    "Framework": "MetaSounds",
+    "DynamicMixing": true,
+    "EnvironmentalEffects": true
+  },
+
+  "EngineSoundProfiles": {
+    "Inline4_NA": {
+      "ID": "SND_I4_NA",
+      "Name": "Inline 4 Naturally Aspirated",
+      "Character": "Buzzy_Revvy",
+      "RPMRange": { "Idle": 800, "Redline": 8500 },
+      "Samples": {
+        "Idle": ["SFX_I4_NA_Idle_01", "SFX_I4_NA_Idle_02"],
+        "OnLoad": ["SFX_I4_NA_OnLoad_Low", "SFX_I4_NA_OnLoad_Mid", "SFX_I4_NA_OnLoad_High"],
+        "OffLoad": ["SFX_I4_NA_OffLoad_Low", "SFX_I4_NA_OffLoad_Mid", "SFX_I4_NA_OffLoad_High"],
+        "Limiter": "SFX_I4_NA_Limiter"
+      },
+      "Characteristics": {
+        "TopEndScream": true,
+        "VTECCrossover": { "Enabled": true, "RPM": 5500 }
+      }
+    },
+    "Inline4_Turbo": {
+      "ID": "SND_I4_TURBO",
+      "Name": "Inline 4 Turbocharged",
+      "Character": "Whooshy_Aggressive",
+      "RPMRange": { "Idle": 850, "Redline": 8000 },
+      "Samples": {
+        "Idle": ["SFX_I4_T_Idle_01"],
+        "OnLoad": ["SFX_I4_T_OnLoad_Low", "SFX_I4_T_OnLoad_Mid", "SFX_I4_T_OnLoad_High"],
+        "OffLoad": ["SFX_I4_T_OffLoad_Low", "SFX_I4_T_OffLoad_Mid", "SFX_I4_T_OffLoad_High"],
+        "Limiter": "SFX_I4_T_Limiter",
+        "Turbo": {
+          "Spool": "SFX_Turbo_Spool_Small",
+          "BlowOff": ["SFX_BOV_01", "SFX_BOV_02", "SFX_BOV_03"],
+          "Wastegate": "SFX_Wastegate_Chatter"
+        }
+      }
+    },
+    "Inline6_NA": {
+      "ID": "SND_I6_NA",
+      "Name": "Inline 6 Naturally Aspirated",
+      "Character": "Smooth_Silky",
+      "RPMRange": { "Idle": 750, "Redline": 7500 },
+      "Samples": {
+        "Idle": ["SFX_I6_NA_Idle_01"],
+        "OnLoad": ["SFX_I6_NA_OnLoad_Low", "SFX_I6_NA_OnLoad_Mid", "SFX_I6_NA_OnLoad_High"],
+        "OffLoad": ["SFX_I6_NA_OffLoad_Low", "SFX_I6_NA_OffLoad_Mid", "SFX_I6_NA_OffLoad_High"],
+        "Limiter": "SFX_I6_NA_Limiter"
+      },
+      "Characteristics": {
+        "Smoothness": "Very High",
+        "TopEndHowl": true
+      }
+    },
+    "Inline6_Turbo": {
+      "ID": "SND_I6_TURBO",
+      "Name": "Inline 6 Twin Turbo",
+      "Character": "Refined_Powerful",
+      "RPMRange": { "Idle": 800, "Redline": 7000 },
+      "Samples": {
+        "Idle": ["SFX_I6_T_Idle_01"],
+        "OnLoad": ["SFX_I6_T_OnLoad_Low", "SFX_I6_T_OnLoad_Mid", "SFX_I6_T_OnLoad_High"],
+        "OffLoad": ["SFX_I6_T_OffLoad_Low", "SFX_I6_T_OffLoad_Mid", "SFX_I6_T_OffLoad_High"],
+        "Limiter": "SFX_I6_T_Limiter",
+        "Turbo": {
+          "Spool": "SFX_Turbo_Spool_Twin",
+          "BlowOff": ["SFX_BOV_Twin_01"],
+          "Wastegate": "SFX_Wastegate_Twin"
+        }
+      },
+      "Famous": "2JZ-GTE"
+    },
+    "V6_NA": {
+      "ID": "SND_V6_NA",
+      "Name": "V6 Naturally Aspirated",
+      "Character": "Raspy_Sporty",
+      "RPMRange": { "Idle": 700, "Redline": 7500 },
+      "Samples": {
+        "Idle": ["SFX_V6_NA_Idle_01"],
+        "OnLoad": ["SFX_V6_NA_OnLoad_Low", "SFX_V6_NA_OnLoad_Mid", "SFX_V6_NA_OnLoad_High"],
+        "OffLoad": ["SFX_V6_NA_OffLoad_Low", "SFX_V6_NA_OffLoad_Mid", "SFX_V6_NA_OffLoad_High"],
+        "Limiter": "SFX_V6_NA_Limiter"
+      }
+    },
+    "V8_American": {
+      "ID": "SND_V8_USA",
+      "Name": "American V8",
+      "Character": "Rumble_Burble",
+      "RPMRange": { "Idle": 600, "Redline": 6500 },
+      "Samples": {
+        "Idle": ["SFX_V8_USA_Idle_01", "SFX_V8_USA_Idle_02"],
+        "OnLoad": ["SFX_V8_USA_OnLoad_Low", "SFX_V8_USA_OnLoad_Mid", "SFX_V8_USA_OnLoad_High"],
+        "OffLoad": ["SFX_V8_USA_OffLoad_Low", "SFX_V8_USA_OffLoad_Mid", "SFX_V8_USA_OffLoad_High"],
+        "Limiter": "SFX_V8_USA_Limiter",
+        "Decel": {
+          "Pops": ["SFX_V8_Pop_01", "SFX_V8_Pop_02", "SFX_V8_Pop_03"],
+          "Burble": "SFX_V8_Burble"
+        }
+      },
+      "Characteristics": {
+        "CrossplaneRumble": true,
+        "DecelPops": true
+      }
+    },
+    "V8_Euro": {
+      "ID": "SND_V8_EURO",
+      "Name": "European V8",
+      "Character": "Refined_Scream",
+      "RPMRange": { "Idle": 850, "Redline": 8500 },
+      "Samples": {
+        "Idle": ["SFX_V8_EU_Idle_01"],
+        "OnLoad": ["SFX_V8_EU_OnLoad_Low", "SFX_V8_EU_OnLoad_Mid", "SFX_V8_EU_OnLoad_High"],
+        "OffLoad": ["SFX_V8_EU_OffLoad_Low", "SFX_V8_EU_OffLoad_Mid", "SFX_V8_EU_OffLoad_High"],
+        "Limiter": "SFX_V8_EU_Limiter"
+      },
+      "Characteristics": {
+        "FlatplaneCrackle": true,
+        "TopEndScream": true
+      }
+    },
+    "V10_NA": {
+      "ID": "SND_V10_NA",
+      "Name": "V10 Naturally Aspirated",
+      "Character": "Screaming_Exotic",
+      "RPMRange": { "Idle": 900, "Redline": 8500 },
+      "Samples": {
+        "Idle": ["SFX_V10_NA_Idle_01"],
+        "OnLoad": ["SFX_V10_NA_OnLoad_Low", "SFX_V10_NA_OnLoad_Mid", "SFX_V10_NA_OnLoad_High"],
+        "OffLoad": ["SFX_V10_NA_OffLoad_Low", "SFX_V10_NA_OffLoad_Mid", "SFX_V10_NA_OffLoad_High"],
+        "Limiter": "SFX_V10_NA_Limiter"
+      },
+      "Characteristics": {
+        "Screamer": true,
+        "F1Inspired": true
+      }
+    },
+    "V12_NA": {
+      "ID": "SND_V12_NA",
+      "Name": "V12 Naturally Aspirated",
+      "Character": "Operatic_Majestic",
+      "RPMRange": { "Idle": 800, "Redline": 9000 },
+      "Samples": {
+        "Idle": ["SFX_V12_NA_Idle_01"],
+        "OnLoad": ["SFX_V12_NA_OnLoad_Low", "SFX_V12_NA_OnLoad_Mid", "SFX_V12_NA_OnLoad_High"],
+        "OffLoad": ["SFX_V12_NA_OffLoad_Low", "SFX_V12_NA_OffLoad_Mid", "SFX_V12_NA_OffLoad_High"],
+        "Limiter": "SFX_V12_NA_Limiter"
+      },
+      "Characteristics": {
+        "Smoothness": "Ultimate",
+        "Operatic": true
+      }
+    },
+    "Flat4_Turbo": {
+      "ID": "SND_F4_TURBO",
+      "Name": "Flat 4 Turbocharged",
+      "Character": "Boxer_Rumble",
+      "RPMRange": { "Idle": 750, "Redline": 7500 },
+      "Samples": {
+        "Idle": ["SFX_F4_T_Idle_01"],
+        "OnLoad": ["SFX_F4_T_OnLoad_Low", "SFX_F4_T_OnLoad_Mid", "SFX_F4_T_OnLoad_High"],
+        "OffLoad": ["SFX_F4_T_OffLoad_Low", "SFX_F4_T_OffLoad_Mid", "SFX_F4_T_OffLoad_High"],
+        "Limiter": "SFX_F4_T_Limiter",
+        "Turbo": {
+          "Spool": "SFX_Turbo_Spool_Single",
+          "BlowOff": ["SFX_BOV_Boxer"]
+        }
+      },
+      "Characteristics": {
+        "BoxerRumble": true,
+        "UnequalLengthHeaders": true
+      }
+    },
+    "Rotary_NA": {
+      "ID": "SND_ROTARY",
+      "Name": "Rotary (Wankel)",
+      "Character": "Brap_Unique",
+      "RPMRange": { "Idle": 900, "Redline": 9000 },
+      "Samples": {
+        "Idle": ["SFX_ROT_Idle_01"],
+        "OnLoad": ["SFX_ROT_OnLoad_Low", "SFX_ROT_OnLoad_Mid", "SFX_ROT_OnLoad_High"],
+        "OffLoad": ["SFX_ROT_OffLoad_Low", "SFX_ROT_OffLoad_Mid", "SFX_ROT_OffLoad_High"],
+        "Limiter": "SFX_ROT_Limiter"
+      },
+      "Characteristics": {
+        "UniqueSound": true,
+        "BrapBrap": true,
+        "HighRevving": true
+      }
+    }
+  },
+
+  "ExhaustSoundProfiles": {
+    "Stock": {
+      "ID": "EXH_STOCK",
+      "VolumeMultiplier": 0.6,
+      "MufflingAmount": 0.7,
+      "Crackle": false,
+      "PopsBangs": false
+    },
+    "Sport": {
+      "ID": "EXH_SPORT",
+      "VolumeMultiplier": 0.8,
+      "MufflingAmount": 0.4,
+      "Crackle": true,
+      "CrackleIntensity": 0.3,
+      "PopsBangs": true
+    },
+    "Race": {
+      "ID": "EXH_RACE",
+      "VolumeMultiplier": 1.0,
+      "MufflingAmount": 0.2,
+      "Crackle": true,
+      "CrackleIntensity": 0.6,
+      "PopsBangs": true,
+      "Backfire": true
+    },
+    "StraightPipe": {
+      "ID": "EXH_STRAIGHT",
+      "VolumeMultiplier": 1.2,
+      "MufflingAmount": 0.0,
+      "Crackle": true,
+      "CrackleIntensity": 0.8,
+      "PopsBangs": true,
+      "Backfire": true,
+      "RawSound": true
+    }
+  },
+
+  "TransmissionSounds": {
+    "Manual": {
+      "ShiftUp": ["SFX_Shift_Up_01", "SFX_Shift_Up_02"],
+      "ShiftDown": ["SFX_Shift_Down_01", "SFX_Shift_Down_02"],
+      "RevMatch": "SFX_Rev_Match",
+      "GearWhine": true
+    },
+    "Sequential": {
+      "ShiftUp": ["SFX_Seq_Up_01"],
+      "ShiftDown": ["SFX_Seq_Down_01"],
+      "QuickShift": true
+    },
+    "DCT": {
+      "ShiftUp": ["SFX_DCT_Up_01"],
+      "ShiftDown": ["SFX_DCT_Down_01"],
+      "SeamlessShift": true
+    }
+  },
+
+  "EnvironmentalEffects": {
+    "Tunnel": {
+      "ReverbAmount": 0.6,
+      "EchoDelay": 0.15,
+      "Amplification": 1.3
+    },
+    "UnderBridge": {
+      "ReverbAmount": 0.4,
+      "EchoDelay": 0.1,
+      "Amplification": 1.15
+    },
+    "OpenRoad": {
+      "ReverbAmount": 0.1,
+      "Amplification": 1.0
+    },
+    "ParkingGarage": {
+      "ReverbAmount": 0.5,
+      "EchoDelay": 0.2,
+      "Amplification": 1.2
+    }
+  },
+
+  "DopplerEffect": {
+    "Enabled": true,
+    "Intensity": 1.0,
+    "ApplyToTraffic": true,
+    "ApplyToOpponents": true
+  }
+}

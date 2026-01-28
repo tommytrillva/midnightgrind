@@ -1,6 +1,97 @@
 // Copyright Midnight Grind. All Rights Reserved.
 // Iteration 82: Parts Catalog Subsystem - Runtime lookups for parts data
 
+/**
+ * =============================================================================
+ * MGPartsCatalogSubsystem.h - Parts Data Access Layer
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This subsystem provides centralized access to the aftermarket parts catalog.
+ * It's the "parts database" that other systems query to get pricing, specs,
+ * compatibility info, and mechanic requirements for any part in the game.
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
+ *
+ * 1. PARTS VS. VEHICLES:
+ *    Vehicles are the "canvas", parts are the "brushstrokes".
+ *    This subsystem handles the parts data, while MGVehicleCatalogSubsystem
+ *    handles vehicle data. They work together for compatibility checking.
+ *
+ * 2. MECHANIC SYSTEM INTEGRATION:
+ *    Parts have skill requirements and install times. The mechanic system
+ *    uses GetPartSpecialization() to determine:
+ *    - Which mechanic NPCs can install a part (by specialization match)
+ *    - Install time (affected by mechanic skill level)
+ *    - Labor cost calculations
+ *
+ *    Example: A "Race Turbo" might require skill level 7, take 180 minutes
+ *    to install, and match the "Engine" specialization.
+ *
+ * 3. COMPATIBILITY SYSTEM:
+ *    Parts can be universal (fit any car) or vehicle-specific.
+ *    - IsPartCompatibleWithVehicle() checks basic compatibility
+ *    - ArePrerequisitesMet() checks if required parts are installed
+ *    - HasConflictingParts() checks for incompatible combinations
+ *
+ *    For ADVANCED dependency logic (warnings, failure risk), see
+ *    MGPartDependencySubsystem instead.
+ *
+ * 4. PRICING WITH MULTIPLIERS:
+ *    Parts have a base price, but actual cost varies by vehicle.
+ *    A turbo might cost $5,000 base, but on an exotic car with a
+ *    2.5x parts multiplier, it costs $12,500.
+ *
+ *    GetAdjustedPartPrice() handles this calculation.
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ * -----------------------------------------
+ *
+ *    [DataTable Asset]
+ *           |
+ *           v
+ *    [MGPartsCatalogSubsystem] <--- Cache for fast lookups
+ *           |
+ *           +---> [Parts Shop UI] - Shows available upgrades and prices
+ *           |
+ *           +---> [Mechanic System] - Determines install requirements
+ *           |
+ *           +---> [Tuning Menu] - Displays part effects on vehicle
+ *           |
+ *           +---> [MGPartDependencySubsystem] - Advanced compatibility checks
+ *           |
+ *           +---> [Performance Calculator] - Sums part bonuses for PI
+ *
+ * COMMON USAGE PATTERNS:
+ * ----------------------
+ *
+ * // Get subsystem
+ * UMGPartsCatalogSubsystem* Parts = GetGameInstance()->GetSubsystem<UMGPartsCatalogSubsystem>();
+ *
+ * // Check if part fits vehicle before showing in shop
+ * if (Parts->IsPartCompatibleWithVehicle(PartID, CurrentVehicleID))
+ * {
+ *     // Calculate price with vehicle multiplier
+ *     int32 Price = Parts->GetAdjustedPartPrice(PartID, VehiclePriceMultiplier);
+ * }
+ *
+ * // Get mechanic info for install dialog
+ * FMGPartSpecializationInfo Spec = Parts->GetPartSpecialization(PartID);
+ * float InstallMinutes = Spec.InstallTime;
+ * EMGPartCategory RequiredSpec = Spec.Category;
+ *
+ * RELATED SYSTEMS:
+ * ----------------
+ * - MGVehicleCatalogSubsystem: Vehicle master data (used for price multipliers)
+ * - MGPartDependencySubsystem: Advanced dependency rules and failure simulation
+ * - MGMechanicSubsystem: NPC mechanics who install parts
+ * - MGInventorySubsystem: Tracks which parts the player owns/has installed
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,53 +99,100 @@
 #include "Catalog/MGCatalogTypes.h"
 #include "MGPartsCatalogSubsystem.generated.h"
 
+// Forward declaration
 class UDataTable;
 
+// =============================================================================
+// LIGHTWEIGHT RETURN STRUCTS
+// These are simplified versions of catalog data for specific use cases
+// =============================================================================
+
 /**
- * Simplified part info for quick lookups
+ * Simplified part pricing info for quick lookups.
+ *
+ * Used when a system only needs pricing data, not full part details.
+ * This is returned by GetPartPricing() and contains just the essential
+ * cost information.
+ *
+ * TOTAL COST CALCULATION:
+ * The full cost of installing a part is:
+ *   TotalCost = (BasePrice * VehiclePriceMultiplier) + LaborCost
+ *
+ * Where VehiclePriceMultiplier comes from the vehicle catalog.
+ *
+ * The bIsValid flag MUST be checked before using other values - it indicates
+ * whether the part lookup succeeded.
  */
 USTRUCT(BlueprintType)
 struct FMGPartPricingInfo
 {
 	GENERATED_BODY()
 
+	/** Part cost before vehicle multipliers */
 	UPROPERTY(BlueprintReadOnly, Category = "Pricing")
 	int32 BasePrice = 0;
 
+	/** Mechanic labor cost (flat fee, not multiplied) */
 	UPROPERTY(BlueprintReadOnly, Category = "Pricing")
 	int32 LaborCost = 0;
 
+	/** Installation time in minutes (affects mechanic availability) */
 	UPROPERTY(BlueprintReadOnly, Category = "Pricing")
 	float InstallTime = 60.0f;
 
+	/** Did the lookup succeed? Always check this first! */
 	UPROPERTY(BlueprintReadOnly, Category = "Pricing")
 	bool bIsValid = false;
 };
 
 /**
- * Part specialization info for mechanic system
+ * Part specialization info for the mechanic system.
+ *
+ * This struct contains everything the mechanic system needs to know
+ * about installing a specific part. It's used to:
+ *
+ * 1. MATCH MECHANICS TO PARTS:
+ *    Mechanics have specializations (Engine, Suspension, etc.)
+ *    A part's Category must match a mechanic's specialization for
+ *    them to install it (or they take longer/charge more).
+ *
+ * 2. CHECK SKILL REQUIREMENTS:
+ *    RequiredSkillLevel (1-10) determines if a mechanic CAN install
+ *    the part at all. A level 3 mechanic can't install a level 7 part.
+ *
+ * 3. SCHEDULE WORK:
+ *    InstallTime determines how long the mechanic is "busy" after
+ *    starting the job. This affects when the player can pick up their car.
+ *
+ * SKILL LEVEL GUIDELINES:
+ * - 1-2: Basic parts (filters, spark plugs)
+ * - 3-4: Bolt-on upgrades (exhaust, intake)
+ * - 5-6: Performance parts (turbo kits, coilovers)
+ * - 7-8: Advanced builds (engine internals, ECU tuning)
+ * - 9-10: Expert only (engine swaps, custom fabrication)
  */
 USTRUCT(BlueprintType)
 struct FMGPartSpecializationInfo
 {
 	GENERATED_BODY()
 
-	/** Part category determines mechanic specialization required */
+	/** Part category - determines which mechanic specialization is needed */
 	UPROPERTY(BlueprintReadOnly, Category = "Specialization")
 	EMGPartCategory Category = EMGPartCategory::Engine;
 
-	/** Sub-category for more specific matching */
+	/** Sub-category for more specific matching (e.g., "Intake", "Turbo") */
 	UPROPERTY(BlueprintReadOnly, Category = "Specialization")
 	FString SubCategory;
 
-	/** Required skill level (1-10) */
+	/** Minimum mechanic skill level required (1=novice, 10=master) */
 	UPROPERTY(BlueprintReadOnly, Category = "Specialization")
 	int32 RequiredSkillLevel = 1;
 
-	/** Install time in minutes */
+	/** How long installation takes in minutes */
 	UPROPERTY(BlueprintReadOnly, Category = "Specialization")
 	float InstallTime = 60.0f;
 
+	/** Did the lookup succeed? Always check this first! */
 	UPROPERTY(BlueprintReadOnly, Category = "Specialization")
 	bool bIsValid = false;
 };
@@ -322,41 +460,81 @@ public:
 	void ReloadCatalog();
 
 protected:
-	/** Build internal lookup cache from DataTable */
+	// ========== Internal Cache Management ==========
+
+	/**
+	 * Build internal lookup caches from DataTable.
+	 *
+	 * This method creates three caches for different access patterns:
+	 * 1. PartCache: Direct lookup by PartID
+	 * 2. PartsByCategory: Fast filtering by category
+	 * 3. PartsByVehicle: Fast compatibility lookups
+	 *
+	 * Called during Initialize() and ReloadCatalog().
+	 */
 	void BuildCache();
 
-	/** Clear internal caches */
+	/** Clear all internal caches and reset state */
 	void ClearCache();
 
 	// ========== Configuration ==========
 
-	/** Reference to parts catalog DataTable asset */
+	/**
+	 * Reference to parts catalog DataTable asset.
+	 *
+	 * This is a soft reference - the DataTable is loaded on-demand
+	 * rather than at subsystem creation. Set this in the editor or config.
+	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Config")
 	TSoftObjectPtr<UDataTable> PartsCatalogTableRef;
 
-	/** Loaded DataTable pointer */
+	/** Loaded DataTable pointer (runtime only, not saved) */
 	UPROPERTY(Transient)
 	UDataTable* PartsCatalogTable = nullptr;
 
 	// ========== Cached Data ==========
+	// Multiple caches optimized for different query patterns
 
-	/** Cached part data for fast lookups */
+	/**
+	 * Primary cache: Part data indexed by PartID.
+	 *
+	 * O(1) lookup when you know the exact part you want.
+	 * Example: PartCache["TURBO_BIG"] returns the full part row.
+	 */
 	UPROPERTY(Transient)
 	TMap<FName, FMGPartCatalogRow> PartCache;
 
-	/** Cache of parts by category for fast filtering */
+	/**
+	 * Secondary cache: Parts grouped by category.
+	 *
+	 * O(1) to get all parts in a category (then iterate the array).
+	 * Used by shop UI for tab filtering and mechanic specialization checks.
+	 * Example: PartsByCategory[EMGPartCategory::Engine] returns all engine parts.
+	 */
 	TMap<EMGPartCategory, TArray<FName>> PartsByCategory;
 
-	/** Cache of parts by vehicle for fast compatibility checks */
+	/**
+	 * Tertiary cache: Vehicle-specific parts indexed by VehicleID.
+	 *
+	 * For fast "what parts fit this car?" queries.
+	 * Only contains vehicle-specific parts; universal parts are not in this cache.
+	 * Example: PartsByVehicle["KAZE_CIVIC"] returns Civic-specific parts only.
+	 */
 	TMap<FName, TArray<FName>> PartsByVehicle;
 
-	/** Flag indicating if cache is built */
+	/** Flag indicating if caches are populated and valid */
 	bool bCacheBuilt = false;
 
 private:
-	/** Default pricing info returned when part not found */
+	/**
+	 * Default pricing info returned when part not found.
+	 * Static to avoid allocating new structs for failed lookups.
+	 */
 	static const FMGPartPricingInfo InvalidPricingInfo;
 
-	/** Default specialization info returned when part not found */
+	/**
+	 * Default specialization info returned when part not found.
+	 * Static to avoid allocating new structs for failed lookups.
+	 */
 	static const FMGPartSpecializationInfo InvalidSpecializationInfo;
 };

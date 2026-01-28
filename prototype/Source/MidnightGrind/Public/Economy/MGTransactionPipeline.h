@@ -1,5 +1,101 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGTransactionPipeline.h
+ * @brief Centralized transaction pipeline for all item and currency exchanges in Midnight Grind.
+ *
+ * The Transaction Pipeline serves as the single point of truth for all economic exchanges
+ * in the game. Every purchase, sale, reward, or cost flows through this subsystem to ensure
+ * consistency, validation, and proper history tracking.
+ *
+ * @section tp_concepts Key Concepts
+ *
+ * **Transaction Types:**
+ * The pipeline handles many different transaction types, each with specific validation rules:
+ * - ShopPurchase/ShopSale: Buying and selling items at shops
+ * - RaceReward/ChallengeReward: Earnings from completing activities
+ * - PinkSlipWin/PinkSlipLoss: Vehicle ownership transfers from racing for pinks
+ * - RepairCost/UpgradeCost: Money spent on vehicle maintenance and upgrades
+ *
+ * **Transaction Items:**
+ * Items exchanged in transactions are categorized by type (Vehicle, Part, Currency, etc.)
+ * and tracked with metadata for complex scenarios like vehicle configurations.
+ *
+ * **Validation Flow:**
+ * Before any transaction is processed, the pipeline validates:
+ * 1. Sufficient funds (credits or premium currency)
+ * 2. Item availability
+ * 3. Inventory capacity
+ * 4. Level/unlock requirements
+ *
+ * **History Tracking:**
+ * All transactions are recorded with unique IDs, timestamps, and full details
+ * for player statistics, analytics, and potential rollback support.
+ *
+ * @section tp_architecture Architecture
+ *
+ * The Transaction Pipeline coordinates with other subsystems:
+ * - UMGEconomySubsystem: Credit balance management
+ * - UMGGarageSubsystem: Vehicle and part ownership
+ * - UMGInventorySubsystem: Consumables and customization items
+ * - UMGProgressionSubsystem: XP and reputation rewards
+ *
+ * @section tp_usage Basic Usage Examples
+ *
+ * **Processing a Purchase:**
+ * @code
+ * // Get the transaction pipeline
+ * UMGTransactionPipeline* Pipeline = GetGameInstance()->GetSubsystem<UMGTransactionPipeline>();
+ *
+ * // Create a purchase request
+ * FMGPurchaseRequest Request;
+ * Request.ItemID = TEXT("turbo_stage2");
+ * Request.ItemType = EMGTransactionItemType::Part;
+ * Request.Price = 15000;
+ * Request.TargetVehicleID = MyVehicleID;
+ * Request.bInstallImmediately = true;
+ *
+ * // Process the purchase
+ * EMGTransactionResult Result = Pipeline->ProcessPurchase(Request);
+ * if (Result == EMGTransactionResult::Success)
+ * {
+ *     // Part purchased and installed!
+ * }
+ * @endcode
+ *
+ * **Awarding Race Rewards:**
+ * @code
+ * // Award race completion rewards
+ * TArray<FMGTransactionItem> BonusItems;
+ * Pipeline->AwardRaceRewards(
+ *     5000,   // Credits won
+ *     250,    // XP earned
+ *     50,     // Reputation gained
+ *     BonusItems  // Any bonus item drops
+ * );
+ * @endcode
+ *
+ * **Selling a Vehicle:**
+ * @code
+ * // Get the sale value (includes depreciation)
+ * int64 SaleValue = Pipeline->GetSaleValue(EMGTransactionItemType::Vehicle, VehicleID);
+ *
+ * // Execute the sale
+ * EMGTransactionResult Result = Pipeline->SellVehicle(VehicleID, SaleValue);
+ * @endcode
+ *
+ * **Listening for Transactions:**
+ * @code
+ * // Subscribe to transaction events for UI updates
+ * Pipeline->OnTransactionComplete.AddDynamic(this, &UMyWidget::HandleTransactionComplete);
+ * Pipeline->OnItemReceived.AddDynamic(this, &UMyWidget::ShowItemReceivedNotification);
+ * @endcode
+ *
+ * @see UMGEconomySubsystem For credit balance management
+ * @see UMGShopSubsystem For shop browsing and item catalogs
+ * @see UMGGarageSubsystem For vehicle and part management
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

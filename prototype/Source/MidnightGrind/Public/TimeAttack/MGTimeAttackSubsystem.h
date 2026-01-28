@@ -1,5 +1,92 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGTimeAttackSubsystem.h
+ * @brief Time Attack System - Solo racing mode focused on beating lap times and chasing ghosts
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ * ==========================
+ * Time Attack is a classic racing game mode where players compete against the clock rather
+ * than other racers. This system tracks lap times, manages ghost replays, handles time
+ * trials, and calculates real-time deltas (time differences from your best lap).
+ *
+ * If you've played games like Gran Turismo, TrackMania, or any racing game with a
+ * "time trial" mode, this system provides similar functionality.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * --------------------------
+ *
+ * 1. WHAT IS A "DELTA"?
+ *    - Delta means "difference" - in racing, it's how much faster/slower you are compared
+ *      to a reference time.
+ *    - A delta of -0.5 means you're half a second FASTER than your best time.
+ *    - A delta of +1.2 means you're 1.2 seconds SLOWER than your best time.
+ *    - The FMGDeltaInfo struct tracks deltas against personal best, session best, and ghosts.
+ *
+ * 2. WHAT IS A "SECTOR"?
+ *    - Tracks are divided into sectors (usually 3) - checkpoints that split the lap.
+ *    - Sector times help identify which parts of the track you're gaining or losing time.
+ *    - You might have a great Sector 1 but struggle in Sector 3 - this data helps improvement.
+ *
+ * 3. WHAT IS A "GHOST"?
+ *    - A ghost is a recorded replay of a previous lap that appears as a semi-transparent car.
+ *    - You can race against your personal best ghost, friends' ghosts, or leaderboard ghosts.
+ *    - Ghosts help you see the optimal racing line and braking points.
+ *    - FMGGhostData stores the metadata; the actual position/rotation data is stored separately.
+ *
+ * 4. WHAT IS "THEORETICAL BEST"?
+ *    - Your theoretical best is calculated by combining your best sector times.
+ *    - If your best Sector 1 is 20.5s, best Sector 2 is 18.2s, and best Sector 3 is 22.1s,
+ *      your theoretical best is 60.8s, even if your actual best lap is 61.5s.
+ *    - This shows the "perfect lap" you're capable of if you nail every sector.
+ *
+ * 5. WHAT ARE "TRIALS"?
+ *    - Trials are structured challenges with medal targets (Bronze, Silver, Gold, etc.).
+ *    - Unlike free Time Attack, trials may have specific requirements (certain car, conditions).
+ *    - Medals provide progression goals and rewards.
+ *
+ * 6. TIME ATTACK MODES:
+ *    - SingleLap: Best single lap time (most common)
+ *    - FullRace: Best time across multiple laps (e.g., best 3-lap time)
+ *    - Sector: Challenge specific track sectors only
+ *    - Checkpoint: Point-to-point time between checkpoints
+ *    - Endurance: How many laps in a time limit
+ *
+ * SYSTEM ARCHITECTURE:
+ * -------------------
+ * The system manages several interconnected features:
+ *
+ * - SESSION: Current active Time Attack session with real-time timing
+ * - RECORDS: Historical best times stored per track/vehicle combination
+ * - GHOSTS: Replay data for visualization and competition
+ * - TRIALS: Structured challenges with medal thresholds
+ * - STATISTICS: Lifetime stats like total laps, personal bests set, etc.
+ *
+ * DATA FLOW EXAMPLE (Single Lap Time Attack):
+ * ------------------------------------------
+ * 1. Player calls StartSession(TrackID, VehicleID, SingleLap)
+ * 2. System loads personal bests and selected ghosts
+ * 3. OnSessionStarted delegate fires
+ * 4. As player races, UpdateCurrentTime() is called every frame
+ * 5. OnCrossedSector() is called at each sector checkpoint
+ * 6. OnDeltaUpdated fires with real-time comparison data
+ * 7. OnCrossedStartLine() completes the lap
+ * 8. ProcessLapCompletion() checks for new records
+ * 9. OnLapCompleted and potentially OnNewPersonalBest fire
+ *
+ * IMPORTANT FUNCTIONS:
+ * -------------------
+ * - StartSession/EndSession: Begin/end a Time Attack session
+ * - OnCrossedStartLine/OnCrossedSector: Called by track checkpoints
+ * - GetCurrentDelta: Get real-time delta info for UI display
+ * - LoadGhost/SelectGhostsForSession: Manage ghost opponents
+ * - StartTrial/EndTrial: Handle structured trial challenges
+ *
+ * @see FMGLapTime - Structure holding detailed lap data
+ * @see FMGGhostData - Ghost replay metadata
+ * @see FMGTrialDefinition - Trial challenge configuration
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

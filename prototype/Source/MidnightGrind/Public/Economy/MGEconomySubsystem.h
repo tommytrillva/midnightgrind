@@ -1,5 +1,184 @@
 // Copyright Midnight Grind. All Rights Reserved.
-// Task #5: Economy Subsystem - Balanced for car culture grind
+
+/**
+ * @file MGEconomySubsystem.h
+ * @brief Core economy subsystem managing player credits, transactions, and economic balance.
+ *
+ * The Economy Subsystem is the foundation of Midnight Grind's in-game economy. It manages
+ * the player's credit balance, tracks all financial transactions, and provides APIs for
+ * race earnings, shop purchases, wagers, and daily bonuses. The system is designed around
+ * the philosophy of "Feel the Grind, Not the Frustration" - progression should be
+ * satisfying and authentic to car culture.
+ *
+ * @section econ_concepts Key Concepts
+ *
+ * **Credits:**
+ * Credits are the primary in-game currency. Players start with $7,500 - enough for
+ * meaningful first upgrades but not enough to skip the early game grind. Credits are
+ * earned through racing, selling items, and completing challenges.
+ *
+ * **Transaction Types:**
+ * All credit changes are logged as transactions with specific types:
+ * - RaceWinnings/RaceEntryFee: Money earned or spent on races
+ * - VehiclePurchase/VehicleSale: Buying and selling cars
+ * - PartPurchase/PartSale: Performance and cosmetic parts
+ * - PartInstallLabor: Shop labor costs for installations
+ * - PinkSlipWin/PinkSlipLoss: Vehicle transfers from pink slip races
+ * - RepairCost: Fixing vehicle damage
+ * - Wager: Side bets on races
+ * - DailyBonus/MilestoneReward: Progression rewards
+ *
+ * **Balance Philosophy:**
+ * The economy is balanced around several core principles:
+ * - Risk = Reward: Higher stakes races pay proportionally more
+ * - Car Culture Authenticity: Parts and vehicles priced realistically
+ * - The Build Journey Matters: Upgrading a car should feel meaningful
+ * - Respect Player Time: Grinding should progress, not plateau
+ *
+ * **Depreciation:**
+ * Vehicles and parts lose value when sold back. The default depreciation rate is 30%,
+ * meaning you'll get 70% of the purchase price back. Condition affects this further.
+ *
+ * @section econ_wagers Wager System
+ *
+ * Players can place side bets on races for additional risk/reward:
+ * - Only one active wager at a time
+ * - Wager amount is held until race completes
+ * - Winning multiplies the wager by the odds (default 2x)
+ * - Losing forfeits the entire wager
+ *
+ * @section econ_daily Daily Bonuses
+ *
+ * The daily login bonus encourages regular play:
+ * - Bonus amount increases with login streak
+ * - Streak resets if you miss a day
+ * - Maximum streak bonus caps at a reasonable level
+ *
+ * @section econ_usage Basic Usage Examples
+ *
+ * **Checking Balance and Affordability:**
+ * @code
+ * UMGEconomySubsystem* Economy = GetGameInstance()->GetSubsystem<UMGEconomySubsystem>();
+ *
+ * // Get current balance
+ * int64 Credits = Economy->GetCredits();
+ *
+ * // Check if player can afford something
+ * if (Economy->CanAfford(25000))
+ * {
+ *     // Player has at least $25,000
+ * }
+ *
+ * // Format for display
+ * FText DisplayBalance = UMGEconomySubsystem::FormatCredits(Credits);
+ * // Result: "$7,500" or "$1,234,567"
+ * @endcode
+ *
+ * **Processing Race Economy:**
+ * @code
+ * // Calculate winnings based on position
+ * int64 Winnings = UMGEconomySubsystem::CalculateRaceWinnings(
+ *     1,      // Position (1st place)
+ *     8,      // Total racers
+ *     10000,  // Base prize pool
+ *     1.5f    // Difficulty multiplier
+ * );
+ *
+ * // Pay entry fee before race
+ * int64 EntryFee = UMGEconomySubsystem::CalculateEntryFee(10000, 0.1f);
+ * if (Economy->PayEntryFee(EntryFee, RaceID))
+ * {
+ *     // Entry fee paid, race can begin
+ * }
+ *
+ * // Award winnings after race
+ * Economy->AwardRaceWinnings(Winnings, RaceID);
+ * @endcode
+ *
+ * **Handling Pink Slip Races:**
+ * @code
+ * // When player wins opponent's car
+ * int64 VehicleValue = 45000;
+ * Economy->ProcessPinkSlipWin(VehicleValue, OpponentVehicleID);
+ *
+ * // When player loses their car
+ * Economy->ProcessPinkSlipLoss(PlayerVehicleValue, PlayerVehicleID);
+ * @endcode
+ *
+ * **Shop Transactions:**
+ * @code
+ * // Purchase a vehicle
+ * FText Message;
+ * if (Economy->PurchaseVehicle(VehicleModelData, Message))
+ * {
+ *     // Vehicle purchased successfully
+ * }
+ *
+ * // Sell a part
+ * int64 SellPrice = UMGEconomySubsystem::CalculateSellValue(
+ *     OriginalPrice,
+ *     0.9f,   // 90% condition
+ *     0.3f    // 30% depreciation
+ * );
+ * Economy->SellPart(PartID, SellPrice, Message);
+ * @endcode
+ *
+ * **Using Wagers:**
+ * @code
+ * // Place a side bet
+ * if (Economy->PlaceWager(5000, RaceID))
+ * {
+ *     // $5,000 wager placed
+ * }
+ *
+ * // Check active wager
+ * if (Economy->HasActiveWager())
+ * {
+ *     int64 WagerAmount = Economy->GetActiveWager();
+ * }
+ *
+ * // After race - resolve wager
+ * Economy->ResolveWager(true, 2.5f);  // Won at 2.5:1 odds
+ * // Player receives $12,500 (5000 * 2.5)
+ * @endcode
+ *
+ * **Daily Bonuses:**
+ * @code
+ * // Check if bonus is available
+ * if (Economy->IsDailyBonusAvailable())
+ * {
+ *     int64 BonusAmount;
+ *     if (Economy->ClaimDailyLoginBonus(BonusAmount))
+ *     {
+ *         // Bonus claimed! Show notification
+ *         int32 Streak = Economy->GetLoginStreakDays();
+ *     }
+ * }
+ * @endcode
+ *
+ * **Listening to Events:**
+ * @code
+ * // React to credit changes
+ * Economy->OnCreditsChanged.AddDynamic(this, &UMyWidget::HandleCreditsChanged);
+ *
+ * void UMyWidget::HandleCreditsChanged(int64 NewBalance, int64 Delta)
+ * {
+ *     if (Delta > 0)
+ *     {
+ *         ShowEarningsAnimation(Delta);
+ *     }
+ *     else
+ *     {
+ *         ShowSpendingAnimation(-Delta);
+ *     }
+ *     UpdateBalanceDisplay(NewBalance);
+ * }
+ * @endcode
+ *
+ * @see UMGTransactionPipeline For complex multi-system transactions
+ * @see UMGShopSubsystem For shop browsing and item catalogs
+ * @see UMGProgressionSubsystem For XP and reputation systems
+ */
 
 #pragma once
 

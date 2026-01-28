@@ -1,6 +1,152 @@
 // Copyright Midnight Grind. All Rights Reserved.
 // Stage 51: Race Starter - Bridge between Garage/UI and Race Flow
 
+/**
+ * @file MGRaceStarter.h
+ * @brief Race Starter Component - Simplified interface for starting races from UI/Blueprints
+ *
+ * This component and accompanying Blueprint Function Library provide a simplified,
+ * high-level interface for starting races. It bridges the gap between the garage/menu
+ * UI and the more complex RaceFlowSubsystem, handling all the setup details automatically.
+ *
+ * ============================================================================
+ * KEY CONCEPTS FOR BEGINNERS
+ * ============================================================================
+ *
+ * WHY DOES THIS EXIST?
+ * Starting a race involves many steps:
+ * 1. Get the player's selected vehicle from the garage
+ * 2. Validate the vehicle is race-ready
+ * 3. Choose or validate the track
+ * 4. Configure AI opponents
+ * 5. Set up timing and scoring
+ * 6. Trigger level loading
+ *
+ * The RaceStarter simplifies this to single function calls like StartQuickRace()
+ * while handling all the complexity internally.
+ *
+ * TWO WAYS TO USE:
+ * 1. UMGRaceStarter (Component): Attach to a menu actor for state tracking
+ * 2. UMGRaceStarterLibrary (Static): Call from anywhere, no setup needed
+ *
+ * QUICK RACE VS CUSTOM RACE:
+ * - Quick Race: One function call, uses defaults and randomization
+ * - Custom Race: Builder pattern for full control over settings
+ *
+ * ============================================================================
+ * COMPONENT USAGE (UMGRaceStarter)
+ * ============================================================================
+ *
+ * The component approach is best when you need:
+ * - Persistent settings between race attempts
+ * - Custom race builder with step-by-step configuration
+ * - Event callbacks for race start results
+ *
+ * @code
+ * // In your garage/menu actor
+ * UPROPERTY()
+ * UMGRaceStarter* RaceStarter;
+ *
+ * void AMyGarageActor::BeginPlay()
+ * {
+ *     RaceStarter = NewObject<UMGRaceStarter>(this);
+ *     RaceStarter->OnRaceStartResult.AddDynamic(this, &AMyGarageActor::HandleResult);
+ * }
+ *
+ * // One-click quick race
+ * void AMyGarageActor::OnQuickRaceClicked()
+ * {
+ *     RaceStarter->StartQuickRace();
+ * }
+ *
+ * // Custom race with builder pattern
+ * void AMyGarageActor::OnStartCustomRace()
+ * {
+ *     RaceStarter->BeginCustomRace();
+ *     RaceStarter->SetTrack(TEXT("Tokyo_Highway"));
+ *     RaceStarter->SetRaceType(TEXT("Sprint"));
+ *     RaceStarter->SetAI(5, 0.7f); // 5 opponents, 70% difficulty
+ *     RaceStarter->SetTimeOfDay(0.0f); // Midnight
+ *     RaceStarter->CommitRace();
+ * }
+ * @endcode
+ *
+ * ============================================================================
+ * STATIC LIBRARY USAGE (UMGRaceStarterLibrary)
+ * ============================================================================
+ *
+ * The static library is best for:
+ * - Simple one-off race starts
+ * - Blueprint scripts without permanent state
+ * - Quick testing and prototyping
+ *
+ * @code
+ * // Start a quick race on any track
+ * UMGRaceStarterLibrary::StartQuickRace(this);
+ *
+ * // Start a quick race on a specific track
+ * UMGRaceStarterLibrary::StartQuickRace(this, FName("Downtown_Circuit"));
+ *
+ * // Start with full configuration
+ * FMGRaceSetupRequest Setup;
+ * Setup.TrackID = FName("Mountain_Pass");
+ * Setup.PlayerVehicleID = UMGRaceStarterLibrary::GetSelectedVehicleID(this);
+ * Setup.LapCount = 5;
+ * Setup.AICount = 7;
+ * Setup.AIDifficulty = 0.8f;
+ * UMGRaceStarterLibrary::StartRace(this, Setup);
+ *
+ * // Test race for development
+ * UMGRaceStarterLibrary::StartTestRace(this);
+ * @endcode
+ *
+ * ============================================================================
+ * BLUEPRINT USAGE
+ * ============================================================================
+ *
+ * All functions are exposed to Blueprint. Common patterns:
+ *
+ * Quick Race Button:
+ *   [Button Clicked] -> [Start Quick Race] -> Done!
+ *
+ * Custom Race Screen:
+ *   [Begin Custom Race]
+ *        |
+ *   [User selects track] -> [Set Track]
+ *        |
+ *   [User selects options] -> [Set AI], [Set Laps], etc.
+ *        |
+ *   [Start Button] -> [Commit Race]
+ *
+ * ============================================================================
+ * RACE EVENT TYPES
+ * ============================================================================
+ *
+ * @see EMGRaceEventType for categorizing race purposes:
+ * - Standard: Normal race selected from menu
+ * - QuickRace: Randomized quick-start race
+ * - Career: Story mode progression race
+ * - Multiplayer: Online race
+ * - PinkSlip: Wager race for vehicle ownership
+ * - Custom: Player-configured private race
+ *
+ * ============================================================================
+ * QUICK RACE SETTINGS
+ * ============================================================================
+ *
+ * @see FMGQuickRaceSettings for configuring quick race defaults:
+ * - PreferredRaceType: Default race type (Circuit, Sprint, etc.)
+ * - DefaultLaps: Number of laps for circuit races
+ * - DefaultAICount: Number of AI opponents
+ * - DefaultDifficulty: AI skill level (0-1)
+ * - bRandomizeTrack: Pick random track vs use favorites
+ * - FavoriteTracks: List of preferred tracks for random selection
+ * - bMidnightOnly: Always use midnight time of day
+ *
+ * @see UMGRaceFlowSubsystem for the underlying race orchestration
+ * @see UMGGarageSubsystem for vehicle selection
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

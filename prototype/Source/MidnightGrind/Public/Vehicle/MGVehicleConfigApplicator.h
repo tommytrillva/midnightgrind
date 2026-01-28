@@ -1,18 +1,90 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehicleConfigApplicator.h
+ * @brief Vehicle customization system for applying visual and performance configurations.
+ *
+ * @section Overview
+ * This file defines the configuration applicator that handles all vehicle customization
+ * in MIDNIGHT GRIND. It manages paint jobs, vinyl/decal layers, tuning parameters,
+ * parts installation, and visual modifications like window tint and underglow.
+ *
+ * @section Architecture
+ * The configuration system uses a layered architecture:
+ *
+ * 1. **FMGVehicleConfig**: Complete vehicle configuration (paint, vinyls, tuning, parts)
+ * 2. **UMGVehicleConfigApplicator**: Applies configs to vehicle pawns
+ * 3. **Preview Mode**: Temporary changes for garage preview before committing
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Paint Types**: Different paint finishes affect how light reflects:
+ * - Solid: Flat, single-color finish
+ * - Metallic: Contains metal flakes that sparkle
+ * - Pearlescent: Color shifts depending on viewing angle
+ * - Matte: Non-reflective, flat finish
+ * - Chrome: Mirror-like reflective surface
+ *
+ * **Dynamic Material Instance**: A runtime copy of a material that can have
+ * its parameters modified without affecting the original. Used for changing
+ * car colors, adding decals, etc.
+ *
+ * **Tuning Parameters**: Values that affect vehicle physics without changing parts:
+ * - Ride height, spring stiffness, damper settings
+ * - Brake bias, differential settings
+ * - Tire pressure, camber, toe angles
+ *
+ * @section Usage Example Usage
+ * @code
+ * // Create an applicator
+ * UMGVehicleConfigApplicator* Applicator = NewObject<UMGVehicleConfigApplicator>();
+ *
+ * // Apply a complete configuration
+ * FMGVehicleConfig Config;
+ * Config.Paint.PrimaryColor = FLinearColor::Red;
+ * Config.Paint.PaintType = EMGPaintType::Metallic;
+ * Config.Tuning.RideHeight = -0.5f; // Lowered
+ * Applicator->ApplyFullConfig(VehiclePawn, Config);
+ *
+ * // Preview mode for garage
+ * Applicator->BeginPreview(VehiclePawn);
+ * Applicator->ApplyColor(VehiclePawn, FLinearColor::Blue, EMGPaintType::Pearlescent);
+ * // Player decides to keep or cancel...
+ * Applicator->EndPreview(VehiclePawn, true); // true = keep changes
+ * @endcode
+ *
+ * @see AMGVehiclePawn The vehicle pawn that receives configurations
+ * @see UMGVehicleMovementComponent Where tuning affects physics
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "MGVehicleConfigApplicator.generated.h"
 
+// ============================================================================
+// FORWARD DECLARATIONS
+// ============================================================================
+
 class AMGVehiclePawn;
 class UMGVehicleMovementComponent;
 class USkeletalMeshComponent;
 class UMaterialInstanceDynamic;
 
+// ============================================================================
+// PAINT TYPE ENUMERATION
+// ============================================================================
+
 /**
- * Paint type
+ * @brief Automotive paint finish types.
+ *
+ * Each paint type has different visual properties that affect how light
+ * interacts with the vehicle surface. The paint type is used to configure
+ * material parameters like metallic intensity, roughness, and clear coat.
+ *
+ * **UENUM(BlueprintType)** makes this enum usable in Blueprint graphs
+ * and exposes it to the Unreal reflection system.
  */
 UENUM(BlueprintType)
 enum class EMGPaintType : uint8
@@ -27,8 +99,18 @@ enum class EMGPaintType : uint8
 	Satin
 };
 
+// ============================================================================
+// PAINT CONFIGURATION
+// ============================================================================
+
 /**
- * Paint configuration
+ * @brief Complete paint configuration for a vehicle.
+ *
+ * Defines all parameters needed to render a vehicle's paint job,
+ * including primary/secondary colors, finish type, and clear coat settings.
+ *
+ * **USTRUCT(BlueprintType)** exposes this struct to Blueprint and allows
+ * it to be used as a variable type, function parameter, or return value.
  */
 USTRUCT(BlueprintType)
 struct FMGPaintConfig
@@ -64,8 +146,24 @@ struct FMGPaintConfig
 	bool bTwoTone = false;
 };
 
+// ============================================================================
+// VINYL/DECAL LAYER
+// ============================================================================
+
 /**
- * Vinyl/decal layer
+ * @brief Single vinyl/decal layer configuration.
+ *
+ * Vinyls are custom graphics that can be placed on the vehicle body.
+ * Multiple layers can be stacked to create complex designs. Each layer
+ * has position, scale, rotation, color, and placement settings.
+ *
+ * Placement values:
+ * - 0 = Left side
+ * - 1 = Right side
+ * - 2 = Both sides
+ * - 3 = Hood
+ * - 4 = Roof
+ * - 5 = Trunk
  */
 USTRUCT(BlueprintType)
 struct FMGVinylLayer
@@ -105,8 +203,30 @@ struct FMGVinylLayer
 	bool bVisible = true;
 };
 
+// ============================================================================
+// TUNING CONFIGURATION
+// ============================================================================
+
 /**
- * Tuning parameters
+ * @brief Complete vehicle tuning parameters.
+ *
+ * These parameters adjust vehicle behavior without swapping physical parts.
+ * All values are normalized (-1 to +1 or 0 to 1) for consistent UI sliders.
+ *
+ * @section TuningCategories Tuning Categories
+ *
+ * **Engine Tuning**: Power output and RPM range adjustments
+ * **Transmission Tuning**: Gear ratios and final drive
+ * **Suspension Tuning**: Ride height, spring rates, dampers, anti-roll bars
+ * **Steering Tuning**: Ratio and sensitivity
+ * **Brake Tuning**: Bias and force
+ * **Differential Tuning**: Lock percentage and AWD torque split
+ * **Tire Tuning**: Pressure and alignment (camber, toe)
+ * **Aero Tuning**: Front and rear downforce
+ * **NOS Tuning**: Boost strength and duration
+ *
+ * @note Values are relative adjustments. A PowerAdjust of 0.1 means +10%
+ * power from the base vehicle specification.
  */
 USTRUCT(BlueprintType)
 struct FMGTuningConfig
@@ -339,16 +459,36 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnConfigApplied, AMGVehiclePawn*, 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTuningChanged, AMGVehiclePawn*, Vehicle, const FMGTuningConfig&, NewTuning);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPaintChanged, AMGVehiclePawn*, Vehicle, const FMGPaintConfig&, NewPaint);
 
+// ============================================================================
+// VEHICLE CONFIGURATION APPLICATOR CLASS
+// ============================================================================
+
 /**
- * Vehicle Configuration Applicator
- * Handles applying configurations to vehicle pawns
+ * @class UMGVehicleConfigApplicator
+ * @brief Applies visual and performance configurations to vehicle pawns.
  *
- * Features:
- * - Applies paint/materials to vehicle mesh
- * - Applies tuning to physics component
- * - Manages vinyl/decal layers
- * - Handles part installation visuals
- * - Supports real-time preview in garage
+ * This utility class handles all aspects of vehicle customization, from
+ * paint jobs to physics tuning. It supports a preview mode for garage
+ * interfaces where players can see changes before committing.
+ *
+ * @section Features Features
+ * - **Paint Application**: Colors, metallic finishes, pearlescent effects
+ * - **Tuning Application**: Suspension, brakes, differential, aero settings
+ * - **Vinyl Management**: Add, update, remove, and layer decals
+ * - **Parts Visuals**: Show installed parts (spoilers, body kits, etc.)
+ * - **Preview Mode**: Temporary changes for garage preview
+ *
+ * @section UnrealMacros Unreal Engine Macro Explanations
+ *
+ * **UCLASS(BlueprintType)**
+ * - BlueprintType: This class can be used as a variable type in Blueprints
+ * - Unlike components, this is a UObject that can be created on-demand
+ *
+ * **DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(...)**
+ * - Creates a delegate (event) that Blueprint can bind to
+ * - TwoParams means it passes two parameters to bound functions
+ * - Dynamic: Can be bound at runtime (not just compile time)
+ * - Multicast: Multiple functions can bind to the same delegate
  */
 UCLASS(BlueprintType)
 class MIDNIGHTGRIND_API UMGVehicleConfigApplicator : public UObject

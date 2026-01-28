@@ -1,5 +1,149 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGSeasonPassSubsystem.h
+ * Season Pass Subsystem - Fair, Player-Friendly Progression System
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file implements Midnight Grind's season pass system with a focus on
+ * FAIR and PLAYER-FRIENDLY design. Unlike predatory implementations, this
+ * system ensures meaningful progression without exploitative monetization.
+ *
+ * DESIGN PHILOSOPHY (READ THIS - IT'S IMPORTANT):
+ * -----------------------------------------------
+ * This season pass was designed to be ethical and fun. Key principles:
+ *
+ * 1. FREE TRACK IS MEANINGFUL
+ *    - Free players get substantial rewards, not just scraps
+ *    - GrindCash (earnable currency), customization items, XP boosts
+ *    - You can fully enjoy the game without paying
+ *
+ * 2. PREMIUM IS COSMETIC ONLY
+ *    - Premium track offers visual items: liveries, decals, wheels, etc.
+ *    - NO gameplay advantages from premium
+ *    - NO pay-to-win mechanics
+ *
+ * 3. XP FROM ALL ACTIVITIES
+ *    - Every race, every mode, everything you do earns XP
+ *    - Not locked to specific "battle pass challenges"
+ *    - Play how you want, progress naturally
+ *
+ * 4. REASONABLE PROGRESSION
+ *    - Completable with normal play (2-3 hours/week)
+ *    - No need to grind 8 hours daily
+ *    - Clear XP requirements, no hidden walls
+ *
+ * 5. NO FOMO (Fear Of Missing Out)
+ *    - Seasons are long (8-12 weeks)
+ *    - Catch-up mechanics for late starters
+ *    - Previous season items become earnable later
+ *    - If you miss something, it's not gone forever
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
+ *
+ * 1. SEASON INFO (FMGSeasonInfo)
+ *    Contains all metadata about the current season:
+ *    - SeasonID/Number: Unique identifier (e.g., "S3", Season 3)
+ *    - SeasonName/Theme: Display text ("Neon Nights", "Underground")
+ *    - StartDate/EndDate: When the season runs
+ *    - MaxTier: Typically 100 tiers
+ *    - Tiers: Array of all tier definitions with rewards
+ *
+ * 2. SEASON TIERS (FMGSeasonTier)
+ *    Each tier (1-100) has:
+ *    - TierNumber: Which tier this is
+ *    - XPRequired: How much XP to reach this tier
+ *    - FreeReward: What free players get
+ *    - PremiumReward: What premium players also get
+ *    - bIsMilestone: Is this a special tier (10, 25, 50, 100)?
+ *
+ * 3. REWARD TYPES (EMGSeasonRewardType)
+ *    What players can earn:
+ *    - GrindCash: Primary earnable currency
+ *    - NeonCredits: Premium currency (also earnable slowly)
+ *    - Cosmetics: Livery, Decal, Wheels, Neon, Horn, Trail
+ *    - Identity: Emote, Avatar, Banner, Title
+ *    - Boosts: XPBoost, CurrencyBoost (temporary multipliers)
+ *
+ * 4. CHALLENGES (FMGSeasonChallenge)
+ *    Optional objectives that grant bonus XP:
+ *    - Daily challenges: Small, quick tasks (bonus XP)
+ *    - Weekly challenges: Larger goals (more XP)
+ *    - NOT required to complete the pass
+ *    - Just accelerators for players who want them
+ *
+ * 5. CATCH-UP MECHANICS
+ *    For players who start late or take breaks:
+ *    - GetCatchUpXPBonus(): Returns bonus XP multiplier
+ *    - IsEligibleForCatchUp(): Checks if player is behind average
+ *    - Automatically applies bonus to help them catch up
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ *
+ *     +---------------------+
+ *     | Race/Activity       |
+ *     | Completion          |
+ *     +---------------------+
+ *              |
+ *              | XP Earned
+ *              v
+ *     +---------------------+
+ *     | UMGSeasonPassSubsystem | <-- This file
+ *     | AddXP(amount, source) |
+ *     +---------------------+
+ *              |
+ *       +------+------+
+ *       |             |
+ *       v             v
+ *  [Tier Up?]    [Challenge
+ *       |         Complete?]
+ *       v             |
+ *  OnSeasonTierReached|
+ *       |             v
+ *       v        OnChallengeCompleted
+ *  [Claim Rewards]
+ *       |
+ *       v
+ *  OnSeasonRewardClaimed
+ *
+ * XP SOURCES:
+ * -----------
+ * XP can come from many sources (tracked via AddXP's Source parameter):
+ * - "Race": Completing any race
+ * - "Win": Winning a race
+ * - "Objective": Completing race objectives
+ * - "Challenge": Completing challenges
+ * - "Daily": Daily login bonus
+ * - "Event": Participating in live events
+ *
+ * TYPICAL USAGE FLOW:
+ * -------------------
+ * 1. Initialize(): Loads season data and player progress
+ * 2. Player completes race -> AddXP(1000, "Race")
+ * 3. If XP crosses tier threshold -> CheckTierUp() triggers
+ * 4. OnSeasonTierReached broadcasts with new tier number
+ * 5. UI shows tier-up animation and available rewards
+ * 6. Player claims via ClaimTierReward(tier, bPremium)
+ * 7. GrantReward() gives the actual items/currency
+ * 8. Progress saved via SaveProgress()
+ *
+ * PREMIUM PASS:
+ * -------------
+ * - Purchased once per season (1000 Neon Credits)
+ * - Unlocks premium reward track
+ * - Can buy mid-season and retroactively claim past rewards
+ * - Does NOT give gameplay advantages
+ *
+ * @see UMGSeasonSubsystem - Older season implementation (being replaced)
+ * @see UMGBattlePassSubsystem - Similar system with different naming
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

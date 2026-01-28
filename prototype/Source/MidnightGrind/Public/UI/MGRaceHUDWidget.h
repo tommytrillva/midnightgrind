@@ -1,5 +1,120 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGRaceHUDWidget.h - Abstract Base Class for Race HUD Widgets
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines the INTERFACE (contract) that all race HUD implementations
+ * must follow. It's marked as "Abstract," meaning you can't use it directly -
+ * you must create a child class that implements the required methods.
+ *
+ * Think of it as a blueprint (in the design sense, not Unreal Blueprint) that
+ * says "any racing HUD must be able to show speed, position, lap count, etc."
+ * The actual visual design can vary wildly between implementations.
+ *
+ * WHY USE AN ABSTRACT BASE CLASS?
+ * --------------------------------
+ * 1. CONSISTENCY: All HUD variations support the same features
+ * 2. FLEXIBILITY: Easy to swap between different HUD styles
+ * 3. POLYMORPHISM: Game code works with any HUD without knowing the type
+ * 4. BLUEPRINT SUPPORT: Designers can create custom HUDs without C++ changes
+ *
+ * Example: The game might ship with a "minimal" HUD and a "detailed" HUD.
+ * Both inherit from this class, so the race manager can use either one
+ * interchangeably - it just calls UpdateSpeedDisplay() and the correct
+ * implementation handles the visual update.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * Abstract Classes (UCLASS(Abstract)):
+ *   - Cannot be instantiated directly (no NewObject<UMGRaceHUDWidget>())
+ *   - Child classes must be created to use this functionality
+ *   - Defines the interface that all children must implement
+ *   - Can still contain shared implementation code
+ *
+ * BlueprintNativeEvent:
+ *   A special function type that:
+ *   - Can be implemented in C++ (via _Implementation suffix)
+ *   - Can be overridden in Blueprint
+ *   - Blueprint override calls parent with Super::FunctionName()
+ *
+ *   This is the bridge between C++ programmers and Blueprint designers.
+ *   C++ defines what the function does by default, Blueprint can customize.
+ *
+ * EMGTachStyle Enum:
+ *   Defines different visual styles for the tachometer (RPM display):
+ *   - Arc: Curved sweep gauge (like car dashboards)
+ *   - Bar: Linear horizontal/vertical bar
+ *   - Digital: Numeric RPM display only
+ *   - Needle: Classic analog needle gauge
+ *
+ *   Enums make code self-documenting and prevent invalid values.
+ *
+ * FMGHUDAnimationState Struct:
+ *   Stores animation data for smoothly transitioning UI elements.
+ *   Uses current/target pairs for interpolation (lerping).
+ *
+ *   Example: When position changes from 3rd to 2nd:
+ *   - TargetScale = 1.5 (temporary enlargement)
+ *   - CurrentScale lerps toward Target each frame
+ *   - Creates smooth "pop" animation
+ *
+ * Smoothed Values (DisplayedSpeed, DisplayedRPM):
+ *   Raw vehicle data can be jittery. Smoothed values use interpolation
+ *   to gradually transition: DisplayedSpeed = FMath::FInterpTo(Current, Target, DeltaTime, Rate)
+ *   This makes the HUD feel polished and professional.
+ *
+ * HOW IT FITS IN THE ARCHITECTURE:
+ * --------------------------------
+ *
+ *                    [UMGRaceHUDWidget]  (Abstract - this file)
+ *                           ^
+ *                           |
+ *        +------------------+------------------+
+ *        |                  |                  |
+ *   [MGDefaultRaceHUD] [MGDefaultGameplayHUD] [BlueprintHUD]
+ *   (C++ minimal)      (C++ full-featured)    (Designer-created)
+ *
+ * The game code only knows about UMGRaceHUDWidget. It calls methods like
+ * UpdateSpeedDisplay(), and the correct child class handles it.
+ *
+ * INTERFACE CONTRACT:
+ * -------------------
+ * Any class inheriting from this must provide implementations for:
+ *
+ * DISPLAY UPDATES:
+ *   - UpdateSpeedDisplay(): Show current speed (KPH or MPH)
+ *   - UpdateTachometer(): Show RPM, gear, and shift indicators
+ *   - UpdateNOSGauge(): Show nitrous oxide amount and activation
+ *   - UpdatePositionDisplay(): Show race standing (1st, 2nd, etc.)
+ *   - UpdateLapDisplay(): Show current lap and total laps
+ *   - UpdateTimeDisplay(): Show lap times (current, best, total)
+ *   - UpdateGapDisplay(): Show time gap to other racers
+ *   - UpdateDriftDisplay(): Show drift score and combo chain
+ *
+ * ANIMATIONS:
+ *   - PlayPositionChangeAnimation(): Celebrate gaining/losing position
+ *   - PlayShiftIndicator(): Flash when approaching optimal shift point
+ *   - PlayRedlineWarning(): Warn when RPM is too high
+ *   - PlayNOSActivationEffect(): Visual feedback for NOS usage
+ *   - PlayFinalLapEffect(): Indicate last lap of the race
+ *   - PlayBestLapEffect(): Celebrate setting a new personal best
+ *
+ * CONFIGURATION OPTIONS:
+ * ----------------------
+ * - TachometerStyle: Visual style for RPM display
+ * - ShiftIndicatorThreshold: When to flash shift light (% of max RPM)
+ * - RedlineThreshold: When to show redline warning
+ * - SpeedInterpRate: How quickly displayed speed follows actual speed
+ * - RPMInterpRate: How quickly displayed RPM follows actual RPM
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

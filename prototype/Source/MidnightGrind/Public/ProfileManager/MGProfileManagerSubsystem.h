@@ -1,5 +1,221 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGProfileManagerSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the Profile Manager Subsystem for Midnight Grind, which is
+ * the central hub for all player data. If the game were a person, this subsystem
+ * would be their memory - it remembers everything about the player: stats,
+ * achievements, race history, friends, settings, and more.
+ *
+ * WHAT IS A PLAYER PROFILE?
+ * -------------------------
+ * A player profile is a collection of all data associated with a specific player:
+ *
+ *    +------------------------------------------+
+ *    |            PLAYER PROFILE                |
+ *    +------------------------------------------+
+ *    | Identity: Name, Avatar, Status           |
+ *    | Progression: Level, XP, Prestige         |
+ *    | Statistics: Wins, Races, Best Times      |
+ *    | History: Recent Races, Records           |
+ *    | Achievements: Unlocked, Progress         |
+ *    | Social: Friends, Blocked Players         |
+ *    | Settings: Controls, Privacy              |
+ *    | Currency: Cash, Premium Credits          |
+ *    +------------------------------------------+
+ *
+ * This data persists between game sessions and syncs with backend servers
+ * for online play.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. PROFILE VERSIONING (EMGProfileVersion):
+ *    As the game updates, the profile structure may change. Version numbers
+ *    help migrate old profiles to new formats without losing data.
+ *
+ *    Example: Version 1 had just basic stats. Version 2 added race history.
+ *    When loading a Version 1 profile, the system upgrades it to Version 2
+ *    by adding empty race history.
+ *
+ * 2. CAREER STATISTICS (FMGCareerStat):
+ *    Tracks cumulative player accomplishments:
+ *    - Total races completed
+ *    - Total wins
+ *    - Total distance driven
+ *    - Longest drift
+ *    - etc.
+ *
+ *    Each stat has:
+ *    - Current value (cumulative)
+ *    - Best value (personal record)
+ *    - Higher/lower is better flag (for comparisons)
+ *
+ * 3. RACE HISTORY (FMGRaceHistoryEntry):
+ *    A log of recent races with detailed information:
+ *    - Which track and vehicle
+ *    - Final position
+ *    - Best lap time
+ *    - XP and currency earned
+ *
+ *    This enables features like "replay recent race" or "show improvement over time."
+ *
+ * 4. VEHICLE USAGE STATS (FMGVehicleUsageStats):
+ *    Per-vehicle statistics showing how the player performs with each car:
+ *    - How many races with this vehicle
+ *    - Win rate
+ *    - Best top speed achieved
+ *    - Total distance driven
+ *
+ *    Used for features like "most used vehicle" or "vehicle mastery."
+ *
+ * 5. TRACK RECORDS (FMGTrackRecord):
+ *    Personal best times and performance on each track:
+ *    - Best lap time
+ *    - Best race time
+ *    - Which vehicle set the record
+ *
+ *    Enables time trial features and personal improvement tracking.
+ *
+ * 6. ACHIEVEMENTS (FMGPlayerAchievement):
+ *    Milestone accomplishments with progress tracking:
+ *    - "Win 100 Races" - shows 45/100 progress
+ *    - Rarity indicates how many players have earned it
+ *    - Point values contribute to achievement score
+ *
+ * 7. CONTROL PRESETS (FMGControlPreset):
+ *    Saved input configurations:
+ *    - Steering sensitivity
+ *    - Button mappings
+ *    - Assist settings (traction control, etc.)
+ *
+ *    Players can have multiple presets for different controllers or play styles.
+ *
+ * 8. SOCIAL CONNECTIONS (FMGSocialConnection):
+ *    Friend and rival data:
+ *    - Online status
+ *    - Race history together
+ *    - Win/loss record against them
+ *    - Block/mute flags
+ *
+ * 9. SEASONAL RANKINGS (FMGSeasonalRanking):
+ *    Competitive rank data for each season:
+ *    - Current rank and points
+ *    - Peak rank achieved
+ *    - Win rate in ranked mode
+ *
+ * ARCHITECTURE OVERVIEW:
+ * ----------------------
+ *
+ *    +-------------+     +------------------+     +-------------+
+ *    |    UI       | <-> | Profile Manager  | <-> |  Save Game  |
+ *    | (displays)  |     | Subsystem        |     |  (local)    |
+ *    +-------------+     +--------+---------+     +-------------+
+ *                               |
+ *                               v
+ *                        +-------------+
+ *                        |   Backend   |
+ *                        |   Server    |
+ *                        | (online sync)|
+ *                        +-------------+
+ *
+ * PROFILE DATA FLOW:
+ * ------------------
+ *
+ * Loading Profile:
+ *    1. LoadProfile() called with player ID
+ *    2. Local save file loaded (if exists)
+ *    3. Profile version checked, migrated if needed
+ *    4. OnProfileLoaded delegate fires
+ *    5. UI updates to show player data
+ *
+ * During Gameplay:
+ *    1. Player finishes a race
+ *    2. AddRaceToHistory() called
+ *    3. UpdateCareerStat() updates totals
+ *    4. AddExperience() grants XP
+ *    5. Profile marked "dirty" (needs saving)
+ *    6. Autosave timer triggers SaveProfile()
+ *
+ * DELEGATE PATTERN:
+ * -----------------
+ * The subsystem broadcasts events when important things happen:
+ *
+ *    OnLevelUp: Player gained a level
+ *       -> UI shows level up animation
+ *       -> Unlocks are checked
+ *
+ *    OnAchievementUnlocked: Player earned an achievement
+ *       -> Notification popup shown
+ *       -> Steam/PlayStation trophy unlocked
+ *
+ *    OnCurrencyChanged: Money balance changed
+ *       -> HUD updates currency display
+ *
+ * CODE EXAMPLE:
+ * -------------
+ *    // Get the subsystem
+ *    UMGProfileManagerSubsystem* ProfileMgr =
+ *        GetGameInstance()->GetSubsystem<UMGProfileManagerSubsystem>();
+ *
+ *    // Load a profile
+ *    ProfileMgr->LoadProfile(TEXT("Player123"));
+ *
+ *    // Update stats after a race
+ *    ProfileMgr->UpdateCareerStat(TEXT("TotalRaces"), 1, true);  // Add 1
+ *    ProfileMgr->UpdateCareerStat(TEXT("TotalWins"), 1, true);   // Add 1
+ *
+ *    // Add XP and check for level up
+ *    ProfileMgr->AddExperience(1500);  // OnLevelUp fires if threshold reached
+ *
+ *    // Record the race in history
+ *    FMGRaceHistoryEntry Entry;
+ *    Entry.TrackId = TEXT("Track_Downtown");
+ *    Entry.Position = 1;
+ *    Entry.ExperienceEarned = 1500;
+ *    ProfileMgr->AddRaceToHistory(Entry);
+ *
+ *    // Check achievement progress
+ *    ProfileMgr->UpdateAchievementProgress(TEXT("Win100Races"), 0.45f);
+ *
+ * PRIVACY AND SETTINGS:
+ * ---------------------
+ * FMGProfileSettings controls what other players can see:
+ * - Public: Everyone sees everything
+ * - FriendsOnly: Only friends see stats
+ * - Private: Nobody sees your profile
+ *
+ * Individual toggles for:
+ * - Online status visibility
+ * - Statistics visibility
+ * - Allow friend requests
+ * - Allow race invites
+ *
+ * EXPORT/IMPORT:
+ * --------------
+ * Profiles can be exported to JSON for:
+ * - Account transfers
+ * - Debugging
+ * - Backup purposes
+ *
+ * The checksum field validates that exported data hasn't been tampered with.
+ *
+ * RELATED FILES:
+ * --------------
+ * - MGProfileManagerSubsystem.cpp: Implementation of all functions
+ * - MGSaveGameSubsystem: Handles actual file I/O
+ * - MGBackendService: Syncs profiles with online servers
+ * - MGAchievementSubsystem: Defines available achievements
+ * - MGRankingSubsystem: Manages seasonal competitive ranks
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

@@ -1,5 +1,85 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * @file MGPartListItemWidget.h
+ * @brief UI widgets for displaying vehicle parts in the customization menu
+ *
+ * =============================================================================
+ * @section Overview
+ * This file defines widgets used in the garage/customization UI to display
+ * individual upgrade parts, stat comparison bars, and Performance Index (PI)
+ * indicators. These are the building blocks of the parts list that players
+ * browse when shopping for or selecting upgrades.
+ *
+ * The visual style follows a PS1/PS2 era aesthetic with bold colors, chunky
+ * UI elements, and high readability - inspired by classic racing games like
+ * Need for Speed Underground and Midnight Club.
+ *
+ * =============================================================================
+ * @section KeyConcepts Key Concepts
+ *
+ * - **Part Tiers**: Parts are categorized by quality (Stock, Street, Sport,
+ *   Race, Pro, Legendary), each with distinct colors and pricing.
+ *
+ * - **State Management**: Items track selected, focused (gamepad), and hovered
+ *   states to provide appropriate visual feedback.
+ *
+ * - **Stat Bars**: Visual comparison of how a part changes vehicle stats,
+ *   showing current value vs preview value with color-coded indicators.
+ *
+ * - **Performance Index (PI)**: A single number (100-999) representing overall
+ *   vehicle performance, used for class-based matchmaking.
+ *
+ * =============================================================================
+ * @section Architecture
+ *
+ *   [MGCustomizationWidget]
+ *          |
+ *          +-- [MGPartListItemWidget] (this file)
+ *          |         |
+ *          |         +-- Part thumbnail, name, price
+ *          |         +-- Tier badge with color coding
+ *          |         +-- Owned/locked/equipped status icons
+ *          |
+ *          +-- [MGStatBarWidget] (this file)
+ *          |         |
+ *          |         +-- Current value bar
+ *          |         +-- Preview value overlay (green/red change)
+ *          |
+ *          +-- [MGPerformanceIndexWidget] (this file)
+ *                    |
+ *                    +-- Class letter (D, C, B, A, S, X)
+ *                    +-- PI number with change preview
+ *
+ * =============================================================================
+ * @section Usage
+ * @code
+ * // Creating and configuring a part list item
+ * UMGPartListItemWidget* PartItem = CreateWidget<UMGPartListItemWidget>(this, PartItemClass);
+ *
+ * // Set the part data
+ * FMGUIPartData PartData;
+ * PartData.DisplayName = FText::FromString("Stage 2 Turbo");
+ * PartData.Tier = EMGPartTier::Sport;
+ * PartData.Price = 15000;
+ * PartItem->SetPartData(PartData);
+ *
+ * // Handle selection events
+ * PartItem->OnPartItemClicked.AddDynamic(this, &UMyWidget::HandlePartClicked);
+ *
+ * // For stat bars
+ * UMGStatBarWidget* StatBar = CreateWidget<UMGStatBarWidget>(this, StatBarClass);
+ * FMGStatChange Change;
+ * Change.StatName = FText::FromString("Horsepower");
+ * Change.CurrentValue = 300.0f;
+ * Change.NewValue = 350.0f;
+ * StatBar->SetStatData(Change);
+ * @endcode
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,7 +91,14 @@ class UTextBlock;
 class UImage;
 class UBorder;
 
+// -----------------------------------------------------------------------------
+// Delegate Declarations
+// -----------------------------------------------------------------------------
+
+/** Broadcast when a part item is clicked/selected */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPartItemClicked, const FGuid&, PartID);
+
+/** Broadcast when mouse hovers over a part item (for preview) */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPartItemHovered, const FGuid&, PartID);
 
 /**

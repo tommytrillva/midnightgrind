@@ -1,0 +1,228 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Pedestrian System and Crowd Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "PedestrianDensity": true,
+    "CrowdBehavior": true,
+    "SpectatorSystem": true
+  },
+
+  "PedestrianTypes": {
+    "Civilian": {
+      "ID": "PED_CIVILIAN",
+      "Description": "General population",
+      "Behavior": "Normal",
+      "Frequency": "High",
+      "Areas": ["Downtown", "Residential", "Commercial"]
+    },
+    "Racer": {
+      "ID": "PED_RACER",
+      "Description": "Street racing participant",
+      "Behavior": "Enthusiast",
+      "Frequency": "AtEvents",
+      "Areas": ["RaceMeets", "CarShows"]
+    },
+    "Spectator": {
+      "ID": "PED_SPECTATOR",
+      "Description": "Race spectator",
+      "Behavior": "Watching",
+      "Frequency": "AtEvents",
+      "Areas": ["RaceStart", "Corners", "FinishLine"]
+    },
+    "Mechanic": {
+      "ID": "PED_MECHANIC",
+      "Description": "Garage mechanic",
+      "Behavior": "Working",
+      "Frequency": "AtShops",
+      "Areas": ["Garages", "TuningShops"]
+    },
+    "Police": {
+      "ID": "PED_POLICE",
+      "Description": "Law enforcement",
+      "Behavior": "Patrol",
+      "Frequency": "Moderate",
+      "Areas": ["All"]
+    },
+    "Businessman": {
+      "ID": "PED_BUSINESS",
+      "Description": "Business person",
+      "Behavior": "Hurried",
+      "Frequency": "DayTime",
+      "Areas": ["Downtown", "Financial"]
+    },
+    "Tourist": {
+      "ID": "PED_TOURIST",
+      "Description": "Tourist/visitor",
+      "Behavior": "Exploring",
+      "Frequency": "Moderate",
+      "Areas": ["Landmarks", "Downtown"]
+    },
+    "Clubber": {
+      "ID": "PED_CLUBBER",
+      "Description": "Nightclub patron",
+      "Behavior": "Party",
+      "Frequency": "NightTime",
+      "Areas": ["Nightclubs", "Downtown"]
+    }
+  },
+
+  "Behavior": {
+    "Walking": {
+      "NormalSpeed": 1.4,
+      "FastSpeed": 2.0,
+      "Unit": "m/s",
+      "Pathfinding": true
+    },
+    "Crossing": {
+      "UseCrosswalks": true,
+      "WaitForCars": true,
+      "Jaywalking": { "Chance": 15 }
+    },
+    "Reactions": {
+      "ToHorn": { "LookAtCar": true, "MoveAside": true },
+      "ToNearMiss": { "Jump": true, "Yell": true },
+      "ToRacing": { "Cheer": true, "RecordPhone": true },
+      "ToPolice": { "Watch": true, "PointOut": true },
+      "ToCrash": { "Gather": true, "CallPolice": true }
+    },
+    "Idle": {
+      "Activities": ["Standing", "Talking", "PhoneUse", "Smoking", "Eating"],
+      "Duration": { "Seconds": { "Min": 10, "Max": 60 } }
+    }
+  },
+
+  "SpectatorSystem": {
+    "RaceEvents": {
+      "Gathering": {
+        "BeforeRace": { "Minutes": 5 },
+        "Locations": ["StartLine", "Corners", "Straightaways"]
+      },
+      "Behavior": {
+        "Cheering": true,
+        "Recording": true,
+        "Betting": true,
+        "Warning": { "OfPolice": true }
+      },
+      "Dispersal": {
+        "OnPolice": true,
+        "AfterRace": { "Minutes": 2 }
+      }
+    },
+    "CarMeets": {
+      "Gathering": {
+        "Continuous": true,
+        "AroundCars": true
+      },
+      "Behavior": {
+        "LookingAtCars": true,
+        "Taking Photos": true,
+        "Talking": true,
+        "Revving": { "Reaction": "Cheering" }
+      }
+    },
+    "DriftEvents": {
+      "Location": "SafeZone",
+      "Behavior": {
+        "Cheering": true,
+        "Smokey": { "Reaction": "Excited" }
+      }
+    }
+  },
+
+  "Density": {
+    "Settings": {
+      "Off": { "Multiplier": 0, "Pedestrians": 0 },
+      "Low": { "Multiplier": 0.25, "Pedestrians": "Few" },
+      "Medium": { "Multiplier": 0.5, "Pedestrians": "Moderate" },
+      "High": { "Multiplier": 1.0, "Pedestrians": "Many" },
+      "Extreme": { "Multiplier": 1.5, "Pedestrians": "Crowded" }
+    },
+    "TimeOfDay": {
+      "Morning": { "Density": 0.6 },
+      "Afternoon": { "Density": 1.0 },
+      "Evening": { "Density": 0.8 },
+      "Night": { "Density": 0.4 },
+      "LateNight": { "Density": 0.2 }
+    },
+    "ByArea": {
+      "Downtown": { "Density": "High" },
+      "Residential": { "Density": "Medium" },
+      "Industrial": { "Density": "Low" },
+      "Highway": { "Density": "None" },
+      "Rural": { "Density": "VeryLow" }
+    }
+  },
+
+  "Appearance": {
+    "Clothing": {
+      "Casual": { "Frequency": "High" },
+      "Business": { "Frequency": "Medium", "DayTime": true },
+      "SportWear": { "Frequency": "Medium" },
+      "Nightclub": { "Frequency": "Medium", "NightTime": true },
+      "Racing": { "Frequency": "AtEvents" }
+    },
+    "Accessories": {
+      "Phones": { "Frequency": "High" },
+      "Bags": { "Frequency": "Medium" },
+      "Cameras": { "Frequency": "AtEvents" },
+      "Food": { "Frequency": "Low" }
+    },
+    "Variation": {
+      "RandomGeneration": true,
+      "UniqueAppearances": 500
+    }
+  },
+
+  "Interaction": {
+    "PlayerInteractions": {
+      "Honking": { "Response": "Varies" },
+      "NearMiss": { "Response": "Scared" },
+      "SlowDriving": { "Response": "None" },
+      "Drifting": { "Response": "Amazed" },
+      "Revving": { "Response": "Attention" }
+    },
+    "VehicleInteractions": {
+      "ExoticCars": { "Response": "PhotoTaking" },
+      "LoudCars": { "Response": "LookAt" },
+      "ModifiedCars": { "Response": "Interest" }
+    }
+  },
+
+  "Safety": {
+    "Collision": {
+      "CanBeHit": true,
+      "Damage": "Cosmetic",
+      "Consequence": { "PoliceAttention": true },
+      "Ragdoll": false
+    },
+    "Avoidance": {
+      "Enabled": true,
+      "JumpAway": true,
+      "RunAway": true
+    }
+  },
+
+  "Performance": {
+    "LODSystem": {
+      "Near": { "Distance": 20, "Detail": "High" },
+      "Medium": { "Distance": 50, "Detail": "Medium" },
+      "Far": { "Distance": 100, "Detail": "Low" },
+      "Culling": { "Distance": 150 }
+    },
+    "Pooling": {
+      "MaxActive": 100,
+      "SpawnRadius": 80,
+      "DespawnRadius": 120
+    }
+  },
+
+  "UI": {
+    "Settings": {
+      "DensitySlider": true,
+      "BehaviorToggle": true,
+      "SpectatorToggle": true
+    }
+  }
+}

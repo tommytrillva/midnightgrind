@@ -1,8 +1,197 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
-// MGInputBufferSubsystem.h
-// Midnight Grind - Input Buffering and Precision Input System
-// Provides frame-perfect input buffering for precise trick/drift/boost inputs
+/**
+ * =============================================================================
+ * @file MGInputBufferSubsystem.h
+ * @brief Input Buffering System - Frame-Perfect Input Handling for Racing
+ * =============================================================================
+ *
+ * @section Overview
+ * This subsystem provides a professional-grade input buffering system for
+ * Midnight Grind. It captures, buffers, and processes player inputs to enable
+ * frame-perfect trick execution, combo detection, and timing-based mechanics.
+ * Think of it like the input system in fighting games - inputs are stored
+ * briefly so they can be executed at the perfect moment.
+ *
+ * @section WhyBuffer Why Buffer Inputs?
+ *
+ * WITHOUT BUFFERING:
+ * - Player presses drift at frame 59
+ * - Game checks for drift input at frame 60
+ * - Input missed! Drift doesn't happen. Player frustrated.
+ *
+ * WITH BUFFERING:
+ * - Player presses drift at frame 59
+ * - Input stored in buffer with timestamp
+ * - Game checks buffer at frame 60
+ * - Buffered input found! Drift executes. Player happy.
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * 1. GAME INSTANCE SUBSYSTEM
+ *    Inherits from UGameInstanceSubsystem:
+ *    - One instance for entire game session
+ *    - Persists across level loads
+ *    - Access via: GetGameInstance()->GetSubsystem<UMGInputBufferSubsystem>()
+ *
+ * 2. INPUT ACTIONS (EMGInputAction)
+ *    Named actions mapped to physical inputs:
+ *    - Movement: Accelerate, Brake, SteerLeft, SteerRight
+ *    - Drift: DriftStart, DriftRelease
+ *    - Tricks: TrickUp, TrickDown, TrickLeft, TrickRight, TrickSpin, TrickFlip
+ *    - Other: Nitro, ShiftUp, ShiftDown, Horn, UseItem
+ *
+ * 3. INPUT STATES (EMGInputState)
+ *    The lifecycle of a button press:
+ *    - Pressed: Just pressed this frame
+ *    - Held: Still held down
+ *    - Released: Just released this frame
+ *    - None: Not active
+ *
+ * 4. BUFFERED INPUTS (FMGBufferedInput)
+ *    Each input is stored with metadata:
+ *    - Timestamp: When the input occurred
+ *    - FrameNumber: Which game frame
+ *    - AnalogValue: For analog inputs (trigger pressure, stick position)
+ *    - HoldDuration: How long held (for charge attacks)
+ *    - bConsumed: Has this input been "used" by game logic?
+ *
+ * 5. BUFFER WINDOW
+ *    How long inputs stay valid (default: 150ms / ~9 frames at 60fps):
+ *    - Too short: Inputs feel unresponsive
+ *    - Too long: Inputs feel "laggy" or delayed
+ *    - BufferWindowSeconds configures this
+ *
+ * 6. INPUT CONSUMPTION
+ *    Consuming an input "uses" it:
+ *    - ConsumeBufferedInput() marks input as consumed
+ *    - Prevents same input triggering multiple actions
+ *    - Example: Drift input shouldn't start two drifts
+ *
+ * 7. COMBO SYSTEM (FMGInputCombo)
+ *    Define complex input sequences:
+ *    - Sequence: Inputs in order (A then B then C)
+ *    - Simultaneous: Multiple inputs at once (A + B)
+ *    - ChargeRelease: Hold then release (charge drift)
+ *    - DoubleTap: Same input twice quickly
+ *
+ * 8. TIMING WINDOWS (FMGTimingWindow)
+ *    For rhythm-based mechanics (drift timing, boost timing):
+ *    - Perfect: Tightest window, best reward
+ *    - Great: Good timing, good reward
+ *    - Good: Acceptable timing, small reward
+ *    - Missed: Outside all windows, no reward
+ *
+ * 9. INPUT RECORDING
+ *    Record and replay input sequences:
+ *    - Ghost/replay systems
+ *    - Tutorial playback
+ *    - QA testing
+ *
+ * @section Usage Common Usage Patterns
+ *
+ * @code
+ * // Get the input buffer subsystem
+ * UMGInputBufferSubsystem* InputBuffer =
+ *     GetGameInstance()->GetSubsystem<UMGInputBufferSubsystem>();
+ *
+ * // Called from your input handler (PlayerController or EnhancedInput):
+ * void AMyPlayerController::OnDriftPressed()
+ * {
+ *     InputBuffer->BufferInput(EMGInputAction::DriftStart, EMGInputState::Pressed);
+ * }
+ *
+ * void AMyPlayerController::OnDriftReleased()
+ * {
+ *     InputBuffer->BufferInput(EMGInputAction::DriftRelease, EMGInputState::Pressed);
+ * }
+ *
+ * // In your vehicle's Tick (check for buffered drift input):
+ * void AMyVehicle::Tick(float DeltaTime)
+ * {
+ *     // Call this each frame to update internal state
+ *     InputBuffer->ProcessInputFrame(DeltaTime);
+ *
+ *     // Check if we can start a drift
+ *     if (CanStartDrift() &&
+ *         InputBuffer->ConsumeBufferedInput(EMGInputAction::DriftStart))
+ *     {
+ *         StartDrift();
+ *     }
+ * }
+ *
+ * // Setting up a combo (e.g., double-tap nitro for mega boost):
+ * FMGInputCombo DoubleTapNitro;
+ * DoubleTapNitro.ComboName = "MegaBoost";
+ * DoubleTapNitro.ComboType = EMGComboType::DoubleTap;
+ * DoubleTapNitro.RequiredInputs.Add(EMGInputAction::Nitro);
+ * DoubleTapNitro.WindowSeconds = 0.3f;  // Must double-tap within 300ms
+ * InputBuffer->RegisterCombo(DoubleTapNitro);
+ *
+ * // Listen for combo completion
+ * InputBuffer->OnComboDetected.AddDynamic(this, &AMyVehicle::HandleCombo);
+ *
+ * void AMyVehicle::HandleCombo(const FMGComboResult& Result)
+ * {
+ *     if (Result.ComboName == "MegaBoost" && Result.bSuccess)
+ *     {
+ *         ActivateMegaBoost();
+ *     }
+ * }
+ *
+ * // Setting up a timing window (perfect drift release):
+ * InputBuffer->StartTimingWindow(
+ *     "DriftRelease",           // Window name
+ *     0.5f,                     // Duration in seconds
+ *     EMGInputAction::DriftRelease  // Expected action
+ * );
+ *
+ * // Later, check the timing quality:
+ * FMGComboResult Result = InputBuffer->EvaluateTimingInput(
+ *     "DriftRelease",
+ *     EMGInputAction::DriftRelease
+ * );
+ * if (Result.Timing == EMGInputTiming::Perfect)
+ * {
+ *     GrantPerfectDriftBonus();
+ * }
+ *
+ * // Check action state (is drift currently held?)
+ * if (InputBuffer->IsActionHeld(EMGInputAction::DriftStart))
+ * {
+ *     float HoldTime = InputBuffer->GetActionHeldDuration(EMGInputAction::DriftStart);
+ *     // Longer hold = more drift charge
+ * }
+ * @endcode
+ *
+ * @section Architecture Architecture Notes
+ *
+ * BUFFER MAINTENANCE:
+ * - Old inputs automatically cleaned by CleanExpiredBuffers()
+ * - Runs on timer, not every frame
+ * - MaxBufferedInputs prevents memory growth
+ *
+ * TIMING PRECISION:
+ * - Uses high-resolution timestamps
+ * - Frame numbers tracked for frame-perfect detection
+ * - LatencyCompensation can offset for display lag
+ *
+ * CONFIGURATION:
+ * - FMGInputBufferConfig holds all tuning parameters
+ * - Can be adjusted at runtime for accessibility
+ * - Per-action configuration possible via custom logic
+ *
+ * EVENTS/DELEGATES:
+ * - OnInputBuffered: New input received
+ * - OnInputConsumed: Input was used
+ * - OnComboDetected: Combo completed
+ * - OnTimingEvaluated: Timing window checked
+ * - OnDoubleTapDetected: Double-tap recognized
+ * - OnHoldCompleted: Button held long enough
+ *
+ * @see UMGHapticsSubsystem - Provides haptic feedback for inputs
+ * @see UMGRacingWheelSubsystem - Specialized input for racing wheels
+ */
 
 #pragma once
 

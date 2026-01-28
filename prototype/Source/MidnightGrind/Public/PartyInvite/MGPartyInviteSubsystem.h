@@ -3,6 +3,90 @@
 // MidnightGrind - Arcade Street Racing Game
 // Party Invite Subsystem - Party invitations, session joining, social matchmaking
 
+/**
+ * =============================================================================
+ * MGPartyInviteSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the Party Invite Subsystem for Midnight Grind, a multiplayer
+ * racing game. The party system allows players to group together before entering
+ * races, similar to how parties work in games like Fortnite, Rocket League, or
+ * Call of Duty.
+ *
+ * WHAT IS A PARTY?
+ * ----------------
+ * A "party" is a temporary group of players who want to play together. Think of
+ * it like a group of friends at an arcade - they're all hanging out together and
+ * will play games as a team. In online gaming:
+ * - One player creates a party (becomes the "leader")
+ * - Other players join via invitations or join requests
+ * - The party stays together when entering matchmaking or races
+ * - The party disbands when everyone leaves or the leader disbands it
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. GAME INSTANCE SUBSYSTEM:
+ *    This class inherits from UGameInstanceSubsystem, which means:
+ *    - It exists for the entire lifetime of the game (not just one level)
+ *    - There's only one instance of it running at a time
+ *    - It's automatically created when the game starts
+ *    - Access it via: GetGameInstance()->GetSubsystem<UMGPartyInviteSubsystem>()
+ *
+ * 2. DELEGATES (Events):
+ *    Delegates are like "event broadcasters". When something important happens
+ *    (like receiving an invite), the subsystem "broadcasts" this event. Other
+ *    parts of the code can "subscribe" to these events to react appropriately.
+ *    Example: The UI subscribes to OnInviteReceived to show a popup when you
+ *    get invited to a party.
+ *
+ * 3. BLUEPRINTTYPE / BLUEPRINTCALLABLE:
+ *    These macros expose C++ code to Unreal's Blueprint visual scripting system.
+ *    This allows designers to use the party system without writing C++ code.
+ *
+ * 4. USTRUCT vs UCLASS:
+ *    - USTRUCT: A simple data container (like FMGPartyMember) - holds information
+ *    - UCLASS: A full-featured class with behavior (like UMGPartyInviteSubsystem)
+ *
+ * ARCHITECTURE OVERVIEW:
+ * ----------------------
+ *
+ *    [Player A's Game]          [Player B's Game]          [Player C's Game]
+ *          |                          |                          |
+ *    [Party Subsystem]          [Party Subsystem]          [Party Subsystem]
+ *          |                          |                          |
+ *          +------------- Backend Server (handles networking) ---+
+ *
+ * Each player's game has its own PartyInviteSubsystem that talks to a backend
+ * server to synchronize party state across all players.
+ *
+ * TYPICAL WORKFLOW:
+ * -----------------
+ * 1. Player A calls CreateParty() to start a new party
+ * 2. Player A calls SendInvite() with Player B's ID
+ * 3. Player B receives OnInviteReceived delegate
+ * 4. Player B calls AcceptInvite() to join
+ * 5. Both players see OnMemberJoined fire
+ * 6. Party leader starts matchmaking, all members join together
+ *
+ * FILE STRUCTURE:
+ * ---------------
+ * - Enums: Define states, roles, and types (EMGInviteStatus, EMGPartyState, etc.)
+ * - Structs: Data containers for party info (FMGPartyMember, FMGPartyInvitation, etc.)
+ * - Delegates: Event declarations for the observer pattern
+ * - Main Class: UMGPartyInviteSubsystem with all the party management functions
+ *
+ * RELATED FILES:
+ * --------------
+ * - MGPartyInviteSubsystem.cpp: Implementation of all functions declared here
+ * - MGMatchmakingSubsystem: Handles finding games once the party is ready
+ * - MGFriendsSubsystem: Provides friend lists for easy inviting
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

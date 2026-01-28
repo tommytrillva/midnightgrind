@@ -1,16 +1,109 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGVehicleWearSubsystem.h
+ * @brief World subsystem tracking vehicle wear, consumables, and maintenance.
+ *
+ * @section Overview
+ * This subsystem simulates realistic vehicle wear and degradation during gameplay.
+ * It tracks tire condition, engine health, brake wear, fuel consumption, and nitrous
+ * levels. Wear affects vehicle performance and creates economic pressure to maintain
+ * your vehicle.
+ *
+ * @section Architecture
+ * As a World Subsystem, this tracks wear per-race session. Integration with save
+ * systems allows persistence between sessions. The subsystem works closely with:
+ * - UMGVehicleMovementComponent: Receives wear effects (reduced grip, power, etc.)
+ * - UMGEconomySubsystem: Processes repair costs and consumable purchases
+ * - HUD systems: Displays wear warnings and status indicators
+ *
+ * Wear Model:
+ * - **Tires**: Degrade based on slip, temperature, and driving style
+ * - **Engine**: Wear from high RPM usage and overheating
+ * - **Brakes**: Fade from extended use, pads wear from application
+ * - **Fuel**: Consumed based on engine load and RPM
+ * - **Nitrous**: Consumable boost, must be refilled at garage
+ *
+ * @section KeyConcepts Key Concepts for Beginners
+ *
+ * **Tire Wear States**: Condition is mapped to states for easy UI display:
+ * - New (100-80%): Full grip, no warnings
+ * - Good (80-50%): Slight grip reduction, green status
+ * - Worn (50-25%): Noticeable grip loss, yellow warning
+ * - Critical (25-10%): Severe grip loss, red warning
+ * - Destroyed (<10%): Nearly no grip, imminent failure
+ *
+ * **Brake Fade**: When brakes overheat, their effectiveness drops dramatically.
+ * Real cars experience this on track days. In-game, it creates strategic
+ * decisions about when to brake hard vs. coast.
+ *
+ * **Engine Overheating**: Running at high RPM or in hot conditions raises
+ * engine temperature. Overheating causes power loss and accelerated wear.
+ *
+ * **Consumables**: Items that are "used up" during gameplay:
+ * - Fuel: Decreases during driving, empty = can't drive
+ * - Nitrous: Provides temporary boost, must be refilled
+ * - Oil: Degrades over distance, needs periodic changes
+ *
+ * @section Usage Example Usage
+ * @code
+ * // Get wear subsystem
+ * UMGVehicleWearSubsystem* WearSystem = GetWorld()->GetSubsystem<UMGVehicleWearSubsystem>();
+ *
+ * // Register a vehicle for tracking
+ * WearSystem->RegisterVehicle(VehicleID);
+ *
+ * // In your Tick or physics update:
+ * WearSystem->ApplyTireWear(VehicleID, WheelSlip, Speed, bDrifting, DeltaTime);
+ * WearSystem->ApplyEngineWear(VehicleID, CurrentRPM, RedlineRPM, ThrottleInput, DeltaTime);
+ * WearSystem->ApplyBrakeWear(VehicleID, BrakeForce, Speed, DeltaTime);
+ *
+ * // Check conditions for HUD
+ * float TireGrip = WearSystem->GetTireGripMultiplier(VehicleID);
+ * if (WearSystem->HasBrakeFade(VehicleID))
+ * {
+ *     ShowWarning("Brakes overheating!");
+ * }
+ *
+ * // After race, show repair menu
+ * FMGRepairEstimate Costs = WearSystem->GetRepairEstimate(VehicleID);
+ * // ... display in UI ...
+ *
+ * // Player chooses to repair
+ * WearSystem->ReplaceTires(PlayerID, VehicleID);
+ * @endcode
+ *
+ * @see UMGEconomySubsystem Handles repair transactions
+ * @see UMGVehicleMovementComponent Receives wear effects
+ * @see PRD Section 4.5: Economic Sinks
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "MGVehicleWearSubsystem.generated.h"
 
+// ============================================================================
+// FORWARD DECLARATIONS
+// ============================================================================
+
 class AMGVehiclePawn;
 class UMGEconomySubsystem;
 
+// ============================================================================
+// TIRE WEAR STATE ENUMERATION
+// ============================================================================
+
 /**
- * Tire wear state
+ * @brief Categorical tire wear states for UI display and logic triggers.
+ *
+ * Maps continuous condition percentage to discrete states for easier
+ * handling in UI, audio cues, and gameplay logic. Each state has
+ * associated grip multipliers and warning levels.
+ *
+ * **UMETA(DisplayName = "...")** provides a human-readable name for
+ * Blueprint dropdowns and debug displays.
  */
 UENUM(BlueprintType)
 enum class EMGTireWearState : uint8
@@ -22,8 +115,15 @@ enum class EMGTireWearState : uint8
 	Destroyed UMETA(DisplayName = "Destroyed (<10%)")
 };
 
+// ============================================================================
+// PART CONDITION STATE ENUMERATION
+// ============================================================================
+
 /**
- * Part condition state
+ * @brief Generic part condition states for non-tire components.
+ *
+ * Used for engine, brakes, suspension, and other components that
+ * don't have tire-specific wear patterns.
  */
 UENUM(BlueprintType)
 enum class EMGPartConditionState : uint8
@@ -35,8 +135,15 @@ enum class EMGPartConditionState : uint8
 	Critical UMETA(DisplayName = "Critical (<25%)")
 };
 
+// ============================================================================
+// CONSUMABLE TYPE ENUMERATION
+// ============================================================================
+
 /**
- * Consumable type
+ * @brief Types of consumable items that deplete during gameplay.
+ *
+ * Consumables create recurring costs and strategic resource management.
+ * Players must balance performance (using NOS) against economy (refill cost).
  */
 UENUM(BlueprintType)
 enum class EMGConsumableType : uint8
@@ -49,8 +156,16 @@ enum class EMGConsumableType : uint8
 	Coolant UMETA(DisplayName = "Coolant")
 };
 
+// ============================================================================
+// TIRE WEAR DATA STRUCTURE
+// ============================================================================
+
 /**
- * Individual tire wear data
+ * @brief Detailed wear data for a single tire.
+ *
+ * Tracks condition, temperature, accumulated stats, and wear rate modifiers.
+ * Each wheel has its own instance - tires wear independently based on
+ * position (front/rear, left/right) and driving style.
  */
 USTRUCT(BlueprintType)
 struct FMGTireWearData
@@ -262,10 +377,39 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBrakeFade, FGuid, VehicleID);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNitrousEmpty, FGuid, VehicleID);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPartFailure, FGuid, VehicleID, FName, PartName);
 
+// ============================================================================
+// VEHICLE WEAR SUBSYSTEM CLASS
+// ============================================================================
+
 /**
- * Vehicle Wear and Consumables Subsystem
- * Manages tire wear, engine condition, brake fade, and consumables
- * Per PRD Section 4.5: Economic Sinks
+ * @class UMGVehicleWearSubsystem
+ * @brief World subsystem managing vehicle wear, consumables, and repairs.
+ *
+ * This subsystem is the central authority for all vehicle degradation systems.
+ * It simulates realistic wear patterns and integrates with the economy for
+ * repair costs.
+ *
+ * @section Features Features
+ * - **Tire Wear**: Condition-based grip with temperature modeling
+ * - **Engine Wear**: RPM and overheating damage accumulation
+ * - **Brake Fade**: Heat-based effectiveness reduction
+ * - **Consumables**: Fuel, nitrous, and fluid tracking
+ * - **Repair System**: Cost estimation and repair execution
+ *
+ * @section UnrealMacros Unreal Engine Macro Explanations
+ *
+ * **UWorldSubsystem**: A subsystem that exists per-world (level).
+ * Access via GetWorld()->GetSubsystem<UMGVehicleWearSubsystem>()
+ *
+ * **DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(...)**
+ * Creates a Blueprint-bindable event with two parameters.
+ * - Dynamic: Can bind/unbind at runtime
+ * - Multicast: Multiple listeners can subscribe
+ * - TwoParams: Passes two values to bound functions
+ *
+ * **static constexpr**: Compile-time constants. More efficient than
+ * UPROPERTY constants because they don't use reflection. Use for
+ * internal tuning values that don't need editor exposure.
  */
 UCLASS()
 class MIDNIGHTGRIND_API UMGVehicleWearSubsystem : public UWorldSubsystem

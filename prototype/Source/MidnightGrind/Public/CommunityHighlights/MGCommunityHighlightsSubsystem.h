@@ -1,6 +1,131 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * =============================================================================
+ * MGCommunityHighlightsSubsystem.h - Community Content Showcase System
+ * =============================================================================
+ *
+ * OVERVIEW
+ * --------
+ * This file defines the community highlights system that showcases exceptional
+ * player-created content and celebrates outstanding community members. It powers
+ * the in-game "Community" hub where players discover featured liveries, tracks,
+ * clips, and creators.
+ *
+ * Think of it like a curated social media feed inside the game, highlighting
+ * the best content the community has created.
+ *
+ * KEY CONCEPTS FOR BEGINNERS
+ * --------------------------
+ *
+ * 1. GAME INSTANCE SUBSYSTEM
+ *    This inherits from UGameInstanceSubsystem:
+ *    - One instance persists for the entire game session
+ *    - Survives level transitions (community hub is always accessible)
+ *    - Access via: GetGameInstance()->GetSubsystem<UMGCommunityHighlightsSubsystem>()
+ *
+ * 2. HIGHLIGHT TYPES (EMGHighlightType)
+ *    Different categories of featured content:
+ *    - FeaturedLivery: Custom vehicle paint jobs/wraps
+ *    - FeaturedTrack: User-created race courses
+ *    - TopRacer: Competitive leaderboard champions
+ *    - ClipOfTheDay: Outstanding gameplay videos
+ *    - PhotoOfTheDay: Exceptional in-game photography
+ *    - CrewSpotlight: Featured racing teams/clans
+ *    - RisingTalent: Promising new players
+ *    - LegendStatus: All-time great recognition
+ *
+ * 3. HIGHLIGHT DATA (FMGCommunityHighlight)
+ *    Each featured item contains:
+ *    - HighlightID: Unique identifier from the backend
+ *    - Title/Description: Display text
+ *    - CreatorPlayerID/CreatorName: Who made it
+ *    - ContentID: Reference to the actual content (livery ID, etc.)
+ *    - ThumbnailURL/MediaURL: Images/videos for display
+ *    - LikeCount/DownloadCount: Community engagement metrics
+ *    - bIsLikedByPlayer: Has the current player liked this?
+ *
+ * 4. CREATOR PROFILES (FMGCreatorProfile)
+ *    Aggregated stats for content creators:
+ *    - TotalCreations: How many things they've shared
+ *    - TotalDownloads/TotalLikes: Cumulative engagement
+ *    - FeatureCount: Times their content was featured
+ *    - bIsVerifiedCreator: Official creator badge (checkmark)
+ *
+ * 5. ASYNC DATA FETCHING
+ *    Highlights come from a backend server, not stored locally:
+ *    - RefreshHighlights(): Requests fresh data from server
+ *    - OnHighlightsFetched: Delegate fires when data arrives
+ *    - GetCurrentHighlights(): Returns cached data (may be stale)
+ *
+ *    Pattern for UI code:
+ *      Subsystem->OnHighlightsFetched.AddDynamic(this, &MyWidget::OnDataReceived);
+ *      Subsystem->RefreshHighlights();
+ *      // ... wait for OnDataReceived to be called ...
+ *
+ * 6. PLAYER INTERACTIONS
+ *    How players engage with featured content:
+ *    - LikeHighlight(ID): Upvote content
+ *    - UnlikeHighlight(ID): Remove upvote
+ *    - DownloadContent(ID): Get the livery/track/etc.
+ *    - FollowCreator(PlayerID): Get notifications about their content
+ *
+ * 7. CONTENT SUBMISSION
+ *    Players can submit their own content for featuring:
+ *    - SubmitForFeature(ContentID, Type): Request review
+ *    - HasPendingSubmission(): Check if awaiting review
+ *
+ *    Submissions are reviewed by the community team before featuring.
+ *    Players are notified via OnPlayerFeatured if selected.
+ *
+ * COMMON USAGE PATTERNS
+ * ---------------------
+ *
+ * Loading highlights for display:
+ *   // In widget initialization
+ *   CommunitySubsystem->OnHighlightsFetched.AddDynamic(this, &UMyWidget::PopulateList);
+ *   CommunitySubsystem->RefreshHighlights();
+ *
+ *   void UMyWidget::PopulateList(const TArray<FMGCommunityHighlight>& Highlights)
+ *   {
+ *       for (const FMGCommunityHighlight& Highlight : Highlights)
+ *       {
+ *           CreateHighlightCard(Highlight);
+ *       }
+ *   }
+ *
+ * Filtering by type:
+ *   TArray<FMGCommunityHighlight> Liveries =
+ *       CommunitySubsystem->GetHighlightsByType(EMGHighlightType::FeaturedLivery);
+ *
+ * Liking content:
+ *   void UMyWidget::OnLikeButtonClicked(FString HighlightID)
+ *   {
+ *       CommunitySubsystem->LikeHighlight(HighlightID);
+ *       // Optimistically update UI
+ *   }
+ *
+ * Downloading featured content:
+ *   void UMyWidget::OnDownloadClicked(FString HighlightID)
+ *   {
+ *       CommunitySubsystem->DownloadContent(HighlightID);
+ *       // This triggers the appropriate download flow based on content type
+ *   }
+ *
+ * Following a creator:
+ *   CommunitySubsystem->FollowCreator(CreatorPlayerID);
+ *   // Player will get notifications when creator uploads new content
+ *
+ * CELEBRATION MOMENT
+ * ------------------
+ * When a player's content gets featured, OnPlayerFeatured fires.
+ * This is a great opportunity to show a celebratory notification/animation!
+ *
+ * @see UMGClipSubsystem for player clip recording
+ * @see UMGLiverySubsystem for livery creation and sharing
+ */
+
+/**
  * @file MGCommunityHighlightsSubsystem.h
  * @brief Community Highlights and Featured Content Subsystem for Midnight Grind
  *

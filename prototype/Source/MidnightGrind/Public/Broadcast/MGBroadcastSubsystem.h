@@ -1,5 +1,184 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGBroadcastSubsystem.h - Esports Broadcast and Streaming System
+ *******************************************************************************
+ *
+ * OVERVIEW FOR NEW DEVELOPERS
+ * ===========================
+ * This file defines the Broadcast system - tools for streaming races to
+ * audiences on Twitch, YouTube, or for recording esports tournaments. Think of
+ * it as the game's built-in "TV production studio" for creating professional
+ * race coverage.
+ *
+ * WHO USES THIS SYSTEM?
+ * ---------------------
+ * - Esports casters/commentators broadcasting tournaments
+ * - Content creators making YouTube videos
+ * - Streamers on Twitch/YouTube Gaming
+ * - Tournament organizers running official events
+ *
+ * WHAT IS A BROADCAST?
+ * --------------------
+ * When you watch motorsport on TV, there's a production team controlling:
+ * - Which camera shows on screen (helicopter, trackside, in-car)
+ * - Graphics overlays (standings, lap times, driver info)
+ * - Picture-in-picture windows (replays, secondary battles)
+ * - Transitions between shots
+ *
+ * This system provides all that functionality in-game!
+ *
+ * KEY CONCEPTS
+ * ------------
+ *
+ * 1. CAMERA PRESETS (EMGBroadcastCameraPreset)
+ *    Pre-configured camera setups for common broadcast shots:
+ *
+ *    - WideStart: Shows the entire starting grid
+ *      [Used for: Race countdown, formation lap]
+ *
+ *    - HelicopterFollow: Aerial view following the pack
+ *      [Used for: Showing the full field, establishing shots]
+ *
+ *    - TrackSideA/B: Fixed trackside cameras
+ *      [Used for: Watching cars pass specific corners]
+ *
+ *    - OnboardLeader: In-car view of the race leader
+ *      [Used for: Showing the leader's perspective]
+ *
+ *    - OnboardBattle: In-car view of the closest battle
+ *      [Used for: Showing exciting overtake attempts]
+ *
+ *    - FinishLine: Fixed camera at the finish
+ *      [Used for: Photo finishes, victory moments]
+ *
+ *    - PodiumCeremony: Post-race celebration shot
+ *      [Used for: Winner celebration]
+ *
+ *    - Replay: Camera for replay playback
+ *      [Used for: Showing incidents, highlights]
+ *
+ *    - Custom: User-defined camera position
+ *      [Used for: Special shots not covered by presets]
+ *
+ * 2. OVERLAYS (FMGBroadcastOverlay)
+ *    Graphics shown on top of the video feed:
+ *    - Leaderboard (race positions)
+ *    - Race progress (lap counter, distance remaining)
+ *    - Driver stats (speed, gap to leader)
+ *    - Minimap (track overview)
+ *    - Timer (race time, session clock)
+ *    - Gap times (time between racers)
+ *    - Speedometer (current speed)
+ *
+ * 3. CLEAN FEED
+ *    A video output with NO overlays - just the raw game footage.
+ *    Used when:
+ *    - External broadcast software adds its own graphics
+ *    - TV networks want to add their own branding
+ *    - Post-production will add graphics later
+ *
+ * 4. PICTURE-IN-PICTURE (PiP)
+ *    A smaller video window overlaid on the main feed.
+ *    Common uses:
+ *    - Showing a replay while live racing continues
+ *    - Following a secondary battle
+ *    - Displaying a different camera angle
+ *
+ *    PiP Configuration:
+ *    - Position: Where on screen (0,0 = top-left, 1,1 = bottom-right)
+ *    - Size: How big (0.25 = 25% of screen)
+ *    - Content: Live player view or replay footage
+ *
+ * 5. CAMERA HOTKEYS
+ *    Number keys (1-9) mapped to specific cameras for quick switching.
+ *    Casters can switch cameras instantly during live broadcasts.
+ *
+ * DATA STRUCTURES EXPLAINED
+ * -------------------------
+ *
+ * FMGBroadcastCamera:
+ *    Complete camera configuration:
+ *    - CameraID: Unique name for this camera
+ *    - Preset: Which preset it's based on
+ *    - CameraTransform: Position and rotation in 3D space
+ *    - TargetPlayerID: Which player to follow (if tracking)
+ *    - FOV: Field of view (wide vs zoomed in)
+ *    - BlendTime: How smoothly to transition to this camera
+ *    - DepthOfField/MotionBlur: Visual effects
+ *
+ * FMGBroadcastOverlay:
+ *    Which HUD elements to show:
+ *    - Toggle each element on/off
+ *    - Control overall opacity
+ *    - Different configs for different situations
+ *
+ * FMGPictureInPicture:
+ *    PiP window configuration:
+ *    - Enabled: Is it visible?
+ *    - Position/Size: Where and how big
+ *    - TargetPlayerID or replay content
+ *
+ * TYPICAL BROADCAST WORKFLOW
+ * --------------------------
+ * 1. StartBroadcast("TournamentFinals")
+ *    - Initializes broadcast mode
+ *    - Fires OnBroadcastStarted
+ *
+ * 2. Before race: SetCameraPreset(WideStart)
+ *    - Shows the starting grid
+ *
+ * 3. Race starts: SetCameraPreset(HelicopterFollow)
+ *    - Aerial view of the pack
+ *
+ * 4. Battle develops: SetCameraPreset(OnboardBattle)
+ *    - In-car view of the action
+ *
+ * 5. Incident occurs: ShowReplayInPiP(5.0f)
+ *    - Shows replay while live racing continues
+ *
+ * 6. Final lap: SetCameraPreset(FinishLine)
+ *    - Ready for the finish
+ *
+ * 7. Race ends: SetCameraPreset(PodiumCeremony)
+ *    - Winner celebration
+ *
+ * 8. EndBroadcast()
+ *    - Cleans up, fires OnBroadcastEnded
+ *
+ * HOW TO USE THIS SYSTEM (EXAMPLE)
+ * --------------------------------
+ * // Get the subsystem:
+ * UMGBroadcastSubsystem* Broadcast = GetGameInstance()->GetSubsystem<UMGBroadcastSubsystem>();
+ *
+ * // Start broadcasting:
+ * Broadcast->StartBroadcast(TEXT("MyStream_Race1"));
+ *
+ * // Set up camera hotkeys:
+ * Broadcast->RegisterCameraHotkey(1, WideStartCamera);
+ * Broadcast->RegisterCameraHotkey(2, HelicopterCamera);
+ * Broadcast->RegisterCameraHotkey(3, OnboardCamera);
+ *
+ * // During broadcast, press hotkey or:
+ * Broadcast->SetCameraPreset(EMGBroadcastCameraPreset::HelicopterFollow);
+ *
+ * // Show a replay in PiP:
+ * Broadcast->ShowReplayInPiP(3.0f);  // 3 second replay
+ *
+ * // Switch to clean feed for external graphics:
+ * Broadcast->SetCleanFeed(true);
+ *
+ * OUTPUT RESOLUTION
+ * -----------------
+ * SetOutputResolution() controls the broadcast quality:
+ * - 1920x1080: Standard HD (1080p)
+ * - 2560x1440: QHD (1440p)
+ * - 3840x2160: 4K UHD
+ *
+ * Higher = better quality but more demanding on hardware.
+ *
+ ******************************************************************************/
+
 /**
  * @file MGBroadcastSubsystem.h
  * @brief Broadcast output management for esports streaming and content creation.
