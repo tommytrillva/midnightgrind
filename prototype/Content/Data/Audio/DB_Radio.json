@@ -1,0 +1,314 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - In-Vehicle Radio System and Broadcast Features",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultStation": "MidnightFM",
+    "DJEnabled": true,
+    "NewsEnabled": true,
+    "AdsEnabled": { "InFreePlay": false }
+  },
+
+  "RadioSystem": {
+    "Reception": {
+      "Always": true,
+      "TunnelCutout": { "Enabled": true, "FadeTime": 1.0 },
+      "StaticEffect": { "InTunnels": true }
+    },
+    "VehicleIntegration": {
+      "DashboardDisplay": true,
+      "SteeringControls": true,
+      "VoiceCommands": { "Future": true }
+    }
+  },
+
+  "Stations": {
+    "MidnightFM": {
+      "ID": "STATION_MIDNIGHT",
+      "Frequency": "98.7",
+      "Name": "Midnight FM",
+      "Tagline": "The Sound of the Night",
+      "Genre": "Synthwave",
+      "DJ": {
+        "Name": "Neon",
+        "Personality": "Cool",
+        "VoiceLines": 100
+      },
+      "Schedule": {
+        "Prime": { "Hours": "20:00-04:00", "SpecialSets": true }
+      },
+      "TrackCount": 50
+    },
+    "StreetBeats": {
+      "ID": "STATION_STREET",
+      "Frequency": "101.5",
+      "Name": "Street Beats",
+      "Tagline": "Underground Sound",
+      "Genre": "HipHop",
+      "DJ": {
+        "Name": "Blaze",
+        "Personality": "Energetic",
+        "VoiceLines": 100
+      },
+      "Schedule": {
+        "Prime": { "Hours": "18:00-02:00" }
+      },
+      "TrackCount": 60
+    },
+    "NitroRock": {
+      "ID": "STATION_NITRO",
+      "Frequency": "103.9",
+      "Name": "Nitro Rock",
+      "Tagline": "Full Throttle Rock",
+      "Genre": "Rock",
+      "DJ": {
+        "Name": "Axel Stone",
+        "Personality": "Intense",
+        "VoiceLines": 80
+      },
+      "Schedule": {
+        "Prime": { "Hours": "16:00-00:00" }
+      },
+      "TrackCount": 45
+    },
+    "PulseDance": {
+      "ID": "STATION_PULSE",
+      "Frequency": "106.1",
+      "Name": "Pulse Dance",
+      "Tagline": "Feel the Rhythm",
+      "Genre": "Electronic",
+      "DJ": {
+        "Name": "DJ Pulse",
+        "Personality": "Hyped",
+        "VoiceLines": 90
+      },
+      "Schedule": {
+        "Prime": { "Hours": "22:00-06:00" }
+      },
+      "TrackCount": 55
+    },
+    "ClassicDrive": {
+      "ID": "STATION_CLASSIC",
+      "Frequency": "94.3",
+      "Name": "Classic Drive",
+      "Tagline": "Timeless Hits",
+      "Genre": "ClassicRock",
+      "DJ": {
+        "Name": "Classic Mike",
+        "Personality": "Nostalgic",
+        "VoiceLines": 70
+      },
+      "Schedule": {
+        "Prime": { "Hours": "08:00-18:00" }
+      },
+      "TrackCount": 50
+    },
+    "TokyoDrift": {
+      "ID": "STATION_TOKYO",
+      "Frequency": "107.5",
+      "Name": "Tokyo Drift",
+      "Tagline": "Sounds of Japan",
+      "Genre": "JPop",
+      "DJ": {
+        "Name": "Yuki",
+        "Personality": "Cheerful",
+        "VoiceLines": 60
+      },
+      "Schedule": {
+        "Prime": { "Hours": "00:00-08:00" }
+      },
+      "TrackCount": 40
+    },
+    "ChillWave": {
+      "ID": "STATION_CHILL",
+      "Frequency": "91.7",
+      "Name": "ChillWave",
+      "Tagline": "Relax and Ride",
+      "Genre": "LoFi",
+      "DJ": {
+        "Name": "Luna",
+        "Personality": "Calm",
+        "VoiceLines": 50
+      },
+      "Schedule": {
+        "Prime": { "Hours": "02:00-10:00" }
+      },
+      "TrackCount": 45
+    },
+    "NewsBeat": {
+      "ID": "STATION_NEWS",
+      "Frequency": "88.1",
+      "Name": "News Beat",
+      "Tagline": "City Updates",
+      "Genre": "News",
+      "ContentType": "TalkRadio",
+      "Updates": { "Frequency": "Hourly" },
+      "TrackCount": 0
+    }
+  },
+
+  "DJSystem": {
+    "VoiceLines": {
+      "TrackIntro": { "Count": 50, "PerStation": true },
+      "TrackOutro": { "Count": 30, "PerStation": true },
+      "TimeAnnouncement": { "Hourly": true },
+      "WeatherComment": { "Dynamic": true },
+      "TrafficUpdate": { "Dynamic": true },
+      "RandomBanter": { "Count": 100, "PerStation": true }
+    },
+    "Personality": {
+      "ReactToEvents": {
+        "PlayerWins": { "Positive": true },
+        "PoliceChase": { "Excited": true },
+        "NightTime": { "Atmospheric": true }
+      },
+      "Humor": { "Level": "Medium" },
+      "KnowledgeOfPlayer": { "ReferencesStats": true }
+    },
+    "Schedule": {
+      "TalkFrequency": { "MinTracks": 3, "MaxTracks": 5 },
+      "SegmentLength": { "Seconds": [10, 30] }
+    }
+  },
+
+  "NewsSystem": {
+    "Enabled": true,
+    "Types": {
+      "RacingNews": {
+        "Content": ["TournamentResults", "NewRecords", "UpcomingEvents"],
+        "Frequency": "Daily"
+      },
+      "CityNews": {
+        "Content": ["RoadClosures", "NewLocations", "Events"],
+        "Frequency": "Daily"
+      },
+      "PlayerNews": {
+        "Content": ["Achievements", "RankChanges", "CrewNews"],
+        "Personalized": true
+      },
+      "WeatherReport": {
+        "Content": ["CurrentWeather", "Forecast"],
+        "Dynamic": true
+      }
+    },
+    "Delivery": {
+      "ByDJ": true,
+      "ByNewsAnchor": { "ForNewsBeat": true },
+      "Frequency": { "MinutesApart": 30 }
+    }
+  },
+
+  "DynamicContent": {
+    "EventBasedTracks": {
+      "HolidayMusic": { "Seasonal": true },
+      "EventThemes": { "SpecialEvents": true }
+    },
+    "TimeBasedPrograms": {
+      "MorningShow": { "Hours": "06:00-10:00" },
+      "DriveTime": { "Hours": "16:00-20:00" },
+      "LateNightMix": { "Hours": "00:00-06:00" }
+    },
+    "WeatherReactive": {
+      "RainyDay": { "MoodShift": "Mellow" },
+      "ClearNight": { "MoodShift": "Energetic" }
+    }
+  },
+
+  "StationWheel": {
+    "Enabled": true,
+    "Animation": true,
+    "Preview": {
+      "ShowCurrentTrack": true,
+      "ShowGenre": true,
+      "ShowDJ": true
+    },
+    "QuickSwitch": {
+      "Keybind": "N",
+      "ControllerButton": "DPadLeft"
+    }
+  },
+
+  "Favorites": {
+    "Stations": {
+      "MaxFavorites": 3,
+      "QuickAccess": { "Number1": true, "Number2": true, "Number3": true }
+    },
+    "Tracks": {
+      "Enabled": true,
+      "MaxFavorites": 50,
+      "CreatePlaylist": true
+    }
+  },
+
+  "CustomStation": {
+    "Enabled": true,
+    "PlayerCreated": true,
+    "FromPlaylists": true,
+    "Slots": 3,
+    "CustomName": true,
+    "CustomIcon": { "FromPresets": true }
+  },
+
+  "AudioSettings": {
+    "Volume": {
+      "RadioMaster": { "Min": 0, "Max": 100, "Default": 50 },
+      "DJVolume": { "Min": 0, "Max": 100, "Default": 40 },
+      "MusicVolume": { "Min": 0, "Max": 100, "Default": 50 }
+    },
+    "Effects": {
+      "VehicleMuffling": { "WindowsUp": true },
+      "SpeedDistortion": { "Optional": true },
+      "ReverbInTunnels": true
+    },
+    "Balance": {
+      "LeftRight": { "Range": [-100, 100], "Default": 0 },
+      "FrontRear": { "Range": [-100, 100], "Default": 0 }
+    }
+  },
+
+  "Accessibility": {
+    "Subtitles": {
+      "ForDJ": true,
+      "ForNews": true,
+      "ForLyrics": { "WhenAvailable": true }
+    },
+    "VisualIndicator": {
+      "NowPlaying": true,
+      "StationChange": true
+    }
+  },
+
+  "Integration": {
+    "GameEvents": {
+      "PoliceChase": { "IntensifyMusic": true },
+      "RaceStart": { "FadeOut": true },
+      "RaceEnd": { "FadeIn": true },
+      "Cutscenes": { "Mute": true }
+    },
+    "SocialSharing": {
+      "ShareNowPlaying": { "Optional": true },
+      "SyncWithFriends": { "Future": true }
+    }
+  },
+
+  "UI": {
+    "RadioDisplay": {
+      "FrequencyDial": true,
+      "StationLogo": true,
+      "NowPlaying": true,
+      "PresetButtons": true
+    },
+    "FullInterface": {
+      "StationList": true,
+      "TrackHistory": true,
+      "Favorites": true,
+      "Settings": true
+    },
+    "MiniDisplay": {
+      "Position": "DashboardCenter",
+      "ShowTrack": true,
+      "ShowStation": true
+    }
+  }
+}

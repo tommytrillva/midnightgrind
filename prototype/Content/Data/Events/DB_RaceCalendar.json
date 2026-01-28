@@ -1,0 +1,291 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Race Calendar and Event Scheduling System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DynamicEvents": true,
+    "ScheduledEvents": true,
+    "SeasonalContent": true,
+    "Timezone": "Local"
+  },
+
+  "CalendarStructure": {
+    "Seasons": {
+      "Length": { "Weeks": 13 },
+      "PerYear": 4,
+      "Naming": {
+        "Season1": "Spring Series",
+        "Season2": "Summer Heat",
+        "Season3": "Fall Showdown",
+        "Season4": "Winter Championship"
+      }
+    },
+    "Weeks": {
+      "StartDay": "Monday",
+      "EndDay": "Sunday",
+      "WeeklyReset": "Monday00:00UTC"
+    },
+    "Days": {
+      "DailyReset": "00:00Local",
+      "PrimeTime": { "Start": "18:00", "End": "23:00" }
+    }
+  },
+
+  "EventTypes": {
+    "Daily": {
+      "ID": "EVENT_DAILY",
+      "Description": "Repeats every day",
+      "Types": {
+        "DailyChallenge": { "Duration": 24, "Rotating": true },
+        "SpotlightRace": { "Duration": 24, "FeaturedTrack": true },
+        "CommunityGoal": { "Duration": 24, "Collaborative": true }
+      }
+    },
+    "Weekly": {
+      "ID": "EVENT_WEEKLY",
+      "Description": "Week-long events",
+      "Types": {
+        "WeeklySeries": { "Races": 7, "PointsBased": true },
+        "FeaturedPlaylist": { "Curated": true, "Bonus": 1.5 },
+        "RivalChallenge": { "Competitive": true }
+      }
+    },
+    "Weekend": {
+      "ID": "EVENT_WEEKEND",
+      "Description": "Friday-Sunday specials",
+      "Types": {
+        "GrandPrix": { "MultiRace": true, "Championship": true },
+        "DoubleCash": { "Bonus": 2.0, "AllRaces": true },
+        "DoubleREP": { "Bonus": 2.0, "AllRaces": true }
+      }
+    },
+    "Monthly": {
+      "ID": "EVENT_MONTHLY",
+      "Description": "Month-long events",
+      "Types": {
+        "MonthlyChampionship": { "Duration": 30, "Tiered": true },
+        "ThemeMonth": { "SpecialContent": true },
+        "SeasonFinale": { "EndOfSeason": true }
+      }
+    },
+    "Special": {
+      "ID": "EVENT_SPECIAL",
+      "Description": "Limited-time special events",
+      "Types": {
+        "Holiday": { "SeasonalTheme": true, "ExclusiveRewards": true },
+        "Anniversary": { "Celebration": true, "LegacyContent": true },
+        "Collaboration": { "CrossPromotion": true }
+      }
+    }
+  },
+
+  "ScheduledRaces": {
+    "RegularSeries": {
+      "Frequency": "Weekly",
+      "Types": {
+        "StreetSeries": { "Day": "Tuesday", "Time": "20:00", "Class": "B" },
+        "DriftNights": { "Day": "Thursday", "Time": "21:00", "Mode": "Drift" },
+        "WeekendWarriors": { "Day": "Saturday", "Time": "19:00", "Class": "Open" },
+        "SundayShowdown": { "Day": "Sunday", "Time": "18:00", "Featured": true }
+      }
+    },
+    "Tournaments": {
+      "Frequency": "Monthly",
+      "Format": {
+        "Qualifiers": { "Week": 1 },
+        "Quarterfinals": { "Week": 2 },
+        "Semifinals": { "Week": 3 },
+        "Finals": { "Week": 4 }
+      },
+      "Rewards": { "CashPool": true, "ExclusiveItems": true }
+    },
+    "SpecialEvents": {
+      "Frequency": "Varies",
+      "Announcement": { "DaysAhead": 7 },
+      "Reminder": { "HoursBefore": [24, 1] }
+    }
+  },
+
+  "SeasonalEvents": {
+    "Spring": {
+      "Theme": "Revival",
+      "Events": ["SpringClassic", "BlossomGrandPrix", "NewBeginningsSeries"],
+      "ExclusiveContent": { "Vehicles": 1, "Cosmetics": 10 },
+      "Months": ["March", "April", "May"]
+    },
+    "Summer": {
+      "Theme": "Heat",
+      "Events": ["SummerHeatwave", "BeachBlast", "MidnightSunRally"],
+      "ExclusiveContent": { "Vehicles": 1, "Cosmetics": 10 },
+      "Months": ["June", "July", "August"]
+    },
+    "Fall": {
+      "Theme": "Legends",
+      "Events": ["AutumnClassics", "HarvestSprint", "LegendsSeries"],
+      "ExclusiveContent": { "Vehicles": 1, "Cosmetics": 10 },
+      "Months": ["September", "October", "November"]
+    },
+    "Winter": {
+      "Theme": "Champions",
+      "Events": ["WinterWonderland", "FrostFury", "ChampionshipFinale"],
+      "ExclusiveContent": { "Vehicles": 1, "Cosmetics": 10 },
+      "Months": ["December", "January", "February"]
+    }
+  },
+
+  "HolidayEvents": {
+    "NewYear": {
+      "Date": "January1",
+      "Duration": 7,
+      "Theme": "NewYear",
+      "Rewards": { "ExclusiveLivery": true }
+    },
+    "ValentinesDay": {
+      "Date": "February14",
+      "Duration": 3,
+      "Theme": "Romance",
+      "Rewards": { "HeartDecals": true }
+    },
+    "Easter": {
+      "Date": "Variable",
+      "Duration": 7,
+      "Theme": "EggHunt",
+      "Rewards": { "EasterCosmetics": true }
+    },
+    "Independence": {
+      "Date": "July4",
+      "Duration": 5,
+      "Theme": "Patriotic",
+      "Rewards": { "PatrioticLivery": true },
+      "Region": "NA"
+    },
+    "Halloween": {
+      "Date": "October31",
+      "Duration": 14,
+      "Theme": "Spooky",
+      "Rewards": { "HalloweenVehicle": true, "Cosmetics": true }
+    },
+    "Thanksgiving": {
+      "Date": "NovemberThursday4",
+      "Duration": 5,
+      "Theme": "Harvest",
+      "Rewards": { "BonusCash": true },
+      "Region": "NA"
+    },
+    "Christmas": {
+      "Date": "December25",
+      "Duration": 14,
+      "Theme": "Winter",
+      "Rewards": { "ChristmasVehicle": true, "Cosmetics": true }
+    }
+  },
+
+  "EventProgression": {
+    "PointSystem": {
+      "PerRace": {
+        "1st": 25,
+        "2nd": 18,
+        "3rd": 15,
+        "4th": 12,
+        "5th": 10,
+        "6th": 8,
+        "7th": 6,
+        "8th": 4,
+        "9th": 2,
+        "10th": 1
+      },
+      "Bonus": {
+        "FastestLap": 1,
+        "PolePosition": 1,
+        "MostPositionsGained": 1
+      }
+    },
+    "Standings": {
+      "Updated": "AfterEachRace",
+      "TieBreaker": "HigherFinishes",
+      "Display": "Leaderboard"
+    },
+    "Rewards": {
+      "PerPosition": true,
+      "Top3": { "ExclusiveRewards": true },
+      "Participation": { "MinimumRaces": 3 }
+    }
+  },
+
+  "Notifications": {
+    "Upcoming": {
+      "DaysAhead": [7, 3, 1],
+      "HoursAhead": [6, 1],
+      "MinutesAhead": [30, 15, 5]
+    },
+    "Types": {
+      "Push": { "Optional": true },
+      "InGame": { "Default": true },
+      "Email": { "Weekly": true, "Optional": true }
+    },
+    "Preferences": {
+      "AllEvents": { "Default": false },
+      "FavoriteEvents": { "Default": true },
+      "FriendActivity": { "Default": true }
+    }
+  },
+
+  "Filters": {
+    "ByTime": {
+      "Today": true,
+      "ThisWeek": true,
+      "ThisMonth": true,
+      "AllUpcoming": true
+    },
+    "ByType": {
+      "Races": true,
+      "Drift": true,
+      "Tournaments": true,
+      "Challenges": true,
+      "Special": true
+    },
+    "ByClass": {
+      "All": true,
+      "SpecificClass": true
+    },
+    "ByReward": {
+      "HighRewards": true,
+      "ExclusiveItems": true
+    }
+  },
+
+  "Favorites": {
+    "Enabled": true,
+    "MaxFavorites": 20,
+    "AutoReminder": true,
+    "QuickAccess": true
+  },
+
+  "UI": {
+    "CalendarView": {
+      "Monthly": true,
+      "Weekly": true,
+      "Daily": true,
+      "Timeline": true
+    },
+    "EventCard": {
+      "Name": true,
+      "Time": true,
+      "Type": true,
+      "Rewards": true,
+      "Participants": true,
+      "JoinButton": true
+    },
+    "Countdown": {
+      "ToNextEvent": true,
+      "ToFeatured": true,
+      "InMenu": true
+    },
+    "QuickJoin": {
+      "FromCalendar": true,
+      "FromNotification": true,
+      "FromFreeRoam": true
+    }
+  }
+}

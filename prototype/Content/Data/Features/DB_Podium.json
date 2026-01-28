@@ -1,0 +1,304 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Podium Ceremony and Victory Celebration System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "AutoPlay": true,
+    "SkipOption": true,
+    "Duration": { "Default": 30, "Extended": 60 }
+  },
+
+  "PodiumTypes": {
+    "Standard": {
+      "ID": "PODIUM_STANDARD",
+      "Description": "Regular race podium",
+      "Positions": 3,
+      "Duration": 20,
+      "Skippable": true
+    },
+    "GrandPrix": {
+      "ID": "PODIUM_GP",
+      "Description": "Championship podium",
+      "Positions": 3,
+      "Duration": 30,
+      "TrophyPresentation": true,
+      "ChampagneSpray": true
+    },
+    "Tournament": {
+      "ID": "PODIUM_TOURNAMENT",
+      "Description": "Tournament finals podium",
+      "Positions": 3,
+      "Duration": 45,
+      "FullCeremony": true,
+      "Fireworks": true
+    },
+    "Quick": {
+      "ID": "PODIUM_QUICK",
+      "Description": "Abbreviated celebration",
+      "Positions": 1,
+      "Duration": 10,
+      "WinnerOnly": true
+    },
+    "Crew": {
+      "ID": "PODIUM_CREW",
+      "Description": "Crew victory celebration",
+      "Positions": { "TopCrew": 3 },
+      "Duration": 25,
+      "TeamDisplay": true
+    }
+  },
+
+  "PodiumElements": {
+    "Positions": {
+      "First": {
+        "Height": 1.0,
+        "Position": "Center",
+        "Spotlight": { "Color": "#FFD700", "Intensity": "High" },
+        "Confetti": true
+      },
+      "Second": {
+        "Height": 0.7,
+        "Position": "Left",
+        "Spotlight": { "Color": "#C0C0C0", "Intensity": "Medium" },
+        "Confetti": true
+      },
+      "Third": {
+        "Height": 0.5,
+        "Position": "Right",
+        "Spotlight": { "Color": "#CD7F32", "Intensity": "Medium" },
+        "Confetti": true
+      }
+    },
+    "Background": {
+      "Types": ["Stadium", "Street", "Garage", "Rooftop", "Beach"],
+      "MatchRaceLocation": true,
+      "DynamicLighting": true
+    },
+    "Crowd": {
+      "Enabled": true,
+      "Size": { "Small": 50, "Medium": 200, "Large": 500 },
+      "Cheering": true,
+      "Animations": true
+    }
+  },
+
+  "CelebrationAnimations": {
+    "Winner": {
+      "Animations": {
+        "Fist Pump": { "ID": "ANIM_FIST_PUMP", "Duration": 3 },
+        "Arms Raised": { "ID": "ANIM_ARMS_RAISED", "Duration": 3 },
+        "Trophy Lift": { "ID": "ANIM_TROPHY_LIFT", "Duration": 4 },
+        "Dance": { "ID": "ANIM_DANCE", "Duration": 5 },
+        "Bow": { "ID": "ANIM_BOW", "Duration": 2 }
+      },
+      "Selection": "PlayerChoice",
+      "DefaultRandom": true
+    },
+    "Runners Up": {
+      "Animations": {
+        "Clap": { "ID": "ANIM_CLAP", "Duration": 3 },
+        "Wave": { "ID": "ANIM_WAVE", "Duration": 2 },
+        "Thumbs Up": { "ID": "ANIM_THUMBS_UP", "Duration": 2 }
+      },
+      "AutoSelect": true
+    },
+    "Unlockable": {
+      "Enabled": true,
+      "Method": { "Achievement": true, "Store": true, "Event": true },
+      "Categories": ["Dances", "Poses", "Celebrations"]
+    }
+  },
+
+  "VehicleDisplay": {
+    "Enabled": true,
+    "Position": "BehindDriver",
+    "Display": {
+      "Lights": { "On": true, "Flashing": false },
+      "Engine": { "Revving": true },
+      "Doors": { "Open": false }
+    },
+    "Camera": {
+      "Showcase": true,
+      "SweepingShot": true,
+      "DetailFocus": true
+    }
+  },
+
+  "Effects": {
+    "Confetti": {
+      "Enabled": true,
+      "Colors": ["Gold", "Silver", "Bronze", "Rainbow"],
+      "Density": "Medium",
+      "Duration": 15
+    },
+    "Fireworks": {
+      "Enabled": { "ForMajorEvents": true },
+      "Types": ["Standard", "Colorful", "Sparkler"],
+      "Timing": "AtPeak"
+    },
+    "Smoke": {
+      "Enabled": true,
+      "Colors": ["White", "TeamColors"],
+      "Amount": "Light"
+    },
+    "Lighting": {
+      "Spotlights": true,
+      "LaserShow": { "ForMajorEvents": true },
+      "DynamicColors": true
+    },
+    "Champagne": {
+      "Enabled": { "ForGrandPrix": true },
+      "Animation": true,
+      "Spray": true
+    }
+  },
+
+  "Audio": {
+    "Music": {
+      "VictoryTheme": true,
+      "Customizable": false,
+      "Volume": 0.8
+    },
+    "CrowdSounds": {
+      "Cheering": true,
+      "Applause": true,
+      "Chanting": false
+    },
+    "Announcer": {
+      "Enabled": true,
+      "WinnerAnnouncement": true,
+      "TimeAnnouncement": true,
+      "Languages": ["English", "Spanish", "Japanese"]
+    },
+    "VehicleSounds": {
+      "EngineRev": true,
+      "Horn": { "Optional": true }
+    }
+  },
+
+  "Camera": {
+    "Modes": {
+      "Cinematic": {
+        "ID": "CAM_CINEMATIC",
+        "AutoSweep": true,
+        "DepthOfField": true,
+        "Default": true
+      },
+      "Focused": {
+        "ID": "CAM_FOCUSED",
+        "OnPlayer": true,
+        "Stable": true
+      },
+      "Dynamic": {
+        "ID": "CAM_DYNAMIC",
+        "MultipleCuts": true,
+        "FastPaced": true
+      },
+      "Free": {
+        "ID": "CAM_FREE",
+        "PlayerControl": true,
+        "PhotoMode": true
+      }
+    },
+    "Angles": ["Front", "Side", "Overhead", "CloseUp", "Wide"],
+    "Transitions": { "Smooth": true, "CutOnBeat": false }
+  },
+
+  "PlayerDisplay": {
+    "Information": {
+      "Gamertag": true,
+      "Level": true,
+      "Crew": true,
+      "Title": { "Optional": true }
+    },
+    "Statistics": {
+      "RaceTime": true,
+      "Margin": true,
+      "FastestLap": true,
+      "TopSpeed": true
+    },
+    "Avatar": {
+      "Show": true,
+      "CustomOutfit": true,
+      "Emotes": true
+    }
+  },
+
+  "Rewards": {
+    "Display": {
+      "Enabled": true,
+      "ShowDuring": true,
+      "ShowAfter": true
+    },
+    "Animation": {
+      "CashCounter": true,
+      "REPCounter": true,
+      "ItemReveal": true
+    },
+    "Bonus": {
+      "HighlightBonuses": true,
+      "ShowMultipliers": true
+    }
+  },
+
+  "Screenshots": {
+    "AutoCapture": {
+      "Enabled": true,
+      "AtPeakMoment": true
+    },
+    "SharePrompt": {
+      "Enabled": true,
+      "SocialMedia": true,
+      "InGame": true
+    },
+    "Filters": {
+      "Victory": true,
+      "Celebration": true
+    }
+  },
+
+  "SkipBehavior": {
+    "Allowed": true,
+    "Timer": { "Seconds": 3, "BeforeSkipAvailable": true },
+    "QuickSkip": { "IfAllSkip": true },
+    "HostDecision": { "InPrivate": true }
+  },
+
+  "Customization": {
+    "PreferredAnimation": {
+      "Settable": true,
+      "PerVehicle": false
+    },
+    "MusicPreference": {
+      "Default": true,
+      "CustomPlaylist": { "Future": true }
+    },
+    "Duration": {
+      "Short": 15,
+      "Normal": 30,
+      "Extended": 60
+    }
+  },
+
+  "UI": {
+    "PodiumScreen": {
+      "Positions": true,
+      "Names": true,
+      "Times": true,
+      "Vehicles": true,
+      "RewardsSummary": true
+    },
+    "Controls": {
+      "Skip": true,
+      "CameraSwitch": true,
+      "Screenshot": true,
+      "Emote": { "ForWinner": true }
+    },
+    "Overlay": {
+      "RaceResults": true,
+      "Statistics": true,
+      "Rewards": true
+    }
+  }
+}

@@ -1,0 +1,284 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - In-Game Music Player and Audio System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultEnabled": true,
+    "MasterVolume": { "Min": 0, "Max": 100, "Default": 50 },
+    "DynamicMixing": true,
+    "CrossFade": true
+  },
+
+  "MusicSources": {
+    "GameSoundtrack": {
+      "ID": "SOURCE_GAME",
+      "Description": "Official game music",
+      "Enabled": true,
+      "Tracks": 100,
+      "Genres": ["Electronic", "HipHop", "Rock", "Synthwave"]
+    },
+    "RadioStations": {
+      "ID": "SOURCE_RADIO",
+      "Description": "In-car radio stations",
+      "Enabled": true,
+      "Stations": 8,
+      "DJChatter": true
+    },
+    "CustomMusic": {
+      "ID": "SOURCE_CUSTOM",
+      "Description": "User music library",
+      "Enabled": true,
+      "Formats": ["MP3", "FLAC", "WAV", "OGG"],
+      "MaxTracks": 500
+    },
+    "Streaming": {
+      "ID": "SOURCE_STREAM",
+      "Description": "Streaming service integration",
+      "Enabled": { "Future": true },
+      "Services": ["Spotify", "AppleMusic"],
+      "RequiresSubscription": true
+    }
+  },
+
+  "RadioStations": {
+    "MidnightFM": {
+      "ID": "RADIO_MIDNIGHT",
+      "Genre": "Synthwave",
+      "Description": "Retro-futuristic synth sounds",
+      "TrackCount": 25,
+      "DJ": "Neon",
+      "Default": true
+    },
+    "StreetBeats": {
+      "ID": "RADIO_STREET",
+      "Genre": "HipHop",
+      "Description": "Underground hip-hop and trap",
+      "TrackCount": 30,
+      "DJ": "Blaze"
+    },
+    "NitroRock": {
+      "ID": "RADIO_ROCK",
+      "Genre": "Rock",
+      "Description": "High-energy rock and metal",
+      "TrackCount": 25,
+      "DJ": "Axel"
+    },
+    "PulseDance": {
+      "ID": "RADIO_DANCE",
+      "Genre": "Electronic",
+      "Description": "EDM and dance music",
+      "TrackCount": 30,
+      "DJ": "Pulse"
+    },
+    "ClassicDrive": {
+      "ID": "RADIO_CLASSIC",
+      "Genre": "ClassicRock",
+      "Description": "Timeless driving anthems",
+      "TrackCount": 25,
+      "DJ": "Classic Mike"
+    },
+    "TokyoDrift": {
+      "ID": "RADIO_TOKYO",
+      "Genre": "JMusic",
+      "Description": "Japanese pop and electronic",
+      "TrackCount": 20,
+      "DJ": "Yuki"
+    },
+    "ChillWave": {
+      "ID": "RADIO_CHILL",
+      "Genre": "LoFi",
+      "Description": "Relaxed lo-fi beats",
+      "TrackCount": 25,
+      "DJ": "Luna"
+    },
+    "TurboMix": {
+      "ID": "RADIO_MIX",
+      "Genre": "Mixed",
+      "Description": "Best of all genres",
+      "TrackCount": 40,
+      "DJ": "Various"
+    }
+  },
+
+  "Playback": {
+    "Modes": {
+      "Radio": { "Description": "Station broadcast", "Sequential": true },
+      "Shuffle": { "Description": "Random playback", "Random": true },
+      "Repeat": { "Description": "Repeat current", "Loop": true },
+      "RepeatAll": { "Description": "Repeat playlist", "LoopAll": true }
+    },
+    "Controls": {
+      "Play": true,
+      "Pause": true,
+      "Next": true,
+      "Previous": true,
+      "Seek": { "InCustom": true }
+    },
+    "CrossFade": {
+      "Enabled": true,
+      "Duration": { "Seconds": 3 }
+    }
+  },
+
+  "Playlists": {
+    "System": {
+      "AllTracks": true,
+      "ByGenre": true,
+      "ByStation": true,
+      "Favorites": true,
+      "RecentlyPlayed": { "Max": 50 }
+    },
+    "Custom": {
+      "Enabled": true,
+      "MaxPlaylists": 20,
+      "MaxTracksPerPlaylist": 100,
+      "Shareable": true
+    },
+    "Smart": {
+      "BasedOnMood": true,
+      "BasedOnSpeed": { "Optional": true },
+      "BasedOnTime": { "Optional": true }
+    }
+  },
+
+  "DynamicMixing": {
+    "Contextual": {
+      "InMenu": { "Volume": 100, "Filter": "None" },
+      "InGarage": { "Volume": 80, "Filter": "Muffled" },
+      "InFreeRoam": { "Volume": 70, "Filter": "Normal" },
+      "InRace": { "Volume": 60, "Filter": "Energetic" },
+      "InChase": { "Volume": 70, "Filter": "Intense" }
+    },
+    "Ducking": {
+      "ForVoiceChat": { "Amount": 50 },
+      "ForAnnouncements": { "Amount": 70 },
+      "ForDialogue": { "Amount": 80 }
+    },
+    "SpeedBased": {
+      "Optional": true,
+      "HighSpeed": { "Intensity": "High" },
+      "LowSpeed": { "Intensity": "Normal" }
+    }
+  },
+
+  "CustomMusic": {
+    "Import": {
+      "FromFolder": true,
+      "Scan": { "Automatic": true },
+      "Supported": ["MP3", "FLAC", "WAV", "OGG", "M4A"]
+    },
+    "Management": {
+      "AddToPlaylist": true,
+      "RemoveTrack": true,
+      "EditMetadata": true,
+      "SortBy": ["Name", "Artist", "Album", "DateAdded"]
+    },
+    "Storage": {
+      "Location": "Documents/MidnightGrind/Music",
+      "MaxSize": "10GB"
+    },
+    "Metadata": {
+      "AutoDetect": true,
+      "ManualEdit": true,
+      "AlbumArt": true
+    }
+  },
+
+  "Visualization": {
+    "Enabled": true,
+    "Types": {
+      "Waveform": { "Style": "Classic" },
+      "Spectrum": { "Bars": true },
+      "Particles": { "ReactToMusic": true },
+      "None": { "CleanDisplay": true }
+    },
+    "Location": {
+      "HUD": { "Small": true },
+      "Garage": { "Full": true },
+      "Menu": { "Background": true }
+    }
+  },
+
+  "NowPlaying": {
+    "Display": {
+      "TrackName": true,
+      "Artist": true,
+      "Album": { "Optional": true },
+      "AlbumArt": true,
+      "Progress": true,
+      "Duration": true
+    },
+    "Position": {
+      "Options": ["TopLeft", "TopRight", "BottomLeft", "BottomRight"],
+      "Default": "TopRight"
+    },
+    "Behavior": {
+      "ShowOnChange": true,
+      "AutoHide": { "Seconds": 5 },
+      "AlwaysShow": { "Optional": true }
+    }
+  },
+
+  "Equalizer": {
+    "Enabled": true,
+    "Presets": {
+      "Flat": { "Default": true },
+      "Bass Boost": { "LowBoost": 6 },
+      "Treble Boost": { "HighBoost": 6 },
+      "Vocal": { "MidBoost": 4 },
+      "Rock": { "Curve": "V" },
+      "Electronic": { "Curve": "U" },
+      "Custom": { "Editable": true }
+    },
+    "Bands": {
+      "Count": 10,
+      "Range": { "dB": [-12, 12] }
+    }
+  },
+
+  "VolumeControls": {
+    "Master": { "Min": 0, "Max": 100, "Default": 50 },
+    "Music": { "Min": 0, "Max": 100, "Default": 50 },
+    "DJ": { "Min": 0, "Max": 100, "Default": 30 },
+    "Relative": {
+      "ToEngine": { "Configurable": true },
+      "ToEffects": { "Configurable": true }
+    }
+  },
+
+  "Shortcuts": {
+    "Toggle": { "Key": "M" },
+    "NextTrack": { "Key": "Period" },
+    "PreviousTrack": { "Key": "Comma" },
+    "VolumeUp": { "Key": "Plus" },
+    "VolumeDown": { "Key": "Minus" },
+    "ChangeStation": { "Key": "N" }
+  },
+
+  "Settings": {
+    "PlayOnStartup": { "Default": true },
+    "RememberPosition": { "InPlaylist": true },
+    "ShuffleDefault": { "Default": false },
+    "StreamingQuality": { "Options": ["Low", "Medium", "High"] }
+  },
+
+  "UI": {
+    "MiniPlayer": {
+      "Position": "TopRight",
+      "ShowControls": true,
+      "Expandable": true
+    },
+    "FullPlayer": {
+      "TrackList": true,
+      "AlbumArt": { "Large": true },
+      "Visualization": true,
+      "Equalizer": true
+    },
+    "QuickAccess": {
+      "StationWheel": true,
+      "RecentTracks": true,
+      "Favorites": true
+    }
+  }
+}
