@@ -3959,6 +3959,13 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestStress_MemoryStability());
 	TestResults.Add(TestStress_RapidStateChanges());
 
+	// UI Data tests
+	TestResults.Add(TestUIData_HUDDataDefaults());
+	TestResults.Add(TestUIData_RaceStatusDefaults());
+	TestResults.Add(TestUIData_TelemetryDefaults());
+	TestResults.Add(TestUIData_HUDModes());
+	TestResults.Add(TestUIData_DataProvider());
+
 	// Count results
 	for (const FMGTestResult& Result : TestResults)
 	{
@@ -4209,6 +4216,33 @@ void UMGSubsystemTests::RunStressTests()
 	TestResults.Add(TestStress_SustainedOperation());
 	TestResults.Add(TestStress_MemoryStability());
 	TestResults.Add(TestStress_RapidStateChanges());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
+void UMGSubsystemTests::RunUIDataTests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING UI DATA TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestUIData_HUDDataDefaults());
+	TestResults.Add(TestUIData_RaceStatusDefaults());
+	TestResults.Add(TestUIData_TelemetryDefaults());
+	TestResults.Add(TestUIData_HUDModes());
+	TestResults.Add(TestUIData_DataProvider());
 
 	for (const FMGTestResult& Result : TestResults)
 	{
