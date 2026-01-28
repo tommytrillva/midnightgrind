@@ -1,0 +1,456 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Engine Internal Components Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "InternalUpgrades": true,
+    "ReliabilityEffects": true,
+    "PowerEffects": true
+  },
+
+  "Pistons": {
+    "Types": {
+      "Stock": {
+        "ID": "PISTON_STOCK",
+        "Description": "Factory cast pistons",
+        "Material": "Cast",
+        "Strength": 1.0,
+        "Weight": 1.0,
+        "Compression": { "ByEngine": true },
+        "Default": true
+      },
+      "Forged": {
+        "ID": "PISTON_FORGED",
+        "Description": "Forged aluminum pistons",
+        "Material": "Forged",
+        "Strength": 1.5,
+        "Weight": 0.95,
+        "Cost": 1500
+      },
+      "LowCompression": {
+        "ID": "PISTON_LOWCOMP",
+        "Description": "Low compression for boost",
+        "Material": "Forged",
+        "Strength": 1.5,
+        "CompressionChange": -1.5,
+        "ForForcedInduction": true,
+        "Cost": 2000
+      },
+      "HighCompression": {
+        "ID": "PISTON_HIGHCOMP",
+        "Description": "High compression NA",
+        "Material": "Forged",
+        "Strength": 1.4,
+        "CompressionChange": 1.0,
+        "ForNA": true,
+        "Cost": 2000
+      },
+      "Lightweight": {
+        "ID": "PISTON_LIGHT",
+        "Description": "Lightweight racing pistons",
+        "Material": "Forged",
+        "Strength": 1.3,
+        "Weight": 0.85,
+        "RevHappy": true,
+        "Cost": 2500
+      }
+    },
+    "Coatings": {
+      "Thermal": { "HeatProtection": true, "Cost": 300 },
+      "Skirt": { "FrictionReduction": true, "Cost": 200 },
+      "Top": { "DetonationResistance": true, "Cost": 400 }
+    }
+  },
+
+  "ConnectingRods": {
+    "Types": {
+      "Stock": {
+        "ID": "ROD_STOCK",
+        "Description": "Factory connecting rods",
+        "Material": "Cast",
+        "Strength": 1.0,
+        "Weight": 1.0,
+        "Default": true
+      },
+      "Forged": {
+        "ID": "ROD_FORGED",
+        "Description": "Forged steel rods",
+        "Material": "ForgedSteel",
+        "Strength": 1.6,
+        "Weight": 0.95,
+        "Cost": 1200
+      },
+      "HBeam": {
+        "ID": "ROD_HBEAM",
+        "Description": "H-beam rods",
+        "Material": "ForgedSteel",
+        "Strength": 1.8,
+        "Weight": 1.0,
+        "ForHighPower": true,
+        "Cost": 1500
+      },
+      "IBeam": {
+        "ID": "ROD_IBEAM",
+        "Description": "I-beam rods",
+        "Material": "ForgedSteel",
+        "Strength": 1.5,
+        "Weight": 0.9,
+        "ForHighRPM": true,
+        "Cost": 1400
+      },
+      "Titanium": {
+        "ID": "ROD_TITANIUM",
+        "Description": "Titanium connecting rods",
+        "Material": "Titanium",
+        "Strength": 1.7,
+        "Weight": 0.7,
+        "ForRacing": true,
+        "Cost": 5000
+      },
+      "Aluminum": {
+        "ID": "ROD_ALUMINUM",
+        "Description": "Aluminum rods",
+        "Material": "Aluminum",
+        "Strength": 1.2,
+        "Weight": 0.6,
+        "LimitedLife": true,
+        "ForDrag": true,
+        "Cost": 3000
+      }
+    },
+    "Bolts": {
+      "Stock": { "Strength": 1.0 },
+      "ARP": { "Strength": 1.5, "Cost": 200 },
+      "L19": { "Strength": 2.0, "Cost": 500 }
+    }
+  },
+
+  "Crankshaft": {
+    "Types": {
+      "Stock": {
+        "ID": "CRANK_STOCK",
+        "Description": "Factory crankshaft",
+        "Material": "Cast",
+        "Strength": 1.0,
+        "Weight": 1.0,
+        "Default": true
+      },
+      "Forged": {
+        "ID": "CRANK_FORGED",
+        "Description": "Forged steel crankshaft",
+        "Material": "ForgedSteel",
+        "Strength": 1.8,
+        "Weight": 1.0,
+        "Cost": 3000
+      },
+      "BilletSteel": {
+        "ID": "CRANK_BILLET",
+        "Description": "Billet steel crankshaft",
+        "Material": "Billet",
+        "Strength": 2.5,
+        "Weight": 0.95,
+        "ForRacing": true,
+        "Cost": 8000
+      },
+      "Stroker": {
+        "ID": "CRANK_STROKER",
+        "Description": "Stroker crankshaft",
+        "Material": "ForgedSteel",
+        "Strength": 1.7,
+        "DisplacementIncrease": true,
+        "Cost": 5000
+      },
+      "Lightweight": {
+        "ID": "CRANK_LIGHT",
+        "Description": "Knife-edged crankshaft",
+        "Material": "ForgedSteel",
+        "Strength": 1.6,
+        "Weight": 0.85,
+        "RevImprovement": true,
+        "Cost": 4000
+      }
+    },
+    "Balancing": {
+      "Factory": { "Balance": "Standard" },
+      "Blueprinted": { "Balance": "Improved", "Cost": 500 },
+      "Precision": { "Balance": "Perfect", "Cost": 1000 }
+    }
+  },
+
+  "Camshaft": {
+    "Types": {
+      "Stock": {
+        "ID": "CAM_STOCK",
+        "Description": "Factory camshaft",
+        "Duration": { "Intake": 200, "Exhaust": 200 },
+        "Lift": { "Intake": 0.4, "Exhaust": 0.4 },
+        "PowerBand": "Smooth",
+        "Default": true
+      },
+      "Stage1": {
+        "ID": "CAM_STAGE1",
+        "Description": "Mild performance cam",
+        "Duration": { "Intake": 220, "Exhaust": 220 },
+        "Lift": { "Intake": 0.45, "Exhaust": 0.45 },
+        "PowerBand": "Mid",
+        "PowerGain": { "Percentage": 5 },
+        "Cost": 800
+      },
+      "Stage2": {
+        "ID": "CAM_STAGE2",
+        "Description": "Aggressive street cam",
+        "Duration": { "Intake": 240, "Exhaust": 240 },
+        "Lift": { "Intake": 0.5, "Exhaust": 0.5 },
+        "PowerBand": "Mid-High",
+        "PowerGain": { "Percentage": 10 },
+        "IdleQuality": "Lopey",
+        "Cost": 1200
+      },
+      "Stage3": {
+        "ID": "CAM_STAGE3",
+        "Description": "Race cam",
+        "Duration": { "Intake": 270, "Exhaust": 270 },
+        "Lift": { "Intake": 0.55, "Exhaust": 0.55 },
+        "PowerBand": "High",
+        "PowerGain": { "Percentage": 15 },
+        "IdleQuality": "Rough",
+        "Cost": 2000
+      },
+      "Custom": {
+        "ID": "CAM_CUSTOM",
+        "Description": "Custom ground cam",
+        "Duration": { "Adjustable": true },
+        "Lift": { "Adjustable": true },
+        "Cost": 3000
+      }
+    },
+    "Timing": {
+      "Adjustable": true,
+      "CamGears": {
+        "Stock": { "Adjustment": false },
+        "Adjustable": { "Range": 10, "Cost": 300 },
+        "Vernier": { "Range": 15, "Precision": true, "Cost": 500 }
+      }
+    }
+  },
+
+  "Valvetrain": {
+    "Valves": {
+      "Stock": {
+        "Material": "Steel",
+        "Size": 1.0,
+        "Default": true
+      },
+      "Oversized": {
+        "Material": "Steel",
+        "Size": 1.05,
+        "Flow": "Increased",
+        "Cost": 600
+      },
+      "Stainless": {
+        "Material": "StainlessSteel",
+        "Size": 1.05,
+        "Durability": "High",
+        "Cost": 800
+      },
+      "Titanium": {
+        "Material": "Titanium",
+        "Size": 1.0,
+        "Weight": 0.6,
+        "HighRPM": true,
+        "Cost": 2000
+      },
+      "Sodium": {
+        "Material": "SodiumFilled",
+        "Size": 1.0,
+        "Cooling": "Improved",
+        "ForTurbo": true,
+        "Cost": 1500
+      }
+    },
+    "Springs": {
+      "Stock": { "Pressure": 1.0, "RPMLimit": 6500 },
+      "Performance": { "Pressure": 1.2, "RPMLimit": 7500, "Cost": 400 },
+      "Racing": { "Pressure": 1.5, "RPMLimit": 9000, "Cost": 800 },
+      "Titanium": { "Pressure": 1.4, "RPMLimit": 10000, "Weight": 0.5, "Cost": 1500 }
+    },
+    "Retainers": {
+      "Steel": { "Weight": 1.0, "Default": true },
+      "Titanium": { "Weight": 0.5, "Cost": 500 },
+      "Chromoly": { "Weight": 0.7, "Cost": 300 }
+    },
+    "Lifters": {
+      "Hydraulic": { "Maintenance": "None", "RPMLimit": 6500, "Default": true },
+      "Solid": { "Maintenance": "Adjustment", "RPMLimit": 9000, "Cost": 400 }
+    }
+  },
+
+  "CylinderHead": {
+    "Types": {
+      "Stock": {
+        "ID": "HEAD_STOCK",
+        "Description": "Factory cylinder head",
+        "Flow": 1.0,
+        "Default": true
+      },
+      "Ported": {
+        "ID": "HEAD_PORTED",
+        "Description": "Port and polish",
+        "Flow": 1.15,
+        "PowerGain": { "Percentage": 5 },
+        "Cost": 2000
+      },
+      "FullyPorted": {
+        "ID": "HEAD_FULLPORT",
+        "Description": "Full CNC port work",
+        "Flow": 1.3,
+        "PowerGain": { "Percentage": 10 },
+        "Cost": 4000
+      },
+      "Aftermarket": {
+        "ID": "HEAD_AFTERMARKET",
+        "Description": "Performance head",
+        "Flow": 1.35,
+        "PowerGain": { "Percentage": 12 },
+        "Cost": 6000
+      },
+      "Racing": {
+        "ID": "HEAD_RACING",
+        "Description": "Full race cylinder head",
+        "Flow": 1.5,
+        "PowerGain": { "Percentage": 18 },
+        "Cost": 10000
+      }
+    },
+    "Gasket": {
+      "Stock": { "Strength": 1.0 },
+      "MLS": { "Strength": 1.5, "ForBoost": true, "Cost": 200 },
+      "Copper": { "Strength": 2.0, "ORing": true, "Cost": 400 }
+    }
+  },
+
+  "EngineBlock": {
+    "Modifications": {
+      "Bore": {
+        "Enabled": true,
+        "MaxIncrease": { "MM": 2 },
+        "DisplacementGain": { "ByEngine": true },
+        "Cost": 1000
+      },
+      "Sleeve": {
+        "Enabled": true,
+        "Material": ["Iron", "Darton"],
+        "Strength": "Increased",
+        "Cost": 3000
+      },
+      "Girdle": {
+        "Enabled": true,
+        "Purpose": "MainCapStrength",
+        "Cost": 1500
+      },
+      "Deck": {
+        "Enabled": true,
+        "Purpose": "CompressionIncrease",
+        "Cost": 500
+      }
+    },
+    "Replacement": {
+      "CrateEngine": { "Available": true },
+      "BuiltShortBlock": { "Available": true },
+      "BuiltLongBlock": { "Available": true }
+    }
+  },
+
+  "DisplacementChanges": {
+    "Stroker": {
+      "Effect": { "MoreTorque": true, "LowerRev": true },
+      "PowerGain": { "Percentage": 15 },
+      "Cost": 8000
+    },
+    "BigBore": {
+      "Effect": { "MorePower": true, "HigherRev": true },
+      "PowerGain": { "Percentage": 10 },
+      "Cost": 5000
+    },
+    "StrokerAndBore": {
+      "Effect": { "Maximum": true },
+      "PowerGain": { "Percentage": 25 },
+      "Cost": 12000
+    }
+  },
+
+  "Balancing": {
+    "RotatingAssembly": {
+      "None": { "Default": true },
+      "Balanced": { "Smoothness": 1.2, "Cost": 800 },
+      "Blueprinted": { "Smoothness": 1.5, "Power": 1.02, "Cost": 2000 }
+    }
+  },
+
+  "Reliability": {
+    "StockInternals": {
+      "MaxSafePower": { "Percentage": 130 },
+      "MaxSafeRPM": { "ByEngine": true }
+    },
+    "ForgedInternals": {
+      "MaxSafePower": { "Percentage": 200 },
+      "MaxSafeRPM": { "Increase": 1500 }
+    },
+    "FullRace": {
+      "MaxSafePower": { "Percentage": 300 },
+      "MaxSafeRPM": { "Increase": 3000 }
+    },
+    "FailureModes": {
+      "RodBend": { "Cause": "Detonation" },
+      "PistonMelt": { "Cause": "LeanCondition" },
+      "ValveDrop": { "Cause": "Overrev" },
+      "BearingSpun": { "Cause": "OilStarvation" }
+    }
+  },
+
+  "Packages": {
+    "Stage1Internal": {
+      "Description": "Basic forged package",
+      "Includes": ["ForgedPistons", "ForgedRods", "ARPBolts"],
+      "PowerIncrease": { "Percentage": 5 },
+      "ReliabilityIncrease": { "Percentage": 60 },
+      "Cost": 4000
+    },
+    "Stage2Internal": {
+      "Description": "Full forged with cam",
+      "Includes": ["ForgedPistons", "HBeamRods", "ForgedCrank", "Stage2Cam"],
+      "PowerIncrease": { "Percentage": 15 },
+      "ReliabilityIncrease": { "Percentage": 100 },
+      "Cost": 10000
+    },
+    "FullRace": {
+      "Description": "Complete race engine",
+      "Includes": ["LightPistons", "TitaniumRods", "BilletCrank", "RaceCam", "RaceHead"],
+      "PowerIncrease": { "Percentage": 30 },
+      "ReliabilityIncrease": { "Percentage": 150 },
+      "Cost": 30000
+    }
+  },
+
+  "UI": {
+    "InternalsMenu": {
+      "PistonSelector": true,
+      "RodSelector": true,
+      "CrankOptions": true,
+      "CamshaftUpgrades": true,
+      "ValvetrainOptions": true,
+      "HeadworkOptions": true
+    },
+    "BuildSheet": {
+      "ComponentList": true,
+      "PowerEstimate": true,
+      "ReliabilityRating": true,
+      "TotalCost": true
+    },
+    "Packages": {
+      "PrebuiltOptions": true,
+      "CustomBuilder": true
+    }
+  }
+}

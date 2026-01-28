@@ -1,0 +1,330 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Engine Cooling System Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "TemperatureSimulation": true,
+    "OverheatEffects": true,
+    "VisualEffects": true
+  },
+
+  "RadiatorTypes": {
+    "Stock": {
+      "ID": "RAD_STOCK",
+      "Description": "Factory radiator",
+      "Capacity": 1.0,
+      "Rows": 1,
+      "Material": "Aluminum",
+      "Default": true
+    },
+    "Performance": {
+      "ID": "RAD_PERFORMANCE",
+      "Description": "High-flow radiator",
+      "Capacity": 1.3,
+      "Rows": 2,
+      "Material": "Aluminum",
+      "Cost": 800
+    },
+    "Racing": {
+      "ID": "RAD_RACING",
+      "Description": "Triple-row racing radiator",
+      "Capacity": 1.6,
+      "Rows": 3,
+      "Material": "Aluminum",
+      "Cost": 1500
+    },
+    "HalfSize": {
+      "ID": "RAD_HALF",
+      "Description": "Slim half-size radiator",
+      "Capacity": 0.7,
+      "Rows": 2,
+      "Material": "Aluminum",
+      "ForDrag": true,
+      "Cost": 600
+    },
+    "DualPass": {
+      "ID": "RAD_DUALPASS",
+      "Description": "Dual-pass efficiency design",
+      "Capacity": 1.5,
+      "Rows": 2,
+      "Material": "Aluminum",
+      "Efficiency": "High",
+      "Cost": 1200
+    }
+  },
+
+  "CoolingFans": {
+    "Types": {
+      "Mechanical": {
+        "ID": "FAN_MECHANICAL",
+        "Description": "Belt-driven fan",
+        "Power": "EngineSpeed",
+        "ParasiticLoss": 5,
+        "Stock": true
+      },
+      "ElectricSingle": {
+        "ID": "FAN_ELECTRIC_SINGLE",
+        "Description": "Single electric fan",
+        "Power": "Electric",
+        "CFM": 2000,
+        "ParasiticLoss": 0,
+        "Cost": 400
+      },
+      "ElectricDual": {
+        "ID": "FAN_ELECTRIC_DUAL",
+        "Description": "Dual electric fans",
+        "Power": "Electric",
+        "CFM": 4000,
+        "ParasiticLoss": 0,
+        "Cost": 700
+      },
+      "HighOutput": {
+        "ID": "FAN_HIGH_OUTPUT",
+        "Description": "High-output pusher/puller",
+        "Power": "Electric",
+        "CFM": 5500,
+        "ParasiticLoss": 0,
+        "Cost": 1200
+      }
+    },
+    "Control": {
+      "TempSwitch": { "ActivationTemp": 195, "Stock": true },
+      "PWMController": { "VariableSpeed": true, "Cost": 200 },
+      "ManualOverride": { "Enabled": true }
+    }
+  },
+
+  "WaterPump": {
+    "Types": {
+      "Stock": {
+        "ID": "PUMP_STOCK",
+        "Description": "Factory water pump",
+        "Flow": 1.0,
+        "Drive": "Belt",
+        "Default": true
+      },
+      "HighFlow": {
+        "ID": "PUMP_HIGHFLOW",
+        "Description": "High-flow impeller",
+        "Flow": 1.3,
+        "Drive": "Belt",
+        "Cost": 400
+      },
+      "Electric": {
+        "ID": "PUMP_ELECTRIC",
+        "Description": "Electric water pump",
+        "Flow": 1.4,
+        "Drive": "Electric",
+        "Controllable": true,
+        "Cost": 1000
+      },
+      "Racing": {
+        "ID": "PUMP_RACING",
+        "Description": "Racing electric pump",
+        "Flow": 1.6,
+        "Drive": "Electric",
+        "VariableSpeed": true,
+        "Cost": 2000
+      }
+    }
+  },
+
+  "Thermostat": {
+    "Types": {
+      "Stock": {
+        "ID": "THERMO_STOCK",
+        "OpenTemp": 195,
+        "Range": "Standard",
+        "Default": true
+      },
+      "LowTemp": {
+        "ID": "THERMO_LOWTEMP",
+        "OpenTemp": 160,
+        "Range": "Performance",
+        "Cost": 50
+      },
+      "HighFlow": {
+        "ID": "THERMO_HIGHFLOW",
+        "OpenTemp": 180,
+        "Flow": "Increased",
+        "Cost": 100
+      },
+      "Delete": {
+        "ID": "THERMO_DELETE",
+        "OpenTemp": 0,
+        "AlwaysOpen": true,
+        "ForRacing": true,
+        "Cost": 20
+      }
+    }
+  },
+
+  "Coolant": {
+    "Types": {
+      "Standard": {
+        "ID": "COOL_STANDARD",
+        "Description": "50/50 antifreeze mix",
+        "BoilPoint": 223,
+        "Protection": "Full",
+        "Default": true
+      },
+      "HighPerformance": {
+        "ID": "COOL_PERFORMANCE",
+        "Description": "Performance coolant",
+        "BoilPoint": 250,
+        "HeatTransfer": "Better",
+        "Cost": 100
+      },
+      "WaterWetter": {
+        "ID": "COOL_WATERWETTER",
+        "Description": "Water with additive",
+        "BoilPoint": 212,
+        "HeatTransfer": "Best",
+        "NoFreeze": true,
+        "Cost": 50
+      },
+      "Racing": {
+        "ID": "COOL_RACING",
+        "Description": "Racing coolant",
+        "BoilPoint": 260,
+        "HeatTransfer": "Excellent",
+        "ForTrack": true,
+        "Cost": 200
+      }
+    },
+    "Capacity": {
+      "Unit": "Gallons",
+      "Typical": { "Min": 2, "Max": 4 }
+    }
+  },
+
+  "AdditionalCooling": {
+    "OilCooler": {
+      "Enabled": true,
+      "Types": {
+        "None": { "Default": true },
+        "AirCooled": { "Reduction": 15, "Cost": 600 },
+        "WaterCooled": { "Reduction": 20, "Cost": 1000 }
+      }
+    },
+    "TransCooler": {
+      "Enabled": true,
+      "Types": {
+        "None": { "Default": true },
+        "External": { "Reduction": 20, "Cost": 500 }
+      }
+    },
+    "PowerSteeringCooler": {
+      "Enabled": true,
+      "ForHighPower": true,
+      "Cost": 300
+    },
+    "DiffCooler": {
+      "Enabled": true,
+      "ForDrift": true,
+      "Cost": 400
+    }
+  },
+
+  "TemperatureManagement": {
+    "Operating": {
+      "ColdStart": { "Temp": 70, "WarmUpNeeded": true },
+      "Optimal": { "Temp": { "Min": 180, "Max": 210 } },
+      "Hot": { "Temp": { "Min": 210, "Max": 230 }, "Warning": true },
+      "Overheat": { "Temp": 240, "Damage": true }
+    },
+    "Factors": {
+      "AmbientTemp": { "Affects": true },
+      "Speed": { "AirflowCooling": true },
+      "Load": { "HeatGeneration": true },
+      "Modifications": { "HeatIncrease": true }
+    }
+  },
+
+  "OverheatEffects": {
+    "PowerReduction": {
+      "Threshold": 220,
+      "Reduction": { "PerDegree": 0.5 }
+    },
+    "LimpMode": {
+      "Threshold": 235,
+      "Enabled": true,
+      "MaxRPM": 3000
+    },
+    "EngineDamage": {
+      "Threshold": 250,
+      "HeadGasket": { "Risk": "High" },
+      "Warping": { "Risk": "Medium" }
+    },
+    "Seizure": {
+      "Threshold": 280,
+      "CatastrophicFailure": true
+    }
+  },
+
+  "VisualEffects": {
+    "Steam": {
+      "Enabled": true,
+      "Threshold": 212,
+      "FromHood": true,
+      "FromRadiator": true
+    },
+    "Smoke": {
+      "Enabled": true,
+      "Threshold": 250,
+      "Color": "White"
+    },
+    "TemperatureGauge": {
+      "Display": true,
+      "Warning": { "Color": "Red", "Threshold": 220 }
+    },
+    "HoodHeatWaves": {
+      "Enabled": true,
+      "Intensity": { "ByTemp": true }
+    }
+  },
+
+  "Upgrades": {
+    "Level1": {
+      "Name": "High-Flow Thermostat",
+      "Cost": 100,
+      "TempReduction": 10
+    },
+    "Level2": {
+      "Name": "Performance Radiator",
+      "Cost": 800,
+      "TempReduction": 20
+    },
+    "Level3": {
+      "Name": "Electric Fan Conversion",
+      "Cost": 700,
+      "TempReduction": 15,
+      "PowerGain": 5
+    },
+    "Level4": {
+      "Name": "Racing Cooling Package",
+      "Cost": 3000,
+      "TempReduction": 40
+    }
+  },
+
+  "UI": {
+    "CoolingMenu": {
+      "RadiatorSelector": true,
+      "FanOptions": true,
+      "PumpUpgrades": true,
+      "CoolantSelection": true
+    },
+    "Temperature": {
+      "GaugeDisplay": true,
+      "HistoryGraph": true,
+      "Warnings": true
+    },
+    "Maintenance": {
+      "CoolantLevel": true,
+      "FlushReminder": true,
+      "ComponentWear": true
+    }
+  }
+}

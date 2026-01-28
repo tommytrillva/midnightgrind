@@ -1,0 +1,470 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Fuel Delivery System Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "FuelDelivery": true,
+    "FuelTypes": true,
+    "FuelPressure": true
+  },
+
+  "FuelInjectors": {
+    "Types": {
+      "Stock": {
+        "ID": "INJ_STOCK",
+        "Description": "Factory injectors",
+        "FlowRate": { "ByEngine": true },
+        "Type": "PortInjection",
+        "Default": true
+      },
+      "HighFlow": {
+        "ID": "INJ_HIGHFLOW",
+        "Description": "High-flow injectors",
+        "FlowRate": { "Increase": 30 },
+        "Type": "PortInjection",
+        "Cost": 800
+      },
+      "Racing": {
+        "ID": "INJ_RACING",
+        "Description": "Racing injectors",
+        "FlowRate": { "Increase": 60 },
+        "Type": "PortInjection",
+        "Response": "Fast",
+        "Cost": 1500
+      },
+      "DirectInjection": {
+        "ID": "INJ_DI",
+        "Description": "Direct injection upgrade",
+        "FlowRate": { "Increase": 40 },
+        "Type": "DirectInjection",
+        "Efficiency": "High",
+        "Cost": 4000
+      },
+      "E85": {
+        "ID": "INJ_E85",
+        "Description": "E85 compatible injectors",
+        "FlowRate": { "Increase": 50 },
+        "Type": "PortInjection",
+        "Flex": true,
+        "Cost": 1200
+      }
+    },
+    "Sizes": {
+      "Unit": "cc/min",
+      "Stock": { "Range": [200, 400] },
+      "Performance": { "Range": [450, 750] },
+      "Racing": { "Range": [800, 1200] },
+      "HighPower": { "Range": [1300, 2200] }
+    },
+    "Configuration": {
+      "PortInjection": { "Location": "IntakePort" },
+      "DirectInjection": { "Location": "Cylinder" },
+      "DualInjection": { "Location": "Both", "Cost": 6000 }
+    }
+  },
+
+  "FuelPump": {
+    "Types": {
+      "Stock": {
+        "ID": "PUMP_STOCK",
+        "Description": "Factory fuel pump",
+        "FlowRate": { "LPH": 255 },
+        "Pressure": { "PSI": 43 },
+        "Default": true
+      },
+      "HighFlow": {
+        "ID": "PUMP_HIGHFLOW",
+        "Description": "High-flow fuel pump",
+        "FlowRate": { "LPH": 340 },
+        "Pressure": { "PSI": 60 },
+        "Cost": 400
+      },
+      "Performance": {
+        "ID": "PUMP_PERFORMANCE",
+        "Description": "Performance fuel pump",
+        "FlowRate": { "LPH": 450 },
+        "Pressure": { "PSI": 70 },
+        "Cost": 600
+      },
+      "Racing": {
+        "ID": "PUMP_RACING",
+        "Description": "Racing fuel pump",
+        "FlowRate": { "LPH": 625 },
+        "Pressure": { "PSI": 90 },
+        "Cost": 1000
+      },
+      "DualPump": {
+        "ID": "PUMP_DUAL",
+        "Description": "Dual pump setup",
+        "FlowRate": { "LPH": 900 },
+        "Pressure": { "PSI": 90 },
+        "Redundancy": true,
+        "Cost": 1800
+      },
+      "External": {
+        "ID": "PUMP_EXTERNAL",
+        "Description": "External surge tank setup",
+        "FlowRate": { "LPH": 1200 },
+        "Pressure": { "PSI": 100 },
+        "ForHighPower": true,
+        "Cost": 3000
+      }
+    },
+    "Location": {
+      "InTank": { "Quiet": true, "Cooling": "FuelCooled", "Default": true },
+      "Inline": { "Louder": true, "EasyAccess": true },
+      "External": { "LoudestGear": true, "MaxFlow": true }
+    }
+  },
+
+  "FuelRail": {
+    "Types": {
+      "Stock": {
+        "ID": "RAIL_STOCK",
+        "Description": "Factory fuel rail",
+        "Flow": 1.0,
+        "Default": true
+      },
+      "HighFlow": {
+        "ID": "RAIL_HIGHFLOW",
+        "Description": "High-flow fuel rail",
+        "Flow": 1.3,
+        "Cost": 400
+      },
+      "Billet": {
+        "ID": "RAIL_BILLET",
+        "Description": "Billet aluminum rail",
+        "Flow": 1.5,
+        "Quality": "Premium",
+        "Cost": 800
+      },
+      "Racing": {
+        "ID": "RAIL_RACING",
+        "Description": "Racing fuel rail",
+        "Flow": 2.0,
+        "DualFeed": true,
+        "Cost": 1200
+      }
+    },
+    "Fittings": {
+      "AN6": { "Size": "Standard" },
+      "AN8": { "Size": "HighFlow" },
+      "AN10": { "Size": "Racing" }
+    }
+  },
+
+  "FuelPressureRegulator": {
+    "Types": {
+      "Stock": {
+        "ID": "FPR_STOCK",
+        "Description": "Factory regulator",
+        "Pressure": { "PSI": 43 },
+        "Adjustable": false,
+        "Default": true
+      },
+      "Adjustable": {
+        "ID": "FPR_ADJUSTABLE",
+        "Description": "Adjustable FPR",
+        "Pressure": { "Range": [30, 70] },
+        "Adjustable": true,
+        "Cost": 200
+      },
+      "RisingRate": {
+        "ID": "FPR_RISING",
+        "Description": "Rising rate FPR",
+        "Pressure": { "Base": 43 },
+        "BoostReferenced": true,
+        "Cost": 300
+      },
+      "Racing": {
+        "ID": "FPR_RACING",
+        "Description": "Racing fuel regulator",
+        "Pressure": { "Range": [30, 100] },
+        "HighFlow": true,
+        "Cost": 500
+      }
+    }
+  },
+
+  "FuelLines": {
+    "Types": {
+      "Stock": {
+        "ID": "LINE_STOCK",
+        "Description": "Factory fuel lines",
+        "Material": "Rubber",
+        "Size": "OEM",
+        "Default": true
+      },
+      "Braided": {
+        "ID": "LINE_BRAIDED",
+        "Description": "Braided stainless lines",
+        "Material": "PTFE",
+        "Size": "AN6",
+        "Durability": "High",
+        "Cost": 300
+      },
+      "HighFlow": {
+        "ID": "LINE_HIGHFLOW",
+        "Description": "High-flow braided lines",
+        "Material": "PTFE",
+        "Size": "AN8",
+        "Durability": "High",
+        "Cost": 500
+      },
+      "Racing": {
+        "ID": "LINE_RACING",
+        "Description": "Racing fuel system",
+        "Material": "PTFE",
+        "Size": "AN10",
+        "Durability": "Extreme",
+        "Cost": 800
+      }
+    },
+    "ReturnLine": {
+      "Returnless": { "Modern": true },
+      "Return": { "Traditional": true, "Cooling": "Better" }
+    }
+  },
+
+  "FuelCell": {
+    "Types": {
+      "Stock": {
+        "ID": "CELL_STOCK",
+        "Description": "Factory fuel tank",
+        "Capacity": { "ByVehicle": true },
+        "Material": "Plastic",
+        "Default": true
+      },
+      "Racing": {
+        "ID": "CELL_RACING",
+        "Description": "FIA-spec fuel cell",
+        "Capacity": { "Gallons": [8, 22] },
+        "Material": "FoamFilled",
+        "Safety": "FIA",
+        "Cost": 2000
+      },
+      "Extended": {
+        "ID": "CELL_EXTENDED",
+        "Description": "Extended range tank",
+        "Capacity": { "Increase": 50 },
+        "Material": "Aluminum",
+        "Cost": 800
+      },
+      "Drag": {
+        "ID": "CELL_DRAG",
+        "Description": "Small drag racing cell",
+        "Capacity": { "Gallons": 5 },
+        "Material": "FoamFilled",
+        "LightWeight": true,
+        "Cost": 1500
+      }
+    }
+  },
+
+  "FuelTypes": {
+    "Regular": {
+      "ID": "FUEL_REGULAR",
+      "Description": "Regular unleaded",
+      "Octane": 87,
+      "PowerModifier": 0.95,
+      "Cost": { "PerGallon": 3.50 },
+      "Default": true
+    },
+    "Premium": {
+      "ID": "FUEL_PREMIUM",
+      "Description": "Premium unleaded",
+      "Octane": 91,
+      "PowerModifier": 1.0,
+      "Cost": { "PerGallon": 4.00 }
+    },
+    "SuperPremium": {
+      "ID": "FUEL_SUPER",
+      "Description": "Super premium",
+      "Octane": 93,
+      "PowerModifier": 1.02,
+      "Cost": { "PerGallon": 4.50 }
+    },
+    "E85": {
+      "ID": "FUEL_E85",
+      "Description": "85% ethanol blend",
+      "Octane": 105,
+      "PowerModifier": 1.05,
+      "ConsumptionIncrease": 30,
+      "Cooling": true,
+      "Cost": { "PerGallon": 3.00 },
+      "Requires": "E85Tune"
+    },
+    "RaceFuel": {
+      "ID": "FUEL_RACE",
+      "Description": "Racing gasoline",
+      "Octane": 110,
+      "PowerModifier": 1.08,
+      "NotStreetLegal": true,
+      "Cost": { "PerGallon": 15.00 }
+    },
+    "Methanol": {
+      "ID": "FUEL_METHANOL",
+      "Description": "Pure methanol",
+      "Octane": 115,
+      "PowerModifier": 1.12,
+      "ConsumptionIncrease": 100,
+      "Cooling": "Extreme",
+      "Requires": "MethanolConversion",
+      "Cost": { "PerGallon": 5.00 }
+    },
+    "Nitromethane": {
+      "ID": "FUEL_NITRO",
+      "Description": "Nitromethane",
+      "Octane": "N/A",
+      "PowerModifier": 2.0,
+      "ConsumptionIncrease": 400,
+      "ForDrag": true,
+      "Requires": "NitroConversion",
+      "Cost": { "PerGallon": 50.00 }
+    }
+  },
+
+  "FuelAdditives": {
+    "OctaneBooster": {
+      "ID": "ADD_OCTANE",
+      "Description": "Octane booster",
+      "OctaneIncrease": 2,
+      "Duration": { "Tanks": 1 },
+      "Cost": 20
+    },
+    "Cleaner": {
+      "ID": "ADD_CLEANER",
+      "Description": "Injector cleaner",
+      "Effect": "CleanInjectors",
+      "Duration": { "Tanks": 1 },
+      "Cost": 15
+    },
+    "Stabilizer": {
+      "ID": "ADD_STABILIZER",
+      "Description": "Fuel stabilizer",
+      "Effect": "PreventDegradation",
+      "ForStorage": true,
+      "Cost": 10
+    }
+  },
+
+  "WaterMethanol": {
+    "Enabled": true,
+    "Types": {
+      "WaterOnly": {
+        "ID": "WMI_WATER",
+        "Description": "Water injection",
+        "CoolingEffect": 20,
+        "PowerGain": { "Percentage": 3 },
+        "Cost": 800
+      },
+      "WaterMeth5050": {
+        "ID": "WMI_5050",
+        "Description": "50/50 water/meth mix",
+        "CoolingEffect": 40,
+        "OctaneIncrease": 5,
+        "PowerGain": { "Percentage": 8 },
+        "Cost": 1000
+      },
+      "HighMeth": {
+        "ID": "WMI_HIGHMETH",
+        "Description": "High methanol mix",
+        "CoolingEffect": 50,
+        "OctaneIncrease": 8,
+        "PowerGain": { "Percentage": 12 },
+        "Cost": 1200
+      }
+    },
+    "Components": {
+      "Tank": { "Capacity": { "Gallons": [1, 5] } },
+      "Pump": { "Flow": { "Variable": true } },
+      "Nozzles": { "Count": [1, 4] },
+      "Controller": { "BoostActivated": true, "Progressive": true }
+    }
+  },
+
+  "FuelPressure": {
+    "Normal": {
+      "Idle": { "PSI": { "Min": 35, "Max": 45 } },
+      "WOT": { "PSI": { "Min": 40, "Max": 70 } },
+      "Boosted": { "PSI": { "BoostAdded": true } }
+    },
+    "Warnings": {
+      "Low": {
+        "Threshold": 30,
+        "Action": "LeanCondition",
+        "Warning": true
+      },
+      "Critical": {
+        "Threshold": 20,
+        "Action": "EngineDamage",
+        "Shutdown": "Recommended"
+      }
+    }
+  },
+
+  "Reliability": {
+    "PumpFailure": {
+      "Causes": ["Age", "ContaminatedFuel", "RunningDry"],
+      "Effect": "NoFuelDelivery"
+    },
+    "InjectorClog": {
+      "Causes": ["DirtyFuel", "CarbonBuildup"],
+      "Effect": "Misfire"
+    },
+    "LeakRisk": {
+      "OldLines": { "Risk": "High" },
+      "BraidedLines": { "Risk": "Low" }
+    }
+  },
+
+  "Upgrades": {
+    "Level1": {
+      "Name": "High-Flow Pump",
+      "Cost": 400,
+      "FlowIncrease": 33
+    },
+    "Level2": {
+      "Name": "Injector Upgrade",
+      "Cost": 800,
+      "FlowIncrease": 30
+    },
+    "Level3": {
+      "Name": "Complete Fuel System",
+      "Cost": 2500,
+      "FlowIncrease": 75
+    },
+    "Level4": {
+      "Name": "E85 Conversion",
+      "Cost": 3000,
+      "FuelType": "E85",
+      "PowerGain": 5
+    },
+    "Level5": {
+      "Name": "Water/Meth Kit",
+      "Cost": 1200,
+      "PowerGain": 10
+    }
+  },
+
+  "UI": {
+    "FuelMenu": {
+      "InjectorSelector": true,
+      "PumpOptions": true,
+      "RailUpgrades": true,
+      "LineUpgrades": true,
+      "FuelTypeSelector": true
+    },
+    "Gauges": {
+      "FuelPressure": true,
+      "FuelLevel": true,
+      "AFR": true
+    },
+    "Refueling": {
+      "GasStations": true,
+      "FuelTypeSelection": true,
+      "CostDisplay": true
+    }
+  }
+}

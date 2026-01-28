@@ -1,0 +1,355 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Engine Oil and Lubrication System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "OilTemperature": true,
+    "OilPressure": true,
+    "WearSimulation": true
+  },
+
+  "OilTypes": {
+    "Conventional": {
+      "ID": "OIL_CONVENTIONAL",
+      "Description": "Standard mineral oil",
+      "Protection": 1.0,
+      "Temperature": { "Max": 250 },
+      "ChangeInterval": 3000,
+      "Cost": 30,
+      "Default": true
+    },
+    "SemiSynthetic": {
+      "ID": "OIL_SEMISYNTHETIC",
+      "Description": "Synthetic blend",
+      "Protection": 1.2,
+      "Temperature": { "Max": 275 },
+      "ChangeInterval": 5000,
+      "Cost": 50
+    },
+    "FullSynthetic": {
+      "ID": "OIL_SYNTHETIC",
+      "Description": "Full synthetic oil",
+      "Protection": 1.5,
+      "Temperature": { "Max": 300 },
+      "ChangeInterval": 7500,
+      "Cost": 80
+    },
+    "Racing": {
+      "ID": "OIL_RACING",
+      "Description": "Racing synthetic",
+      "Protection": 1.8,
+      "Temperature": { "Max": 325 },
+      "ChangeInterval": 1000,
+      "HighRPM": true,
+      "Cost": 150
+    },
+    "HighMileage": {
+      "ID": "OIL_HIGHMILEAGE",
+      "Description": "High mileage formula",
+      "Protection": 1.3,
+      "Temperature": { "Max": 275 },
+      "SealConditioner": true,
+      "ChangeInterval": 5000,
+      "Cost": 60
+    }
+  },
+
+  "OilViscosity": {
+    "Grades": {
+      "0W20": { "Thin": true, "ColdFlow": "Excellent", "FuelEconomy": true },
+      "5W30": { "AllSeason": true, "ColdFlow": "Good", "Common": true },
+      "5W40": { "Performance": true, "ColdFlow": "Good" },
+      "10W40": { "ThickFilm": true, "ColdFlow": "Moderate" },
+      "15W50": { "HighTemp": true, "Racing": true },
+      "20W50": { "VeryThick": true, "OldEngines": true }
+    },
+    "Selection": {
+      "ByClimate": true,
+      "ByEngine": true,
+      "ByUse": true
+    }
+  },
+
+  "OilCooler": {
+    "Types": {
+      "None": {
+        "ID": "OILCOOL_NONE",
+        "Description": "No oil cooler",
+        "Default": true
+      },
+      "Small": {
+        "ID": "OILCOOL_SMALL",
+        "Description": "Small oil cooler",
+        "Rows": 10,
+        "TempReduction": 20,
+        "Cost": 400
+      },
+      "Medium": {
+        "ID": "OILCOOL_MEDIUM",
+        "Description": "Medium oil cooler",
+        "Rows": 15,
+        "TempReduction": 35,
+        "Cost": 600
+      },
+      "Large": {
+        "ID": "OILCOOL_LARGE",
+        "Description": "Large racing cooler",
+        "Rows": 25,
+        "TempReduction": 50,
+        "Cost": 1000
+      },
+      "DualPass": {
+        "ID": "OILCOOL_DUALPASS",
+        "Description": "Dual-pass efficiency",
+        "Rows": 19,
+        "TempReduction": 45,
+        "Efficiency": "High",
+        "Cost": 800
+      }
+    },
+    "Mounting": {
+      "FrontMount": { "AirflowDependent": true },
+      "RemoteMount": { "Flexible": true },
+      "StackedWithRadiator": { "SpaceSaving": true }
+    },
+    "Thermostat": {
+      "Enabled": true,
+      "BypassTemp": 180,
+      "Purpose": "QuickWarmup"
+    }
+  },
+
+  "OilPump": {
+    "Types": {
+      "Stock": {
+        "ID": "PUMP_STOCK",
+        "Description": "Factory oil pump",
+        "Flow": 1.0,
+        "Pressure": { "Max": 60 },
+        "Default": true
+      },
+      "HighVolume": {
+        "ID": "PUMP_HIGHVOLUME",
+        "Description": "High-volume pump",
+        "Flow": 1.25,
+        "Pressure": { "Max": 70 },
+        "Cost": 500
+      },
+      "HighPressure": {
+        "ID": "PUMP_HIGHPRESSURE",
+        "Description": "High-pressure pump",
+        "Flow": 1.1,
+        "Pressure": { "Max": 90 },
+        "Cost": 600
+      },
+      "Racing": {
+        "ID": "PUMP_RACING",
+        "Description": "Racing dry sump pump",
+        "Flow": 1.5,
+        "Pressure": { "Max": 100 },
+        "DrySump": true,
+        "Cost": 3000
+      }
+    }
+  },
+
+  "OilPan": {
+    "Types": {
+      "Stock": {
+        "ID": "PAN_STOCK",
+        "Description": "Factory oil pan",
+        "Capacity": 1.0,
+        "Baffled": false,
+        "Default": true
+      },
+      "Baffled": {
+        "ID": "PAN_BAFFLED",
+        "Description": "Baffled oil pan",
+        "Capacity": 1.0,
+        "Baffled": true,
+        "OilControl": "Better",
+        "Cost": 400
+      },
+      "Extended": {
+        "ID": "PAN_EXTENDED",
+        "Description": "Extended capacity pan",
+        "Capacity": 1.5,
+        "Baffled": true,
+        "Cost": 600
+      },
+      "DrySump": {
+        "ID": "PAN_DRYSUMP",
+        "Description": "Dry sump system",
+        "Capacity": "External",
+        "OilControl": "Perfect",
+        "ForRacing": true,
+        "Cost": 5000
+      }
+    },
+    "OilControl": {
+      "Baffles": { "PreventsStarvation": true },
+      "Windage Tray": { "ReducesDrag": true },
+      "Scraper": { "ReclainsOil": true }
+    }
+  },
+
+  "OilFilter": {
+    "Types": {
+      "Standard": {
+        "ID": "FILTER_STANDARD",
+        "Description": "OEM replacement filter",
+        "Filtration": 25,
+        "Unit": "Microns",
+        "Default": true,
+        "Cost": 10
+      },
+      "Performance": {
+        "ID": "FILTER_PERFORMANCE",
+        "Description": "High-flow filter",
+        "Filtration": 20,
+        "Flow": "Increased",
+        "Cost": 20
+      },
+      "Racing": {
+        "ID": "FILTER_RACING",
+        "Description": "Racing filter",
+        "Filtration": 15,
+        "Flow": "High",
+        "MagneticDrain": true,
+        "Cost": 40
+      },
+      "Reusable": {
+        "ID": "FILTER_REUSABLE",
+        "Description": "Cleanable filter",
+        "Filtration": 18,
+        "Washable": true,
+        "Cost": 100
+      }
+    },
+    "Relocation": {
+      "Kit": { "Available": true, "Cost": 200 },
+      "RemoteMount": { "EasierAccess": true }
+    }
+  },
+
+  "OilPressure": {
+    "Normal": {
+      "Idle": { "PSI": { "Min": 15, "Max": 25 } },
+      "Cruise": { "PSI": { "Min": 30, "Max": 50 } },
+      "WOT": { "PSI": { "Min": 50, "Max": 70 } }
+    },
+    "Warnings": {
+      "Low": {
+        "Threshold": 10,
+        "Action": "Warning",
+        "Damage": "Possible"
+      },
+      "Critical": {
+        "Threshold": 5,
+        "Action": "EngineShutdown",
+        "Damage": "Imminent"
+      }
+    },
+    "Effects": {
+      "LowPressure": {
+        "BearingWear": "Accelerated",
+        "Seizure": "Risk"
+      },
+      "HighPressure": {
+        "SealsBlown": "Risk",
+        "Generally": "Safe"
+      }
+    }
+  },
+
+  "OilTemperature": {
+    "Ranges": {
+      "Cold": { "Temp": { "Max": 150 }, "Status": "WarmUpNeeded" },
+      "Optimal": { "Temp": { "Min": 180, "Max": 230 }, "Status": "Ideal" },
+      "Hot": { "Temp": { "Min": 230, "Max": 275 }, "Status": "Warning" },
+      "Critical": { "Temp": 290, "Status": "Damage" }
+    },
+    "Effects": {
+      "Cold": {
+        "Viscosity": "Thick",
+        "Protection": "Reduced",
+        "FuelEconomy": "Poor"
+      },
+      "Hot": {
+        "Viscosity": "Thin",
+        "Protection": "Degraded",
+        "Breakdown": "Accelerated"
+      }
+    }
+  },
+
+  "Maintenance": {
+    "OilChange": {
+      "Interval": { "ByOilType": true },
+      "Warning": { "AtInterval": true },
+      "Cost": { "Service": 50 }
+    },
+    "OilLevel": {
+      "Check": { "Available": true },
+      "TopOff": { "Available": true },
+      "LowWarning": { "Enabled": true }
+    },
+    "FilterChange": {
+      "WithOilChange": true,
+      "Separate": { "Available": true }
+    },
+    "Consumption": {
+      "Normal": { "QuartsPerMile": 0.0001 },
+      "Worn": { "QuartsPerMile": 0.001 },
+      "Indicator": { "BlueSmoke": true }
+    }
+  },
+
+  "Upgrades": {
+    "Level1": {
+      "Name": "Synthetic Oil Upgrade",
+      "Cost": 80,
+      "Protection": "+20%"
+    },
+    "Level2": {
+      "Name": "Oil Cooler Kit",
+      "Cost": 600,
+      "TempReduction": 35
+    },
+    "Level3": {
+      "Name": "High-Volume Pump",
+      "Cost": 500,
+      "PressureIncrease": 15
+    },
+    "Level4": {
+      "Name": "Baffled Pan Kit",
+      "Cost": 400,
+      "OilControl": "Improved"
+    },
+    "Level5": {
+      "Name": "Dry Sump System",
+      "Cost": 8000,
+      "AllBenefits": true
+    }
+  },
+
+  "UI": {
+    "OilMenu": {
+      "OilTypeSelector": true,
+      "ViscositySelector": true,
+      "CoolerOptions": true,
+      "PanUpgrades": true
+    },
+    "Gauges": {
+      "OilPressure": true,
+      "OilTemperature": true,
+      "OilLevel": true
+    },
+    "Maintenance": {
+      "ChangeReminder": true,
+      "ServiceHistory": true,
+      "QualityIndicator": true
+    }
+  }
+}
