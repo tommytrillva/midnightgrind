@@ -1,0 +1,326 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Trunk Setup and Show Car Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "TrunkBuilds": true,
+    "ShowCarSetup": true,
+    "AudioDisplays": true
+  },
+
+  "TrunkStyles": {
+    "Stock": {
+      "ID": "TRUNK_STOCK",
+      "Description": "Factory trunk",
+      "UsableSpace": 1.0,
+      "Weight": 1.0,
+      "Default": true
+    },
+    "AudioBasic": {
+      "ID": "TRUNK_AUDIO_BASIC",
+      "Description": "Basic audio setup",
+      "SubBox": true,
+      "AmpRack": false,
+      "UsableSpace": 0.7,
+      "Cost": 500
+    },
+    "AudioCustom": {
+      "ID": "TRUNK_AUDIO_CUSTOM",
+      "Description": "Custom audio build",
+      "SubBox": true,
+      "AmpRack": true,
+      "Trim": "Custom",
+      "UsableSpace": 0.4,
+      "Cost": 2000
+    },
+    "ShowCar": {
+      "ID": "TRUNK_SHOW",
+      "Description": "Full show trunk",
+      "CustomBuild": true,
+      "Display": true,
+      "Lighting": true,
+      "UsableSpace": 0.2,
+      "Cost": 5000
+    },
+    "RaceStripped": {
+      "ID": "TRUNK_RACE",
+      "Description": "Stripped racing trunk",
+      "Lightweight": true,
+      "BatteryRelocation": true,
+      "FuelCell": { "Optional": true },
+      "UsableSpace": 0.9,
+      "WeightSaving": 30,
+      "Cost": 500
+    },
+    "Hydraulics": {
+      "ID": "TRUNK_HYDRO",
+      "Description": "Hydraulic setup trunk",
+      "Pumps": true,
+      "Batteries": true,
+      "Switches": true,
+      "UsableSpace": 0.1,
+      "Cost": 8000
+    }
+  },
+
+  "AudioDisplays": {
+    "SubwooferBox": {
+      "Types": {
+        "PreFab": {
+          "Description": "Pre-fabricated box",
+          "Fit": "Universal",
+          "Cost": 100
+        },
+        "VehicleSpecific": {
+          "Description": "Vehicle-specific box",
+          "Fit": "Perfect",
+          "Cost": 200
+        },
+        "Custom": {
+          "Description": "Custom fiberglass",
+          "Fit": "Custom",
+          "Show": true,
+          "Cost": 500
+        },
+        "Blow Through": {
+          "Description": "Blow-through wall",
+          "ToRearSeat": true,
+          "Loud": true,
+          "Cost": 800
+        }
+      },
+      "Finishes": {
+        "Carpet": { "Standard": true },
+        "Vinyl": { "Durable": true, "Cost": 100 },
+        "Leather": { "Premium": true, "Cost": 300 },
+        "Fiberglass": { "Show": true, "Cost": 400 },
+        "Acrylic": { "Transparent": true, "Cost": 500 }
+      }
+    },
+    "AmpRack": {
+      "Types": {
+        "Basic": {
+          "Description": "Basic amp rack",
+          "Amps": 1,
+          "Cost": 100
+        },
+        "Multi": {
+          "Description": "Multi-amp rack",
+          "Amps": [2, 4],
+          "Cost": 300
+        },
+        "ShowRack": {
+          "Description": "Show display rack",
+          "LED": true,
+          "Plexiglass": true,
+          "Cost": 600
+        }
+      },
+      "Orientation": ["Horizontal", "Vertical", "Angled"]
+    },
+    "FloorPanels": {
+      "Types": {
+        "Stock": { "Default": true },
+        "FalseFloor": {
+          "Description": "Raised false floor",
+          "HiddenStorage": true,
+          "Cost": 400
+        },
+        "ShowFloor": {
+          "Description": "Show quality floor",
+          "LED": true,
+          "Custom": true,
+          "Cost": 1000
+        }
+      },
+      "Materials": ["Carpet", "Vinyl", "Fiberglass", "Acrylic", "Wood"]
+    }
+  },
+
+  "TrunkLighting": {
+    "Types": {
+      "Stock": {
+        "ID": "LIGHT_STOCK",
+        "Description": "Factory trunk light",
+        "Default": true
+      },
+      "LED": {
+        "ID": "LIGHT_LED",
+        "Description": "LED strip lighting",
+        "Color": "White",
+        "Cost": 50
+      },
+      "RGB": {
+        "ID": "LIGHT_RGB",
+        "Description": "RGB LED kit",
+        "Color": "Any",
+        "App": true,
+        "Cost": 150
+      },
+      "ShowLighting": {
+        "ID": "LIGHT_SHOW",
+        "Description": "Show lighting kit",
+        "Zones": 4,
+        "Effects": true,
+        "Cost": 400
+      },
+      "NeonAccent": {
+        "ID": "LIGHT_NEON",
+        "Description": "Neon accent tubes",
+        "Retro": true,
+        "Cost": 200
+      }
+    },
+    "Zones": {
+      "Lid": true,
+      "Floor": true,
+      "Sides": true,
+      "Around Equipment": true
+    }
+  },
+
+  "TrunkComponents": {
+    "BatteryRelocation": {
+      "ID": "COMP_BATTERY",
+      "Description": "Battery relocation kit",
+      "Location": "Trunk",
+      "WeightDistribution": "Better",
+      "Safety": { "Box": true, "Vent": true },
+      "Cost": 200
+    },
+    "FuelCell": {
+      "ID": "COMP_FUEL",
+      "Description": "Racing fuel cell",
+      "ForRacing": true,
+      "FIA": { "Optional": true },
+      "Cost": 2000
+    },
+    "AirTankSetup": {
+      "ID": "COMP_AIR",
+      "Description": "Air suspension tanks",
+      "Tanks": [1, 2, 4],
+      "Compressor": true,
+      "Cost": 1000
+    },
+    "NOSBottles": {
+      "ID": "COMP_NOS",
+      "Description": "Nitrous bottle mount",
+      "Bottles": [1, 2],
+      "Warmer": { "Optional": true },
+      "Cost": 200
+    },
+    "Toolbox": {
+      "ID": "COMP_TOOLS",
+      "Description": "Built-in toolbox",
+      "Organized": true,
+      "Cost": 300
+    },
+    "SubFloorStorage": {
+      "ID": "COMP_STORAGE",
+      "Description": "Under-floor storage",
+      "Hidden": true,
+      "Cost": 200
+    }
+  },
+
+  "HydraulicSetup": {
+    "Pumps": {
+      "Single": {
+        "Pumps": 1,
+        "Movement": "Basic",
+        "Cost": 2000
+      },
+      "Double": {
+        "Pumps": 2,
+        "Movement": "FrontRear",
+        "Cost": 3500
+      },
+      "Triple": {
+        "Pumps": 3,
+        "Movement": "3Wheel",
+        "Cost": 5000
+      },
+      "Quad": {
+        "Pumps": 4,
+        "Movement": "Individual",
+        "Cost": 7000
+      }
+    },
+    "Batteries": {
+      "Count": { "Range": [4, 16] },
+      "Type": "DeepCycle",
+      "Voltage": { "Total": true }
+    },
+    "Switches": {
+      "Basic": { "Count": 4 },
+      "Extended": { "Count": 8 },
+      "Custom": { "Count": 16 }
+    },
+    "Display": {
+      "Chrome": true,
+      "ShowPolish": true,
+      "Engraved": true
+    }
+  },
+
+  "AirRideSetup": {
+    "Tanks": {
+      "Single": {
+        "Gallons": 3,
+        "Cost": 300
+      },
+      "Dual": {
+        "Gallons": 6,
+        "Cost": 500
+      },
+      "Quad": {
+        "Gallons": 12,
+        "Cost": 800
+      }
+    },
+    "Compressors": {
+      "Single": { "CFM": 3, "Cost": 300 },
+      "Dual": { "CFM": 6, "Cost": 500 }
+    },
+    "Management": {
+      "Basic": { "Switches": 4, "Cost": 400 },
+      "Digital": { "Presets": true, "App": true, "Cost": 1500 }
+    }
+  },
+
+  "Finishes": {
+    "TrunkLiner": {
+      "Stock": { "Default": true },
+      "Carpet": { "Colors": "Many", "Cost": 200 },
+      "Vinyl": { "Marine": true, "Cost": 300 },
+      "Leather": { "Premium": true, "Cost": 800 },
+      "Suede": { "Show": true, "Cost": 600 }
+    },
+    "TrimPieces": {
+      "Stock": { "Default": true },
+      "Carbon": { "Look": "Racing", "Cost": 400 },
+      "Chrome": { "Look": "Classic", "Cost": 300 },
+      "Painted": { "BodyMatch": true, "Cost": 500 }
+    }
+  },
+
+  "UI": {
+    "TrunkMenu": {
+      "StyleSelector": true,
+      "AudioOptions": true,
+      "LightingOptions": true,
+      "ComponentOptions": true
+    },
+    "Preview": {
+      "TrunkOpenView": true,
+      "EquipmentLayout": true,
+      "LightingPreview": true
+    },
+    "BuildPlanner": {
+      "ComponentPlacement": true,
+      "WiringDiagram": true,
+      "CostEstimate": true
+    }
+  }
+}

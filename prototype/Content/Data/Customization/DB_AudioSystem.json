@@ -1,0 +1,383 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Audio System Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "AudioUpgrades": true,
+    "CustomInstalls": true,
+    "CompetitionAudio": true
+  },
+
+  "SystemTiers": {
+    "Stock": {
+      "ID": "SYS_STOCK",
+      "Description": "Factory audio system",
+      "Quality": "Basic",
+      "Wattage": 150,
+      "Speakers": 4,
+      "Default": true
+    },
+    "Premium": {
+      "ID": "SYS_PREMIUM",
+      "Description": "Premium factory option",
+      "Quality": "Good",
+      "Wattage": 400,
+      "Speakers": 8,
+      "Brand": { "ByVehicle": true },
+      "Cost": 1000
+    },
+    "Aftermarket": {
+      "ID": "SYS_AFTERMARKET",
+      "Description": "Aftermarket upgrade",
+      "Quality": "Very Good",
+      "Wattage": 800,
+      "Speakers": { "Custom": true },
+      "Cost": 2000
+    },
+    "Competition": {
+      "ID": "SYS_COMPETITION",
+      "Description": "Competition audio system",
+      "Quality": "Extreme",
+      "Wattage": { "Min": 2000 },
+      "Custom": true,
+      "Cost": 10000
+    }
+  },
+
+  "HeadUnits": {
+    "Stock": {
+      "ID": "HEAD_STOCK",
+      "Description": "Factory head unit",
+      "Features": ["Radio", "CD"],
+      "Display": { "ByVehicle": true },
+      "Default": true
+    },
+    "SingleDIN": {
+      "ID": "HEAD_1DIN",
+      "Description": "Single DIN aftermarket",
+      "Size": "1DIN",
+      "Features": ["Radio", "Bluetooth", "USB", "AUX"],
+      "Display": "Small",
+      "Cost": 200
+    },
+    "DoubleDIN": {
+      "ID": "HEAD_2DIN",
+      "Description": "Double DIN touchscreen",
+      "Size": "2DIN",
+      "Features": ["Radio", "Bluetooth", "USB", "CarPlay", "AndroidAuto"],
+      "Display": "7inch",
+      "Cost": 500
+    },
+    "FloatingScreen": {
+      "ID": "HEAD_FLOAT",
+      "Description": "Floating screen unit",
+      "Size": "Universal",
+      "Features": ["Radio", "Bluetooth", "USB", "CarPlay", "AndroidAuto", "Navigation"],
+      "Display": "9-10inch",
+      "Cost": 800
+    },
+    "TabletStyle": {
+      "ID": "HEAD_TABLET",
+      "Description": "Tesla-style tablet",
+      "Size": "Large",
+      "Features": "All",
+      "Display": "12-15inch",
+      "Premium": true,
+      "Cost": 1500
+    }
+  },
+
+  "Amplifiers": {
+    "Types": {
+      "Stock": {
+        "ID": "AMP_STOCK",
+        "Description": "Factory amplifier",
+        "Channels": 4,
+        "Wattage": 100,
+        "Default": true
+      },
+      "ClassAB": {
+        "ID": "AMP_AB",
+        "Description": "Class A/B amplifier",
+        "Channels": [2, 4, 5, 6],
+        "Wattage": { "Range": [200, 1000] },
+        "Quality": "Good",
+        "Heat": "Moderate",
+        "Cost": 300
+      },
+      "ClassD": {
+        "ID": "AMP_D",
+        "Description": "Class D amplifier",
+        "Channels": [1, 2, 4, 5],
+        "Wattage": { "Range": [500, 3000] },
+        "Quality": "Very Good",
+        "Heat": "Low",
+        "Efficient": true,
+        "Cost": 400
+      },
+      "MonoBlock": {
+        "ID": "AMP_MONO",
+        "Description": "Mono subwoofer amp",
+        "Channels": 1,
+        "Wattage": { "Range": [500, 5000] },
+        "ForSubs": true,
+        "Cost": 350
+      },
+      "FullRange": {
+        "ID": "AMP_FULL",
+        "Description": "Full-range amplifier",
+        "Channels": [4, 5, 6],
+        "Wattage": { "Range": [400, 1500] },
+        "AllSpeakers": true,
+        "Cost": 500
+      },
+      "Competition": {
+        "ID": "AMP_COMP",
+        "Description": "Competition amplifier",
+        "Channels": { "Custom": true },
+        "Wattage": { "Range": [2000, 10000] },
+        "Premium": true,
+        "Cost": 2000
+      }
+    },
+    "Brands": {
+      "Premium": ["JL Audio", "Focal", "McIntosh", "Audison"],
+      "Performance": ["Rockford Fosgate", "Kicker", "Alpine", "Pioneer"],
+      "Budget": ["Boss", "Pyle", "Generic"]
+    }
+  },
+
+  "Speakers": {
+    "Types": {
+      "Coaxial": {
+        "ID": "SPKR_COAX",
+        "Description": "Full-range coaxial",
+        "Components": "Integrated",
+        "Installation": "Easy",
+        "Quality": "Good"
+      },
+      "Component": {
+        "ID": "SPKR_COMP",
+        "Description": "Component speakers",
+        "Components": "Separate",
+        "Installation": "Moderate",
+        "Quality": "Excellent"
+      },
+      "MidRange": {
+        "ID": "SPKR_MID",
+        "Description": "Midrange drivers",
+        "Frequency": "Mid",
+        "ForCustom": true
+      },
+      "Tweeter": {
+        "ID": "SPKR_TWEET",
+        "Description": "Tweeters",
+        "Frequency": "High",
+        "ForCustom": true
+      }
+    },
+    "Sizes": {
+      "Standard": ["6.5inch", "6x9inch", "5.25inch"],
+      "Custom": ["8inch", "10inch", "3.5inch"]
+    },
+    "Locations": {
+      "FrontDoors": { "Primary": true },
+      "RearDoors": { "Secondary": true },
+      "RearDeck": { "ForSedan": true },
+      "APillar": { "ForTweeters": true },
+      "Dashboard": { "ForTweeters": true },
+      "Kicks": { "ForMidbass": true }
+    }
+  },
+
+  "Subwoofers": {
+    "Types": {
+      "None": {
+        "ID": "SUB_NONE",
+        "Description": "No subwoofer",
+        "Default": true
+      },
+      "PoweredCompact": {
+        "ID": "SUB_COMPACT",
+        "Description": "Powered compact sub",
+        "Size": "8inch",
+        "Power": 200,
+        "Enclosure": "Integrated",
+        "Cost": 200
+      },
+      "Standard": {
+        "ID": "SUB_STD",
+        "Description": "Standard subwoofer",
+        "Size": ["10inch", "12inch"],
+        "Power": { "Range": [300, 800] },
+        "Enclosure": "Required",
+        "Cost": 300
+      },
+      "Performance": {
+        "ID": "SUB_PERF",
+        "Description": "Performance subwoofer",
+        "Size": ["12inch", "15inch"],
+        "Power": { "Range": [500, 1500] },
+        "Enclosure": "Required",
+        "Cost": 600
+      },
+      "Competition": {
+        "ID": "SUB_COMP",
+        "Description": "Competition subwoofer",
+        "Size": ["15inch", "18inch"],
+        "Power": { "Range": [1500, 5000] },
+        "Enclosure": "Custom",
+        "Cost": 1500
+      }
+    },
+    "Enclosures": {
+      "Sealed": {
+        "Description": "Sealed enclosure",
+        "Sound": "Tight",
+        "Accuracy": "High"
+      },
+      "Ported": {
+        "Description": "Ported enclosure",
+        "Sound": "Loud",
+        "Output": "Higher"
+      },
+      "Bandpass": {
+        "Description": "Bandpass enclosure",
+        "Sound": "Very Loud",
+        "Narrow": true
+      },
+      "FreeAir": {
+        "Description": "Free-air mounting",
+        "NoBox": true,
+        "SpaceSaving": true
+      },
+      "Custom": {
+        "Description": "Custom fiberglass",
+        "FitsTrunk": true,
+        "Cost": 500
+      }
+    }
+  },
+
+  "SoundProcessing": {
+    "DSP": {
+      "ID": "PROC_DSP",
+      "Description": "Digital signal processor",
+      "Features": ["Crossover", "EQ", "TimeAlignment", "RTA"],
+      "Tuning": "Professional",
+      "Cost": 400
+    },
+    "Equalizer": {
+      "ID": "PROC_EQ",
+      "Description": "Graphic equalizer",
+      "Bands": [7, 10, 15, 31],
+      "Cost": 100
+    },
+    "Crossover": {
+      "ID": "PROC_XOVER",
+      "Description": "Active crossover",
+      "Channels": [2, 3, 4],
+      "Cost": 150
+    },
+    "LineDriver": {
+      "ID": "PROC_LINE",
+      "Description": "Line driver",
+      "SignalBoost": true,
+      "NoiseReduction": true,
+      "Cost": 100
+    }
+  },
+
+  "Installation": {
+    "Wiring": {
+      "PowerWire": {
+        "Gauges": ["8AWG", "4AWG", "0AWG"],
+        "ByPower": true
+      },
+      "SpeakerWire": {
+        "Gauges": ["16AWG", "14AWG", "12AWG"],
+        "ByDistance": true
+      },
+      "RCA": {
+        "Quality": ["Basic", "Premium", "Competition"],
+        "Shielded": true
+      }
+    },
+    "Accessories": {
+      "BigThree": {
+        "Description": "Big 3 upgrade",
+        "Grounds": true,
+        "Alternator": true,
+        "Cost": 200
+      },
+      "Capacitor": {
+        "Description": "Audio capacitor",
+        "Farad": [1, 2, 5],
+        "Cost": 100
+      },
+      "SecondBattery": {
+        "Description": "Secondary battery",
+        "ForHighPower": true,
+        "Cost": 300
+      }
+    },
+    "SoundDeadening": {
+      "Doors": { "Coverage": "Full", "Cost": 200 },
+      "Floor": { "Coverage": "Full", "Cost": 300 },
+      "Trunk": { "Coverage": "Full", "Cost": 200 },
+      "Roof": { "Coverage": "Full", "Cost": 150 }
+    }
+  },
+
+  "Presets": {
+    "Quiet": {
+      "Description": "Background music",
+      "Volume": "Low",
+      "Bass": "Minimal"
+    },
+    "Balanced": {
+      "Description": "Balanced sound",
+      "Volume": "Moderate",
+      "Bass": "Normal"
+    },
+    "Bass": {
+      "Description": "Bass heavy",
+      "Volume": "High",
+      "Bass": "Maximum"
+    },
+    "Racing": {
+      "Description": "Race day mix",
+      "Volume": "Maximum",
+      "Focus": "ExhaustNote"
+    },
+    "Custom": {
+      "Description": "Custom EQ",
+      "UserDefined": true
+    }
+  },
+
+  "Brands": {
+    "Premium": ["JL Audio", "Focal", "Dynaudio", "Morel", "Audison"],
+    "Performance": ["Rockford Fosgate", "Kicker", "Alpine", "JBL", "Hertz"],
+    "Value": ["Pioneer", "Kenwood", "Sony", "Boss"]
+  },
+
+  "UI": {
+    "AudioMenu": {
+      "SystemSelector": true,
+      "ComponentUpgrades": true,
+      "PresetSelector": true
+    },
+    "Equalizer": {
+      "Bands": true,
+      "Presets": true,
+      "Custom": true
+    },
+    "Installation": {
+      "WiringOptions": true,
+      "AccessoryOptions": true,
+      "SoundDeadeningOptions": true
+    }
+  }
+}

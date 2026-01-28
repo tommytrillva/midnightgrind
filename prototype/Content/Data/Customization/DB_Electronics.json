@@ -1,0 +1,355 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Electronics and Gadgets Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "ElectronicsUpgrades": true,
+    "SafetyElectronics": true,
+    "PerformanceElectronics": true
+  },
+
+  "NavigationSystems": {
+    "Types": {
+      "None": {
+        "ID": "NAV_NONE",
+        "Description": "No navigation",
+        "Default": true
+      },
+      "PhoneMirror": {
+        "ID": "NAV_PHONE",
+        "Description": "Phone mirroring",
+        "CarPlay": true,
+        "AndroidAuto": true,
+        "Cost": 0
+      },
+      "Integrated": {
+        "ID": "NAV_INT",
+        "Description": "Integrated navigation",
+        "BuiltIn": true,
+        "OfflineMaps": true,
+        "Cost": 500
+      },
+      "Premium": {
+        "ID": "NAV_PREMIUM",
+        "Description": "Premium navigation",
+        "RealTimeTraffic": true,
+        "3DMaps": true,
+        "VoiceAssist": true,
+        "Cost": 1000
+      },
+      "Racing": {
+        "ID": "NAV_RACING",
+        "Description": "Racing navigation",
+        "TrackMaps": true,
+        "LapTiming": true,
+        "DataOverlay": true,
+        "Cost": 1500
+      }
+    },
+    "Features": {
+      "POI": true,
+      "SpeedCamera": true,
+      "TrafficAlerts": true,
+      "RouteOptimization": true
+    }
+  },
+
+  "DashCameras": {
+    "Types": {
+      "None": {
+        "ID": "DASHCAM_NONE",
+        "Default": true
+      },
+      "FrontOnly": {
+        "ID": "DASHCAM_FRONT",
+        "Description": "Front dash camera",
+        "Resolution": "1080p",
+        "Recording": "Loop",
+        "Cost": 150
+      },
+      "DualChannel": {
+        "ID": "DASHCAM_DUAL",
+        "Description": "Front and rear cameras",
+        "Resolution": "1080p",
+        "Coverage": "Both",
+        "Cost": 300
+      },
+      "FourK": {
+        "ID": "DASHCAM_4K",
+        "Description": "4K dash camera",
+        "Resolution": "4K",
+        "NightVision": true,
+        "Cost": 500
+      },
+      "Racing": {
+        "ID": "DASHCAM_RACE",
+        "Description": "Racing camera system",
+        "MultiAngle": true,
+        "DataOverlay": true,
+        "HighFPS": true,
+        "Cost": 1000
+      }
+    },
+    "Features": {
+      "GPSLogging": true,
+      "GForce": true,
+      "ParkingMode": true,
+      "CloudBackup": true,
+      "EmergencyLock": true
+    }
+  },
+
+  "PerformanceMonitors": {
+    "OBD2Scanner": {
+      "ID": "PERF_OBD",
+      "Description": "OBD2 scanner",
+      "DiagnosticCodes": true,
+      "LiveData": true,
+      "Cost": 100
+    },
+    "BoostController": {
+      "ID": "PERF_BOOST",
+      "Description": "Electronic boost controller",
+      "Presets": 4,
+      "BoostByGear": true,
+      "Cost": 400
+    },
+    "WidebandsAFR": {
+      "ID": "PERF_AFR",
+      "Description": "Wideband AFR controller",
+      "AFRMonitoring": true,
+      "DataLogging": true,
+      "Cost": 300
+    },
+    "LapTimer": {
+      "ID": "PERF_LAP",
+      "Description": "GPS lap timer",
+      "Accuracy": "High",
+      "TrackDatabase": true,
+      "Cost": 500
+    },
+    "DataLogger": {
+      "ID": "PERF_DATA",
+      "Description": "Performance data logger",
+      "Channels": 20,
+      "GPSIntegrated": true,
+      "VideoSync": true,
+      "Cost": 1500
+    },
+    "QuarterMile": {
+      "ID": "PERF_DRAG",
+      "Description": "Drag racing timer",
+      "ReactionTime": true,
+      "ET": true,
+      "TrapSpeed": true,
+      "Cost": 200
+    }
+  },
+
+  "RemoteStarters": {
+    "Types": {
+      "None": {
+        "ID": "REMOTE_NONE",
+        "Default": true
+      },
+      "Basic": {
+        "ID": "REMOTE_BASIC",
+        "Description": "Basic remote start",
+        "Range": "500ft",
+        "OneWay": true,
+        "Cost": 200
+      },
+      "TwoWay": {
+        "ID": "REMOTE_2WAY",
+        "Description": "Two-way remote start",
+        "Range": "1000ft",
+        "Confirmation": true,
+        "Cost": 400
+      },
+      "Smartphone": {
+        "ID": "REMOTE_SMART",
+        "Description": "Smartphone remote start",
+        "Range": "Unlimited",
+        "App": true,
+        "GPS": true,
+        "Cost": 500
+      }
+    },
+    "Features": {
+      "EngineStart": true,
+      "Climate": true,
+      "SeatHeat": true,
+      "Unlock": true,
+      "PanicAlarm": true
+    }
+  },
+
+  "SecuritySystems": {
+    "Types": {
+      "Stock": {
+        "ID": "SEC_STOCK",
+        "Description": "Factory alarm",
+        "Basic": true,
+        "Default": true
+      },
+      "Upgraded": {
+        "ID": "SEC_UPGRADE",
+        "Description": "Upgraded alarm system",
+        "Sensors": "More",
+        "Siren": "Louder",
+        "Cost": 300
+      },
+      "Premium": {
+        "ID": "SEC_PREMIUM",
+        "Description": "Premium security",
+        "TwoWay": true,
+        "Notification": true,
+        "GPS": true,
+        "Cost": 700
+      },
+      "Tracking": {
+        "ID": "SEC_TRACK",
+        "Description": "GPS tracking system",
+        "RealTime": true,
+        "Recovery": true,
+        "Geofence": true,
+        "Cost": 500
+      }
+    },
+    "Components": {
+      "ShockSensor": { "Standard": true },
+      "TiltSensor": { "AntiTow": true },
+      "GlassBreak": { "Window": true },
+      "ProximitySensor": { "Approach": true },
+      "KillSwitch": { "Hidden": true }
+    }
+  },
+
+  "RadarDetectors": {
+    "Types": {
+      "None": {
+        "ID": "RADAR_NONE",
+        "Default": true
+      },
+      "Basic": {
+        "ID": "RADAR_BASIC",
+        "Description": "Basic radar detector",
+        "Bands": ["X", "K", "Ka"],
+        "Range": "Short",
+        "Cost": 150
+      },
+      "Advanced": {
+        "ID": "RADAR_ADV",
+        "Description": "Advanced radar detector",
+        "Bands": ["X", "K", "Ka", "Laser"],
+        "Range": "Long",
+        "GPSLockout": true,
+        "Cost": 400
+      },
+      "Premium": {
+        "ID": "RADAR_PREMIUM",
+        "Description": "Premium detector",
+        "AllBands": true,
+        "Range": "Extreme",
+        "Arrows": true,
+        "App": true,
+        "Cost": 700
+      },
+      "Integrated": {
+        "ID": "RADAR_INT",
+        "Description": "Integrated system",
+        "Hidden": true,
+        "Custom": true,
+        "Cost": 2000
+      }
+    },
+    "Features": {
+      "LaserDetection": true,
+      "GPSDatabase": true,
+      "CommunityAlerts": true,
+      "FilteringBSM": true
+    },
+    "LegalNote": {
+      "Varies": { "ByState": true },
+      "CheckLocal": true
+    }
+  },
+
+  "LightingControllers": {
+    "UnderglowController": {
+      "ID": "CTRL_GLOW",
+      "Description": "Underglow controller",
+      "RGB": true,
+      "Patterns": 20,
+      "App": true,
+      "Cost": 100
+    },
+    "HeadlightController": {
+      "ID": "CTRL_HEAD",
+      "Description": "Sequential headlight kit",
+      "Modes": 5,
+      "Remote": true,
+      "Cost": 200
+    },
+    "InteriorController": {
+      "ID": "CTRL_INT",
+      "Description": "Interior light controller",
+      "Zones": 6,
+      "App": true,
+      "MusicSync": true,
+      "Cost": 150
+    }
+  },
+
+  "PhoneIntegration": {
+    "CarPlay": {
+      "Description": "Apple CarPlay",
+      "Wireless": { "Available": true },
+      "Features": ["Maps", "Music", "Calls", "Messages"]
+    },
+    "AndroidAuto": {
+      "Description": "Android Auto",
+      "Wireless": { "Available": true },
+      "Features": ["Maps", "Music", "Calls", "Messages"]
+    },
+    "MirrorLink": {
+      "Description": "MirrorLink",
+      "Wired": true
+    }
+  },
+
+  "ChargingPorts": {
+    "USB": {
+      "Types": ["USB-A", "USB-C"],
+      "Locations": ["Console", "Rear", "Dashboard"]
+    },
+    "Wireless": {
+      "QiCharging": true,
+      "Location": "Console",
+      "Cost": 100
+    },
+    "HighPower": {
+      "Watts": [18, 27, 45, 100],
+      "FastCharge": true
+    }
+  },
+
+  "UI": {
+    "ElectronicsMenu": {
+      "NavigationOptions": true,
+      "DashCamOptions": true,
+      "PerformanceMonitors": true,
+      "SecurityOptions": true
+    },
+    "Settings": {
+      "DevicePairing": true,
+      "AlertSettings": true,
+      "RecordingSettings": true
+    },
+    "Preview": {
+      "MountingLocations": true,
+      "ScreenDisplay": true
+    }
+  }
+}

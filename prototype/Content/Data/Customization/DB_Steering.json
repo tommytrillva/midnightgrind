@@ -1,0 +1,293 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Steering System and Modifications",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "SteeringUpgrades": true,
+    "QuickRatio": true,
+    "PowerSteeringMods": true
+  },
+
+  "SteeringRacks": {
+    "Stock": {
+      "ID": "RACK_STOCK",
+      "Description": "Factory steering rack",
+      "Ratio": { "ByVehicle": true },
+      "PowerAssist": { "ByVehicle": true },
+      "Default": true
+    },
+    "QuickRatio": {
+      "ID": "RACK_QUICK",
+      "Description": "Quick ratio rack",
+      "Ratio": { "Reduction": 15 },
+      "Response": "Faster",
+      "Cost": 1500
+    },
+    "ManualRack": {
+      "ID": "RACK_MANUAL",
+      "Description": "Manual steering rack",
+      "NoPower": true,
+      "DirectFeel": true,
+      "Weight": -15,
+      "ForRacing": true,
+      "Cost": 1200
+    },
+    "RacingRack": {
+      "ID": "RACK_RACING",
+      "Description": "Racing steering rack",
+      "Ratio": { "Reduction": 25 },
+      "QuickLock": true,
+      "ForDrift": true,
+      "Cost": 3000
+    },
+    "ElectricAssist": {
+      "ID": "RACK_EPS",
+      "Description": "Electric power steering",
+      "Adjustable": true,
+      "Modes": ["Comfort", "Normal", "Sport"],
+      "Cost": 2500
+    }
+  },
+
+  "SteeringRatio": {
+    "Stock": {
+      "Description": "Factory ratio",
+      "Turns": { "LockToLock": { "ByVehicle": true } },
+      "Default": true
+    },
+    "Sport": {
+      "Description": "Sport ratio",
+      "Turns": { "Reduction": 0.5 },
+      "Response": "Quicker"
+    },
+    "Racing": {
+      "Description": "Racing ratio",
+      "Turns": { "Reduction": 1.0 },
+      "Response": "Very Quick"
+    },
+    "Drift": {
+      "Description": "Drift ratio",
+      "Turns": { "Reduction": 1.5 },
+      "SteeringAngle": "Maximum"
+    }
+  },
+
+  "SteeringAngle": {
+    "Types": {
+      "Stock": {
+        "ID": "ANGLE_STOCK",
+        "Description": "Factory steering angle",
+        "Degrees": { "ByVehicle": true },
+        "Default": true
+      },
+      "Increased": {
+        "ID": "ANGLE_PLUS",
+        "Description": "Increased steering angle",
+        "DegreesAdded": 10,
+        "ForDrift": true,
+        "Cost": 500
+      },
+      "MaxAngle": {
+        "ID": "ANGLE_MAX",
+        "Description": "Maximum angle kit",
+        "DegreesAdded": 25,
+        "ForDrift": true,
+        "Cost": 1200
+      },
+      "CompetitionAngle": {
+        "ID": "ANGLE_COMP",
+        "Description": "Competition angle kit",
+        "DegreesAdded": 40,
+        "ProDrift": true,
+        "Cost": 2500
+      }
+    },
+    "Components": {
+      "AngleSpacers": { "Front": true },
+      "ExtendedTieRods": { "Required": true },
+      "ModifiedKnuckles": { "ForMax": true }
+    }
+  },
+
+  "PowerSteeringTypes": {
+    "Hydraulic": {
+      "ID": "PS_HYDRAULIC",
+      "Description": "Hydraulic power steering",
+      "Pump": "Belt-Driven",
+      "Feel": "Traditional",
+      "ParasiticLoss": 5
+    },
+    "ElectricHydraulic": {
+      "ID": "PS_EHPS",
+      "Description": "Electric-hydraulic PS",
+      "Pump": "Electric",
+      "Feel": "Good",
+      "ParasiticLoss": 2
+    },
+    "Electric": {
+      "ID": "PS_EPS",
+      "Description": "Electric power steering",
+      "Motor": "Rack-Mounted",
+      "Feel": "Variable",
+      "ParasiticLoss": 0
+    },
+    "Manual": {
+      "ID": "PS_MANUAL",
+      "Description": "No power assist",
+      "HeavyEffort": true,
+      "DirectFeel": true,
+      "ParasiticLoss": 0
+    }
+  },
+
+  "PowerSteeringMods": {
+    "PumpUpgrade": {
+      "ID": "MOD_PUMP",
+      "Description": "High-flow PS pump",
+      "Pressure": "Higher",
+      "Response": "Better",
+      "Cost": 400
+    },
+    "Cooler": {
+      "ID": "MOD_COOLER",
+      "Description": "Power steering cooler",
+      "Temperature": "Lower",
+      "ForTrack": true,
+      "Cost": 200
+    },
+    "Delete": {
+      "ID": "MOD_DELETE",
+      "Description": "Power steering delete",
+      "Manual": true,
+      "WeightSaving": 15,
+      "ForRacing": true,
+      "Cost": 300
+    },
+    "LockValve": {
+      "ID": "MOD_LOCK",
+      "Description": "PS lock valve",
+      "AdjustableAssist": true,
+      "ForDrift": true,
+      "Cost": 250
+    }
+  },
+
+  "SteeringComponents": {
+    "TieRods": {
+      "Stock": {
+        "Description": "Factory tie rods",
+        "Default": true
+      },
+      "Adjustable": {
+        "Description": "Adjustable tie rod ends",
+        "Alignment": "Precise",
+        "Cost": 200
+      },
+      "Extended": {
+        "Description": "Extended tie rods",
+        "ForAngleKits": true,
+        "Cost": 300
+      },
+      "RoseJoint": {
+        "Description": "Rose joint tie rods",
+        "Precision": "Maximum",
+        "ForRacing": true,
+        "Cost": 500
+      }
+    },
+    "SteeringColumn": {
+      "Stock": {
+        "Description": "Factory column",
+        "Default": true
+      },
+      "Collapsible": {
+        "Description": "Safety collapsible",
+        "Safety": true
+      },
+      "QuickRelease": {
+        "Description": "Quick-release column",
+        "Removable": true,
+        "ForRacing": true,
+        "Cost": 400
+      }
+    },
+    "UniversalJoints": {
+      "Stock": {
+        "Description": "Factory U-joints",
+        "Default": true
+      },
+      "Heavy Duty": {
+        "Description": "Heavy-duty U-joints",
+        "Strength": "Higher",
+        "Cost": 150
+      },
+      "Racing": {
+        "Description": "Racing U-joints",
+        "ZeroSlop": true,
+        "Cost": 300
+      }
+    }
+  },
+
+  "SteeringFeel": {
+    "Adjustments": {
+      "EPSModes": {
+        "Comfort": { "Assist": "High", "Effort": "Light" },
+        "Normal": { "Assist": "Medium", "Effort": "Moderate" },
+        "Sport": { "Assist": "Low", "Effort": "Heavy" },
+        "Track": { "Assist": "Minimum", "Effort": "Maximum" }
+      },
+      "WeightSimulation": {
+        "Enabled": { "ForEPS": true },
+        "Configurable": true
+      }
+    },
+    "Feedback": {
+      "RoadFeel": { "ByType": true },
+      "CenterFeel": { "Return": true },
+      "OnCenterDeadzone": { "Minimal": "Better" }
+    }
+  },
+
+  "DriftApplications": {
+    "AngleKit": {
+      "BasicAngleKit": {
+        "Angle": "+10",
+        "Components": ["Spacers", "TieRods"],
+        "Cost": 800
+      },
+      "ProAngleKit": {
+        "Angle": "+25",
+        "Components": ["Spacers", "TieRods", "Knuckles"],
+        "Cost": 2000
+      },
+      "MaxAngleKit": {
+        "Angle": "+45",
+        "Components": ["Full", "Custom"],
+        "Cost": 4000
+      }
+    },
+    "Benefits": {
+      "MoreAngle": { "DriftCapability": "Better" },
+      "CounterSteer": { "Recovery": "Easier" }
+    }
+  },
+
+  "UI": {
+    "SteeringMenu": {
+      "RackSelector": true,
+      "RatioOptions": true,
+      "AngleOptions": true,
+      "PowerSteeringMods": true
+    },
+    "Settings": {
+      "EPSModes": { "ForEPS": true },
+      "AngleDisplay": true
+    },
+    "Preview": {
+      "TurningRadius": true,
+      "SteeringAngle": true
+    }
+  }
+}
