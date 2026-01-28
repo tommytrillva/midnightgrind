@@ -1,0 +1,313 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vinyl Wrap and Full Body Coverage System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "WrapSystem": true,
+    "LayeredVinyl": true,
+    "CommunitySharing": true,
+    "MaxLayersPerWrap": 100
+  },
+
+  "WrapTypes": {
+    "FullWrap": {
+      "ID": "WRAP_FULL",
+      "Description": "Complete vehicle coverage",
+      "Coverage": 100,
+      "Sections": ["Hood", "Roof", "Trunk", "Doors", "Fenders", "Bumpers", "Mirrors"],
+      "BasePrice": 50000
+    },
+    "PartialWrap": {
+      "ID": "WRAP_PARTIAL",
+      "Description": "Selected panels only",
+      "Coverage": { "Min": 25, "Max": 75 },
+      "Sections": "Selectable",
+      "PriceMultiplier": 0.5
+    },
+    "AccentWrap": {
+      "ID": "WRAP_ACCENT",
+      "Description": "Accent lines and highlights",
+      "Coverage": { "Max": 25 },
+      "Focus": ["Stripes", "Trim", "Accents"],
+      "PriceMultiplier": 0.25
+    },
+    "RoofWrap": {
+      "ID": "WRAP_ROOF",
+      "Description": "Roof only coverage",
+      "Sections": ["Roof"],
+      "BasePrice": 5000
+    }
+  },
+
+  "VinylCategories": {
+    "SolidColors": {
+      "ID": "VINYL_SOLID",
+      "Types": {
+        "Gloss": { "Count": 100, "Shine": "High" },
+        "Matte": { "Count": 100, "Shine": "None" },
+        "Satin": { "Count": 100, "Shine": "Low" },
+        "Metallic": { "Count": 50, "Shine": "Metallic" }
+      }
+    },
+    "SpecialFinishes": {
+      "ID": "VINYL_SPECIAL",
+      "Types": {
+        "Chrome": { "Count": 20, "Reflective": true, "Price": 25000 },
+        "BrushedMetal": { "Count": 15, "Texture": true, "Price": 20000 },
+        "CarbonFiber": { "Count": 10, "Weave": true, "Price": 15000 },
+        "Holographic": { "Count": 10, "ColorShift": true, "Price": 50000 },
+        "Chameleon": { "Count": 15, "ColorShift": true, "Price": 40000 }
+      }
+    },
+    "Patterns": {
+      "ID": "VINYL_PATTERN",
+      "Types": {
+        "Camo": { "Count": 30, "Styles": ["Military", "Urban", "Digital", "Snow"] },
+        "Racing": { "Count": 25, "Styles": ["Gulf", "Martini", "Rothmans"] },
+        "Geometric": { "Count": 40, "Customizable": true },
+        "Abstract": { "Count": 35, "Artistic": true },
+        "Tribal": { "Count": 20, "Traditional": true }
+      }
+    },
+    "Themed": {
+      "ID": "VINYL_THEMED",
+      "Types": {
+        "JDM": { "Count": 50, "Style": "Japanese" },
+        "Euro": { "Count": 40, "Style": "European" },
+        "Muscle": { "Count": 35, "Style": "American" },
+        "Drift": { "Count": 45, "Style": "DriftCulture" },
+        "Cyberpunk": { "Count": 30, "Style": "Futuristic" }
+      }
+    },
+    "Liveries": {
+      "ID": "VINYL_LIVERY",
+      "Types": {
+        "RacingLiveries": { "Count": 50, "Authentic": true },
+        "HistoricLiveries": { "Count": 30, "Classic": true },
+        "FantasyLiveries": { "Count": 40, "Original": true },
+        "TeamLiveries": { "Count": 25, "Matching": true }
+      }
+    }
+  },
+
+  "VinylEditor": {
+    "Canvas": {
+      "Resolution": "4K",
+      "LayerLimit": 100,
+      "UVMapping": true,
+      "RealTimePreview": true
+    },
+    "Shapes": {
+      "Basic": {
+        "Rectangle": true,
+        "Circle": true,
+        "Triangle": true,
+        "Polygon": true,
+        "Line": true
+      },
+      "Advanced": {
+        "Bezier": true,
+        "FreeformPath": true,
+        "Text": true,
+        "CustomShape": true
+      },
+      "Primitives": {
+        "Stars": { "Points": [3, 4, 5, 6, 8] },
+        "Arrows": { "Styles": 10 },
+        "Hexagons": { "Patterns": true },
+        "Chevrons": { "Stackable": true }
+      }
+    },
+    "Tools": {
+      "Selection": { "Box": true, "Lasso": true, "Magic": true },
+      "Transform": { "Move": true, "Scale": true, "Rotate": true, "Skew": true },
+      "PathEdit": { "AddPoint": true, "RemovePoint": true, "CurveHandle": true },
+      "Fill": { "Solid": true, "Gradient": true, "Pattern": true },
+      "Stroke": { "Width": { "Min": 0, "Max": 50 }, "Style": ["Solid", "Dashed", "Dotted"] }
+    },
+    "Gradients": {
+      "Types": {
+        "Linear": { "Angle": 360 },
+        "Radial": { "CenterPoint": true },
+        "Conical": { "Available": true },
+        "Diamond": { "Available": true }
+      },
+      "Stops": { "Max": 10 },
+      "ColorPicker": true,
+      "SaveGradient": { "Max": 20 }
+    }
+  },
+
+  "MaskingSystem": {
+    "BodyPanelMasks": {
+      "Enabled": true,
+      "Panels": {
+        "Hood": { "Mask": true, "Edges": true },
+        "Doors": { "Mask": true, "HandleCutout": true },
+        "Fenders": { "Mask": true, "WheelWellCutout": true },
+        "Bumpers": { "Mask": true, "GrilleCutout": true },
+        "Trunk": { "Mask": true, "BadgeCutout": true }
+      }
+    },
+    "CustomMasks": {
+      "CreateMask": true,
+      "InvertMask": true,
+      "FeatherEdge": { "Min": 0, "Max": 50 },
+      "MaskFromShape": true
+    },
+    "ClippingMasks": {
+      "Enabled": true,
+      "GroupClipping": true,
+      "MultiLayerClip": true
+    }
+  },
+
+  "SymmetryOptions": {
+    "Modes": {
+      "LeftToRight": { "Mirror": true },
+      "RightToLeft": { "Mirror": true },
+      "FrontToBack": { "Mirror": true },
+      "FullSymmetry": { "AllSides": true }
+    },
+    "LiveMirror": {
+      "Enabled": true,
+      "RealTimeUpdate": true
+    },
+    "BreakSymmetry": {
+      "Allowed": true,
+      "PerLayer": true
+    }
+  },
+
+  "CommunityFeatures": {
+    "Sharing": {
+      "UploadDesign": true,
+      "DownloadDesign": true,
+      "ShareCode": true,
+      "DirectShare": { "Friends": true, "Crew": true }
+    },
+    "Storefront": {
+      "Enabled": true,
+      "ListForSale": true,
+      "PriceRange": { "Min": 1000, "Max": 500000 },
+      "CreatorRevenue": { "Percentage": 70 }
+    },
+    "Discovery": {
+      "Featured": true,
+      "Trending": true,
+      "NewArrivals": true,
+      "TopRated": true,
+      "ByCreator": true,
+      "ByVehicle": true
+    },
+    "Ratings": {
+      "FiveStars": true,
+      "DownloadCount": true,
+      "FavoriteCount": true,
+      "Comments": true
+    },
+    "Curation": {
+      "StaffPicks": true,
+      "WeeklySpotlight": true,
+      "ContestWinners": true
+    }
+  },
+
+  "PremadeWraps": {
+    "Categories": {
+      "Starter": {
+        "Price": "Free",
+        "Count": 20,
+        "Quality": "Basic"
+      },
+      "Standard": {
+        "Price": { "Range": [5000, 25000] },
+        "Count": 100,
+        "Quality": "Good"
+      },
+      "Premium": {
+        "Price": { "Range": [25000, 100000] },
+        "Count": 50,
+        "Quality": "High"
+      },
+      "Exclusive": {
+        "Price": { "Range": [100000, 500000] },
+        "Count": 20,
+        "Quality": "Premium",
+        "Limited": true
+      }
+    },
+    "UnlockMethods": {
+      "Purchase": true,
+      "LevelUnlock": true,
+      "AchievementUnlock": true,
+      "EventReward": true,
+      "CrewReward": true
+    }
+  },
+
+  "SaveSystem": {
+    "DesignSlots": {
+      "PerVehicle": 10,
+      "CloudSaved": true,
+      "AutoSave": true
+    },
+    "Export": {
+      "ShareCode": { "Length": 12 },
+      "QRCode": true,
+      "Screenshot": { "Resolution": "4K" }
+    },
+    "Import": {
+      "ByCode": true,
+      "FromGallery": true,
+      "FromFriend": true
+    },
+    "Versioning": {
+      "Enabled": true,
+      "MaxVersions": 5,
+      "RestorePrevious": true
+    }
+  },
+
+  "Performance": {
+    "TextureResolution": {
+      "Low": "1024",
+      "Medium": "2048",
+      "High": "4096",
+      "Ultra": "8192"
+    },
+    "LOD": {
+      "Enabled": true,
+      "DistanceBased": true,
+      "DetailReduction": true
+    },
+    "Caching": {
+      "Enabled": true,
+      "PreloadOwned": true,
+      "MaxCached": 20
+    }
+  },
+
+  "UI": {
+    "EditorLayout": {
+      "LayerPanel": { "Position": "Left" },
+      "ToolPanel": { "Position": "Top" },
+      "ColorPanel": { "Position": "Right" },
+      "Preview": { "Position": "Center" }
+    },
+    "ViewControls": {
+      "RotateVehicle": true,
+      "ZoomLevels": [0.5, 1.0, 2.0, 4.0],
+      "PanelIsolation": true,
+      "Wireframe": true
+    },
+    "Shortcuts": {
+      "UndoRedo": { "Steps": 100 },
+      "QuickSave": "Ctrl+S",
+      "QuickLoad": "Ctrl+O",
+      "Copy": "Ctrl+C",
+      "Paste": "Ctrl+V"
+    }
+  }
+}

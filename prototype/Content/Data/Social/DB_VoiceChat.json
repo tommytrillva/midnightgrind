@@ -1,0 +1,308 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Voice Communication System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DefaultEnabled": false,
+    "RequiresOptIn": true,
+    "QualitySettings": true,
+    "SpatialAudio": true
+  },
+
+  "VoiceChannels": {
+    "Proximity": {
+      "ID": "VOICE_PROXIMITY",
+      "Name": "Proximity Chat",
+      "Description": "Hear nearby players",
+      "Range": { "Min": 10, "Max": 100, "Default": 50 },
+      "FallOff": "Linear",
+      "InVehicle": true,
+      "FreeRoam": true
+    },
+    "Party": {
+      "ID": "VOICE_PARTY",
+      "Name": "Party Chat",
+      "Description": "Private group voice",
+      "MaxMembers": 8,
+      "Priority": "High",
+      "CrossSession": true
+    },
+    "Crew": {
+      "ID": "VOICE_CREW",
+      "Name": "Crew Chat",
+      "Description": "Crew members only",
+      "MaxMembers": 50,
+      "Priority": "Medium",
+      "CrewMembersOnly": true
+    },
+    "Race": {
+      "ID": "VOICE_RACE",
+      "Name": "Race Chat",
+      "Description": "All racers in event",
+      "MaxMembers": 16,
+      "Priority": "High",
+      "AutoJoin": true,
+      "EventOnly": true
+    },
+    "Team": {
+      "ID": "VOICE_TEAM",
+      "Name": "Team Chat",
+      "Description": "Team races only",
+      "MaxMembers": 8,
+      "Priority": "High",
+      "TeamMembersOnly": true
+    },
+    "Spectator": {
+      "ID": "VOICE_SPECTATOR",
+      "Name": "Spectator Chat",
+      "Description": "Spectators only",
+      "MaxMembers": 100,
+      "Priority": "Low",
+      "SpectatorsOnly": true
+    }
+  },
+
+  "AudioQuality": {
+    "Presets": {
+      "Low": {
+        "ID": "QUALITY_LOW",
+        "Bitrate": 16,
+        "SampleRate": 16000,
+        "Bandwidth": "Minimal"
+      },
+      "Medium": {
+        "ID": "QUALITY_MEDIUM",
+        "Bitrate": 32,
+        "SampleRate": 24000,
+        "Bandwidth": "Moderate",
+        "Default": true
+      },
+      "High": {
+        "ID": "QUALITY_HIGH",
+        "Bitrate": 64,
+        "SampleRate": 48000,
+        "Bandwidth": "High"
+      },
+      "Ultra": {
+        "ID": "QUALITY_ULTRA",
+        "Bitrate": 128,
+        "SampleRate": 48000,
+        "Bandwidth": "Maximum",
+        "VIPOnly": true
+      }
+    },
+    "Adaptive": {
+      "Enabled": true,
+      "AdjustForLatency": true,
+      "AdjustForBandwidth": true
+    }
+  },
+
+  "SpatialAudio": {
+    "Enabled": true,
+    "Settings": {
+      "HRTF": true,
+      "DirectionAccuracy": "High",
+      "DistanceModel": "InverseSquare",
+      "DopplerEffect": false
+    },
+    "Environments": {
+      "OpenWorld": {
+        "Reverb": "Minimal",
+        "Occlusion": true
+      },
+      "Tunnel": {
+        "Reverb": "Strong",
+        "EchoEffect": true
+      },
+      "Garage": {
+        "Reverb": "Medium",
+        "Enclosed": true
+      }
+    },
+    "VehicleEffects": {
+      "InsideVehicle": {
+        "Muffled": true,
+        "EngineBlend": 0.3
+      },
+      "WindowsDown": {
+        "Muffled": false,
+        "WindNoise": true
+      }
+    }
+  },
+
+  "PushToTalk": {
+    "Enabled": true,
+    "DefaultBinding": {
+      "Keyboard": "V",
+      "Controller": "DPadDown"
+    },
+    "Options": {
+      "Hold": { "Default": true },
+      "Toggle": { "Available": true },
+      "OpenMic": { "Available": true, "RequiresSensitivity": true }
+    }
+  },
+
+  "OpenMic": {
+    "Enabled": true,
+    "VoiceActivation": {
+      "Sensitivity": { "Min": 0, "Max": 100, "Default": 50 },
+      "NoiseGate": true,
+      "AutoGain": true
+    },
+    "Settings": {
+      "ActivationDelay": { "Ms": 50 },
+      "ReleaseDelay": { "Ms": 200 },
+      "MinDuration": { "Ms": 100 }
+    }
+  },
+
+  "VolumeControls": {
+    "Master": {
+      "Min": 0,
+      "Max": 200,
+      "Default": 100
+    },
+    "PerChannel": {
+      "Enabled": true,
+      "IndependentVolume": true
+    },
+    "PerPlayer": {
+      "Enabled": true,
+      "IndependentVolume": true,
+      "SavePreferences": true
+    },
+    "DuckingOptions": {
+      "DuckGameAudio": true,
+      "DuckAmount": { "Min": 0, "Max": 100, "Default": 50 },
+      "DuckEngine": false,
+      "DuckMusic": true
+    }
+  },
+
+  "Moderation": {
+    "Muting": {
+      "MutePlayer": true,
+      "MuteAll": true,
+      "AutoMuteReported": true,
+      "PersistentMute": true
+    },
+    "Reporting": {
+      "ReportAbuse": true,
+      "Categories": ["Harassment", "Spam", "ToxicBehavior", "InappropriateContent"],
+      "VoiceRecording": { "ForReports": true, "Duration": 30 }
+    },
+    "AutoModeration": {
+      "Enabled": true,
+      "ToxicityDetection": true,
+      "LoudnessLimit": true,
+      "SpamPrevention": true
+    },
+    "Penalties": {
+      "Warning": { "First": true },
+      "TempMute": { "Duration": "24Hours" },
+      "VoiceBan": { "Duration": "7Days" },
+      "PermanentBan": { "Repeat": true }
+    }
+  },
+
+  "AccessibilityFeatures": {
+    "SpeechToText": {
+      "Enabled": true,
+      "Languages": ["English", "Spanish", "French", "German", "Japanese"],
+      "DisplayLocation": "ChatWindow",
+      "SpeakerIdentification": true
+    },
+    "TextToSpeech": {
+      "Enabled": true,
+      "ReadChatAloud": true,
+      "VoiceOptions": 4,
+      "Speed": { "Min": 0.5, "Max": 2.0, "Default": 1.0 }
+    },
+    "VisualIndicators": {
+      "SpeakingIndicator": true,
+      "WhoIsTalking": true,
+      "VolumeLevel": true,
+      "DirectionIndicator": true
+    }
+  },
+
+  "Privacy": {
+    "Settings": {
+      "VoiceChatEnabled": { "Default": false },
+      "ProximityChatEnabled": { "Default": false },
+      "PartyOnly": { "Default": true },
+      "FriendsOnly": { "Available": true }
+    },
+    "BlockOptions": {
+      "BlockStranger": true,
+      "BlockNonFriends": true,
+      "WhitelistOnly": true
+    },
+    "DataHandling": {
+      "NoRecording": true,
+      "NoStorage": true,
+      "ReportRecordingOnly": true
+    }
+  },
+
+  "TechnicalSettings": {
+    "Codec": {
+      "Primary": "Opus",
+      "Fallback": "SILK"
+    },
+    "Latency": {
+      "Target": 50,
+      "Max": 150,
+      "JitterBuffer": true
+    },
+    "Bandwidth": {
+      "AutoDetect": true,
+      "MaxUpload": "128kbps",
+      "MaxDownload": "1Mbps"
+    },
+    "DeviceDetection": {
+      "AutoDetect": true,
+      "DefaultInput": "System",
+      "DefaultOutput": "System",
+      "HotSwap": true
+    }
+  },
+
+  "InputDevices": {
+    "Microphone": {
+      "Selection": { "Dropdown": true },
+      "TestMic": true,
+      "InputLevel": { "Display": true },
+      "NoiseReduction": { "Enabled": true, "Strength": 50 },
+      "EchoCancellation": true
+    },
+    "Output": {
+      "Selection": { "Dropdown": true },
+      "TestOutput": true,
+      "Normalization": true
+    }
+  },
+
+  "UI": {
+    "Indicators": {
+      "MicrophoneActive": { "Icon": true, "Position": "BottomLeft" },
+      "SpeakingPlayers": { "Nameplates": true, "List": true },
+      "ChannelIndicator": { "Show": true },
+      "ConnectionQuality": { "Show": true }
+    },
+    "Settings": {
+      "QuickMute": { "Shortcut": true },
+      "VolumeSlider": { "Accessible": true },
+      "ChannelSwitch": { "Quick": true }
+    },
+    "InRace": {
+      "MinimalUI": true,
+      "SpeakingOnly": true,
+      "PositionalIndicator": false
+    }
+  }
+}

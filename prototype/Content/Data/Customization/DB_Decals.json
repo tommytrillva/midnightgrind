@@ -1,0 +1,269 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Decal and Sticker System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MaxDecalsPerVehicle": 50,
+    "LayerSystem": true,
+    "CustomUpload": true,
+    "QualityLevels": 3
+  },
+
+  "DecalCategories": {
+    "Racing": {
+      "ID": "DECAL_RACING",
+      "Items": {
+        "Numbers": { "Count": 100, "Customizable": true },
+        "RacingStripes": { "Count": 25, "Variants": true },
+        "Checkered": { "Count": 15, "Patterns": true },
+        "StartFinish": { "Count": 10 },
+        "SpeedLines": { "Count": 20 }
+      }
+    },
+    "Sponsors": {
+      "ID": "DECAL_SPONSORS",
+      "Items": {
+        "FictionalBrands": { "Count": 50, "Authentic": true },
+        "PartsBrands": { "Count": 40, "LinkedToGame": true },
+        "EnergyDrinks": { "Count": 15 },
+        "FuelBrands": { "Count": 10 },
+        "ToolBrands": { "Count": 20 }
+      }
+    },
+    "Lifestyle": {
+      "ID": "DECAL_LIFESTYLE",
+      "Items": {
+        "Streetwear": { "Count": 30 },
+        "Music": { "Count": 25 },
+        "Gaming": { "Count": 20 },
+        "Sports": { "Count": 25 },
+        "Vintage": { "Count": 35 }
+      }
+    },
+    "Japanese": {
+      "ID": "DECAL_JAPANESE",
+      "Items": {
+        "Kanji": { "Count": 100, "Authentic": true },
+        "Katakana": { "Count": 50 },
+        "Anime": { "Count": 30 },
+        "JDMLogos": { "Count": 45 },
+        "RisingStars": { "Count": 15 }
+      }
+    },
+    "Graphics": {
+      "ID": "DECAL_GRAPHICS",
+      "Items": {
+        "Flames": { "Count": 25, "Animated": false },
+        "Tribal": { "Count": 30 },
+        "Geometric": { "Count": 40 },
+        "Abstract": { "Count": 35 },
+        "Gradients": { "Count": 20 }
+      }
+    },
+    "Nature": {
+      "ID": "DECAL_NATURE",
+      "Items": {
+        "Skulls": { "Count": 20 },
+        "Animals": { "Count": 30 },
+        "Floral": { "Count": 25 },
+        "Wings": { "Count": 15 },
+        "Elements": { "Count": 20 }
+      }
+    },
+    "CrewBased": {
+      "ID": "DECAL_CREW",
+      "Items": {
+        "CrewLogo": { "Custom": true, "Placement": "Any" },
+        "CrewName": { "Custom": true, "FontOptions": 10 },
+        "CrewColors": { "AutoMatch": true },
+        "MemberNumber": { "Customizable": true }
+      }
+    },
+    "Achievement": {
+      "ID": "DECAL_ACHIEVEMENT",
+      "Items": {
+        "ChampionBadges": { "Earned": true, "Count": 15 },
+        "MilestoneBadges": { "Earned": true, "Count": 25 },
+        "EventWinner": { "Earned": true, "Limited": true },
+        "PrestigeMarks": { "Earned": true, "Exclusive": true }
+      }
+    }
+  },
+
+  "PlacementSystem": {
+    "Zones": {
+      "Hood": { "MaxDecals": 10, "Curvature": "High" },
+      "Roof": { "MaxDecals": 8, "Curvature": "Low" },
+      "Doors": { "MaxDecals": 15, "PerSide": true },
+      "Fenders": { "MaxDecals": 10, "PerSide": true },
+      "Trunk": { "MaxDecals": 8, "Curvature": "Medium" },
+      "Bumpers": { "MaxDecals": 6, "Front": true, "Rear": true },
+      "Windows": { "MaxDecals": 5, "Transparency": true },
+      "Mirrors": { "MaxDecals": 2, "Small": true }
+    },
+    "Tools": {
+      "Move": { "FreePosition": true, "SnapToGrid": true },
+      "Rotate": { "360Degrees": true, "SnapAngles": [0, 45, 90, 180] },
+      "Scale": { "Min": 0.1, "Max": 5.0, "AspectLock": true },
+      "Skew": { "Enabled": true, "Max": 45 },
+      "Mirror": { "Horizontal": true, "Vertical": true, "MirrorToSide": true }
+    },
+    "Snapping": {
+      "ToGrid": { "Enabled": true, "GridSize": 5 },
+      "ToCenter": { "Enabled": true },
+      "ToEdges": { "Enabled": true },
+      "ToOtherDecals": { "Enabled": true }
+    }
+  },
+
+  "LayerSystem": {
+    "MaxLayers": 50,
+    "Operations": {
+      "BringToFront": true,
+      "SendToBack": true,
+      "MoveUp": true,
+      "MoveDown": true,
+      "Lock": true,
+      "Hide": true,
+      "Group": true
+    },
+    "LayerPanel": {
+      "Thumbnail": true,
+      "QuickSelect": true,
+      "DragReorder": true,
+      "MultiSelect": true
+    }
+  },
+
+  "ColorSystem": {
+    "DecalColors": {
+      "Primary": { "Customizable": true },
+      "Secondary": { "Customizable": true },
+      "Tertiary": { "Available": true },
+      "Outline": { "Available": true }
+    },
+    "ColorOptions": {
+      "Palette": { "Presets": 100 },
+      "CustomRGB": true,
+      "CustomHex": true,
+      "ColorPicker": true,
+      "RecentColors": { "Saved": 10 }
+    },
+    "SpecialFinishes": {
+      "Metallic": { "Available": true, "Cost": 500 },
+      "Pearl": { "Available": true, "Cost": 750 },
+      "Chrome": { "Available": true, "Cost": 1000 },
+      "Holographic": { "Available": true, "Cost": 1500, "Rare": true }
+    },
+    "Opacity": {
+      "Min": 10,
+      "Max": 100,
+      "Default": 100
+    }
+  },
+
+  "CustomDecals": {
+    "Upload": {
+      "Enabled": true,
+      "Formats": ["PNG", "JPG", "SVG"],
+      "MaxFileSize": "2MB",
+      "MaxResolution": "2048x2048",
+      "MinResolution": "64x64"
+    },
+    "Moderation": {
+      "Required": true,
+      "AutoFilter": true,
+      "ManualReview": { "Flagged": true },
+      "ApprovalTime": "24Hours"
+    },
+    "Restrictions": {
+      "NoNudity": true,
+      "NoHateSpeech": true,
+      "NoCopyright": true,
+      "NoRealLogos": true
+    },
+    "Sharing": {
+      "ShareWithFriends": true,
+      "ShareWithCrew": true,
+      "PublicUpload": true,
+      "Marketplace": true
+    }
+  },
+
+  "Presets": {
+    "SavePreset": {
+      "Enabled": true,
+      "MaxSaved": 20,
+      "IncludesPositions": true,
+      "IncludesColors": true
+    },
+    "QuickApply": {
+      "MirrorLeftRight": true,
+      "ApplyToAll": true,
+      "ClearAll": true
+    },
+    "Templates": {
+      "RaceReady": { "Preset": true, "Style": "Professional" },
+      "StreetStyle": { "Preset": true, "Style": "JDM" },
+      "Minimal": { "Preset": true, "Style": "Clean" },
+      "FullCoverage": { "Preset": true, "Style": "Busy" }
+    }
+  },
+
+  "Unlocking": {
+    "Methods": {
+      "LevelUnlock": { "PerLevel": 5 },
+      "REPUnlock": { "Tiers": true },
+      "Purchase": { "InGameCash": true },
+      "Achievement": { "SpecificUnlocks": true },
+      "Event": { "LimitedTime": true },
+      "CrewReward": { "CrewLevel": true }
+    },
+    "Rarity": {
+      "Common": { "Percentage": 50 },
+      "Uncommon": { "Percentage": 30 },
+      "Rare": { "Percentage": 15 },
+      "Epic": { "Percentage": 4 },
+      "Legendary": { "Percentage": 1 }
+    }
+  },
+
+  "Performance": {
+    "LOD": {
+      "Enabled": true,
+      "DistanceLevels": [50, 100, 200],
+      "QualityReduction": true
+    },
+    "Batching": {
+      "Enabled": true,
+      "TextureAtlas": true,
+      "DrawCallOptimization": true
+    },
+    "MemoryLimit": {
+      "PerVehicle": "64MB",
+      "Total": "256MB"
+    }
+  },
+
+  "UI": {
+    "Editor": {
+      "CategoryBrowser": true,
+      "SearchFunction": true,
+      "FavoritesTab": true,
+      "RecentlyUsed": true,
+      "Preview3D": true
+    },
+    "QuickAccess": {
+      "Hotkeys": true,
+      "RadialMenu": true,
+      "UndoRedo": { "Steps": 50 }
+    },
+    "ViewControls": {
+      "RotateVehicle": true,
+      "ZoomIn": true,
+      "ZoomOut": true,
+      "CameraPresets": ["Front", "Side", "Rear", "Top", "Free"]
+    }
+  }
+}

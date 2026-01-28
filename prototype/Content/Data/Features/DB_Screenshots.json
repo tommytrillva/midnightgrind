@@ -1,0 +1,320 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Screenshot and Photo Mode System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "PhotoMode": true,
+    "QuickCapture": true,
+    "CloudStorage": true,
+    "MaxStoredScreenshots": 1000
+  },
+
+  "PhotoMode": {
+    "Activation": {
+      "DefaultKey": "P",
+      "PauseGame": true,
+      "AvailableInRace": { "Enabled": true, "PausesRace": true },
+      "AvailableInFreeRoam": true,
+      "AvailableInGarage": true,
+      "AvailableInReplay": true
+    },
+    "CameraControls": {
+      "Movement": {
+        "Free": true,
+        "Orbit": true,
+        "Range": { "Min": 1, "Max": 50 },
+        "Speed": { "Min": 0.1, "Max": 5.0, "Default": 1.0 }
+      },
+      "Rotation": {
+        "Pan": { "Range": 360 },
+        "Tilt": { "Range": [-90, 90] },
+        "Roll": { "Range": [-180, 180] }
+      },
+      "Zoom": {
+        "FieldOfView": { "Min": 10, "Max": 120, "Default": 60 },
+        "DigitalZoom": { "Max": 4.0 }
+      },
+      "Focus": {
+        "AutoFocus": true,
+        "ManualFocus": true,
+        "FocusDistance": { "Min": 0.5, "Max": 100 },
+        "FocusPoint": { "Clickable": true }
+      }
+    }
+  },
+
+  "ImageSettings": {
+    "Resolution": {
+      "Options": {
+        "Native": { "Description": "Current display resolution" },
+        "HD": { "Width": 1920, "Height": 1080 },
+        "QHD": { "Width": 2560, "Height": 1440 },
+        "4K": { "Width": 3840, "Height": 2160 },
+        "8K": { "Width": 7680, "Height": 4320, "Premium": true }
+      },
+      "SuperSampling": {
+        "Enabled": true,
+        "Multipliers": [1.0, 1.5, 2.0, 4.0]
+      }
+    },
+    "AspectRatio": {
+      "Options": {
+        "16:9": { "Standard": true },
+        "21:9": { "Ultrawide": true },
+        "1:1": { "Square": true },
+        "4:3": { "Classic": true },
+        "3:2": { "Photo": true },
+        "Custom": { "Available": true }
+      }
+    },
+    "Format": {
+      "JPEG": { "Quality": { "Min": 70, "Max": 100, "Default": 95 } },
+      "PNG": { "Lossless": true },
+      "RAW": { "Available": true, "Premium": true }
+    }
+  },
+
+  "DepthOfField": {
+    "Enabled": true,
+    "Modes": {
+      "Off": { "Description": "No blur" },
+      "Subtle": { "Strength": 0.3 },
+      "Moderate": { "Strength": 0.6 },
+      "Strong": { "Strength": 1.0 },
+      "Custom": { "FullControl": true }
+    },
+    "Settings": {
+      "Aperture": { "Min": 1.4, "Max": 22, "Default": 5.6 },
+      "FocalLength": { "Min": 10, "Max": 300 },
+      "BokehShape": { "Options": ["Circle", "Hexagon", "Octagon", "Heart", "Star"] },
+      "BokehIntensity": { "Min": 0, "Max": 100 }
+    }
+  },
+
+  "ExposureSettings": {
+    "ExposureControl": {
+      "Auto": true,
+      "Manual": true,
+      "Compensation": { "Min": -5, "Max": 5, "Default": 0 }
+    },
+    "Brightness": { "Min": -100, "Max": 100, "Default": 0 },
+    "Contrast": { "Min": -100, "Max": 100, "Default": 0 },
+    "Highlights": { "Min": -100, "Max": 100, "Default": 0 },
+    "Shadows": { "Min": -100, "Max": 100, "Default": 0 }
+  },
+
+  "ColorGrading": {
+    "WhiteBalance": {
+      "Temperature": { "Min": 2000, "Max": 10000, "Default": 6500 },
+      "Tint": { "Min": -100, "Max": 100, "Default": 0 }
+    },
+    "Saturation": { "Min": -100, "Max": 100, "Default": 0 },
+    "Vibrance": { "Min": -100, "Max": 100, "Default": 0 },
+    "Hue": { "Min": -180, "Max": 180, "Default": 0 },
+    "SplitToning": {
+      "Highlights": { "Color": true, "Balance": true },
+      "Shadows": { "Color": true, "Balance": true }
+    }
+  },
+
+  "Filters": {
+    "Presets": {
+      "None": { "Default": true },
+      "Vivid": { "Saturation": 20, "Contrast": 10 },
+      "Cinematic": { "BlackBars": true, "FilmGrain": true },
+      "Vintage": { "Sepia": true, "Vignette": true },
+      "Noir": { "BlackAndWhite": true, "HighContrast": true },
+      "Neon": { "Glow": true, "HighSaturation": true },
+      "Sunset": { "WarmTones": true, "GoldenHour": true },
+      "Midnight": { "CoolTones": true, "HighContrast": true },
+      "Racing": { "MotionBlur": true, "SpeedLines": true },
+      "Drift": { "SmokeFocus": true, "Dramatic": true }
+    },
+    "Custom": {
+      "Save": true,
+      "MaxCustomFilters": 20,
+      "ShareFilters": true
+    }
+  },
+
+  "Effects": {
+    "Vignette": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "Feather": { "Min": 0, "Max": 100 }
+    },
+    "FilmGrain": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "Size": { "Min": 0, "Max": 100 }
+    },
+    "ChromaticAberration": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 }
+    },
+    "LensFlare": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "Style": { "Options": ["Anamorphic", "Cinematic", "Natural"] }
+    },
+    "MotionBlur": {
+      "Enabled": true,
+      "Intensity": { "Min": 0, "Max": 100 },
+      "Direction": "FromMovement"
+    },
+    "LightStreaks": {
+      "Enabled": true,
+      "FromHeadlights": true,
+      "FromTaillights": true
+    }
+  },
+
+  "SceneControl": {
+    "TimeOfDay": {
+      "Override": true,
+      "Time": { "Min": 0, "Max": 24, "Step": 0.5 },
+      "Speed": { "Pause": true, "SlowMotion": true }
+    },
+    "Weather": {
+      "Override": true,
+      "Options": ["Clear", "Cloudy", "Rain", "Storm", "Fog", "Snow"]
+    },
+    "Traffic": {
+      "Hide": true,
+      "Show": true,
+      "Freeze": true
+    },
+    "NPCs": {
+      "Hide": true,
+      "Show": true,
+      "Freeze": true
+    },
+    "HUD": {
+      "Hide": true,
+      "ShowBranding": { "Optional": true },
+      "ShowWatermark": { "Optional": true }
+    }
+  },
+
+  "VehicleDisplay": {
+    "Visibility": {
+      "ShowVehicle": true,
+      "HideVehicle": true,
+      "GhostMode": { "Transparent": true }
+    },
+    "VehicleState": {
+      "Doors": { "Open": true, "Close": true },
+      "Hood": { "Open": true, "Close": true },
+      "Trunk": { "Open": true, "Close": true },
+      "Lights": { "On": true, "Off": true, "HighBeam": true },
+      "Wheels": { "Turn": { "Angle": [-45, 45] } }
+    },
+    "VehicleEffects": {
+      "TireSmoke": { "Enable": true, "Color": true },
+      "ExhaustFlames": { "Enable": true },
+      "NOS": { "Enable": true },
+      "WetLook": { "Enable": true }
+    }
+  },
+
+  "Composition": {
+    "Guides": {
+      "RuleOfThirds": true,
+      "GoldenRatio": true,
+      "Diagonal": true,
+      "Center": true,
+      "CustomGrid": true
+    },
+    "Overlays": {
+      "Watermark": { "Custom": true, "Position": "Configurable" },
+      "Timestamp": { "Optional": true },
+      "GameLogo": { "Optional": true },
+      "VehicleInfo": { "Optional": true }
+    }
+  },
+
+  "QuickCapture": {
+    "Enabled": true,
+    "DefaultKey": "F12",
+    "NoPhotoMode": true,
+    "InstantSave": true,
+    "NotificationPopup": true,
+    "AutoSettings": {
+      "Resolution": "Native",
+      "Format": "JPEG",
+      "Quality": 95
+    }
+  },
+
+  "Storage": {
+    "Local": {
+      "Enabled": true,
+      "DefaultPath": "Screenshots",
+      "Subfolder": { "ByDate": true, "ByVehicle": false }
+    },
+    "Cloud": {
+      "Enabled": true,
+      "MaxStorage": "10GB",
+      "AutoSync": true,
+      "CrossPlatform": true
+    },
+    "Management": {
+      "Gallery": true,
+      "Delete": true,
+      "Favorite": true,
+      "Tags": true,
+      "Search": true
+    }
+  },
+
+  "Sharing": {
+    "InGame": {
+      "ShareToFeed": true,
+      "ShareToCrew": true,
+      "SetAsProfile": true,
+      "SetAsVehicleCard": true
+    },
+    "External": {
+      "DirectDownload": true,
+      "ShareLink": true,
+      "SocialMedia": { "DirectPost": false, "ExportForPost": true }
+    },
+    "Community": {
+      "PhotoContest": true,
+      "WeeklyChallenge": true,
+      "FeaturedPhotos": true,
+      "PhotoGallery": true
+    }
+  },
+
+  "Achievements": {
+    "Photography": {
+      "FirstPhoto": { "REP": 100 },
+      "100Photos": { "REP": 1000, "Badge": "Photographer" },
+      "1000Photos": { "REP": 5000, "Badge": "Pro Photographer" },
+      "Featured": { "REP": 2500, "Badge": "Featured Artist" }
+    }
+  },
+
+  "UI": {
+    "PhotoModeHUD": {
+      "SettingsPanel": { "Position": "Right" },
+      "Histogram": { "Optional": true },
+      "MiniPreview": { "Enabled": true },
+      "QuickActions": { "Bottom": true }
+    },
+    "Gallery": {
+      "GridView": true,
+      "ListView": true,
+      "Slideshow": true,
+      "FullscreenViewer": true,
+      "EXIF": { "ShowDetails": true }
+    },
+    "Controls": {
+      "MouseSupport": true,
+      "ControllerSupport": true,
+      "TouchSupport": { "ForMobile": true }
+    }
+  }
+}
