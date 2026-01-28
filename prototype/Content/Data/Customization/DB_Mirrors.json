@@ -1,0 +1,348 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Side Mirror Customization System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "MirrorSwaps": true,
+    "MirrorCovers": true,
+    "MirrorDelete": true
+  },
+
+  "MirrorTypes": {
+    "Stock": {
+      "ID": "MIRROR_STOCK",
+      "Description": "Factory side mirrors",
+      "Style": "OEM",
+      "Powered": true,
+      "Heated": { "ByVehicle": true },
+      "Default": true
+    },
+    "SportStyle": {
+      "ID": "MIRROR_SPORT",
+      "Description": "Sport-style mirrors",
+      "Style": "Aero",
+      "Powered": true,
+      "ReducedSize": true,
+      "Cost": 300
+    },
+    "MPerformance": {
+      "ID": "MIRROR_MSTYLE",
+      "Description": "M-style sport mirrors",
+      "Style": "MSport",
+      "Powered": true,
+      "Sleek": true,
+      "Cost": 400
+    },
+    "DTM": {
+      "ID": "MIRROR_DTM",
+      "Description": "DTM racing mirrors",
+      "Style": "Racing",
+      "Manual": true,
+      "Aerodynamic": true,
+      "Cost": 350
+    },
+    "Ganador": {
+      "ID": "MIRROR_GANADOR",
+      "Description": "Ganador-style mirrors",
+      "Style": "JDM",
+      "Manual": true,
+      "LowProfile": true,
+      "Cost": 400
+    },
+    "CF": {
+      "ID": "MIRROR_CF",
+      "Description": "Carbon fiber mirrors",
+      "Style": "CarbonFiber",
+      "Powered": true,
+      "Lightweight": true,
+      "Cost": 800
+    },
+    "BulletStyle": {
+      "ID": "MIRROR_BULLET",
+      "Description": "Bullet-style mirrors",
+      "Style": "Classic",
+      "Manual": true,
+      "Compact": true,
+      "Cost": 200
+    },
+    "Sequential": {
+      "ID": "MIRROR_SEQ",
+      "Description": "Sequential turn signal mirrors",
+      "Style": "Modern",
+      "Powered": true,
+      "LEDTurn": "Sequential",
+      "Cost": 500
+    },
+    "Delete": {
+      "ID": "MIRROR_DELETE",
+      "Description": "Mirror delete kit",
+      "Style": "None",
+      "Plugs": true,
+      "ForTrack": true,
+      "Cost": 100
+    }
+  },
+
+  "MirrorCovers": {
+    "Stock": {
+      "ID": "COVER_STOCK",
+      "Description": "Factory mirror covers",
+      "Default": true
+    },
+    "PaintMatch": {
+      "ID": "COVER_PAINT",
+      "Description": "Body color matched",
+      "Color": "VehicleColor",
+      "Cost": 100
+    },
+    "Gloss Black": {
+      "ID": "COVER_BLACK",
+      "Description": "Gloss black covers",
+      "Color": "Black",
+      "Cost": 150
+    },
+    "CarbonFiber": {
+      "ID": "COVER_CF",
+      "Description": "Carbon fiber covers",
+      "Material": "CarbonFiber",
+      "Weave": "Visible",
+      "Cost": 400
+    },
+    "Forged Carbon": {
+      "ID": "COVER_FORGED",
+      "Description": "Forged carbon covers",
+      "Material": "ForgedCarbon",
+      "Pattern": "Chopped",
+      "Cost": 600
+    },
+    "Chrome": {
+      "ID": "COVER_CHROME",
+      "Description": "Chrome mirror covers",
+      "Finish": "Chrome",
+      "Cost": 200
+    },
+    "Flag": {
+      "ID": "COVER_FLAG",
+      "Description": "Flag design covers",
+      "Design": ["USA", "UK", "Germany", "Japan", "Racing"],
+      "Cost": 150
+    }
+  },
+
+  "MirrorGlass": {
+    "Standard": {
+      "ID": "GLASS_STD",
+      "Description": "Standard mirror glass",
+      "Curvature": "Standard",
+      "Default": true
+    },
+    "Wide": {
+      "ID": "GLASS_WIDE",
+      "Description": "Wide-angle glass",
+      "Curvature": "Convex",
+      "FieldOfView": "Wider",
+      "Cost": 50
+    },
+    "Aspherical": {
+      "ID": "GLASS_ASPH",
+      "Description": "Aspherical glass",
+      "Curvature": "Mixed",
+      "BlindSpot": "Reduced",
+      "Cost": 75
+    },
+    "BlueTint": {
+      "ID": "GLASS_BLUE",
+      "Description": "Blue-tinted glass",
+      "Tint": "Blue",
+      "AntiGlare": true,
+      "Cost": 60
+    },
+    "AutoDim": {
+      "ID": "GLASS_AUTODIM",
+      "Description": "Auto-dimming glass",
+      "AutoDim": true,
+      "NightDriving": "Better",
+      "Cost": 150
+    }
+  },
+
+  "Features": {
+    "PowerFold": {
+      "ID": "FEAT_FOLD",
+      "Description": "Power folding mirrors",
+      "Automatic": true,
+      "Cost": 200
+    },
+    "Heated": {
+      "ID": "FEAT_HEAT",
+      "Description": "Heated mirrors",
+      "Defrost": true,
+      "Cost": 100
+    },
+    "BlindSpotMonitor": {
+      "ID": "FEAT_BSM",
+      "Description": "Blind spot indicators",
+      "LED": true,
+      "Warning": true,
+      "Cost": 300
+    },
+    "Puddle Lights": {
+      "ID": "FEAT_PUDDLE",
+      "Description": "Puddle light projection",
+      "Logo": true,
+      "Cost": 100
+    },
+    "TurnSignal": {
+      "Standard": { "Cost": 0 },
+      "LED": { "Cost": 100 },
+      "Sequential": { "Cost": 200 }
+    },
+    "MemoryPositions": {
+      "ID": "FEAT_MEMORY",
+      "Description": "Memory position recall",
+      "Positions": 3,
+      "Cost": 150
+    }
+  },
+
+  "InteriorMirror": {
+    "Types": {
+      "Stock": {
+        "ID": "INT_STOCK",
+        "Description": "Factory interior mirror",
+        "Default": true
+      },
+      "FramelessWide": {
+        "ID": "INT_WIDE",
+        "Description": "Frameless wide mirror",
+        "Width": "Extended",
+        "Sleek": true,
+        "Cost": 100
+      },
+      "AutoDim": {
+        "ID": "INT_AUTODIM",
+        "Description": "Auto-dimming mirror",
+        "AutoDim": true,
+        "Compass": true,
+        "Cost": 200
+      },
+      "Camera": {
+        "ID": "INT_CAMERA",
+        "Description": "Digital mirror display",
+        "RearCamera": true,
+        "WideFOV": true,
+        "Cost": 500
+      },
+      "Racing": {
+        "ID": "INT_RACING",
+        "Description": "Racing convex mirror",
+        "Convex": true,
+        "Compact": true,
+        "Cost": 80
+      },
+      "Delete": {
+        "ID": "INT_DELETE",
+        "Description": "Mirror delete",
+        "Removed": true,
+        "ForTrack": true,
+        "Cost": 0
+      }
+    }
+  },
+
+  "RacingMirrors": {
+    "FenderMount": {
+      "ID": "RACE_FENDER",
+      "Description": "Fender-mounted mirrors",
+      "Location": "Fender",
+      "Aerodynamic": true,
+      "ForTrack": true,
+      "Cost": 300
+    },
+    "DoorMount": {
+      "ID": "RACE_DOOR",
+      "Description": "Low-profile door mirrors",
+      "Location": "DoorLow",
+      "Compact": true,
+      "Cost": 250
+    },
+    "AFrame": {
+      "ID": "RACE_AFRAME",
+      "Description": "A-frame mounted mirrors",
+      "Location": "AFrame",
+      "Interior": true,
+      "ForCage": true,
+      "Cost": 150
+    },
+    "WideAngle": {
+      "ID": "RACE_WIDE",
+      "Description": "Wide-angle race mirrors",
+      "Curvature": "ExtraConvex",
+      "FOV": "Maximum",
+      "Cost": 200
+    }
+  },
+
+  "Finishes": {
+    "OEM": { "Default": true },
+    "GlossBlack": { "Cost": 0 },
+    "MatteBlack": { "Cost": 50 },
+    "Chrome": { "Cost": 100 },
+    "CarbonFiber": { "Cost": 300 },
+    "BodyColor": { "PaintMatch": true, "Cost": 150 },
+    "Custom": { "AnyColor": true, "Cost": 200 }
+  },
+
+  "Aerodynamics": {
+    "Stock": {
+      "Drag": 1.0,
+      "Noise": "Standard"
+    },
+    "Sport": {
+      "Drag": 0.9,
+      "Noise": "Reduced"
+    },
+    "Racing": {
+      "Drag": 0.8,
+      "Noise": "Minimal"
+    },
+    "Delete": {
+      "Drag": 0.7,
+      "Noise": "None",
+      "NotStreetLegal": true
+    }
+  },
+
+  "LegalConsiderations": {
+    "Required": {
+      "DriverSide": true,
+      "PassengerSide": { "ByRegion": true }
+    },
+    "MirrorDelete": {
+      "StreetLegal": false,
+      "TrackOnly": true
+    },
+    "MinimumSize": {
+      "ByRegion": true
+    }
+  },
+
+  "UI": {
+    "MirrorMenu": {
+      "TypeSelector": true,
+      "CoverOptions": true,
+      "GlassOptions": true,
+      "FeatureOptions": true
+    },
+    "Preview": {
+      "ExteriorView": true,
+      "InteriorView": true,
+      "FoldAnimation": true
+    },
+    "Interior": {
+      "MirrorOptions": true,
+      "PositionAdjust": true
+    }
+  }
+}

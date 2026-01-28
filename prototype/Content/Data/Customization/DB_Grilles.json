@@ -1,0 +1,386 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Front Grille Customization System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "GrilleSwaps": true,
+    "CustomGrilles": true,
+    "FunctionalEffects": true
+  },
+
+  "GrilleTypes": {
+    "Stock": {
+      "ID": "GRILLE_STOCK",
+      "Description": "Factory grille",
+      "Style": "OEM",
+      "Airflow": 1.0,
+      "Default": true
+    },
+    "MeshBlack": {
+      "ID": "GRILLE_MESH_BLK",
+      "Description": "Black mesh grille",
+      "Style": "Mesh",
+      "Pattern": "Diamond",
+      "Finish": "Black",
+      "Airflow": 1.2,
+      "Cost": 300
+    },
+    "MeshChrome": {
+      "ID": "GRILLE_MESH_CHR",
+      "Description": "Chrome mesh grille",
+      "Style": "Mesh",
+      "Pattern": "Diamond",
+      "Finish": "Chrome",
+      "Airflow": 1.2,
+      "Cost": 350
+    },
+    "HoneycombBlack": {
+      "ID": "GRILLE_HONEY_BLK",
+      "Description": "Honeycomb grille black",
+      "Style": "Honeycomb",
+      "Pattern": "Hexagon",
+      "Finish": "GlossBlack",
+      "Airflow": 1.3,
+      "Cost": 400
+    },
+    "VerticalSlat": {
+      "ID": "GRILLE_VERT",
+      "Description": "Vertical slat grille",
+      "Style": "Slat",
+      "Pattern": "Vertical",
+      "Classic": true,
+      "Airflow": 1.1,
+      "Cost": 350
+    },
+    "HorizontalSlat": {
+      "ID": "GRILLE_HORZ",
+      "Description": "Horizontal bar grille",
+      "Style": "Slat",
+      "Pattern": "Horizontal",
+      "Airflow": 1.0,
+      "Cost": 300
+    },
+    "Billet": {
+      "ID": "GRILLE_BILLET",
+      "Description": "Billet aluminum grille",
+      "Style": "Billet",
+      "Material": "Aluminum",
+      "Premium": true,
+      "Airflow": 1.1,
+      "Cost": 600
+    },
+    "WireInsert": {
+      "ID": "GRILLE_WIRE",
+      "Description": "Wire mesh insert",
+      "Style": "Wire",
+      "HighFlow": true,
+      "Airflow": 1.4,
+      "Cost": 200
+    },
+    "Delete": {
+      "ID": "GRILLE_DELETE",
+      "Description": "Grille delete",
+      "Style": "None",
+      "Aggressive": true,
+      "Airflow": 1.5,
+      "DirtIngestion": true,
+      "Cost": 100
+    },
+    "Custom": {
+      "ID": "GRILLE_CUSTOM",
+      "Description": "Custom one-off grille",
+      "Style": "Custom",
+      "Design": "Any",
+      "Cost": 1000
+    }
+  },
+
+  "GrilleStyles": {
+    "Sport": {
+      "ID": "STYLE_SPORT",
+      "Description": "Sport styling",
+      "LargerOpening": true,
+      "Aggressive": true
+    },
+    "Luxury": {
+      "ID": "STYLE_LUXURY",
+      "Description": "Luxury styling",
+      "ChromeAccents": true,
+      "Refined": true
+    },
+    "Racing": {
+      "ID": "STYLE_RACING",
+      "Description": "Racing style",
+      "MaxAirflow": true,
+      "FunctionOverForm": true
+    },
+    "JDM": {
+      "ID": "STYLE_JDM",
+      "Description": "JDM styling",
+      "Clean": true,
+      "Subtle": true
+    },
+    "Euro": {
+      "ID": "STYLE_EURO",
+      "Description": "Euro styling",
+      "Sleek": true,
+      "Modern": true
+    },
+    "Muscle": {
+      "ID": "STYLE_MUSCLE",
+      "Description": "Muscle car styling",
+      "Bold": true,
+      "Large": true
+    }
+  },
+
+  "GrillePatterns": {
+    "Diamond": {
+      "Description": "Diamond mesh pattern",
+      "OpenArea": "High",
+      "Popular": true
+    },
+    "Hexagon": {
+      "Description": "Honeycomb hexagon",
+      "OpenArea": "Very High",
+      "Modern": true
+    },
+    "Square": {
+      "Description": "Square mesh",
+      "OpenArea": "High",
+      "Industrial": true
+    },
+    "VerticalBars": {
+      "Description": "Vertical bar pattern",
+      "OpenArea": "Moderate",
+      "Classic": true
+    },
+    "HorizontalBars": {
+      "Description": "Horizontal bar pattern",
+      "OpenArea": "Moderate",
+      "Traditional": true
+    },
+    "Kidney": {
+      "Description": "Kidney grille style",
+      "OpenArea": "Moderate",
+      "BMWStyle": true
+    },
+    "Spindle": {
+      "Description": "Spindle grille style",
+      "OpenArea": "High",
+      "LexusStyle": true
+    },
+    "Solid": {
+      "Description": "Solid with vents",
+      "OpenArea": "Low",
+      "Clean": true
+    }
+  },
+
+  "GrilleFinishes": {
+    "GlossBlack": {
+      "ID": "FIN_GLOSS_BLK",
+      "Description": "Gloss black finish",
+      "Shine": "High",
+      "Popular": true
+    },
+    "MatteBlack": {
+      "ID": "FIN_MATTE_BLK",
+      "Description": "Matte black finish",
+      "Shine": "None",
+      "Stealthy": true
+    },
+    "Chrome": {
+      "ID": "FIN_CHROME",
+      "Description": "Chrome finish",
+      "Shine": "Maximum",
+      "Classic": true
+    },
+    "Brushed": {
+      "ID": "FIN_BRUSHED",
+      "Description": "Brushed aluminum",
+      "Shine": "Satin",
+      "Premium": true
+    },
+    "CarbonFiber": {
+      "ID": "FIN_CARBON",
+      "Description": "Carbon fiber",
+      "Material": "CarbonFiber",
+      "Lightweight": true,
+      "CostMultiplier": 2.0
+    },
+    "BodyColor": {
+      "ID": "FIN_BODY",
+      "Description": "Body color matched",
+      "PaintMatch": true,
+      "Integrated": true
+    },
+    "TwoTone": {
+      "ID": "FIN_TWOTONE",
+      "Description": "Two-tone finish",
+      "Contrast": true
+    }
+  },
+
+  "GrilleAccents": {
+    "Surround": {
+      "Chrome": { "Cost": 100 },
+      "Black": { "Cost": 75 },
+      "Carbon": { "Cost": 200 },
+      "BodyColor": { "Cost": 150 }
+    },
+    "Emblem": {
+      "Stock": { "Default": true },
+      "Upgraded": { "Cost": 100 },
+      "Illuminated": { "Cost": 250 },
+      "Delete": { "Cost": 0 }
+    },
+    "Trim": {
+      "Chrome": { "Default": true },
+      "Black": { "Cost": 50 },
+      "Color": { "Cost": 75 }
+    }
+  },
+
+  "LowerGrille": {
+    "Types": {
+      "Stock": {
+        "ID": "LOWER_STOCK",
+        "Description": "Factory lower grille",
+        "Default": true
+      },
+      "OpenMouth": {
+        "ID": "LOWER_OPEN",
+        "Description": "Open mouth style",
+        "LargeOpening": true,
+        "Airflow": "Maximum",
+        "Cost": 400
+      },
+      "Mesh": {
+        "ID": "LOWER_MESH",
+        "Description": "Mesh lower grille",
+        "HighFlow": true,
+        "Cost": 250
+      },
+      "Splitter": {
+        "ID": "LOWER_SPLITTER",
+        "Description": "Integrated splitter",
+        "Downforce": true,
+        "Cost": 500
+      },
+      "Delete": {
+        "ID": "LOWER_DELETE",
+        "Description": "Lower grille delete",
+        "Smooth": true,
+        "Cost": 100
+      }
+    }
+  },
+
+  "FunctionalEffects": {
+    "Airflow": {
+      "Stock": 1.0,
+      "HighFlow": 1.3,
+      "MaxFlow": 1.5,
+      "Effect": { "Cooling": "Improved", "Intake": "Improved" }
+    },
+    "Aerodynamics": {
+      "Closed": { "Drag": "Lower", "Cooling": "Less" },
+      "Open": { "Drag": "Higher", "Cooling": "More" }
+    },
+    "Protection": {
+      "MeshFine": { "DebrisProtection": "High" },
+      "MeshCoarse": { "DebrisProtection": "Moderate" },
+      "Open": { "DebrisProtection": "None" }
+    }
+  },
+
+  "ActiveGrille": {
+    "Enabled": true,
+    "Types": {
+      "Static": {
+        "Description": "Fixed grille",
+        "Default": true
+      },
+      "ActiveShutters": {
+        "Description": "Active grille shutters",
+        "Automatic": true,
+        "Aerodynamics": "Improved",
+        "Cost": 800
+      }
+    },
+    "Modes": {
+      "Closed": { "AtSpeed": true, "Aerodynamic": true },
+      "Open": { "WhenHot": true, "Cooling": true },
+      "Partial": { "Balanced": true }
+    }
+  },
+
+  "VehicleSpecific": {
+    "BMW": {
+      "KidneyGrille": true,
+      "Sizes": ["Standard", "Large", "Connected"]
+    },
+    "Audi": {
+      "SingleFrame": true,
+      "Honeycomb": true
+    },
+    "Lexus": {
+      "SpindleGrille": true,
+      "Aggressive": true
+    },
+    "Ford": {
+      "ThreeBar": true,
+      "Heritage": true
+    },
+    "Toyota": {
+      "Various": true
+    },
+    "Universal": {
+      "MeshInserts": true,
+      "Overlays": true
+    }
+  },
+
+  "Installation": {
+    "BoltOn": {
+      "Difficulty": "Easy",
+      "OEMReplacement": true
+    },
+    "ClipIn": {
+      "Difficulty": "Easy",
+      "QuickChange": true
+    },
+    "Custom": {
+      "Difficulty": "Moderate",
+      "Fitting": "Required"
+    },
+    "FullBumper": {
+      "Difficulty": "Hard",
+      "BumperSwap": true
+    }
+  },
+
+  "UI": {
+    "GrilleMenu": {
+      "TypeSelector": true,
+      "PatternSelector": true,
+      "FinishOptions": true,
+      "AccentOptions": true
+    },
+    "Preview": {
+      "FrontView": true,
+      "CloseUp": true,
+      "WithEmblem": true
+    },
+    "LowerGrille": {
+      "TypeSelector": true,
+      "MatchUpper": { "Option": true }
+    },
+    "Performance": {
+      "AirflowDisplay": true,
+      "CoolingEffect": true
+    }
+  }
+}

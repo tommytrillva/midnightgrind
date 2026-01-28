@@ -1,0 +1,341 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Emblems and Badges Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "EmblemSwaps": true,
+    "EmblemDelete": true,
+    "CustomEmblems": true
+  },
+
+  "EmblemLocations": {
+    "FrontGrille": {
+      "ID": "LOC_FRONT",
+      "Description": "Front grille emblem",
+      "Size": "Large",
+      "Primary": true
+    },
+    "RearTrunk": {
+      "ID": "LOC_REAR",
+      "Description": "Rear trunk/hatch emblem",
+      "Size": "Large",
+      "Primary": true
+    },
+    "FrontFender": {
+      "ID": "LOC_FENDER",
+      "Description": "Front fender badges",
+      "Size": "Small",
+      "Paired": true
+    },
+    "RearQuarter": {
+      "ID": "LOC_QUARTER",
+      "Description": "Rear quarter badges",
+      "Size": "Small",
+      "Paired": true
+    },
+    "CSail": {
+      "ID": "LOC_CSAIL",
+      "Description": "C-pillar sail badges",
+      "Size": "Small",
+      "Paired": true
+    },
+    "DeckLid": {
+      "ID": "LOC_DECKLID",
+      "Description": "Deck lid lettering",
+      "Size": "Medium",
+      "Letters": true
+    },
+    "Steering": {
+      "ID": "LOC_STEERING",
+      "Description": "Steering wheel emblem",
+      "Size": "Small",
+      "Interior": true
+    },
+    "WheelCaps": {
+      "ID": "LOC_WHEELS",
+      "Description": "Wheel center caps",
+      "Size": "Small",
+      "Quantity": 4
+    }
+  },
+
+  "EmblemTypes": {
+    "Manufacturer": {
+      "ID": "TYPE_MAKE",
+      "Description": "Manufacturer badge",
+      "Brand": { "ByVehicle": true },
+      "OEM": true
+    },
+    "Model": {
+      "ID": "TYPE_MODEL",
+      "Description": "Model designation",
+      "Name": { "ByVehicle": true },
+      "OEM": true
+    },
+    "Trim": {
+      "ID": "TYPE_TRIM",
+      "Description": "Trim level badge",
+      "Level": ["Base", "Sport", "Premium", "Performance"],
+      "OEM": true
+    },
+    "Engine": {
+      "ID": "TYPE_ENGINE",
+      "Description": "Engine designation",
+      "Displacement": true,
+      "Turbo": true
+    },
+    "Performance": {
+      "ID": "TYPE_PERF",
+      "Description": "Performance badge",
+      "Examples": ["M", "AMG", "RS", "TRD", "Nismo", "Type R"]
+    },
+    "Anniversary": {
+      "ID": "TYPE_ANNIV",
+      "Description": "Anniversary edition",
+      "Special": true,
+      "Limited": true
+    },
+    "Custom": {
+      "ID": "TYPE_CUSTOM",
+      "Description": "Custom emblem",
+      "Design": "Any",
+      "Cost": 100
+    }
+  },
+
+  "EmblemFinishes": {
+    "Chrome": {
+      "ID": "FIN_CHROME",
+      "Description": "Chrome finish",
+      "Shine": "High",
+      "Default": true
+    },
+    "GlossBlack": {
+      "ID": "FIN_GLOSS",
+      "Description": "Gloss black finish",
+      "Shine": "High",
+      "Modern": true,
+      "Cost": 50
+    },
+    "MatteBlack": {
+      "ID": "FIN_MATTE",
+      "Description": "Matte black finish",
+      "Shine": "None",
+      "Stealthy": true,
+      "Cost": 50
+    },
+    "BodyColor": {
+      "ID": "FIN_BODY",
+      "Description": "Body color matched",
+      "PaintMatch": true,
+      "Subtle": true,
+      "Cost": 100
+    },
+    "CarbonFiber": {
+      "ID": "FIN_CARBON",
+      "Description": "Carbon fiber inlay",
+      "Material": "CarbonFiber",
+      "Premium": true,
+      "Cost": 150
+    },
+    "Gold": {
+      "ID": "FIN_GOLD",
+      "Description": "Gold finish",
+      "Luxury": true,
+      "Cost": 200
+    },
+    "Red": {
+      "ID": "FIN_RED",
+      "Description": "Red accent finish",
+      "Sporty": true,
+      "Cost": 75
+    },
+    "Custom": {
+      "ID": "FIN_CUSTOM",
+      "Description": "Custom color",
+      "AnyColor": true,
+      "Cost": 100
+    }
+  },
+
+  "EmblemStyles": {
+    "Raised": {
+      "ID": "STYLE_RAISED",
+      "Description": "3D raised emblem",
+      "Depth": "High",
+      "Traditional": true
+    },
+    "Flat": {
+      "ID": "STYLE_FLAT",
+      "Description": "Flat badge",
+      "Depth": "None",
+      "Modern": true
+    },
+    "Debossed": {
+      "ID": "STYLE_DEBOSS",
+      "Description": "Recessed emblem",
+      "Depth": "Inward",
+      "Subtle": true
+    },
+    "Illuminated": {
+      "ID": "STYLE_LIT",
+      "Description": "LED illuminated",
+      "Light": true,
+      "NightEffect": true,
+      "Cost": 200
+    },
+    "Vinyl": {
+      "ID": "STYLE_VINYL",
+      "Description": "Vinyl overlay",
+      "Removable": true,
+      "Affordable": true
+    }
+  },
+
+  "BadgeDelete": {
+    "Options": {
+      "Full": {
+        "ID": "DELETE_FULL",
+        "Description": "Complete debadge",
+        "AllEmblems": true,
+        "Clean": true,
+        "Cost": 0
+      },
+      "Partial": {
+        "ID": "DELETE_PARTIAL",
+        "Description": "Selective debadge",
+        "KeepSome": true,
+        "Cost": 0
+      },
+      "ShaveAndFill": {
+        "ID": "DELETE_SHAVE",
+        "Description": "Badge delete with hole fill",
+        "HoleFill": true,
+        "Paint": true,
+        "Cost": 200
+      }
+    },
+    "Process": {
+      "HeatGun": true,
+      "FishingLine": true,
+      "AdhesiveRemover": true,
+      "Polish": true
+    }
+  },
+
+  "CustomBadges": {
+    "NamePlate": {
+      "ID": "CUSTOM_NAME",
+      "Description": "Custom name plate",
+      "Text": { "Custom": true },
+      "MaxChars": 20,
+      "Cost": 150
+    },
+    "NumberBadge": {
+      "ID": "CUSTOM_NUMBER",
+      "Description": "Number badge",
+      "Number": { "Custom": true },
+      "Racing": true,
+      "Cost": 75
+    },
+    "CrewBadge": {
+      "ID": "CUSTOM_CREW",
+      "Description": "Crew/team badge",
+      "Logo": { "Custom": true },
+      "Cost": 100
+    },
+    "UpgradeBadge": {
+      "ID": "CUSTOM_UPGRADE",
+      "Description": "Upgrade indicator badge",
+      "Types": ["Turbo", "Supercharged", "V8 Swap", "Built"],
+      "Cost": 50
+    },
+    "FuelBadge": {
+      "ID": "CUSTOM_FUEL",
+      "Description": "Fuel type badge",
+      "Types": ["E85", "Flex Fuel", "Race Gas"],
+      "Cost": 40
+    }
+  },
+
+  "LetteringStyles": {
+    "OEMStyle": {
+      "Description": "Factory style letters",
+      "Font": "OEM",
+      "Spacing": "OEM"
+    },
+    "Wide": {
+      "Description": "Wide spaced letters",
+      "Spacing": "Extended"
+    },
+    "Stacked": {
+      "Description": "Stacked letters",
+      "Arrangement": "Vertical"
+    },
+    "Script": {
+      "Description": "Script lettering",
+      "Font": "Cursive"
+    },
+    "Block": {
+      "Description": "Block letters",
+      "Font": "Bold"
+    }
+  },
+
+  "OEMUpgradeBadges": {
+    "Performance": {
+      "Examples": {
+        "BMW": ["M Sport", "M Performance", "M"],
+        "Mercedes": ["AMG Line", "AMG"],
+        "Audi": ["S Line", "S", "RS"],
+        "Toyota": ["TRD", "GR"],
+        "Nissan": ["Nismo", "Z"],
+        "Honda": ["Si", "Type R"],
+        "Subaru": ["STI", "WRX"],
+        "Ford": ["ST", "RS", "Shelby"],
+        "Chevrolet": ["SS", "Z06", "ZR1"]
+      }
+    },
+    "Installation": {
+      "AdhesiveBacked": true,
+      "Professional": { "Optional": true }
+    }
+  },
+
+  "Compatibility": {
+    "ByVehicle": true,
+    "Universal": {
+      "SomeBadges": true,
+      "SizeMatters": true
+    },
+    "Mounting": {
+      "Adhesive": { "Common": true },
+      "Pins": { "SomeModels": true },
+      "Clips": { "SomeModels": true }
+    }
+  },
+
+  "UI": {
+    "EmblemMenu": {
+      "LocationSelector": true,
+      "TypeSelector": true,
+      "FinishOptions": true,
+      "StyleOptions": true
+    },
+    "Preview": {
+      "ExteriorView": true,
+      "CloseUpView": true,
+      "NightView": { "ForIlluminated": true }
+    },
+    "Custom": {
+      "TextInput": true,
+      "FontSelector": true,
+      "ColorPicker": true
+    },
+    "Delete": {
+      "SelectionTool": true,
+      "BeforeAfter": true
+    }
+  }
+}

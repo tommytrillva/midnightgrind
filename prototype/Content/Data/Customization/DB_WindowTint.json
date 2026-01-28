@@ -1,0 +1,344 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Window Tint and Film Customization",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "WindowTint": true,
+    "LegalLimits": true,
+    "HeatRejection": true
+  },
+
+  "TintLevels": {
+    "Clear": {
+      "ID": "TINT_CLEAR",
+      "Description": "No tint / factory clear",
+      "VLT": 100,
+      "Legal": "Always",
+      "Default": true
+    },
+    "Factory": {
+      "ID": "TINT_FACTORY",
+      "Description": "Factory privacy glass",
+      "VLT": 70,
+      "Legal": "Always",
+      "Rear": true
+    },
+    "Light": {
+      "ID": "TINT_LIGHT",
+      "Description": "Light tint (50%)",
+      "VLT": 50,
+      "Legal": "Most",
+      "Cost": 150
+    },
+    "Medium": {
+      "ID": "TINT_MEDIUM",
+      "Description": "Medium tint (35%)",
+      "VLT": 35,
+      "Legal": "Varies",
+      "Cost": 200
+    },
+    "Dark": {
+      "ID": "TINT_DARK",
+      "Description": "Dark tint (20%)",
+      "VLT": 20,
+      "Legal": "RearOnly",
+      "Cost": 250
+    },
+    "Limo": {
+      "ID": "TINT_LIMO",
+      "Description": "Limo tint (5%)",
+      "VLT": 5,
+      "Legal": "RearOnly",
+      "Cost": 300
+    },
+    "Blacked": {
+      "ID": "TINT_BLACKED",
+      "Description": "Blacked out (1%)",
+      "VLT": 1,
+      "Legal": "NotLegal",
+      "Cost": 350
+    }
+  },
+
+  "TintTypes": {
+    "Dyed": {
+      "ID": "TYPE_DYED",
+      "Description": "Dyed window film",
+      "HeatRejection": "Low",
+      "UVRejection": "Moderate",
+      "Durability": "Low",
+      "FadeResistance": "Poor",
+      "CostMultiplier": 1.0
+    },
+    "Metalized": {
+      "ID": "TYPE_METAL",
+      "Description": "Metalized window film",
+      "HeatRejection": "Good",
+      "UVRejection": "Good",
+      "Durability": "High",
+      "ShinyAppearance": true,
+      "SignalInterference": true,
+      "CostMultiplier": 1.3
+    },
+    "Carbon": {
+      "ID": "TYPE_CARBON",
+      "Description": "Carbon window film",
+      "HeatRejection": "Very Good",
+      "UVRejection": "Excellent",
+      "Durability": "High",
+      "MatteFinish": true,
+      "NoInterference": true,
+      "CostMultiplier": 1.5
+    },
+    "Ceramic": {
+      "ID": "TYPE_CERAMIC",
+      "Description": "Ceramic window film",
+      "HeatRejection": "Excellent",
+      "UVRejection": "Maximum",
+      "Durability": "Very High",
+      "Premium": true,
+      "NoInterference": true,
+      "CostMultiplier": 2.0
+    },
+    "NanoCeramic": {
+      "ID": "TYPE_NANO",
+      "Description": "Nano-ceramic film",
+      "HeatRejection": "Maximum",
+      "UVRejection": "Maximum",
+      "Durability": "Extreme",
+      "Clarity": "Best",
+      "Premium": true,
+      "CostMultiplier": 2.5
+    },
+    "Crystalline": {
+      "ID": "TYPE_CRYSTAL",
+      "Description": "Crystalline film",
+      "HeatRejection": "Excellent",
+      "UVRejection": "Maximum",
+      "Durability": "Extreme",
+      "NearClear": true,
+      "LightTintOnly": true,
+      "CostMultiplier": 3.0
+    }
+  },
+
+  "TintColors": {
+    "Charcoal": {
+      "ID": "COLOR_CHARCOAL",
+      "Description": "Charcoal black",
+      "MostCommon": true,
+      "Default": true
+    },
+    "Neutral": {
+      "ID": "COLOR_NEUTRAL",
+      "Description": "Neutral gray",
+      "TrueColor": true
+    },
+    "Bronze": {
+      "ID": "COLOR_BRONZE",
+      "Description": "Bronze tint",
+      "WarmTone": true,
+      "CostMultiplier": 1.1
+    },
+    "Blue": {
+      "ID": "COLOR_BLUE",
+      "Description": "Blue tint",
+      "CoolTone": true,
+      "CostMultiplier": 1.1
+    },
+    "Green": {
+      "ID": "COLOR_GREEN",
+      "Description": "Green tint",
+      "Subtle": true,
+      "CostMultiplier": 1.1
+    }
+  },
+
+  "WindowZones": {
+    "Windshield": {
+      "ID": "ZONE_WIND",
+      "LegalVLT": { "Min": 70 },
+      "BrowStrip": {
+        "Allowed": true,
+        "MaxHeight": { "Inches": 5 }
+      }
+    },
+    "FrontSide": {
+      "ID": "ZONE_FRONTSIDE",
+      "LegalVLT": { "Min": { "ByState": true } },
+      "TypicalLimit": 35
+    },
+    "RearSide": {
+      "ID": "ZONE_REARSIDE",
+      "LegalVLT": { "Min": "Any" },
+      "LessRestricted": true
+    },
+    "RearWindow": {
+      "ID": "ZONE_REAR",
+      "LegalVLT": { "Min": "Any" },
+      "LessRestricted": true
+    },
+    "Sunroof": {
+      "ID": "ZONE_SUNROOF",
+      "Optional": true,
+      "LegalVLT": { "NoLimit": true }
+    }
+  },
+
+  "WindshieldBrow": {
+    "None": {
+      "ID": "BROW_NONE",
+      "Default": true
+    },
+    "Standard": {
+      "ID": "BROW_STD",
+      "Description": "Standard sun strip",
+      "Height": { "Inches": 5 },
+      "GradientFade": true,
+      "Cost": 75
+    },
+    "Extended": {
+      "ID": "BROW_EXT",
+      "Description": "Extended sun strip",
+      "Height": { "Inches": 8 },
+      "GradientFade": true,
+      "Cost": 100
+    },
+    "Full": {
+      "ID": "BROW_FULL",
+      "Description": "Full windshield tint",
+      "Legal": "OnlyClear",
+      "Cost": 150
+    }
+  },
+
+  "SpecialFilms": {
+    "SecurityFilm": {
+      "ID": "SPECIAL_SECURITY",
+      "Description": "Shatter-resistant film",
+      "Thickness": "Thick",
+      "ShatterProof": true,
+      "Cost": 500
+    },
+    "IRRejecting": {
+      "ID": "SPECIAL_IR",
+      "Description": "Infrared rejecting",
+      "HeatRejection": "Maximum",
+      "ClearAppearance": true,
+      "Cost": 400
+    },
+    "Chameleon": {
+      "ID": "SPECIAL_CHAM",
+      "Description": "Color-shifting film",
+      "ColorShift": true,
+      "Iridescent": true,
+      "NotLegal": { "InSomeStates": true },
+      "Cost": 600
+    },
+    "Privacy": {
+      "ID": "SPECIAL_PRIVACY",
+      "Description": "One-way privacy film",
+      "MirrorEffect": true,
+      "DaytimeOnly": true,
+      "Cost": 350
+    }
+  },
+
+  "HeatRejection": {
+    "None": { "Percentage": 0, "Level": "Clear" },
+    "Low": { "Percentage": 25, "Level": "Dyed" },
+    "Moderate": { "Percentage": 40, "Level": "Metalized" },
+    "Good": { "Percentage": 55, "Level": "Carbon" },
+    "Excellent": { "Percentage": 70, "Level": "Ceramic" },
+    "Maximum": { "Percentage": 85, "Level": "NanoCeramic" }
+  },
+
+  "UVRejection": {
+    "Standard": { "Percentage": 95 },
+    "Premium": { "Percentage": 99 },
+    "SkinProtection": true,
+    "InteriorProtection": true
+  },
+
+  "LegalConsiderations": {
+    "ByState": {
+      "Varies": true,
+      "Windshield": { "Usually": "BrowOnly" },
+      "FrontSide": { "Common": 35 },
+      "Rear": { "Usually": "Any" }
+    },
+    "Enforcement": {
+      "PoliceAttention": true,
+      "FixItTicket": true,
+      "Fines": true
+    },
+    "MedicalExemption": {
+      "Available": { "InSomeStates": true },
+      "Documentation": "Required"
+    }
+  },
+
+  "Benefits": {
+    "Privacy": {
+      "Level": { "ByTint": true },
+      "DaytimeVsNight": true
+    },
+    "HeatReduction": {
+      "InteriorTemp": "Lower",
+      "ACLoad": "Reduced"
+    },
+    "UVProtection": {
+      "SkinProtection": true,
+      "InteriorFading": "Reduced"
+    },
+    "GlareReduction": {
+      "Driving": "Easier",
+      "EyeStrain": "Reduced"
+    },
+    "Appearance": {
+      "SleekLook": true,
+      "Customization": true
+    }
+  },
+
+  "Installation": {
+    "Professional": {
+      "Recommended": true,
+      "Warranty": true,
+      "Quality": "Best"
+    },
+    "DIY": {
+      "Available": true,
+      "Difficulty": "Moderate",
+      "RiskOfBubbles": true
+    },
+    "RemovalCost": {
+      "PerWindow": 50
+    }
+  },
+
+  "UI": {
+    "TintMenu": {
+      "LevelSelector": true,
+      "TypeSelector": true,
+      "ColorOptions": true,
+      "ZoneSelection": true
+    },
+    "Preview": {
+      "ExteriorView": true,
+      "InteriorView": true,
+      "DayNightToggle": true
+    },
+    "Legal": {
+      "StateSelector": true,
+      "ComplianceCheck": true,
+      "WarningDisplay": true
+    },
+    "Specs": {
+      "VLTDisplay": true,
+      "HeatRejectionDisplay": true,
+      "UVRejectionDisplay": true
+    }
+  }
+}
