@@ -1,0 +1,441 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Roll Cage and Safety Equipment Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "SafetyRating": true,
+    "WeightEffects": true,
+    "StiffnessEffects": true
+  },
+
+  "RollCageTypes": {
+    "None": {
+      "ID": "CAGE_NONE",
+      "Description": "No roll cage",
+      "Safety": 0,
+      "Weight": 0,
+      "Stiffness": 0,
+      "Default": true
+    },
+    "HarnesBar": {
+      "ID": "CAGE_HARNESS",
+      "Description": "Harness bar only",
+      "Safety": 1,
+      "Weight": 10,
+      "Stiffness": 0.05,
+      "Points": 2,
+      "Cost": 200
+    },
+    "FourPoint": {
+      "ID": "CAGE_4POINT",
+      "Description": "4-point roll bar",
+      "Safety": 2,
+      "Weight": 25,
+      "Stiffness": 0.1,
+      "Points": 4,
+      "Cost": 800
+    },
+    "SixPoint": {
+      "ID": "CAGE_6POINT",
+      "Description": "6-point roll bar",
+      "Safety": 3,
+      "Weight": 35,
+      "Stiffness": 0.15,
+      "Points": 6,
+      "Cost": 1200
+    },
+    "EightPoint": {
+      "ID": "CAGE_8POINT",
+      "Description": "8-point half cage",
+      "Safety": 4,
+      "Weight": 50,
+      "Stiffness": 0.2,
+      "Points": 8,
+      "Cost": 2000
+    },
+    "TenPoint": {
+      "ID": "CAGE_10POINT",
+      "Description": "10-point full cage",
+      "Safety": 5,
+      "Weight": 70,
+      "Stiffness": 0.3,
+      "Points": 10,
+      "Cost": 3500
+    },
+    "NASCAR": {
+      "ID": "CAGE_NASCAR",
+      "Description": "NASCAR-spec full cage",
+      "Safety": 6,
+      "Weight": 90,
+      "Stiffness": 0.4,
+      "Points": 14,
+      "Cost": 6000
+    },
+    "WRC": {
+      "ID": "CAGE_WRC",
+      "Description": "WRC-spec rally cage",
+      "Safety": 6,
+      "Weight": 85,
+      "Stiffness": 0.35,
+      "Points": 12,
+      "Cost": 8000
+    },
+    "Custom": {
+      "ID": "CAGE_CUSTOM",
+      "Description": "Custom fabricated cage",
+      "Safety": { "Variable": true },
+      "Weight": { "Variable": true },
+      "Stiffness": { "Variable": true },
+      "Cost": { "StartingAt": 5000 }
+    }
+  },
+
+  "Materials": {
+    "MildSteel": {
+      "ID": "MAT_MILD",
+      "Description": "Mild steel tubing",
+      "Strength": 1.0,
+      "Weight": 1.0,
+      "Weldability": "Easy",
+      "Cost": 1.0,
+      "Default": true
+    },
+    "DOM": {
+      "ID": "MAT_DOM",
+      "Description": "DOM steel tubing",
+      "Strength": 1.3,
+      "Weight": 1.0,
+      "Weldability": "Good",
+      "Cost": 1.3
+    },
+    "Chromoly": {
+      "ID": "MAT_CHROMOLY",
+      "Description": "4130 chromoly tubing",
+      "Strength": 1.6,
+      "Weight": 0.85,
+      "Weldability": "Difficult",
+      "Cost": 2.0
+    },
+    "Titanium": {
+      "ID": "MAT_TITANIUM",
+      "Description": "Titanium tubing",
+      "Strength": 1.5,
+      "Weight": 0.6,
+      "Weldability": "Expert",
+      "Cost": 5.0
+    }
+  },
+
+  "TubingSize": {
+    "Standard": {
+      "Diameter": 1.5,
+      "Wall": 0.095,
+      "Unit": "Inches",
+      "Use": "GeneralPurpose"
+    },
+    "MainHoop": {
+      "Diameter": 1.75,
+      "Wall": 0.120,
+      "Unit": "Inches",
+      "Use": "PrimaryStructure"
+    },
+    "Racing": {
+      "Diameter": 1.625,
+      "Wall": 0.134,
+      "Unit": "Inches",
+      "Use": "Competition"
+    }
+  },
+
+  "CageComponents": {
+    "MainHoop": {
+      "Description": "Primary overhead hoop",
+      "Required": true,
+      "Points": 2
+    },
+    "FrontDowntubes": {
+      "Description": "A-pillar reinforcement",
+      "Required": { "For6Plus": true },
+      "Points": 2
+    },
+    "RearDowntubes": {
+      "Description": "C-pillar reinforcement",
+      "Required": true,
+      "Points": 2
+    },
+    "DoorBars": {
+      "Description": "Door intrusion bars",
+      "Required": { "For8Plus": true },
+      "Points": 2
+    },
+    "XBrace": {
+      "Description": "Cross brace in door",
+      "Required": { "For10Plus": true },
+      "Points": 1
+    },
+    "HarnessBar": {
+      "Description": "Shoulder harness mount",
+      "Required": true,
+      "Points": 1
+    },
+    "FloorBraces": {
+      "Description": "Floor reinforcement",
+      "Required": { "ForRacing": true },
+      "Points": 2
+    },
+    "RoofBraces": {
+      "Description": "Roof reinforcement",
+      "Required": { "For10Plus": true },
+      "Points": 2
+    },
+    "NASCARBars": {
+      "Description": "Additional NASCAR bars",
+      "Required": { "ForNASCAR": true },
+      "Points": 4
+    }
+  },
+
+  "Finishes": {
+    "Bare": {
+      "Description": "Unfinished steel",
+      "Protection": "None",
+      "Default": true
+    },
+    "Painted": {
+      "Description": "Painted finish",
+      "Protection": "Basic",
+      "Colors": ["Black", "White", "Red", "Blue", "Custom"],
+      "Cost": 200
+    },
+    "PowderCoat": {
+      "Description": "Powder coated",
+      "Protection": "Good",
+      "Colors": "Any",
+      "Durable": true,
+      "Cost": 400
+    },
+    "Chrome": {
+      "Description": "Show chrome",
+      "Protection": "Excellent",
+      "ShowOnly": true,
+      "Cost": 1000
+    },
+    "Ceramic": {
+      "Description": "Ceramic coating",
+      "Protection": "Best",
+      "HeatResistant": true,
+      "Cost": 800
+    }
+  },
+
+  "Padding": {
+    "Required": true,
+    "Types": {
+      "Basic": {
+        "ID": "PAD_BASIC",
+        "Description": "Basic SFI padding",
+        "Protection": 1.0,
+        "Coverage": "Minimal",
+        "Cost": 100
+      },
+      "Full": {
+        "ID": "PAD_FULL",
+        "Description": "Full SFI padding",
+        "Protection": 1.5,
+        "Coverage": "Complete",
+        "Cost": 300
+      },
+      "HighImpact": {
+        "ID": "PAD_HIIMPACT",
+        "Description": "High-impact padding",
+        "Protection": 2.0,
+        "Coverage": "Complete",
+        "Cost": 500
+      }
+    },
+    "Areas": {
+      "MainHoop": true,
+      "APillar": true,
+      "DoorBars": true,
+      "HarnessBar": true
+    }
+  },
+
+  "SafetyHarness": {
+    "Types": {
+      "Stock": {
+        "ID": "HARNESS_STOCK",
+        "Description": "Factory seatbelt",
+        "Points": 3,
+        "Default": true
+      },
+      "FourPoint": {
+        "ID": "HARNESS_4PT",
+        "Description": "4-point racing harness",
+        "Points": 4,
+        "Quick": true,
+        "Cost": 200
+      },
+      "FivePoint": {
+        "ID": "HARNESS_5PT",
+        "Description": "5-point racing harness",
+        "Points": 5,
+        "SFI": true,
+        "Cost": 400
+      },
+      "SixPoint": {
+        "ID": "HARNESS_6PT",
+        "Description": "6-point racing harness",
+        "Points": 6,
+        "FIA": true,
+        "AntiSubmarine": true,
+        "Cost": 600
+      },
+      "CAMSLock": {
+        "ID": "HARNESS_CAMS",
+        "Description": "CAMS-lock harness",
+        "Points": 6,
+        "QuickRelease": true,
+        "Premium": true,
+        "Cost": 1000
+      }
+    },
+    "Width": {
+      "TwoInch": { "Use": "Street" },
+      "ThreeInch": { "Use": "Racing" }
+    },
+    "Colors": ["Black", "Red", "Blue", "Purple", "Green", "Pink", "Orange"]
+  },
+
+  "FireSuppression": {
+    "Types": {
+      "None": {
+        "ID": "FIRE_NONE",
+        "Description": "No fire system",
+        "Default": true
+      },
+      "Handheld": {
+        "ID": "FIRE_HANDHELD",
+        "Description": "Handheld extinguisher",
+        "Automatic": false,
+        "Cost": 100
+      },
+      "Mounted": {
+        "ID": "FIRE_MOUNTED",
+        "Description": "Mounted extinguisher",
+        "Automatic": false,
+        "Accessible": true,
+        "Cost": 200
+      },
+      "Automatic": {
+        "ID": "FIRE_AUTO",
+        "Description": "Automatic system",
+        "Automatic": true,
+        "Nozzles": 2,
+        "Cost": 1000
+      },
+      "FIA": {
+        "ID": "FIRE_FIA",
+        "Description": "FIA-spec system",
+        "Automatic": true,
+        "Nozzles": 4,
+        "FIAApproved": true,
+        "Cost": 2500
+      }
+    },
+    "Agents": {
+      "DryChemical": { "Common": true },
+      "Halon": { "Effective": true, "Banned": "SomeRegions" },
+      "AFFF": { "FIAApproved": true }
+    }
+  },
+
+  "WindowNet": {
+    "Types": {
+      "None": { "Default": true },
+      "Ribbon": {
+        "ID": "NET_RIBBON",
+        "Description": "Ribbon window net",
+        "SFI": true,
+        "Cost": 100
+      },
+      "Mesh": {
+        "ID": "NET_MESH",
+        "Description": "Mesh window net",
+        "SFI": true,
+        "Visibility": "Better",
+        "Cost": 150
+      }
+    },
+    "Release": {
+      "QuickRelease": true,
+      "DriverSide": true
+    }
+  },
+
+  "PerformanceEffects": {
+    "ChassisStiffness": {
+      "Improvement": { "ByPoints": true },
+      "Handling": "Better",
+      "Response": "Quicker"
+    },
+    "WeightPenalty": {
+      "CenterOfGravity": "Higher",
+      "WeightDistribution": "Variable"
+    },
+    "SafetyRating": {
+      "CrashSurvivability": "Improved",
+      "Required": { "ForRacing": true }
+    }
+  },
+
+  "Certifications": {
+    "SFI": {
+      "Level1": { "Use": "Basic" },
+      "Level2": { "Use": "Competition" }
+    },
+    "FIA": {
+      "Standard": { "Use": "International" }
+    },
+    "NHRA": {
+      "Class": { "ByET": true }
+    },
+    "NASCAR": {
+      "Standard": { "Use": "StockCar" }
+    }
+  },
+
+  "Installation": {
+    "BoltIn": {
+      "Difficulty": "Moderate",
+      "Removable": true,
+      "Strength": 0.8
+    },
+    "WeldIn": {
+      "Difficulty": "Hard",
+      "Removable": false,
+      "Strength": 1.0,
+      "Professional": "Recommended"
+    }
+  },
+
+  "UI": {
+    "SafetyMenu": {
+      "CageSelector": true,
+      "MaterialOptions": true,
+      "HarnessOptions": true,
+      "FireSystemOptions": true
+    },
+    "Preview": {
+      "3DView": true,
+      "SafetyRating": true,
+      "WeightDisplay": true,
+      "StiffnessDisplay": true
+    },
+    "Compliance": {
+      "CertificationDisplay": true,
+      "RequirementChecker": true
+    }
+  }
+}

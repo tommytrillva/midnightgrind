@@ -1,0 +1,372 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Racing Seats and Interior Seating Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "SeatSwaps": true,
+    "WeightEffects": true,
+    "ComfortEffects": true
+  },
+
+  "SeatTypes": {
+    "Stock": {
+      "ID": "SEAT_STOCK",
+      "Description": "Factory seats",
+      "Style": "OEM",
+      "Bolstering": "Low",
+      "Weight": 1.0,
+      "Comfort": 1.0,
+      "Default": true
+    },
+    "Sport": {
+      "ID": "SEAT_SPORT",
+      "Description": "Sport bucket seats",
+      "Style": "SportBucket",
+      "Bolstering": "Medium",
+      "Weight": 0.9,
+      "Comfort": 0.95,
+      "Cost": 800
+    },
+    "Recaro": {
+      "ID": "SEAT_RECARO",
+      "Description": "Recaro-style sport seats",
+      "Style": "EuroSport",
+      "Bolstering": "High",
+      "Weight": 0.85,
+      "Comfort": 0.9,
+      "Adjustable": true,
+      "Cost": 2000
+    },
+    "FixedBack": {
+      "ID": "SEAT_FIXED",
+      "Description": "Fixed-back racing seat",
+      "Style": "Racing",
+      "Bolstering": "VeryHigh",
+      "Weight": 0.6,
+      "Comfort": 0.7,
+      "HarnessSlots": true,
+      "Cost": 1500
+    },
+    "HaloSeat": {
+      "ID": "SEAT_HALO",
+      "Description": "Halo-style FIA seat",
+      "Style": "FIA",
+      "Bolstering": "Extreme",
+      "Weight": 0.5,
+      "Comfort": 0.6,
+      "HarnessSlots": true,
+      "HeadRestraint": true,
+      "Cost": 3000
+    },
+    "Lightweight": {
+      "ID": "SEAT_LIGHT",
+      "Description": "Ultra-lightweight seat",
+      "Style": "Racing",
+      "Bolstering": "High",
+      "Weight": 0.4,
+      "Comfort": 0.5,
+      "Material": "CarbonKevlar",
+      "Cost": 5000
+    },
+    "Drag": {
+      "ID": "SEAT_DRAG",
+      "Description": "Drag racing seat",
+      "Style": "Drag",
+      "Bolstering": "Maximum",
+      "Weight": 0.55,
+      "Comfort": 0.4,
+      "FullContainment": true,
+      "Cost": 2500
+    },
+    "Rally": {
+      "ID": "SEAT_RALLY",
+      "Description": "Rally racing seat",
+      "Style": "Rally",
+      "Bolstering": "VeryHigh",
+      "Weight": 0.6,
+      "Comfort": 0.65,
+      "FIA": true,
+      "Cost": 3500
+    }
+  },
+
+  "Materials": {
+    "Cloth": {
+      "ID": "MAT_CLOTH",
+      "Description": "Cloth upholstery",
+      "Durability": "Medium",
+      "Grip": "Good",
+      "Heat": "Neutral",
+      "Default": true
+    },
+    "Leather": {
+      "ID": "MAT_LEATHER",
+      "Description": "Leather upholstery",
+      "Durability": "High",
+      "Grip": "Moderate",
+      "Heat": "Hot",
+      "Premium": true,
+      "CostMultiplier": 1.5
+    },
+    "Alcantara": {
+      "ID": "MAT_ALCANTARA",
+      "Description": "Alcantara suede",
+      "Durability": "Medium",
+      "Grip": "Excellent",
+      "Heat": "Neutral",
+      "Premium": true,
+      "CostMultiplier": 1.8
+    },
+    "Vinyl": {
+      "ID": "MAT_VINYL",
+      "Description": "Vinyl upholstery",
+      "Durability": "High",
+      "Grip": "Low",
+      "Heat": "Hot",
+      "CostMultiplier": 0.8
+    },
+    "FiberglassShell": {
+      "ID": "MAT_FG_SHELL",
+      "Description": "Fiberglass shell",
+      "Durability": "High",
+      "Weight": "Light",
+      "Racing": true,
+      "CostMultiplier": 1.2
+    },
+    "CarbonFiberShell": {
+      "ID": "MAT_CF_SHELL",
+      "Description": "Carbon fiber shell",
+      "Durability": "Very High",
+      "Weight": "VeryLight",
+      "Racing": true,
+      "CostMultiplier": 3.0
+    },
+    "CarbonKevlar": {
+      "ID": "MAT_CK_SHELL",
+      "Description": "Carbon-Kevlar shell",
+      "Durability": "Extreme",
+      "Weight": "Lightest",
+      "Racing": true,
+      "CostMultiplier": 4.0
+    }
+  },
+
+  "SeatFeatures": {
+    "Adjustability": {
+      "HeightAdjust": {
+        "Available": ["Stock", "Sport", "Recaro"],
+        "Range": { "Inches": 3 }
+      },
+      "ReclineAdjust": {
+        "Available": ["Stock", "Sport", "Recaro"],
+        "Range": { "Degrees": 30 }
+      },
+      "LumbarSupport": {
+        "Available": ["Stock", "Sport", "Recaro"],
+        "Adjustable": true
+      },
+      "ThighExtension": {
+        "Available": ["Sport", "Recaro"],
+        "Adjustable": true
+      },
+      "BolsterAdjust": {
+        "Available": ["Recaro"],
+        "Adjustable": true
+      }
+    },
+    "Heating": {
+      "Available": ["Stock", "Sport", "Recaro"],
+      "Levels": 3,
+      "Cost": 300
+    },
+    "Cooling": {
+      "Available": ["Stock", "Sport", "Recaro"],
+      "Ventilated": true,
+      "Cost": 500
+    },
+    "Memory": {
+      "Available": ["Stock", "Recaro"],
+      "Positions": 3,
+      "Cost": 400
+    }
+  },
+
+  "Mounting": {
+    "SeatBrackets": {
+      "Stock": {
+        "ID": "MOUNT_STOCK",
+        "Description": "Factory seat brackets",
+        "Adjustable": true,
+        "Default": true
+      },
+      "LowMount": {
+        "ID": "MOUNT_LOW",
+        "Description": "Low-mount brackets",
+        "HeightReduction": 1.5,
+        "CoG": "Lower",
+        "Cost": 200
+      },
+      "SideMount": {
+        "ID": "MOUNT_SIDE",
+        "Description": "Side-mount brackets",
+        "Rigid": true,
+        "ForRacing": true,
+        "Cost": 300
+      },
+      "Universal": {
+        "ID": "MOUNT_UNIVERSAL",
+        "Description": "Universal sliders",
+        "Adjustable": true,
+        "ForAftermrket": true,
+        "Cost": 150
+      }
+    },
+    "Rails": {
+      "Stock": { "Default": true },
+      "Slider": {
+        "Adjustable": true,
+        "Travel": { "Inches": 6 },
+        "Cost": 100
+      },
+      "LockingSlider": {
+        "Adjustable": true,
+        "DoubleLock": true,
+        "Cost": 200
+      },
+      "Fixed": {
+        "Racing": true,
+        "NoAdjustment": true,
+        "Cost": 150
+      }
+    }
+  },
+
+  "Harnesses": {
+    "HarnessCompatibility": {
+      "StockSeats": { "3Point": true, "4Point": "Limited" },
+      "SportSeats": { "3Point": true, "4Point": true },
+      "RacingSeats": { "4Point": true, "5Point": true, "6Point": true }
+    },
+    "HarnessSlots": {
+      "Shoulder": { "Required": true, "Width": [2, 3] },
+      "Lap": { "Required": true, "Width": [2, 3] },
+      "AntiSubmarine": { "Required": { "For5Plus": true } }
+    }
+  },
+
+  "PassengerSeat": {
+    "Options": {
+      "Matching": {
+        "ID": "PASS_MATCH",
+        "Description": "Matching passenger seat",
+        "CostMultiplier": 0.9
+      },
+      "Delete": {
+        "ID": "PASS_DELETE",
+        "Description": "Passenger seat delete",
+        "WeightSaving": 30,
+        "ForRacing": true,
+        "Cost": 0
+      },
+      "Stock": {
+        "ID": "PASS_STOCK",
+        "Description": "Keep factory passenger",
+        "Default": true
+      }
+    }
+  },
+
+  "RearSeats": {
+    "Options": {
+      "Stock": {
+        "ID": "REAR_STOCK",
+        "Description": "Factory rear seats",
+        "Default": true
+      },
+      "FoldFlat": {
+        "ID": "REAR_FOLD",
+        "Description": "Fold-flat rear seats",
+        "Cargo": true
+      },
+      "Delete": {
+        "ID": "REAR_DELETE",
+        "Description": "Rear seat delete",
+        "WeightSaving": 50,
+        "ForRacing": true,
+        "Cost": 0
+      },
+      "RollCageBar": {
+        "ID": "REAR_CAGE",
+        "Description": "Replace with harness bar",
+        "SafetyEquipment": true,
+        "Cost": 200
+      }
+    }
+  },
+
+  "WeightSavings": {
+    "ByType": {
+      "Stock": { "Pounds": 0 },
+      "Sport": { "Pounds": -5 },
+      "Recaro": { "Pounds": -8 },
+      "FixedBack": { "Pounds": -20 },
+      "HaloSeat": { "Pounds": -25 },
+      "Lightweight": { "Pounds": -35 },
+      "Drag": { "Pounds": -22 },
+      "Rally": { "Pounds": -20 }
+    },
+    "ByMaterial": {
+      "Cloth": { "Modifier": 1.0 },
+      "Leather": { "Modifier": 1.1 },
+      "Alcantara": { "Modifier": 1.0 },
+      "FiberglassShell": { "Modifier": 0.8 },
+      "CarbonFiberShell": { "Modifier": 0.6 },
+      "CarbonKevlar": { "Modifier": 0.5 }
+    }
+  },
+
+  "Certifications": {
+    "FIA": {
+      "Standard": "8855-1999",
+      "HomologationPeriod": { "Years": 5 },
+      "Required": { "ForSanctionedRacing": true }
+    },
+    "SFI": {
+      "Spec": "39.2",
+      "Required": { "ForNHRA": true }
+    }
+  },
+
+  "Colors": {
+    "Shell": ["Black", "Red", "Blue", "Yellow", "Carbon", "Custom"],
+    "Upholstery": ["Black", "Red", "Blue", "Gray", "Tan", "Custom"],
+    "Stitching": ["Black", "Red", "Blue", "White", "Yellow", "Contrast"],
+    "Accents": ["Carbon", "Alcantara", "Leather", "Color"]
+  },
+
+  "Brands": {
+    "Premium": ["Recaro", "Bride", "Sparco", "OMP", "Corbeau"],
+    "Value": ["NRG", "Cipher", "Braum", "Spec-D"],
+    "OEM": ["Factory", "OEMPlus"]
+  },
+
+  "UI": {
+    "SeatMenu": {
+      "TypeSelector": true,
+      "MaterialOptions": true,
+      "ColorCustomization": true,
+      "MountingOptions": true
+    },
+    "Preview": {
+      "3DView": true,
+      "WeightDisplay": true,
+      "FeaturesDisplay": true
+    },
+    "Compatibility": {
+      "HarnessCheck": true,
+      "MountingCheck": true,
+      "CertificationDisplay": true
+    }
+  }
+}

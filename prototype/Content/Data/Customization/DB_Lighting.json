@@ -1,0 +1,391 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Vehicle Lighting Customization System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "HeadlightSwaps": true,
+    "TaillightMods": true,
+    "UnderglowEnabled": true,
+    "InteriorLighting": true
+  },
+
+  "Headlights": {
+    "Types": {
+      "Stock": {
+        "ID": "HEAD_STOCK",
+        "Description": "Factory headlights",
+        "BulbType": "Halogen",
+        "Brightness": 1.0,
+        "Color": "Warm White",
+        "Default": true
+      },
+      "Halogen": {
+        "ID": "HEAD_HALOGEN",
+        "Description": "Upgraded halogen",
+        "BulbType": "Halogen",
+        "Brightness": 1.2,
+        "Color": "White",
+        "Cost": 100
+      },
+      "HID": {
+        "ID": "HEAD_HID",
+        "Description": "HID xenon kit",
+        "BulbType": "HID",
+        "Brightness": 1.8,
+        "Color": { "Selectable": true },
+        "Kelvin": [4300, 5000, 6000, 8000, 10000, 12000],
+        "Cost": 400
+      },
+      "LED": {
+        "ID": "HEAD_LED",
+        "Description": "LED headlight kit",
+        "BulbType": "LED",
+        "Brightness": 2.0,
+        "Color": "Pure White",
+        "InstantOn": true,
+        "Cost": 600
+      },
+      "Projector": {
+        "ID": "HEAD_PROJECTOR",
+        "Description": "Projector retrofit",
+        "BulbType": "HID",
+        "Brightness": 2.2,
+        "BeamPattern": "Sharp",
+        "Cost": 1000
+      },
+      "Sequential": {
+        "ID": "HEAD_SEQUENTIAL",
+        "Description": "Sequential turn signals",
+        "BulbType": "LED",
+        "Brightness": 2.0,
+        "Animation": "Sequential",
+        "Cost": 800
+      },
+      "RGB": {
+        "ID": "HEAD_RGB",
+        "Description": "RGB DRL halos",
+        "BulbType": "LED",
+        "Brightness": 1.5,
+        "Color": { "RGB": true, "App": true },
+        "Halos": true,
+        "Cost": 500
+      }
+    },
+    "Housing": {
+      "Stock": { "Default": true },
+      "Clear": { "Cost": 200 },
+      "Smoked": { "Cost": 250 },
+      "Blacked": { "Cost": 300 },
+      "Chrome": { "Cost": 250 },
+      "Custom": { "Cost": 500 }
+    },
+    "DRL": {
+      "None": { "Default": true },
+      "Strip": { "Style": "Modern", "Cost": 200 },
+      "Halo": { "Style": "Angel Eyes", "Cost": 300 },
+      "Sequential": { "Style": "Flowing", "Cost": 400 }
+    }
+  },
+
+  "Taillights": {
+    "Types": {
+      "Stock": {
+        "ID": "TAIL_STOCK",
+        "Description": "Factory taillights",
+        "BulbType": "Incandescent",
+        "Default": true
+      },
+      "LED": {
+        "ID": "TAIL_LED",
+        "Description": "LED tail lights",
+        "BulbType": "LED",
+        "InstantOn": true,
+        "Cost": 400
+      },
+      "Sequential": {
+        "ID": "TAIL_SEQUENTIAL",
+        "Description": "Sequential LED tails",
+        "BulbType": "LED",
+        "Animation": "Sequential",
+        "Cost": 600
+      },
+      "FullLED": {
+        "ID": "TAIL_FULLLED",
+        "Description": "Full LED assembly",
+        "BulbType": "LED",
+        "AllFunctions": "LED",
+        "Cost": 800
+      },
+      "Custom": {
+        "ID": "TAIL_CUSTOM",
+        "Description": "Custom tail lights",
+        "BulbType": "LED",
+        "Design": "Unique",
+        "Cost": 1200
+      }
+    },
+    "Housing": {
+      "Stock": { "Default": true },
+      "Clear": { "Cost": 200 },
+      "Smoked": { "Cost": 250 },
+      "Blacked": { "Cost": 300 },
+      "Red": { "Cost": 200 }
+    },
+    "Effects": {
+      "Standard": { "Default": true },
+      "Sequential": { "Cost": 200 },
+      "Scanning": { "Cost": 300 },
+      "Startup": { "Animation": true, "Cost": 250 }
+    }
+  },
+
+  "FogLights": {
+    "Types": {
+      "Stock": {
+        "ID": "FOG_STOCK",
+        "Description": "Factory fog lights",
+        "Default": true
+      },
+      "Yellow": {
+        "ID": "FOG_YELLOW",
+        "Description": "Yellow fog lights",
+        "Color": "Yellow",
+        "Visibility": "Better",
+        "Cost": 150
+      },
+      "LED": {
+        "ID": "FOG_LED",
+        "Description": "LED fog lights",
+        "Brightness": 1.5,
+        "Cost": 300
+      },
+      "DRL": {
+        "ID": "FOG_DRL",
+        "Description": "Fog light DRL kit",
+        "DualFunction": true,
+        "Cost": 250
+      },
+      "Delete": {
+        "ID": "FOG_DELETE",
+        "Description": "Fog light delete",
+        "CoverPlate": true,
+        "Cost": 100
+      }
+    }
+  },
+
+  "Underglow": {
+    "Enabled": true,
+    "Types": {
+      "Neon": {
+        "ID": "GLOW_NEON",
+        "Description": "Classic neon tubes",
+        "Style": "Retro",
+        "Colors": ["Red", "Blue", "Green", "Purple", "Pink", "White"],
+        "Brightness": 1.0,
+        "Cost": 300
+      },
+      "LED": {
+        "ID": "GLOW_LED",
+        "Description": "LED underglow strips",
+        "Style": "Modern",
+        "Colors": "Multiple",
+        "Brightness": 1.2,
+        "Cost": 400
+      },
+      "RGB": {
+        "ID": "GLOW_RGB",
+        "Description": "RGB LED underglow",
+        "Style": "Modern",
+        "Colors": { "Full": true, "16Million": true },
+        "App": true,
+        "Cost": 600
+      },
+      "Chasing": {
+        "ID": "GLOW_CHASING",
+        "Description": "Chasing LED kit",
+        "Style": "Premium",
+        "Colors": { "Full": true },
+        "Animation": ["Chase", "Flow", "Pulse"],
+        "Cost": 800
+      },
+      "Rock": {
+        "ID": "GLOW_ROCK",
+        "Description": "Rock lights",
+        "Style": "OffRoad",
+        "WheelWell": true,
+        "Cost": 400
+      }
+    },
+    "Positions": {
+      "Front": true,
+      "Rear": true,
+      "Sides": true,
+      "WheelWells": true
+    },
+    "Modes": {
+      "Solid": { "Effect": "Constant" },
+      "Breathing": { "Effect": "Fade" },
+      "Strobe": { "Effect": "Flash" },
+      "Rainbow": { "Effect": "ColorCycle" },
+      "MusicSync": { "Effect": "BeatReactive" }
+    },
+    "Legal": {
+      "WhileMoving": false,
+      "Parked": true,
+      "ShowMode": true
+    }
+  },
+
+  "InteriorLighting": {
+    "Types": {
+      "Stock": {
+        "ID": "INT_STOCK",
+        "Description": "Factory interior lights",
+        "Default": true
+      },
+      "LEDReplacement": {
+        "ID": "INT_LED",
+        "Description": "LED bulb upgrade",
+        "Brightness": 1.5,
+        "Cost": 50
+      },
+      "Footwell": {
+        "ID": "INT_FOOTWELL",
+        "Description": "Footwell lighting kit",
+        "RGB": true,
+        "Cost": 150
+      },
+      "Dashboard": {
+        "ID": "INT_DASH",
+        "Description": "Dashboard accent kit",
+        "RGB": true,
+        "Cost": 200
+      },
+      "FullAmbient": {
+        "ID": "INT_AMBIENT",
+        "Description": "Full ambient lighting",
+        "RGB": true,
+        "Zones": 6,
+        "Cost": 500
+      }
+    },
+    "Zones": {
+      "Footwell": true,
+      "Dashboard": true,
+      "DoorPanels": true,
+      "CenterConsole": true,
+      "Headliner": true,
+      "Trunk": true
+    }
+  },
+
+  "SpecialtyLighting": {
+    "LightBar": {
+      "ID": "LIGHT_BAR",
+      "Description": "LED light bar",
+      "ForOffRoad": true,
+      "Sizes": [20, 30, 40, 50],
+      "Unit": "Inches",
+      "Cost": { "Per": 10, "Amount": 100 }
+    },
+    "SpotLights": {
+      "ID": "LIGHT_SPOT",
+      "Description": "Pod spot lights",
+      "Pairs": true,
+      "Cost": 200
+    },
+    "ThirdBrakeLight": {
+      "ID": "LIGHT_THIRD",
+      "Description": "Custom third brake light",
+      "LED": true,
+      "Cost": 100
+    },
+    "LicensePlate": {
+      "ID": "LIGHT_PLATE",
+      "Description": "License plate LEDs",
+      "Colors": ["White", "RGB"],
+      "Cost": 50
+    },
+    "PuddleLights": {
+      "ID": "LIGHT_PUDDLE",
+      "Description": "Door puddle lights",
+      "Projector": true,
+      "Logo": true,
+      "Cost": 100
+    }
+  },
+
+  "HIDColors": {
+    "Kelvin4300": { "Color": "Warm White", "Output": "Best" },
+    "Kelvin5000": { "Color": "Pure White", "Output": "Excellent" },
+    "Kelvin6000": { "Color": "Cool White", "Output": "Good" },
+    "Kelvin8000": { "Color": "Light Blue", "Output": "Moderate" },
+    "Kelvin10000": { "Color": "Blue", "Output": "Lower" },
+    "Kelvin12000": { "Color": "Purple", "Output": "Lowest" }
+  },
+
+  "Controls": {
+    "Switch": {
+      "Physical": true,
+      "Cost": 0
+    },
+    "Remote": {
+      "Wireless": true,
+      "Cost": 50
+    },
+    "App": {
+      "Bluetooth": true,
+      "WiFi": true,
+      "Cost": 100
+    },
+    "Voice": {
+      "Integration": true,
+      "Cost": 150
+    }
+  },
+
+  "LegalConsiderations": {
+    "Headlights": {
+      "HID": { "Projector": "Required" },
+      "Color": { "WhiteOnly": true }
+    },
+    "Taillights": {
+      "Red": "Required",
+      "Visible": "Required"
+    },
+    "Underglow": {
+      "WhileMoving": "Illegal",
+      "RedBlue": "Prohibited",
+      "Flashing": "Prohibited"
+    },
+    "Enforcement": {
+      "PoliceAttention": true,
+      "Fines": true
+    }
+  },
+
+  "UI": {
+    "LightingMenu": {
+      "HeadlightOptions": true,
+      "TaillightOptions": true,
+      "UnderglowControls": true,
+      "InteriorOptions": true
+    },
+    "ColorPicker": {
+      "RGBSlider": true,
+      "Presets": true,
+      "Favorites": true
+    },
+    "Preview": {
+      "DayView": true,
+      "NightView": true,
+      "LivePreview": true
+    },
+    "ModeSelector": {
+      "QuickModes": true,
+      "CustomPatterns": true
+    }
+  }
+}

@@ -1,0 +1,320 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Hood and Engine Bay Customization",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "HoodSwaps": true,
+    "VentsFunctional": true,
+    "WeightEffects": true
+  },
+
+  "HoodTypes": {
+    "Stock": {
+      "ID": "HOOD_STOCK",
+      "Description": "Factory steel hood",
+      "Material": "Steel",
+      "Weight": 1.0,
+      "Vents": false,
+      "Default": true
+    },
+    "FiberglassFlat": {
+      "ID": "HOOD_FG_FLAT",
+      "Description": "Fiberglass flat hood",
+      "Material": "Fiberglass",
+      "Weight": 0.6,
+      "Vents": false,
+      "Cost": 400
+    },
+    "CarbonFlat": {
+      "ID": "HOOD_CF_FLAT",
+      "Description": "Carbon fiber flat hood",
+      "Material": "CarbonFiber",
+      "Weight": 0.4,
+      "Vents": false,
+      "Cost": 1200
+    },
+    "CowlInduction": {
+      "ID": "HOOD_COWL",
+      "Description": "Cowl induction hood",
+      "Material": "Fiberglass",
+      "Weight": 0.65,
+      "Scoop": true,
+      "ScoopType": "Cowl",
+      "Functional": true,
+      "Cost": 600
+    },
+    "ShakeScoop": {
+      "ID": "HOOD_SHAKER",
+      "Description": "Shaker hood scoop",
+      "Material": "Steel",
+      "Weight": 1.1,
+      "Scoop": true,
+      "ScoopType": "Shaker",
+      "EngineConnected": true,
+      "Cost": 800
+    },
+    "RamAir": {
+      "ID": "HOOD_RAMAIR",
+      "Description": "Ram air hood",
+      "Material": "Fiberglass",
+      "Weight": 0.7,
+      "Scoop": true,
+      "ScoopType": "RamAir",
+      "Functional": true,
+      "SpeedBonus": true,
+      "Cost": 900
+    },
+    "HeatExtractor": {
+      "ID": "HOOD_EXTRACTOR",
+      "Description": "Heat extractor hood",
+      "Material": "CarbonFiber",
+      "Weight": 0.45,
+      "Vents": true,
+      "VentType": "Extractor",
+      "CoolingBonus": true,
+      "Cost": 1500
+    },
+    "VentedCF": {
+      "ID": "HOOD_CF_VENTED",
+      "Description": "Vented carbon hood",
+      "Material": "CarbonFiber",
+      "Weight": 0.4,
+      "Vents": true,
+      "VentType": "Louvers",
+      "CoolingBonus": true,
+      "Cost": 1800
+    },
+    "DryCarbon": {
+      "ID": "HOOD_DRYCF",
+      "Description": "Dry carbon hood",
+      "Material": "DryCarbonFiber",
+      "Weight": 0.3,
+      "Vents": true,
+      "VentType": "Integrated",
+      "Premium": true,
+      "Cost": 3000
+    },
+    "ProStock": {
+      "ID": "HOOD_PROSTOCK",
+      "Description": "Pro stock scoop hood",
+      "Material": "Fiberglass",
+      "Weight": 0.5,
+      "Scoop": true,
+      "ScoopType": "ProStock",
+      "MassiveAirflow": true,
+      "ForDrag": true,
+      "Cost": 1200
+    }
+  },
+
+  "ScoopTypes": {
+    "Cowl": {
+      "Description": "Rear-facing cowl scoop",
+      "AirflowDirection": "Rear",
+      "Benefit": { "IntakeTemp": -5 }
+    },
+    "Shaker": {
+      "Description": "Engine-mounted shaker",
+      "AirflowDirection": "Top",
+      "Benefit": { "IntakeTemp": -3 },
+      "Visual": "MovesWithEngine"
+    },
+    "RamAir": {
+      "Description": "Forward-facing ram air",
+      "AirflowDirection": "Forward",
+      "Benefit": { "IntakeTemp": -10, "SpeedBonus": true }
+    },
+    "ProStock": {
+      "Description": "Large drag racing scoop",
+      "AirflowDirection": "Forward",
+      "Benefit": { "IntakeTemp": -15, "MassiveFlow": true }
+    },
+    "Snorkel": {
+      "Description": "Raised air snorkel",
+      "AirflowDirection": "Top",
+      "Benefit": { "WaterCrossing": true }
+    }
+  },
+
+  "VentTypes": {
+    "Louvers": {
+      "Description": "Slotted louver vents",
+      "CoolingEffect": 10,
+      "Aerodynamic": "Neutral"
+    },
+    "Extractor": {
+      "Description": "Heat extractor vents",
+      "CoolingEffect": 15,
+      "Aerodynamic": "Slight Lift Reduction"
+    },
+    "Functional": {
+      "Description": "NACA duct style",
+      "CoolingEffect": 12,
+      "Aerodynamic": "Good"
+    },
+    "Mesh": {
+      "Description": "Mesh vent inserts",
+      "CoolingEffect": 8,
+      "Aerodynamic": "Neutral"
+    }
+  },
+
+  "HoodPins": {
+    "Types": {
+      "None": {
+        "ID": "PIN_NONE",
+        "Description": "Stock latch only",
+        "Default": true
+      },
+      "QuikLatch": {
+        "ID": "PIN_QUIK",
+        "Description": "Quick-release latches",
+        "Security": "Low",
+        "Style": "Modern",
+        "Cost": 100
+      },
+      "Racing": {
+        "ID": "PIN_RACING",
+        "Description": "Racing hood pins",
+        "Security": "High",
+        "Style": "Classic",
+        "Required": { "ForLightHoods": true },
+        "Cost": 80
+      },
+      "Aerocatch": {
+        "ID": "PIN_AERO",
+        "Description": "Flush aerodynamic pins",
+        "Security": "High",
+        "Style": "Flush",
+        "Aerodynamic": true,
+        "Cost": 200
+      }
+    },
+    "Finishes": ["Chrome", "Black", "Red", "Carbon"]
+  },
+
+  "Materials": {
+    "Steel": {
+      "Weight": 1.0,
+      "Durability": "High",
+      "Cost": "Low",
+      "Paintable": true
+    },
+    "Aluminum": {
+      "Weight": 0.5,
+      "Durability": "Medium",
+      "Cost": "Medium",
+      "Paintable": true
+    },
+    "Fiberglass": {
+      "Weight": 0.6,
+      "Durability": "Low",
+      "Cost": "Low",
+      "Paintable": true,
+      "FlexProne": true
+    },
+    "CarbonFiber": {
+      "Weight": 0.4,
+      "Durability": "Medium",
+      "Cost": "High",
+      "Paintable": false,
+      "Weave": "Visible"
+    },
+    "DryCarbonFiber": {
+      "Weight": 0.3,
+      "Durability": "High",
+      "Cost": "Premium",
+      "Paintable": false,
+      "Weave": "Premium"
+    }
+  },
+
+  "Finishes": {
+    "Paint": {
+      "MatchBody": true,
+      "Custom": true,
+      "Available": ["Steel", "Aluminum", "Fiberglass"]
+    },
+    "Primer": {
+      "Unfinished": true,
+      "Available": ["Fiberglass"]
+    },
+    "CarbonWeave": {
+      "Glossy": { "ClearCoat": true },
+      "Matte": { "SatinFinish": true },
+      "Forged": { "ChoppedPattern": true }
+    },
+    "TwoTone": {
+      "ColoredAccents": true,
+      "Stripes": true
+    }
+  },
+
+  "WeightSavings": {
+    "ByMaterial": {
+      "Steel": { "Pounds": 0 },
+      "Aluminum": { "Pounds": -20 },
+      "Fiberglass": { "Pounds": -15 },
+      "CarbonFiber": { "Pounds": -25 },
+      "DryCarbonFiber": { "Pounds": -30 }
+    },
+    "Effect": {
+      "WeightDistribution": true,
+      "FrontEnd": "Lighter",
+      "Handling": "Improved"
+    }
+  },
+
+  "FunctionalEffects": {
+    "CoolingBonus": {
+      "VentedHood": { "TempReduction": 10 },
+      "ExtractorHood": { "TempReduction": 15 }
+    },
+    "IntakeBonus": {
+      "ScoopHood": { "IntakeTempReduction": 5 },
+      "RamAir": { "SpeedBonusPowerIncrease": 2 }
+    },
+    "Aerodynamic": {
+      "FlatHood": { "Cd": 0 },
+      "ScoopHood": { "Cd": 0.01 },
+      "ExtractorHood": { "Cd": -0.005 }
+    }
+  },
+
+  "Installation": {
+    "Difficulty": {
+      "DirectReplacement": "Easy",
+      "Requires Pins": "Moderate",
+      "CustomFitting": "Hard"
+    },
+    "Requirements": {
+      "LightweightHoods": { "NeedPins": true },
+      "FunctionalScoops": { "NeedIntakeMod": true }
+    }
+  },
+
+  "Compatibility": {
+    "Universal": false,
+    "ByVehicle": true,
+    "ByBodyStyle": true
+  },
+
+  "UI": {
+    "HoodMenu": {
+      "TypeSelector": true,
+      "MaterialFilter": true,
+      "ScoopFilter": true,
+      "VentFilter": true
+    },
+    "Preview": {
+      "3DView": true,
+      "WeightDisplay": true,
+      "BenefitsDisplay": true
+    },
+    "CustomOptions": {
+      "PinSelector": true,
+      "FinishOptions": true
+    }
+  }
+}
