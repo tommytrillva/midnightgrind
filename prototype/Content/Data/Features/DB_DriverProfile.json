@@ -1,0 +1,266 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Driver Profile and Public Identity System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "PublicProfiles": true,
+    "Customizable": true,
+    "StatisticsTracking": true
+  },
+
+  "ProfileInfo": {
+    "Basic": {
+      "Username": { "Display": true, "Editable": false },
+      "DisplayName": { "Enabled": true, "MaxLength": 20, "Editable": true },
+      "Avatar": { "Custom": true, "Presets": 50 },
+      "Title": { "Earned": true, "Selectable": true },
+      "Level": { "Display": true },
+      "REP": { "Display": true, "Tier": true }
+    },
+    "CrewAffiliation": {
+      "CrewName": { "Display": true },
+      "CrewRole": { "Display": true },
+      "CrewBadge": { "Display": true }
+    },
+    "Status": {
+      "Online": { "Show": true, "Configurable": true },
+      "CustomStatus": { "MaxLength": 50, "Enabled": true },
+      "LastSeen": { "Show": true, "Configurable": true }
+    }
+  },
+
+  "AvatarSystem": {
+    "Types": {
+      "Photo": {
+        "Upload": true,
+        "Crop": true,
+        "Filter": true,
+        "Moderation": { "Required": true }
+      },
+      "Character": {
+        "CustomCharacter": true,
+        "Outfits": { "Unlockable": true },
+        "Poses": { "Selectable": true }
+      },
+      "Vehicle": {
+        "ShowOwnedCar": true,
+        "Angle": { "Selectable": true }
+      },
+      "Preset": {
+        "Count": 100,
+        "Categories": ["Drivers", "Logos", "Abstract", "Gaming"]
+      }
+    },
+    "Frames": {
+      "Enabled": true,
+      "Types": ["Standard", "Bronze", "Silver", "Gold", "Platinum", "Animated"],
+      "Unlockable": true
+    }
+  },
+
+  "Titles": {
+    "Categories": {
+      "Achievement": {
+        "Examples": ["Drift King", "Speed Demon", "Collector", "Champion"],
+        "EarnedThrough": "Achievements"
+      },
+      "Rank": {
+        "Examples": ["Rookie", "Pro", "Elite", "Legend"],
+        "EarnedThrough": "Level"
+      },
+      "Event": {
+        "Examples": ["Tournament Winner 2026", "Season 1 Champion"],
+        "EarnedThrough": "Events",
+        "Limited": true
+      },
+      "Prestige": {
+        "Examples": ["Prestige I", "Prestige V", "Legendary"],
+        "EarnedThrough": "Prestige"
+      },
+      "Special": {
+        "Examples": ["Founder", "Beta Tester", "Crew Leader"],
+        "EarnedThrough": "Various"
+      }
+    },
+    "Display": {
+      "MaxVisible": 2,
+      "Primary": { "BeforeName": true },
+      "Secondary": { "AfterName": true }
+    }
+  },
+
+  "Badges": {
+    "Types": {
+      "Achievement": { "Count": 100, "Categories": ["Racing", "Drift", "Collection", "Social"] },
+      "Event": { "Limited": true, "Seasonal": true },
+      "Milestone": { "ProgressBased": true },
+      "Special": { "Exclusive": true }
+    },
+    "Display": {
+      "MaxShowcase": 6,
+      "Position": "ProfileCard",
+      "Animated": { "ForRare": true }
+    },
+    "Rarity": {
+      "Common": { "Color": "#808080" },
+      "Uncommon": { "Color": "#00AA00" },
+      "Rare": { "Color": "#0066FF" },
+      "Epic": { "Color": "#AA00AA" },
+      "Legendary": { "Color": "#FF8C00" }
+    }
+  },
+
+  "Statistics": {
+    "Racing": {
+      "TotalRaces": true,
+      "Wins": true,
+      "Podiums": true,
+      "WinRate": { "Calculated": true },
+      "FastestLaps": true,
+      "TotalDistance": { "Unit": "Kilometers" },
+      "TopSpeed": { "Record": true }
+    },
+    "Drift": {
+      "TotalScore": true,
+      "HighScore": true,
+      "LongestDrift": { "Distance": true, "Time": true },
+      "MaxAngle": true
+    },
+    "Progression": {
+      "PlayTime": { "Hours": true },
+      "TotalEarnings": { "Cash": true, "REP": true },
+      "CarsOwned": true,
+      "PartsPurchased": true
+    },
+    "Social": {
+      "FriendsCount": true,
+      "CrewContributions": true,
+      "RacesWith": { "TopPartners": 5 }
+    },
+    "Records": {
+      "BestLapTimes": { "PerTrack": true },
+      "PersonalBests": { "PerMode": true }
+    }
+  },
+
+  "Showcase": {
+    "FeaturedVehicle": {
+      "Enabled": true,
+      "DisplayMode": "3D",
+      "Rotatable": true,
+      "ShowStats": true
+    },
+    "GaragePreview": {
+      "Enabled": true,
+      "MaxShown": 5,
+      "SortBy": ["MostUsed", "Value", "Recent"]
+    },
+    "Achievements": {
+      "Pinned": { "Max": 4 },
+      "Recent": { "Show": true }
+    },
+    "Photos": {
+      "Gallery": true,
+      "MaxShown": 6,
+      "Featured": { "Count": 1 }
+    }
+  },
+
+  "PrivacySettings": {
+    "Visibility": {
+      "ProfilePublic": { "Default": true },
+      "StatsPublic": { "Default": true },
+      "GaragePublic": { "Default": true },
+      "OnlineStatus": { "Default": true }
+    },
+    "Options": {
+      "FriendsOnly": true,
+      "CrewOnly": true,
+      "Private": true
+    },
+    "Blocking": {
+      "ViewProfile": { "BlockedHidden": true }
+    }
+  },
+
+  "SocialLinks": {
+    "InGame": {
+      "AddFriend": true,
+      "InviteToRace": true,
+      "InviteToCrew": true,
+      "Message": true
+    },
+    "External": {
+      "Discord": { "Optional": true },
+      "Twitch": { "Optional": true },
+      "YouTube": { "Optional": true },
+      "Twitter": { "Optional": true }
+    }
+  },
+
+  "Comparison": {
+    "Enabled": true,
+    "CompareTo": {
+      "Friends": true,
+      "CrewMembers": true,
+      "GlobalRank": true
+    },
+    "Metrics": {
+      "Stats": true,
+      "Achievements": true,
+      "Vehicles": true,
+      "Records": true
+    }
+  },
+
+  "ProfileCard": {
+    "MiniCard": {
+      "ShowOnHover": true,
+      "Elements": ["Avatar", "Name", "Level", "Status"]
+    },
+    "FullCard": {
+      "OnClick": true,
+      "Elements": ["AllInfo", "Stats", "Badges", "Vehicle"]
+    },
+    "ShareCard": {
+      "Enabled": true,
+      "Format": "Image",
+      "SocialReady": true
+    }
+  },
+
+  "Customization": {
+    "ProfileTheme": {
+      "Colors": { "Primary": true, "Secondary": true, "Accent": true },
+      "Presets": 20,
+      "Custom": true
+    },
+    "Background": {
+      "Options": ["Solid", "Gradient", "Image", "Vehicle", "Animated"],
+      "Unlockable": true
+    },
+    "Layout": {
+      "Presets": ["Standard", "Compact", "Extended"],
+      "Customizable": { "Future": true }
+    }
+  },
+
+  "UI": {
+    "ProfileView": {
+      "Header": { "Avatar": true, "Name": true, "Title": true },
+      "Body": { "Stats": true, "Showcase": true, "Badges": true },
+      "Actions": { "Social": true, "Compare": true }
+    },
+    "QuickView": {
+      "Hover": true,
+      "Minimal": true,
+      "ExpandOption": true
+    },
+    "Settings": {
+      "EditProfile": true,
+      "PrivacyControls": true,
+      "ThemeCustomization": true
+    }
+  }
+}

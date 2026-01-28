@@ -1,0 +1,291 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Race Start, Grid System, and Launch Mechanics",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "StartTypes": ["Rolling", "Standing", "Drag"],
+    "CountdownSystem": true,
+    "FalseStartPenalty": true
+  },
+
+  "StartTypes": {
+    "Standing": {
+      "ID": "START_STANDING",
+      "Description": "Traditional grid start",
+      "Formation": "Grid",
+      "Countdown": true,
+      "ReactionTimeMatters": true,
+      "LaunchControl": { "Optional": true }
+    },
+    "Rolling": {
+      "ID": "START_ROLLING",
+      "Description": "Formation lap start",
+      "Formation": "Line",
+      "FormationLap": true,
+      "PaceCarSpeed": 60,
+      "GreenFlagStart": true
+    },
+    "Drag": {
+      "ID": "START_DRAG",
+      "Description": "Christmas tree start",
+      "Formation": "SideBySide",
+      "ChristmasTree": true,
+      "ReactionTimeDisplay": true,
+      "StagingRequired": true
+    },
+    "Running": {
+      "ID": "START_RUNNING",
+      "Description": "Already moving start",
+      "Formation": "Staggered",
+      "NoCountdown": true,
+      "FlyingStart": true
+    },
+    "Street": {
+      "ID": "START_STREET",
+      "Description": "Informal street start",
+      "Formation": "Loose",
+      "HornStart": true,
+      "Casual": true
+    }
+  },
+
+  "GridFormation": {
+    "Positions": {
+      "Pole": { "Position": 1, "Advantage": "Clear Track" },
+      "FrontRow": { "Positions": [1, 2], "Premium": true },
+      "SecondRow": { "Positions": [3, 4] },
+      "MidPack": { "Positions": [5, 10] },
+      "BackGrid": { "Positions": [11, 16] }
+    },
+    "Determination": {
+      "Qualifying": {
+        "Enabled": true,
+        "FastestLap": true,
+        "Sessions": { "Q1": true, "Q2": { "Optional": true } }
+      },
+      "Random": {
+        "Enabled": true,
+        "ForQuickRaces": true
+      },
+      "Reverse": {
+        "Enabled": true,
+        "ForSeries": true
+      },
+      "Points": {
+        "Enabled": true,
+        "ChampionshipOrder": true
+      }
+    },
+    "Spacing": {
+      "RowGap": { "Meters": 8 },
+      "LateralGap": { "Meters": 4 },
+      "Stagger": { "Enabled": true, "Offset": 2 }
+    }
+  },
+
+  "Countdown": {
+    "Standard": {
+      "Sequence": ["3", "2", "1", "GO"],
+      "Interval": { "Seconds": 1 },
+      "Sound": { "Beep": true, "Voice": true }
+    },
+    "Lights": {
+      "Enabled": true,
+      "Sequence": {
+        "Red": { "Count": 5, "Sequential": true },
+        "AllOut": { "Random": { "Min": 0.2, "Max": 3.0 } }
+      },
+      "Visual": { "LightsPanel": true }
+    },
+    "Random": {
+      "GoSignal": { "Variance": { "Seconds": [1, 4] } },
+      "PreventAnticipation": true
+    }
+  },
+
+  "ChristmasTree": {
+    "Enabled": { "ForDrag": true },
+    "Stages": {
+      "PreStage": { "Light": "Yellow", "Position": "Approaching" },
+      "Stage": { "Light": "Yellow", "Position": "Ready" },
+      "Countdown": { "Lights": ["Amber1", "Amber2", "Amber3"], "Interval": 0.4 },
+      "Green": { "Light": "Green", "Go": true },
+      "Red": { "Light": "Red", "FalseStart": true }
+    },
+    "ReactionTime": {
+      "Display": true,
+      "Perfect": { "Range": [0.0, 0.010] },
+      "Excellent": { "Range": [0.010, 0.050] },
+      "Good": { "Range": [0.050, 0.100] },
+      "Average": { "Range": [0.100, 0.200] }
+    }
+  },
+
+  "LaunchControl": {
+    "Enabled": true,
+    "Modes": {
+      "Full": {
+        "ID": "LAUNCH_FULL",
+        "OptimalRPM": true,
+        "TractionControl": true,
+        "AutoClutch": true
+      },
+      "Assisted": {
+        "ID": "LAUNCH_ASSISTED",
+        "RPMHold": true,
+        "PartialTraction": true
+      },
+      "Manual": {
+        "ID": "LAUNCH_MANUAL",
+        "NoAssist": true,
+        "SkillBased": true
+      }
+    },
+    "Activation": {
+      "HoldBrakeAndThrottle": true,
+      "RevLimit": { "Automatic": true },
+      "Release": { "OnGo": true }
+    },
+    "Perfect Launch": {
+      "Window": { "RPM": [7000, 7500] },
+      "Reward": { "BonusAcceleration": 5 }
+    }
+  },
+
+  "FalseStart": {
+    "Detection": {
+      "MovementThreshold": { "Meters": 0.5 },
+      "BeforeGo": true
+    },
+    "Penalties": {
+      "DriveThrough": { "Default": true },
+      "TimeAddition": { "Seconds": 5, "Alternative": true },
+      "Disqualification": { "AfterRepeats": 2 }
+    },
+    "Warning": {
+      "Visual": { "Flash": true },
+      "Audio": { "Horn": true }
+    }
+  },
+
+  "RollingStart": {
+    "FormationLap": {
+      "Enabled": true,
+      "PaceCar": { "Leads": true, "Speed": 60 },
+      "TireWarming": { "Allowed": true },
+      "Weaving": { "Allowed": true }
+    },
+    "Rules": {
+      "MaintainOrder": true,
+      "NoOvertaking": true,
+      "SafeDistance": { "Meters": 3 }
+    },
+    "GreenFlag": {
+      "Location": "StartFinishLine",
+      "Signal": { "Visual": true, "Audio": true }
+    }
+  },
+
+  "StartAssists": {
+    "AutoStart": {
+      "Enabled": true,
+      "ForBeginners": true,
+      "OptimalLaunch": true
+    },
+    "RevHelper": {
+      "Enabled": true,
+      "ShowOptimalRange": true,
+      "HapticFeedback": true
+    },
+    "TractionStart": {
+      "Enabled": true,
+      "PreventWheelspin": true,
+      "AdjustableSeverity": true
+    }
+  },
+
+  "GridWalk": {
+    "PreRace": {
+      "Enabled": { "ForMajorEvents": true },
+      "Duration": { "Seconds": 60 },
+      "CameraMode": "Cinematic"
+    },
+    "Content": {
+      "ShowVehicles": true,
+      "ShowDrivers": true,
+      "ShowStats": true,
+      "Predictions": { "Optional": true }
+    }
+  },
+
+  "Audio": {
+    "Countdown": {
+      "Beeps": { "Enabled": true, "Style": "Racing" },
+      "Voice": { "Enabled": true, "Language": "Localized" }
+    },
+    "Atmosphere": {
+      "CrowdAntipation": true,
+      "EngineRevs": true,
+      "Tension": true
+    },
+    "Go": {
+      "Sound": { "Dramatic": true },
+      "CrowdReaction": true
+    }
+  },
+
+  "Visuals": {
+    "LightsGantry": {
+      "Model": true,
+      "Position": "AboveGrid"
+    },
+    "GridMarkers": {
+      "Visible": true,
+      "Numbers": true,
+      "PositionNames": { "Optional": true }
+    },
+    "Camera": {
+      "PreStart": { "Angles": ["Wide", "Close", "Aerial"] },
+      "AtStart": { "Focus": "Player" },
+      "CutScenes": { "Optional": true }
+    },
+    "Particles": {
+      "TireSmoke": { "AtLaunch": true },
+      "Sparks": { "FromBottoming": true }
+    }
+  },
+
+  "Performance": {
+    "StartBoost": {
+      "Enabled": { "ForCasual": true },
+      "Effect": { "SpeedBonus": 10, "Duration": 3 }
+    },
+    "PerfectStart": {
+      "Detection": true,
+      "Bonus": { "AccelerationBoost": 5 },
+      "Indicator": { "Visual": true, "Audio": true }
+    }
+  },
+
+  "UI": {
+    "Countdown": {
+      "Position": "Center",
+      "Size": "Large",
+      "Animation": true
+    },
+    "Grid": {
+      "MiniMap": { "ShowPositions": true },
+      "NameTags": { "ShowDrivers": true }
+    },
+    "ReactionTime": {
+      "Display": { "ForDrag": true },
+      "PostRace": true
+    },
+    "LaunchAssist": {
+      "RPMMeter": true,
+      "OptimalZone": { "Highlighted": true },
+      "Feedback": { "RealTime": true }
+    }
+  }
+}

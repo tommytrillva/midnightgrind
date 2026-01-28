@@ -1,0 +1,321 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - AI Opponent System and Behavior Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "DynamicDifficulty": true,
+    "PersonalitySystem": true,
+    "RubberBanding": { "Configurable": true }
+  },
+
+  "DifficultyLevels": {
+    "Novice": {
+      "ID": "AI_NOVICE",
+      "SkillLevel": 0.3,
+      "Aggression": 0.2,
+      "Consistency": 0.5,
+      "MistakeRate": 0.15,
+      "ReactionTime": 0.5,
+      "Description": "Learning the ropes"
+    },
+    "Easy": {
+      "ID": "AI_EASY",
+      "SkillLevel": 0.5,
+      "Aggression": 0.3,
+      "Consistency": 0.6,
+      "MistakeRate": 0.10,
+      "ReactionTime": 0.4,
+      "Description": "Casual racing"
+    },
+    "Medium": {
+      "ID": "AI_MEDIUM",
+      "SkillLevel": 0.7,
+      "Aggression": 0.5,
+      "Consistency": 0.75,
+      "MistakeRate": 0.05,
+      "ReactionTime": 0.3,
+      "Description": "Competitive challenge",
+      "Default": true
+    },
+    "Hard": {
+      "ID": "AI_HARD",
+      "SkillLevel": 0.85,
+      "Aggression": 0.6,
+      "Consistency": 0.85,
+      "MistakeRate": 0.02,
+      "ReactionTime": 0.2,
+      "Description": "Serious competition"
+    },
+    "Expert": {
+      "ID": "AI_EXPERT",
+      "SkillLevel": 0.95,
+      "Aggression": 0.7,
+      "Consistency": 0.95,
+      "MistakeRate": 0.01,
+      "ReactionTime": 0.15,
+      "Description": "Near-perfect racing"
+    },
+    "Unbeatable": {
+      "ID": "AI_UNBEATABLE",
+      "SkillLevel": 1.0,
+      "Aggression": 0.8,
+      "Consistency": 0.99,
+      "MistakeRate": 0.005,
+      "ReactionTime": 0.1,
+      "Description": "Maximum challenge"
+    }
+  },
+
+  "DynamicDifficulty": {
+    "Enabled": true,
+    "Settings": {
+      "AdjustmentSpeed": { "Min": 0.1, "Max": 1.0, "Default": 0.5 },
+      "MaxAdjustment": { "Percentage": 20 },
+      "BasedOn": ["RecentPerformance", "WinRate", "GapToPlayer"]
+    },
+    "Triggers": {
+      "Winning": { "Action": "Increase", "Threshold": 3 },
+      "Losing": { "Action": "Decrease", "Threshold": 3 },
+      "LargeGap": { "Action": "Adjust", "GapSeconds": 10 }
+    },
+    "UserControl": {
+      "EnableDisable": true,
+      "FixedDifficulty": true
+    }
+  },
+
+  "AIPersonalities": {
+    "Aggressive": {
+      "ID": "PERSONALITY_AGGRESSIVE",
+      "Traits": {
+        "LateBraking": 0.8,
+        "DiveBombing": 0.6,
+        "BlockingMoves": 0.7,
+        "RiskTaking": 0.8
+      },
+      "Description": "Hard racing, close battles"
+    },
+    "Defensive": {
+      "ID": "PERSONALITY_DEFENSIVE",
+      "Traits": {
+        "LateBraking": 0.3,
+        "DefendingLine": 0.8,
+        "Caution": 0.7,
+        "ConsistentPace": 0.8
+      },
+      "Description": "Holds position well"
+    },
+    "Calculated": {
+      "ID": "PERSONALITY_CALCULATED",
+      "Traits": {
+        "OpportunisticPasses": 0.9,
+        "PatientRacing": 0.8,
+        "EnergyManagement": 0.9,
+        "StrategicThinking": 0.9
+      },
+      "Description": "Smart, strategic racing"
+    },
+    "Erratic": {
+      "ID": "PERSONALITY_ERRATIC",
+      "Traits": {
+        "Unpredictable": 0.9,
+        "MistakeProne": 0.4,
+        "FastLaps": 0.7,
+        "SlowLaps": 0.5
+      },
+      "Description": "Fast but inconsistent"
+    },
+    "Rookie": {
+      "ID": "PERSONALITY_ROOKIE",
+      "Traits": {
+        "WideLines": 0.7,
+        "HesitantPasses": 0.6,
+        "Learning": 0.8,
+        "ImprovesOverRace": 0.5
+      },
+      "Description": "New to racing"
+    },
+    "Veteran": {
+      "ID": "PERSONALITY_VETERAN",
+      "Traits": {
+        "OptimalLines": 0.9,
+        "RaceSmarts": 0.9,
+        "TireManagement": 0.8,
+        "WeatherAdaptation": 0.9
+      },
+      "Description": "Experienced racer"
+    }
+  },
+
+  "RacingBehavior": {
+    "Passing": {
+      "Zones": ["Braking", "Corner Exit", "Straights"],
+      "Methods": {
+        "SlipstreamPass": true,
+        "Outbraking": true,
+        "SwitchbackManeuver": true,
+        "DiveBomb": { "Aggression": "High" }
+      },
+      "GiveUp": { "WhenBlocked": 0.7 }
+    },
+    "Defending": {
+      "Methods": {
+        "CoverLine": true,
+        "LateMoveAllowed": false,
+        "BlockOnStraight": { "Moves": 1 }
+      },
+      "Fairness": { "NoWeaving": true, "SpaceForCar": true }
+    },
+    "Collisions": {
+      "Avoidance": { "Priority": "High" },
+      "RecoveryTime": { "Seconds": 2 },
+      "BlamelessRacing": { "Preferred": true }
+    }
+  },
+
+  "DrivingSkills": {
+    "Cornering": {
+      "ApexHitting": { "Accuracy": "ByDifficulty" },
+      "TrailBraking": { "Usage": "ByDifficulty" },
+      "CornerExitSpeed": { "Optimization": "ByDifficulty" }
+    },
+    "Braking": {
+      "BrakePoints": { "Accuracy": "ByDifficulty" },
+      "ABSUsage": true,
+      "LockupRecovery": { "Speed": "ByDifficulty" }
+    },
+    "Acceleration": {
+      "TractionManagement": { "Skill": "ByDifficulty" },
+      "GearShiftTiming": { "Optimization": "ByDifficulty" },
+      "WheelspinControl": true
+    },
+    "Awareness": {
+      "TrackPosition": { "Knowledge": "ByDifficulty" },
+      "OpponentPosition": { "Awareness": "ByDifficulty" },
+      "FlagResponse": { "Speed": "ByDifficulty" }
+    }
+  },
+
+  "Mistakes": {
+    "Types": {
+      "Lockup": { "BaseChance": 0.02 },
+      "WideLine": { "BaseChance": 0.03 },
+      "MissedApex": { "BaseChance": 0.02 },
+      "OversteerCorrection": { "BaseChance": 0.01 },
+      "CollisionAvoidance": { "BaseChance": 0.01 }
+    },
+    "Triggers": {
+      "UnderPressure": { "Multiplier": 1.5 },
+      "TireDegradation": { "Multiplier": 1.3 },
+      "WetConditions": { "Multiplier": 2.0 }
+    },
+    "Recovery": {
+      "Time": { "Seconds": [1, 3] },
+      "PositionLoss": { "Possible": true }
+    }
+  },
+
+  "RubberBanding": {
+    "Enabled": true,
+    "Configurable": true,
+    "Settings": {
+      "WhenBehind": {
+        "SpeedBoost": { "Max": 5 },
+        "BrakingHelp": { "Max": 3 }
+      },
+      "WhenAhead": {
+        "SpeedReduction": { "Max": 3 },
+        "MistakeIncrease": { "Max": 2 }
+      },
+      "Threshold": {
+        "Distance": { "Meters": 50 },
+        "Time": { "Seconds": 5 }
+      }
+    },
+    "UserControl": {
+      "Off": { "Description": "Pure simulation" },
+      "Low": { "Multiplier": 0.5 },
+      "Medium": { "Multiplier": 1.0, "Default": true },
+      "High": { "Multiplier": 1.5 }
+    }
+  },
+
+  "AIFleet": {
+    "Opponents": {
+      "MaxInRace": 16,
+      "SkillSpread": { "Range": 20, "Distribution": "Normal" },
+      "PersonalityDistribution": { "Mixed": true }
+    },
+    "Naming": {
+      "RandomNames": true,
+      "NamePool": 500,
+      "RegionalNames": { "Enabled": true }
+    },
+    "Vehicles": {
+      "Selection": "MatchPlayerClass",
+      "Variety": { "Min": 3, "Max": 8 },
+      "CustomLiveries": true
+    }
+  },
+
+  "SpecialAI": {
+    "BossRaces": {
+      "Enhanced": true,
+      "UniquePersonality": true,
+      "CustomVehicle": true,
+      "HigherSkill": { "Boost": 10 }
+    },
+    "RivalRacing": {
+      "MatchPlayerSkill": true,
+      "AdaptiveOver": "MultipleRaces",
+      "PersonalVendetta": { "Aggression": "Higher" }
+    },
+    "Crew": {
+      "TeamOrders": { "Optional": true },
+      "Cooperation": true,
+      "ProtectLead": true
+    }
+  },
+
+  "Conditions": {
+    "Weather": {
+      "WetAdaptation": { "Speed": "ByDifficulty" },
+      "TireChoice": { "Smart": true },
+      "CautionIncrease": true
+    },
+    "Night": {
+      "HeadlightUsage": true,
+      "VisionReduction": { "Slight": true },
+      "CautionIncrease": { "Slight": true }
+    },
+    "Traffic": {
+      "Avoidance": { "Priority": "High" },
+      "Weaving": { "ByDifficulty": true }
+    }
+  },
+
+  "Performance": {
+    "LOD": {
+      "DistantAI": { "SimplifiedBehavior": true },
+      "OffScreenAI": { "OptimizedCalculation": true }
+    },
+    "UpdateRate": {
+      "NearPlayer": { "Hz": 60 },
+      "MidRange": { "Hz": 30 },
+      "FarAway": { "Hz": 15 }
+    }
+  },
+
+  "UI": {
+    "Settings": {
+      "DifficultySlider": true,
+      "PersonalityToggle": { "Advanced": true },
+      "RubberBandingControl": true
+    },
+    "InRace": {
+      "AINames": { "Visible": true },
+      "DifficultyIndicator": { "Optional": true }
+    }
+  }
+}
