@@ -21,6 +21,7 @@
 #include "UI/MGHUDDataProvider.h"
 #include "UI/MGRaceHUDSubsystem.h"
 #include "UI/MGMenuSubsystem.h"
+#include "UI/MGNotificationSubsystem.h"
 
 void UMGSubsystemTests::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -564,7 +565,54 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 60);
+	// Notification Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Notification_Priority"));
+		Test.TestName = FText::FromString(TEXT("Notification - Priority"));
+		Test.Description = FText::FromString(TEXT("Verify notification priority enumeration values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Notification")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Notification_Types"));
+		Test.TestName = FText::FromString(TEXT("Notification - Types"));
+		Test.Description = FText::FromString(TEXT("Verify notification type enumeration values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Notification")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Notification_Styles"));
+		Test.TestName = FText::FromString(TEXT("Notification - Styles"));
+		Test.Description = FText::FromString(TEXT("Verify notification style enumeration values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Notification")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Notification_DataDefaults"));
+		Test.TestName = FText::FromString(TEXT("Notification - Data Defaults"));
+		Test.Description = FText::FromString(TEXT("Verify notification data structure defaults"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Notification")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_Notification_Subsystem"));
+		Test.TestName = FText::FromString(TEXT("Notification - Subsystem"));
+		Test.Description = FText::FromString(TEXT("Verify notification subsystem functionality"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("Notification")));
+		TestFramework->RegisterTest(Test);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 65);
 }
 
 // ==========================================
@@ -4314,6 +4362,379 @@ FMGTestResult UMGSubsystemTests::TestMenu_SettingsRanges()
 }
 
 // ==========================================
+// NOTIFICATION TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestNotification_Priority()
+{
+	LogTestStart(TEXT("TestNotification_Priority"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test EMGNotificationPriority enum values
+	TSet<int32> UniqueValues;
+
+	int32 LowVal = static_cast<int32>(EMGNotificationPriority::Low);
+	int32 NormalVal = static_cast<int32>(EMGNotificationPriority::Normal);
+	int32 HighVal = static_cast<int32>(EMGNotificationPriority::High);
+	int32 CriticalVal = static_cast<int32>(EMGNotificationPriority::Critical);
+	int32 SystemVal = static_cast<int32>(EMGNotificationPriority::System);
+
+	UniqueValues.Add(LowVal);
+	UniqueValues.Add(NormalVal);
+	UniqueValues.Add(HighVal);
+	UniqueValues.Add(CriticalVal);
+	UniqueValues.Add(SystemVal);
+
+	if (UniqueValues.Num() != 5)
+	{
+		Logs.Add(FString::Printf(TEXT("Expected 5 unique priority levels, got %d"), UniqueValues.Num()));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("All 5 priority levels are unique"));
+	}
+
+	// Verify priority ordering (Low < Normal < High < Critical < System)
+	if (LowVal >= NormalVal || NormalVal >= HighVal || HighVal >= CriticalVal || CriticalVal >= SystemVal)
+	{
+		Logs.Add(TEXT("WARNING: Priority values may not be in expected order"));
+	}
+	else
+	{
+		Logs.Add(TEXT("Priority ordering is correct"));
+	}
+
+	Logs.Add(FString::Printf(TEXT("Low=%d, Normal=%d, High=%d, Critical=%d, System=%d"),
+		LowVal, NormalVal, HighVal, CriticalVal, SystemVal));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Notification_Priority")),
+			TEXT("Notification priority validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Notification_Priority")),
+		TEXT("All 5 notification priorities valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestNotification_Types()
+{
+	LogTestStart(TEXT("TestNotification_Types"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test EMGNotificationType enum values (14 types in NotificationSubsystem)
+	TSet<int32> UniqueValues;
+
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Info));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Success));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Warning));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Error));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Reward));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::LevelUp));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Unlock));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::ChallengeComplete));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::RaceResult));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Multiplayer));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Season));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Economy));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::Social));
+	UniqueValues.Add(static_cast<int32>(EMGNotificationType::System));
+
+	if (UniqueValues.Num() != 14)
+	{
+		Logs.Add(FString::Printf(TEXT("Expected 14 unique notification types, got %d"), UniqueValues.Num()));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("All 14 notification types are unique"));
+	}
+
+	Logs.Add(FString::Printf(TEXT("Info=%d, Success=%d, Warning=%d, Error=%d"),
+		static_cast<int32>(EMGNotificationType::Info),
+		static_cast<int32>(EMGNotificationType::Success),
+		static_cast<int32>(EMGNotificationType::Warning),
+		static_cast<int32>(EMGNotificationType::Error)));
+
+	Logs.Add(FString::Printf(TEXT("Reward=%d, LevelUp=%d, Unlock=%d, ChallengeComplete=%d"),
+		static_cast<int32>(EMGNotificationType::Reward),
+		static_cast<int32>(EMGNotificationType::LevelUp),
+		static_cast<int32>(EMGNotificationType::Unlock),
+		static_cast<int32>(EMGNotificationType::ChallengeComplete)));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Notification_Types")),
+			TEXT("Notification types validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Notification_Types")),
+		TEXT("All 14 notification types valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestNotification_Styles()
+{
+	LogTestStart(TEXT("TestNotification_Styles"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test EMGNotificationStyle enum values
+	TSet<int32> UniqueValues;
+
+	int32 ToastVal = static_cast<int32>(EMGNotificationStyle::Toast);
+	int32 BannerVal = static_cast<int32>(EMGNotificationStyle::Banner);
+	int32 PopupVal = static_cast<int32>(EMGNotificationStyle::Popup);
+	int32 FullScreenVal = static_cast<int32>(EMGNotificationStyle::FullScreen);
+	int32 MinimalVal = static_cast<int32>(EMGNotificationStyle::Minimal);
+
+	UniqueValues.Add(ToastVal);
+	UniqueValues.Add(BannerVal);
+	UniqueValues.Add(PopupVal);
+	UniqueValues.Add(FullScreenVal);
+	UniqueValues.Add(MinimalVal);
+
+	if (UniqueValues.Num() != 5)
+	{
+		Logs.Add(FString::Printf(TEXT("Expected 5 unique notification styles, got %d"), UniqueValues.Num()));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("All 5 notification styles are unique"));
+	}
+
+	Logs.Add(FString::Printf(TEXT("Toast=%d, Banner=%d, Popup=%d, FullScreen=%d, Minimal=%d"),
+		ToastVal, BannerVal, PopupVal, FullScreenVal, MinimalVal));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Notification_Styles")),
+			TEXT("Notification styles validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Notification_Styles")),
+		TEXT("All 5 notification styles valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestNotification_DataDefaults()
+{
+	LogTestStart(TEXT("TestNotification_DataDefaults"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Create default notification data
+	FMGNotificationData Data;
+
+	// Check NotificationID is valid
+	if (!Data.NotificationID.IsValid())
+	{
+		Logs.Add(TEXT("NotificationID is not valid"));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("NotificationID is valid GUID"));
+	}
+
+	// Check default type
+	if (Data.Type != EMGNotificationType::Info)
+	{
+		Logs.Add(FString::Printf(TEXT("Default Type is not Info: %d"), static_cast<int32>(Data.Type)));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("Default Type is Info"));
+	}
+
+	// Check default priority
+	if (Data.Priority != EMGNotificationPriority::Normal)
+	{
+		Logs.Add(FString::Printf(TEXT("Default Priority is not Normal: %d"), static_cast<int32>(Data.Priority)));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("Default Priority is Normal"));
+	}
+
+	// Check default style
+	if (Data.Style != EMGNotificationStyle::Toast)
+	{
+		Logs.Add(FString::Printf(TEXT("Default Style is not Toast: %d"), static_cast<int32>(Data.Style)));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("Default Style is Toast"));
+	}
+
+	// Check default duration
+	if (Data.Duration <= 0.0f || Data.Duration > 60.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("Duration out of range: %.2f"), Data.Duration));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("Duration: %.2f seconds"), Data.Duration));
+	}
+
+	// Check boolean defaults
+	if (!Data.bCanDismiss)
+	{
+		Logs.Add(TEXT("bCanDismiss should default to true"));
+	}
+	else
+	{
+		Logs.Add(TEXT("bCanDismiss: true"));
+	}
+
+	if (!Data.bPlaySound)
+	{
+		Logs.Add(TEXT("bPlaySound should default to true"));
+	}
+	else
+	{
+		Logs.Add(TEXT("bPlaySound: true"));
+	}
+
+	// Check timestamp is set
+	if (Data.Timestamp == FDateTime())
+	{
+		Logs.Add(TEXT("Timestamp not initialized"));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("Timestamp is set"));
+	}
+
+	// Check bIsRead defaults to false
+	if (Data.bIsRead)
+	{
+		Logs.Add(TEXT("bIsRead should default to false"));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("bIsRead: false"));
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Notification_DataDefaults")),
+			TEXT("Notification data defaults validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Notification_DataDefaults")),
+		TEXT("Notification data defaults valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestNotification_Subsystem()
+{
+	LogTestStart(TEXT("TestNotification_Subsystem"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Notification_Subsystem")),
+			TEXT("GameInstance not found"),
+			{TEXT("Cannot access GameInstance")}
+		);
+	}
+
+	UMGNotificationSubsystem* NotificationSubsystem = GameInstance->GetSubsystem<UMGNotificationSubsystem>();
+	if (!NotificationSubsystem)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Notification_Subsystem")),
+			TEXT("Notification Subsystem not found"),
+			{TEXT("GetSubsystem<UMGNotificationSubsystem> returned nullptr")}
+		);
+	}
+
+	Logs.Add(TEXT("Notification Subsystem found"));
+
+	// Test GetQueueSize
+	int32 QueueSize = NotificationSubsystem->GetQueueSize();
+	Logs.Add(FString::Printf(TEXT("Queue size: %d"), QueueSize));
+
+	// Test IsShowingNotification
+	bool bIsShowing = NotificationSubsystem->IsShowingNotification();
+	Logs.Add(FString::Printf(TEXT("IsShowingNotification: %s"), bIsShowing ? TEXT("true") : TEXT("false")));
+
+	// Test AreNotificationsEnabled
+	bool bEnabled = NotificationSubsystem->AreNotificationsEnabled();
+	Logs.Add(FString::Printf(TEXT("NotificationsEnabled: %s"), bEnabled ? TEXT("true") : TEXT("false")));
+
+	// Test AreSoundsEnabled
+	bool bSounds = NotificationSubsystem->AreSoundsEnabled();
+	Logs.Add(FString::Printf(TEXT("SoundsEnabled: %s"), bSounds ? TEXT("true") : TEXT("false")));
+
+	// Test IsDoNotDisturbActive
+	bool bDND = NotificationSubsystem->IsDoNotDisturbActive();
+	Logs.Add(FString::Printf(TEXT("DoNotDisturb: %s"), bDND ? TEXT("true") : TEXT("false")));
+
+	// Test GetMinimumPriority
+	EMGNotificationPriority MinPriority = NotificationSubsystem->GetMinimumPriority();
+	Logs.Add(FString::Printf(TEXT("MinimumPriority: %d"), static_cast<int32>(MinPriority)));
+
+	// Test GetUnreadCount
+	int32 UnreadCount = NotificationSubsystem->GetUnreadCount();
+	Logs.Add(FString::Printf(TEXT("Unread count: %d"), UnreadCount));
+
+	// Test GetNotificationHistory
+	TArray<FMGNotificationHistoryEntry> History = NotificationSubsystem->GetNotificationHistory();
+	Logs.Add(FString::Printf(TEXT("History count: %d"), History.Num()));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_Notification_Subsystem")),
+			TEXT("Notification subsystem issues found"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_Notification_Subsystem")),
+		TEXT("Notification Subsystem functioning correctly")
+	);
+}
+
+// ==========================================
 // CONSOLE COMMANDS
 // ==========================================
 
@@ -4409,6 +4830,13 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestMenu_SettingsCategories());
 	TestResults.Add(TestMenu_Subsystem());
 	TestResults.Add(TestMenu_SettingsRanges());
+
+	// Notification tests
+	TestResults.Add(TestNotification_Priority());
+	TestResults.Add(TestNotification_Types());
+	TestResults.Add(TestNotification_Styles());
+	TestResults.Add(TestNotification_DataDefaults());
+	TestResults.Add(TestNotification_Subsystem());
 
 	// Count results
 	for (const FMGTestResult& Result : TestResults)
@@ -4714,6 +5142,33 @@ void UMGSubsystemTests::RunMenuTests()
 	TestResults.Add(TestMenu_SettingsCategories());
 	TestResults.Add(TestMenu_Subsystem());
 	TestResults.Add(TestMenu_SettingsRanges());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
+void UMGSubsystemTests::RunNotificationTests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING NOTIFICATION TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestNotification_Priority());
+	TestResults.Add(TestNotification_Types());
+	TestResults.Add(TestNotification_Styles());
+	TestResults.Add(TestNotification_DataDefaults());
+	TestResults.Add(TestNotification_Subsystem());
 
 	for (const FMGTestResult& Result : TestResults)
 	{

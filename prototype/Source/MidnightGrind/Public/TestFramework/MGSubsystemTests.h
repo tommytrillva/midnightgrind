@@ -8,8 +8,8 @@
  * PURPOSE:
  * This file contains the actual test implementations for all core game
  * subsystems. While MGTestFrameworkSubsystem provides the infrastructure
- * for running tests, THIS file contains the tests themselves - 60 individual
- * tests covering currency, weather, vehicles, AI, physics, menu systems, and more.
+ * for running tests, THIS file contains the tests themselves - 65 individual
+ * tests covering currency, weather, vehicles, AI, physics, menu systems, notifications, and more.
  *
  * KEY CONCEPTS FOR NEW DEVELOPERS:
  *
@@ -36,6 +36,7 @@
  *    - Stress (4 tests): High load scenarios
  *    - UI Data (5 tests): HUD and telemetry data
  *    - Menu (5 tests): Menu states, settings, navigation
+ *    - Notification (5 tests): Notification queue, priority, types, styles
  *    - Integration (2 tests): Cross-system interactions
  *
  * 4. FORWARD DECLARATIONS:
@@ -98,10 +99,11 @@
  * - Stress (4): High object count, sustained operation, memory stability
  * - UI Data (5): HUD data, race status, telemetry, HUD modes
  * - Menu (5): Settings defaults, menu states, settings categories, subsystem
+ * - Notification (5): Priority, types, styles, data defaults, subsystem
  * - Integration (2): Cross-system verification
  *
  * Console Commands Quick Reference:
- * - MG.RunAllTests - Run all 60 tests
+ * - MG.RunAllTests - Run all 65 tests
  * - MG.RunCurrencyTests - Run 6 currency subsystem tests
  * - MG.RunWeatherTests - Run 6 weather subsystem tests
  * - MG.RunEconomyTests - Run 3 economy tests
@@ -113,6 +115,7 @@
  * - MG.RunStressTests - Run 4 stress tests
  * - MG.RunUIDataTests - Run 5 UI data tests
  * - MG.RunMenuTests - Run 5 menu system tests
+ * - MG.RunNotificationTests - Run 5 notification tests
  * - MG.RunSmokeTests - Run quick smoke tests
  * - MG.PrintTestReport - Print last test report
  * =============================================================================
@@ -137,11 +140,12 @@ class UMGAIDriverProfile;      // AI racer personality and skills
 class UMGSaveManagerSubsystem; // Handles save/load operations
 class UMGSaveGame;             // The actual save data structure
 class UMGMenuSubsystem;        // Manages game menus and settings
+class UMGNotificationSubsystem; // Manages in-game notifications
 
 /**
  * Subsystem Unit Tests
  *
- * This class contains 60 automated tests for verifying that all core game
+ * This class contains 65 automated tests for verifying that all core game
  * subsystems work correctly. Tests can be run individually, by category,
  * or all at once.
  *
@@ -456,6 +460,30 @@ public:
 	FMGTestResult TestMenu_SettingsRanges();
 
 	// ==========================================
+	// NOTIFICATION TESTS
+	// ==========================================
+
+	/** Test notification priority enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Notification")
+	FMGTestResult TestNotification_Priority();
+
+	/** Test notification type enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Notification")
+	FMGTestResult TestNotification_Types();
+
+	/** Test notification style enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Notification")
+	FMGTestResult TestNotification_Styles();
+
+	/** Test notification data defaults */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Notification")
+	FMGTestResult TestNotification_DataDefaults();
+
+	/** Test notification subsystem functionality */
+	UFUNCTION(BlueprintCallable, Category = "Tests|Notification")
+	FMGTestResult TestNotification_Subsystem();
+
+	// ==========================================
 	// CONSOLE COMMANDS
 	// ==========================================
 
@@ -506,6 +534,10 @@ public:
 	/** Run menu tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunMenuTests();
+
+	/** Run notification tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunNotificationTests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
