@@ -1,19 +1,89 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGSpectatorPawn.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * This file defines the spectator camera system used when watching races or
+ * replays. Think of it like a TV broadcast camera that can fly around freely
+ * or follow vehicles during a race.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ *
+ * 1. PAWN vs ACTOR:
+ *    - An Actor is any object that can exist in the game world
+ *    - A Pawn is a special Actor that can be "possessed" (controlled) by a player
+ *    - When you enter spectator mode, you stop controlling your car and instead
+ *      control this "ghost camera" that can fly around
+ *
+ * 2. SPECTATOR MODE:
+ *    - Used when watching other players race, during replays, or after your
+ *      car is eliminated
+ *    - Unlike driving, spectating lets you fly the camera anywhere to get
+ *      the best viewing angle
+ *
+ * 3. CAMERA COMPONENT:
+ *    - The "eye" through which the player sees the world
+ *    - Has properties like Field of View (FOV) which controls zoom level
+ *    - Lower FOV = zoomed in (telephoto lens), Higher FOV = zoomed out (wide angle)
+ *
+ * 4. INPUT BINDING:
+ *    - SetupPlayerInputComponent() connects keyboard/gamepad buttons to actions
+ *    - For example: pressing W might call MoveForward(), pressing Shift activates
+ *      fast mode
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ *
+ *    [Player Controller]
+ *           |
+ *           v (possesses)
+ *    [MGSpectatorPawn] <---> [MGSpectatorSubsystem]
+ *           |                       |
+ *           v                       v
+ *    [Camera Component]      [Target Tracking]
+ *                            [Camera Modes]
+ *                            [Auto-Director]
+ *
+ * When spectator mode is activated:
+ * 1. The SpectatorSubsystem spawns this pawn
+ * 2. The player controller "possesses" (takes control of) this pawn
+ * 3. Player input now moves the spectator camera instead of a vehicle
+ * 4. The subsystem provides additional features like target tracking
+ *
+ * USAGE EXAMPLE (in Blueprints):
+ *    // Get reference to spectator pawn
+ *    SpectatorPawn->SetFieldOfView(60.0f);  // Zoom in
+ *    SpectatorPawn->bFastMode = true;        // Move faster
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "MGSpectatorPawn.generated.h"
 
-class UCameraComponent;
-class USpringArmComponent;
-class UInputComponent;
-class UMGSpectatorSubsystem;
+// Forward declarations - these tell the compiler these classes exist without
+// including their full header files. This speeds up compilation.
+class UCameraComponent;        // The actual camera that renders what the player sees
+class USpringArmComponent;     // A "boom arm" that can be used to position cameras (not currently used here)
+class UInputComponent;         // Handles mapping player inputs to functions
+class UMGSpectatorSubsystem;   // The manager that coordinates all spectator features
 
 /**
- * Spectator Pawn
- * Custom spectator pawn with camera controls
+ * AMGSpectatorPawn - The controllable camera pawn for spectator mode.
+ *
+ * This pawn gives players a free-flying camera to watch the action. It supports:
+ * - WASD/stick movement in any direction
+ * - Mouse/right stick to look around
+ * - Speed modifiers (shift for fast, ctrl for slow)
+ * - Zoom in/out functionality
+ * - Integration with the spectator subsystem for target tracking
+ *
+ * The "A" prefix means this is an Actor-derived class (Unreal naming convention).
  */
 UCLASS()
 class MIDNIGHTGRIND_API AMGSpectatorPawn : public ASpectatorPawn
@@ -166,8 +236,35 @@ protected:
 };
 
 /**
- * Spectator Camera Actor
- * Placeable camera for broadcast/trackside views
+ * AMGSpectatorCameraActor - A pre-placed camera in the level for broadcast-style shots.
+ *
+ * WHAT THIS IS:
+ * Unlike the SpectatorPawn which players control freely, this is a FIXED camera
+ * that level designers place around the track. Think of TV cameras at a real race:
+ * - Cameras on the pit wall
+ * - Cameras at corners
+ * - Helicopter cameras
+ *
+ * WHY IT EXISTS:
+ * The auto-director system can switch between these cameras to create a
+ * professional TV broadcast feel. Each camera has settings that define:
+ * - Where along the track it should be active (TrackRange)
+ * - How important it is compared to other cameras (Priority)
+ * - Whether it should zoom to follow vehicles (bIsZoomCamera)
+ *
+ * HOW TO USE (for Level Designers):
+ * 1. Drag this actor into your level from the Content Browser
+ * 2. Position it where you want a camera shot
+ * 3. Adjust the rotation to frame the shot nicely
+ * 4. Set TrackRange to define which part of the track this camera covers
+ *    (e.g., TrackRange(500, 800) means active from 500m to 800m along the track)
+ * 5. If bAutoRegister is true, it will automatically be available for the
+ *    broadcast/director camera modes
+ *
+ * ARCHITECTURE NOTE:
+ * These cameras are registered with the SpectatorSubsystem when the level loads.
+ * The subsystem then selects the best camera based on where the target vehicle
+ * is on the track.
  */
 UCLASS()
 class MIDNIGHTGRIND_API AMGSpectatorCameraActor : public AActor

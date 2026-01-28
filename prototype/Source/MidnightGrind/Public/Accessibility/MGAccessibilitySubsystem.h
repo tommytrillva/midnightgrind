@@ -1,5 +1,128 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/*******************************************************************************
+ * MGAccessibilitySubsystem.h - Accessibility Subsystem for Midnight Grind
+ *******************************************************************************
+ *
+ * WHAT THIS FILE DOES:
+ * ====================
+ * This file defines the Accessibility Subsystem - a central manager that handles
+ * ALL accessibility features in the game. Accessibility features are options that
+ * help players with disabilities (visual, hearing, motor, cognitive) enjoy the game,
+ * but they're also useful for players who simply prefer alternative ways to play.
+ *
+ * Think of this subsystem as a "control center" for player accommodations. When a
+ * player opens the accessibility menu and toggles an option (like enabling subtitles
+ * or color-blind mode), this subsystem processes that change, saves it, and notifies
+ * other parts of the game to update accordingly.
+ *
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * =================================
+ *
+ * 1. GAME INSTANCE SUBSYSTEM
+ *    - This class inherits from UGameInstanceSubsystem, which means:
+ *      * There's exactly ONE instance that exists for the entire game session
+ *      * It persists across level loads (unlike actors that get destroyed)
+ *      * It's automatically created when the game starts and destroyed when it ends
+ *      * You access it via: GetGameInstance()->GetSubsystem<UMGAccessibilitySubsystem>()
+ *
+ * 2. UPROPERTY() AND UFUNCTION() MACROS
+ *    - These Unreal macros expose C++ code to the reflection system
+ *    - UPROPERTY() makes variables visible to Blueprints and serialization
+ *    - UFUNCTION(BlueprintCallable) lets Blueprints call the function
+ *    - UFUNCTION(BlueprintPure) means it doesn't modify state (safe for getters)
+ *
+ * 3. DELEGATES (EVENT SYSTEM)
+ *    - Delegates like FOnAccessibilitySettingsChanged are Unreal's event system
+ *    - Other systems can "subscribe" to these events to be notified of changes
+ *    - Example: The HUD subscribes to OnAccessibilitySettingsChanged to know
+ *      when to update its text size or colors
+ *
+ * 4. USTRUCT FOR DATA CONTAINERS
+ *    - FMGAccessibilitySettings is a USTRUCT - a data container
+ *    - It groups related settings together (visual, audio, controls, etc.)
+ *    - This entire struct can be saved/loaded as one unit
+ *
+ * 5. ENUMS FOR FIXED OPTIONS
+ *    - Enums like EMGColorBlindMode define a fixed set of choices
+ *    - They're type-safe (can't accidentally pass invalid values)
+ *    - BlueprintType makes them usable in Blueprint visual scripting
+ *
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ========================================
+ *
+ *                    +-----------------------+
+ *                    |    Game Instance      |
+ *                    +-----------+-----------+
+ *                                |
+ *          +---------------------+---------------------+
+ *          |                     |                     |
+ *   +------v------+     +--------v--------+    +------v------+
+ *   | Accessibility|    | Localization    |    | Settings    |
+ *   | Subsystem   |    | Subsystem       |    | Subsystem   |
+ *   +------+------+    +-----------------+    +-------------+
+ *          |
+ *          | Broadcasts events to:
+ *          |
+ *   +------v------------------------------------------+
+ *   |  - UI/HUD (updates text size, colors)          |
+ *   |  - Post-Process Volume (applies color filters) |
+ *   |  - Audio System (enables mono, subtitles)      |
+ *   |  - Input System (applies input remapping)      |
+ *   |  - Vehicle Controller (enables auto-steering)  |
+ *   +------------------------------------------------+
+ *
+ * FLOW OF A SETTING CHANGE:
+ * 1. Player toggles "Enable Subtitles" in the Accessibility Menu
+ * 2. Menu UI calls AccessibilitySubsystem->SetSubtitles(true, Size)
+ * 3. Subsystem updates CurrentSettings.bSubtitlesEnabled
+ * 4. Subsystem calls SaveSettings() to persist to disk
+ * 5. Subsystem broadcasts OnAccessibilitySettingsChanged
+ * 6. Subtitle Widget receives event and shows/hides itself
+ *
+ *
+ * COMMON TASKS FOR NEW DEVELOPERS:
+ * =================================
+ *
+ * Adding a new accessibility option:
+ *   1. Add the variable to FMGAccessibilitySettings struct
+ *   2. Create a setter function (SetMyNewOption)
+ *   3. Call SaveSettings() and broadcast the event in the setter
+ *   4. Add UI control in the accessibility menu Blueprint
+ *
+ * Reading a setting from elsewhere in code:
+ *   if (auto* Accessibility = GetGameInstance()->GetSubsystem<UMGAccessibilitySubsystem>())
+ *   {
+ *       if (Accessibility->GetAccessibilitySettings().bReduceMotion)
+ *       {
+ *           // Skip the camera shake
+ *       }
+ *   }
+ *
+ * Reacting to setting changes:
+ *   // In your class's BeginPlay or initialization:
+ *   Accessibility->OnAccessibilitySettingsChanged.AddDynamic(this, &UMyClass::OnSettingsChanged);
+ *
+ *
+ * ACCESSIBILITY CATEGORIES SUPPORTED:
+ * ====================================
+ * - Visual: Color blindness filters, text scaling, UI scaling, high contrast,
+ *           motion reduction, screen shake disable, flash prevention
+ * - Audio: Subtitles, mono audio, visual audio cues, speaker identification
+ * - Motor: Auto-acceleration, auto-steering, one-handed mode, input remapping,
+ *          dead zones, sensitivity adjustment
+ * - Cognitive: Extended timers, simplified controls, gameplay assists
+ * - Screen Reader: Text-to-speech for UI navigation
+ *
+ *
+ * @see FMGAccessibilitySettings - The data structure holding all settings
+ * @see UMGSettingsSubsystem - For general game settings (graphics, audio volumes)
+ * @see UMGLocalizationSubsystem - For language/region settings (works with subtitles)
+ *
+ ******************************************************************************/
+
 /**
  * @file MGAccessibilitySubsystem.h
  * @brief Accessibility Subsystem for Midnight Grind

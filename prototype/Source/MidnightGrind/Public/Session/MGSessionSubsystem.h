@@ -1,6 +1,97 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * ============================================================================
+ * MGSessionSubsystem.h - Core Session Management for Multiplayer
+ * ============================================================================
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * WHAT IS THIS FILE?
+ * ------------------
+ * This is the main entry point for all multiplayer features in Midnight Grind.
+ * It provides a simplified, high-level interface for creating/joining games,
+ * finding opponents, and playing with friends. Think of it as the "front door"
+ * to all online functionality.
+ *
+ * If you're building multiplayer UI (menus, lobbies, etc.), this is likely
+ * the subsystem you'll interact with most often.
+ *
+ * KEY CONCEPTS EXPLAINED:
+ * -----------------------
+ *
+ * 1. SESSION vs LOBBY vs MATCH
+ *    - SESSION: The entire multiplayer game instance (server + all players)
+ *    - LOBBY: The pre-game waiting room where players gather
+ *    - MATCH: The actual race/gameplay portion
+ *    - Flow: Create Session -> Enter Lobby -> Start Match -> Return to Lobby
+ *
+ * 2. HOST vs CLIENT
+ *    - HOST: The player who created the session (has admin powers)
+ *    - CLIENT: Players who joined the session
+ *    - Host can kick players, change settings, start races
+ *    - In dedicated server games, no player is the "host"
+ *
+ * 3. PARTY SYSTEM
+ *    - Parties are groups of friends who want to play together
+ *    - Party members stick together through matchmaking
+ *    - Example: 3 friends form a party, then queue together for races
+ *    - The party persists even after individual races end
+ *
+ * 4. MATCHMAKING vs SERVER BROWSER
+ *    - MATCHMAKING: Automatic - system finds suitable opponents for you
+ *    - SERVER BROWSER: Manual - you pick a specific game to join
+ *    - This subsystem supports both approaches
+ *
+ * 5. PRIVACY LEVELS (EMGLobbyPrivacy)
+ *    - Public: Anyone can join (shows in server browser)
+ *    - FriendsOnly: Only your platform friends can join
+ *    - InviteOnly: Requires an explicit invite
+ *    - Closed: No one can join (race in progress)
+ *
+ * HOW THIS FITS IN THE ARCHITECTURE:
+ * ----------------------------------
+ *
+ *   [UI Layer - Menus, HUD]
+ *            |
+ *            | (calls CreateSession, StartMatchmaking, etc.)
+ *            v
+ *   [MGSessionSubsystem] <-- THIS FILE: Simplified API for multiplayer
+ *            |
+ *            | (delegates to specialized subsystems)
+ *            v
+ *   +-------------------+-------------------+
+ *   |                   |                   |
+ *   v                   v                   v
+ * [MGMatchmaking]   [MGParty]      [MGMultiplayer]
+ * (find opponents)  (friend groups) (network layer)
+ *
+ * WHY USE THIS INSTEAD OF MGMatchmakingSubsystem?
+ * -----------------------------------------------
+ * - This subsystem is SIMPLER - fewer options, easier to use
+ * - MGMatchmakingSubsystem offers FINE-GRAINED control
+ * - Use MGSessionSubsystem for: Quick menus, basic flows
+ * - Use MGMatchmakingSubsystem for: Advanced features, custom modes
+ *
+ * COMMON TASKS:
+ * -------------
+ *
+ * Quick Play (find any match):
+ *   GetGameInstance()->GetSubsystem<UMGSessionSubsystem>()->QuickPlay("Circuit");
+ *
+ * Create a private lobby:
+ *   FMGSessionInfo Settings;
+ *   Settings.Privacy = EMGLobbyPrivacy::InviteOnly;
+ *   SessionSubsystem->CreateSession(Settings);
+ *
+ * Invite a friend:
+ *   SessionSubsystem->InvitePlayer(FriendPlayerID);
+ *
+ * Listen for match found:
+ *   SessionSubsystem->OnSessionFound.AddDynamic(this, &UMyWidget::HandleMatchFound);
+ *
+ * ============================================================================
+ *
  * @file MGSessionSubsystem.h
  * @brief Core Session Management Subsystem for Midnight Grind Multiplayer
  *

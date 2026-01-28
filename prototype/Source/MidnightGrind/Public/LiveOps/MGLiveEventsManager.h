@@ -1,5 +1,109 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGLiveEventsManager.h
+ * Live Events Manager - Daily/Weekly Challenges and Community Goals System
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines the Live Events Manager, which handles all time-limited
+ * gameplay challenges and community-wide goals in Midnight Grind. Think of it
+ * as the system that keeps players engaged on a daily and weekly basis by
+ * providing fresh objectives and rewards.
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
+ *
+ * 1. CHALLENGES
+ *    Challenges are specific objectives that players must complete to earn rewards.
+ *    Examples: "Win 5 races", "Drift 10,000 meters", "Race on Downtown Circuit".
+ *    - Daily challenges: Small tasks that reset every 24 hours at midnight UTC
+ *    - Weekly challenges: Larger goals that reset every Monday
+ *    - Event challenges: Special tasks tied to limited-time events
+ *    - Permanent challenges: One-time achievements that never expire
+ *
+ * 2. CHALLENGE TYPES (EMGChallengeType)
+ *    Each challenge tracks a specific type of gameplay action:
+ *    - RaceCount/WinCount: How many races you complete or win
+ *    - DriftScore/Distance: Cumulative stats across multiple races
+ *    - LapTime: Beat a specific time on a track
+ *    - SpecificVehicle/SpecificTrack: Use particular content
+ *    - FlawlessWin/PinkSlipWin: Skill-based achievements
+ *
+ * 3. COMMUNITY GOALS (FMGCommunityGoal)
+ *    Server-wide objectives where ALL players contribute to a shared target.
+ *    Example: "Community drives 1 billion meters this week"
+ *    - Creates a sense of collective achievement
+ *    - Rewards unlock at tier thresholds (25%, 50%, 75%, 100%)
+ *    - Everyone who participates gets the unlocked rewards
+ *
+ * 4. LIVE EVENTS (FMGLiveEvent)
+ *    Time-limited special events with unique challenges and bonuses:
+ *    - Weekend Showdowns: Friday-Sunday events
+ *    - Holiday Specials: Themed content for holidays
+ *    - XP/Credit multipliers during events
+ *    - Featured vehicles and tracks with bonus rewards
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ *
+ *                        +-----------------------+
+ *                        |  UMGLiveEventsManager |  <-- This file
+ *                        |  (GameInstanceSubsystem)|
+ *                        +-----------------------+
+ *                                   |
+ *         +------------+------------+------------+
+ *         |            |            |            |
+ *         v            v            v            v
+ *   [Daily        [Weekly      [Community   [Live
+ *    Challenges]   Challenges]  Goals]       Events]
+ *         |            |            |            |
+ *         +------------+------------+------------+
+ *                        |
+ *                        v
+ *              +-------------------+
+ *              | Race Results      |  <-- ProcessRaceForChallenges()
+ *              | (from gameplay)   |      called after each race
+ *              +-------------------+
+ *                        |
+ *                        v
+ *              +-------------------+
+ *              | Transaction       |  <-- Awards credits, XP, items
+ *              | Pipeline          |
+ *              +-------------------+
+ *
+ * TYPICAL USAGE FLOW:
+ * -------------------
+ * 1. At game startup, the manager initializes and loads saved progress
+ * 2. CheckForResets() runs periodically to refresh daily/weekly challenges
+ * 3. After each race, call ProcessRaceForChallenges() with race results
+ * 4. When a challenge completes, OnChallengeCompleted fires (UI shows popup)
+ * 5. Player clicks "Claim" -> ClaimChallengeReward() grants the reward
+ *
+ * DELEGATES (Events you can listen to):
+ * ------------------------------------
+ * - OnChallengeProgressUpdated: Progress bar updates in UI
+ * - OnChallengeCompleted: Show completion fanfare
+ * - OnChallengeRewardClaimed: Play reward animation
+ * - OnCommunityGoalUpdated: Update community progress bar
+ * - OnCommunityGoalTierReached: Celebrate tier unlocks
+ * - OnLiveEventStarted/Ended: Switch UI to show active events
+ * - OnDailyChallengesRefreshed: Reset daily challenge UI
+ *
+ * IMPORTANT NOTES:
+ * ----------------
+ * - This is a GameInstanceSubsystem, so it persists across level loads
+ * - Challenge progress is saved locally and synced to server
+ * - Time checks use UTC to ensure consistency across timezones
+ * - The system generates challenges procedurally based on difficulty settings
+ *
+ * @see UMGProgressionSubsystem - For player level and XP
+ * @see UMGTransactionPipeline - For processing rewards
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

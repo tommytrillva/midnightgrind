@@ -1,0 +1,235 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Tournament and Championship System",
+
+  "TournamentSystem": {
+    "Enabled": true,
+    "MaxActiveTournaments": 3,
+    "SaveProgressBetweenSessions": true,
+    "AllowRetry": true
+  },
+
+  "TournamentTypes": {
+    "Championship": {
+      "ID": "TOURN_CHAMPIONSHIP",
+      "Name": "Championship Series",
+      "Description": "Multi-race championship with points standings",
+      "Format": "PointsBased",
+      "PointSystem": {
+        "1st": 25, "2nd": 18, "3rd": 15, "4th": 12, "5th": 10,
+        "6th": 8, "7th": 6, "8th": 4, "9th": 2, "10th": 1
+      },
+      "BonusPoints": {
+        "FastestLap": 1,
+        "PolePosition": 1
+      }
+    },
+    "Knockout": {
+      "ID": "TOURN_KNOCKOUT",
+      "Name": "Knockout Tournament",
+      "Description": "Last place is eliminated each round",
+      "Format": "Elimination",
+      "RoundsToWin": 1
+    },
+    "Bracket": {
+      "ID": "TOURN_BRACKET",
+      "Name": "Bracket Tournament",
+      "Description": "Head-to-head elimination bracket",
+      "Format": "Bracket",
+      "BracketSize": [8, 16, 32]
+    },
+    "Endurance": {
+      "ID": "TOURN_ENDURANCE",
+      "Name": "Endurance Series",
+      "Description": "Long-distance races testing consistency",
+      "Format": "Endurance",
+      "LapCounts": [25, 50, 100]
+    }
+  },
+
+  "OfflineTournaments": [
+    {
+      "ID": "TOURN_STREET_SERIES",
+      "Name": "Street Series",
+      "Description": "Entry-level championship for newcomers",
+      "Type": "Championship",
+      "ClassRestriction": ["D", "C"],
+      "Races": [
+        { "Track": "Downtown_Circuit_01", "Laps": 3 },
+        { "Track": "Industrial_Sprint_01" },
+        { "Track": "Harbor_Circuit_01", "Laps": 4 },
+        { "Track": "Suburbs_Sprint_01" }
+      ],
+      "TotalRaces": 4,
+      "UnlockLevel": 5,
+      "Rewards": {
+        "1st": { "Cash": 50000, "REP": 2500, "Trophy": "TROPHY_STREET_CHAMPION" },
+        "2nd": { "Cash": 30000, "REP": 1500 },
+        "3rd": { "Cash": 15000, "REP": 750 }
+      }
+    },
+    {
+      "ID": "TOURN_UNDERGROUND_CUP",
+      "Name": "Underground Cup",
+      "Description": "The premier underground racing series",
+      "Type": "Championship",
+      "ClassRestriction": ["B", "A"],
+      "Races": [
+        { "Track": "Downtown_Night_Circuit", "Laps": 4 },
+        { "Track": "Harbor_Sprint_02" },
+        { "Track": "Industrial_Circuit_02", "Laps": 5 },
+        { "Track": "Highway_Sprint_01" },
+        { "Track": "Mountain_Touge_01" },
+        { "Track": "Downtown_Street_Circuit", "Laps": 4 }
+      ],
+      "TotalRaces": 6,
+      "UnlockLevel": 15,
+      "UnlockCondition": "REP_TIER_STREET",
+      "Rewards": {
+        "1st": { "Cash": 150000, "REP": 7500, "Vehicle": "VEH_UNDERGROUND_WINNER", "Trophy": "TROPHY_UNDERGROUND_CHAMPION" },
+        "2nd": { "Cash": 75000, "REP": 4000 },
+        "3rd": { "Cash": 40000, "REP": 2000 }
+      }
+    },
+    {
+      "ID": "TOURN_DRIFT_MASTERS",
+      "Name": "Drift Masters Series",
+      "Description": "Compete for the title of Drift King",
+      "Type": "Championship",
+      "RaceType": "Drift",
+      "ClassRestriction": "Any",
+      "Events": [
+        { "Zone": "Drift_Zone_Alpha", "Format": "Score" },
+        { "Zone": "Harbor_Slide", "Format": "Score" },
+        { "Zone": "Mountain_Touge", "Format": "Tandem" },
+        { "Zone": "Garage_Spiral", "Format": "Score" },
+        { "Zone": "Figure_Eight", "Format": "Tandem" }
+      ],
+      "TotalEvents": 5,
+      "UnlockLevel": 20,
+      "Rewards": {
+        "1st": { "Cash": 100000, "REP": 5000, "Title": "TITLE_DRIFT_MASTER", "Trophy": "TROPHY_DRIFT_MASTER" },
+        "2nd": { "Cash": 50000, "REP": 2500 },
+        "3rd": { "Cash": 25000, "REP": 1250 }
+      }
+    },
+    {
+      "ID": "TOURN_ELITE_CHAMPIONSHIP",
+      "Name": "Elite Championship",
+      "Description": "The ultimate test of racing skill",
+      "Type": "Championship",
+      "ClassRestriction": ["S", "S+"],
+      "Races": [
+        { "Track": "Championship_Track_01", "Laps": 5 },
+        { "Track": "Championship_Track_02", "Laps": 4 },
+        { "Track": "Championship_Track_03", "Laps": 6 },
+        { "Track": "Highway_Sprint_Long" },
+        { "Track": "Mountain_Descent" },
+        { "Track": "Coastal_Sprint" },
+        { "Track": "Championship_Final", "Laps": 8 }
+      ],
+      "TotalRaces": 7,
+      "UnlockCondition": "REP_TIER_ELITE",
+      "Rewards": {
+        "1st": { "Cash": 500000, "REP": 25000, "Vehicle": "VEH_ELITE_CHAMPION", "Title": "TITLE_ELITE_CHAMPION", "Trophy": "TROPHY_ELITE_CHAMPION" },
+        "2nd": { "Cash": 250000, "REP": 12500 },
+        "3rd": { "Cash": 125000, "REP": 6000 }
+      }
+    },
+    {
+      "ID": "TOURN_KNOCKOUT_CHALLENGE",
+      "Name": "Knockout Challenge",
+      "Description": "Survive or be eliminated",
+      "Type": "Knockout",
+      "ClassRestriction": "Any",
+      "Races": [
+        { "Track": "Industrial_Circuit_01", "Laps": 3, "Eliminate": 2 },
+        { "Track": "Downtown_Sprint", "Eliminate": 2 },
+        { "Track": "Harbor_Circuit_02", "Laps": 4, "Eliminate": 2 },
+        { "Track": "Highway_Circuit", "Laps": 3, "Eliminate": 1 },
+        { "Track": "Championship_Final", "Laps": 5, "Final": true }
+      ],
+      "StartingDrivers": 12,
+      "UnlockLevel": 25,
+      "Rewards": {
+        "Winner": { "Cash": 200000, "REP": 10000, "Title": "TITLE_SURVIVOR" }
+      }
+    },
+    {
+      "ID": "TOURN_ENDURANCE_100",
+      "Name": "Endurance 100",
+      "Description": "100-lap test of skill and consistency",
+      "Type": "Endurance",
+      "Track": "Championship_Track_01",
+      "Laps": 100,
+      "PitStops": "Optional",
+      "TireWear": true,
+      "FuelConsumption": true,
+      "Duration": "~90 minutes",
+      "UnlockLevel": 30,
+      "UnlockCondition": "REP_TIER_PRO",
+      "Rewards": {
+        "1st": { "Cash": 300000, "REP": 15000, "Title": "TITLE_ENDURANCE_CHAMPION" },
+        "2nd": { "Cash": 150000, "REP": 7500 },
+        "3rd": { "Cash": 75000, "REP": 3500 }
+      }
+    }
+  ],
+
+  "WeeklyTournaments": {
+    "Enabled": true,
+    "ResetDay": "Monday",
+    "Participation": "Online",
+    "Types": [
+      {
+        "ID": "WEEKLY_SPRINT",
+        "Name": "Weekly Sprint Series",
+        "Format": "BestTime",
+        "Track": "Rotating",
+        "Entries": "Unlimited",
+        "Rewards": {
+          "Top1Percent": { "Cash": 50000, "REP": 2500 },
+          "Top10Percent": { "Cash": 25000, "REP": 1000 },
+          "Top25Percent": { "Cash": 10000, "REP": 500 },
+          "Participation": { "Cash": 2500, "REP": 100 }
+        }
+      },
+      {
+        "ID": "WEEKLY_DRIFT",
+        "Name": "Weekly Drift Challenge",
+        "Format": "HighScore",
+        "Zone": "Rotating",
+        "Entries": "Unlimited",
+        "Rewards": {
+          "Top1Percent": { "Cash": 40000, "REP": 2000 },
+          "Top10Percent": { "Cash": 20000, "REP": 800 },
+          "Top25Percent": { "Cash": 8000, "REP": 400 },
+          "Participation": { "Cash": 2000, "REP": 80 }
+        }
+      }
+    ]
+  },
+
+  "SeasonalChampionship": {
+    "Enabled": true,
+    "Duration": "Season",
+    "Format": "PointsAccumulation",
+    "Tiers": {
+      "Bronze": { "PointsRequired": 1000, "Reward": { "Cash": 25000, "REP": 1000 } },
+      "Silver": { "PointsRequired": 5000, "Reward": { "Cash": 75000, "REP": 3000 } },
+      "Gold": { "PointsRequired": 15000, "Reward": { "Cash": 200000, "REP": 10000, "Vehicle": "VEH_SEASON_GOLD" } },
+      "Platinum": { "PointsRequired": 50000, "Reward": { "Cash": 500000, "REP": 25000, "Vehicle": "VEH_SEASON_PLATINUM", "Title": "TITLE_SEASON_CHAMPION" } }
+    }
+  },
+
+  "TournamentUI": {
+    "ShowStandings": true,
+    "ShowUpcoming": true,
+    "ShowHistory": true,
+    "Notifications": {
+      "NewTournamentAvailable": true,
+      "TournamentStarting": true,
+      "StandingsUpdate": true
+    }
+  }
+}

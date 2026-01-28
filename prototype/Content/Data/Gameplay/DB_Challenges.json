@@ -1,0 +1,347 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - In-Game Challenges and Objectives System",
+
+  "ChallengeSystem": {
+    "Enabled": true,
+    "MaxActiveChallenges": 10,
+    "TrackingEnabled": true,
+    "NotificationsEnabled": true
+  },
+
+  "ChallengeCategories": {
+    "Racing": {
+      "ID": "CHAL_RACING",
+      "Icon": "ICO_Challenge_Race",
+      "Color": "#FF6600",
+      "Challenges": [
+        {
+          "ID": "CHAL_RACE_WINS_10",
+          "Name": "Winner",
+          "Description": "Win 10 races",
+          "Objective": { "Type": "RaceWin", "Count": 10 },
+          "Reward": { "Cash": 5000, "REP": 250 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "CHAL_RACE_WINS_50",
+          "Name": "Champion",
+          "Description": "Win 50 races",
+          "Objective": { "Type": "RaceWin", "Count": 50 },
+          "Reward": { "Cash": 25000, "REP": 1000, "Title": "TITLE_CHAMPION" },
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "CHAL_RACE_WINS_200",
+          "Name": "Racing Legend",
+          "Description": "Win 200 races",
+          "Objective": { "Type": "RaceWin", "Count": 200 },
+          "Reward": { "Cash": 100000, "REP": 5000, "Vehicle": "VEH_CHALLENGE_LEGEND" },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_PERFECT_START_25",
+          "Name": "Launch Control",
+          "Description": "Get 25 perfect race starts",
+          "Objective": { "Type": "PerfectStart", "Count": 25 },
+          "Reward": { "Cash": 7500, "REP": 350 },
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "CHAL_WIN_STREAK_5",
+          "Name": "On Fire",
+          "Description": "Win 5 races in a row",
+          "Objective": { "Type": "WinStreak", "Count": 5 },
+          "Reward": { "Cash": 15000, "REP": 750 },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_PODIUM_100",
+          "Name": "Podium Regular",
+          "Description": "Finish on the podium 100 times",
+          "Objective": { "Type": "PodiumFinish", "Count": 100 },
+          "Reward": { "Cash": 30000, "REP": 1500 },
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "CHAL_CLEAN_RACE_20",
+          "Name": "Clean Racer",
+          "Description": "Complete 20 races without collisions",
+          "Objective": { "Type": "CleanRace", "Count": 20 },
+          "Reward": { "Cash": 20000, "REP": 1000 },
+          "Difficulty": "Hard"
+        }
+      ]
+    },
+    "Drifting": {
+      "ID": "CHAL_DRIFT",
+      "Icon": "ICO_Challenge_Drift",
+      "Color": "#00FFFF",
+      "Challenges": [
+        {
+          "ID": "CHAL_DRIFT_SCORE_100K",
+          "Name": "Sideways",
+          "Description": "Score 100,000 drift points total",
+          "Objective": { "Type": "DriftScore", "Count": 100000 },
+          "Reward": { "Cash": 5000, "REP": 250 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "CHAL_DRIFT_SCORE_1M",
+          "Name": "Drift King",
+          "Description": "Score 1,000,000 drift points total",
+          "Objective": { "Type": "DriftScore", "Count": 1000000 },
+          "Reward": { "Cash": 50000, "REP": 2500, "Title": "TITLE_DRIFT_KING" },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_DRIFT_SINGLE_50K",
+          "Name": "Single Drift Master",
+          "Description": "Score 50,000 points in a single drift",
+          "Objective": { "Type": "SingleDriftScore", "Count": 50000 },
+          "Reward": { "Cash": 15000, "REP": 750 },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_DRIFT_CHAIN_10",
+          "Name": "Chain Drifter",
+          "Description": "Chain 10 drifts together",
+          "Objective": { "Type": "DriftChain", "Count": 10 },
+          "Reward": { "Cash": 10000, "REP": 500 },
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "CHAL_DRIFT_ZONES_ALL",
+          "Name": "Zone Master",
+          "Description": "Get gold on all drift zones",
+          "Objective": { "Type": "DriftZoneGold", "Count": "All" },
+          "Reward": { "Cash": 75000, "REP": 3500, "Vehicle": "VEH_DRIFT_SPECIAL" },
+          "Difficulty": "Expert"
+        }
+      ]
+    },
+    "Speed": {
+      "ID": "CHAL_SPEED",
+      "Icon": "ICO_Challenge_Speed",
+      "Color": "#FF0000",
+      "Challenges": [
+        {
+          "ID": "CHAL_SPEED_150",
+          "Name": "Speed Demon",
+          "Description": "Reach 150 MPH",
+          "Objective": { "Type": "TopSpeed", "Count": 150 },
+          "Reward": { "Cash": 2500, "REP": 100 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "CHAL_SPEED_200",
+          "Name": "Velocity",
+          "Description": "Reach 200 MPH",
+          "Objective": { "Type": "TopSpeed", "Count": 200 },
+          "Reward": { "Cash": 10000, "REP": 500 },
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "CHAL_SPEED_250",
+          "Name": "Terminal Velocity",
+          "Description": "Reach 250 MPH",
+          "Objective": { "Type": "TopSpeed", "Count": 250 },
+          "Reward": { "Cash": 50000, "REP": 2500, "Title": "TITLE_SPEEDSTER" },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_SPEED_TRAPS_ALL",
+          "Name": "Trap Master",
+          "Description": "Get gold on all speed traps",
+          "Objective": { "Type": "SpeedTrapGold", "Count": "All" },
+          "Reward": { "Cash": 60000, "REP": 3000 },
+          "Difficulty": "Expert"
+        },
+        {
+          "ID": "CHAL_NEAR_MISS_100",
+          "Name": "Close Call",
+          "Description": "Near miss 100 vehicles at high speed",
+          "Objective": { "Type": "NearMiss", "Count": 100 },
+          "Reward": { "Cash": 8000, "REP": 400 },
+          "Difficulty": "Medium"
+        }
+      ]
+    },
+    "Pursuit": {
+      "ID": "CHAL_PURSUIT",
+      "Icon": "ICO_Challenge_Pursuit",
+      "Color": "#0066FF",
+      "Challenges": [
+        {
+          "ID": "CHAL_ESCAPE_10",
+          "Name": "Getaway Driver",
+          "Description": "Escape 10 police pursuits",
+          "Objective": { "Type": "PursuitEscape", "Count": 10 },
+          "Reward": { "Cash": 10000, "REP": 500 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "CHAL_ESCAPE_50",
+          "Name": "Ghost",
+          "Description": "Escape 50 police pursuits",
+          "Objective": { "Type": "PursuitEscape", "Count": 50 },
+          "Reward": { "Cash": 50000, "REP": 2500, "Title": "TITLE_GHOST" },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_HEAT_5_ESCAPE",
+          "Name": "Most Wanted",
+          "Description": "Escape from Heat Level 5",
+          "Objective": { "Type": "EscapeAtHeat", "HeatLevel": 5 },
+          "Reward": { "Cash": 25000, "REP": 1250 },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_PURSUIT_SURVIVE_10",
+          "Name": "Untouchable",
+          "Description": "Survive a pursuit for 10 minutes",
+          "Objective": { "Type": "PursuitDuration", "Minutes": 10 },
+          "Reward": { "Cash": 20000, "REP": 1000 },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_ROADBLOCK_BUST_25",
+          "Name": "Roadblock Buster",
+          "Description": "Break through 25 roadblocks",
+          "Objective": { "Type": "RoadblockBust", "Count": 25 },
+          "Reward": { "Cash": 12000, "REP": 600 },
+          "Difficulty": "Medium"
+        }
+      ]
+    },
+    "Exploration": {
+      "ID": "CHAL_EXPLORE",
+      "Icon": "ICO_Challenge_Explore",
+      "Color": "#00FF00",
+      "Challenges": [
+        {
+          "ID": "CHAL_DISTANCE_100",
+          "Name": "Road Trip",
+          "Description": "Drive 100 miles",
+          "Objective": { "Type": "Distance", "Miles": 100 },
+          "Reward": { "Cash": 5000, "REP": 250 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "CHAL_DISTANCE_1000",
+          "Name": "Long Haul",
+          "Description": "Drive 1,000 miles",
+          "Objective": { "Type": "Distance", "Miles": 1000 },
+          "Reward": { "Cash": 30000, "REP": 1500 },
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "CHAL_POI_ALL",
+          "Name": "Cartographer",
+          "Description": "Discover all points of interest",
+          "Objective": { "Type": "POIDiscover", "Count": "All" },
+          "Reward": { "Cash": 100000, "REP": 5000, "Title": "TITLE_CARTOGRAPHER" },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_BARN_FINDS_ALL",
+          "Name": "Treasure Hunter",
+          "Description": "Find all barn finds",
+          "Objective": { "Type": "BarnFind", "Count": "All" },
+          "Reward": { "Cash": 150000, "REP": 7500, "Vehicle": "VEH_BARN_SPECIAL" },
+          "Difficulty": "Expert"
+        },
+        {
+          "ID": "CHAL_PHOTOS_100",
+          "Name": "Photographer",
+          "Description": "Take 100 photos",
+          "Objective": { "Type": "PhotosTaken", "Count": 100 },
+          "Reward": { "Cash": 15000, "REP": 750 },
+          "Difficulty": "Easy"
+        }
+      ]
+    },
+    "Vehicles": {
+      "ID": "CHAL_VEHICLE",
+      "Icon": "ICO_Challenge_Car",
+      "Color": "#FFD700",
+      "Challenges": [
+        {
+          "ID": "CHAL_OWN_5",
+          "Name": "Collector",
+          "Description": "Own 5 vehicles",
+          "Objective": { "Type": "VehiclesOwned", "Count": 5 },
+          "Reward": { "Cash": 10000, "REP": 500 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "CHAL_OWN_25",
+          "Name": "Car Enthusiast",
+          "Description": "Own 25 vehicles",
+          "Objective": { "Type": "VehiclesOwned", "Count": 25 },
+          "Reward": { "Cash": 75000, "REP": 3500, "Title": "TITLE_COLLECTOR" },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_MAX_VEHICLE",
+          "Name": "Perfect Build",
+          "Description": "Fully upgrade a vehicle",
+          "Objective": { "Type": "VehicleMaxed", "Count": 1 },
+          "Reward": { "Cash": 25000, "REP": 1250 },
+          "Difficulty": "Medium"
+        },
+        {
+          "ID": "CHAL_WIN_ALL_CLASSES",
+          "Name": "Versatile",
+          "Description": "Win a race in every vehicle class",
+          "Objective": { "Type": "WinInClass", "Classes": ["D", "C", "B", "A", "S", "S+"] },
+          "Reward": { "Cash": 50000, "REP": 2500 },
+          "Difficulty": "Hard"
+        }
+      ]
+    },
+    "Social": {
+      "ID": "CHAL_SOCIAL",
+      "Icon": "ICO_Challenge_Social",
+      "Color": "#FF69B4",
+      "Challenges": [
+        {
+          "ID": "CHAL_CAR_MEET_10",
+          "Name": "Social Racer",
+          "Description": "Attend 10 car meets",
+          "Objective": { "Type": "CarMeetAttend", "Count": 10 },
+          "Reward": { "Cash": 7500, "REP": 350 },
+          "Difficulty": "Easy"
+        },
+        {
+          "ID": "CHAL_ONLINE_WINS_25",
+          "Name": "Online Champion",
+          "Description": "Win 25 online races",
+          "Objective": { "Type": "OnlineWin", "Count": 25 },
+          "Reward": { "Cash": 40000, "REP": 2000 },
+          "Difficulty": "Hard"
+        },
+        {
+          "ID": "CHAL_SHARE_PHOTO_10",
+          "Name": "Influencer",
+          "Description": "Share 10 photos",
+          "Objective": { "Type": "PhotoShared", "Count": 10 },
+          "Reward": { "Cash": 5000, "REP": 250 },
+          "Difficulty": "Easy"
+        }
+      ]
+    }
+  },
+
+  "ProgressTracking": {
+    "ShowInHUD": true,
+    "ShowInPauseMenu": true,
+    "NotifyOnProgress": true,
+    "NotifyOnComplete": true
+  },
+
+  "TotalChallenges": 45,
+  "CompletionBonus": {
+    "All": { "Cash": 500000, "REP": 25000, "Title": "TITLE_COMPLETIONIST", "Achievement": "ACH_ALL_CHALLENGES" }
+  }
+}

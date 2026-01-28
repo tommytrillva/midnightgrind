@@ -1,5 +1,81 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGAnalyticsSubsystem.h
+ * =============================================================================
+ *
+ * PURPOSE:
+ * --------
+ * This file defines the Analytics Subsystem for Midnight Grind - a comprehensive
+ * system that tracks player behavior, game performance, and balance data. Analytics
+ * help developers understand how players interact with the game, identify issues,
+ * and make data-driven decisions for game improvements.
+ *
+ * KEY CONCEPTS:
+ * -------------
+ *
+ * 1. GAME INSTANCE SUBSYSTEM:
+ *    - This class inherits from UGameInstanceSubsystem, meaning it exists for the
+ *      entire lifetime of the game session (from launch to quit).
+ *    - Unlike World Subsystems, it persists across level loads, making it ideal
+ *      for tracking session-wide statistics.
+ *    - Unreal automatically creates and destroys this subsystem - you don't need
+ *      to spawn it manually.
+ *
+ * 2. ANALYTICS EVENTS:
+ *    - Events are discrete actions or occurrences that we want to track (e.g.,
+ *      "player started a race", "player purchased a vehicle").
+ *    - Each event has properties (string key-value pairs) and metrics (numeric values).
+ *    - Events are batched and uploaded periodically to reduce network overhead.
+ *
+ * 3. HEAT MAPS:
+ *    - Visual representations of where events occur on a track.
+ *    - Each point has a location, intensity, and event type.
+ *    - Used to identify problem areas (frequent crashes) or popular spots (overtakes).
+ *
+ * 4. FUNNELS:
+ *    - Track player progression through a sequence of steps (e.g., tutorial stages).
+ *    - Help identify where players drop off or get stuck.
+ *    - Conversion rate = (users who completed step) / (users who reached step).
+ *
+ * 5. BALANCE DATA:
+ *    - Tracks vehicle performance statistics to ensure fair gameplay.
+ *    - Win rates, usage rates, and average positions help identify overpowered
+ *      or underpowered vehicles that need tuning.
+ *
+ * HOW IT FITS IN THE ARCHITECTURE:
+ * --------------------------------
+ * - The Analytics Subsystem is accessed via the Game Instance:
+ *     UMGAnalyticsSubsystem* Analytics = GameInstance->GetSubsystem<UMGAnalyticsSubsystem>();
+ *
+ * - Other systems (Gameplay, Economy, Progression) call into this subsystem to
+ *   record events when important actions occur.
+ *
+ * - Data flows: Game Events -> Analytics Subsystem -> Event Queue -> Backend Server
+ *
+ * - Works alongside:
+ *     - TelemetrySubsystem: Captures real-time vehicle data during races
+ *     - CrashReportingSubsystem: Handles errors and crashes specifically
+ *
+ * USAGE EXAMPLES:
+ * ---------------
+ * // Track a simple event
+ * AnalyticsSubsystem->TrackEvent("MainMenuOpened", EMGAnalyticsCategory::Engagement);
+ *
+ * // Track a race completion with full data
+ * FMGRaceAnalytics RaceData;
+ * RaceData.TrackID = "DowntownCircuit";
+ * RaceData.FinalPosition = 1;
+ * RaceData.RaceTime = 125.5f;
+ * AnalyticsSubsystem->TrackRaceEnd(RaceData);
+ *
+ * // Add a heat map point when player crashes
+ * AnalyticsSubsystem->AddHeatMapPoint("DowntownCircuit", "Crash", CrashLocation, 1.0f);
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,64 +84,98 @@
 
 /**
  * Analytics Event Category
+ *
+ * Categories help organize events for filtering and analysis. When viewing analytics
+ * dashboards, you can filter by category to focus on specific aspects of the game.
+ *
+ * Choose the most appropriate category when logging events - this makes data analysis
+ * much easier later.
  */
 UENUM(BlueprintType)
 enum class EMGAnalyticsCategory : uint8
 {
-	Gameplay		UMETA(DisplayName = "Gameplay"),
-	Economy			UMETA(DisplayName = "Economy"),
-	Social			UMETA(DisplayName = "Social"),
-	Progression		UMETA(DisplayName = "Progression"),
-	Technical		UMETA(DisplayName = "Technical"),
-	Engagement		UMETA(DisplayName = "Engagement"),
-	Monetization	UMETA(DisplayName = "Monetization"),
-	Error			UMETA(DisplayName = "Error")
+	Gameplay		UMETA(DisplayName = "Gameplay"),		// Racing events: starts, finishes, crashes, overtakes
+	Economy			UMETA(DisplayName = "Economy"),		// Currency: earning, spending, purchases
+	Social			UMETA(DisplayName = "Social"),			// Multiplayer: crew actions, friend interactions
+	Progression		UMETA(DisplayName = "Progression"),	// Level ups, achievements, unlocks
+	Technical		UMETA(DisplayName = "Technical"),		// Performance metrics, load times, errors
+	Engagement		UMETA(DisplayName = "Engagement"),		// Session data, retention, UI interactions
+	Monetization	UMETA(DisplayName = "Monetization"),	// Real-money transactions, ad views
+	Error			UMETA(DisplayName = "Error")			// Errors that don't cause crashes but should be tracked
 };
 
 /**
  * Heat Map Data Point
+ *
+ * A single data point in a heat map visualization. Heat maps are used to visualize
+ * where specific events occur on a race track. By aggregating many data points,
+ * designers can see patterns like:
+ * - Where players frequently crash (collision hot spots)
+ * - Popular overtaking zones
+ * - Areas where players slow down unexpectedly
+ *
+ * The "Intensity" value can be used to weight the visualization - higher intensity
+ * points appear more prominently (useful for severe crashes vs minor bumps).
  */
 USTRUCT(BlueprintType)
 struct FMGHeatMapPoint
 {
 	GENERATED_BODY()
 
+	/** World-space location where the event occurred (X, Y, Z coordinates on the track) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	FVector Location = FVector::ZeroVector;
 
+	/** How "significant" this point is (0.0 to 1.0+). Higher = more prominent in visualization */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	float Intensity = 1.0f;
 
+	/** What type of event this point represents (e.g., "Crash", "Overtake", "Drift") */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	FName EventType;
 
+	/** When this event occurred - useful for filtering heat maps by time period */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	FDateTime Timestamp;
 };
 
 /**
  * Heat Map Data for a Track
+ *
+ * Contains all heat map data for a specific race track. This structure organizes
+ * event points by type, making it easy to visualize different aspects of player
+ * behavior on the track.
+ *
+ * Example use case: A level designer notices many CrashPoints clustered at a
+ * particular corner. This indicates the corner may be too difficult or have
+ * misleading visual cues, prompting a redesign.
  */
 USTRUCT(BlueprintType)
 struct FMGTrackHeatMap
 {
 	GENERATED_BODY()
 
+	/** Unique identifier for the track (must match the track's asset name) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	FName TrackID;
 
+	/** Locations where vehicle collisions occurred - helps identify dangerous sections */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	TArray<FMGHeatMapPoint> CrashPoints;
 
+	/** Locations where players successfully overtook opponents */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	TArray<FMGHeatMapPoint> OvertakePoints;
 
+	/** Locations where players executed drifts - shows popular drift zones */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	TArray<FMGHeatMapPoint> DriftPoints;
 
+	/** Locations where players activated nitro boost */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	TArray<FMGHeatMapPoint> NitroPoints;
 
+	/** Locations where players unexpectedly slowed down - may indicate confusing sections */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeatMap")
 	TArray<FMGHeatMapPoint> SlowdownPoints;
 };

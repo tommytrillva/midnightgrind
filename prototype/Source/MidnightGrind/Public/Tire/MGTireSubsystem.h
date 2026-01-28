@@ -1,11 +1,100 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * @file MGTireSubsystem.h
+ * @brief Tire Simulation and Management Subsystem for Midnight Grind Racing
+ *
+ * This subsystem provides comprehensive tire physics simulation and management for all
+ * vehicles in the game. It handles tire wear, temperature, grip calculations, compound
+ * characteristics, and tire strategy for races.
+ *
+ * =============================================================================
+ * OVERVIEW FOR ENTRY-LEVEL DEVELOPERS
+ * =============================================================================
+ *
+ * Tires are one of the most important aspects of racing simulation. This subsystem
+ * simulates how real tires behave:
+ *
+ * 1. TIRE WEAR: As you drive, tires lose rubber and grip decreases. Aggressive
+ *    driving (hard braking, fast cornering) wears tires faster.
+ *
+ * 2. TIRE TEMPERATURE: Tires need to be at optimal temperature for best grip.
+ *    Cold tires = less grip (slippery). Overheated tires = also less grip and
+ *    faster wear. The "optimal window" is the sweet spot.
+ *
+ * 3. TIRE COMPOUNDS: Different rubber mixtures with different characteristics:
+ *    - Soft compounds: More grip but wear faster (good for qualifying)
+ *    - Hard compounds: Less grip but last longer (good for long stints)
+ *    - Wet compounds: Special rubber for rain conditions
+ *
+ * 4. TIRE GRIP: The amount of friction between tire and track. Affected by:
+ *    - Compound type (softer = more grip)
+ *    - Temperature (optimal range = best grip)
+ *    - Wear level (new tires = more grip)
+ *    - Track surface (asphalt vs dirt vs wet)
+ *
+ * Key Racing Terms:
+ * - "Stint": Period between pit stops on one set of tires
+ * - "Compound": The type of rubber mixture (Soft, Medium, Hard, etc.)
+ * - "Grip": How much traction the tire provides
+ * - "Lockup": When brakes lock and tire slides (causes flat spots and wear)
+ * - "Wheelspin": When tires spin faster than the car is moving (traction loss)
+ * - "Slip Ratio": Difference between wheel speed and car speed
+ * - "Slip Angle": Angle between where the tire points and where it's going
+ *
+ * =============================================================================
+ * HOW IT FITS INTO THE GAME ARCHITECTURE
+ * =============================================================================
+ *
+ * This is a UGameInstanceSubsystem, meaning:
+ * - One instance exists for the entire game session
+ * - Persists across level loads (keeps tire data when changing tracks)
+ * - Access via: GetGameInstance()->GetSubsystem<UMGTireSubsystem>()
+ *
+ * Integration Points:
+ * - MGPitStopSubsystem: Tire changes during pit stops
+ * - MGFuelSubsystem: Tire wear affects fuel consumption slightly
+ * - Vehicle Physics: Grip values fed to wheel components for handling
+ * - AI System: AI uses tire data for pit stop strategy decisions
+ * - HUD/UI: Displays tire temperatures, wear levels, and compound info
+ *
+ * Typical Usage Flow:
+ * 1. RegisterVehicle() when a car joins the race
+ * 2. UpdateTireState() called every frame with physics data
+ * 3. GetTireGrip() returns current grip for physics calculations
+ * 4. ChangeTires() called during pit stops to install fresh tires
+ *
+ * @see UMGPitStopSubsystem for tire change operations during pit stops
+ * @see UMGFuelSubsystem for how tire wear affects fuel consumption
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MGTireSubsystem.generated.h"
 
+//=============================================================================
+// TIRE COMPOUND TYPES
+//=============================================================================
+
+/**
+ * @brief Available tire compound types with different performance characteristics
+ *
+ * Each compound is designed for specific conditions and driving styles.
+ * Choosing the right compound is crucial for race strategy.
+ *
+ * Racing Compound Hierarchy (grip vs durability):
+ * - UltraSoft: Maximum grip, shortest life (~10 laps)
+ * - Soft: High grip, short life (~15 laps)
+ * - Medium: Balanced (~25 laps)
+ * - Hard: Lower grip, longest life (~40 laps)
+ *
+ * Special Compounds:
+ * - Intermediate: Light rain (standing water in patches)
+ * - FullWet: Heavy rain (lots of standing water)
+ * - Others: Specialized for specific game modes
+ */
 UENUM(BlueprintType)
 enum class EMGTireCompoundType : uint8
 {

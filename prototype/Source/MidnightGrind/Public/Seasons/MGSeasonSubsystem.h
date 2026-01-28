@@ -1,5 +1,123 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGSeasonSubsystem.h
+ * Season Subsystem - Manages Seasonal Content and Live Events
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines the Season Subsystem, which manages the game's seasonal
+ * content cycle. Seasons are multi-week periods (typically 8-12 weeks) with
+ * themed content, progression rewards, and time-limited events. Think of it
+ * like Fortnite's seasons - each one brings new content and a fresh start
+ * for the progression system.
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
+ *
+ * 1. SEASONS (FMGSeasonData)
+ *    A season is a themed content period with:
+ *    - Unique name and theme (e.g., "Season 3: Neon Nights")
+ *    - Start and end dates (typically 2-3 months)
+ *    - 100 progression tiers with rewards
+ *    - Featured vehicles and tracks that get bonus XP
+ *    - XP requirements that scale per tier
+ *
+ * 2. SEASON PROGRESS (FMGSeasonProgress)
+ *    Tracks the player's advancement through the season:
+ *    - CurrentTier: Which tier (1-100) the player has reached
+ *    - CurrentXP: XP earned toward the next tier
+ *    - TotalXP: All XP earned this season
+ *    - bHasPremiumPass: Whether player bought the premium upgrade
+ *    - ClaimedTiers: Which rewards have been collected
+ *
+ * 3. SEASON REWARDS (FMGSeasonReward)
+ *    Items earned by reaching tiers in the season pass:
+ *    - Cash: In-game currency for buying cars/parts
+ *    - Reputation: Increases your street cred level
+ *    - SeasonXP: Bonus XP toward future tiers
+ *    - Vehicle/Customization: Unlockable content
+ *    - Cosmetic: Avatars, emblems, titles
+ *    - Premium rewards (bIsPremium=true) require the premium pass
+ *
+ * 4. EVENT TYPES (EMGEventType)
+ *    Different categories of time-limited events:
+ *    - Weekly: Core engagement, resets every Monday
+ *    - Weekend: Friday-Sunday specials with bonus rewards
+ *    - TimeTrial: Beat-the-clock challenges on specific tracks
+ *    - Community: Server-wide collaborative goals
+ *    - Holiday: Themed events (Halloween, Christmas, etc.)
+ *    - Championship: Multi-race competitive tournaments
+ *    - CrewBattle: Team-based competitive events
+ *
+ * 5. EVENTS (FMGEventData)
+ *    Time-limited gameplay experiences with:
+ *    - Specific objectives to complete (FMGEventObjective)
+ *    - Rewards for completion
+ *    - Required player level to participate
+ *    - Participation tracking
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ *
+ *     +------------------+     +----------------------+
+ *     | UMGSeasonSubsystem| <-> | UMGLiveEventsManager |
+ *     +------------------+     +----------------------+
+ *              |                         |
+ *              v                         v
+ *     +------------------+     +------------------+
+ *     | Season Pass      |     | Challenges       |
+ *     | (Tier Rewards)   |     | (Objectives)     |
+ *     +------------------+     +------------------+
+ *              |                         |
+ *              +------------+------------+
+ *                           |
+ *                           v
+ *              +------------------------+
+ *              | Race/Gameplay Results  |
+ *              | UpdateEventProgress()  |
+ *              +------------------------+
+ *                           |
+ *                           v
+ *              +------------------------+
+ *              | UI Widgets             |
+ *              | (MGSeasonWidgets.h)    |
+ *              +------------------------+
+ *
+ * TYPICAL USAGE FLOW:
+ * -------------------
+ * 1. At startup, LoadSeasonData() and LoadEventsData() fetch current season info
+ * 2. Player earns XP through races -> AddSeasonXP() updates progress
+ * 3. When XP threshold is reached -> OnSeasonTierUp fires, unlocking rewards
+ * 4. Player views Season Pass UI -> GetAvailableRewards() shows claimable items
+ * 5. Player clicks "Claim" -> ClaimTierReward() grants the item
+ * 6. Events are checked periodically via CheckEventTimers()
+ * 7. After races, UpdateEventProgress() tracks objective completion
+ *
+ * DELEGATES (Events you can listen to):
+ * ------------------------------------
+ * - OnSeasonChanged: New season started
+ * - OnSeasonTierUp: Player reached a new tier
+ * - OnSeasonXPGained: XP was earned (update progress bar)
+ * - OnEventStarted/Ended: Event lifecycle changes
+ * - OnEventObjectiveProgress: Objective progress updated
+ * - OnEventCompleted: All objectives in an event finished
+ *
+ * TIMING AND RESETS:
+ * ------------------
+ * - Daily challenges reset at midnight UTC (GetDailyResetTime())
+ * - Weekly challenges reset Monday midnight UTC (GetWeeklyResetTime())
+ * - Events have their own start/end times checked every 60 seconds
+ * - Seasons typically last 8-12 weeks
+ *
+ * @see MGSeasonWidgets.h - UI widgets for displaying season content
+ * @see UMGLiveEventsManager - Handles challenges and community goals
+ * @see UMGProgressionSubsystem - Player level progression (separate from season)
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

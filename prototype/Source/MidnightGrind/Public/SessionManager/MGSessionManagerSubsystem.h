@@ -1,5 +1,163 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * ============================================================================
+ * MGSessionManagerSubsystem.h - Low-Level Session Lifecycle Management
+ * ============================================================================
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * WHAT IS THIS FILE?
+ * ------------------
+ * This subsystem handles the technical details of multiplayer sessions:
+ * creating game servers, connecting players, handling disconnections,
+ * and managing host migration. It's the "plumbing" that makes multiplayer work.
+ *
+ * While MGSessionSubsystem provides a friendly API for UI developers,
+ * this subsystem deals with the nitty-gritty of network connections.
+ *
+ * WHEN WOULD YOU USE THIS?
+ * ------------------------
+ * - Implementing custom server browser features
+ * - Handling network errors and reconnection
+ * - Building admin/moderation tools (kick, ban, etc.)
+ * - Debugging connection issues
+ * - Implementing host migration (when host disconnects)
+ *
+ * KEY CONCEPTS EXPLAINED:
+ * -----------------------
+ *
+ * 1. SESSION STATES (EMGSessionState)
+ *    A session moves through states like a state machine:
+ *
+ *    None -> Creating -> InLobby -> Starting -> InProgress -> Ending -> PostGame
+ *      ^                                                                   |
+ *      +-------------------------------------------------------------------+
+ *
+ *    - None: No active session
+ *    - Creating: Server is being set up
+ *    - Joining: Client is connecting to a server
+ *    - InLobby: Players are in the pre-game waiting room
+ *    - Starting: Countdown to race start
+ *    - InProgress: Race is happening
+ *    - Ending: Race finished, calculating results
+ *    - PostGame: Showing results, before returning to lobby
+ *    - Disconnected: Connection was lost
+ *    - Error: Something went wrong
+ *
+ * 2. SESSION TYPES (EMGSessionType)
+ *    Different kinds of multiplayer experiences:
+ *
+ *    - Singleplayer: Solo play (no network)
+ *    - LocalMultiplayer: Split-screen, same console
+ *    - OnlinePrivate: Invite-only online game
+ *    - OnlinePublic: Anyone can join via server browser
+ *    - Ranked: Competitive mode affecting skill ratings
+ *    - Tournament: Special bracket-based events
+ *    - FreeroamPublic/Private: Open-world driving (no races)
+ *
+ * 3. HOST MIGRATION
+ *    What happens when the host disconnects:
+ *
+ *    - In peer-to-peer games, one player is the "host"
+ *    - If host disconnects, the session would normally end
+ *    - Host migration picks a new host automatically
+ *    - EMGMigrationState tracks this process
+ *
+ *    Flow:
+ *    HostMigrationStarted -> WaitingForNewHost -> NewHostSelected -> MigrationComplete
+ *
+ * 4. CONNECTION ATTEMPTS (FMGConnectionAttempt)
+ *    Handles retrying failed connections:
+ *
+ *    - Tracks how many times we've tried to connect
+ *    - Has a timeout to prevent waiting forever
+ *    - Records error messages for debugging
+ *    - Default: 3 attempts, 30 second timeout each
+ *
+ * 5. DISCONNECT REASONS (EMGDisconnectReason)
+ *    Why a player left - important for UI feedback:
+ *
+ *    - PlayerQuit: They chose to leave
+ *    - HostClosed: Host ended the session
+ *    - Kicked: Removed by host
+ *    - Banned: Removed and blocked from rejoining
+ *    - Timeout: Connection timed out
+ *    - NetworkError: Internet problems
+ *    - etc.
+ *
+ * HOW THIS FITS IN THE ARCHITECTURE:
+ * ----------------------------------
+ *
+ *   [MGSessionSubsystem] - Friendly API for UI
+ *            |
+ *            v
+ *   [MGMatchmakingSubsystem] - Finding opponents
+ *            |
+ *            v
+ *   [MGSessionManagerSubsystem] <-- THIS FILE: Network session management
+ *            |
+ *            v
+ *   [Unreal Online Subsystem] - Platform-specific networking (Steam, Xbox, etc.)
+ *            |
+ *            v
+ *   [Actual Network Layer] - Sockets, packets, etc.
+ *
+ * KEY STRUCTURES:
+ * ---------------
+ *
+ * FMGSessionInfo - Complete info about a session (for server browser)
+ *   - SessionID, HostName, CurrentPlayers, MaxPlayers, Ping, Region, etc.
+ *
+ * FMGSessionPlayer - Info about a player in the session
+ *   - PlayerID, DisplayName, IsHost, IsReady, Ping, Team, etc.
+ *
+ * FMGSessionSettings - Configuration when creating a session
+ *   - SessionName, MaxPlayers, Password, CrossPlay, etc.
+ *
+ * FMGSessionSearchFilters - Filters for server browser
+ *   - GameMode, MaxPing, HideFull, Region, etc.
+ *
+ * FMGSessionInvite - An invite from another player
+ *   - SenderName, SessionInfo, ExpiryTime, etc.
+ *
+ * IMPORTANT DELEGATES (Events):
+ * -----------------------------
+ *
+ * OnSessionStateChanged - Called whenever session state changes
+ *   Use for: Updating UI, showing/hiding screens
+ *
+ * OnPlayerJoined / OnPlayerLeft - Player roster changes
+ *   Use for: Updating lobby player list
+ *
+ * OnSessionJoinFailed - Connection failed
+ *   Use for: Showing error message, offering retry
+ *
+ * OnHostMigrationStateChanged - Host migration progress
+ *   Use for: Showing "Finding new host..." message
+ *
+ * OnInviteReceived - Someone invited you to their game
+ *   Use for: Showing invite notification popup
+ *
+ * EXAMPLE USAGE:
+ * --------------
+ *
+ * // Create a session
+ * FMGSessionSettings Settings;
+ * Settings.SessionName = TEXT("My Awesome Race");
+ * Settings.MaxPlayers = 8;
+ * Settings.bPrivate = true;
+ * GetGameInstance()->GetSubsystem<UMGSessionManagerSubsystem>()->CreateSession(Settings);
+ *
+ * // Listen for players joining
+ * SessionManager->OnPlayerJoined.AddDynamic(this, &UMyWidget::OnPlayerJoined);
+ *
+ * // Kick a player (host only)
+ * SessionManager->KickPlayer(PlayerID, TEXT("Breaking rules"));
+ *
+ * ============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"

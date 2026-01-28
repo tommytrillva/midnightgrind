@@ -1,18 +1,88 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGSpectatorSubsystem.h
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * This file defines the "brain" of the spectator system - a subsystem that
+ * manages all spectator functionality including camera modes, target tracking,
+ * and the auto-director feature that creates TV-style broadcasts.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ *
+ * 1. WHAT IS A SUBSYSTEM?
+ *    - A subsystem is a singleton manager that exists once per "world" (level)
+ *    - UWorldSubsystem specifically lives as long as the current level/world
+ *    - You access it via: GetWorld()->GetSubsystem<UMGSpectatorSubsystem>()
+ *    - It's automatically created when the world loads - no manual setup needed
+ *
+ * 2. SPECTATOR VS PLAYING:
+ *    - When PLAYING: You control a vehicle, camera follows your car
+ *    - When SPECTATING: You watch others or freely fly a camera
+ *    - This subsystem handles the transition and all spectating features
+ *
+ * 3. CAMERA MODES:
+ *    - FreeCam: Fly anywhere you want (like noclip in shooter games)
+ *    - Chase: Camera follows behind a target vehicle
+ *    - Orbit: Camera circles around a vehicle
+ *    - Broadcast/TrackSide: Uses pre-placed cameras for TV-style viewing
+ *    - Director: AI automatically picks the best camera angles
+ *
+ * 4. TARGET TRACKING:
+ *    - The "target" is whatever vehicle/player the camera is focused on
+ *    - You can cycle through targets (all racers) or jump to specific ones
+ *    - The system tracks info like position, speed, and lap times
+ *
+ * 5. DELEGATES (EVENTS):
+ *    - Events that fire when things happen (target changes, camera cuts, etc.)
+ *    - UI widgets can "listen" to these to update their displays
+ *    - Example: OnTargetChanged fires when you switch to watching a different car
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ *
+ *    [Game Mode] -------> creates -------> [MGSpectatorSubsystem]
+ *                                                    |
+ *                                                    | manages
+ *                                                    v
+ *    [Player Controller] <--- possesses --- [MGSpectatorPawn]
+ *           |
+ *           | controls via
+ *           v
+ *    [Spectator Widgets] <--- listens to events --- [Subsystem Events]
+ *
+ * WORKFLOW EXAMPLE:
+ * 1. Player's car crashes and is eliminated
+ * 2. Game calls SpectatorSubsystem->EnterSpectatorMode()
+ * 3. Subsystem spawns SpectatorPawn and possesses it
+ * 4. Subsystem sets default target (maybe the race leader)
+ * 5. Player can now:
+ *    - Press Tab to cycle targets
+ *    - Press C to change camera mode
+ *    - Press A to enable auto-director
+ *    - Use WASD/mouse to manually control camera in FreeCam mode
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "MGSpectatorSubsystem.generated.h"
 
-class AMGSpectatorPawn;
-class APlayerController;
-class APawn;
-class UCameraComponent;
+// Forward declarations
+class AMGSpectatorPawn;   // The controllable camera pawn (defined in MGSpectatorPawn.h)
+class APlayerController;  // Unreal's player controller - handles player input routing
+class APawn;              // Base class for all possessable actors
+class UCameraComponent;   // The actual rendering camera component
 
 /**
- * Spectator camera mode
+ * EMGSpectatorCameraMode - All available camera viewing modes.
+ *
+ * Each mode provides a different way to view the action. The auto-director
+ * can switch between these automatically, or players can manually select them.
  */
 UENUM(BlueprintType)
 enum class EMGSpectatorCameraMode : uint8
@@ -40,7 +110,16 @@ enum class EMGSpectatorCameraMode : uint8
 };
 
 /**
- * Spectator target info
+ * FMGSpectatorTarget - Information about a spectatable target (vehicle/player).
+ *
+ * This struct holds all the real-time data about a target that the spectator
+ * UI needs to display. When you're watching a racer, this tells you their
+ * position, speed, lap times, etc.
+ *
+ * USTRUCT vs UCLASS:
+ * - USTRUCT is a lightweight data container (like a C++ struct)
+ * - UCLASS is a full object with garbage collection and more features
+ * - Use USTRUCT for simple data, UCLASS for complex behavior
  */
 USTRUCT(BlueprintType)
 struct FMGSpectatorTarget
@@ -85,7 +164,17 @@ struct FMGSpectatorTarget
 };
 
 /**
- * Broadcast camera point
+ * FMGBroadcastCameraPoint - Configuration for a fixed broadcast camera position.
+ *
+ * Think of these as virtual TV cameras placed around the track. Level designers
+ * define where each camera is, what direction it points, and when it should be
+ * used (based on where vehicles are on the track).
+ *
+ * TRACK RANGE EXPLAINED:
+ * The track is measured in distance from the start line. If TrackRange is
+ * (500, 1000), this camera will be considered "active" when targets are
+ * between 500 and 1000 meters along the track. The auto-director uses this
+ * to pick the best camera for the current action.
  */
 USTRUCT(BlueprintType)
 struct FMGBroadcastCameraPoint

@@ -1,29 +1,150 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGSlipstreamSubsystem.h
+ * Slipstream (Drafting) System for Midnight Grind Racing Game
+ * =============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This subsystem implements the "slipstream" or "drafting" mechanic - a real-world
+ * racing phenomenon where following closely behind another vehicle reduces air
+ * resistance, allowing you to go faster with the same power output.
+ *
+ * In Midnight Grind, slipstreaming provides:
+ * - Speed bonuses when driving behind other vehicles
+ * - "Slingshot" ability to overtake after building up charge
+ * - Nitro charging while drafting
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
+ *
+ * 1. DRAFTING/SLIPSTREAM:
+ *    When a vehicle moves through air, it creates a low-pressure "wake" behind it.
+ *    A following vehicle in this wake experiences less air resistance (drag),
+ *    allowing it to maintain higher speeds with less effort. This is called
+ *    "drafting" in NASCAR or "slipstreaming" in Formula 1.
+ *
+ * 2. DRAFTING CONE:
+ *    The slipstream effect only works within a cone-shaped area behind the lead
+ *    vehicle. The cone has an angle (typically 30 degrees) and a maximum distance.
+ *    Being directly behind the leader = maximum benefit. Being at an angle = less.
+ *
+ * 3. DRAFTING ZONES:
+ *    - Outer: Far from leader, minimal benefit
+ *    - Inner: Closer, good benefit
+ *    - Optimal: "Sweet spot" distance for maximum benefit
+ *    - TooClose: Dangerously close, risk of collision
+ *
+ * 4. SLINGSHOT MANEUVER:
+ *    After drafting for a period, the follower builds up "charge". When full,
+ *    they can execute a "slingshot" - pulling out of the slipstream with a
+ *    temporary speed boost to overtake the leader. This is a classic racing
+ *    tactic seen in real motorsport.
+ *
+ * 5. LINE OF SIGHT:
+ *    The system can require clear line of sight between vehicles. If another
+ *    car or obstacle blocks the path, the slipstream effect is interrupted.
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ * - This is a UWorldSubsystem, meaning one instance exists per game world/level
+ * - Vehicles register themselves when spawned, unregister when destroyed
+ * - The subsystem ticks every frame to update slipstream states
+ * - Works with MGNitroBoostSubsystem to charge nitro while drafting
+ * - Broadcasts events for UI feedback (visual effects, sounds, HUD indicators)
+ *
+ * USAGE EXAMPLE:
+ * --------------
+ * From a vehicle Blueprint or C++:
+ *
+ *   // Get the subsystem
+ *   UMGSlipstreamSubsystem* Slipstream = GetWorld()->GetSubsystem<UMGSlipstreamSubsystem>();
+ *
+ *   // Register this vehicle
+ *   Slipstream->RegisterVehicle(MyVehicle, MyVehicleData);
+ *
+ *   // Check if we're drafting
+ *   if (Slipstream->IsInSlipstream(MyVehicle))
+ *   {
+ *       float SpeedBonus = Slipstream->GetCurrentSpeedBonus(MyVehicle);
+ *       // Apply speed bonus to vehicle...
+ *   }
+ *
+ *   // Use slingshot when ready
+ *   if (Slipstream->IsSlingshotReady(MyVehicle))
+ *   {
+ *       Slipstream->ActivateSlingshot(MyVehicle);
+ *   }
+ *
+ * @see UMGNitroBoostSubsystem - Nitro system that charges from drafting
+ * @see UMGAerodynamicsSubsystem - Advanced aerodynamics calculations
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "MGSlipstreamSubsystem.generated.h"
 
+//=============================================================================
+// ENUMERATIONS
+// These define the discrete states and categories used by the slipstream system
+//=============================================================================
+
+/**
+ * How strong the slipstream effect currently is.
+ *
+ * Strength increases the longer you stay in the slipstream and the closer
+ * you are to the optimal drafting position. Higher strength = more benefit.
+ *
+ * Used for:
+ * - Scaling speed bonuses
+ * - Visual effect intensity
+ * - Audio feedback volume
+ * - UI indicator display
+ */
 UENUM(BlueprintType)
 enum class EMGSlipstreamStrength : uint8
 {
-	None,
-	Weak,
-	Moderate,
-	Strong,
-	Maximum
+	None,      ///< Not in a slipstream at all
+	Weak,      ///< Just entered or at edge of slipstream
+	Moderate,  ///< Building up, decent benefit
+	Strong,    ///< Well-positioned, good benefit
+	Maximum    ///< Optimal position, maximum benefit, slingshot charges fastest
 };
 
+/**
+ * Which zone of the drafting area the follower vehicle is in.
+ *
+ * Think of the drafting area as concentric zones behind the lead vehicle:
+ *
+ *                    [LEAD VEHICLE]
+ *                          |
+ *         TooClose --------+-------- (danger zone, too close!)
+ *                          |
+ *          Optimal --------+-------- (sweet spot for max benefit)
+ *                          |
+ *           Inner  --------+-------- (good position)
+ *                          |
+ *           Outer  --------+-------- (minimal effect)
+ *                          |
+ *            None  --------+-------- (outside slipstream cone)
+ *
+ * The zone determines:
+ * - How much speed bonus you receive
+ * - How fast the slingshot charges
+ * - Risk level (TooClose = collision danger)
+ */
 UENUM(BlueprintType)
 enum class EMGDraftingZone : uint8
 {
-	None,
-	Outer,
-	Inner,
-	Optimal,
-	TooClose
+	None,      ///< Outside the slipstream cone entirely
+	Outer,     ///< Far edge of the cone, minimal aerodynamic benefit
+	Inner,     ///< Inside the cone, receiving good benefit
+	Optimal,   ///< Perfect distance, maximum benefit and fastest charge
+	TooClose   ///< Dangerously close, still get benefit but risk collision
 };
 
 USTRUCT(BlueprintType)

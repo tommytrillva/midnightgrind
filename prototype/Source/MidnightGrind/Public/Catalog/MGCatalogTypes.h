@@ -1,14 +1,108 @@
 // Copyright Midnight Grind. All Rights Reserved.
 // Iteration 81: Vehicle and Parts Catalog DataTable row definitions
 
+/**
+ * =============================================================================
+ * MGCatalogTypes.h - Core Data Types for Vehicle and Parts Catalog System
+ * =============================================================================
+ *
+ * OVERVIEW:
+ * ---------
+ * This file defines the foundational data structures (structs) and enumerations
+ * (enums) used throughout the Midnight Grind vehicle customization and upgrade
+ * system. Think of this as the "dictionary" that defines how vehicle and parts
+ * data is organized and stored.
+ *
+ * KEY CONCEPTS FOR NEW DEVELOPERS:
+ * --------------------------------
+ *
+ * 1. DATA TABLES:
+ *    Unreal Engine DataTables are spreadsheet-like assets that store rows of
+ *    structured data. Each row follows a "row struct" definition. The structs
+ *    in this file (FMGVehicleCatalogRow, FMGPartCatalogRow) define what columns
+ *    exist in our vehicle and parts DataTables.
+ *
+ *    Example: A DataTable using FMGVehicleCatalogRow might have rows like:
+ *    | VehicleID    | DisplayName      | Year | Category | BaseStats.Power |
+ *    |--------------|------------------|------|----------|-----------------|
+ *    | KAZE_CIVIC   | "Kaze Civic"     | 1999 | JDM      | 160             |
+ *    | VENOM_CAMARO | "Venom Camaro"   | 2020 | American | 455             |
+ *
+ * 2. ENUMERATIONS (UENUM):
+ *    Enums define a fixed set of named options. They're type-safe and show up
+ *    nicely in the Unreal Editor as dropdown menus.
+ *
+ *    Example: EMGPerformanceClass has values D, C, B, A, S, X - used to
+ *    categorize vehicles by their power level for matchmaking and race classes.
+ *
+ * 3. STRUCTURES (USTRUCT):
+ *    Structs group related data together. They can be embedded within other
+ *    structs to create organized, hierarchical data. All structs here use
+ *    GENERATED_BODY() which enables Unreal's reflection system.
+ *
+ *    Example: FMGVehicleCatalogRow contains FMGVehicleBaseStats, which itself
+ *    contains Power, Torque, Weight, etc. This keeps data organized.
+ *
+ * 4. UPROPERTY SPECIFIERS:
+ *    - EditAnywhere: Value can be changed in the editor
+ *    - BlueprintReadOnly: Blueprints can read but not modify the value
+ *    - Category: Groups properties in the editor's Details panel
+ *
+ * HOW THIS FITS INTO THE GAME ARCHITECTURE:
+ * -----------------------------------------
+ *
+ *    [JSON Files] --> [DataTable Assets] --> [Catalog Subsystems] --> [Game Logic]
+ *         ^                   ^                       ^
+ *         |                   |                       |
+ *    Designer edits      Uses these types        Provides runtime
+ *    vehicle specs       as row format           lookups for pricing,
+ *                                                specs, compatibility
+ *
+ * The types defined here are used by:
+ * - MGVehicleCatalogSubsystem: Looks up vehicle pricing and specifications
+ * - MGPartsCatalogSubsystem: Looks up part pricing and mechanic requirements
+ * - MGInventorySubsystem: Stores owned vehicles/parts
+ * - Shop/Dealership UI: Displays vehicle and part information to players
+ *
+ * FILE SECTIONS:
+ * --------------
+ * 1. Vehicle Enums: Performance classes, categories, drivetrains
+ * 2. Vehicle Structs: Base stats, economy, performance index, unlock requirements
+ * 3. Vehicle Catalog Row: Complete vehicle definition for DataTable
+ * 4. Part Enums: Tiers and categories
+ * 5. Part Catalog Row: Complete part definition for DataTable
+ * 6. Simplified Info Structs: Lightweight structs for quick lookups
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "MGCatalogTypes.generated.h"
 
+// =============================================================================
+// VEHICLE ENUMERATIONS
+// These enums categorize vehicles by their capabilities and origins
+// =============================================================================
+
 /**
- * Performance class tiers for vehicles
+ * Performance class tiers for vehicles.
+ *
+ * Performance classes are used for:
+ * - Race matchmaking: Players compete against vehicles in the same class
+ * - Race restrictions: Some events only allow certain classes
+ * - Progression gating: Higher classes unlock as players advance
+ * - Upgrade targets: Players can upgrade a D-class car into S-class
+ *
+ * The classes roughly correspond to real-world vehicle tiers:
+ * - D: Economy cars, compacts (Honda Fit, Toyota Corolla)
+ * - C: Sport compacts, muscle car base models (Civic Si, Mustang V6)
+ * - B: Hot hatches, mid-tier sports cars (Golf GTI, Miata)
+ * - A: Performance variants, Euro sports (BMW M3, Porsche Cayman)
+ * - S: Supercars, heavily modified builds (GT-R, 911 Turbo)
+ * - X: Hypercars, record-breaking builds (LaFerrari, 2000hp builds)
  */
 UENUM(BlueprintType)
 enum class EMGPerformanceClass : uint8

@@ -1,0 +1,286 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Air Intake System and Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "PerformanceEffect": true,
+    "SoundEffect": true,
+    "TemperatureEffect": true
+  },
+
+  "IntakeTypes": {
+    "Stock": {
+      "ID": "INTAKE_STOCK",
+      "Description": "Factory air intake",
+      "FlowRestriction": 1.0,
+      "Sound": "Quiet",
+      "HeatSoak": "Protected",
+      "Default": true
+    },
+    "DropIn": {
+      "ID": "INTAKE_DROPIN",
+      "Description": "Drop-in performance filter",
+      "FlowRestriction": 0.9,
+      "Sound": "SlightlyLouder",
+      "HeatSoak": "Protected",
+      "PowerGain": { "Percentage": 2 },
+      "Cost": 200
+    },
+    "ShortRam": {
+      "ID": "INTAKE_SHORTRAM",
+      "Description": "Short ram intake",
+      "FlowRestriction": 0.75,
+      "Sound": "Moderate",
+      "HeatSoak": "Susceptible",
+      "PowerGain": { "Percentage": 5 },
+      "Cost": 500
+    },
+    "ColdAir": {
+      "ID": "INTAKE_COLDAIR",
+      "Description": "Cold air intake",
+      "FlowRestriction": 0.7,
+      "Sound": "Moderate",
+      "HeatSoak": "Resistant",
+      "TemperatureReduction": 15,
+      "PowerGain": { "Percentage": 8 },
+      "Cost": 800
+    },
+    "RamAir": {
+      "ID": "INTAKE_RAMAIR",
+      "Description": "Ram air system",
+      "FlowRestriction": 0.65,
+      "Sound": "Loud",
+      "HeatSoak": "Resistant",
+      "SpeedBonus": true,
+      "PowerGain": { "Percentage": 10 },
+      "Cost": 1500
+    },
+    "Velocity": {
+      "ID": "INTAKE_VELOCITY",
+      "Description": "Individual throttle bodies",
+      "FlowRestriction": 0.5,
+      "Sound": "VeryLoud",
+      "HeatSoak": "High",
+      "Response": "Instant",
+      "PowerGain": { "Percentage": 15 },
+      "Cost": 5000
+    },
+    "ForcedInduction": {
+      "ID": "INTAKE_FORCED",
+      "Description": "For turbo/supercharged",
+      "FlowRestriction": 0.6,
+      "HighFlow": true,
+      "ForTurbo": true,
+      "PowerGain": { "Percentage": 5 },
+      "Cost": 600
+    }
+  },
+
+  "IntakeComponents": {
+    "AirFilter": {
+      "Types": {
+        "Paper": {
+          "Flow": 1.0,
+          "Filtration": "High",
+          "Lifespan": "Short",
+          "Cost": 30,
+          "Stock": true
+        },
+        "Cotton": {
+          "Flow": 1.15,
+          "Filtration": "Good",
+          "Lifespan": "Reusable",
+          "Cost": 100
+        },
+        "Foam": {
+          "Flow": 1.2,
+          "Filtration": "Low",
+          "Lifespan": "Reusable",
+          "Cost": 80
+        },
+        "Mesh": {
+          "Flow": 1.3,
+          "Filtration": "Minimal",
+          "ForRacing": true,
+          "Cost": 150
+        },
+        "VelocityStack": {
+          "Flow": 1.4,
+          "Filtration": "None",
+          "ForRacing": true,
+          "Sound": "Trumpets",
+          "Cost": 300
+        }
+      },
+      "Shapes": ["Cone", "Panel", "Cylindrical", "Stack"]
+    },
+    "IntakePiping": {
+      "Materials": {
+        "Plastic": { "Weight": "Light", "Heat": "Insulating", "Stock": true },
+        "Aluminum": { "Weight": "Light", "Heat": "Conductive", "Cost": 200 },
+        "CarbonFiber": { "Weight": "VeryLight", "Heat": "Insulating", "Cost": 500 },
+        "Silicone": { "Weight": "Light", "Heat": "Insulating", "Flexible": true, "Cost": 150 }
+      },
+      "Diameter": {
+        "Stock": { "Inches": 2.5 },
+        "Performance": { "Inches": 3.0 },
+        "Racing": { "Inches": 3.5 }
+      }
+    },
+    "Airbox": {
+      "Types": {
+        "Stock": { "Volume": "Standard", "HeatShield": true },
+        "HighFlow": { "Volume": "Large", "HeatShield": true, "Cost": 300 },
+        "Open": { "Volume": "Unlimited", "HeatShield": false },
+        "CarbonFiber": { "Volume": "Large", "HeatShield": true, "Weight": "Light", "Cost": 800 }
+      }
+    },
+    "ThrottleBody": {
+      "Sizes": {
+        "Stock": { "MM": 65 },
+        "Ported": { "MM": 70, "Cost": 400 },
+        "Oversized": { "MM": 75, "Cost": 800 },
+        "Racing": { "MM": 85, "Cost": 1500 }
+      },
+      "Types": {
+        "Single": { "Standard": true },
+        "TwinThrottle": { "ForHighPower": true },
+        "ITB": { "IndividualPerCylinder": true, "Cost": 4000 }
+      }
+    },
+    "IntakeManifold": {
+      "Types": {
+        "Stock": { "Runner": "Standard" },
+        "ShortRunner": { "Power": "TopEnd", "Cost": 1000 },
+        "LongRunner": { "Power": "LowEnd", "Cost": 1000 },
+        "VariableRunner": { "Power": "Both", "Cost": 2500 },
+        "Custom": { "Tuned": true, "Cost": 3000 }
+      }
+    }
+  },
+
+  "AirTemperature": {
+    "Effect": {
+      "PerDegree": { "PowerChange": 0.3 },
+      "Cold": { "DenserAir": true, "MorePower": true },
+      "Hot": { "ThinnerAir": true, "LessPower": true }
+    },
+    "HeatSoak": {
+      "Sources": ["Engine", "Exhaust", "Turbo", "AmbientEngine"],
+      "Protection": {
+        "HeatShield": { "Reduction": 15 },
+        "ColdAir": { "Reduction": 25 },
+        "IceBox": { "Reduction": 40 }
+      }
+    },
+    "Cooling": {
+      "Intercooler": { "ForForcedInduction": true },
+      "WaterInjection": { "Reduction": 30, "Cost": 1500 },
+      "IceTank": { "Reduction": 50, "ForDrag": true, "Cost": 500 }
+    }
+  },
+
+  "SoundCharacteristics": {
+    "InductionNoise": {
+      "Stock": "Muted",
+      "OpenFilter": "Whoosh",
+      "VelocityStack": "Trumpets",
+      "ITB": "Screaming"
+    },
+    "ThrottleResponse": {
+      "Stock": "Muted",
+      "HighFlow": "Pronounced",
+      "OpenElement": "Loud"
+    },
+    "TurboSounds": {
+      "CompressorWhine": true,
+      "FlutterOnLift": true,
+      "BOVWhoosh": true
+    }
+  },
+
+  "PerformanceEffects": {
+    "Airflow": {
+      "CFM": { "Measurement": true },
+      "Restriction": { "AffectsPower": true }
+    },
+    "Response": {
+      "ThrottleResponse": { "Improved": true },
+      "RevSpeed": { "Affected": true }
+    },
+    "PowerBand": {
+      "ShortRunner": { "TopEnd": true },
+      "LongRunner": { "LowEnd": true },
+      "Variable": { "Adaptive": true }
+    }
+  },
+
+  "EnvironmentalFactors": {
+    "Weather": {
+      "Rain": { "Risk": "WaterIngestion", "WithOpenFilter": true },
+      "Dust": { "FilterClogging": true },
+      "Temperature": { "AffectsDensity": true }
+    },
+    "Altitude": {
+      "HighAltitude": { "LessDenseAir": true, "PowerLoss": true },
+      "TurboCompensation": { "Helps": true }
+    }
+  },
+
+  "ForcedInductionIntake": {
+    "Turbo": {
+      "PreTurbo": { "Filter": true, "HighFlow": true },
+      "PostIntercooler": { "Piping": true }
+    },
+    "Supercharger": {
+      "InletPipe": { "HighFlow": true },
+      "BypassValve": { "ForCentrifugal": true }
+    }
+  },
+
+  "Upgrades": {
+    "Level1": {
+      "Type": "DropInFilter",
+      "Cost": 200,
+      "PowerGain": 2
+    },
+    "Level2": {
+      "Type": "ShortRamIntake",
+      "Cost": 500,
+      "PowerGain": 5
+    },
+    "Level3": {
+      "Type": "ColdAirIntake",
+      "Cost": 800,
+      "PowerGain": 8
+    },
+    "Level4": {
+      "Type": "RamAirSystem",
+      "Cost": 1500,
+      "PowerGain": 10
+    },
+    "Level5": {
+      "Type": "VelocityStacks",
+      "Cost": 5000,
+      "PowerGain": 15
+    }
+  },
+
+  "UI": {
+    "IntakeMenu": {
+      "TypeSelector": true,
+      "ComponentUpgrades": true,
+      "FilterOptions": true
+    },
+    "Performance": {
+      "AirflowDisplay": true,
+      "TemperatureDisplay": true,
+      "PowerGainPreview": true
+    },
+    "Sound": {
+      "SoundPreview": true,
+      "CharacterIndicator": true
+    }
+  }
+}

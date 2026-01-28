@@ -1,6 +1,80 @@
 // Copyright Midnight Grind. All Rights Reserved.
 
 /**
+ * ============================================================================
+ * MGMatchmakingSubsystem.h - Skill-Based Matchmaking and Lobby Management
+ * ============================================================================
+ *
+ * FOR ENTRY-LEVEL DEVELOPERS:
+ *
+ * WHAT IS THIS FILE?
+ * ------------------
+ * This header file defines the matchmaking system for Midnight Grind, a racing game.
+ * Matchmaking is the automated process of finding suitable opponents for players
+ * to race against online. Think of it like a dating app, but for finding racing
+ * opponents with similar skill levels.
+ *
+ * KEY CONCEPTS EXPLAINED:
+ * -----------------------
+ *
+ * 1. SUBSYSTEM (UGameInstanceSubsystem)
+ *    - In Unreal Engine, a "subsystem" is a singleton object that provides
+ *      game-wide services. Think of it as a global manager class.
+ *    - GameInstanceSubsystem means this object persists across level loads,
+ *      so your matchmaking state is preserved when changing maps.
+ *    - You access it via: GetGameInstance()->GetSubsystem<UMGMatchmakingSubsystem>()
+ *
+ * 2. MMR (Matchmaking Rating)
+ *    - A hidden number representing player skill (like ELO in chess)
+ *    - Players start at 1000 (average)
+ *    - Win against better players = gain more MMR
+ *    - Lose against worse players = lose more MMR
+ *    - The system uses this to match players of similar skill
+ *
+ * 3. LOBBY
+ *    - A virtual "waiting room" where players gather before a race
+ *    - Players can see each other, select vehicles, mark themselves ready
+ *    - Host controls when the race starts
+ *
+ * 4. DELEGATES (Events)
+ *    - Unreal's way of implementing the Observer pattern
+ *    - Other code can "subscribe" to these events to react to changes
+ *    - Example: UI subscribes to OnMatchFound to show "Match Found!" popup
+ *
+ * 5. BLUEPRINTTYPE / BLUEPRINTCALLABLE
+ *    - Macros that expose C++ code to Unreal's visual scripting (Blueprints)
+ *    - Allows designers to use these systems without writing C++
+ *
+ * HOW THIS FITS IN THE ARCHITECTURE:
+ * ----------------------------------
+ *
+ *   [Player wants to race online]
+ *            |
+ *            v
+ *   [MGSessionSubsystem] <-- High-level session management (simplified API)
+ *            |
+ *            v
+ *   [MGMatchmakingSubsystem] <-- THIS FILE: Finds opponents, manages lobbies
+ *            |
+ *            v
+ *   [MGMultiplayerSubsystem] <-- Low-level network connections
+ *            |
+ *            v
+ *   [Game Server / P2P Connection]
+ *
+ * TYPICAL USAGE FLOW:
+ * -------------------
+ * 1. Player clicks "Find Match" in UI
+ * 2. UI calls StartMatchmaking() with player preferences
+ * 3. System searches for players with similar MMR and acceptable ping
+ * 4. OnMatchFound delegate fires when opponents are found
+ * 5. Players enter lobby, select vehicles, mark ready
+ * 6. Host clicks "Start Race" -> OnMatchStarting fires
+ * 7. Race begins, OnMatchEnded fires when race completes
+ * 8. MMR updates based on finishing position
+ *
+ * ============================================================================
+ *
  * @file MGMatchmakingSubsystem.h
  * @brief Skill-Based Matchmaking and Lobby Management for Midnight Grind
  *

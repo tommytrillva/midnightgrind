@@ -1,0 +1,262 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Exhaust System and Sound Configuration",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "PerformanceEffect": true,
+    "SoundCustomization": true,
+    "VisualEffects": true
+  },
+
+  "ExhaustTypes": {
+    "Stock": {
+      "ID": "EXHAUST_STOCK",
+      "Description": "Factory exhaust",
+      "FlowRestriction": 1.0,
+      "Sound": "Quiet",
+      "Weight": "Heavy",
+      "Emissions": "Legal",
+      "Default": true
+    },
+    "CatBack": {
+      "ID": "EXHAUST_CATBACK",
+      "Description": "Cat-back exhaust system",
+      "FlowRestriction": 0.85,
+      "Sound": "Moderate",
+      "Weight": "Medium",
+      "Emissions": "Legal",
+      "PowerGain": { "Percentage": 5 },
+      "Cost": 3000
+    },
+    "Axleback": {
+      "ID": "EXHAUST_AXLEBACK",
+      "Description": "Axle-back only",
+      "FlowRestriction": 0.9,
+      "Sound": "Moderate",
+      "Weight": "MediumLight",
+      "Emissions": "Legal",
+      "PowerGain": { "Percentage": 2 },
+      "Cost": 1500
+    },
+    "TurboBack": {
+      "ID": "EXHAUST_TURBOBACK",
+      "Description": "Full turbo-back system",
+      "FlowRestriction": 0.7,
+      "Sound": "Loud",
+      "Weight": "Light",
+      "ForTurbo": true,
+      "PowerGain": { "Percentage": 15 },
+      "Cost": 5000
+    },
+    "Headers": {
+      "ID": "EXHAUST_HEADERS",
+      "Description": "Performance headers",
+      "FlowRestriction": 0.75,
+      "Sound": "Aggressive",
+      "PowerGain": { "Percentage": 10 },
+      "Cost": 4000
+    },
+    "FullRace": {
+      "ID": "EXHAUST_RACE",
+      "Description": "Full race exhaust",
+      "FlowRestriction": 0.5,
+      "Sound": "VeryLoud",
+      "Weight": "VeryLight",
+      "Emissions": "NotLegal",
+      "PowerGain": { "Percentage": 20 },
+      "Cost": 8000
+    },
+    "StraightPipe": {
+      "ID": "EXHAUST_STRAIGHT",
+      "Description": "No muffler straight pipe",
+      "FlowRestriction": 0.4,
+      "Sound": "Extreme",
+      "Weight": "Lightest",
+      "Emissions": "NotLegal",
+      "PowerGain": { "Percentage": 8 },
+      "Cost": 500
+    }
+  },
+
+  "ExhaustComponents": {
+    "Manifold": {
+      "Types": {
+        "Stock": { "Flow": 1.0 },
+        "Performance": { "Flow": 1.15, "Cost": 2000 },
+        "Headers4-2-1": { "Flow": 1.25, "PowerBand": "Mid", "Cost": 3000 },
+        "Headers4-1": { "Flow": 1.3, "PowerBand": "High", "Cost": 3500 },
+        "EqualLength": { "Flow": 1.25, "Sound": "Rumble", "Cost": 4000 }
+      }
+    },
+    "CatalyticConverter": {
+      "Types": {
+        "Stock": { "Flow": 1.0, "Legal": true },
+        "HighFlow": { "Flow": 1.3, "Legal": true, "Cost": 1500 },
+        "Race": { "Flow": 1.5, "Legal": false, "Cost": 800 },
+        "Delete": { "Flow": 1.6, "Legal": false, "Cost": 200 }
+      }
+    },
+    "Downpipe": {
+      "ForTurbo": true,
+      "Types": {
+        "Stock": { "Flow": 1.0 },
+        "Catted": { "Flow": 1.4, "Legal": true, "Cost": 2000 },
+        "Catless": { "Flow": 1.6, "Legal": false, "Cost": 1500 }
+      }
+    },
+    "Muffler": {
+      "Types": {
+        "Stock": { "Sound": "Quiet", "Flow": 1.0 },
+        "Performance": { "Sound": "Moderate", "Flow": 1.2, "Cost": 800 },
+        "Straight-Through": { "Sound": "Loud", "Flow": 1.4, "Cost": 600 },
+        "Resonator": { "Sound": "Tuned", "Flow": 1.3, "Cost": 1000 },
+        "Valved": { "Sound": "Variable", "Flow": 1.3, "Cost": 2500 }
+      }
+    },
+    "Tips": {
+      "Styles": {
+        "Single": { "Look": "Clean" },
+        "Dual": { "Look": "Sporty" },
+        "Quad": { "Look": "Aggressive" },
+        "CenterExit": { "Look": "Exotic" },
+        "SideExit": { "Look": "Racing" }
+      },
+      "Finishes": ["Chrome", "Black", "Titanium", "CarbonFiber", "Burnt"],
+      "Sizes": { "Small": 3, "Medium": 4, "Large": 5, "Unit": "Inches" }
+    }
+  },
+
+  "SoundCharacteristics": {
+    "Tone": {
+      "Deep": { "ForV8": true, "ForBoxer": true },
+      "Raspy": { "ForInline4": true },
+      "Screaming": { "ForHighRev": true },
+      "Rumble": { "ForEqualLength": true },
+      "Crackle": { "ForAntiLag": true }
+    },
+    "Volume": {
+      "Quiet": { "dB": 80, "Legal": true },
+      "Moderate": { "dB": 90, "Legal": true },
+      "Loud": { "dB": 100, "Legal": "Marginal" },
+      "VeryLoud": { "dB": 110, "Legal": false },
+      "Extreme": { "dB": 120, "Legal": false }
+    },
+    "Character": {
+      "Smooth": { "Resonance": "Low" },
+      "Aggressive": { "Resonance": "Medium" },
+      "Raw": { "Resonance": "High" }
+    }
+  },
+
+  "ValvedExhaust": {
+    "Enabled": true,
+    "Modes": {
+      "Quiet": { "Valves": "Closed", "Sound": "Moderate" },
+      "Normal": { "Valves": "Partial", "Sound": "Loud" },
+      "Sport": { "Valves": "Open", "Sound": "VeryLoud" },
+      "Auto": { "RPMBased": true, "ThrottleBased": true }
+    },
+    "Control": {
+      "Button": true,
+      "Remote": true,
+      "ECU": true
+    },
+    "Cost": 3000
+  },
+
+  "VisualEffects": {
+    "Flames": {
+      "Enabled": true,
+      "Triggers": ["Overrun", "AntiLag", "MisfireMap"],
+      "Size": { "ByFuelRichness": true },
+      "Color": { "Default": "Orange", "TwoStep": "Blue" }
+    },
+    "Smoke": {
+      "ColdStart": true,
+      "Color": { "Normal": "White", "Rich": "Black" }
+    },
+    "Glow": {
+      "Enabled": true,
+      "HotManifold": true,
+      "HotTurbo": true
+    },
+    "Pops": {
+      "Enabled": true,
+      "Overrun": true,
+      "Downshift": true
+    }
+  },
+
+  "Materials": {
+    "Aluminized": {
+      "Weight": "Heavy",
+      "Durability": "Low",
+      "Cost": "Cheap"
+    },
+    "StainlessSteel": {
+      "Weight": "Medium",
+      "Durability": "High",
+      "Cost": "Medium"
+    },
+    "Titanium": {
+      "Weight": "Light",
+      "Durability": "High",
+      "Cost": "Expensive",
+      "Sound": "Unique"
+    },
+    "Inconel": {
+      "Weight": "Medium",
+      "Durability": "Extreme",
+      "Cost": "VeryExpensive",
+      "ForRacing": true
+    }
+  },
+
+  "Piping": {
+    "Diameter": {
+      "Stock": { "Inches": 2.0 },
+      "Sport": { "Inches": 2.5 },
+      "Performance": { "Inches": 3.0 },
+      "Race": { "Inches": 3.5 },
+      "BigPower": { "Inches": 4.0 }
+    },
+    "Effect": {
+      "TooSmall": { "Restriction": "High" },
+      "Optimal": { "Flow": "Best" },
+      "TooBig": { "VelocityLoss": true }
+    }
+  },
+
+  "LegalConsiderations": {
+    "EmissionsLegal": {
+      "WithCat": true,
+      "CARB": { "Requires": "ApprovedParts" }
+    },
+    "NoiseLegal": {
+      "Limit": { "dB": 95 },
+      "Varies": { "ByRegion": true }
+    },
+    "Enforcement": {
+      "InGame": { "PoliceAttention": true },
+      "Fines": { "ForIllegal": true }
+    }
+  },
+
+  "UI": {
+    "ExhaustMenu": {
+      "SystemSelector": true,
+      "ComponentUpgrades": true,
+      "TipCustomization": true,
+      "SoundPreview": true
+    },
+    "SoundSettings": {
+      "ValveControl": { "ForValved": true },
+      "VolumePreview": true
+    },
+    "Performance": {
+      "FlowGraph": true,
+      "PowerGainDisplay": true
+    }
+  }
+}

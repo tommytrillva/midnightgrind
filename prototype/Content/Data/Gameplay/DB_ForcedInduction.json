@@ -1,0 +1,285 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Forced Induction Systems (Turbo/Supercharger)",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "TurbochargerSystem": true,
+    "SuperchargerSystem": true,
+    "BoostControl": true,
+    "AntiLag": true
+  },
+
+  "TurbochargerTypes": {
+    "Small": {
+      "ID": "TURBO_SMALL",
+      "Description": "Quick spooling turbo",
+      "Size": "Small",
+      "MaxBoost": 12,
+      "SpoolTime": "Fast",
+      "PowerBand": "Low-Mid",
+      "PowerGain": { "Percentage": 30 },
+      "Cost": 8000
+    },
+    "Medium": {
+      "ID": "TURBO_MEDIUM",
+      "Description": "Balanced turbo",
+      "Size": "Medium",
+      "MaxBoost": 18,
+      "SpoolTime": "Medium",
+      "PowerBand": "Mid",
+      "PowerGain": { "Percentage": 50 },
+      "Cost": 15000
+    },
+    "Large": {
+      "ID": "TURBO_LARGE",
+      "Description": "High power turbo",
+      "Size": "Large",
+      "MaxBoost": 25,
+      "SpoolTime": "Slow",
+      "PowerBand": "High",
+      "PowerGain": { "Percentage": 80 },
+      "Cost": 25000
+    },
+    "TwinTurbo": {
+      "ID": "TURBO_TWIN",
+      "Description": "Sequential or parallel twins",
+      "Size": "Medium",
+      "MaxBoost": 22,
+      "SpoolTime": "Fast",
+      "PowerBand": "Wide",
+      "PowerGain": { "Percentage": 70 },
+      "Cost": 40000
+    },
+    "VariableGeometry": {
+      "ID": "TURBO_VGT",
+      "Description": "Variable geometry turbo",
+      "Size": "Variable",
+      "MaxBoost": 20,
+      "SpoolTime": "Adaptive",
+      "PowerBand": "Very Wide",
+      "PowerGain": { "Percentage": 55 },
+      "Cost": 35000
+    },
+    "ElectricAssist": {
+      "ID": "TURBO_ETURBO",
+      "Description": "Electrically assisted turbo",
+      "Size": "Medium",
+      "MaxBoost": 18,
+      "SpoolTime": "Instant",
+      "LagElimination": true,
+      "PowerGain": { "Percentage": 45 },
+      "Cost": 50000
+    }
+  },
+
+  "SuperchargerTypes": {
+    "Roots": {
+      "ID": "SC_ROOTS",
+      "Description": "Positive displacement blower",
+      "Type": "Roots",
+      "MaxBoost": 10,
+      "Response": "Instant",
+      "PowerBand": "Low-Mid",
+      "Efficiency": "Low",
+      "PowerGain": { "Percentage": 40 },
+      "Cost": 12000
+    },
+    "TwinScrew": {
+      "ID": "SC_TWINSCREW",
+      "Description": "Efficient twin screw",
+      "Type": "TwinScrew",
+      "MaxBoost": 15,
+      "Response": "Instant",
+      "PowerBand": "Wide",
+      "Efficiency": "High",
+      "PowerGain": { "Percentage": 55 },
+      "Cost": 20000
+    },
+    "Centrifugal": {
+      "ID": "SC_CENTRIFUGAL",
+      "Description": "Belt-driven centrifugal",
+      "Type": "Centrifugal",
+      "MaxBoost": 18,
+      "Response": "Progressive",
+      "PowerBand": "High",
+      "Efficiency": "Medium",
+      "PowerGain": { "Percentage": 60 },
+      "Cost": 15000
+    },
+    "ProCharger": {
+      "ID": "SC_PROCHARGER",
+      "Description": "High-output centrifugal",
+      "Type": "Centrifugal",
+      "MaxBoost": 25,
+      "Response": "Progressive",
+      "PowerBand": "Mid-High",
+      "Efficiency": "High",
+      "PowerGain": { "Percentage": 80 },
+      "Cost": 30000
+    }
+  },
+
+  "TurboComponents": {
+    "Compressor": {
+      "Wheels": {
+        "Standard": { "Efficiency": 1.0 },
+        "Billet": { "Efficiency": 1.1, "Cost": 2000 },
+        "Titanium": { "Efficiency": 1.15, "Weight": -0.5, "Cost": 5000 }
+      }
+    },
+    "Turbine": {
+      "Housings": {
+        "Standard": { "SpoolTime": 1.0 },
+        "Divided": { "SpoolTime": 0.9, "Cost": 1500 },
+        "TwinScroll": { "SpoolTime": 0.8, "Cost": 3000 }
+      }
+    },
+    "Wastegate": {
+      "Internal": { "Control": "Basic", "MaxBoost": 15 },
+      "External": { "Control": "Precise", "MaxBoost": 30, "Cost": 1500 }
+    },
+    "BlowOffValve": {
+      "Standard": { "Sound": "Quiet" },
+      "Atmospheric": { "Sound": "Loud", "Whoosh": true, "Cost": 500 },
+      "Recirc": { "Sound": "Quiet", "Efficient": true }
+    },
+    "Intercooler": {
+      "None": { "Efficiency": 0.7 },
+      "FrontMount": { "Efficiency": 1.0, "Cost": 2000 },
+      "TopMount": { "Efficiency": 0.9, "Cost": 1500 },
+      "WaterAir": { "Efficiency": 1.1, "Cost": 4000 }
+    }
+  },
+
+  "BoostControl": {
+    "Manual": {
+      "Type": "ManualBoostController",
+      "Adjustment": "Physical",
+      "Precision": "Low",
+      "Cost": 200
+    },
+    "Electronic": {
+      "Type": "ElectronicBoostController",
+      "Adjustment": "ECU",
+      "Precision": "High",
+      "Presets": 4,
+      "Cost": 1000
+    },
+    "Settings": {
+      "BoostLevel": { "Range": [5, 30], "Unit": "PSI" },
+      "BoostByGear": { "Enabled": true },
+      "BoostBySpeed": { "Enabled": true },
+      "ScrambleBoost": { "Temporary": true, "Bonus": 5 }
+    }
+  },
+
+  "TurboLag": {
+    "Simulation": {
+      "Enabled": true,
+      "Factors": ["TurboSize", "RPM", "ThrottlePosition", "ExhaustFlow"]
+    },
+    "Mitigation": {
+      "AntiLag": {
+        "Enabled": true,
+        "Method": "IgnitionRetard",
+        "Effect": "ReduceLag",
+        "Sound": "Pops",
+        "Flames": true,
+        "Wear": "Increased"
+      },
+      "LaunchControl": {
+        "Enabled": true,
+        "BuildBoost": true,
+        "RPMHold": true
+      },
+      "NoLiftShift": {
+        "Enabled": true,
+        "MaintainBoost": true
+      }
+    }
+  },
+
+  "SuperchargerBehavior": {
+    "LinearPower": true,
+    "NoLag": true,
+    "ParasiticLoss": {
+      "Roots": { "HP": 30 },
+      "TwinScrew": { "HP": 20 },
+      "Centrifugal": { "HP": 15 }
+    },
+    "HeatGeneration": {
+      "Roots": "High",
+      "TwinScrew": "Medium",
+      "Centrifugal": "Low"
+    },
+    "Whine": {
+      "Enabled": true,
+      "Volume": { "ByType": true }
+    }
+  },
+
+  "SupportingMods": {
+    "Required": {
+      "FuelSystem": { "Upgrade": "Recommended" },
+      "Internals": { "ForHighBoost": true },
+      "Cooling": { "ForReliability": true }
+    },
+    "Recommended": {
+      "Exhaust": { "FreeFlowing": true },
+      "Intake": { "HighFlow": true },
+      "ECU": { "Tunable": true }
+    }
+  },
+
+  "VisualEffects": {
+    "TurboSpool": {
+      "Sound": true,
+      "WhineIncrease": true
+    },
+    "BlowOff": {
+      "Sound": true,
+      "Visual": { "Optional": true }
+    },
+    "Backfire": {
+      "AntiLag": true,
+      "Flames": true,
+      "Pops": true
+    },
+    "BoostGauge": {
+      "Display": true,
+      "Position": "Dashboard"
+    }
+  },
+
+  "Reliability": {
+    "Factors": {
+      "HighBoost": { "WearMultiplier": 1.5 },
+      "AntiLag": { "WearMultiplier": 2.0 },
+      "PoorCooling": { "RiskMultiplier": 1.5 }
+    },
+    "Failures": {
+      "BearingFailure": { "Cause": "OilStarvation" },
+      "CompressorSurge": { "Cause": "TooMuchBoost" },
+      "ShaftSnap": { "Cause": "Overrev" }
+    }
+  },
+
+  "UI": {
+    "BoostGauge": {
+      "Style": ["Analog", "Digital", "Bar"],
+      "PeakHold": true,
+      "Warning": { "AtMax": true }
+    },
+    "TurboMenu": {
+      "TypeSelector": true,
+      "ComponentUpgrades": true,
+      "BoostSettings": true
+    },
+    "Telemetry": {
+      "BoostPressure": true,
+      "TurboSpeed": true,
+      "IntakeTemp": true
+    }
+  }
+}

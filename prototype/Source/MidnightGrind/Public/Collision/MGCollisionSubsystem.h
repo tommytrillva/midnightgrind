@@ -1,43 +1,202 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * ============================================================================
+ * MGCollisionSubsystem.h
+ * ============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * --------------------
+ * This file defines the Collision Subsystem - a centralized system that manages
+ * all vehicle-to-vehicle and vehicle-to-environment collisions in the game.
+ * Think of it as the "physics referee" that detects when vehicles crash into
+ * things, calculates the damage, and triggers appropriate effects.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ * ---------------------------
+ *
+ * 1. GAME INSTANCE SUBSYSTEM:
+ *    - This class inherits from UGameInstanceSubsystem, meaning it exists for
+ *      the entire lifetime of the game session (from start to quit)
+ *    - There is only ONE instance of this subsystem - all vehicles share it
+ *    - Access it from any Blueprint or C++ code using:
+ *      GetGameInstance()->GetSubsystem<UMGCollisionSubsystem>()
+ *
+ * 2. COLLISION TYPES:
+ *    - VehicleToVehicle: Two cars hitting each other
+ *    - VehicleToWall: Car hitting a solid wall or building
+ *    - Sideswipe: Glancing side-to-side contact between vehicles
+ *    - TBone: Perpendicular impact (one car hits another's side)
+ *    - HeadOn: Two cars colliding front-to-front
+ *    - RearEnd: One car hitting another from behind
+ *
+ * 3. COLLISION SEVERITY:
+ *    - Ranges from "Glancing" (minor scratch) to "Catastrophic" (totaled)
+ *    - Determined by impact speed and force
+ *    - Higher severity = more damage, bigger effects, more points for takedowns
+ *
+ * 4. IMPACT ZONES:
+ *    - Vehicles are divided into 10 zones (front, sides, rear, roof, etc.)
+ *    - Each zone can take independent damage
+ *    - Hitting certain zones affects specific systems (front hits damage engine)
+ *
+ * 5. DAMAGE STATES:
+ *    - Pristine -> Scratched -> Dented -> Damaged -> Heavy Damage -> Critical -> Wrecked
+ *    - Visual appearance changes at each state
+ *    - Performance degrades as damage increases
+ *
+ * 6. TAKEDOWNS:
+ *    - Special events when you wreck an opponent through aggressive driving
+ *    - Award bonus points, boost, and trigger special camera effects
+ *    - Can chain together for combo multipliers
+ *
+ * 7. INVINCIBILITY:
+ *    - Brief period after respawning where you cannot take damage
+ *    - Prevents spawn-killing and gives players time to recover
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ * ---------------------------------------
+ *
+ *   [Physics Engine]
+ *         |
+ *         v (collision detected)
+ *   [UMGCollisionSubsystem] <--- This file!
+ *         |
+ *         +---> [UMGDamageSubsystem] - Applies damage to vehicle health
+ *         |
+ *         +---> [UMGTakedownSubsystem] - Handles takedown scoring/cameras
+ *         |
+ *         +---> [Audio/VFX Systems] - Plays crash sounds and particles
+ *         |
+ *         +---> [HUD/UI] - Shows damage indicators, points earned
+ *
+ * TYPICAL USAGE FLOW:
+ * -------------------
+ * 1. Physics engine detects a collision between two actors
+ * 2. Vehicle's collision component calls ProcessCollision() on this subsystem
+ * 3. Subsystem determines collision type, severity, and impact zone
+ * 4. Damage is applied to the vehicle(s) involved
+ * 5. If a takedown occurred, the TakedownSubsystem is notified
+ * 6. Events are broadcast so UI/audio/VFX can respond
+ * 7. Stats are updated for end-of-race summaries
+ *
+ * EXAMPLE CODE:
+ * -------------
+ * // In your vehicle's collision handler:
+ * void AMyVehicle::OnHit(AActor* OtherActor, FVector HitLocation, FVector HitNormal)
+ * {
+ *     UMGCollisionSubsystem* CollisionSys = GetGameInstance()->GetSubsystem<UMGCollisionSubsystem>();
+ *
+ *     // Process the collision and get detailed event data
+ *     FMGCollisionEvent Event = CollisionSys->ProcessCollision(
+ *         MyVehicleId,
+ *         OtherActor->GetName(),
+ *         HitLocation,
+ *         HitNormal,
+ *         GetVelocity(),
+ *         EMGCollisionType::VehicleToVehicle
+ *     );
+ *
+ *     // React to the collision
+ *     if (Event.bCausedWreck)
+ *     {
+ *         // Play wreck animation
+ *     }
+ * }
+ *
+ * @see UMGDamageSubsystem - Handles health/damage calculations
+ * @see UMGTakedownSubsystem - Handles takedown scoring and crash cameras
+ * @see UMGDestructionSubsystem - Handles environmental object destruction
+ * ============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MGCollisionSubsystem.generated.h"
 
+// ============================================================================
+// ENUMERATIONS
+// ============================================================================
+
 /**
- * Collision type
+ * Collision type - Categorizes the kind of collision that occurred.
+ *
+ * This helps the game know what kind of effects to play, how much damage
+ * to apply, and whether special mechanics (like takedowns) should trigger.
  */
 UENUM(BlueprintType)
 enum class EMGCollisionType : uint8
 {
+	/** No collision (default/invalid state) */
 	None				UMETA(DisplayName = "None"),
+
+	/** Two player/AI vehicles colliding - may trigger takedowns */
 	VehicleToVehicle	UMETA(DisplayName = "Vehicle to Vehicle"),
+
+	/** Vehicle hitting a solid wall or building - high damage, full stop */
 	VehicleToWall		UMETA(DisplayName = "Vehicle to Wall"),
+
+	/** Vehicle hitting race barriers - moderate damage, designed to redirect */
 	VehicleToBarrier	UMETA(DisplayName = "Vehicle to Barrier"),
+
+	/** Vehicle hitting civilian traffic cars - can trigger traffic takedowns */
 	VehicleToTraffic	UMETA(DisplayName = "Vehicle to Traffic"),
+
+	/** Vehicle hitting misc props (cones, signs) - usually low damage */
 	VehicleToObject		UMETA(DisplayName = "Vehicle to Object"),
+
+	/** Vehicle hitting guard rails - scraping damage, keeps you on track */
 	VehicleToRail		UMETA(DisplayName = "Vehicle to Rail"),
+
+	/** Side-to-side contact between vehicles - used for grinding maneuvers */
 	Sideswipe			UMETA(DisplayName = "Sideswipe"),
+
+	/** Perpendicular impact (hitting someone's door) - high takedown potential */
 	TBone				UMETA(DisplayName = "T-Bone"),
+
+	/** Front-to-front collision - massive damage to both vehicles */
 	HeadOn				UMETA(DisplayName = "Head On"),
+
+	/** Hitting another vehicle from behind - shunting/ramming */
 	RearEnd				UMETA(DisplayName = "Rear End"),
+
+	/** Vehicle flipped over - roof/underbody damage */
 	Rollover			UMETA(DisplayName = "Rollover"),
+
+	/** Hard landing from a jump - suspension/underbody damage */
 	Airborne			UMETA(DisplayName = "Airborne Landing")
 };
 
 /**
- * Collision severity
+ * Collision severity - How intense the impact was.
+ *
+ * Severity is calculated from impact speed and force. Higher severity means:
+ * - More damage to the vehicle
+ * - Bigger visual/audio effects
+ * - More points if it results in a takedown
+ * - More likely to trigger slow-motion crash camera
  */
 UENUM(BlueprintType)
 enum class EMGCollisionSeverity : uint8
 {
+	/** Barely touched - paint scratch at worst (< 20 km/h) */
 	Glancing			UMETA(DisplayName = "Glancing"),
+
+	/** Light bump - small dent, minimal speed loss (20-40 km/h) */
 	Minor				UMETA(DisplayName = "Minor"),
+
+	/** Solid hit - visible damage, noticeable slowdown (40-70 km/h) */
 	Moderate			UMETA(DisplayName = "Moderate"),
+
+	/** Heavy impact - significant damage, may affect handling (70-100 km/h) */
 	Major				UMETA(DisplayName = "Major"),
+
+	/** Brutal crash - major damage, systems may fail (100-150 km/h) */
 	Severe				UMETA(DisplayName = "Severe"),
+
+	/** Devastating - near or total destruction (> 150 km/h) */
 	Catastrophic		UMETA(DisplayName = "Catastrophic")
 };
 

@@ -1,5 +1,68 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * =============================================================================
+ * MGStuntSubsystem.h
+ * =============================================================================
+ *
+ * PURPOSE:
+ * This file defines the Stunt Subsystem, which is responsible for tracking and
+ * scoring aerial stunts and tricks that players perform while driving vehicles
+ * in the game. Think of it as the system that watches when your car goes airborne
+ * and rewards you for doing cool things like flips, barrel rolls, and big jumps.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ *
+ * 1. SUBSYSTEM:
+ *    - A Subsystem in Unreal Engine is a singleton-like object that exists for
+ *      the lifetime of its outer object (in this case, the GameInstance).
+ *    - GameInstanceSubsystem means this system persists across level loads and
+ *      is available throughout the entire game session.
+ *    - You can access it from anywhere using: GetGameInstance()->GetSubsystem<UMGStuntSubsystem>()
+ *
+ * 2. STUNTS vs TRICKS:
+ *    - "Stunts" refer to the overall aerial maneuver (the jump itself)
+ *    - "Tricks" are specific actions performed during a stunt (barrel rolls, flips)
+ *    - This system tracks both and combines them for scoring
+ *
+ * 3. COMBO SYSTEM:
+ *    - When players perform multiple stunts in quick succession, they build a "combo"
+ *    - Combos multiply the points earned and must be "banked" (saved) before timing out
+ *    - If you crash or take too long between stunts, the combo is lost
+ *
+ * 4. STUNT ZONES:
+ *    - Special areas on the map designed for stunts (like ramps, rooftops, canyons)
+ *    - These zones give bonus multipliers for performing stunts there
+ *    - Can have target scores for players to beat
+ *
+ * 5. LANDING SYSTEM:
+ *    - How you land affects your final score
+ *    - Perfect landings give bonuses, crash landings can zero out your points
+ *    - The system measures the angle of your vehicle relative to the ground
+ *
+ * HOW IT FITS INTO THE GAME ARCHITECTURE:
+ *
+ *    [Vehicle/Player]
+ *          |
+ *          v
+ *    [Physics Detection] -- Detects when vehicle leaves ground
+ *          |
+ *          v
+ *    [MGStuntSubsystem] -- This file! Tracks air state, rotations, calculates scores
+ *          |
+ *          +---> [Score/Points System] -- Awards points to player
+ *          +---> [Boost System] -- Rewards boost meter for stunts
+ *          +---> [UI System] -- Shows stunt names, scores, combos
+ *          +---> [Progression System] -- Tracks statistics, achievements
+ *
+ * RELATED SYSTEMS:
+ * - MGAirtimeSubsystem: Handles ramp-based jumps and jump ratings
+ * - MGSpeedtrapSubsystem: Handles speed-based challenges
+ * - Both can interact with this system (e.g., stunt bonuses during speed zones)
+ *
+ * =============================================================================
+ */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,7 +70,39 @@
 #include "MGStuntSubsystem.generated.h"
 
 /**
- * Type of stunt/trick
+ * EMGStuntType - Enumeration of all possible stunt/trick types
+ *
+ * This enum categorizes every type of stunt the player can perform.
+ * Each type has different point values and detection requirements.
+ *
+ * ROTATION-BASED STUNTS:
+ * - BarrelRoll: Spinning around the vehicle's forward axis (like a log rolling)
+ * - Flip: Rotating end-over-end (front flip or back flip)
+ * - FlatSpin: Spinning horizontally while airborne (like a spinning top)
+ * - Corkscrew: Combination of roll and flip (diagonal rotation)
+ *
+ * HEIGHT/TIME-BASED STUNTS:
+ * - Jump: Basic jump (minimum air time threshold)
+ * - BigAir: Longer air time or higher jump
+ * - MassiveAir: Even longer/higher than BigAir
+ * - Hangtime: Extended time in the air without rotation
+ *
+ * CONTEXT-BASED STUNTS:
+ * - NearMissAir: Passing close to obstacles while airborne
+ * - OncomingAir: Passing oncoming traffic while airborne
+ * - DriftJump: Launching into the air from a drift
+ * - TwoWheels: Driving on two wheels (not technically airborne)
+ *
+ * LOCATION-BASED STUNTS:
+ * - TrainHop: Jumping over or off a train
+ * - BridgeJump: Jumping from a bridge
+ * - RoofJump: Jumping from rooftops
+ * - CanyonJump: Jumping across a canyon
+ * - Signature: Special stunts unique to specific locations
+ *
+ * LANDING TYPES:
+ * - PerfectLanding: Landed cleanly with correct orientation
+ * - CrashLanding: Landed poorly, may affect score negatively
  */
 UENUM(BlueprintType)
 enum class EMGStuntType : uint8

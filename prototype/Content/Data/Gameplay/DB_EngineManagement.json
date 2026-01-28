@@ -1,0 +1,252 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - Engine Management and ECU Tuning System",
+
+  "GlobalSettings": {
+    "Enabled": true,
+    "ECUTuning": true,
+    "FuelMaps": true,
+    "IgnitionTiming": true,
+    "SafetyLimits": true
+  },
+
+  "ECUTypes": {
+    "Stock": {
+      "ID": "ECU_STOCK",
+      "Description": "Factory ECU",
+      "Tunability": "Limited",
+      "Parameters": ["FuelTrim", "IdleSpeed"],
+      "Default": true
+    },
+    "Reflash": {
+      "ID": "ECU_REFLASH",
+      "Description": "Reflashed stock ECU",
+      "Tunability": "Moderate",
+      "Parameters": ["FuelMap", "IgnitionTiming", "RevLimit", "SpeedLimiter"],
+      "Cost": 2000
+    },
+    "Piggyback": {
+      "ID": "ECU_PIGGYBACK",
+      "Description": "Piggyback tuning unit",
+      "Tunability": "Good",
+      "Parameters": ["FuelEnrichment", "BoostControl", "TimingAdvance"],
+      "Cost": 5000
+    },
+    "Standalone": {
+      "ID": "ECU_STANDALONE",
+      "Description": "Full standalone ECU",
+      "Tunability": "Full",
+      "Parameters": "All",
+      "Cost": 15000
+    },
+    "Racing": {
+      "ID": "ECU_RACING",
+      "Description": "Professional racing ECU",
+      "Tunability": "Full",
+      "DataLogging": true,
+      "TelemetryOutput": true,
+      "Cost": 35000
+    }
+  },
+
+  "TuningParameters": {
+    "FuelMapping": {
+      "ID": "TUNE_FUEL",
+      "Description": "Air-fuel ratio control",
+      "Zones": {
+        "Idle": { "AFR": { "Min": 13.0, "Max": 15.0, "Default": 14.7 } },
+        "Cruise": { "AFR": { "Min": 13.5, "Max": 16.0, "Default": 14.7 } },
+        "PartThrottle": { "AFR": { "Min": 12.5, "Max": 14.0, "Default": 13.5 } },
+        "WOT": { "AFR": { "Min": 11.0, "Max": 13.0, "Default": 12.0 } }
+      },
+      "Effects": {
+        "Rich": { "Power": "More", "Fuel": "Higher", "Safety": "Better" },
+        "Lean": { "Power": "Less", "Fuel": "Lower", "Risk": "Detonation" }
+      }
+    },
+    "IgnitionTiming": {
+      "ID": "TUNE_TIMING",
+      "Description": "Spark advance control",
+      "Range": { "Min": -10, "Max": 40 },
+      "Default": 15,
+      "Unit": "BTDC",
+      "Effects": {
+        "Advanced": { "Power": "More", "Heat": "More", "Risk": "Knock" },
+        "Retarded": { "Power": "Less", "Heat": "Less", "Safety": "Better" }
+      }
+    },
+    "RevLimit": {
+      "ID": "TUNE_REVLIMIT",
+      "Description": "Maximum RPM",
+      "Range": { "Min": 5000, "Max": 10000 },
+      "Default": { "PerEngine": true },
+      "Effects": {
+        "Higher": { "Power": "Accessible", "Wear": "More" },
+        "Lower": { "Protection": "Better" }
+      }
+    },
+    "BoostControl": {
+      "ID": "TUNE_BOOST",
+      "Description": "Turbo/SC boost pressure",
+      "Range": { "Min": 0, "Max": 30 },
+      "Unit": "PSI",
+      "Requires": "ForcedInduction",
+      "Effects": {
+        "Higher": { "Power": "More", "Stress": "More" },
+        "Lower": { "Reliability": "Better" }
+      }
+    },
+    "SpeedLimiter": {
+      "ID": "TUNE_SPEED",
+      "Description": "Electronic speed limit",
+      "Options": { "Remove": true, "Adjust": true },
+      "Default": { "Limited": true }
+    },
+    "LaunchControl": {
+      "ID": "TUNE_LAUNCH",
+      "Description": "Launch RPM setting",
+      "Range": { "Min": 3000, "Max": 7000 },
+      "TwoStep": { "Available": true }
+    },
+    "VTECEngagement": {
+      "ID": "TUNE_VTEC",
+      "Description": "Variable valve timing point",
+      "Range": { "Min": 4000, "Max": 7000 },
+      "Requires": "VTECEngine"
+    },
+    "TractionControl": {
+      "ID": "TUNE_TC",
+      "Description": "TC intervention level",
+      "Range": { "Min": 0, "Max": 100 },
+      "Modes": ["Off", "Sport", "Normal", "Rain"]
+    }
+  },
+
+  "TuningMaps": {
+    "Stock": {
+      "Description": "Factory calibration",
+      "Performance": 1.0,
+      "Reliability": 1.0,
+      "Emissions": "Legal"
+    },
+    "Stage1": {
+      "Description": "Mild tune",
+      "PowerGain": { "Percentage": 10 },
+      "Reliability": 0.95,
+      "Cost": 3000
+    },
+    "Stage2": {
+      "Description": "Aggressive tune",
+      "PowerGain": { "Percentage": 20 },
+      "Reliability": 0.85,
+      "Requires": ["Intake", "Exhaust"],
+      "Cost": 8000
+    },
+    "Stage3": {
+      "Description": "Maximum power tune",
+      "PowerGain": { "Percentage": 35 },
+      "Reliability": 0.70,
+      "Requires": ["ForcedInduction", "Internals"],
+      "Cost": 15000
+    },
+    "Economy": {
+      "Description": "Fuel efficiency focus",
+      "PowerGain": { "Percentage": -5 },
+      "FuelSaving": { "Percentage": 15 },
+      "Reliability": 1.0
+    },
+    "AntiLag": {
+      "Description": "Rally-style anti-lag",
+      "TurboResponse": "Instant",
+      "FuelUse": "High",
+      "Flames": true,
+      "Requires": "Turbo"
+    }
+  },
+
+  "SafetyFeatures": {
+    "KnockDetection": {
+      "Enabled": true,
+      "Action": "RetardTiming",
+      "Warning": true
+    },
+    "OverheatProtection": {
+      "Enabled": true,
+      "Threshold": 110,
+      "Action": "ReducePower"
+    },
+    "OverboostProtection": {
+      "Enabled": true,
+      "Action": "WastegateOpen"
+    },
+    "RevLimiter": {
+      "Enabled": true,
+      "Type": ["HardCut", "SoftCut"],
+      "Default": "SoftCut"
+    },
+    "LeanProtection": {
+      "Enabled": true,
+      "Threshold": 15.0,
+      "Action": "AddFuel"
+    }
+  },
+
+  "DataLogging": {
+    "Parameters": {
+      "RPM": true,
+      "ThrottlePosition": true,
+      "BoostPressure": true,
+      "AFR": true,
+      "IgnitionAdvance": true,
+      "CoolantTemp": true,
+      "IntakeTemp": true,
+      "OilPressure": true,
+      "OilTemp": true,
+      "FuelPressure": true,
+      "KnockCount": true
+    },
+    "Storage": {
+      "Duration": { "Minutes": 60 },
+      "Export": true,
+      "Analysis": true
+    }
+  },
+
+  "DynoIntegration": {
+    "LiveTuning": true,
+    "PowerCurve": true,
+    "TorqueCurve": true,
+    "BeforeAfter": true
+  },
+
+  "Reliability": {
+    "Factors": {
+      "AggressiveTune": { "WearIncrease": 20 },
+      "HighBoost": { "StressIncrease": 30 },
+      "AdvancedTiming": { "RiskIncrease": 15 }
+    },
+    "Failures": {
+      "Detonation": { "EngineDamage": true },
+      "Overheat": { "HeadGasket": true },
+      "Overrev": { "ValveTrain": true }
+    }
+  },
+
+  "UI": {
+    "TuningInterface": {
+      "MapEditor": { "2D": true, "3D": true },
+      "SliderControls": true,
+      "PresetSelector": true,
+      "LiveGauges": true
+    },
+    "DataDisplay": {
+      "Gauges": true,
+      "Graphs": true,
+      "Warnings": true
+    },
+    "QuickTune": {
+      "PresetButtons": true,
+      "OneClickMaps": true
+    }
+  }
+}

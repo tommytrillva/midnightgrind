@@ -1,0 +1,289 @@
+{
+  "Version": "1.0",
+  "Description": "MIDNIGHT GRIND - World Regions and Districts Configuration",
+
+  "WorldInfo": {
+    "Name": "Midnight City",
+    "TotalArea": "64 sq km",
+    "RoadNetwork": "450 km",
+    "Regions": 8,
+    "Districts": 24
+  },
+
+  "Regions": [
+    {
+      "ID": "REGION_DOWNTOWN",
+      "Name": "Downtown",
+      "Description": "The heart of the city - skyscrapers, neon lights, and heavy traffic",
+      "Bounds": { "Min": { "X": -1500, "Y": -2000 }, "Max": { "X": 2000, "Y": 2000 } },
+      "Ambience": "Urban_Dense",
+      "TrafficDensity": 1.0,
+      "PedestrianDensity": 0.8,
+      "PolicePresence": "High",
+      "RoadTypes": ["Highway", "MainStreet", "Alley"],
+      "Landmarks": ["Neo Tower", "Neon District", "Central Station"],
+      "Districts": [
+        {
+          "ID": "DIST_FINANCIAL",
+          "Name": "Financial District",
+          "Character": "Corporate",
+          "DayActivity": "High",
+          "NightActivity": "Low"
+        },
+        {
+          "ID": "DIST_NEON",
+          "Name": "Neon District",
+          "Character": "Nightlife",
+          "DayActivity": "Low",
+          "NightActivity": "Very High",
+          "SpecialFeature": "NeonSigns"
+        },
+        {
+          "ID": "DIST_SHOPPING",
+          "Name": "Shopping District",
+          "Character": "Commercial",
+          "DayActivity": "High",
+          "NightActivity": "Medium"
+        }
+      ],
+      "UnlockLevel": 1,
+      "DiscoveryREP": 100
+    },
+    {
+      "ID": "REGION_INDUSTRIAL",
+      "Name": "Industrial Zone",
+      "Description": "Warehouses, factories, and the underground racing scene's home turf",
+      "Bounds": { "Min": { "X": 2500, "Y": -3500 }, "Max": { "X": 5000, "Y": -500 } },
+      "Ambience": "Industrial",
+      "TrafficDensity": 0.5,
+      "PedestrianDensity": 0.2,
+      "PolicePresence": "Low",
+      "RoadTypes": ["Industrial", "Highway", "Dirt"],
+      "Landmarks": ["Abandoned Warehouse", "Old Factory"],
+      "Districts": [
+        {
+          "ID": "DIST_WAREHOUSE",
+          "Name": "Warehouse District",
+          "Character": "Abandoned",
+          "RacingActivity": "High"
+        },
+        {
+          "ID": "DIST_FACTORY",
+          "Name": "Factory Row",
+          "Character": "Working",
+          "DayActivity": "Medium",
+          "NightActivity": "Low"
+        }
+      ],
+      "UnlockLevel": 5,
+      "DiscoveryREP": 150
+    },
+    {
+      "ID": "REGION_HARBOR",
+      "Name": "Harbor District",
+      "Description": "Docks, shipping containers, and waterfront racing",
+      "Bounds": { "Min": { "X": -4500, "Y": 500 }, "Max": { "X": -2000, "Y": 2500 } },
+      "Ambience": "Coastal_Industrial",
+      "TrafficDensity": 0.4,
+      "PedestrianDensity": 0.3,
+      "PolicePresence": "Medium",
+      "RoadTypes": ["Dock", "Highway", "Coastal"],
+      "Landmarks": ["Midnight Bridge", "Harbor Lighthouse", "Container Yard"],
+      "Districts": [
+        {
+          "ID": "DIST_DOCKS",
+          "Name": "The Docks",
+          "Character": "Working Harbor",
+          "ShipHorns": true
+        },
+        {
+          "ID": "DIST_SHIPYARD",
+          "Name": "Shipyard",
+          "Character": "Industrial",
+          "CraneBackdrops": true
+        },
+        {
+          "ID": "DIST_WATERFRONT",
+          "Name": "Waterfront",
+          "Character": "Mixed Use",
+          "ViewBonus": true
+        }
+      ],
+      "UnlockLevel": 8,
+      "DiscoveryREP": 150
+    },
+    {
+      "ID": "REGION_SUBURBS",
+      "Name": "Suburbs",
+      "Description": "Residential neighborhoods, strip malls, and winding roads",
+      "Bounds": { "Min": { "X": -1000, "Y": 2000 }, "Max": { "X": 2500, "Y": 4500 } },
+      "Ambience": "Suburban",
+      "TrafficDensity": 0.6,
+      "PedestrianDensity": 0.5,
+      "PolicePresence": "Medium",
+      "RoadTypes": ["Residential", "MainStreet", "Highway"],
+      "Landmarks": ["Mall", "Drive-In Theater"],
+      "Districts": [
+        {
+          "ID": "DIST_RESIDENTIAL",
+          "Name": "Residential Area",
+          "Character": "Quiet",
+          "SpeedLimit": 35
+        },
+        {
+          "ID": "DIST_COMMERCIAL",
+          "Name": "Strip Mall Area",
+          "Character": "Commercial",
+          "ParkingLots": true
+        }
+      ],
+      "UnlockLevel": 3,
+      "DiscoveryREP": 100
+    },
+    {
+      "ID": "REGION_HIGHWAY",
+      "Name": "Highway System",
+      "Description": "Multi-lane highways connecting all regions - high-speed territory",
+      "Bounds": "Interconnected",
+      "Ambience": "Highway",
+      "TrafficDensity": 0.8,
+      "PedestrianDensity": 0.0,
+      "PolicePresence": "Medium",
+      "RoadTypes": ["Highway", "OnRamp", "OffRamp"],
+      "Landmarks": ["Highway 101", "Interchange"],
+      "MaxSpeed": "Unlimited",
+      "SpeedTrapCount": 5,
+      "UnlockLevel": 1,
+      "DiscoveryREP": 200
+    },
+    {
+      "ID": "REGION_MOUNTAINS",
+      "Name": "Mountain Pass",
+      "Description": "Winding touge roads, scenic overlooks, and legendary drift spots",
+      "Bounds": { "Min": { "X": 3000, "Y": 2000 }, "Max": { "X": 6000, "Y": 5500 } },
+      "Ambience": "Mountain",
+      "TrafficDensity": 0.2,
+      "PedestrianDensity": 0.1,
+      "PolicePresence": "Low",
+      "RoadTypes": ["Touge", "Scenic", "Dirt"],
+      "Landmarks": ["Sakura Temple", "Mountain Overlook", "Haruna Pass"],
+      "Districts": [
+        {
+          "ID": "DIST_TOUGE",
+          "Name": "Touge Roads",
+          "Character": "Racing Legend",
+          "DriftZones": 3,
+          "ElevationChange": "High"
+        },
+        {
+          "ID": "DIST_SCENIC",
+          "Name": "Scenic Route",
+          "Character": "Beautiful",
+          "PhotoSpots": 5
+        },
+        {
+          "ID": "DIST_TEMPLE",
+          "Name": "Temple Area",
+          "Character": "Cultural",
+          "SeasonalEffect": "CherryBlossoms"
+        }
+      ],
+      "UnlockLevel": 12,
+      "DiscoveryREP": 250
+    },
+    {
+      "ID": "REGION_RURAL",
+      "Name": "Rural Outskirts",
+      "Description": "Farmland, dirt roads, and hidden barn finds",
+      "Bounds": { "Min": { "X": 5000, "Y": 2000 }, "Max": { "X": 7500, "Y": 5000 } },
+      "Ambience": "Rural",
+      "TrafficDensity": 0.15,
+      "PedestrianDensity": 0.05,
+      "PolicePresence": "Very Low",
+      "RoadTypes": ["Country", "Dirt", "Farm"],
+      "Landmarks": ["Old Farm Barn", "Abandoned Airfield"],
+      "Districts": [
+        {
+          "ID": "DIST_FARMLAND",
+          "Name": "Farmland",
+          "Character": "Agricultural",
+          "BarnFinds": 2
+        },
+        {
+          "ID": "DIST_AIRFIELD",
+          "Name": "Abandoned Airfield",
+          "Character": "Empty",
+          "DragStrip": true,
+          "OpenSpace": true
+        }
+      ],
+      "UnlockLevel": 15,
+      "DiscoveryREP": 200
+    },
+    {
+      "ID": "REGION_COAST",
+      "Name": "Coastal Highway",
+      "Description": "Scenic coastal roads with ocean views and clifftop racing",
+      "Bounds": { "Min": { "X": -5500, "Y": 2000 }, "Max": { "X": -4000, "Y": 4500 } },
+      "Ambience": "Coastal",
+      "TrafficDensity": 0.3,
+      "PedestrianDensity": 0.2,
+      "PolicePresence": "Low",
+      "RoadTypes": ["Coastal", "Cliff", "Beach"],
+      "Landmarks": ["Coastal Cave", "Beach House", "Cliffside Road"],
+      "Districts": [
+        {
+          "ID": "DIST_BEACH",
+          "Name": "Beach Area",
+          "Character": "Relaxed",
+          "PhotoBonus": 1.5
+        },
+        {
+          "ID": "DIST_CLIFFS",
+          "Name": "Cliffside",
+          "Character": "Dangerous",
+          "GuardrailsMinimal": true
+        }
+      ],
+      "UnlockLevel": 10,
+      "DiscoveryREP": 200
+    }
+  ],
+
+  "SpecialZones": {
+    "YourGarage": {
+      "ID": "ZONE_GARAGE",
+      "Location": { "X": 0, "Y": 0, "Z": 5 },
+      "SafeZone": true,
+      "NoPolice": true,
+      "AlwaysAccessible": true
+    },
+    "Underground": {
+      "ID": "ZONE_UNDERGROUND",
+      "Location": { "X": -500, "Y": -2800, "Z": -30 },
+      "Hidden": true,
+      "UnlockCondition": "REP_TIER_ELITE",
+      "ExclusiveContent": true
+    },
+    "RaceStartZones": {
+      "NoTraffic": true,
+      "ReducedPolice": true,
+      "Duration": "UntilRaceStart"
+    }
+  },
+
+  "RegionEvents": {
+    "Downtown": ["StreetRace", "Pursuit", "CarMeet"],
+    "Industrial": ["DriftEvent", "TimeAttack", "Underground"],
+    "Harbor": ["SprintRace", "DragRace"],
+    "Mountains": ["TougeRace", "DriftBattle", "TimeAttack"],
+    "Rural": ["DragRace", "BarnFind"],
+    "Coast": ["SprintRace", "PhotoChallenge"]
+  },
+
+  "DiscoveryProgress": {
+    "TrackByRegion": true,
+    "RewardPerRegion": { "REP": 500 },
+    "AllRegionsBonus": { "Cash": 50000, "REP": 5000, "Title": "TITLE_EXPLORER" }
+  }
+}
