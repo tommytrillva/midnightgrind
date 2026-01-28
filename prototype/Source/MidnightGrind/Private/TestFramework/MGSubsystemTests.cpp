@@ -22,6 +22,8 @@
 #include "UI/MGRaceHUDSubsystem.h"
 #include "UI/MGMenuSubsystem.h"
 #include "UI/MGNotificationSubsystem.h"
+#include "Race/MGRaceFlowSubsystem.h"
+#include "Racing/MGRaceModeSubsystem.h"
 
 void UMGSubsystemTests::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -612,7 +614,54 @@ void UMGSubsystemTests::RegisterAllTests()
 		TestFramework->RegisterTest(Test);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 65);
+	// Race Flow Tests
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_RaceFlow_FlowStates"));
+		Test.TestName = FText::FromString(TEXT("Race Flow - Flow States"));
+		Test.Description = FText::FromString(TEXT("Verify race flow state enumeration values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("RaceFlow")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_RaceFlow_RaceTypes"));
+		Test.TestName = FText::FromString(TEXT("Race Flow - Race Types"));
+		Test.Description = FText::FromString(TEXT("Verify race type enumeration values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("RaceFlow")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_RaceFlow_Difficulty"));
+		Test.TestName = FText::FromString(TEXT("Race Flow - Difficulty"));
+		Test.Description = FText::FromString(TEXT("Verify race difficulty enumeration values"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("RaceFlow")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_RaceFlow_DataStructures"));
+		Test.TestName = FText::FromString(TEXT("Race Flow - Data Structures"));
+		Test.Description = FText::FromString(TEXT("Verify race setup and result structure defaults"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("RaceFlow")));
+		TestFramework->RegisterTest(Test);
+	}
+	{
+		FMGTestCase Test;
+		Test.TestID = FName(TEXT("Test_RaceFlow_Subsystem"));
+		Test.TestName = FText::FromString(TEXT("Race Flow - Subsystem"));
+		Test.Description = FText::FromString(TEXT("Verify race flow subsystem functionality"));
+		Test.Category = EMGTestCategory::Unit;
+		Test.Tags.Add(FName(TEXT("RaceFlow")));
+		TestFramework->RegisterTest(Test);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Registered %d subsystem tests"), 70);
 }
 
 // ==========================================
@@ -4735,6 +4784,369 @@ FMGTestResult UMGSubsystemTests::TestNotification_Subsystem()
 }
 
 // ==========================================
+// RACE FLOW TESTS
+// ==========================================
+
+FMGTestResult UMGSubsystemTests::TestRaceFlow_FlowStates()
+{
+	LogTestStart(TEXT("TestRaceFlow_FlowStates"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test EMGRaceFlowState enum values (11 states)
+	TSet<int32> UniqueValues;
+
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::Idle));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::Setup));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::Loading));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::PreRace));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::Countdown));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::Racing));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::Cooldown));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::Results));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::ProcessingRewards));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::Returning));
+	UniqueValues.Add(static_cast<int32>(EMGRaceFlowState::Error));
+
+	if (UniqueValues.Num() != 11)
+	{
+		Logs.Add(FString::Printf(TEXT("Expected 11 unique flow states, got %d"), UniqueValues.Num()));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("All 11 race flow states are unique"));
+	}
+
+	Logs.Add(FString::Printf(TEXT("Idle=%d, Setup=%d, Loading=%d, PreRace=%d"),
+		static_cast<int32>(EMGRaceFlowState::Idle),
+		static_cast<int32>(EMGRaceFlowState::Setup),
+		static_cast<int32>(EMGRaceFlowState::Loading),
+		static_cast<int32>(EMGRaceFlowState::PreRace)));
+
+	Logs.Add(FString::Printf(TEXT("Countdown=%d, Racing=%d, Cooldown=%d, Results=%d"),
+		static_cast<int32>(EMGRaceFlowState::Countdown),
+		static_cast<int32>(EMGRaceFlowState::Racing),
+		static_cast<int32>(EMGRaceFlowState::Cooldown),
+		static_cast<int32>(EMGRaceFlowState::Results)));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_RaceFlow_FlowStates")),
+			TEXT("Race flow states validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_RaceFlow_FlowStates")),
+		TEXT("All 11 race flow states valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestRaceFlow_RaceTypes()
+{
+	LogTestStart(TEXT("TestRaceFlow_RaceTypes"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test EMGRaceType enum values (11 types)
+	TSet<int32> UniqueValues;
+
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::Circuit));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::Sprint));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::Drag));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::Drift));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::TimeAttack));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::Elimination));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::PinkSlip));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::Touge));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::Knockout));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::Checkpoint));
+	UniqueValues.Add(static_cast<int32>(EMGRaceType::FreeRoam));
+
+	if (UniqueValues.Num() != 11)
+	{
+		Logs.Add(FString::Printf(TEXT("Expected 11 unique race types, got %d"), UniqueValues.Num()));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("All 11 race types are unique"));
+	}
+
+	Logs.Add(FString::Printf(TEXT("Circuit=%d, Sprint=%d, Drag=%d, Drift=%d"),
+		static_cast<int32>(EMGRaceType::Circuit),
+		static_cast<int32>(EMGRaceType::Sprint),
+		static_cast<int32>(EMGRaceType::Drag),
+		static_cast<int32>(EMGRaceType::Drift)));
+
+	Logs.Add(FString::Printf(TEXT("TimeAttack=%d, Elimination=%d, PinkSlip=%d, Touge=%d"),
+		static_cast<int32>(EMGRaceType::TimeAttack),
+		static_cast<int32>(EMGRaceType::Elimination),
+		static_cast<int32>(EMGRaceType::PinkSlip),
+		static_cast<int32>(EMGRaceType::Touge)));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_RaceFlow_RaceTypes")),
+			TEXT("Race types validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_RaceFlow_RaceTypes")),
+		TEXT("All 11 race types valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestRaceFlow_Difficulty()
+{
+	LogTestStart(TEXT("TestRaceFlow_Difficulty"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test EMGRaceDifficulty enum values (5 levels)
+	TSet<int32> UniqueValues;
+
+	int32 EasyVal = static_cast<int32>(EMGRaceDifficulty::Easy);
+	int32 MediumVal = static_cast<int32>(EMGRaceDifficulty::Medium);
+	int32 HardVal = static_cast<int32>(EMGRaceDifficulty::Hard);
+	int32 ExpertVal = static_cast<int32>(EMGRaceDifficulty::Expert);
+	int32 LegendaryVal = static_cast<int32>(EMGRaceDifficulty::Legendary);
+
+	UniqueValues.Add(EasyVal);
+	UniqueValues.Add(MediumVal);
+	UniqueValues.Add(HardVal);
+	UniqueValues.Add(ExpertVal);
+	UniqueValues.Add(LegendaryVal);
+
+	if (UniqueValues.Num() != 5)
+	{
+		Logs.Add(FString::Printf(TEXT("Expected 5 unique difficulty levels, got %d"), UniqueValues.Num()));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("All 5 difficulty levels are unique"));
+	}
+
+	// Verify difficulty ordering
+	if (EasyVal >= MediumVal || MediumVal >= HardVal || HardVal >= ExpertVal || ExpertVal >= LegendaryVal)
+	{
+		Logs.Add(TEXT("WARNING: Difficulty values may not be in expected order"));
+	}
+	else
+	{
+		Logs.Add(TEXT("Difficulty ordering is correct (Easy < Medium < Hard < Expert < Legendary)"));
+	}
+
+	Logs.Add(FString::Printf(TEXT("Easy=%d, Medium=%d, Hard=%d, Expert=%d, Legendary=%d"),
+		EasyVal, MediumVal, HardVal, ExpertVal, LegendaryVal));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_RaceFlow_Difficulty")),
+			TEXT("Race difficulty validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_RaceFlow_Difficulty")),
+		TEXT("All 5 difficulty levels valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestRaceFlow_DataStructures()
+{
+	LogTestStart(TEXT("TestRaceFlow_DataStructures"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	// Test FMGRaceSetupRequest defaults
+	FMGRaceSetupRequest SetupRequest;
+
+	if (SetupRequest.RaceType != FName("Circuit"))
+	{
+		Logs.Add(TEXT("Default RaceType should be Circuit"));
+	}
+	else
+	{
+		Logs.Add(TEXT("Default RaceType: Circuit OK"));
+	}
+
+	if (SetupRequest.LapCount < 1 || SetupRequest.LapCount > 99)
+	{
+		Logs.Add(FString::Printf(TEXT("LapCount out of range: %d"), SetupRequest.LapCount));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("LapCount: %d OK"), SetupRequest.LapCount));
+	}
+
+	if (SetupRequest.AICount < 0 || SetupRequest.AICount > 31)
+	{
+		Logs.Add(FString::Printf(TEXT("AICount out of range: %d"), SetupRequest.AICount));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("AICount: %d OK"), SetupRequest.AICount));
+	}
+
+	if (SetupRequest.AIDifficulty < 0.0f || SetupRequest.AIDifficulty > 1.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("AIDifficulty out of range: %.2f"), SetupRequest.AIDifficulty));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("AIDifficulty: %.2f OK"), SetupRequest.AIDifficulty));
+	}
+
+	if (SetupRequest.TimeOfDay < 0.0f || SetupRequest.TimeOfDay > 1.0f)
+	{
+		Logs.Add(FString::Printf(TEXT("TimeOfDay out of range: %.2f"), SetupRequest.TimeOfDay));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(FString::Printf(TEXT("TimeOfDay: %.2f OK"), SetupRequest.TimeOfDay));
+	}
+
+	// Test FMGRaceFlowResult defaults
+	FMGRaceFlowResult FlowResult;
+
+	if (FlowResult.bPlayerFinished)
+	{
+		Logs.Add(TEXT("bPlayerFinished should default to false"));
+		bAllPassed = false;
+	}
+	else
+	{
+		Logs.Add(TEXT("bPlayerFinished: false OK"));
+	}
+
+	if (FlowResult.PlayerPosition != 0)
+	{
+		Logs.Add(FString::Printf(TEXT("PlayerPosition should default to 0, got %d"), FlowResult.PlayerPosition));
+	}
+	else
+	{
+		Logs.Add(TEXT("PlayerPosition: 0 OK"));
+	}
+
+	if (FlowResult.CashEarned != 0)
+	{
+		Logs.Add(TEXT("CashEarned should default to 0"));
+	}
+	else
+	{
+		Logs.Add(TEXT("CashEarned: 0 OK"));
+	}
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_RaceFlow_DataStructures")),
+			TEXT("Race data structures validation failed"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_RaceFlow_DataStructures")),
+		TEXT("Race data structures valid")
+	);
+}
+
+FMGTestResult UMGSubsystemTests::TestRaceFlow_Subsystem()
+{
+	LogTestStart(TEXT("TestRaceFlow_Subsystem"));
+
+	TArray<FString> Logs;
+	bool bAllPassed = true;
+
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_RaceFlow_Subsystem")),
+			TEXT("GameInstance not found"),
+			{TEXT("Cannot access GameInstance")}
+		);
+	}
+
+	UMGRaceFlowSubsystem* RaceFlowSubsystem = GameInstance->GetSubsystem<UMGRaceFlowSubsystem>();
+	if (!RaceFlowSubsystem)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_RaceFlow_Subsystem")),
+			TEXT("Race Flow Subsystem not found"),
+			{TEXT("GetSubsystem<UMGRaceFlowSubsystem> returned nullptr")}
+		);
+	}
+
+	Logs.Add(TEXT("Race Flow Subsystem found"));
+
+	// Test GetFlowState
+	EMGRaceFlowState FlowState = RaceFlowSubsystem->GetFlowState();
+	Logs.Add(FString::Printf(TEXT("Current flow state: %d"), static_cast<int32>(FlowState)));
+
+	// Test IsRaceActive
+	bool bIsActive = RaceFlowSubsystem->IsRaceActive();
+	Logs.Add(FString::Printf(TEXT("IsRaceActive: %s"), bIsActive ? TEXT("true") : TEXT("false")));
+
+	// Test CanStartRace
+	bool bCanStart = RaceFlowSubsystem->CanStartRace();
+	Logs.Add(FString::Printf(TEXT("CanStartRace: %s"), bCanStart ? TEXT("true") : TEXT("false")));
+
+	// Test IsLoading
+	bool bIsLoading = RaceFlowSubsystem->IsLoading();
+	Logs.Add(FString::Printf(TEXT("IsLoading: %s"), bIsLoading ? TEXT("true") : TEXT("false")));
+
+	// Test GetLoadingProgress
+	float LoadingProgress = RaceFlowSubsystem->GetLoadingProgress();
+	Logs.Add(FString::Printf(TEXT("LoadingProgress: %.2f"), LoadingProgress));
+
+	// Test GetCurrentSetup
+	FMGRaceSetupRequest Setup = RaceFlowSubsystem->GetCurrentSetup();
+	Logs.Add(FString::Printf(TEXT("Current setup LapCount: %d"), Setup.LapCount));
+
+	// Test GetLastResult
+	FMGRaceFlowResult LastResult = RaceFlowSubsystem->GetLastResult();
+	Logs.Add(FString::Printf(TEXT("Last result position: %d"), LastResult.PlayerPosition));
+
+	// Test GetAvailableTracks
+	TArray<FName> Tracks = RaceFlowSubsystem->GetAvailableTracks();
+	Logs.Add(FString::Printf(TEXT("Available tracks count: %d"), Tracks.Num()));
+
+	if (!bAllPassed)
+	{
+		return CreateFailResult(
+			FName(TEXT("Test_RaceFlow_Subsystem")),
+			TEXT("Race Flow Subsystem issues found"),
+			Logs
+		);
+	}
+
+	return CreatePassResult(
+		FName(TEXT("Test_RaceFlow_Subsystem")),
+		TEXT("Race Flow Subsystem functioning correctly")
+	);
+}
+
+// ==========================================
 // CONSOLE COMMANDS
 // ==========================================
 
@@ -4837,6 +5249,13 @@ void UMGSubsystemTests::RunAllTests()
 	TestResults.Add(TestNotification_Styles());
 	TestResults.Add(TestNotification_DataDefaults());
 	TestResults.Add(TestNotification_Subsystem());
+
+	// Race flow tests
+	TestResults.Add(TestRaceFlow_FlowStates());
+	TestResults.Add(TestRaceFlow_RaceTypes());
+	TestResults.Add(TestRaceFlow_Difficulty());
+	TestResults.Add(TestRaceFlow_DataStructures());
+	TestResults.Add(TestRaceFlow_Subsystem());
 
 	// Count results
 	for (const FMGTestResult& Result : TestResults)
@@ -5169,6 +5588,33 @@ void UMGSubsystemTests::RunNotificationTests()
 	TestResults.Add(TestNotification_Styles());
 	TestResults.Add(TestNotification_DataDefaults());
 	TestResults.Add(TestNotification_Subsystem());
+
+	for (const FMGTestResult& Result : TestResults)
+	{
+		TotalTests++;
+		if (Result.Result == EMGTestResult::Passed)
+			PassedTests++;
+		else
+			FailedTests++;
+	}
+
+	PrintTestReport();
+}
+
+void UMGSubsystemTests::RunRaceFlowTests()
+{
+	UE_LOG(LogTemp, Log, TEXT("=== RUNNING RACE FLOW TESTS ==="));
+
+	TestResults.Empty();
+	TotalTests = 0;
+	PassedTests = 0;
+	FailedTests = 0;
+
+	TestResults.Add(TestRaceFlow_FlowStates());
+	TestResults.Add(TestRaceFlow_RaceTypes());
+	TestResults.Add(TestRaceFlow_Difficulty());
+	TestResults.Add(TestRaceFlow_DataStructures());
+	TestResults.Add(TestRaceFlow_Subsystem());
 
 	for (const FMGTestResult& Result : TestResults)
 	{

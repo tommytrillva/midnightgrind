@@ -8,8 +8,8 @@
  * PURPOSE:
  * This file contains the actual test implementations for all core game
  * subsystems. While MGTestFrameworkSubsystem provides the infrastructure
- * for running tests, THIS file contains the tests themselves - 65 individual
- * tests covering currency, weather, vehicles, AI, physics, menu systems, notifications, and more.
+ * for running tests, THIS file contains the tests themselves - 70 individual
+ * tests covering currency, weather, vehicles, AI, physics, menu systems, notifications, race flow, and more.
  *
  * KEY CONCEPTS FOR NEW DEVELOPERS:
  *
@@ -37,6 +37,7 @@
  *    - UI Data (5 tests): HUD and telemetry data
  *    - Menu (5 tests): Menu states, settings, navigation
  *    - Notification (5 tests): Notification queue, priority, types, styles
+ *    - Race Flow (5 tests): Race states, setup, results, race types
  *    - Integration (2 tests): Cross-system interactions
  *
  * 4. FORWARD DECLARATIONS:
@@ -100,10 +101,11 @@
  * - UI Data (5): HUD data, race status, telemetry, HUD modes
  * - Menu (5): Settings defaults, menu states, settings categories, subsystem
  * - Notification (5): Priority, types, styles, data defaults, subsystem
+ * - Race Flow (5): Flow states, race types, difficulty, setup/results, subsystem
  * - Integration (2): Cross-system verification
  *
  * Console Commands Quick Reference:
- * - MG.RunAllTests - Run all 65 tests
+ * - MG.RunAllTests - Run all 70 tests
  * - MG.RunCurrencyTests - Run 6 currency subsystem tests
  * - MG.RunWeatherTests - Run 6 weather subsystem tests
  * - MG.RunEconomyTests - Run 3 economy tests
@@ -116,6 +118,7 @@
  * - MG.RunUIDataTests - Run 5 UI data tests
  * - MG.RunMenuTests - Run 5 menu system tests
  * - MG.RunNotificationTests - Run 5 notification tests
+ * - MG.RunRaceFlowTests - Run 5 race flow tests
  * - MG.RunSmokeTests - Run quick smoke tests
  * - MG.PrintTestReport - Print last test report
  * =============================================================================
@@ -141,11 +144,13 @@ class UMGSaveManagerSubsystem; // Handles save/load operations
 class UMGSaveGame;             // The actual save data structure
 class UMGMenuSubsystem;        // Manages game menus and settings
 class UMGNotificationSubsystem; // Manages in-game notifications
+class UMGRaceFlowSubsystem;     // Orchestrates complete race lifecycle
+class UMGRaceModeSubsystem;     // Core race logic and scoring
 
 /**
  * Subsystem Unit Tests
  *
- * This class contains 65 automated tests for verifying that all core game
+ * This class contains 70 automated tests for verifying that all core game
  * subsystems work correctly. Tests can be run individually, by category,
  * or all at once.
  *
@@ -484,6 +489,30 @@ public:
 	FMGTestResult TestNotification_Subsystem();
 
 	// ==========================================
+	// RACE FLOW TESTS
+	// ==========================================
+
+	/** Test race flow state enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|RaceFlow")
+	FMGTestResult TestRaceFlow_FlowStates();
+
+	/** Test race type enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|RaceFlow")
+	FMGTestResult TestRaceFlow_RaceTypes();
+
+	/** Test race difficulty enumeration */
+	UFUNCTION(BlueprintCallable, Category = "Tests|RaceFlow")
+	FMGTestResult TestRaceFlow_Difficulty();
+
+	/** Test race setup and result structures */
+	UFUNCTION(BlueprintCallable, Category = "Tests|RaceFlow")
+	FMGTestResult TestRaceFlow_DataStructures();
+
+	/** Test race flow subsystem functionality */
+	UFUNCTION(BlueprintCallable, Category = "Tests|RaceFlow")
+	FMGTestResult TestRaceFlow_Subsystem();
+
+	// ==========================================
 	// CONSOLE COMMANDS
 	// ==========================================
 
@@ -538,6 +567,10 @@ public:
 	/** Run notification tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
 	void RunNotificationTests();
+
+	/** Run race flow tests via console */
+	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
+	void RunRaceFlowTests();
 
 	/** Run smoke tests via console */
 	UFUNCTION(Exec, BlueprintCallable, Category = "Tests|Commands")
