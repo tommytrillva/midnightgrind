@@ -119,6 +119,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Core/MGCoreEnums.h"
 #include "MGReportSubsystem.generated.h"
 
 // =============================================================================
@@ -208,21 +209,7 @@ enum class EMGPunishmentType : uint8
 	ShadowBan			///< Can play but only matched with other shadowbanned players
 };
 
-/**
- * Reasons why a player might be muted.
- *
- * Distinguishes between player-initiated mutes (I don't want to hear them)
- * and system-imposed mutes (they violated rules).
- */
-UENUM(BlueprintType)
-enum class EMGMuteReason : uint8
-{
-	None,			///< Not muted
-	Manual,			///< Player manually muted them (personal choice)
-	Reported,		///< Muted as result of report investigation
-	AutoDetected,	///< Automatically muted by detection system
-	ContentFilter	///< Muted because their messages trigger filters
-};
+// EMGMuteReason defined in Core/MGCoreEnums.h
 
 // =============================================================================
 // DATA STRUCTURES

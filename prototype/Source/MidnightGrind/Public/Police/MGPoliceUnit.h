@@ -418,27 +418,7 @@ protected:
 	UFUNCTION()
 	void OnCollisionHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-private:
-	/** Unique unit identifier */
-	UPROPERTY()
-	int32 UnitID = -1;
-
-	/** Current AI state */
-	UPROPERTY()
-	EMGPoliceState CurrentState = EMGPoliceState::Idle;
-
-	/** Reference to pursuit target */
-	UPROPERTY()
-	TWeakObjectPtr<APawn> PursuitTarget;
-
-	/** Last confirmed target position */
-	UPROPERTY()
-	FVector LastKnownTargetPosition = FVector::ZeroVector;
-
-	/** Assigned position for boxing maneuver */
-	UPROPERTY()
-	FVector BoxingTargetPosition = FVector::ZeroVector;
-
+protected:
 	/** Current unit health */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	float Health = 100.0f;
@@ -470,6 +450,27 @@ private:
 	/** Side to approach for PIT (-1 = left, 1 = right) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	float PITSide = 1.0f;
+
+private:
+	/** Unique unit identifier */
+	UPROPERTY()
+	int32 UnitID = -1;
+
+	/** Current AI state */
+	UPROPERTY()
+	EMGPoliceState CurrentState = EMGPoliceState::Idle;
+
+	/** Reference to pursuit target */
+	UPROPERTY()
+	TWeakObjectPtr<APawn> PursuitTarget;
+
+	/** Last confirmed target position */
+	UPROPERTY()
+	FVector LastKnownTargetPosition = FVector::ZeroVector;
+
+	/** Assigned position for boxing maneuver */
+	UPROPERTY()
+	FVector BoxingTargetPosition = FVector::ZeroVector;
 
 	/**
 	 * @brief Setup component hierarchy.

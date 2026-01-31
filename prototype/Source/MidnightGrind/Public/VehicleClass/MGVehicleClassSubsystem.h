@@ -250,6 +250,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Core/MGCoreEnums.h"
 #include "MGVehicleClassSubsystem.generated.h"
 
 /**
@@ -333,45 +334,7 @@ enum class EMGVehicleBodyType : uint8
 	Exotic		UMETA(DisplayName = "Exotic")
 };
 
-/**
- * Vehicle drivetrain type - Which wheels receive power
- *
- * Drivetrain fundamentally affects handling characteristics:
- * - FWD: Tends to understeer, stable but less responsive
- * - RWD: Can oversteer, better for drifting, more challenging
- * - AWD: Balanced, excellent traction, stable at high speeds
- *
- * Some events may restrict drivetrain (e.g., "RWD Drift Challenge")
- */
-UENUM(BlueprintType)
-enum class EMGDrivetrainType : uint8
-{
-	/** Front-Wheel Drive: Engine in front, power to front wheels. Understeer tendency. (Honda Civic) */
-	FWD			UMETA(DisplayName = "Front-Wheel Drive"),
-	/** Rear-Wheel Drive: Engine in front, power to rear wheels. Classic sports car layout. (BMW M3) */
-	RWD			UMETA(DisplayName = "Rear-Wheel Drive"),
-	/** All-Wheel Drive: Power to all wheels. Best traction. (Nissan GT-R, Audi RS) */
-	AWD			UMETA(DisplayName = "All-Wheel Drive"),
-	/** Mid-Engine RWD: Engine behind driver, rear drive. Balanced weight. (Ferrari, Lamborghini) */
-	MR			UMETA(DisplayName = "Mid-Engine RWD"),
-	/** Rear-Engine RWD: Engine at rear, rear drive. Unique handling. (Porsche 911) */
-	RR			UMETA(DisplayName = "Rear-Engine RWD"),
-	/** Full-Time 4WD: Permanent 4-wheel drive with center differential. (Rally vehicles) */
-	F4WD		UMETA(DisplayName = "Full-Time 4WD")
-};
-
-/**
- * Vehicle era/generation
- */
-UENUM(BlueprintType)
-enum class EMGVehicleEra : uint8
-{
-	Classic		UMETA(DisplayName = "Classic (Pre-1980)"),
-	Retro		UMETA(DisplayName = "Retro (1980-1999)"),
-	Modern		UMETA(DisplayName = "Modern (2000-2015)"),
-	Current		UMETA(DisplayName = "Current (2015+)"),
-	Future		UMETA(DisplayName = "Future Concept")
-};
+// EMGDrivetrainType and EMGVehicleEra defined in Core/MGCoreEnums.h
 
 /**
  * Performance stat category

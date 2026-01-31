@@ -49,6 +49,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+#include "Core/MGCoreEnums.h"
 #include "MGWeatherSubsystem.generated.h"
 
 class UMaterialParameterCollection;
@@ -75,69 +76,7 @@ class UMGWeatherRacingSubsystem;
  * Some weather types are time-specific (NightClear, NightRain) and are
  * typically set automatically based on time of day.
  */
-UENUM(BlueprintType)
-enum class EMGWeatherType : uint8
-{
-	/** Clear skies - Optimal racing conditions with full visibility */
-	Clear,
-	/** Partly cloudy - Scattered clouds, no precipitation */
-	PartlyCloudy,
-	/** Overcast - Full cloud cover, reduced light, no precipitation */
-	Overcast,
-	/** Light rain - Mild precipitation, slightly reduced grip */
-	LightRain,
-	/** Heavy rain - Significant precipitation, major grip reduction */
-	HeavyRain,
-	/** Thunderstorm - Heavy rain with lightning, dangerous conditions */
-	Thunderstorm,
-	/** Fog - Reduced visibility, normal road surface */
-	Fog,
-	/** Heavy fog - Severely reduced visibility (<100m) */
-	HeavyFog,
-	/** Snow - Light snowfall, icy road conditions possible */
-	Snow,
-	/** Blizzard - Heavy snow, extremely reduced visibility and grip */
-	Blizzard,
-	/** Dust storm - Sand/dust particles, very low visibility */
-	DustStorm,
-	/** Night clear - Clear skies at night, street lights active */
-	NightClear,
-	/** Night rain - Rain during nighttime hours */
-	NightRain
-};
-
-// ============================================================================
-// TIME OF DAY ENUMERATION
-// ============================================================================
-
-/**
- * @brief Time periods that affect lighting, traffic, and game events
- *
- * Each time period has associated lighting presets and can trigger
- * specific gameplay events. The time system affects:
- * - Sun position and lighting intensity
- * - Street light and neon sign activation
- * - Traffic and pedestrian density
- * - Available race types
- */
-UENUM(BlueprintType)
-enum class EMGTimeOfDay : uint8
-{
-	/** Dawn (5-7 AM) - Sunrise, golden hour lighting */
-	Dawn,
-	/** Morning (7-10 AM) - Bright daylight, moderate traffic */
-	Morning,
-	/** Midday (10 AM - 2 PM) - Peak sunlight, harsh shadows */
-	Midday,
-	/** Afternoon (2-5 PM) - Warm lighting, increasing traffic */
-	Afternoon,
-	/** Sunset (5-7 PM) - Golden hour, dramatic sky colors */
-	Sunset,
-	/** Evening (7-10 PM) - Twilight transitioning to night */
-	Evening,
-	/** Night (10 PM - 5 AM) - Full darkness, street racing prime time */
-	Night
-};
+// EMGWeatherType and EMGTimeOfDay defined in Core/MGCoreEnums.h
 
 // ============================================================================
 // ROAD CONDITION ENUMERATION

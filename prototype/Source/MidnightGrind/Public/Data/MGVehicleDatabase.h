@@ -30,6 +30,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Core/MGCoreEnums.h"
 #include "MGVehicleDatabase.generated.h"
 
 // ============================================================================
@@ -165,18 +166,7 @@ enum class EMGTransmissionType : uint8
 	Sequential UMETA(DisplayName = "Sequential")
 };
 
-/**
- * Vehicle era (for Y2K aesthetic)
- */
-UENUM(BlueprintType)
-enum class EMGVehicleEra : uint8
-{
-	Classic UMETA(DisplayName = "Classic (Pre-1980)"),
-	Retro UMETA(DisplayName = "Retro (1980-1989)"),
-	GoldenAge UMETA(DisplayName = "Golden Age (1990-1999)"),
-	Y2K UMETA(DisplayName = "Y2K Era (2000-2009)"),
-	Modern UMETA(DisplayName = "Modern (2010+)")
-};
+// EMGVehicleEra defined in Core/MGCoreEnums.h
 
 /**
  * Vehicle rarity

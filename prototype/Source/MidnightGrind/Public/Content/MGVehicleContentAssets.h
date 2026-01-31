@@ -92,6 +92,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Core/MGCoreEnums.h"
 #include "MGVehicleContentAssets.generated.h"
 
 class USkeletalMesh;
@@ -129,19 +130,7 @@ enum class EMGVehicleClass : uint8
 	S_Plus
 };
 
-/**
- * Vehicle drivetrain type
- *
- * Determines which wheels receive engine power and affects
- * handling characteristics, especially during acceleration and cornering.
- */
-UENUM(BlueprintType)
-enum class EMGDrivetrainType : uint8
-{
-	FWD,  ///< Front-wheel drive - power to front wheels, tends to understeer
-	RWD,  ///< Rear-wheel drive - power to rear wheels, can oversteer/drift
-	AWD   ///< All-wheel drive - power to all wheels, best traction
-};
+// EMGDrivetrainType defined in Core/MGCoreEnums.h
 
 /**
  * Vehicle body style

@@ -1,10 +1,8 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.2",
+	"EngineAssociation": "5.7",
 	"Category": "Games",
-	"Description": "MIDNIGHT GRIND - Arcade street racing with PS1/PS2 era aesthetics and deep car customization.",
-	"DisableEnginePluginsByDefault": false,
-	"IsEnterpriseProject": false,
+	"Description": "Midnight Grind - Illegal Street Racing",
 	"Modules": [
 		{
 			"Name": "MidnightGrind",
@@ -12,28 +10,30 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"CoreUObject",
 				"ChaosVehicles",
-				"PhysicsCore"
+				"AIModule"
 			]
 		},
 		{
 			"Name": "MidnightGrindEditor",
 			"Type": "Editor",
-			"LoadingPhase": "PostEngineInit"
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [
 		{
+			"Name": "RawInput",
+			"Enabled": true
+		},
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		},
+		{
 			"Name": "ChaosVehiclesPlugin",
-			"Enabled": true
-		},
-		{
-			"Name": "ChaosCloth",
-			"Enabled": true
-		},
-		{
-			"Name": "ChaosSolverPlugin",
 			"Enabled": true
 		},
 		{
@@ -49,6 +49,10 @@
 			"Enabled": true
 		},
 		{
+			"Name": "Metasound",
+			"Enabled": true
+		},
+		{
 			"Name": "OnlineSubsystem",
 			"Enabled": true
 		},
@@ -57,171 +61,8 @@
 			"Enabled": true
 		},
 		{
-			"Name": "OnlineSubsystemSteam",
-			"Enabled": false
-		},
-		{
-			"Name": "OnlineSubsystemNull",
-			"Enabled": true
-		},
-		{
-			"Name": "Niagara",
-			"Enabled": true
-		},
-		{
-			"Name": "MetaSounds",
-			"Enabled": true
-		},
-		{
-			"Name": "Metasound",
-			"Enabled": true
-		},
-		{
-			"Name": "AudioModulation",
-			"Enabled": true
-		},
-		{
-			"Name": "Soundscape",
-			"Enabled": true
-		},
-		{
-			"Name": "ResonanceAudio",
-			"Enabled": true
-		},
-		{
-			"Name": "ModelingToolsEditorMode",
-			"Enabled": true
-		},
-		{
-			"Name": "PCG",
-			"Enabled": true
-		},
-		{
-			"Name": "GeometryScripting",
-			"Enabled": true
-		},
-		{
-			"Name": "JsonBlueprintUtilities",
-			"Enabled": true
-		},
-		{
-			"Name": "DataRegistry",
-			"Enabled": true
-		},
-		{
-			"Name": "GameFeatures",
-			"Enabled": true
-		},
-		{
-			"Name": "ModularGameplay",
-			"Enabled": true
-		},
-		{
-			"Name": "ControlFlows",
-			"Enabled": true
-		},
-		{
-			"Name": "StateTree",
-			"Enabled": true
-		},
-		{
-			"Name": "MotionWarping",
-			"Enabled": true
-		},
-		{
-			"Name": "AnimationWarping",
-			"Enabled": true
-		},
-		{
-			"Name": "ControlRig",
-			"Enabled": true
-		},
-		{
-			"Name": "FullBodyIK",
-			"Enabled": true
-		},
-		{
-			"Name": "IKRig",
-			"Enabled": true
-		},
-		{
-			"Name": "Volumetrics",
-			"Enabled": true
-		},
-		{
-			"Name": "HDRIBackdrop",
-			"Enabled": true
-		},
-		{
-			"Name": "SunPosition",
-			"Enabled": true
-		},
-		{
-			"Name": "Water",
-			"Enabled": true
-		},
-		{
-			"Name": "Landmass",
-			"Enabled": true
-		},
-		{
-			"Name": "GPULightmass",
-			"Enabled": true
-		},
-		{
-			"Name": "OpenImageDenoise",
-			"Enabled": true
-		},
-		{
-			"Name": "LiveLink",
-			"Enabled": true
-		},
-		{
-			"Name": "LiveLinkControlRig",
-			"Enabled": true
-		},
-		{
-			"Name": "Takes",
-			"Enabled": true
-		},
-		{
-			"Name": "VirtualCamera",
-			"Enabled": true
-		},
-		{
-			"Name": "RemoteSession",
-			"Enabled": true
-		},
-		{
-			"Name": "Chooser",
-			"Enabled": true
-		},
-		{
-			"Name": "StructUtils",
-			"Enabled": true
-		},
-		{
-			"Name": "BlueprintStats",
-			"Enabled": true
-		},
-		{
-			"Name": "EditorScriptingUtilities",
-			"Enabled": true
-		},
-		{
-			"Name": "PythonScriptPlugin",
-			"Enabled": true
-		},
-		{
-			"Name": "SequencerScripting",
-			"Enabled": true
-		},
-		{
-			"Name": "MovieRenderPipeline",
+			"Name": "UnrealMCP",
 			"Enabled": true
 		}
-	],
-	"TargetPlatforms": [
-		"Windows"
 	]
 }

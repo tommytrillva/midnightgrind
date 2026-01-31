@@ -142,6 +142,7 @@
 #include "GameFramework/Actor.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
+#include "Core/MGCoreEnums.h"
 #include "MGEnvironmentVFXManager.generated.h"
 
 class UMGVFXSubsystem;
@@ -150,36 +151,7 @@ class UNiagaraComponent;
 class UPostProcessComponent;
 class UExponentialHeightFogComponent;
 
-/**
- * Weather type
- */
-UENUM(BlueprintType)
-enum class EMGWeatherType : uint8
-{
-	Clear,
-	Overcast,
-	LightRain,
-	HeavyRain,
-	Storm,
-	Fog,
-	Heat
-};
-
-/**
- * Time of day period
- */
-UENUM(BlueprintType)
-enum class EMGTimeOfDay : uint8
-{
-	Dawn,
-	Morning,
-	Noon,
-	Afternoon,
-	Sunset,
-	Dusk,
-	Night,
-	Midnight
-};
+// EMGWeatherType and EMGTimeOfDay defined in Core/MGCoreEnums.h
 
 /**
  * Environment zone type (affects ambient particles)

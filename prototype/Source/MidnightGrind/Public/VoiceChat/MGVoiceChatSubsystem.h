@@ -108,6 +108,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Core/MGCoreEnums.h"
 #include "MGVoiceChatSubsystem.generated.h"
 
 // Forward declarations
@@ -152,19 +153,7 @@ enum class EMGVoiceQuality : uint8
     Ultra           UMETA(DisplayName = "Ultra")
 };
 
-/**
- * EMGMuteReason - Reasons for muting a player
- */
-UENUM(BlueprintType)
-enum class EMGMuteReason : uint8
-{
-    Manual          UMETA(DisplayName = "Manual"),
-    Spam            UMETA(DisplayName = "Spam"),
-    Toxic           UMETA(DisplayName = "Toxic"),
-    Background      UMETA(DisplayName = "Background Noise"),
-    AutoMuted       UMETA(DisplayName = "Auto Muted"),
-    Reported        UMETA(DisplayName = "Reported")
-};
+// EMGMuteReason defined in Core/MGCoreEnums.h
 
 /**
  * EMGSpeakerState - Visual state of a speaker

@@ -184,6 +184,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Core/MGCoreEnums.h"
 #include "MGPostProcessSubsystem.generated.h"
 
 // Visual style presets
@@ -250,20 +251,7 @@ enum class EMGPixelationMode : uint8
     Custom                  UMETA(DisplayName = "Custom")
 };
 
-// Weather/time effects
-UENUM(BlueprintType)
-enum class EMGTimeOfDay : uint8
-{
-    Dawn                    UMETA(DisplayName = "Dawn"),
-    Morning                 UMETA(DisplayName = "Morning"),
-    Noon                    UMETA(DisplayName = "Noon"),
-    Afternoon               UMETA(DisplayName = "Afternoon"),
-    Sunset                  UMETA(DisplayName = "Sunset"),
-    Dusk                    UMETA(DisplayName = "Dusk"),
-    Night                   UMETA(DisplayName = "Night"),
-    Midnight                UMETA(DisplayName = "Midnight"),
-    Custom                  UMETA(DisplayName = "Custom")
-};
+// EMGTimeOfDay defined in Core/MGCoreEnums.h
 
 // Bloom settings
 USTRUCT(BlueprintType)
