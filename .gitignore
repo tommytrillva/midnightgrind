@@ -1,0 +1,65 @@
+# Unreal Engine
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+*.opensdf
+*.sdf
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+
+# Visual Studio
+.vs/
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+*.sbr
+*.obj
+*.pdb
+*.idb
+*.res
+*.suo
+*.user
+*.VC.db
+*.VC.opendb
+
+# Rider
+.idea/
+*.sln.iml
+
+# Build artifacts
+Build/
+Dist/
+
+# Don't ignore .uproject or build.cs files
+!*.uproject
+!*.Build.cs
+!*.Target.cs
+
+# Keep docs and assets
+!Documentation/
+!Docs/
+!Assets/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Backups
+_backup*/
+
+# Results and profiles
+*_results.json
+*_profile_results.json
