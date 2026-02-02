@@ -3,7 +3,7 @@
 #include "Vehicle/MGVehiclePawn.h"
 #include "Vehicle/MGVehicleMovementComponent.h"
 #include "Vehicle/MGVehicleDamageSystem.h"
-#include "VFX/MGVehicleVFXComponent.h"
+#include "VFX/MG_VHCL_VFXComponent.h"
 #include "VFX/MGCameraVFXComponent.h"
 #include "Audio/MGEngineAudioComponent.h"
 #include "Audio/MGVehicleSFXComponent.h"

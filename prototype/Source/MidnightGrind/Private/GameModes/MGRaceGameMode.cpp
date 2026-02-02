@@ -7,7 +7,7 @@
 #include "UI/MGRaceHUDSubsystem.h"
 #include "Track/MGCheckpoint.h"
 #include "GameModes/MGRaceFlowManager.h"
-#include "Fuel/MGFuelSubsystem.h"
+#include "Fuel/MG_FUEL_Subsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "EngineUtils.h"

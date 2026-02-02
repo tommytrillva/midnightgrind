@@ -10,7 +10,7 @@
 #include "NearMiss/MGNearMissSubsystem.h"
 #include "Drift/MGDriftSubsystem.h"
 #include "Airtime/MGAirtimeSubsystem.h"
-#include "Fuel/MGFuelSubsystem.h"
+#include "Fuel/MG_FUEL_Subsystem.h"
 #include "Tire/MGTireSubsystem.h"
 #include "Collision/MGCollisionSubsystem.h"
 #include "PitStop/MGPitStopSubsystem.h"

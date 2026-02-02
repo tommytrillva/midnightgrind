@@ -139,7 +139,7 @@
 #include "Engine/DataAsset.h"
 #include "NiagaraSystem.h"
 #include "VFX/MGVFXSubsystem.h"
-#include "VFX/MGVehicleVFXComponent.h"
+#include "VFX/MG_VHCL_VFXComponent.h"
 #include "VFX/MGEnvironmentVFXManager.h"
 #include "VFX/MGCameraVFXComponent.h"
 #include "MGVFXDataAssets.generated.h"

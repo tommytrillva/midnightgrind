@@ -53,7 +53,7 @@
  *
  * Integration Points:
  * - MGPitStopSubsystem: Tire changes during pit stops
- * - MGFuelSubsystem: Tire wear affects fuel consumption slightly
+ * - MG_FUEL_Subsystem: Tire wear affects fuel consumption slightly
  * - Vehicle Physics: Grip values fed to wheel components for handling
  * - AI System: AI uses tire data for pit stop strategy decisions
  * - HUD/UI: Displays tire temperatures, wear levels, and compound info

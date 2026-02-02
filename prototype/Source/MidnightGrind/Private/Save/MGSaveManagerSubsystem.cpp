@@ -4,7 +4,7 @@
 #include "Economy/MGEconomySubsystem.h"
 #include "Garage/MGGarageSubsystem.h"
 #include "License/MGLicenseSubsystem.h"
-#include "VehicleClass/MGVehicleClassSubsystem.h"
+#include "VehicleClass/MG_VHCL_ClassSubsystem.h"
 #include "Stunt/MGStuntSubsystem.h"
 #include "Shortcut/MGShortcutSubsystem.h"
 #include "NearMiss/MGNearMissSubsystem.h"

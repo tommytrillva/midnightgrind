@@ -7,7 +7,7 @@
 
 #include "Vehicle/MGFuelConsumptionComponent.h"
 #include "Vehicle/MGVehicleMovementComponent.h"
-#include "Fuel/MGFuelSubsystem.h"
+#include "Fuel/MG_FUEL_Subsystem.h"
 #include "Economy/MGEconomySubsystem.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
